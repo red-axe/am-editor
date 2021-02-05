@@ -1,0 +1,5 @@
+export const JSONML = {
+  TAG_NAME_INDEX: 0,
+  ATTRIBUTE_INDEX: 1,
+  ELEMENT_LIST_OFFSET: 2,
+};

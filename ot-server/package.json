@@ -1,0 +1,27 @@
+{
+  "name": "am-ot-server",
+  "version": "1.0.0",
+  "description": "AoMao编辑器协作服务",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "dependencies": {
+    "@teamwork/websocket-json-stream": "^2.0.0",
+    "sharedb": "^1.6.0",
+    "umi": "^3.3.7",
+    "url": "^0.11.0",
+    "uuid": "^8.3.2",
+    "ws": "^7.4.2",
+    "express": "^4.17.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "me@aomao.com",
+  "license": "MIT"
+}

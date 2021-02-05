@@ -1,0 +1,51 @@
+.card-maximize-header {
+    position: fixed !important;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1032;
+    height: 56px;
+    background: #fff;
+    border-bottom: 1px solid #e8e8e8;
+    width: 100%;
+}
+
+.card-maximize-header .header-crumb {
+    float: left;
+    line-height: 32px;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+}
+
+.card-maximize-header .header-crumb a
+{
+    color: #595959;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.card-maximize-header .header-crumb .split {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0 15px;
+    font-size: 20px;
+    padding-right: 8px;
+    font-weight: 200;
+    margin: 0 8px;
+}
+
+.card-maximize-header .header-crumb .split + a {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.card-maximize-header .header-crumb .split + a:hover {
+	color: #8C8C8C;
+}
+
+.data-card-block-max .card-max-edit {
+    top: 96px;
+}

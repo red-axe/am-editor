@@ -1,0 +1,21 @@
+.am-engine .am-list-node [data-card-key="checkbox"],.am-engine-view .am-list-node [data-card-key="checkbox"] {
+	margin-left: 0;
+	margin-right: 5px;
+}
+
+.am-engine .data-list-task,.am-engine-view .data-list-task {
+	position: relative;
+	list-style: none;
+	text-indent: 0;
+}
+
+.am-engine .data-list-task .data-list-node,.am-engine-view .data-list-task .data-list-node {
+    display: flex;
+    align-items: center;
+}
+
+.am-engine .data-list-task [data-card-key="checkbox"],.am-engine-view .data-list-task [data-card-key="checkbox"] {
+	padding-right: 6px;
+	line-height: 16px;
+	margin-left: -20px;
+}
