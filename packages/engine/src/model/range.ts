@@ -672,7 +672,12 @@ class Range implements RangeInterface {
     block.find('br').each(br => {
       const domBr = $(br);
       if (
-        ((!domBr.prev() || domBr.prev()?.attr(CARD_KEY) === 'checkbox') &&
+        ((!domBr.prev() ||
+          (domBr.parent()?.hasClass('data-list-node') &&
+            domBr
+              .parent()
+              ?.first()
+              ?.equal(domBr.prev()!))) &&
           domBr.next() &&
           domBr.next()!.name !== 'br' &&
           ![CURSOR, ANCHOR, FOCUS].includes(
@@ -683,7 +688,13 @@ class Range implements RangeInterface {
         if (
           isLeft &&
           domBr.prev() &&
-          'checkbox' !== domBr.prev()!.attr(CARD_KEY)
+          !(
+            domBr.parent()?.hasClass('data-list-node') &&
+            domBr
+              .parent()
+              ?.first()
+              ?.equal(domBr.prev()!)
+          )
         )
           return;
         domBr.remove();
@@ -693,7 +704,8 @@ class Range implements RangeInterface {
     if (
       !block.first() ||
       (block.children().length === 1 &&
-        block.first()?.attr(CARD_KEY) === 'checkbox')
+        block.parent()?.hasClass('data-list-node') &&
+        block.first()?.isCard())
     ) {
       block.append('<br />');
       return this;
@@ -701,7 +713,8 @@ class Range implements RangeInterface {
 
     if (
       block.children().length === 2 &&
-      block.first()?.attr(CARD_KEY) === 'checkbox' &&
+      block.parent()?.hasClass('data-list-node') &&
+      block.first()?.isCard() &&
       ['cursor', 'anchor', 'focus'].includes(
         block.last()?.attr(DATA_ELEMENT) || '',
       )

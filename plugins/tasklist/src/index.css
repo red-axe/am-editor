@@ -9,13 +9,13 @@
 	text-indent: 0;
 }
 
-.am-engine .data-list-task .data-list-node,.am-engine-view .data-list-task .data-list-node {
-    display: flex;
-    align-items: center;
-}
-
 .am-engine .data-list-task [data-card-key="checkbox"],.am-engine-view .data-list-task [data-card-key="checkbox"] {
 	padding-right: 6px;
-	line-height: 16px;
-	margin-left: -20px;
+    vertical-align: middle;
+    line-height: 16px;
+    position: absolute;
+    margin-left: -20px;
+    display: flex;
+    align-items: center;
+    height: 100%;
 }

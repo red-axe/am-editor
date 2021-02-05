@@ -262,8 +262,14 @@ export default (engine: EngineInterface, e: Event) => {
 
   if (
     prevNode &&
-    prevNode.attr(CARD_KEY) &&
-    prevNode.attr(CARD_KEY) !== 'checkbox'
+    prevNode.isCard() &&
+    !(
+      prevNode.parent()?.hasClass('data-list-node') &&
+      prevNode
+        .parent()
+        ?.first()
+        ?.equal(prevNode)
+    )
   ) {
     e.preventDefault();
     change.removeCard(prevNode);
@@ -357,7 +363,7 @@ export default (engine: EngineInterface, e: Event) => {
   }
 
   if (block.name === 'li') {
-    if (block.find('[data-card-key=checkbox]').length > 0) {
+    if (block.hasClass('data-list-node') && block.first()?.isCard()) {
       return;
     }
 

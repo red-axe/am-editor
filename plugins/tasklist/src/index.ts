@@ -17,7 +17,6 @@ export default class extends List<Options> {
   schema(): any {
     const rules = super.schema();
     rules[0].ul?.class.push('data-list-task');
-    console.log(rules);
     return rules;
   }
 

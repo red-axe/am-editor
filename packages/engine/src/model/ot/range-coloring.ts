@@ -156,9 +156,14 @@ class RangeColoring implements RangeColoringInterface {
   }
 
   getNodeRect(node: NodeInterface, rect: DOMRect) {
+    //自定义列表项的第一个card跳过
     if (
       node.isCard() &&
-      'checkbox' === node.attr('data-card-key') &&
+      node.parent()?.hasClass('data-list-node') &&
+      node
+        .parent()
+        ?.first()
+        ?.equal(node) &&
       node.next()
     ) {
       node = node.next()!;

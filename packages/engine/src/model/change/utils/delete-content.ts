@@ -69,7 +69,8 @@ export default (range: RangeInterface, isDeepMerge: boolean = true) => {
       startNode[0].childNodes.length === 1 &&
       firstChild.nodeType === getWindow().Node.ELEMENT_NODE &&
       startNode[0].nodeName === 'LI' &&
-      (firstChild as Element).getAttribute(CARD_KEY) === 'checkbox'
+      startNode.hasClass('data-list-node') &&
+      startNode.first()?.isCard()
     )
       isEmptyNode = true;
   }

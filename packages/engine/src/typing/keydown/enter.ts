@@ -187,7 +187,7 @@ export default (engine: EngineInterface, e: KeyboardEvent) => {
   }
   // 列表
   if (block.name === 'li') {
-    if (block.find('[data-card-key=checkbox]').length > 0) {
+    if (block.hasClass('data-list-node') && block.first()?.isCard()) {
       return;
     }
     e.preventDefault();
