@@ -541,7 +541,11 @@
 	word-wrap: break-word;
 	outline-style: none;
 	white-space: pre-wrap;
-	-webkit-user-select: auto;
+    -webkit-user-select: auto;
+    font-size: 14px;
+    line-height: 1.74;
+    color: #262626;
+    letter-spacing: .05em;
     /* pt / px 换算表：https://websemantics.uk/articles/font-size-conversion/ */
 }
 

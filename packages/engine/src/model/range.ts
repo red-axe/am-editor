@@ -704,7 +704,7 @@ class Range implements RangeInterface {
     if (
       !block.first() ||
       (block.children().length === 1 &&
-        block.parent()?.hasClass('data-list-node') &&
+        block.hasClass('data-list-node') &&
         block.first()?.isCard())
     ) {
       block.append('<br />');
@@ -713,7 +713,7 @@ class Range implements RangeInterface {
 
     if (
       block.children().length === 2 &&
-      block.parent()?.hasClass('data-list-node') &&
+      block.hasClass('data-list-node') &&
       block.first()?.isCard() &&
       ['cursor', 'anchor', 'focus'].includes(
         block.last()?.attr(DATA_ELEMENT) || '',

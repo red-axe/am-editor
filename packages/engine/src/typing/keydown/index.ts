@@ -11,34 +11,16 @@ import { EngineInterface } from '../../types/engine';
 import _delete from './delete';
 import { isSafari } from '../../utils';
 import { CardType } from '../../types/card';
+import { pluginKeydownTrigger } from '../utils';
 
 export default (engine: EngineInterface, e: KeyboardEvent) => {
-  const pluginTrigger = (
-    type:
-      | 'enter'
-      | 'backspace'
-      | 'space'
-      | 'tab'
-      | 'at'
-      | 'slash'
-      | 'selectall',
-  ) => {
-    return Object.keys(engine.plugin.components).every(name => {
-      const plugin = engine.plugin.components[name];
-      if (plugin.onCustomizeKeydown) {
-        const reuslt = plugin.onCustomizeKeydown(type, e);
-        if (reuslt === false) {
-          return false;
-        }
-      }
-      return true;
-    });
-  };
-
   if (engine.readonly) {
     if (isHotkey('mod+a', e)) e.preventDefault();
   } else if (!engine.card.find($(e.target || []))) {
-    if (isHotkey('enter', e) && pluginTrigger('enter') !== false) {
+    if (
+      isHotkey('enter', e) &&
+      pluginKeydownTrigger(engine, 'enter', e) !== false
+    ) {
       enter(engine, e);
       if (engine.scrollNode)
         engine.change
@@ -56,9 +38,11 @@ export default (engine: EngineInterface, e: KeyboardEvent) => {
     }
 
     if (isHotkey('backspace', e)) {
-      if (pluginTrigger('backspace') !== false) backspace(engine, e);
+      if (pluginKeydownTrigger(engine, 'backspace', e) !== false)
+        backspace(engine, e);
     } else if (isHotkey('delete', e)) {
-      if (pluginTrigger('backspace') !== false) _delete(engine, e);
+      if (pluginKeydownTrigger(engine, 'backspace', e) !== false)
+        _delete(engine, e);
     } else if (isHotkey('mod+backspace', e)) {
       if (isSafari) {
         const range = engine.change.getRange();
@@ -68,7 +52,7 @@ export default (engine: EngineInterface, e: KeyboardEvent) => {
         }
       }
     } else if (isHotkey('tab', e)) {
-      if (pluginTrigger('tab') !== false) tab(engine, e);
+      if (pluginKeydownTrigger(engine, 'tab', e) !== false) tab(engine, e);
     } else if (isHotkey('shift+tab', e)) {
       shiftTab(engine, e);
     } else {
@@ -83,7 +67,7 @@ export default (engine: EngineInterface, e: KeyboardEvent) => {
       )
         return;
       if (e.key === ' ') {
-        pluginTrigger('space');
+        pluginKeydownTrigger(engine, 'space', e);
         return;
       }
       // 在 Windows 下使用中文输入法， keyCode 为 229，需要通过 code 判断
@@ -91,8 +75,7 @@ export default (engine: EngineInterface, e: KeyboardEvent) => {
         e.key === '@' ||
         (e.shiftKey && e.keyCode === 229 && e.code === 'Digit2')
       ) {
-        engine.event.trigger('keydown:at', e);
-        pluginTrigger('at');
+        pluginKeydownTrigger(engine, 'at', e);
         return;
       }
       // 搜狗输入法在中文输入状态下，输入“/”变成“、”，所以需要加额外的 keyCode 判断
@@ -102,12 +85,12 @@ export default (engine: EngineInterface, e: KeyboardEvent) => {
         isHotkey('/', e) ||
         (e.keyCode === 229 && e.code === 'Slash')
       ) {
-        pluginTrigger('slash');
+        pluginKeydownTrigger(engine, 'slash', e);
         return;
       }
 
       if (isHotkey('mod+a', e)) {
-        pluginTrigger('selectall');
+        pluginKeydownTrigger(engine, 'selectall', e);
         return;
       }
     }

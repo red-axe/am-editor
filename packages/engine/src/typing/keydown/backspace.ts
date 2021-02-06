@@ -11,7 +11,7 @@ import { NodeInterface } from '../../types/node';
 import { getWindow, mergeNode, unwrapNode } from '../../utils';
 import { ChangeInterface } from '../../types/change';
 import { deleteContent } from '../../model/change/utils';
-import engine from 'docs/demo/engine';
+import { pluginKeydownTrigger } from '../utils';
 // 删除节点，删除后如果是空段落，自动添加 BR
 const removeNode = (
   change: ChangeInterface,
@@ -220,7 +220,7 @@ export const backspaceCard = (
   return true;
 };
 // 后退键
-export default (engine: EngineInterface, e: Event) => {
+export default (engine: EngineInterface, e: KeyboardEvent) => {
   const { change } = engine;
   const range = change.getRange();
   // 在Card里
@@ -230,7 +230,8 @@ export default (engine: EngineInterface, e: Event) => {
     if (backspaceCard(engine, range, card, e) === false) {
       return false;
     }
-    if (engine.event.trigger('keydown:backspace', e) === false) return;
+
+    if (pluginKeydownTrigger(engine, 'backspace', e) === false) return;
   }
   // 没有可编辑的文本
   if (change.isEmpty()) {
