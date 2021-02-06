@@ -9,6 +9,8 @@ import Undo from '@aomao/plugin-undo';
 import Tasklist, { Checkbox } from '@aomao/plugin-tasklist';
 import Orderedlist from '@aomao/plugin-orderedlist';
 import Unorderedlist from '@aomao/plugin-unorderedlist';
+import Indent from '@aomao/plugin-indent';
+import Outdent from '@aomao/plugin-outdent';
 import Content from './content';
 import OTClient from './ot-client';
 
@@ -23,38 +25,40 @@ Engine.plugin.add('hr', Hr);
 Engine.plugin.add('tasklist', Tasklist);
 Engine.plugin.add('orderedlist', Orderedlist);
 Engine.plugin.add('unorderedlist', Unorderedlist);
+Engine.plugin.add('indent', Indent);
+Engine.plugin.add('outdent', Outdent);
 
 const EngineDemo = () => {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const engineRef = useRef<EngineInterface>();
-  const [content, setContent] = useState<string>(
-    `<p data-id="daab65504017af77a36594f98ab4875d">Hello<strong>AoMao</strong></p><card type="block" name="hr" value="data:%7B%22id%22%3A%22eIxTM%22%7D"></card>`,
-  );
+	const ref = useRef<HTMLDivElement | null>(null);
+	const engineRef = useRef<EngineInterface>();
+	const [content, setContent] = useState<string>(
+		`<p data-id="daab65504017af77a36594f98ab4875d">Hello<strong>AoMao</strong></p><card type="block" name="hr" value="data:%7B%22id%22%3A%22eIxTM%22%7D"></card>`,
+	);
 
-  useEffect(() => {
-    if (!ref.current) return;
-    const engine = new Engine(ref.current);
-    engine.ot.initLockMode();
-    engine.setValue(content);
-    engine.on('change', value => {
-      setContent(value);
-      console.log(`value:${value}，html:${engine.getHtml()}`);
-    });
-    engineRef.current = engine;
+	useEffect(() => {
+		if (!ref.current) return;
+		const engine = new Engine(ref.current);
+		engine.ot.initLockMode();
+		engine.setValue(content);
+		engine.on('change', value => {
+			setContent(value);
+			console.log(`value:${value}，html:${engine.getHtml()}`);
+		});
+		engineRef.current = engine;
 
-    const otClient = new OTClient(engine);
-    otClient.connect('ws://127.0.0.1:8080', 'demo');
-  }, []);
+		const otClient = new OTClient(engine);
+		otClient.connect('ws://127.0.0.1:8080', 'demo');
+	}, []);
 
-  return (
-    <div>
-      <div style={{ position: 'relative' }}>
-        <div ref={ref} />
-      </div>
-      <h4>ContentView:</h4>
-      <Content content={content} />
-    </div>
-  );
+	return (
+		<div>
+			<div style={{ position: 'relative' }}>
+				<div ref={ref} />
+			</div>
+			<h4>ContentView:</h4>
+			<Content content={content} />
+		</div>
+	);
 };
 
 export default EngineDemo;

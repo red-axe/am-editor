@@ -1,10 +1,10 @@
 {
-  "name": "@aomao/plugin-bold",
+  "name": "@aomao/plugin-indent",
   "version": "1.0.0",
   "main": "src/index.ts",
   "author": "me@aomao.com",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "@aomao/engine": "^1.0.0"
   }
 }

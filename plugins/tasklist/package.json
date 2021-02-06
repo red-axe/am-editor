@@ -4,7 +4,7 @@
   "main": "src/index.ts",
   "author": "me@aomao.com",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "@aomao/engine": "^1.0.0"
   }
 }
