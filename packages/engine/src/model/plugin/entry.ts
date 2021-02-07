@@ -20,7 +20,14 @@ abstract class PluginEntry<T extends {} = {}> implements PluginInterface {
 		this.engine = engine;
 		this.contentView = contentView;
 		this.options = options as T;
+		if (this.initialize) {
+			this.initialize();
+		}
 	}
+	/**
+	 * 初始化
+	 */
+	initialize?(): void;
 	/**
 	 * 获取插件本地化语言
 	 */

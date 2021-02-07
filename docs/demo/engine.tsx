@@ -10,6 +10,10 @@ import Tasklist, { Checkbox } from '@aomao/plugin-tasklist';
 import Orderedlist from '@aomao/plugin-orderedlist';
 import Unorderedlist from '@aomao/plugin-unorderedlist';
 import Indent from '@aomao/plugin-indent';
+import Heading from '@aomao/plugin-heading';
+import Strikethrough from '@aomao/plugin-strikethrough';
+import Sub from '@aomao/plugin-sub';
+import Sup from '@aomao/plugin-sup';
 import Content from './content';
 import OTClient from './ot-client';
 
@@ -25,6 +29,10 @@ Engine.plugin.add('hr', Hr);
 Engine.plugin.add('tasklist', Tasklist);
 Engine.plugin.add('orderedlist', Orderedlist);
 Engine.plugin.add('unorderedlist', Unorderedlist);
+Engine.plugin.add('heading', Heading);
+Engine.plugin.add('strikethrough', Strikethrough);
+Engine.plugin.add('sub', Sub);
+Engine.plugin.add('sup', Sup);
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
@@ -35,16 +43,21 @@ const EngineDemo = () => {
 
 	useEffect(() => {
 		if (!ref.current) return;
+		//实例化引擎
 		const engine = new Engine(ref.current);
+		//初始化本地协作，用作记录历史
 		engine.ot.initLockMode();
+		//设置编辑器值
 		engine.setValue(content);
+		//监听编辑器值改变事件
 		engine.on('change', value => {
 			setContent(value);
 			console.log(`value:${value}，html:${engine.getHtml()}`);
 		});
 		engineRef.current = engine;
-
+		//实例化协作编辑客户端
 		const otClient = new OTClient(engine);
+		//连接到协作服务端，demo文档
 		otClient.connect('ws://127.0.0.1:8080', 'demo');
 	}, []);
 

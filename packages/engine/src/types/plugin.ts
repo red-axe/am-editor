@@ -22,6 +22,10 @@ export interface PluginInterface {
 	 */
 	readonly name: string;
 	/**
+	 * 初始化
+	 */
+	initialize?(): void;
+	/**
 	 * 获取插件本地化语言
 	 */
 	getLang(): LanguageInterface;

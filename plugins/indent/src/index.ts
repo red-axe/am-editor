@@ -11,8 +11,8 @@ import {
 
 export type Options = {
 	hotkey?: {
-		in: string;
-		out: string;
+		in?: string;
+		out?: string;
 	};
 	maxPadding?: number;
 };
