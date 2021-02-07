@@ -10,7 +10,10 @@ import {
 } from '@aomao/engine';
 
 export type Options = {
-	hotkey?: string | Array<string>;
+	hotkey?: {
+		in: string;
+		out: string;
+	};
 	maxPadding?: number;
 };
 
@@ -103,7 +106,7 @@ export default class extends Plugin<Options> {
 		return 0;
 	}
 
-	execute(isTab: boolean = false) {
+	execute(type: 'in' | 'out' = 'in', isTab: boolean = false) {
 		if (!this.engine) return;
 		const { change } = this.engine;
 		change.separateBlocks();
@@ -116,13 +119,18 @@ export default class extends Plugin<Options> {
 		const maxPadding = this.options.maxPadding || 50;
 		// 其它情况
 		blocks.forEach(block => {
-			addPadding(block, 2, isTab, maxPadding);
+			addPadding(block, type === 'in' ? 2 : -2, isTab, maxPadding);
 		});
 		change.mergeAdjacentList();
 	}
 
 	hotkey() {
-		return this.options.hotkey || 'mod+]';
+		const inHotkey = this.options.hotkey?.in || 'mod+]';
+		const outHotkey = this.options.hotkey?.out || 'mod+[';
+		return [
+			{ key: inHotkey, args: 'in' },
+			{ key: outHotkey, args: 'out' },
+		];
 	}
 
 	schema() {
@@ -139,5 +147,58 @@ export default class extends Plugin<Options> {
 			rules.push(rule);
 		});
 		return rules;
+	}
+
+	onCustomizeKeydown(
+		type:
+			| 'enter'
+			| 'backspace'
+			| 'space'
+			| 'tab'
+			| 'shift-tab'
+			| 'at'
+			| 'slash'
+			| 'selectall',
+		event: KeyboardEvent,
+	) {
+		if (type === 'backspace') {
+			if (!this.engine) return;
+			const { change } = this.engine;
+			let range = change.getRange();
+			const block = range.startNode.getClosestBlock();
+			if (
+				range.collapsed &&
+				'li' === block.name &&
+				!range.isListFirst()
+			) {
+				return;
+			}
+			if (this.queryState()) {
+				event.preventDefault();
+				this.execute('out');
+				return false;
+			}
+		} else if (type === 'tab') {
+			if (!this.engine) return;
+			const { change } = this.engine;
+			const range = change.getRange();
+			//列表
+			if (range.collapsed && range.isListFirst()) {
+				event.preventDefault();
+				this.execute('in');
+				return false;
+			}
+			// <p><cursor />foo</p>
+			if (!range.collapsed || range.isBlockFirstOffset('start')) {
+				event.preventDefault();
+				this.execute('in', true);
+				return false;
+			}
+		} else if (type === 'shift-tab') {
+			event.preventDefault();
+			this.execute('out');
+			return false;
+		}
+		return;
 	}
 }

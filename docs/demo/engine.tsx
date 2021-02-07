@@ -10,12 +10,12 @@ import Tasklist, { Checkbox } from '@aomao/plugin-tasklist';
 import Orderedlist from '@aomao/plugin-orderedlist';
 import Unorderedlist from '@aomao/plugin-unorderedlist';
 import Indent from '@aomao/plugin-indent';
-import Outdent from '@aomao/plugin-outdent';
 import Content from './content';
 import OTClient from './ot-client';
 
 Engine.card.add('hr', HrEntry);
 Engine.card.add('checkbox', Checkbox);
+Engine.plugin.add('indent', Indent);
 Engine.plugin.add('redo', Redo);
 Engine.plugin.add('undo', Undo);
 Engine.plugin.add('bold', Bold);
@@ -25,8 +25,6 @@ Engine.plugin.add('hr', Hr);
 Engine.plugin.add('tasklist', Tasklist);
 Engine.plugin.add('orderedlist', Orderedlist);
 Engine.plugin.add('unorderedlist', Unorderedlist);
-Engine.plugin.add('indent', Indent);
-Engine.plugin.add('outdent', Outdent);
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
