@@ -41,5 +41,6 @@ export type ContentViewOptions = {
 	lang?: string;
 	card?: CardModelInterface;
 	plugin?: PluginModelInterface;
+	pluginOptions?: { [k: string]: {} };
 	root?: Node;
 };

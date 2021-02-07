@@ -8,6 +8,7 @@ const ContentRender = ({ content }: { content: string }) => {
 
 	useEffect(() => {
 		if (viewRef.current && !contentView.current) {
+			//初始化
 			contentView.current = new ContentView(viewRef.current, {
 				card: Engine.card,
 				plugin: Engine.plugin,
@@ -17,7 +18,9 @@ const ContentRender = ({ content }: { content: string }) => {
 
 	useEffect(() => {
 		if (contentView.current) {
+			//渲染内容到viewRef节点下
 			contentView.current.render(content);
+			//触发渲染完成事件，用来展示插件的特俗效果。例如在heading插件中，展示锚点显示功能
 			contentView.current.event.trigger('render', viewRef.current);
 		}
 	}, [content]);
@@ -29,6 +32,7 @@ const ContentRender = ({ content }: { content: string }) => {
 			card: Engine.card,
 			plugin: Engine.plugin,
 		});
+		//渲染内容到container节点下
 		view.render(content);
 		return (
 			<div

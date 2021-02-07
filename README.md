@@ -20,6 +20,13 @@ Start the dev server by SSR
 $ yarn ssr
 ```
 
+Start the ot server
+
+```bash
+$ cd ot-server
+$ yarn start
+```
+
 Build documentation,
 
 ```bash

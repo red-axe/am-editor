@@ -63,8 +63,10 @@ class ContentView implements ContentViewInterface {
 		this.plugin.setContentView(this);
 		(this.options.plugin || EngineModel.plugin).each((name, clazz) => {
 			this.plugin.add(name, clazz);
+			const config = (this.options.pluginOptions || {})[name];
 			const plugin = new clazz(name, {
 				contentView: this,
+				...config,
 			});
 			this.plugin.components[name] = plugin;
 			if (plugin.schema) this.schema.add(plugin.schema());
