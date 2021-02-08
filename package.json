@@ -1,6 +1,7 @@
 {
     "name": "am-editor",
     "private": true,
+    "license": "MIT",
     "workspaces": [
         "packages/*",
         "plugins/*"

@@ -85,7 +85,7 @@ class ContentView implements ContentViewInterface {
 		return this;
 	}
 
-	render(content: string) {
+	render(content: string, trigger: boolean = true) {
 		const parser = new Parser(content, undefined, this);
 		const value = parser.toValue(
 			this.schema.getValue(),
@@ -95,6 +95,7 @@ class ContentView implements ContentViewInterface {
 		);
 		this.container.html(value);
 		this.card.render();
+		if (trigger) this.event.trigger('render', this.container);
 	}
 
 	messageSuccess(message: string) {

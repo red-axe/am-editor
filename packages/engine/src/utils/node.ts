@@ -401,7 +401,12 @@ export const setNode = (oldNode: NodeInterface, newNode: NodeInterface) => {
 export const setNodeProps = (node: NodeInterface, props: any) => {
 	let { style, ...attrs } = props;
 	Object.keys(attrs).forEach(key => {
-		node.attr(key, attrs[key].toString());
+		if (key === 'className') {
+			const value = attrs[key];
+			if (Array.isArray(value)) {
+				value.forEach(name => node.addClass(name));
+			} else node.addClass(value);
+		} else node.attr(key, attrs[key].toString());
 	});
 	if (typeof style === 'number') style = {};
 	if (typeof style === 'string') style = getStyleMap(style);

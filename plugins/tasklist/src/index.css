@@ -12,10 +12,8 @@
 .am-engine .data-list-task [data-card-key="checkbox"],.am-engine-view .data-list-task [data-card-key="checkbox"] {
 	padding-right: 6px;
     vertical-align: middle;
-    line-height: 16px;
+    line-height: inherit;
     position: absolute;
     margin-left: -20px;
-    display: flex;
-    align-items: center;
     height: 100%;
 }

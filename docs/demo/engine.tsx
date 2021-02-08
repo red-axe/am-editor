@@ -14,6 +14,7 @@ import Heading from '@aomao/plugin-heading';
 import Strikethrough from '@aomao/plugin-strikethrough';
 import Sub from '@aomao/plugin-sub';
 import Sup from '@aomao/plugin-sup';
+import Alignment from '@aomao/plugin-alignment';
 import Content from './content';
 import OTClient from './ot-client';
 
@@ -33,6 +34,7 @@ Engine.plugin.add('heading', Heading);
 Engine.plugin.add('strikethrough', Strikethrough);
 Engine.plugin.add('sub', Sub);
 Engine.plugin.add('sup', Sup);
+Engine.plugin.add('alignment', Alignment);
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
