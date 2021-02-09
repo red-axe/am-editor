@@ -15,6 +15,7 @@ import Strikethrough from '@aomao/plugin-strikethrough';
 import Sub from '@aomao/plugin-sub';
 import Sup from '@aomao/plugin-sup';
 import Alignment from '@aomao/plugin-alignment';
+import Backcolor from '@aomao/plugin-backcolor';
 import Content from './content';
 import OTClient from './ot-client';
 
@@ -35,6 +36,7 @@ Engine.plugin.add('strikethrough', Strikethrough);
 Engine.plugin.add('sub', Sub);
 Engine.plugin.add('sup', Sup);
 Engine.plugin.add('alignment', Alignment);
+Engine.plugin.add('backcolor', Backcolor);
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
@@ -46,7 +48,14 @@ const EngineDemo = () => {
 	useEffect(() => {
 		if (!ref.current) return;
 		//实例化引擎
-		const engine = new Engine(ref.current);
+		const engine = new Engine(ref.current, {
+			plugin: {
+				//背景色测试
+				backcolor: {
+					hotkey: { key: 'mod+0', args: ['#000000'] },
+				},
+			},
+		});
 		//初始化本地协作，用作记录历史
 		engine.ot.initLockMode();
 		//设置编辑器值
