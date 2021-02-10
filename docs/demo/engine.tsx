@@ -16,6 +16,9 @@ import Sub from '@aomao/plugin-sub';
 import Sup from '@aomao/plugin-sup';
 import Alignment from '@aomao/plugin-alignment';
 import Backcolor from '@aomao/plugin-backcolor';
+import Code from '@aomao/plugin-code';
+import Fontcolor from '@aomao/plugin-fontcolor';
+import Fontsize from '@aomao/plugin-fontsize';
 import Content from './content';
 import OTClient from './ot-client';
 
@@ -37,6 +40,9 @@ Engine.plugin.add('sub', Sub);
 Engine.plugin.add('sup', Sup);
 Engine.plugin.add('alignment', Alignment);
 Engine.plugin.add('backcolor', Backcolor);
+Engine.plugin.add('code', Code);
+Engine.plugin.add('fontcolor', Fontcolor);
+Engine.plugin.add('fontsize', Fontsize);
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
