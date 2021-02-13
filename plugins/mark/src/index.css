@@ -1,0 +1,5 @@
+.am-engine mark,
+.am-engine-view mark {
+    padding: 0;
+    background: #ff0;
+}

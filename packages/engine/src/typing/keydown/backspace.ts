@@ -396,7 +396,7 @@ export default (engine: EngineInterface, e: KeyboardEvent) => {
 			return false;
 		}
 	}
-	if (parentBlock?.isTitle() && block.isEmptyWithTrim()) {
+	if (block.isTitle() && block.isEmptyWithTrim()) {
 		e.preventDefault();
 		change.setBlocks('<p />');
 		return false;

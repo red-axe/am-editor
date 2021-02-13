@@ -19,6 +19,8 @@ import Backcolor from '@aomao/plugin-backcolor';
 import Code from '@aomao/plugin-code';
 import Fontcolor from '@aomao/plugin-fontcolor';
 import Fontsize from '@aomao/plugin-fontsize';
+import Mark from '@aomao/plugin-mark';
+import Markdown from '@aomao/plugin-markdown';
 import Content from './content';
 import OTClient from './ot-client';
 
@@ -43,6 +45,8 @@ Engine.plugin.add('backcolor', Backcolor);
 Engine.plugin.add('code', Code);
 Engine.plugin.add('fontcolor', Fontcolor);
 Engine.plugin.add('fontsize', Fontsize);
+Engine.plugin.add('mark', Mark);
+Engine.plugin.add('markdown', Markdown);
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
@@ -59,6 +63,10 @@ const EngineDemo = () => {
 				//背景色测试
 				backcolor: {
 					hotkey: { key: 'mod+0', args: ['#000000'] },
+				},
+				//前景色测试
+				fontcolor: {
+					hotkey: { key: 'mod+1', args: ['#666666'] },
 				},
 			},
 		});
