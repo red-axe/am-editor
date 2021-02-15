@@ -171,7 +171,11 @@ export interface PluginInterface {
 	 * @param event 事件
 	 * @param text 空格左边内容
 	 */
-	onKeydownSpace?(event: KeyboardEvent, text: string): boolean | void;
+	onKeydownSpace?(
+		event: KeyboardEvent,
+		node: NodeInterface,
+		text: string,
+	): boolean | void;
 }
 
 export interface PluginModelInterface {

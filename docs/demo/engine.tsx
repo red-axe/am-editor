@@ -20,7 +20,7 @@ import Code from '@aomao/plugin-code';
 import Fontcolor from '@aomao/plugin-fontcolor';
 import Fontsize from '@aomao/plugin-fontsize';
 import Mark from '@aomao/plugin-mark';
-import Markdown from '@aomao/plugin-markdown';
+import Quote from '@aomao/plugin-quote';
 import Content from './content';
 import OTClient from './ot-client';
 
@@ -46,7 +46,7 @@ Engine.plugin.add('code', Code);
 Engine.plugin.add('fontcolor', Fontcolor);
 Engine.plugin.add('fontsize', Fontsize);
 Engine.plugin.add('mark', Mark);
-Engine.plugin.add('markdown', Markdown);
+Engine.plugin.add('quote', Quote);
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);

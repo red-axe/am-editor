@@ -86,4 +86,34 @@ export default class extends Plugin<Options> {
 			},
 		];
 	}
+
+	onCustomizeKeydown(
+		type:
+			| 'enter'
+			| 'backspace'
+			| 'space'
+			| 'tab'
+			| 'at'
+			| 'slash'
+			| 'selectall',
+		event: KeyboardEvent,
+	) {
+		if (!this.engine || type !== 'backspace') return;
+		const range = this.engine.change.getRange();
+		if (!range.isBlockFirstOffset('start')) return;
+		// 改变对齐
+		const align = this.queryState();
+		if (align === 'center') {
+			event.preventDefault();
+			this.execute('left');
+			return false;
+		}
+
+		if (align === 'right') {
+			event.preventDefault();
+			this.execute('center');
+			return false;
+		}
+		return;
+	}
 }

@@ -6,6 +6,7 @@ import {
 	DATA_ELEMENT,
 	HEADING_TAG_MAP,
 	isCustomizeListBlock,
+	NodeInterface,
 	Plugin,
 	random,
 	Tooltip,
@@ -25,6 +26,7 @@ export type Options = {
 	};
 	showAnchor?: boolean;
 	anchorCopy?: (id: string) => string;
+	markdown?: boolean;
 };
 export default class extends Plugin<Options> {
 	initialize() {
@@ -413,5 +415,77 @@ export default class extends Plugin<Options> {
 			});
 		});
 		return rules;
+	}
+
+	//设置markdown
+	onKeydownSpace?(event: KeyboardEvent, node: NodeInterface) {
+		if (!this.engine || this.options.markdown === false) return;
+
+		const block = node.getClosestBlock();
+		if (!block.isHeading()) {
+			return;
+		}
+		const { change } = this.engine;
+		const range = change.getRange();
+		const text = range.getBlockLeftText(block[0]);
+		let type: any = '';
+		switch (text) {
+			case '#':
+				type = 'h1';
+				break;
+			case '##':
+				type = 'h2';
+				break;
+			case '###':
+				type = 'h3';
+				break;
+			case '####':
+				type = 'h4';
+				break;
+			case '#####':
+				type = 'h5';
+				break;
+			case '######':
+				type = 'h6';
+				break;
+		}
+		if (!type) return;
+		event.preventDefault();
+		range.removeBlockLeftText(block[0]);
+		if (block.isEmpty()) {
+			block.empty();
+			block.append('<br />');
+		}
+		this.execute(type);
+		return false;
+	}
+
+	onCustomizeKeydown(
+		type:
+			| 'enter'
+			| 'backspace'
+			| 'space'
+			| 'tab'
+			| 'at'
+			| 'slash'
+			| 'selectall',
+		event: KeyboardEvent,
+	) {
+		if (!this.engine || type !== 'backspace') return;
+		const { change } = this.engine;
+		const range = change.getRange();
+		if (!range.isBlockFirstOffset('start')) return;
+		const block = range.startNode.getClosestBlock();
+
+		if (
+			block.isTitle() &&
+			block.isEmptyWithTrim() &&
+			block.parent()?.isRoot()
+		) {
+			event.preventDefault();
+			change.setBlocks('<p />');
+			return false;
+		}
+		return;
 	}
 }

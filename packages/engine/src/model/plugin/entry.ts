@@ -172,11 +172,16 @@ abstract class PluginEntry<T extends {} = {}> implements PluginInterface {
 	): boolean | void;
 
 	/**
-	 * 按下空格后触发
+	 * 完成输入按下空格后触发
 	 * @param event 事件
-	 * @param text 空格左边内容
+	 * @param node 当前节点
+	 * @param text 空格所在节点左边内容
 	 */
-	onKeydownSpace?(event: KeyboardEvent, text: string): boolean | void;
+	onKeydownSpace?(
+		event: KeyboardEvent,
+		node: NodeInterface,
+		text: string,
+	): boolean | void;
 }
 
 export default PluginEntry;

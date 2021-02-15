@@ -28,15 +28,19 @@ export const pluginKeydownTrigger = (
 		const range = change.getRange();
 		if (!range.collapsed || change.isComposing()) return customResult;
 		const { startNode, startOffset } = range;
-		const leftText =
+		const node =
 			startNode.type === Node.TEXT_NODE
-				? startNode.text().substr(0, startOffset)
-				: startNode[0].childNodes[startOffset - 1].textContent;
+				? startNode
+				: startNode.children().eq(startOffset - 1)!;
+		const leftText =
+			node.type === Node.TEXT_NODE
+				? node.text().substr(0, startOffset)
+				: node.text();
 
 		customResult = Object.keys(engine.plugin.components).every(name => {
 			const plugin = engine.plugin.components[name];
 			if (plugin.onKeydownSpace) {
-				const reuslt = plugin.onKeydownSpace(e, leftText || '');
+				const reuslt = plugin.onKeydownSpace(e, node, leftText || '');
 				if (reuslt === false) {
 					return false;
 				}

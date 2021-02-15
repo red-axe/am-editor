@@ -11,6 +11,7 @@ import './index.css';
 
 export type Options = {
 	hotkey?: string | Array<string>;
+	markdown?: boolean;
 };
 
 export default class extends List<Options> {
@@ -95,6 +96,30 @@ export default class extends List<Options> {
 			node.empty();
 			node.append(checkbox);
 		});
+	}
+
+	//设置markdown
+	onKeydownSpace?(event: KeyboardEvent, node: NodeInterface) {
+		if (!this.engine || this.options.markdown === false) return;
+
+		const block = node.getClosestBlock();
+		// fix: 列表、引用等 markdown 快捷方式不应该在标题内生效
+		if (!block.isHeading() || /^h\d$/i.test(block.name || '')) {
+			return;
+		}
+
+		const { change } = this.engine;
+		const range = change.getRange();
+		const text = range.getBlockLeftText(block[0]);
+		if (['[]', '[ ]', '[x]'].indexOf(text) < 0) return;
+		event.preventDefault();
+		range.removeBlockLeftText(block[0]);
+		if (block.isEmpty()) {
+			block.empty();
+			block.append('<br />');
+		}
+		this.execute(text === '[x]' ? { checked: true } : undefined);
+		return false;
 	}
 }
 export { Checkbox };
