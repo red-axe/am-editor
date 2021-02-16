@@ -166,8 +166,8 @@ export default (engine: EngineInterface, e: KeyboardEvent) => {
 		}
 	}
 
-	// 在标题、正文里
-	if (block.isHeading()) {
+	// 在正文里
+	if (block.name === 'p') {
 		e.preventDefault();
 		change.mergeAfterDeletePrevNode(block);
 		return false;

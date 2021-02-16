@@ -90,7 +90,10 @@ export default class extends List<Options> {
 			| 'selectall',
 		event: KeyboardEvent,
 	) {
-		if (!this.engine || type !== 'backspace') return;
+		if (!this.engine) return;
+		const result = super.onCustomizeKeydown(type, event);
+		if (type !== 'backspace' && result !== undefined) return result;
+
 		const { change } = this.engine;
 		const range = change.getRange();
 		if (!range.isBlockFirstOffset('start')) return;

@@ -486,6 +486,11 @@ export default class extends Plugin<Options> {
 			change.setBlocks('<p />');
 			return false;
 		}
+		if (block.isTitle()) {
+			event.preventDefault();
+			change.mergeAfterDeletePrevNode(block);
+			return false;
+		}
 		return;
 	}
 }
