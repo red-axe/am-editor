@@ -868,7 +868,7 @@ class ChangeModel implements ChangeInterface {
 	 * 移除mark标签
 	 * @param mark mark 标签或选择器
 	 */
-	removeMark(mark: NodeInterface | Node | string): ChangeInterface {
+	removeMark(mark?: NodeInterface | Node | string): ChangeInterface {
 		let range = this.getRange();
 		this.repairRange(range);
 		range = removeMark(range, mark);

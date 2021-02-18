@@ -21,6 +21,8 @@ import Fontcolor from '@aomao/plugin-fontcolor';
 import Fontsize from '@aomao/plugin-fontsize';
 import Mark from '@aomao/plugin-mark';
 import Quote from '@aomao/plugin-quote';
+import PaintFormat from '@aomao/plugin-paintformat';
+import RemoveFormat from '@aomao/plugin-removeformat';
 import Content from './content';
 import OTClient from './ot-client';
 
@@ -47,6 +49,8 @@ Engine.plugin.add('fontcolor', Fontcolor);
 Engine.plugin.add('fontsize', Fontsize);
 Engine.plugin.add('mark', Mark);
 Engine.plugin.add('quote', Quote);
+Engine.plugin.add('paintformat', PaintFormat);
+Engine.plugin.add('removeformat', RemoveFormat);
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);

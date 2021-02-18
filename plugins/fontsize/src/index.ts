@@ -2,7 +2,7 @@ import { NodeInterface, Plugin } from '@aomao/engine';
 
 export type Options = {
 	hotkey?: { key: string; args: Array<string> };
-	defaultSize: string;
+	defaultSize?: string;
 };
 
 export const fontsizeMap = {

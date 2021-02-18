@@ -175,7 +175,7 @@ export interface ChangeInterface {
 	 * 移除mark标签
 	 * @param mark mark 标签或选择器
 	 */
-	removeMark(mark: NodeInterface | Node | string): ChangeInterface;
+	removeMark(mark?: NodeInterface | Node | string): ChangeInterface;
 	/**
 	 * 合并mark标签
 	 */

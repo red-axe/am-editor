@@ -764,7 +764,7 @@ const isFontsize = (node: Node) => {
  * @param node 节点
  * @param mark mark节点
  */
-export const canRemoveMark = (node: NodeInterface, mark: NodeInterface) => {
+export const canRemoveMark = (node: NodeInterface, mark?: NodeInterface) => {
 	if (node.isCard()) return false;
 	if (!mark || mark.length === 0) return true;
 	return (
