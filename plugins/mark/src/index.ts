@@ -28,7 +28,7 @@ export default class extends Plugin<Options> {
 	}
 
 	//设置markdown
-	onKeydownSpace?(event: KeyboardEvent, node: NodeInterface, text: string) {
+	onKeydownSpace(event: KeyboardEvent, node: NodeInterface, text: string) {
 		if (
 			!this.engine ||
 			!text ||

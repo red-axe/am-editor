@@ -43,7 +43,7 @@ export default class extends Plugin<Options> {
 	}
 
 	//设置markdown
-	onKeydownSpace?(event: KeyboardEvent, node: NodeInterface) {
+	onKeydownSpace(event: KeyboardEvent, node: NodeInterface) {
 		if (!this.engine || this.options.markdown === false) return;
 
 		const block = node.getClosestBlock();

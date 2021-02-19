@@ -23,6 +23,7 @@ import Mark from '@aomao/plugin-mark';
 import Quote from '@aomao/plugin-quote';
 import PaintFormat from '@aomao/plugin-paintformat';
 import RemoveFormat from '@aomao/plugin-removeformat';
+import SelectAll from '@aomao/plugin-selectall';
 import Content from './content';
 import OTClient from './ot-client';
 
@@ -51,6 +52,7 @@ Engine.plugin.add('mark', Mark);
 Engine.plugin.add('quote', Quote);
 Engine.plugin.add('paintformat', PaintFormat);
 Engine.plugin.add('removeformat', RemoveFormat);
+Engine.plugin.add('selectall', SelectAll);
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);

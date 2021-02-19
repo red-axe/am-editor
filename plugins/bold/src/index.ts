@@ -31,7 +31,7 @@ export default class extends Plugin<Options> {
 		return TAG_NAME;
 	}
 	//设置markdown
-	onKeydownSpace?(event: KeyboardEvent, node: NodeInterface, text: string) {
+	onKeydownSpace(event: KeyboardEvent, node: NodeInterface, text: string) {
 		if (
 			!this.engine ||
 			!text ||
