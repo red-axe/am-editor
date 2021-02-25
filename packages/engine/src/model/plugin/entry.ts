@@ -49,13 +49,12 @@ abstract class PluginEntry<T extends {} = {}> implements PluginInterface {
 	 */
 	locales?(): {};
 	/**
-	 * 插件热键绑定，返回ture，即执行插件，或者返回需要匹配的组合键字符，如 mod+b，匹配成功即执行插件，还可以带上插件执行所需要的参数，多个参数以数组形式返回{key:"mod+b",args:[]}
-	 * @param e 键盘事件
+	 * 插件热键绑定，返回需要匹配的组合键字符，如 mod+b，匹配成功即执行插件，还可以带上插件执行所需要的参数，多个参数以数组形式返回{key:"mod+b",args:[]}
+	 * @param event 键盘事件
 	 */
 	hotkey?(
-		e: KeyboardEvent,
+		event?: KeyboardEvent,
 	):
-		| boolean
 		| string
 		| { key: string; args: any }
 		| Array<{ key: string; args: any }>

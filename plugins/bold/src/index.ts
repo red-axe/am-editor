@@ -1,4 +1,4 @@
-import { $, NodeInterface, Plugin } from '@aomao/engine';
+import { NodeInterface, Plugin } from '@aomao/engine';
 
 const TAG_NAME = 'strong';
 export type Options = {

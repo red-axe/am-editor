@@ -1,4 +1,5 @@
 import { NodeInterface, Plugin } from '@aomao/engine';
+import './index.css';
 
 export type Options = {
 	hotkey?: { key: string; args: Array<string> };
@@ -55,7 +56,7 @@ export default class extends Plugin<Options> {
 	) {
 		if (!this.engine) return;
 		const { change } = this.engine;
-		const mark = `<span class="data-fontsize-${size};" />`;
+		const mark = `<span class="data-fontsize-${size}" />`;
 		if (size !== defaultSize) {
 			change.addMark(mark);
 		} else {
@@ -108,5 +109,79 @@ export default class extends Plugin<Options> {
 			}
 			node.css('font-size', '');
 		}
+	}
+
+	parseHtml(root: NodeInterface) {
+		root.find('.data-fontsize-9')
+			.css({
+				'font-size': '12px',
+			})
+			.attr('data-mce-style', 'font-size: 9px');
+
+		root.find('.data-fontsize-10')
+			.css({
+				'font-size': '13px',
+			})
+			.attr('data-mce-style', 'font-size: 10px');
+
+		root.find('.data-fontsize-11')
+			.css({
+				'font-size': '14px',
+			})
+			.attr('data-mce-style', 'font-size: 11px');
+
+		root.find('.data-fontsize-1515')
+			.css({
+				'font-size': '15px',
+			})
+			.attr('data-mce-style', 'font-size: 15px');
+
+		root.find('.data-fontsize-12')
+			.css({
+				'font-size': '16px',
+			})
+			.attr('data-mce-style', 'font-size: 12px');
+
+		root.find('.data-fontsize-14')
+			.css({
+				'font-size': '19px',
+			})
+			.attr('data-mce-style', 'font-size: 14px');
+
+		root.find('.data-fontsize-16')
+			.css({
+				'font-size': '22px',
+			})
+			.attr('data-mce-style', 'font-size: 16px');
+
+		root.find('.data-fontsize-18')
+			.css({
+				'font-size': '24px',
+			})
+			.attr('data-mce-style', 'font-size: 18px');
+
+		root.find('.data-fontsize-22')
+			.css({
+				'font-size': '29px',
+			})
+			.attr('data-mce-style', 'font-size: 22px');
+
+		root.find('.data-fontsize-24')
+			.css({
+				'font-size': '32px',
+			})
+			.attr('data-mce-style', 'font-size: 24px');
+
+		root.find('.data-fontsize-30')
+			.css({
+				'font-size': '40px',
+			})
+			.attr('data-mce-style', 'font-size: 30px');
+
+		root.find('.data-fontsize-36')
+			.css({
+				'font-size': '48px',
+			})
+			.attr('data-mce-style', 'font-size: 36px');
 	}
 }

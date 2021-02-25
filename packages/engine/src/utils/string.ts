@@ -1,24 +1,26 @@
 import { ANCHOR, CURSOR, FOCUS } from '../constants/bookmark';
 import {
-  CARD_TYPE_KEY,
-  CARD_VALUE_KEY,
-  READY_CARD_KEY,
+	CARD_TYPE_KEY,
+	CARD_VALUE_KEY,
+	READY_CARD_KEY,
 } from '../constants/card';
 import { DATA_ELEMENT } from '../constants/root';
 import { getWindow } from './node';
+import { isMacos } from './user-agent';
 
 /**
  * 随机字符串
  * @param length 长度
  */
 export const random = (length: number = 5) => {
-  if (length < 5) length = 5;
-  const str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let word = '';
-  for (let index = 0; index < length; index++) {
-    word += str.charAt(Math.floor(Math.random() * str.length));
-  }
-  return word;
+	if (length < 5) length = 5;
+	const str =
+		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	let word = '';
+	for (let index = 0; index < length; index++) {
+		word += str.charAt(Math.floor(Math.random() * str.length));
+	}
+	return word;
 };
 
 /**
@@ -28,36 +30,40 @@ export const random = (length: number = 5) => {
  * @param callback 回调函数
  */
 export const toMap = <V = boolean>(
-  value: Array<string> | string,
-  delimiter: string = ',',
-  callback: (key: string) => boolean = function() {
-    return true;
-  },
+	value: Array<string> | string,
+	delimiter: string = ',',
+	callback: (key: string) => boolean = function() {
+		return true;
+	},
 ): { [k: string]: V | boolean } => {
-  const map: { [k: string]: V | boolean } = {};
+	const map: { [k: string]: V | boolean } = {};
 
-  const arr: Array<string> = Array.isArray(value)
-    ? value
-    : value.split(delimiter);
-  let match;
-  arr.forEach(char => {
-    if ((match = /^(\d+)\.\.(\d+)$/.exec(char))) {
-      for (let i = parseInt(match[1], 10); i <= parseInt(match[2], 10); i++) {
-        map[i.toString()] = callback(i.toString());
-      }
-    } else {
-      map[char] = true;
-    }
-  });
-  return map;
+	const arr: Array<string> = Array.isArray(value)
+		? value
+		: value.split(delimiter);
+	let match;
+	arr.forEach(char => {
+		if ((match = /^(\d+)\.\.(\d+)$/.exec(char))) {
+			for (
+				let i = parseInt(match[1], 10);
+				i <= parseInt(match[2], 10);
+				i++
+			) {
+				map[i.toString()] = callback(i.toString());
+			}
+		} else {
+			map[char] = true;
+		}
+	});
+	return map;
 };
 
 /**
  * 驼峰命名转换枚举
  */
 export enum CamelCaseType {
-  UPPER = 'upper',
-  LOWER = 'lower',
+	UPPER = 'upper',
+	LOWER = 'lower',
 }
 
 /**
@@ -66,21 +72,21 @@ export enum CamelCaseType {
  * @param {upper,lower} type 转换类型，upper 大驼峰命名法，lower，小驼峰命名法（默认）
  */
 export const toCamelCase = (
-  value: string,
-  type: CamelCaseType = CamelCaseType.LOWER,
+	value: string,
+	type: CamelCaseType = CamelCaseType.LOWER,
 ): string => {
-  return value
-    .split('-')
-    .map((str, index) => {
-      if (type === 'upper' || (type === 'lower' && index > 0)) {
-        return str.charAt(0).toUpperCase() + str.substr(1);
-      }
-      if (type === 'lower' && index === 0) {
-        return str.charAt(0).toLowerCase() + str.substr(1);
-      }
-      return str;
-    })
-    .join('');
+	return value
+		.split('-')
+		.map((str, index) => {
+			if (type === 'upper' || (type === 'lower' && index > 0)) {
+				return str.charAt(0).toUpperCase() + str.substr(1);
+			}
+			if (type === 'lower' && index === 0) {
+				return str.charAt(0).toLowerCase() + str.substr(1);
+			}
+			return str;
+		})
+		.join('');
 };
 
 /**
@@ -88,17 +94,17 @@ export const toCamelCase = (
  * @param {string} rgb
  */
 export const toHex = (rgb: string): string => {
-  const hex = (num: string) => {
-    const char = parseInt(num, 10)
-      .toString(16)
-      .toUpperCase();
-    return char.length > 1 ? char : '0' + char;
-  };
+	const hex = (num: string) => {
+		const char = parseInt(num, 10)
+			.toString(16)
+			.toUpperCase();
+		return char.length > 1 ? char : '0' + char;
+	};
 
-  const reg = /rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/gi;
-  return rgb.replace(reg, ($0, $1, $2, $3) => {
-    return '#' + hex($1) + hex($2) + hex($3);
-  });
+	const reg = /rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/gi;
+	return rgb.replace(reg, ($0, $1, $2, $3) => {
+		return '#' + hex($1) + hex($2) + hex($3);
+	});
 };
 
 /**
@@ -106,23 +112,23 @@ export const toHex = (rgb: string): string => {
  * @param {string} value
  */
 export const getAttrMap = (value: string): { [k: string]: string } => {
-  const map: { [k: string]: string } = {};
-  const reg = /\s+(?:([\w\-:]+)|(?:([\w\-:]+)=([^\s"'<>]+))|(?:([\w\-:"]+)="([^"]*)")|(?:([\w\-:"]+)='([^']*)'))(?=(?:\s|\/|>)+)/g;
-  let match;
+	const map: { [k: string]: string } = {};
+	const reg = /\s+(?:([\w\-:]+)|(?:([\w\-:]+)=([^\s"'<>]+))|(?:([\w\-:"]+)="([^"]*)")|(?:([\w\-:"]+)='([^']*)'))(?=(?:\s|\/|>)+)/g;
+	let match;
 
-  while ((match = reg.exec(value))) {
-    const key: string = (
-      match[1] ||
-      match[2] ||
-      match[4] ||
-      match[6]
-    ).toLowerCase();
-    const val: string =
-      (match[2] ? match[3] : match[4] ? match[5] : match[7]) || '';
-    map[key] = val;
-  }
+	while ((match = reg.exec(value))) {
+		const key: string = (
+			match[1] ||
+			match[2] ||
+			match[4] ||
+			match[6]
+		).toLowerCase();
+		const val: string =
+			(match[2] ? match[3] : match[4] ? match[5] : match[7]) || '';
+		map[key] = val;
+	}
 
-  return map;
+	return map;
 };
 
 /**
@@ -130,18 +136,18 @@ export const getAttrMap = (value: string): { [k: string]: string } => {
  * @param {string} style
  */
 export const getStyleMap = (style: string): { [k: string]: string } => {
-  style = style.replace(/&quot;/g, '"');
-  const map: { [k: string]: string } = {};
-  const reg = /\s*([\w\-]+)\s*:([^;]*)(;|$)/g;
-  let match;
+	style = style.replace(/&quot;/g, '"');
+	const map: { [k: string]: string } = {};
+	const reg = /\s*([\w\-]+)\s*:([^;]*)(;|$)/g;
+	let match;
 
-  while ((match = reg.exec(style))) {
-    const key = match[1].toLowerCase().trim();
-    const val = toHex(match[2]).trim();
-    map[key] = val;
-  }
+	while ((match = reg.exec(style))) {
+		const key = match[1].toLowerCase().trim();
+		const val = toHex(match[2]).trim();
+		map[key] = val;
+	}
 
-  return map;
+	return map;
 };
 
 /**
@@ -150,10 +156,10 @@ export const getStyleMap = (style: string): { [k: string]: string } => {
  * @param {string} attrName
  */
 export const getComputedStyle = (element: Element, attrName: string) => {
-  const win = getWindow(element);
-  const camelKey = toCamelCase(attrName);
-  const style = win?.getComputedStyle(element, null);
-  return style ? style[camelKey] : '';
+	const win = getWindow(element);
+	const camelKey = toCamelCase(attrName);
+	const style = win?.getComputedStyle(element, null);
+	return style ? style[camelKey] : '';
 };
 
 /**
@@ -161,11 +167,11 @@ export const getComputedStyle = (element: Element, attrName: string) => {
  * @param value 需要编码的字符串
  */
 export const escape = (value: string) => {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+	return value
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;');
 };
 
 /**
@@ -173,11 +179,11 @@ export const escape = (value: string) => {
  * @param value 需要解码的字符串
  */
 export const unescape = (value: string) => {
-  return value
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, '&');
+	return value
+		.replace(/&lt;/g, '<')
+		.replace(/&gt;/g, '>')
+		.replace(/&quot;/g, '"')
+		.replace(/&amp;/g, '&');
 };
 
 /**
@@ -185,7 +191,7 @@ export const unescape = (value: string) => {
  * @param value 需要编码的字符串
  */
 export const escapeDots = (value: string) => {
-  return value.replace(/\./g, '&dot;');
+	return value.replace(/\./g, '&dot;');
 };
 
 /**
@@ -193,7 +199,7 @@ export const escapeDots = (value: string) => {
  * @param value 需要解码的字符串
  */
 export const unescapeDots = (value: string) => {
-  return value.replace(/&dot;/g, '.');
+	return value.replace(/&dot;/g, '.');
 };
 
 /**
@@ -201,32 +207,32 @@ export const unescapeDots = (value: string) => {
  * @param url 需要验证的字符串
  */
 export const isUrl = (url: string) => {
-  url = url.toLowerCase(); // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+	url = url.toLowerCase(); // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
 
-  if (url.startsWith('data:text/html')) {
-    return false;
-  }
+	if (url.startsWith('data:text/html')) {
+		return false;
+	}
 
-  if (!!!url.match(/^\S*$/)) {
-    return false;
-  }
+	if (!!!url.match(/^\S*$/)) {
+		return false;
+	}
 
-  if (
-    !!['http:', 'https:', 'data:', 'ftp:'].some(protocol => {
-      return url.startsWith(protocol);
-    })
-  ) {
-    return true;
-  }
+	if (
+		!!['http:', 'https:', 'data:', 'ftp:'].some(protocol => {
+			return url.startsWith(protocol);
+		})
+	) {
+		return true;
+	}
 
-  if (url.startsWith('./') || url.startsWith('/')) {
-    return true;
-  }
+	if (url.startsWith('./') || url.startsWith('/')) {
+		return true;
+	}
 
-  if (url.indexOf(':') < 0) {
-    return true;
-  }
-  return false;
+	if (url.indexOf(':') < 0) {
+		return true;
+	}
+	return false;
 };
 
 /**
@@ -235,9 +241,9 @@ export const isUrl = (url: string) => {
  * @param unit 单位
  */
 export const addUnit = (value: string | number, unit: string = 'px') => {
-  return value && /^-?\d+(?:\.\d+)?$/.test(value.toString())
-    ? value + unit
-    : value;
+	return value && /^-?\d+(?:\.\d+)?$/.test(value.toString())
+		? value + unit
+		: value;
 };
 
 /**
@@ -245,8 +251,10 @@ export const addUnit = (value: string | number, unit: string = 'px') => {
  * @param value 值
  */
 export const removeUnit = (value: string) => {
-  let match;
-  return value && (match = /^(-?\d+)/.exec(value)) ? parseInt(match[1], 10) : 0;
+	let match;
+	return value && (match = /^(-?\d+)/.exec(value))
+		? parseInt(match[1], 10)
+		: 0;
 };
 
 /**
@@ -254,10 +262,10 @@ export const removeUnit = (value: string) => {
  * @param value 需要移除的字符串
  */
 export const removeBookmarkTags = (value: string) => {
-  return value
-    .replace(/<anchor\s*\/>/gi, '')
-    .replace(/<focus\s*\/>/gi, '')
-    .replace(/<cursor\s*\/>/gi, '');
+	return value
+		.replace(/<anchor\s*\/>/gi, '')
+		.replace(/<focus\s*\/>/gi, '')
+		.replace(/<cursor\s*\/>/gi, '');
 };
 
 /**
@@ -265,13 +273,13 @@ export const removeBookmarkTags = (value: string) => {
  * @param value 需要编码的字符串
  */
 export const encodeCardValue = (value: any): string => {
-  try {
-    value = encodeURIComponent(JSON.stringify(value));
-  } catch (e) {
-    value = '';
-  }
+	try {
+		value = encodeURIComponent(JSON.stringify(value));
+	} catch (e) {
+		value = '';
+	}
 
-  return 'data:'.concat(value);
+	return 'data:'.concat(value);
 };
 
 /**
@@ -279,12 +287,12 @@ export const encodeCardValue = (value: any): string => {
  * @param value 需要解码的字符串
  */
 export const decodeCardValue = (value: string): any => {
-  try {
-    value = value.substr(5);
-    return JSON.parse(decodeURIComponent(value));
-  } catch (e) {
-    return {};
-  }
+	try {
+		value = value.substr(5);
+		return JSON.parse(decodeURIComponent(value));
+	} catch (e) {
+		return {};
+	}
 };
 
 /**
@@ -292,36 +300,36 @@ export const decodeCardValue = (value: string): any => {
  * @param value 需要转换的字符串
  */
 export const transformCustomTags = (value: string) => {
-  return value
-    .replace(
-      /<anchor\s*\/>/gi,
-      '<span '.concat(DATA_ELEMENT, '="').concat(ANCHOR, '"></span>'),
-    )
-    .replace(
-      /<focus\s*\/>/gi,
-      '<span '.concat(DATA_ELEMENT, '="').concat(FOCUS, '"></span>'),
-    )
-    .replace(
-      /<cursor\s*\/>/gi,
-      '<span '.concat(DATA_ELEMENT, '="').concat(CURSOR, '"></span>'),
-    )
-    .replace(/(<card\s+[^>]+>).*?<\/card>/gi, (_, tag) => {
-      //获取Card属性
-      const attrs = getAttrMap(tag);
-      const { type, name, value } = attrs;
-      const isInline = type === 'inline';
-      const tagName = isInline ? 'span' : 'div';
-      const list = ['<'.concat(tagName)];
-      list.push(' '.concat(CARD_TYPE_KEY, '="').concat(type || '', '"'));
-      list.push(' '.concat(READY_CARD_KEY, '="').concat(name || '', '"'));
+	return value
+		.replace(
+			/<anchor\s*\/>/gi,
+			'<span '.concat(DATA_ELEMENT, '="').concat(ANCHOR, '"></span>'),
+		)
+		.replace(
+			/<focus\s*\/>/gi,
+			'<span '.concat(DATA_ELEMENT, '="').concat(FOCUS, '"></span>'),
+		)
+		.replace(
+			/<cursor\s*\/>/gi,
+			'<span '.concat(DATA_ELEMENT, '="').concat(CURSOR, '"></span>'),
+		)
+		.replace(/(<card\s+[^>]+>).*?<\/card>/gi, (_, tag) => {
+			//获取Card属性
+			const attrs = getAttrMap(tag);
+			const { type, name, value } = attrs;
+			const isInline = type === 'inline';
+			const tagName = isInline ? 'span' : 'div';
+			const list = ['<'.concat(tagName)];
+			list.push(' '.concat(CARD_TYPE_KEY, '="').concat(type || '', '"'));
+			list.push(' '.concat(READY_CARD_KEY, '="').concat(name || '', '"'));
 
-      if (value !== undefined) {
-        list.push(' '.concat(CARD_VALUE_KEY, '="').concat(value, '"'));
-      }
+			if (value !== undefined) {
+				list.push(' '.concat(CARD_VALUE_KEY, '="').concat(value, '"'));
+			}
 
-      list.push('></'.concat(tagName, '>'));
-      return list.join('');
-    });
+			list.push('></'.concat(tagName, '>'));
+			return list.join('');
+		});
 };
 
 /**
@@ -329,46 +337,65 @@ export const transformCustomTags = (value: string) => {
  * @param url URL地址
  */
 export const validUrl = (url: string) => {
-  if (typeof url !== 'string') {
-    return false;
-  }
+	if (typeof url !== 'string') {
+		return false;
+	}
 
-  url = url.toLowerCase(); // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+	url = url.toLowerCase(); // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
 
-  if (url.startsWith('data:text/html')) {
-    return false;
-  }
+	if (url.startsWith('data:text/html')) {
+		return false;
+	}
 
-  if (!!!url.match(/^\S*$/)) {
-    return false;
-  }
+	if (!!!url.match(/^\S*$/)) {
+		return false;
+	}
 
-  if (
-    !!['http:', 'https:', 'data:', 'ftp:'].some(protocol => {
-      return url.startsWith(protocol);
-    })
-  ) {
-    return true;
-  }
+	if (
+		!!['http:', 'https:', 'data:', 'ftp:'].some(protocol => {
+			return url.startsWith(protocol);
+		})
+	) {
+		return true;
+	}
 
-  if (url.startsWith('./') || url.startsWith('/')) {
-    return true;
-  }
+	if (url.startsWith('./') || url.startsWith('/')) {
+		return true;
+	}
 
-  if (url.indexOf(':') < 0) {
-    return true;
-  }
-  return false;
+	if (url.indexOf(':') < 0) {
+		return true;
+	}
+	return false;
 };
 
 export const sanitizeUrl = (url: string) => {
-  return validUrl(url) ? url : '';
+	return validUrl(url) ? url : '';
 };
 
 export const formatEngineValue = (value: string) => {
-  if (!value) return value;
-  const newValue = value.replace(/<(anchor|focus|cursor)[^>]*?\/>/gi, '');
-  return /^<p(\s[^>]*?)><br \/><\/p>$/i.test(newValue)
-    ? value.replace(RegExp.$1, '')
-    : value;
+	if (!value) return value;
+	const newValue = value.replace(/<(anchor|focus|cursor)[^>]*?\/>/gi, '');
+	return /^<p(\s[^>]*?)><br \/><\/p>$/i.test(newValue)
+		? value.replace(RegExp.$1, '')
+		: value;
+};
+
+/**
+ * 格式化热键
+ * @param key 热键
+ */
+export const formatHotkey = (key: string) => {
+	let keys = key.toLowerCase().split('+');
+	keys = keys.map(key => {
+		if (key === 'mod') {
+			return isMacos ? '⌘' : 'Ctrl';
+		} else if (key === 'opt') {
+			return isMacos ? 'Option' : 'Alt';
+		} else if (key.length > 1) {
+			return key.substr(0, 1).toUpperCase() + key.substr(1).toLowerCase();
+		}
+		return key.toUpperCase();
+	});
+	return keys.join('+');
 };

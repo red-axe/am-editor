@@ -24,6 +24,7 @@ import Quote from '@aomao/plugin-quote';
 import PaintFormat from '@aomao/plugin-paintformat';
 import RemoveFormat from '@aomao/plugin-removeformat';
 import SelectAll from '@aomao/plugin-selectall';
+import Toolbar from '@aomao/toolbar';
 import Content from './content';
 import OTClient from './ot-client';
 
@@ -56,7 +57,7 @@ Engine.plugin.add('selectall', SelectAll);
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
-	const engineRef = useRef<EngineInterface>();
+	const [engine, setEngine] = useState<EngineInterface>();
 	const [content, setContent] = useState<string>(
 		`<p data-id="daab65504017af77a36594f98ab4875d">Hello<strong>AoMao</strong></p><card type="block" name="hr" value="data:%7B%22id%22%3A%22eIxTM%22%7D"></card>`,
 	);
@@ -64,18 +65,7 @@ const EngineDemo = () => {
 	useEffect(() => {
 		if (!ref.current) return;
 		//实例化引擎
-		const engine = new Engine(ref.current, {
-			plugin: {
-				//背景色测试
-				backcolor: {
-					hotkey: { key: 'mod+0', args: ['#000000'] },
-				},
-				//前景色测试
-				fontcolor: {
-					hotkey: { key: 'mod+1', args: ['#666666'] },
-				},
-			},
-		});
+		const engine = new Engine(ref.current);
 		//初始化本地协作，用作记录历史
 		engine.ot.initLockMode();
 		//设置编辑器值
@@ -85,15 +75,36 @@ const EngineDemo = () => {
 			setContent(value);
 			console.log(`value:${value}，html:${engine.getHtml()}`);
 		});
-		engineRef.current = engine;
 		//实例化协作编辑客户端
 		const otClient = new OTClient(engine);
 		//连接到协作服务端，demo文档
 		otClient.connect('ws://127.0.0.1:8080', 'demo');
+
+		setEngine(engine);
 	}, []);
 
 	return (
 		<div>
+			{engine && (
+				<Toolbar
+					engine={engine}
+					items={[
+						['undo', 'redo', 'paintformat', 'removeformat'],
+						['heading', 'fontsize'],
+						[
+							'bold',
+							'italic',
+							'strikethrough',
+							'underline',
+							'moremark',
+						],
+						['fontcolor', 'backcolor'],
+						['alignment'],
+						['unorderedlist', 'orderedlist', 'tasklist', 'indent'],
+						['quote', 'hr'],
+					]}
+				/>
+			)}
 			<div style={{ position: 'relative' }}>
 				<div ref={ref} />
 			</div>

@@ -76,4 +76,18 @@ export default class extends Plugin<Options> {
 		}
 		return;
 	}
+
+	parseHtml(root: NodeInterface) {
+		root.find('code').css({
+			'font-family': 'monospace',
+			'font-size': 'inherit',
+			'background-color': 'rgba(0,0,0,.06)',
+			padding: '0 2px',
+			border: '1px solid rgba(0,0,0,.08)',
+			'border-radius': '2px 2px',
+			'line-height': 'inherit',
+			'overflow-wrap': 'break-word',
+			'text-indent': '0',
+		});
+	}
 }

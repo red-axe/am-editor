@@ -99,4 +99,15 @@ export default class extends Plugin<Options> {
 		}
 		return;
 	}
+
+	parseHtml(root: NodeInterface) {
+		root.find('blockquote').css({
+			'margin-top': '5px',
+			'margin-bottom': '5px',
+			'padding-left': '1em',
+			'margin-left': '0px',
+			'border-left': '3px solid #eee',
+			opacity: '0.6',
+		});
+	}
 }

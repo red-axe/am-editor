@@ -1,0 +1,29 @@
+.ant-tooltip .toolbar-tooltip-title {
+    font-size: 12px;
+    text-align: center;
+}
+
+.ant-tooltip .toolbar-tooltip-hotkey {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+}
+
+.editor-toolbar {
+    position: relative;
+    width: 100%;
+    padding:0;
+    background-color: #fcfcfc;
+    z-index: 200;
+    border-top:1px solid rgba(0,0,0,.05);
+    border-bottom: 1px solid rgba(0,0,0,.05);
+    user-select: none;
+}
+
+.editor-toolbar .editor-toolbar-content {
+    position: relative;
+    flex-direction: row;
+    background: transparent;
+    text-align: center;
+    width: 100%;
+}

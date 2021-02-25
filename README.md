@@ -1,7 +1,5 @@
 # am-editor
 
-暂时处于测试阶段，还未发布任何包
-
 编辑器引擎纯 JavaScript 编写。插件可配合 React 或 Vue 等主流前端库渲染
 
 ## Getting Started
@@ -14,8 +12,6 @@ $ yarn
 ```
 
 Start the dev server
-
-事例还未添加各插件的按钮触发，暂时支持快捷键测试，默认快捷键在插件中查看
 
 ```bash
 $ yarn start

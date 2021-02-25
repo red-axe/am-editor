@@ -1,0 +1,36 @@
+.editor-toolbar .toolbar-button {
+    display: inline-block;
+    height: 32px;
+    width: auto;
+    min-width: 32px;
+    margin: 0;
+    text-align: center;
+    padding: 0 7px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px 3px;
+    font-size: 16px;
+    cursor: pointer;
+    color: #595959;
+    outline: none;
+    line-height: 32px;
+}
+
+.editor-toolbar .toolbar-button:hover {
+    border: 1px solid transparent;
+    background-color: #f5f5f5;
+}
+
+.editor-toolbar .toolbar-button:active,.editor-toolbar .toolbar-button-active,.editor-toolbar .toolbar-button-active:hover {
+    background-color: #e8e8e8;
+    border: 1px solid transparent;
+}
+
+.editor-toolbar .toolbar-button-disabled,.editor-toolbar .toolbar-button-disabled:hover {
+    background-color: transparent;
+    border: 1px solid transparent;
+    box-shadow: none;
+    color: #000000;
+    opacity: 0.25;
+    cursor: not-allowed;
+}

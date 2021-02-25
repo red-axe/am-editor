@@ -96,6 +96,9 @@ export default class extends List<Options> {
 			node.empty();
 			node.append(checkbox);
 		});
+		root.find('.data-list-task').css({
+			'list-style': 'none',
+		});
 	}
 
 	//设置markdown

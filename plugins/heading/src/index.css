@@ -65,31 +65,32 @@
 }
 
 .am-engine-view h2 , .am-engine h2 {
-    font-size: 26px;
-    line-height: 34px;
-    padding: 7px 0;
-}
-
-.am-engine-view h3 , .am-engine h3 {
     font-size: 24px;
     line-height: 32px;
     padding: 7px 0;
 }
 
-.am-engine-view h4 , .am-engine h4 {
-    font-size: 22px;
-    line-height: 30px;
-    padding: 7px 0;
-}
-
-.am-engine-view h5 , .am-engine h5 {
+.am-engine-view h3 , .am-engine h3 {
     font-size: 20px;
     line-height: 28px;
     padding: 7px 0;
 }
 
-.am-engine-view h6 , .am-engine h6 {
-    font-size: 18px;
-    line-height: 26px;
+.am-engine-view h4 , .am-engine h4 {
+    font-size: 16px;
+    line-height: 24px;
     padding: 7px 0;
+}
+
+.am-engine-view h5 , .am-engine h5 {
+    font-size: 14px;
+    line-height: 24px;
+    padding: 7px 0;
+}
+
+.am-engine-view h6 , .am-engine h6 {
+    font-size: 14px;
+    line-height: 24px;
+    padding: 7px 0;
+    font-weight: normal;
 }

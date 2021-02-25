@@ -42,7 +42,7 @@ class ContentView implements ContentViewInterface {
 
 	constructor(selector: Selector, options?: ContentViewOptions) {
 		this.options = { ...this.options, ...options };
-		this.language = new Language(language[this.options.lang || 'zh-cn']);
+		this.language = new Language(this.options.lang || 'zh-cn', language);
 		this.container = $(selector);
 		this.root = $(
 			this.options.root || this.container.parent() || document.body,
