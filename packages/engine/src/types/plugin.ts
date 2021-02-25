@@ -1,5 +1,5 @@
 import { ClipboardData } from './clipboard';
-import { ContentViewInterface } from './content-view';
+import { ViewInterface } from './view';
 import { EngineInterface } from './engine';
 import { LanguageInterface } from './language';
 import { NodeInterface } from './node';
@@ -8,7 +8,7 @@ import { SchemaInterface } from './schema';
 
 export type PluginOptions = {
 	engine?: EngineInterface;
-	contentView?: ContentViewInterface;
+	view?: ViewInterface;
 };
 
 export interface PluginEntry {
@@ -208,5 +208,5 @@ export interface PluginModelInterface {
 	 * 设置内容渲染实例
 	 * @param engine 引擎实例
 	 */
-	setContentView(contentView: ContentViewInterface): void;
+	setContentView(view: ViewInterface): void;
 }

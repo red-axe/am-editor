@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey';
-import $ from '../../model/node';
+import $ from '../../node';
 import inlineCard from './inline-card';
 import blockCard from './block-card';
 import tab from './tab';

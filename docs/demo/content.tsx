@@ -1,15 +1,15 @@
 import React, { useRef, useEffect } from 'react';
 import { isBrowser } from 'umi';
-import Engine, { $, ContentView, ContentViewInterface } from '@aomao/engine';
+import Engine, { $, View, ViewInterface } from '@aomao/engine';
 
 const ContentRender = ({ content }: { content: string }) => {
-	const contentView = useRef<ContentViewInterface>();
+	const view = useRef<ViewInterface>();
 	const viewRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
-		if (viewRef.current && !contentView.current) {
+		if (viewRef.current && !view.current) {
 			//初始化
-			contentView.current = new ContentView(viewRef.current, {
+			view.current = new View(viewRef.current, {
 				card: Engine.card,
 				plugin: Engine.plugin,
 			});
@@ -17,16 +17,16 @@ const ContentRender = ({ content }: { content: string }) => {
 	}, []);
 
 	useEffect(() => {
-		if (contentView.current) {
+		if (view.current) {
 			//渲染内容到viewRef节点下
-			contentView.current.render(content);
+			view.current.render(content);
 		}
 	}, [content]);
 
 	//服务端渲染
 	const renderServer = () => {
 		const container = $('<div></div>');
-		const view = new ContentView(container, {
+		const view = new View(container, {
 			card: Engine.card,
 			plugin: Engine.plugin,
 		});

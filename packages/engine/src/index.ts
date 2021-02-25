@@ -1,11 +1,11 @@
-import Engine from './model/engine';
-import Plugin from './model/plugin/entry';
-import Card from './model/card/entry';
-import List from './model/list/entry';
-import ContentView from './model/content-view';
-import $, { isNode, isNodeEntry, isNodeList } from './model/node';
+import Engine from './engine';
+import Plugin from './plugin/entry';
+import Card from './card/entry';
+import List from './list/entry';
+import View from './view';
+import $, { isNode, isNodeEntry, isNodeList } from './node';
 import Toolbar, { Tooltip } from './toolbar';
-import Range from './model/range';
+import Range from './range';
 import Parser from './parser';
 export * from './types';
 export * from './utils';
@@ -16,7 +16,7 @@ export default Engine;
 export {
 	$,
 	Range,
-	ContentView,
+	View,
 	Plugin,
 	Card,
 	List,

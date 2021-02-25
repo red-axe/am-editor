@@ -2,7 +2,7 @@ export * from './card';
 export * from './change';
 export * from './clipboard';
 export * from './command';
-export * from './content-view';
+export * from './view';
 export * from './conversion';
 export * from './engine';
 export * from './history';

@@ -31,8 +31,8 @@ export type Options = {
 export default class extends Plugin<Options> {
 	initialize() {
 		//阅读模式处理
-		if (this.contentView && this.options.showAnchor !== false) {
-			this.contentView.on('render', (root: Node) => {
+		if (this.view && this.options.showAnchor !== false) {
+			this.view.on('render', (root: Node) => {
 				const container = $(root);
 				container.find('h1,h2,h3,h4,h5,h6').each(heading => {
 					const node = $(heading);
@@ -65,12 +65,12 @@ export default class extends Plugin<Options> {
 								? this.options.anchorCopy(id)
 								: window.location.href + '/' + id;
 
-							if (this.contentView!.clipboard.copy(url)) {
-								this.contentView!.messageSuccess(
+							if (this.view!.clipboard.copy(url)) {
+								this.view!.messageSuccess(
 									lang.get('copy', 'success').toString(),
 								);
 							} else {
-								this.contentView!.messageError(
+								this.view!.messageError(
 									lang.get('copy', 'error').toString(),
 								);
 							}

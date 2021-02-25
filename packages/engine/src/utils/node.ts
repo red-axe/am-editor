@@ -1,12 +1,12 @@
 import md5 from 'blueimp-md5';
-import $, { isNodeEntry } from '../model/node';
+import $, { isNodeEntry } from '../node';
 import {
 	CARD_KEY,
 	READY_CARD_KEY,
 	CARD_SELECTOR,
 	CARD_TYPE_KEY,
 } from '../constants/card';
-import { ANCHOR, FOCUS, CURSOR } from '../constants/bookmark';
+import { ANCHOR, FOCUS, CURSOR } from '../constants/selection';
 import { MARK_ELEMENTID_MAP, ROOT_TAG_MAP } from '../constants/tags';
 import { Level } from '../constants/semantics';
 import { INDENT_KEY } from '../constants/indent';
@@ -15,7 +15,7 @@ import { toCamelCase, getStyleMap } from './string';
 import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { DATA_ELEMENT } from '../constants/root';
-import Range from '../model/range';
+import Range from '../range';
 
 /**
  * 获取样式名称
@@ -719,7 +719,7 @@ export const brToParagraph = (block: NodeInterface) => {
 			prevContainer &&
 			!prevContainer.first()
 		) {
-			prevContainer.append('<br />');
+			prevContainer.append($('<br />'));
 		}
 		node = next;
 	}

@@ -73,7 +73,7 @@ const EngineDemo = () => {
 		//监听编辑器值改变事件
 		engine.on('change', value => {
 			setContent(value);
-			console.log(`value:${value}，html:${engine.getHtml()}`);
+			console.log(`value:${value}`);
 		});
 		//实例化协作编辑客户端
 		const otClient = new OTClient(engine);
@@ -108,7 +108,7 @@ const EngineDemo = () => {
 			<div style={{ position: 'relative' }}>
 				<div ref={ref} />
 			</div>
-			<h4>ContentView:</h4>
+			<h4>View:</h4>
 			<Content content={content} />
 		</div>
 	);

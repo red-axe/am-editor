@@ -1,10 +1,10 @@
-import $ from '../../model/node';
+import $ from '../../node';
 import { CARD_LEFT_SELECTOR, CARD_RIGHT_SELECTOR } from '../../constants/card';
 import { EngineInterface } from '../../types/engine';
 import { RangeInterface } from '../../types/range';
 import { CardInterface, CardType } from '../../types/card';
 import { getWindow } from '../../utils';
-import { deleteContent } from '../../model/change/utils';
+import { deleteContent } from '../../change/utils';
 import { pluginKeydownTrigger } from '../utils';
 
 // Card

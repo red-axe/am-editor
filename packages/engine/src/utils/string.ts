@@ -1,4 +1,4 @@
-import { ANCHOR, CURSOR, FOCUS } from '../constants/bookmark';
+import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import {
 	CARD_TYPE_KEY,
 	CARD_VALUE_KEY,

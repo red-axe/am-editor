@@ -1,4 +1,4 @@
-import $ from '../model/node';
+import $ from '../node';
 import { INDENT_KEY } from '../constants/indent';
 import { unwrapNode, setNode, getWindow } from './node';
 import { CARD_KEY, CARD_SELECTOR } from '../constants/card';
@@ -380,7 +380,7 @@ const addBrToCustomzieList = (root: NodeInterface) => {
 				domChild.first()?.equal(domNode) &&
 				domChild.first()?.isCard()
 			) {
-				domChild.append('<br />');
+				domChild.append($('<br />'));
 				return;
 			}
 			if (node.nodeType === getWindow().Node.TEXT_NODE) {
