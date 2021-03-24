@@ -1,20 +1,16 @@
 import {
-	$,
 	ANCHOR,
-	brToParagraph,
 	CURSOR,
 	DATA_ELEMENT,
-	HEADING_TAG_MAP,
-	isCustomizeListBlock,
+	isEngine,
 	NodeInterface,
-	Plugin,
 	random,
 	Tooltip,
-	unwrapNode,
+	Block,
+	PluginEntry,
 } from '@aomao/engine';
 import './index.css';
 
-const HeadingTags = Object.keys(HEADING_TAG_MAP);
 export type Options = {
 	hotkey?: {
 		h1?: string;
@@ -27,16 +23,35 @@ export type Options = {
 	showAnchor?: boolean;
 	anchorCopy?: (id: string) => string;
 	markdown?: boolean;
+	disableMark?: Array<string>;
 };
-export default class extends Plugin<Options> {
-	initialize() {
+export default class extends Block<Options> {
+	attributes = {
+		id: '@var0',
+	};
+	variable = {
+		'@var0': /^[\w\.\-]+$/,
+	};
+	tagName = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+	allowIn = ['blockquote'];
+
+	disableMark = this.options.disableMark || ['fontsize', 'bold'];
+
+	static get pluginName() {
+		return 'heading';
+	}
+
+	init() {
+		super.init();
+		const { $ } = this.editor;
 		//阅读模式处理
-		if (this.view && this.options.showAnchor !== false) {
-			this.view.on('render', (root: Node) => {
+		if (!isEngine(this.editor) && this.options.showAnchor !== false) {
+			this.editor.on('render', (root: Node) => {
 				const container = $(root);
-				container.find('h1,h2,h3,h4,h5,h6').each(heading => {
+				container.find(this.tagName.join(',')).each(heading => {
 					const node = $(heading);
-					const id = node.attr('id');
+					const id = node.attributes('id');
 					if (id) {
 						node.find('.data-anchor-button').remove();
 						const button = $(
@@ -48,14 +63,15 @@ export default class extends Plugin<Options> {
 							});
 						}
 						const lang = this.getLang();
+						const tooltip = new Tooltip(this.editor);
 						button.on('mouseenter', () => {
-							Tooltip.show(
+							tooltip.show(
 								button,
 								lang.get('copyAnchor', 'title').toString(),
 							);
 						});
 						button.on('mouseleave', () => {
-							Tooltip.hide();
+							tooltip.hide();
 						});
 
 						button.on('click', e => {
@@ -65,12 +81,12 @@ export default class extends Plugin<Options> {
 								? this.options.anchorCopy(id)
 								: window.location.href + '/' + id;
 
-							if (this.view!.clipboard.copy(url)) {
-								this.view!.messageSuccess(
+							if (this.editor.clipboard.copy(url)) {
+								this.editor.messageSuccess(
 									lang.get('copy', 'success').toString(),
 								);
 							} else {
-								this.view!.messageError(
+								this.editor.messageError(
 									lang.get('copy', 'error').toString(),
 								);
 							}
@@ -80,16 +96,21 @@ export default class extends Plugin<Options> {
 				});
 			});
 		}
+		if (isEngine(this.editor))
+			this.editor.on('keydown:backspace', event =>
+				this.onBackspace(event),
+			);
 		//引擎处理
-		if (!this.engine || this.options.showAnchor === false) return;
-		this.engine.on('setvalue', () => {
+		if (!isEngine(this.editor) || this.options.showAnchor === false) return;
+
+		this.editor.on('setvalue', () => {
 			this.updateId();
 		});
-		this.engine.on('change', () => {
+		this.editor.on('change', () => {
 			this.updateId();
 			this.showAnchor();
 		});
-		this.engine.on('select', () => {
+		this.editor.on('select', () => {
 			this.showAnchor();
 		});
 		window.addEventListener(
@@ -103,32 +124,33 @@ export default class extends Plugin<Options> {
 
 	updateId() {
 		const ids = {};
-		this.engine?.container.find('h1,h2,h3,h4,h5,h6').each(titleNode => {
+		const { $ } = this.editor;
+		this.editor.container.find(this.tagName.join(',')).each(titleNode => {
 			const node = $(titleNode);
 
 			if (!node.parent()?.isRoot()) {
-				node.removeAttr('id');
+				node.removeAttributes('id');
 				return;
 			}
 
-			let id = node.attr('id');
+			let id = node.attributes('id');
 			if (!id) {
 				id = random();
-				node.attr('id', id);
+				node.attributes('id', id);
 			}
 			if (ids[id]) {
 				while (ids[id]) {
 					id = random();
 				}
-				node.attr('id', id);
+				node.attributes('id', id);
 			}
 			ids[id] = true;
 		});
 	}
 
 	updateAnchorPosition() {
-		if (!this.engine) return;
-		const { change, root } = this.engine;
+		if (!isEngine(this.editor)) return;
+		const { change, root } = this.editor;
 		const button = root.find('.data-anchor-button');
 
 		if (button.length === 0) {
@@ -162,17 +184,16 @@ export default class extends Plugin<Options> {
 	}
 
 	showAnchor() {
-		if (!this.engine) return;
-		const { change, root, clipboard } = this.engine;
+		if (!isEngine(this.editor)) return;
+		const { change, root, clipboard, $ } = this.editor;
 		const range = change.getRange();
 		let button = root.find('.data-anchor-button');
-		const block = range.startNode.closest('h1,h2,h3,h4,h5,h6');
+		const block = range.startNode.closest(this.tagName.join(','));
 
 		if (
 			block.length === 0 ||
 			(button.length > 0 &&
-				button.find('.data-icon-'.concat(block.name || '')).length ===
-					0)
+				button.find('.data-icon-'.concat(block.name)).length === 0)
 		) {
 			button.remove();
 		}
@@ -185,7 +206,7 @@ export default class extends Plugin<Options> {
 			return;
 		}
 
-		if (button.find('.data-icon-'.concat(block.name || '')).length > 0) {
+		if (button.find('.data-icon-'.concat(block.name)).length > 0) {
 			this.updateAnchorPosition();
 			return;
 		}
@@ -217,27 +238,28 @@ export default class extends Plugin<Options> {
 		});
 		const lang = this.getLang();
 		button.addClass('data-anchor-button-active');
+		const tooltip = new Tooltip(this.editor);
 		button.on('mouseenter', () => {
-			Tooltip.show(button, lang.get('copyAnchor', 'title').toString());
+			tooltip.show(button, lang.get('copyAnchor', 'title').toString());
 		});
 		button.on('mouseleave', () => {
-			Tooltip.hide();
+			tooltip.hide();
 		});
 
 		button.on('click', e => {
 			e.preventDefault();
 			e.stopPropagation();
-			const id = block.attr('id');
+			const id = block.attributes('id');
 			const url = this.options.anchorCopy
 				? this.options.anchorCopy(id)
 				: window.location.href + '/' + id;
 
 			if (clipboard.copy(url)) {
-				this.engine!.messageSuccess(
+				this.editor!.messageSuccess(
 					lang.get('copy', 'success').toString(),
 				);
 			} else {
-				this.engine!.messageError(lang.get('copy', 'error').toString());
+				this.editor!.messageError(lang.get('copy', 'error').toString());
 			}
 		});
 	}
@@ -246,15 +268,15 @@ export default class extends Plugin<Options> {
 	 * 将p标签下的节点放到标题节点下，并且移除p标签
 	 */
 	private replaceParagraph() {
-		if (!this.engine) return;
-		const { change } = this.engine;
+		if (!isEngine(this.editor)) return;
+		const { change, block } = this.editor;
 		const range = change.getRange();
-		const blocks = range.getBlocks();
-		const bookmark = range.createBookmark();
+		const blocks = block.getBlocks(range);
+		const selection = range.createSelection();
 		blocks.forEach(block => {
 			if (block.name === 'p') {
 				const parent = block.parent();
-				if (parent && parent.isHeading()) {
+				if (parent && this.tagName.indexOf(parent.name) > -1) {
 					const childNodes = block[0].childNodes;
 					for (
 						let index = childNodes.length - 1;
@@ -267,19 +289,19 @@ export default class extends Plugin<Options> {
 				}
 			}
 		});
-		if (bookmark) range.moveToBookmark(bookmark);
+		selection.move();
 	}
 
 	// 前置处理
 	beforeProcess() {
-		if (!this.engine) return;
+		if (!isEngine(this.editor)) return;
 		this.replaceParagraph();
-		const { change } = this.engine;
+		const { change, block } = this.editor;
 		const range = change.getRange();
-		const blocks = range.getBlocks();
-		const bookmark = range.createBookmark();
+		const blocks = block.getBlocks(range);
+		const selection = range.createSelection();
 
-		if (!bookmark) {
+		if (!selection.has()) {
 			return;
 		}
 		let start;
@@ -287,7 +309,9 @@ export default class extends Plugin<Options> {
 			const parent = block.parent();
 			let first = block.first();
 			//如果是光标相关节点取下一个兄弟节点
-			if ([CURSOR, ANCHOR].includes(first?.attr(DATA_ELEMENT) || '')) {
+			if (
+				[CURSOR, ANCHOR].includes(first?.attributes(DATA_ELEMENT) || '')
+			) {
 				first = first!.next();
 			}
 			//如果是有序列表，转换序号
@@ -298,49 +322,40 @@ export default class extends Plugin<Options> {
 				first &&
 				first.isText()
 			) {
-				start = parseInt(parent.attr('start'), 10) || 1;
+				start = parseInt(parent.attributes('start'), 10) || 1;
 				first[0].nodeValue = `${start}.` + first[0].nodeValue;
 			}
-			brToParagraph(block);
+			this.editor.block.brToBlock(block);
 		});
-		if (bookmark) range.moveToBookmark(bookmark);
+		selection.move();
 		return start;
 	}
 
 	// 后续处理
 	afterProcess(start?: number) {
-		if (!this.engine) return;
-		const { change } = this.engine;
+		if (!isEngine(this.editor)) return;
+		const { change, block, mark, $ } = this.editor;
 		const range = change.getRange();
-		const blocks = range.getBlocks();
-		const bookmark = range.createBookmark();
-		if (!bookmark) {
+		const blocks = block.getBlocks(range);
+		const selection = range.createSelection();
+		if (!selection.has()) {
 			return;
 		}
 
 		blocks.forEach(block => {
 			block.allChildren().forEach(child => {
 				const node = $(child);
-				//字体大小去除
-				if (
-					node.name === 'strong' ||
-					(node.name === 'span' &&
-						/^data-fontsize-\d+$/.test(
-							node.get<Element>()?.className || '',
-						))
-				) {
-					unwrapNode(node);
-					return;
-				}
-
-				if (node.name === 'span') {
-					const match = /(?:^|\b)(data-fontsize-\d+)(?:$|\b)/.exec(
-						node.get<Element>()?.className || '',
+				const plugins = mark.findPlugin(node);
+				this.disableMark.forEach(pluginName => {
+					const plugin = plugins.find(
+						plugin =>
+							(plugin.constructor as PluginEntry).pluginName ===
+							pluginName,
 					);
-					if (match) {
-						node.removeClass(match[1]);
+					if (plugin) {
+						this.editor.node.unwrap(node);
 					}
-				}
+				});
 			});
 			//有序列表序号
 			const parent = block.parent();
@@ -349,42 +364,40 @@ export default class extends Plugin<Options> {
 				if (
 					parentNext &&
 					parentNext.name === 'ol' &&
-					parentNext.attr('start')
+					parentNext.attributes('start')
 				) {
-					parentNext.attr('start', start + 1);
+					parentNext.attributes('start', start + 1);
 				}
 			}
 			//列表
-			if (parent && ['ul', 'ol'].includes(parent.name || '')) {
-				if (isCustomizeListBlock(parent)) {
+			if (parent && this.editor.node.isList(parent)) {
+				if (this.editor.node.isCustomize(parent)) {
 					parent.first()?.remove();
 				}
-				unwrapNode(parent);
+				this.editor.node.unwrap(parent);
 			}
 		});
-		if (bookmark) range.moveToBookmark(bookmark);
+		selection.move();
 	}
 
 	execute(type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p') {
-		if (!this.engine) return;
+		if (!isEngine(this.editor)) return;
 		if (type === this.queryState()) type = 'p';
 		this.beforeProcess();
-		const { change } = this.engine;
-		change.separateBlocks();
-		change.setBlocks(`<${type} />`);
+		const { list, block } = this.editor;
+		list.split();
+		block.setBlocks(`<${type} />`);
 		this.afterProcess();
 	}
 
 	queryState() {
-		if (!this.engine) return;
-		const { change } = this.engine;
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
 		const blocks = change.blocks;
 		if (blocks.length === 0) {
 			return '';
 		}
-		return HeadingTags.indexOf(blocks[0].name || '') >= 0
-			? blocks[0].name
-			: '';
+		return this.tagName.indexOf(blocks[0].name) >= 0 ? blocks[0].name : '';
 	}
 
 	hotkey() {
@@ -404,30 +417,13 @@ export default class extends Plugin<Options> {
 		];
 	}
 
-	schema() {
-		const rules: Array<any> = [];
-		HeadingTags.forEach(key => {
-			rules.push({
-				[key]: {
-					id: /^[\w\.\-]+$/,
-					'data-id': '*',
-				},
-			});
-		});
-		return rules;
-	}
-
 	//设置markdown
-	onKeydownSpace(event: KeyboardEvent, node: NodeInterface) {
-		if (!this.engine || this.options.markdown === false) return;
+	markdown(event: KeyboardEvent, text: string, block: NodeInterface) {
+		if (!isEngine(this.editor) || this.options.markdown === false)
+			return false;
 
-		const block = node.getClosestBlock();
-		if (!block.isHeading()) {
-			return;
-		}
-		const { change } = this.engine;
+		const { change } = this.editor;
 		const range = change.getRange();
-		const text = range.getBlockLeftText(block[0]);
 		let type: any = '';
 		switch (text) {
 			case '#':
@@ -449,10 +445,10 @@ export default class extends Plugin<Options> {
 				type = 'h6';
 				break;
 		}
-		if (!type) return;
+		if (!type) return true;
 		event.preventDefault();
-		range.removeBlockLeftText(block[0]);
-		if (block.isEmpty()) {
+		this.editor.block.removeLeftText(block);
+		if (this.editor.node.isEmpty(block)) {
 			block.empty();
 			block.append('<br />');
 		}
@@ -460,33 +456,23 @@ export default class extends Plugin<Options> {
 		return false;
 	}
 
-	onCustomizeKeydown(
-		type:
-			| 'enter'
-			| 'backspace'
-			| 'space'
-			| 'tab'
-			| 'at'
-			| 'slash'
-			| 'selectall',
-		event: KeyboardEvent,
-	) {
-		if (!this.engine || type !== 'backspace') return;
-		const { change } = this.engine;
+	onBackspace(event: KeyboardEvent) {
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
 		const range = change.getRange();
-		if (!range.isBlockFirstOffset('start')) return;
-		const block = range.startNode.getClosestBlock();
+		if (!this.editor.block.isFirstOffset(range, 'start')) return;
+		const block = this.editor.block.closest(range.startNode);
 
 		if (
-			block.isTitle() &&
-			block.isEmptyWithTrim() &&
+			this.tagName.indexOf(block.name) > -1 &&
+			this.editor.node.isEmptyWithTrim(block) &&
 			block.parent()?.isRoot()
 		) {
 			event.preventDefault();
-			change.setBlocks('<p />');
+			this.editor.block.setBlocks('<p />');
 			return false;
 		}
-		if (block.isTitle()) {
+		if (this.tagName.indexOf(block.name) > -1) {
 			event.preventDefault();
 			change.mergeAfterDeletePrevNode(block);
 			return false;

@@ -1,58 +1,70 @@
 import {
-  Card,
-  CardToolbarItemOptions,
-  ToolbarItemOptions,
+	Card,
+	CardToolbarItemOptions,
+	CardType,
+	ToolbarItemOptions,
 } from '@aomao/engine';
 import './index.css';
 class Hr extends Card {
-  toolbarConfig(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
-    return [
-      {
-        type: 'dnd',
-      },
-      {
-        type: 'copy',
-      },
-      {
-        type: 'separator',
-      },
-      {
-        type: 'delete',
-      },
-    ];
-  }
+	static get cardName() {
+		return 'hr';
+	}
 
-  onSelect(selected: boolean) {
-    const selectedClass = 'hr-selected';
-    const center = this.getCenter();
-    if (selected) center.addClass(selectedClass);
-    else center.removeClass(selectedClass);
-  }
+	static get cardType() {
+		return CardType.BLOCK;
+	}
 
-  onActivate(activated: boolean) {
-    const activatedClass = 'hr-activated';
-    const center = this.getCenter();
-    if (activated) center.addClass(activatedClass);
-    else center.removeClass(activatedClass);
-  }
+	static get autoActivate() {
+		return false;
+	}
 
-  onSelectByOther(selected: boolean, value?: { color: string; rgb: string }) {
-    const center = this.getCenter();
-    center.css('background-color', selected ? value!.rgb : '');
-    center.find('hr').css('background-color', selected ? value!.rgb : '');
-  }
+	toolbarConfig(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+		return [
+			{
+				type: 'dnd',
+			},
+			{
+				type: 'copy',
+			},
+			{
+				type: 'separator',
+			},
+			{
+				type: 'delete',
+			},
+		];
+	}
 
-  onActivateByOther(
-    activated: boolean,
-    value?: { color: string; rgb: string },
-  ) {
-    this.onSelectByOther(activated, value);
-  }
+	onSelect(selected: boolean) {
+		const selectedClass = 'hr-selected';
+		const center = this.getCenter();
+		if (selected) center.addClass(selectedClass);
+		else center.removeClass(selectedClass);
+	}
 
-  render() {
-    this.getCenter().addClass('card-hr');
-    return '<hr />';
-  }
+	onActivate(activated: boolean) {
+		const activatedClass = 'hr-activated';
+		const center = this.getCenter();
+		if (activated) center.addClass(activatedClass);
+		else center.removeClass(activatedClass);
+	}
+
+	onSelectByOther(selected: boolean, value?: { color: string; rgb: string }) {
+		const center = this.getCenter();
+		center.css('background-color', selected ? value!.rgb : '');
+		center.find('hr').css('background-color', selected ? value!.rgb : '');
+	}
+
+	onActivateByOther(
+		activated: boolean,
+		value?: { color: string; rgb: string },
+	) {
+		this.onSelectByOther(activated, value);
+	}
+
+	render() {
+		this.getCenter().addClass('card-hr');
+		return '<hr />';
+	}
 }
-Hr.autoActivate = false;
 export default Hr;

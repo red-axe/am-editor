@@ -1,4 +1,4 @@
-import $ from '../../node';
+import { EditorInterface } from '../../types';
 import { NodeInterface } from '../../types/node';
 import { DropdownSwitchOptions } from '../../types/toolbar';
 
@@ -20,15 +20,18 @@ const template = (options: DropdownSwitchOptions) => {
 };
 
 export default class {
+	private editor: EditorInterface;
 	private options: DropdownSwitchOptions;
 	private root: NodeInterface | undefined;
 	private switch: NodeInterface | undefined;
 
-	constructor(options: DropdownSwitchOptions) {
+	constructor(editor: EditorInterface, options: DropdownSwitchOptions) {
+		this.editor = editor;
 		this.options = options;
 	}
 
 	renderTo(container: NodeInterface) {
+		const { $ } = this.editor;
 		this.root = $(template(this.options));
 		this.switch = this.root.find('.ant-switch');
 		container.append(this.root);

@@ -1,11 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Engine, { EngineInterface } from '@aomao/engine';
+import Redo from '@aomao/plugin-redo';
+import Undo from '@aomao/plugin-undo';
 import Bold from '@aomao/plugin-bold';
+import Code from '@aomao/plugin-code';
+import Backcolor from '@aomao/plugin-backcolor';
+import Fontcolor from '@aomao/plugin-fontcolor';
+import Fontsize from '@aomao/plugin-fontsize';
 import Italic from '@aomao/plugin-italic';
 import Underline from '@aomao/plugin-underline';
 import Hr, { HrEntry } from '@aomao/plugin-hr';
-import Redo from '@aomao/plugin-redo';
-import Undo from '@aomao/plugin-undo';
 import Tasklist, { Checkbox } from '@aomao/plugin-tasklist';
 import Orderedlist from '@aomao/plugin-orderedlist';
 import Unorderedlist from '@aomao/plugin-unorderedlist';
@@ -15,10 +19,6 @@ import Strikethrough from '@aomao/plugin-strikethrough';
 import Sub from '@aomao/plugin-sub';
 import Sup from '@aomao/plugin-sup';
 import Alignment from '@aomao/plugin-alignment';
-import Backcolor from '@aomao/plugin-backcolor';
-import Code from '@aomao/plugin-code';
-import Fontcolor from '@aomao/plugin-fontcolor';
-import Fontsize from '@aomao/plugin-fontsize';
 import Mark from '@aomao/plugin-mark';
 import Quote from '@aomao/plugin-quote';
 import PaintFormat from '@aomao/plugin-paintformat';
@@ -28,33 +28,33 @@ import Toolbar from '@aomao/toolbar';
 import Content from './content';
 import OTClient from './ot-client';
 
-Engine.card.add('hr', HrEntry);
-Engine.card.add('checkbox', Checkbox);
-Engine.plugin.add('indent', Indent);
-Engine.plugin.add('redo', Redo);
-Engine.plugin.add('undo', Undo);
-Engine.plugin.add('bold', Bold);
-Engine.plugin.add('italic', Italic);
-Engine.plugin.add('underline', Underline);
-Engine.plugin.add('hr', Hr);
-Engine.plugin.add('tasklist', Tasklist);
-Engine.plugin.add('orderedlist', Orderedlist);
-Engine.plugin.add('unorderedlist', Unorderedlist);
-Engine.plugin.add('heading', Heading);
-Engine.plugin.add('strikethrough', Strikethrough);
-Engine.plugin.add('sub', Sub);
-Engine.plugin.add('sup', Sup);
-Engine.plugin.add('alignment', Alignment);
-Engine.plugin.add('backcolor', Backcolor);
-Engine.plugin.add('code', Code);
-Engine.plugin.add('fontcolor', Fontcolor);
-Engine.plugin.add('fontsize', Fontsize);
-Engine.plugin.add('mark', Mark);
-Engine.plugin.add('quote', Quote);
-Engine.plugin.add('paintformat', PaintFormat);
-Engine.plugin.add('removeformat', RemoveFormat);
-Engine.plugin.add('selectall', SelectAll);
-
+const plugins = [
+	Redo,
+	Undo,
+	Bold,
+	Code,
+	Backcolor,
+	Fontcolor,
+	Fontsize,
+	Italic,
+	Underline,
+	Hr,
+	Tasklist,
+	Orderedlist,
+	Unorderedlist,
+	Indent,
+	Heading,
+	Strikethrough,
+	Sub,
+	Sup,
+	Alignment,
+	Mark,
+	Quote,
+	PaintFormat,
+	RemoveFormat,
+	SelectAll,
+];
+const cards = [HrEntry, Checkbox];
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const [engine, setEngine] = useState<EngineInterface>();
@@ -65,7 +65,10 @@ const EngineDemo = () => {
 	useEffect(() => {
 		if (!ref.current) return;
 		//实例化引擎
-		const engine = new Engine(ref.current);
+		const engine = new Engine(ref.current, {
+			plugins,
+			cards,
+		});
 		//初始化本地协作，用作记录历史
 		engine.ot.initLockMode();
 		//设置编辑器值
@@ -109,7 +112,7 @@ const EngineDemo = () => {
 				<div ref={ref} />
 			</div>
 			<h4>View:</h4>
-			<Content content={content} />
+			<Content content={content} plugins={plugins} cards={cards} />
 		</div>
 	);
 };

@@ -1,9 +1,9 @@
-import $ from '../../node';
 import { NodeInterface } from '../../types/node';
 import Tooltip from '../tooltip';
 import Switch from './switch';
 import Button from './button';
 import { DropdownInterface, DropdownOptions } from '../../types/toolbar';
+import { EditorInterface } from '../../types';
 
 const template = (options: DropdownOptions) => {
 	return `
@@ -16,11 +16,13 @@ const template = (options: DropdownOptions) => {
 };
 
 export default class Dropdown implements DropdownInterface {
+	private editor: EditorInterface;
 	private options: DropdownOptions;
 	private root: NodeInterface | undefined;
 	private dropdown: NodeInterface | undefined;
 
-	constructor(options: DropdownOptions) {
+	constructor(editor: EditorInterface, options: DropdownOptions) {
+		this.editor = editor;
 		this.options = options;
 	}
 
@@ -66,17 +68,18 @@ export default class Dropdown implements DropdownInterface {
 	renderTooltip() {
 		const { title } = this.options;
 		if (title) {
+			const tooltip = new Tooltip(this.editor);
 			this.root!.on('mouseenter', () => {
-				Tooltip.show(
+				tooltip.show(
 					this.root!,
 					typeof title === 'function' ? title() : title,
 				);
 			});
 			this.root!.on('mouseleave', () => {
-				Tooltip.hide();
+				tooltip.hide();
 			});
 			this.root!.on('mousedown', () => {
-				Tooltip.hide();
+				tooltip.hide();
 			});
 		}
 	}
@@ -87,9 +90,13 @@ export default class Dropdown implements DropdownInterface {
 		items.forEach(item => {
 			switch (item.type) {
 				case 'switch':
-					return new Switch(item).renderTo(this.dropdown!);
+					return new Switch(this.editor, item).renderTo(
+						this.dropdown!,
+					);
 				case 'button':
-					return new Button(item).renderTo(this.dropdown!);
+					return new Button(this.editor, item).renderTo(
+						this.dropdown!,
+					);
 			}
 		});
 		this.dropdown.on('click', e => {
@@ -99,7 +106,7 @@ export default class Dropdown implements DropdownInterface {
 	}
 
 	render(container: NodeInterface) {
-		this.root = $(template(this.options));
+		this.root = this.editor.$(template(this.options));
 		container.append(this.root);
 		this.initToggleEvent();
 		this.renderTooltip();

@@ -1,4 +1,3 @@
-import $, { isNodeEntry } from '../node';
 import {
 	CARD_ELEMENT_KEY,
 	CARD_KEY,
@@ -6,7 +5,6 @@ import {
 	CARD_VALUE_KEY,
 	CARD_TYPE_KEY,
 } from '../constants/card';
-import { VOID_TAG_MAP } from '../constants/tags';
 import {
 	escape,
 	unescape,
@@ -17,12 +15,11 @@ import {
 	getWindow,
 } from '../utils';
 import transform from './transform';
-import filter from './filter';
 import TextParser from './text';
 import { NodeInterface } from '../types/node';
 import { DATA_ELEMENT } from '../constants/root';
-import { EngineInterface } from '../types/engine';
-import { ViewInterface } from '../types/view';
+import { EditorInterface } from '../types/engine';
+import { SchemaInterface, isNodeEntry } from '../types';
 
 const style = {
 	'font-size': '14px',
@@ -47,119 +44,6 @@ type Callbacks = {
 		styles: { [k: string]: string },
 	) => void;
 	onText?: (node: NodeInterface, test: string) => void;
-};
-/**
- * data type:
- *
- * Value: <p>foo</p><p><br /><cursor /></p>
- * LowerValue: <p>foo</p><p><br /><span data-element="cursor"></span></p>
- * DOM: HTML DOM tree
- * Markdown: ### heading
- * Text: plain text
- *
- */
-const walkTree = (
-	node: NodeInterface,
-	conversionRules: any,
-	callbacks: Callbacks,
-	isCardNode?: boolean,
-	includeCard?: boolean,
-) => {
-	let child = node.first();
-
-	while (child) {
-		if (child.isElement()) {
-			let name = child.name!;
-			let attrs = child.attr();
-			let styles = child.css();
-			//删除属性中的style属性
-			delete attrs.style;
-			// 光标相关节点
-			if (attrs[DATA_ELEMENT]) {
-				name = attrs[DATA_ELEMENT].toLowerCase();
-				attrs = {};
-				styles = {};
-			}
-			// Card相关节点
-			if (['left', 'right'].indexOf(attrs[CARD_ELEMENT_KEY]) >= 0) {
-				child = child.next();
-				continue;
-			}
-
-			if (attrs[CARD_KEY] || attrs[READY_CARD_KEY]) {
-				name = 'card';
-				const value = attrs[CARD_VALUE_KEY];
-				attrs = {
-					type: attrs[CARD_TYPE_KEY],
-					name: (
-						attrs[CARD_KEY] || attrs[READY_CARD_KEY]
-					).toLowerCase(),
-				};
-
-				if (value !== undefined) {
-					attrs.value = value;
-				}
-				styles = {};
-			}
-			// 转换标签
-			name = transform(conversionRules, name, attrs, styles, isCardNode);
-			// 执行回调函数
-			if (attrs[CARD_ELEMENT_KEY] !== 'center') {
-				if (callbacks.onOpen) {
-					const result = callbacks.onOpen(child, name, attrs, styles);
-					if (result === false) {
-						child = child.next();
-						continue;
-					}
-				}
-			}
-			// Card不遍历子节点
-			if (name !== 'card' || includeCard) {
-				walkTree(
-					child,
-					conversionRules,
-					callbacks,
-					isCardNode,
-					includeCard,
-				);
-			}
-			// 执行回调函数
-			if (attrs[CARD_ELEMENT_KEY] !== 'center' && !VOID_TAG_MAP[name]) {
-				if (callbacks.onClose) {
-					callbacks.onClose(child, name, attrs, styles);
-				}
-			}
-		} else if (child.isText()) {
-			let text = child[0].nodeValue ? escape(child[0].nodeValue) : '';
-			// 为了简化 DOM 操作复杂度，删除 block 两边的空白字符，不影响渲染展示
-			if (text === '' && child.parent()?.isBlock()) {
-				if (!child.prev()) {
-					text = text.replace(/^[ \n]+/, '');
-				}
-
-				if (!child.next()) {
-					text = text.replace(/[ \n]+$/, '');
-				}
-			}
-			// 删除两个 block 中间的空白字符
-			// <p>foo</p>\n<p>bar</p>
-			if (
-				child.prev() &&
-				child.prev()?.isBlock() &&
-				child.next() &&
-				child.next()?.isBlock() &&
-				text.trim() === ''
-			) {
-				text = text.trim();
-			}
-			// 删除 zero width space
-			text = text.replace(/\u200B/g, '');
-			if (callbacks.onText) {
-				callbacks.onText(child, text);
-			}
-		}
-		child = child.next();
-	}
 };
 
 const escapeAttr = (value: string) => {
@@ -203,23 +87,19 @@ const stylesToString = (styles: { [k: string]: string }) => {
 };
 
 const pToDiv = (value: string) => {
-	return value
-		.replace(/<p(>|\s+[^>]*>)/gi, '<div$1')
-		.replace(/<\/p>/gi, '</div>');
+	return value;
 };
 
 class Parser {
 	private root: NodeInterface;
-	private engine?: EngineInterface;
-	private view?: ViewInterface;
+	private editor: EditorInterface;
 	constructor(
 		source: string | Node | NodeInterface,
-		engine?: EngineInterface,
-		view?: ViewInterface,
+		editor: EditorInterface,
 		paserBefore?: (node: NodeInterface) => void,
 	) {
-		this.engine = engine;
-		this.view = view;
+		this.editor = editor;
+		const { $ } = this.editor;
 		if (typeof source === 'string') {
 			source = source.replace(/<a\s{0,1000}\/>/gi, '<a></a>');
 			source = source.replace(/<a(\s[^>]+?)\/>/gi, (_, t) => {
@@ -229,7 +109,9 @@ class Parser {
 			// <p><div>foo</div></p>
 			// 变成
 			// <p></p><div>foo</div><p></p>
-			source = pToDiv(source);
+			source = source
+				.replace(/<p(>|\s+[^>]*>)/gi, '<paragraph$1')
+				.replace(/<\/p>/gi, '</paragraph>');
 			source = transformCustomTags(source);
 			const doc = new (getWindow().DOMParser)().parseFromString(
 				source,
@@ -244,6 +126,135 @@ class Parser {
 		if (paserBefore) paserBefore(this.root);
 	}
 	/**
+	 * data type:
+	 *
+	 * Value: <p>foo</p><p><br /><cursor /></p>
+	 * LowerValue: <p>foo</p><p><br /><span data-element="cursor"></span></p>
+	 * DOM: HTML DOM tree
+	 * Markdown: ### heading
+	 * Text: plain text
+	 *
+	 */
+	walkTree(
+		node: NodeInterface,
+		conversionRules: any,
+		callbacks: Callbacks,
+		isCardNode?: boolean,
+		includeCard?: boolean,
+	) {
+		let child = node.first();
+
+		while (child) {
+			if (child.isElement()) {
+				let name = child.name;
+				let attrs = child.attributes();
+				let styles = child.css();
+				//删除属性中的style属性
+				delete attrs.style;
+				// 光标相关节点
+				if (attrs[DATA_ELEMENT]) {
+					name = attrs[DATA_ELEMENT].toLowerCase();
+					attrs = {};
+					styles = {};
+				}
+				// Card相关节点
+				if (['left', 'right'].indexOf(attrs[CARD_ELEMENT_KEY]) >= 0) {
+					child = child.next();
+					continue;
+				}
+
+				if (attrs[CARD_KEY] || attrs[READY_CARD_KEY]) {
+					name = 'card';
+					const value = attrs[CARD_VALUE_KEY];
+					attrs = {
+						type: attrs[CARD_TYPE_KEY],
+						name: (
+							attrs[CARD_KEY] || attrs[READY_CARD_KEY]
+						).toLowerCase(),
+					};
+
+					if (value !== undefined) {
+						attrs.value = value;
+					}
+					styles = {};
+				}
+				// 转换标签
+				name = transform(
+					conversionRules,
+					name,
+					attrs,
+					styles,
+					isCardNode,
+				);
+				// 执行回调函数
+				if (attrs[CARD_ELEMENT_KEY] !== 'center') {
+					if (callbacks.onOpen) {
+						const result = callbacks.onOpen(
+							child,
+							name,
+							attrs,
+							styles,
+						);
+						if (result === false) {
+							child = child.next();
+							continue;
+						}
+					}
+				}
+				// Card不遍历子节点
+				if (name !== 'card' || includeCard) {
+					this.walkTree(
+						child,
+						conversionRules,
+						callbacks,
+						isCardNode,
+						includeCard,
+					);
+				}
+				// 执行回调函数
+				if (
+					attrs[CARD_ELEMENT_KEY] !== 'center' &&
+					!this.editor.node.isVoid(name)
+				) {
+					if (callbacks.onClose) {
+						callbacks.onClose(child, name, attrs, styles);
+					}
+				}
+			} else if (child.isText()) {
+				let text = child[0].nodeValue ? escape(child[0].nodeValue) : '';
+				// 为了简化 DOM 操作复杂度，删除 block 两边的空白字符，不影响渲染展示
+				if (text === '' && this.editor.node.isBlock(child.parent()!)) {
+					if (!child.prev()) {
+						text = text.replace(/^[ \n]+/, '');
+					}
+
+					if (!child.next()) {
+						text = text.replace(/[ \n]+$/, '');
+					}
+				}
+				// 删除两个 block 中间的空白字符
+				// <p>foo</p>\n<p>bar</p>
+				const childPrev = child.prev();
+				const childNext = child.next();
+				if (
+					childPrev &&
+					this.editor.node.isBlock(childPrev) &&
+					childNext &&
+					this.editor.node.isBlock(childNext) &&
+					text.trim() === ''
+				) {
+					text = text.trim();
+				}
+				// 删除 zero width space
+				text = text.replace(/\u200B/g, '');
+				if (callbacks.onText) {
+					callbacks.onText(child, text);
+				}
+			}
+			child = child.next();
+		}
+	}
+	/**
 	 * 遍历 DOM 树，生成符合标准的 XML 代码
 	 * @param schemaRules 标签保留规则
 	 * @param conversionRules 标签转换规则
@@ -251,38 +262,41 @@ class Parser {
 	 * @param customTags 是否将光标、卡片节点转换为标准代码
 	 */
 	toValue(
-		schemaRules: any = null,
+		schema: SchemaInterface | null = null,
 		conversionRules: any = null,
 		replaceSpaces: boolean = false,
 		customTags: boolean = false,
 	) {
 		const result: Array<string> = [];
 		let index: number = 0;
-		const engineOrContentView = (this.engine || this.view)!;
-		Object.keys(engineOrContentView.plugin.components).forEach(name => {
-			const plugin = engineOrContentView.plugin.components[name];
+		Object.keys(this.editor.plugin.components).forEach(name => {
+			const plugin = this.editor.plugin.components[name];
 			if (plugin.parseValueBefore) plugin.parseValueBefore(this.root);
 		});
-		walkTree(this.root, conversionRules, {
+		this.walkTree(this.root, conversionRules, {
 			onOpen: (child, name, attrs, styles) => {
-				if (filter(schemaRules, name, attrs, styles)) {
-					return;
+				if (schema) {
+					const node = this.editor.$(`<${name} />`);
+					node.attributes(attrs);
+					node.css(styles);
+					const type = this.editor.node.getType(node);
+					if (type === undefined) return;
+					schema.filterAttributes(name, attrs, type);
+					schema.filterStyles(name, styles, type);
 				}
+
 				let isContinue = 0;
-				Object.keys(engineOrContentView.plugin.components).every(
-					name => {
-						const plugin =
-							engineOrContentView.plugin.components[name];
-						if (plugin.parseValue) {
-							const value = plugin.parseValue(child, result);
-							if (value === false) {
-								isContinue = 1;
-								return false;
-							}
+				Object.keys(this.editor.plugin.components).every(name => {
+					const plugin = this.editor.plugin.components[name];
+					if (plugin.parseValue) {
+						const value = plugin.parseValue(child, result);
+						if (value === false) {
+							isContinue = 1;
+							return false;
 						}
-						return true;
-					},
-				);
+					}
+					return true;
+				});
 				if (isContinue === 1) return false;
 				if (name === 'pre') {
 					index++;
@@ -304,7 +318,7 @@ class Parser {
 					}
 				}
 
-				if (VOID_TAG_MAP[name]) {
+				if (this.editor.node.isVoid(name)) {
 					result.push(' />');
 				} else {
 					result.push('>');
@@ -327,8 +341,14 @@ class Parser {
 				result.push(text);
 			},
 			onClose: (_, name, attrs, styles) => {
-				if (filter(schemaRules, name, attrs, styles)) {
-					return;
+				if (schema) {
+					const node = this.editor.$(`<${name} />`);
+					node.attributes(attrs);
+					node.css(styles);
+					const type = this.editor.node.getType(node);
+					if (type === undefined) return;
+					schema.filterAttributes(name, attrs, type);
+					schema.filterStyles(name, styles, type);
 				}
 				if (name === 'pre' && --index < 0) {
 					index = 0;
@@ -336,8 +356,8 @@ class Parser {
 				result.push('</'.concat(name, '>'));
 			},
 		});
-		Object.keys(engineOrContentView.plugin.components).forEach(name => {
-			const plugin = engineOrContentView.plugin.components[name];
+		Object.keys(this.editor.plugin.components).forEach(name => {
+			const plugin = this.editor.plugin.components[name];
 			if (plugin.parseValueAfter) plugin.parseValueAfter(result);
 		});
 		const value = result.join('');
@@ -350,6 +370,7 @@ class Parser {
 	 * @param outter 外包裹节点
 	 */
 	toHTML(inner?: Node, outter?: Node) {
+		const { $ } = this.editor;
 		const element = $('<div />');
 		if (inner && outter) {
 			$(inner)
@@ -359,9 +380,8 @@ class Parser {
 		} else {
 			element.append(this.root);
 		}
-		const engineOrContentView = (this.engine || this.view)!;
-		Object.keys(engineOrContentView.plugin.components).forEach(name => {
-			const plugin = engineOrContentView.plugin.components[name];
+		Object.keys(this.editor.plugin.components).forEach(name => {
+			const plugin = this.editor.plugin.components[name];
 			if (plugin.parseHtmlBefore) plugin.parseHtmlBefore(this.root);
 		});
 		element.traverse(domNode => {
@@ -375,29 +395,26 @@ class Parser {
 				node.parentNode.removeChild(node);
 			}
 		});
-		Object.keys(engineOrContentView.plugin.components).forEach(name => {
-			const plugin = engineOrContentView.plugin.components[name];
+		Object.keys(this.editor.plugin.components).forEach(name => {
+			const plugin = this.editor.plugin.components[name];
 			if (plugin.parseHtml) plugin.parseHtml(element);
 		});
 		element.find('p').css(style);
-		Object.keys(engineOrContentView.plugin.components).forEach(name => {
-			const plugin = engineOrContentView.plugin.components[name];
+		Object.keys(this.editor.plugin.components).forEach(name => {
+			const plugin = this.editor.plugin.components[name];
 			if (plugin.parseHtmlAfter) plugin.parseHtmlAfter(element);
 		});
 		return {
 			html: element.html(),
-			text: new Parser(element, this.engine, this.view).toText(
-				null,
-				true,
-			),
+			text: new Parser(element, this.editor).toText(null, true),
 		};
 	}
 
 	/**
 	 * 返回DOM树
 	 */
-	toDOM(schemaRules: any = null, conversionRules: any = null) {
-		const value = this.toValue(schemaRules, conversionRules, false, true);
+	toDOM(schema: SchemaInterface | null = null, conversionRules: any = null) {
+		const value = this.toValue(schema, conversionRules, false, true);
 		const doc = new DOMParser().parseFromString(value, 'text/html');
 		const fragment = doc.createDocumentFragment();
 		const nodes = doc.body.childNodes;
@@ -416,7 +433,7 @@ class Parser {
 	toText(conversionRules: any = null, includeCard?: boolean) {
 		const result: Array<string> = [];
 
-		walkTree(
+		this.walkTree(
 			this.root,
 			conversionRules,
 			{
@@ -426,7 +443,7 @@ class Parser {
 					}
 					const nodeElement = node[0];
 					if (node.name === 'li') {
-						if (node.hasClass('data-list-node')) {
+						if (node.hasClass('data-list-item')) {
 							return;
 						}
 						const parent = node.parent();
@@ -465,7 +482,7 @@ class Parser {
 					result.push(text);
 				},
 				onClose: node => {
-					if (node.isBlock()) {
+					if (this.editor.node.isBlock(node)) {
 						result.push('\n');
 					}
 				},

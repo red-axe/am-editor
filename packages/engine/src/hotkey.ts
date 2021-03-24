@@ -7,14 +7,17 @@ class Hotkey implements HotkeyInterface {
 	private disabled: boolean = false;
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
-		engine.container.on('keydown', this.handleKeydown);
+		//绑定事件
+		this.engine.typing
+			.getHandleListener('default', 'keydown')
+			?.on(event => this.trigger(event));
 	}
 
 	/**
 	 * 处理按键按下事件
 	 * @param e 事件
 	 */
-	handleKeydown = (e: KeyboardEvent) => {
+	trigger(e: KeyboardEvent) {
 		//禁用快捷键不处理
 		if (this.disabled) {
 			return;
@@ -74,7 +77,7 @@ class Hotkey implements HotkeyInterface {
 			}
 			return true;
 		});
-	};
+	}
 
 	enable() {
 		this.disabled = false;
@@ -85,7 +88,7 @@ class Hotkey implements HotkeyInterface {
 	}
 
 	destroy() {
-		this.engine.container.off('keydown', this.handleKeydown);
+		this.engine.container.off('keydown', this.trigger);
 	}
 }
 export default Hotkey;

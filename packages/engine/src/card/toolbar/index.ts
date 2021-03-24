@@ -1,4 +1,3 @@
-import $ from '../../node';
 import Toolbar, { Tooltip } from '../../toolbar';
 import {
 	CardInterface,
@@ -10,7 +9,7 @@ import {
 	ToolbarInterface as ToolbarBaseInterface,
 } from '../../types/toolbar';
 import { LanguageInterface } from '../../types/language';
-import { EngineInterface } from '../../types/engine';
+import { EditorInterface } from '../../types/engine';
 import './index.css';
 
 export const isCardToolbarItemOptions = (
@@ -23,8 +22,10 @@ class CardToolbar implements CardToolbarInterface {
 	private card: CardInterface;
 	private toolbar?: ToolbarBaseInterface;
 	private language: LanguageInterface;
+	private editor: EditorInterface;
 
-	constructor(card: CardInterface) {
+	constructor(editor: EditorInterface, card: CardInterface) {
+		this.editor = editor;
 		this.card = card;
 		this.language = card.getLang();
 	}
@@ -32,6 +33,7 @@ class CardToolbar implements CardToolbarInterface {
 	getDefaultItem(
 		item: CardToolbarItemOptions,
 	): ToolbarItemOptions | undefined {
+		const { $ } = this.editor;
 		switch (item.type) {
 			case 'separator':
 				return {
@@ -50,17 +52,16 @@ class CardToolbar implements CardToolbarInterface {
 						item.title ||
 						this.language.get('copy', 'title').toString(),
 					onClick: () => {
-						const engine = this.card.getEngine();
-						const result = engine?.clipboard.copy(
+						const result = this.editor.clipboard.copy(
 							this.card.root[0],
 							true,
 						);
 						if (result)
-							engine?.messageSuccess(
+							this.editor.messageSuccess(
 								this.language.get('copy', 'success').toString(),
 							);
 						else
-							engine?.messageError(
+							this.editor.messageError(
 								this.language.get('copy', 'error').toString(),
 							);
 					},
@@ -75,10 +76,8 @@ class CardToolbar implements CardToolbarInterface {
 						item.title ||
 						this.language.get('delete', 'title').toString(),
 					onClick: () => {
-						const {
-							change,
-						} = this.card.getEngine() as EngineInterface;
-						if (change) change.removeCard(this.card.root);
+						const { card } = this.editor;
+						card.remove(this.card.root);
 					},
 				};
 			case 'maximize':
@@ -142,7 +141,7 @@ class CardToolbar implements CardToolbarInterface {
 				}
 			});
 			if (items.length > 0) {
-				const toolbar = new Toolbar({
+				const toolbar = new Toolbar(this.editor, {
 					items,
 				});
 				toolbar.root.addClass('data-card-toolbar');
@@ -205,6 +204,7 @@ class CardToolbar implements CardToolbarInterface {
 	}
 
 	private createDnd(content: string, title: string) {
+		const { $ } = this.editor;
 		const dndNode = $(
 			`<div class="data-card-dnd" draggable="true" contenteditable="false">
                 <div class="data-card-dnd-trigger">
@@ -212,15 +212,16 @@ class CardToolbar implements CardToolbarInterface {
                 </div>
             </div>`,
 		);
+		const tooltip = new Tooltip(this.editor);
 		dndNode.on('mouseenter', () => {
-			Tooltip.show(dndNode, title);
+			tooltip.show(dndNode, title);
 		});
 		dndNode.on('mouseleave', () => {
-			Tooltip.hide();
+			tooltip.hide();
 		});
 		dndNode.on('mousedown', e => {
 			e.stopPropagation();
-			Tooltip.hide();
+			tooltip.hide();
 			this.hideCardToolbar();
 		});
 

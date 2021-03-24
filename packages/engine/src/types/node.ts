@@ -1,4 +1,5 @@
 import { Path } from 'sharedb';
+import { EditorInterface } from './engine';
 
 export type EventListener = (...args: Array<Event | any>) => boolean | void;
 
@@ -25,7 +26,7 @@ export interface EventInterface {
 	 * @param eventType 事件类型
 	 * @param args 事件参数
 	 */
-	trigger(eventType: string, ...args: any): boolean | undefined;
+	trigger(eventType: string, ...args: any): boolean | void;
 }
 export type Selector =
 	| string
@@ -40,6 +41,7 @@ export type Context = Element | Document;
 export interface NodeEntry {
 	prototype: NodeInterface;
 	new (
+		editor: EditorInterface,
 		nodes: Node | NodeList | Array<Node>,
 		context?: Context,
 	): NodeInterface;
@@ -57,15 +59,15 @@ export interface NodeInterface {
 	/**
 	 * Document
 	 */
-	doc: Document | null;
+	document: Document | null;
 	/**
 	 * 根节点
 	 */
-	root: Context | undefined;
+	context: Context | undefined;
 	/**
 	 * 节点名称
 	 */
-	name: string | undefined;
+	name: string;
 	/**
 	 * 节点类型
 	 */
@@ -73,7 +75,7 @@ export interface NodeInterface {
 	/**
 	 * Window
 	 */
-	win: Window | null;
+	window: Window | null;
 	/**
 	 * 显示状态
 	 */
@@ -100,7 +102,7 @@ export interface NodeInterface {
 	 * 将 NodeInterface 转换为 Array
 	 * @return {Array} 返回数组
 	 */
-	toArray(): Array<Node>;
+	toArray(): Array<NodeInterface>;
 
 	/**
 	 * 判断当前节点是否为 Node.ELEMENT_NODE 节点类型
@@ -115,31 +117,6 @@ export interface NodeInterface {
 	isText(): boolean;
 
 	/**
-	 * 判断当前节点是否为 block 类型
-	 */
-	isBlock(): boolean;
-
-	/**
-	 * 判断当前节点是否为 inline 类型
-	 */
-	isInline(): boolean;
-
-	/**
-	 * 判断当前节点是否为block类型根节点
-	 */
-	isRootBlock(): boolean;
-
-	/**
-	 * 判断当前节点是否为block类型的简单节点（子节点不包含blcok标签）
-	 */
-	isSimpleBlock(): boolean;
-
-	/**
-	 * 判断当前节点是否为 mark 类型标签
-	 */
-	isMark(): boolean;
-
-	/**
 	 * 判断当前节点是否为Card组件
 	 */
 	isCard(): boolean;
@@ -148,31 +125,16 @@ export interface NodeInterface {
 	 * 判断当前节点是否为block类型的Card组件
 	 */
 	isBlockCard(): boolean;
+	/**
+	 * 判断当前节点是否为inline类型的Card组件
+	 * @returns
+	 */
+	isInlineCard(): boolean;
 
 	/**
-	 * 判断当前节点是否为不需要内容的空节点，如：br
+	 * 具有 display:block css 属性的inline card
 	 */
-	isVoid(): boolean;
-
-	/**
-	 * 判断当前节点是否为固体标签
-	 */
-	isSolid(): boolean;
-
-	/**
-	 * 判断当前节点是否为主题节点
-	 */
-	isHeading(): boolean;
-
-	/**
-	 * 判断当前节点是否为标题节点
-	 */
-	isTitle(): boolean;
-
-	/**
-	 * 判断当前节点是否为表格
-	 */
-	isTable(): boolean;
+	isPseudoBlockCard(): boolean;
 
 	/**
 	 * 判断当前节点是否为根节点
@@ -182,7 +144,7 @@ export interface NodeInterface {
 	/**
 	 * 判断当前是否在根节点内
 	 */
-	inRoot(): boolean;
+	inEditor(): boolean;
 
 	/**
 	 * 获取当前Node节点
@@ -340,11 +302,11 @@ export interface NodeInterface {
 	 * @param {string|undefined} val 属性值，val为空获取当前key的属性，返回string|null
 	 * @return {NodeInterface|{[k:string]:string}} 返回值或当前实例
 	 */
-	attr(): { [k: string]: string };
-	attr(key: { [k: string]: string }): string;
-	attr(key: string, val: string | number): NodeInterface;
-	attr(key: string): string;
-	attr(
+	attributes(): { [k: string]: string };
+	attributes(key: { [k: string]: string }): string;
+	attributes(key: string, val: string | number): NodeInterface;
+	attributes(key: string): string;
+	attributes(
 		key?: string | { [k: string]: string },
 		val?: string | number,
 	): NodeInterface | { [k: string]: string } | string;
@@ -354,7 +316,7 @@ export interface NodeInterface {
 	 * @param {String} key 属性名称
 	 * @return {NodeInterface} 返当前实例
 	 */
-	removeAttr(key: string): NodeInterface;
+	removeAttributes(key: string): NodeInterface;
 
 	/**
 	 * 判断元素节点是否包含某个 class
@@ -406,19 +368,10 @@ export interface NodeInterface {
 
 	/**
 	 * 获取或设置元素节点html文本
-	 * @param {String|undefined} val html文本
-	 * @return {NodeInterface|String} 当前实例或html文本
 	 */
 	html(): string;
-	html(val: string): NodeInterface;
-	html(val?: string): NodeInterface | string;
-
-	/**
-	 * 获取或设置元素节点html文本
-	 */
-	htmlKeepID(): string;
-	htmlKeepID(html: string): NodeInterface;
-	htmlKeepID(html?: string): NodeInterface | string;
+	html(html: string): NodeInterface;
+	html(html?: string): NodeInterface | string;
 
 	/**
 	 * 获取元素节点文本
@@ -460,16 +413,9 @@ export interface NodeInterface {
 
 	/**
 	 * 复制元素节点
-	 * @param {Boolean} deep 是否深度复制
-	 * @return {NodeInterface} 复制后的元素节点
-	 */
-	clone(deep?: boolean): NodeInterface;
-
-	/**
-	 * 复制元素节点
 	 * @param deep 是否深度复制
 	 */
-	cloneKeepID(deep?: boolean): NodeInterface;
+	clone(deep?: boolean): NodeInterface;
 
 	/**
 	 * 在元素节点的开头插入指定内容
@@ -537,9 +483,9 @@ export interface NodeInterface {
 
 	/**
 	 * 在指定容器里获取父节点
-	 * @param container 容器节点
+	 * @param container 容器节点，默认为编辑器根节点
 	 */
-	getParent(container: Node | NodeInterface): NodeInterface | null;
+	findParent(container?: Node | NodeInterface): NodeInterface | null;
 
 	/**
 	 * 获取节点下的所有子节点
@@ -572,29 +518,171 @@ export interface NodeInterface {
 		view: NodeInterface,
 		align?: 'start' | 'center' | 'end' | 'nearest',
 	): void;
+}
+
+export interface NodeModelInterface {
 	/**
-	 * 获取最近的 Block 节点，找不到则返回自己
+	 * 是否是空节点
+	 * @param node 节点或节点名称
 	 */
-	getClosestBlock(): NodeInterface;
+	isVoid(node: NodeInterface | Node | string): boolean;
 	/**
-	 * 获取最近的 Inline 节点
+	 * 是否是mark标签
+	 * @param node 节点
 	 */
-	getClosestInline(): NodeInterface | null;
+	isMark(node: NodeInterface | Node): boolean;
 	/**
-	 * 获取向上第一个非 Mark 节点
+	 * 是否是inline标签
+	 * @param node 节点
 	 */
-	getClosestNotMark(): NodeInterface;
+	isInline(node: NodeInterface | Node): boolean;
+	/**
+	 * 是否是block节点
+	 * @param node 节点
+	 */
+	isBlock(node: NodeInterface | Node): boolean;
+	/**
+	 * 判断当前节点是否为block类型的简单节点（子节点不包含blcok标签）
+	 */
+	isSimpleBlock(node: NodeInterface): boolean;
+	/**
+	 * 判断节点是否是顶级根节点，父级为编辑器根节点，且，子级节点没有block节点
+	 * @param node 节点
+	 * @returns
+	 */
+	isRootBlock(node: NodeInterface): boolean;
 	/**
 	 * 判断节点下的文本是否为空
+	 * @param node 节点
 	 * @param withTrim 是否 trim
 	 */
-	isEmpty(withTrim?: boolean): boolean;
+	isEmpty(node: NodeInterface, withTrim?: boolean): boolean;
 	/**
 	 * 判断一个节点下的文本是否为空，或者只有空白字符
+	 * @param node 节点
 	 */
-	isEmptyWithTrim(): boolean;
+	isEmptyWithTrim(node: NodeInterface): boolean;
 	/**
 	 * 判断一个节点是否为空
+	 * @param node 节点
 	 */
-	isLikeEmpty(): boolean;
+	isLikeEmpty(node: NodeInterface): boolean;
+	/**
+	 * 判断节点是否为列表节点
+	 * @param node 节点或者节点名称
+	 */
+	isList(node: NodeInterface | string | Node): boolean;
+	/**
+	 * 判断节点是否是自定义列表
+	 * @param node 节点
+	 */
+	isCustomize(node: NodeInterface): boolean;
+	/**
+	 * 获取节点所属类型
+	 * @param node 节点
+	 * @returns
+	 */
+	getType(node: NodeInterface | Node): 'mark' | 'block' | 'inline' | void;
+	/**
+	 * 去除包裹
+	 * @param node 需要去除包裹的节点
+	 */
+	unwrap(node: NodeInterface): void;
+	/**
+	 * 包裹节点
+	 * @param source 需要包裹的节点
+	 * @param outer 包裹的外部节点
+	 */
+	wrap(source: NodeInterface | Node, outer: NodeInterface): NodeInterface;
+	/**
+	 * 合并节点
+	 * @param source 合并的节点
+	 * @param target 需要合并的节点
+	 * @param remove 合并后是否移除
+	 */
+	merge(source: NodeInterface, target: NodeInterface, remove?: boolean): void;
+	/**
+	 * 将源节点的子节点追加到目标节点，并替换源节点
+	 * @param source 旧节点
+	 * @param target 新节点
+	 */
+	replace(source: NodeInterface, target: NodeInterface): NodeInterface;
+	/**
+	 * 设置节点属性
+	 * @param node 节点
+	 * @param props 属性
+	 */
+	setAttributes(node: NodeInterface, attributes: any): NodeInterface;
+	/**
+	 * 移除值为负的样式
+	 * @param node 节点
+	 * @param style 样式名称
+	 */
+	removeMinusStyle(node: NodeInterface, style: string): void;
+	/**
+	 * 合并节点下的子节点，两个相同的相邻节点的子节点，通常是 blockquote、ul、ol 标签
+	 * @param node 当前节点
+	 */
+	mergeAdjacent(node: NodeInterface): void;
+	/**
+	 * 删除节点两边标签
+	 * @param node 节点
+	 * @param tagName 标签名称，默认为br标签
+	 */
+	removeSide(node: NodeInterface, tagName?: string): void;
+	/**
+	 * 整理节点
+	 * @param node 节点
+	 * @param root 根节点，默认为node节点
+	 */
+	flatten(node: NodeInterface, root?: NodeInterface): void;
+	/**
+	 * 标准化节点
+	 * @param node 节点
+	 */
+	normalize(node: NodeInterface): void;
+	/**
+	 * 修复节点两侧零宽字符占位
+	 * @param node 节点
+	 */
+	repairBoth(node: NodeInterface | Node): void;
+	/**
+	 * 获取或设置元素节点html文本
+	 * @param {string|undefined} val html文本
+	 * @return {NodeEntry|string} 当前实例或html文本
+	 */
+	html(node: NodeInterface): string;
+	html(node: NodeInterface, val: string): NodeInterface;
+	html(node: NodeInterface, val?: string): NodeInterface | string;
+	/**
+	 * 复制元素节点
+	 * @param {boolean} deep 是否深度复制
+	 * @return 复制后的元素节点
+	 */
+	clone(node: NodeInterface, deep?: boolean): NodeInterface;
+	/**
+	 * 获取批量追加子节点后的outerHTML
+	 * @param nodes 节点集合
+	 * @param appendExp 追加的节点
+	 */
+	getBatchAppendHTML(nodes: Array<NodeInterface>, appendExp: string): string;
 }
+
+export interface ElementInterface extends Element {
+	matchesSelector(selectors: string): boolean;
+	mozMatchesSelector(selectors: string): boolean;
+	msMatchesSelector(selectors: string): boolean;
+	oMatchesSelector(selectors: string): boolean;
+}
+
+export const isNodeEntry = (selector: Selector): selector is NodeInterface => {
+	return !!selector && (selector as NodeInterface).get !== undefined;
+};
+
+export const isNodeList = (selector: Selector): selector is NodeList => {
+	return !!selector && (selector as NodeList).entries !== undefined;
+};
+
+export const isNode = (selector: Selector): selector is Node => {
+	return !!selector && (selector as Node).nodeType !== undefined;
+};

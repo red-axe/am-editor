@@ -37,10 +37,10 @@ class SelectionData implements SelectionDataInterface {
 			if (item) {
 				const name = 'data-selection-'.concat(item.uuid);
 				dataState[name] = true;
-				const value = container.attr(name);
+				const value = container.attributes(name);
 				const value_str = encodeURIComponent(JSON.stringify(item));
 				if (value !== value_str) {
-					container.attr(name, value_str);
+					container.attributes(name, value_str);
 				}
 			}
 		});
@@ -51,14 +51,14 @@ class SelectionData implements SelectionDataInterface {
 			if (!item) continue;
 			const { nodeName } = item;
 			if (/^data-selection-/.test(nodeName) && !dataState[nodeName]) {
-				container.removeAttr(nodeName);
+				container.removeAttributes(nodeName);
 			}
 		}
 	}
 
 	remove(name: string) {
 		const { container } = this.engine;
-		container.removeAttr('data-selection-'.concat(name));
+		container.removeAttributes('data-selection-'.concat(name));
 	}
 
 	updateAll(currentMember: Member, members: Array<Member>) {

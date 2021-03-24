@@ -1,5 +1,5 @@
 import { DATA_ELEMENT } from '../../constants/root';
-import $ from '../../node';
+import { EditorInterface } from '../../types';
 import { NodeInterface } from '../../types/node';
 import './index.css';
 
@@ -24,44 +24,42 @@ const template = (options: { placement: Placement }) => {
 };
 
 class Tooltip {
-	static show: (
+	private editor: EditorInterface;
+	constructor(editor: EditorInterface) {
+		this.editor = editor;
+	}
+	show(
 		node: NodeInterface,
 		title: string,
-		options?: { placement: Placement },
-	) => void;
-	static hide: () => void;
+		options: { placement: Placement } = { placement: 'top' },
+	) {
+		this.hide();
+		const { $ } = this.editor;
+		const root = $(template(options));
+		// 设置提示文字
+		root.find('[data-role=tooltip]').html(title);
+		// 计算定位
+		const body = $(document.body);
+		body.append(root);
+		const element = root.get<Element>();
+		const width = element?.clientWidth || 0;
+		const height = element?.clientHeight || 0;
+		const nodeWidth = node.get<Element>()?.clientWidth || 0;
+		const offset = node.offset() || {};
+		const left = Math.round(
+			window.pageXOffset + offset.left + nodeWidth / 2 - width / 2,
+		);
+		const top = Math.round(window.pageYOffset + offset.top - height - 2);
+		root.css({
+			left: left + 'px',
+			top: top + 'px',
+		});
+		root.addClass('data-tooltip-active');
+	}
+	hide() {
+		const { $ } = this.editor;
+		$(`div[${DATA_ELEMENT}=tooltip]`).remove();
+	}
 }
-
-Tooltip.show = (
-	node: NodeInterface,
-	title: string,
-	options: { placement: Placement } = { placement: 'top' },
-) => {
-	Tooltip.hide();
-	const root = $(template(options));
-	// 设置提示文字
-	root.find('[data-role=tooltip]').html(title);
-	// 计算定位
-	const body = $(document.body);
-	body.append(root);
-	const element = root.get<Element>();
-	const width = element?.clientWidth || 0;
-	const height = element?.clientHeight || 0;
-	const nodeWidth = node.get<Element>()?.clientWidth || 0;
-	const offset = node.offset() || {};
-	const left = Math.round(
-		window.pageXOffset + offset.left + nodeWidth / 2 - width / 2,
-	);
-	const top = Math.round(window.pageYOffset + offset.top - height - 2);
-	root.css({
-		left: left + 'px',
-		top: top + 'px',
-	});
-	root.addClass('data-tooltip-active');
-};
-
-Tooltip.hide = () => {
-	$(`div[${DATA_ELEMENT}=tooltip]`).remove();
-};
 
 export default Tooltip;

@@ -1,9 +1,8 @@
-import $ from '../../node';
-import { RangeInterface } from '../../../types/range';
+import { RangeInterface } from '../../types/range';
 import Range from '../../range';
-import { EngineInterface } from '../../../types/engine';
-import { CardInterface } from '../../../types/card';
-import { DragoverOptions } from '../../../types/change';
+import { EngineInterface } from '../../types/engine';
+import { CardInterface } from '../../types/card';
+import { DragoverOptions } from '../../types/change';
 import './index.css';
 
 class DragoverHelper {
@@ -33,11 +32,11 @@ class DragoverHelper {
 		// https://developer.mozilla.org/en-US/docs/Web/API/Document/caretRangeFromPoint
 		const { doc, x, y } = this;
 		if (doc.caretRangeFromPoint !== undefined) {
-			const range = Range.create(doc, { x, y });
+			const range = Range.create(this.engine, doc, { x, y });
 			if (range) return range;
 		}
 		if (event && event['rangeParent'] !== undefined) {
-			const range = Range.create(doc);
+			const range = Range.create(this.engine, doc);
 			range.setStart(event['rangeParent'], event['rangeOffset']);
 			range.collapse(true);
 			return range;
@@ -69,8 +68,8 @@ class DragoverHelper {
 
 		this.x = e.clientX;
 		this.y = e.clientY;
-		const target = $(e.target || []);
-		this.doc = target.doc || document;
+		const target = this.engine.$(e.target || []);
+		this.doc = target.document || document;
 		this.targetCard = card.find(target);
 		// 当前鼠标精确击中的Card
 		this.caretRange = this.getCaretRange();
@@ -87,7 +86,7 @@ class DragoverHelper {
 		let cardCaretRange;
 
 		if (card && card.root.length > 0) {
-			cardCaretRange = Range.create(doc);
+			cardCaretRange = Range.create(this.engine, doc);
 			const { left, right } = card.root.getBoundingClientRect() || {
 				left: 0,
 				right: 0,
@@ -169,7 +168,7 @@ class DragoverHelper {
 
 	getCursor() {
 		const { className } = this.options;
-		return $(`body > div.${className}`);
+		return this.engine.$(`body > div.${className}`);
 	}
 
 	removeCursor() {
@@ -178,6 +177,7 @@ class DragoverHelper {
 
 	setCursor() {
 		this.removeCursor();
+		const { $ } = this.engine;
 		const { className } = this.options;
 		const cursor = $(`<div class="${className}" />`);
 		$(document.body).append(cursor);

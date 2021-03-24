@@ -7,7 +7,6 @@ import {
 	DIFF_EQUAL,
 	DIFF_INSERT,
 } from 'diff-match-patch';
-import $ from '../node';
 import {
 	getOldIndex,
 	isCursorOp,
@@ -83,10 +82,13 @@ class Creator extends EventEmitter2 {
 	}
 
 	inAddedCache(node: Node) {
-		return this.addedNodes.find(n => $(node).inside(n) || n === node);
+		return this.addedNodes.find(
+			n => this.engine.$(node).inside(n) || n === node,
+		);
 	}
 
 	isTransientMutation(record: MutationRecord) {
+		const { $ } = this.engine;
 		const {
 			addedNodes,
 			removedNodes,
@@ -95,17 +97,18 @@ class Creator extends EventEmitter2 {
 			attributeName,
 		} = record;
 		if (type === 'childList') {
-			if (addedNodes[0] && isTransientElement(addedNodes[0])) return true;
-			if (removedNodes[0] && isTransientElement(removedNodes[0]))
+			if (addedNodes[0] && isTransientElement($(addedNodes[0])))
 				return true;
-			if (isTransientElement(target)) return true;
+			if (removedNodes[0] && isTransientElement($(removedNodes[0])))
+				return true;
+			if (isTransientElement($(target))) return true;
 		}
 		return (
 			!(
 				type !== 'attributes' ||
-				(!isTransientElement(target) &&
-					!isTransientAttribute(target, attributeName || ''))
-			) || !(type !== 'characterData' || !isTransientElement(target))
+				(!isTransientElement($(target)) &&
+					!isTransientAttribute($(target), attributeName || ''))
+			) || !(type !== 'characterData' || !isTransientElement($(target)))
 		);
 	}
 
@@ -122,7 +125,7 @@ class Creator extends EventEmitter2 {
 		const mutationsNodes: Array<Node> = [];
 
 		let isDataString = false;
-
+		const { $ } = this.engine;
 		const setNodeMutations = (root: Node, record: MutationRecord) => {
 			if (!cacheNodes.includes(root)) {
 				if (!mutationsNodes.includes(root)) mutationsNodes.push(root);
@@ -177,7 +180,7 @@ class Creator extends EventEmitter2 {
 								cacheNodes.push(addedNode);
 								this.cacheAddedNode(addedNode);
 							} else if (addedNode.parentNode !== null) {
-								const parent = $(addedNode).getParent(node);
+								const parent = $(addedNode).findParent(node);
 								if (parent && parent.length > 0)
 									setNodeMutations(parent.get()!, record);
 								addNodes.push(addedNode);
@@ -187,7 +190,7 @@ class Creator extends EventEmitter2 {
 						});
 					}
 				} else {
-					const parent = $(target).getParent(node);
+					const parent = $(target).findParent(node);
 					if (parent && parent.length > 0)
 						setNodeMutations(parent.get()!, record);
 				}
@@ -206,7 +209,7 @@ class Creator extends EventEmitter2 {
 						}
 					}
 				} else {
-					const parent = $(target).getParent(node);
+					const parent = $(target).findParent(node);
 					if (parent && parent.length > 0)
 						setNodeMutations(parent.get()!, record);
 				}
@@ -230,7 +233,7 @@ class Creator extends EventEmitter2 {
 						attrOps.push(newOp);
 					}
 				} else {
-					const parent = $(target).getParent(node);
+					const parent = $(target).findParent(node);
 					if (parent && parent.length > 0)
 						setNodeMutations(parent.get()!, record);
 				}

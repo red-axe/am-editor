@@ -14,7 +14,7 @@ Add Plugin
 $ import Engine, { EngineInterface } from '@aomao/engine';
 $ import Alignment from '@aomao/plugin-alignment';
 
-$ Engine.plugin.add('alignment', Alignment);
+$ new Engine(...,{ plugins:[Alignment] })
 ```
 
 Options

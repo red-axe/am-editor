@@ -10,6 +10,7 @@ export type DropdownListItem = {
 	icon?: React.ReactNode;
 	content?: React.ReactNode | (() => React.ReactNode);
 	hotkey?: boolean | string;
+	isDefault?: boolean;
 	title?: string;
 	placement?:
 		| 'right'

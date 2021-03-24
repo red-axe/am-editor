@@ -1,40 +1,76 @@
 import {
-  $,
-  Plugin,
-  NodeInterface,
-  CARD_KEY,
-  CARD_VALUE_KEY,
+	Plugin,
+	NodeInterface,
+	CARD_KEY,
+	CARD_VALUE_KEY,
+	isEngine,
 } from '@aomao/engine';
 import HrEntry from './entry';
 const CARD_NAME = 'hr';
 
 export type Options = {
-  hotkey?: string | Array<string>;
+	hotkey?: string | Array<string>;
+	markdown?: boolean;
 };
 export default class extends Plugin<Options> {
-  execute() {
-    if (!this.engine) return;
-    const { change } = this.engine;
-    change.insertCard(CARD_NAME);
-  }
+	static get pluginName() {
+		return 'hr';
+	}
 
-  hotkey() {
-    return this.options.hotkey || 'mod+shift+e';
-  }
+	init() {
+		super.init();
+		this.editor.on('keydown:enter', event => this.markdown(event));
+	}
 
-  parseHtml(root: NodeInterface) {
-    root.find(`[${CARD_KEY}=${CARD_NAME}`).each(hrNode => {
-      const node = $(hrNode);
-      const hr = node.find('hr');
-      hr.css({
-        'background-color': '#e8e8e8',
-        border: '1px solid transparent',
-        margin: '18px 0',
-      });
-      node.removeAttr(CARD_VALUE_KEY);
-      node.empty();
-      node.append(hr);
-    });
-  }
+	execute() {
+		if (!isEngine(this.editor)) return;
+		const { card } = this.editor;
+		card.insert(CARD_NAME);
+	}
+
+	hotkey() {
+		return this.options.hotkey || 'mod+shift+e';
+	}
+
+	markdown(event: KeyboardEvent) {
+		if (!isEngine(this.editor) || this.options.markdown === false) return;
+		const { change } = this.editor;
+		const range = change.getRange();
+
+		if (!range.collapsed || change.isComposing() || !this.markdown) return;
+
+		const block = this.editor.block.closest(range.startNode);
+
+		if (!this.editor.node.isRootBlock(block)) {
+			return;
+		}
+
+		const chars = this.editor.block.getLeftText(block);
+		const match = /^---$/.exec(chars);
+
+		if (match) {
+			event.preventDefault();
+			this.editor.block.removeLeftText(block);
+			this.execute();
+			return false;
+		}
+		return;
+	}
+
+	parseHtml(root: NodeInterface) {
+		const { $ } = this.editor;
+		root.find(`[${CARD_KEY}=${CARD_NAME}`).each(hrNode => {
+			const node = $(hrNode);
+			const hr = node.find('hr');
+			hr.css({
+				'background-color': '#e8e8e8',
+				border: '1px solid transparent',
+				margin: '18px 0',
+			});
+			node.removeAttributes(CARD_VALUE_KEY);
+			node.empty();
+			node.append(hr);
+		});
+	}
 }
 export { HrEntry };

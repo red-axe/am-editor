@@ -1,4 +1,3 @@
-import $, { isNode, isNodeEntry } from '../node';
 import {
 	CARD_ELEMENT_KEY,
 	CARD_KEY,
@@ -9,35 +8,29 @@ import {
 	READY_CARD_SELECTOR,
 } from '../constants/card';
 import {
+	ActiveTrigger,
 	CardEntry,
 	CardInterface,
 	CardModelInterface,
 	CardType,
 } from '../types/card';
-import { NodeInterface } from '../types/node';
+import { NodeInterface, isNode, isNodeEntry } from '../types/node';
 import { RangeInterface } from '../types/range';
-import { EngineInterface } from '../types/engine';
+import { EditorInterface, EngineInterface, isEngine } from '../types/engine';
 import { encodeCardValue, transformCustomTags } from '../utils';
-import {
-	deleteContent,
-	insertBlock,
-	insertInline,
-	unwrapBlock,
-} from '../change/utils';
-import { ViewInterface } from '../types/view';
+import { Backspace, Directional, Enter } from './typing';
 
 class CardModel implements CardModelInterface {
 	classes: {
 		[k: string]: CardEntry;
 	};
 	private components: Array<CardInterface>;
-	private engine?: EngineInterface;
-	private view?: ViewInterface;
+	private editor: EditorInterface;
 
-	constructor(engine?: EngineInterface) {
+	constructor(editor: EditorInterface) {
 		this.classes = {};
 		this.components = [];
-		this.engine = engine;
+		this.editor = editor;
 	}
 
 	get active() {
@@ -48,16 +41,32 @@ class CardModel implements CardModelInterface {
 		return this.components.length;
 	}
 
-	setEngine(engine: EngineInterface) {
-		this.engine = engine;
+	init(cards: Array<CardEntry>) {
+		if (isEngine(this.editor)) {
+			//绑定回车事件
+			const enter = new Enter(this.editor);
+			this.editor.typing
+				.getHandleListener('enter', 'keydown')
+				?.on(event => enter.trigger(event));
+			//删除事件
+			const backspace = new Backspace(this.editor);
+			this.editor.typing
+				.getHandleListener('backspace', 'keydown')
+				?.on(event => backspace.trigger(event));
+			//方向键事件
+			const directional = new Directional(this.editor);
+			this.editor.typing
+				.getHandleListener('default', 'keydown')
+				?.on(event => directional.trigger(event));
+		}
+
+		cards.forEach(card => {
+			this.classes[card.cardName] = card;
+		});
 	}
 
-	setContentView(view: ViewInterface) {
-		this.view = view;
-	}
-
-	add(name: string, clazz: CardEntry) {
-		this.classes[name] = clazz;
+	add(clazz: CardEntry) {
+		this.classes[clazz.cardName] = clazz;
 	}
 
 	each(
@@ -70,6 +79,7 @@ class CardModel implements CardModelInterface {
 	}
 
 	closest(selector: Node | NodeInterface): NodeInterface | undefined {
+		const { $ } = this.editor;
 		if (isNode(selector)) selector = $(selector);
 		if (isNodeEntry(selector) && !selector.isCard()) {
 			const card = selector.closest(CARD_SELECTOR, (node: Node) => {
@@ -100,24 +110,16 @@ class CardModel implements CardModelInterface {
 	}
 
 	findBlock(selector: Node | NodeInterface): CardInterface | undefined {
+		const { $ } = this.editor;
 		if (isNode(selector)) selector = $(selector);
 		if (!selector.get()) return;
 		const parent = selector.parent();
 		if (!parent) return;
 		const card = this.find(parent);
 		if (!card) return;
-		if (card.type === CardType.BLOCK) return card;
+		if ((card.constructor as CardEntry).cardType === CardType.BLOCK)
+			return card;
 		return this.findBlock(card.root);
-	}
-
-	private remove(card: CardInterface): void {
-		this.each((c, index) => {
-			if (c.root.equal(card.root)) {
-				this.components.splice(index!, 1);
-				return false;
-			}
-			return;
-		});
 	}
 
 	getSingleCard(range: RangeInterface) {
@@ -127,6 +129,7 @@ class CardModel implements CardModelInterface {
 	}
 
 	getSingleSelectedCard(range: RangeInterface) {
+		const { $ } = this.editor;
 		const elements = range.findElementsInSimpleRange();
 		let node = elements[0];
 		if (elements.length === 1 && node) {
@@ -140,27 +143,30 @@ class CardModel implements CardModelInterface {
 
 	// 插入Card
 	insertNode(range: RangeInterface, card: CardInterface) {
-		const isInline = card.type === 'inline';
+		const { $ } = this.editor;
+		const isInline = (card.constructor as CardEntry).cardType === 'inline';
+		const editor = this.editor as EngineInterface;
 		// 范围为折叠状态时先删除内容
 		if (!range.collapsed) {
-			deleteContent(range);
+			editor.change.deleteContent(range);
 		}
 		this.gc();
 		// 插入新 Card
 		if (isInline) {
-			insertInline(range, card.root);
+			editor.inline.insert(card.root, range);
 		} else {
-			insertBlock(range, card.root, true);
+			editor.block.insert(card.root, true, range);
 		}
 		this.components.push(card);
 		card.focus(range);
 		// 矫正错误 HTML 结构
+		const rootParent = card.root.parent();
 		if (
-			['ol', 'ul', 'blockquote'].indexOf(
-				card.root.parent()?.name || '',
-			) >= 0
+			rootParent &&
+			rootParent.inEditor() &&
+			this.editor.node.isBlock(rootParent)
 		) {
-			unwrapBlock(range, card.root.parent()!);
+			editor.block.unwrap(card.root.parent()!, range);
 		}
 		const result = card.render();
 		if (result !== undefined) {
@@ -177,15 +183,17 @@ class CardModel implements CardModelInterface {
 	// 移除Card
 	removeNode(card: CardInterface) {
 		if (card.destroy) card.destroy();
-		if (card.type === CardType.BLOCK && this.engine) {
-			this.engine.readonly = false;
+		const editor = this.editor as EngineInterface;
+		if ((card.constructor as CardEntry).cardType === CardType.BLOCK) {
+			editor.readonly = false;
 		}
-		this.remove(card);
+		this.removeComponent(card);
 		card.root.remove();
 	}
 
 	// 更新Card
 	updateNode(card: CardInterface, value: any) {
+		const { $ } = this.editor;
 		if (card.destroy) card.destroy();
 		const container = card.findByKey('center');
 		container.empty();
@@ -209,6 +217,7 @@ class CardModel implements CardModelInterface {
 	) {
 		const clazz = this.classes[name];
 		if (!clazz) throw ''.concat(name, ': This card does not exist');
+		const { $ } = this.editor;
 		value = encodeCardValue(value);
 		const cardNode = transformCustomTags(
 			`<card type="${type}" name="${name}" value="${value}"></card>`,
@@ -218,10 +227,169 @@ class CardModel implements CardModelInterface {
 		readyCard.append(node);
 	}
 
+	activate(
+		node: NodeInterface,
+		trigger: ActiveTrigger = ActiveTrigger.MANUAL,
+		event?: MouseEvent,
+	) {
+		if (!isEngine(this.editor)) return;
+		//获取当前卡片所在编辑器的根节点
+		const container = node.getRoot();
+		//如果当前编辑器根节点和引擎的根节点不匹配就不执行，主要是子父编辑器的情况
+		if (!container.get() || this.editor.container.equal(container)) {
+			let card = this.find(node);
+			const blockCard = card ? this.findBlock(card.root) : undefined;
+			if (blockCard) {
+				card = blockCard;
+			}
+			if (card && card.isCursor(node)) card = undefined;
+			let isCurrentActiveCard =
+				card && this.active && this.active.root.equal(card.root);
+			if (trigger === ActiveTrigger.UPDATE_CARD) {
+				isCurrentActiveCard = false;
+			}
+			if (this.active && !isCurrentActiveCard) {
+				this.active.toolbar?.hide();
+				const type = (this.active.constructor as CardEntry).cardType;
+				this.active.activate(false);
+				if (type === CardType.BLOCK) {
+					this.editor.readonly = false;
+				}
+			}
+			if (card) {
+				if (card.activatedByOther) return;
+				if (!isCurrentActiveCard) {
+					card.toolbar?.show(event);
+					if (
+						(card.constructor as CardEntry).cardType ===
+							CardType.INLINE &&
+						(card.constructor as CardEntry).autoSelected !==
+							false &&
+						(trigger !== ActiveTrigger.CLICK || !card.readonly)
+					) {
+						this.select(card);
+					}
+					card.activate(true);
+				}
+				if (
+					(card.constructor as CardEntry).cardType === CardType.BLOCK
+				) {
+					card.select(false);
+					this.editor.readonly = true;
+				}
+				if (
+					!isCurrentActiveCard &&
+					trigger === ActiveTrigger.MOUSE_DOWN
+				) {
+					this.editor.event.trigger('focus');
+				}
+				this.editor.change.onSelect();
+			}
+		}
+	}
+
+	select(card: CardInterface) {
+		if (!isEngine(this.editor)) return;
+		if (
+			(card.constructor as CardEntry).singleSelectable !== false &&
+			((card.constructor as CardEntry).cardType !== CardType.BLOCK ||
+				!card.activated)
+		) {
+			const range = this.editor.change.getRange();
+			const parentNode = card.root[0].parentNode!;
+			const index = Array.prototype.slice
+				.call(parentNode.childNodes)
+				.indexOf(card.root.get());
+			range.setStart(parentNode, index);
+			range.setEnd(parentNode, index + 1);
+			this.editor.change.select(range);
+		}
+	}
+
+	focus(card: CardInterface, toStart: boolean = false) {
+		if (!isEngine(this.editor)) return;
+		const range = this.editor.change.getRange();
+		card.focus(range, toStart);
+		this.editor.change.select(range);
+		this.editor.readonly = false;
+		this.activate(range.startNode, ActiveTrigger.MOUSE_DOWN);
+		this.editor.change.onSelect();
+		if (this.editor.scrollNode)
+			range.scrollIntoViewIfNeeded(
+				this.editor.container,
+				this.editor.scrollNode,
+			);
+	}
+
+	insert(name: string, value?: any) {
+		if (!isEngine(this.editor)) throw 'Engine not found';
+		const component = this.create(name, {
+			value,
+		});
+		const { change } = this.editor;
+		const range = change.getSafeRange();
+		const card = this.insertNode(range, component);
+		const type = (component.constructor as CardEntry).cardType;
+		if (type === 'inline') {
+			card.focus(range, false);
+		}
+		change.select(range);
+		if (
+			type === 'block' &&
+			(component.constructor as CardEntry).autoActivate !== false
+		) {
+			this.activate(card.root, ActiveTrigger.INSERT_CARD);
+		}
+		change.change();
+		return card;
+	}
+
+	update(selector: NodeInterface | Node | string, value: any) {
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
+		const card = this.find(selector);
+		if (card) {
+			this.updateNode(card, value);
+			const range = change.getRange();
+			card.focus(range, false);
+			change.change();
+		}
+	}
+
+	remove(selector: NodeInterface | Node | string) {
+		if (!isEngine(this.editor)) return;
+		const { change, list, node } = this.editor;
+		const range = change.getRange();
+		const card = this.find(selector);
+		if (!card) return;
+		if ((card.constructor as CardEntry).cardType === CardType.INLINE) {
+			range.setEndAfter(card.root[0]);
+			range.collapse(false);
+		} else {
+			card.focusPrevBlock(range, true);
+		}
+		const parent = card.root.parent();
+		this.removeNode(card);
+		list.addBr(range.startNode);
+		if (parent && node.isEmpty(parent)) {
+			if (parent.isRoot()) {
+				this.editor.node.html(parent, '<p><br /></p>');
+				range.select(parent, true);
+				range.shrinkToElementNode();
+				range.collapse(false);
+			} else {
+				this.editor.node.html(parent, '<br />');
+				range.select(parent, true);
+				range.collapse(false);
+			}
+		}
+		change.select(range);
+		change.change();
+	}
+
 	// 创建Card DOM 节点
 	create(
 		name: string,
-		type: CardType,
 		options?: {
 			value?: any;
 			root?: NodeInterface;
@@ -229,8 +397,8 @@ class CardModel implements CardModelInterface {
 	): CardInterface {
 		const clazz = this.classes[name];
 		if (!clazz) throw ''.concat(name, ': This card does not exist');
-
-		if (['inline', 'block'].indexOf(type) < 0) {
+		const { $ } = this.editor;
+		if (['inline', 'block'].indexOf(clazz.cardType) < 0) {
 			throw ''.concat(
 				name,
 				': the type of card must be "inline", "block"',
@@ -238,27 +406,25 @@ class CardModel implements CardModelInterface {
 		}
 		if (options?.root) options.root.empty();
 		const component = new clazz({
-			engine: this.engine,
-			view: this.view,
-			type,
+			editor: this.editor,
 			value: options?.value,
 			root: options?.root,
 		});
 
-		component.root.attr(CARD_TYPE_KEY, type);
-		component.root.attr(CARD_KEY, name);
+		component.root.attributes(CARD_TYPE_KEY, clazz.cardType);
+		component.root.attributes(CARD_KEY, name);
 		//如果没有指定是否能聚集，那么当card不是只读的时候就可以聚焦
 		const hasFocus =
 			clazz.focus !== undefined ? clazz.focus : !component.readonly;
-		const tagName = type === CardType.INLINE ? 'span' : 'div';
+		const tagName = clazz.cardType === CardType.INLINE ? 'span' : 'div';
 		//center
 		const center = $(`<${tagName} />`);
-		center.attr(CARD_ELEMENT_KEY, 'center');
+		center.attributes(CARD_ELEMENT_KEY, 'center');
 
 		if (hasFocus) {
-			center.attr('contenteditable', 'false');
+			center.attributes('contenteditable', 'false');
 		} else {
-			component.root.attr('contenteditable', 'false');
+			component.root.attributes('contenteditable', 'false');
 		}
 		//body
 		const body = $(
@@ -291,32 +457,30 @@ class CardModel implements CardModelInterface {
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
 	 */
 	render(container?: NodeInterface) {
-		if (!container && !this.engine && !this.view)
-			throw ''.concat('Engine Or View does not exist');
+		const { $ } = this.editor;
 		const cards = container
 			? container.isCard()
 				? container
 				: container.find(CARD_SELECTOR)
-			: (this.engine || this.view)!.container.find(READY_CARD_SELECTOR);
+			: this.editor.container.find(READY_CARD_SELECTOR);
 		this.gc();
 		cards.each(node => {
 			const cardNode = $(node);
-			const readyKey = cardNode.attr(READY_CARD_KEY);
-			const key = cardNode.attr(CARD_KEY);
+			const readyKey = cardNode.attributes(READY_CARD_KEY);
+			const key = cardNode.attributes(CARD_KEY);
 			const name = readyKey || key;
 			if (this.classes[name]) {
-				const type = cardNode.attr(CARD_TYPE_KEY);
-				const value = cardNode.attr(CARD_VALUE_KEY);
+				const value = cardNode.attributes(CARD_VALUE_KEY);
 				let card: CardInterface | undefined;
 				if (key) {
 					card = this.find(cardNode);
 					if (card) {
 						if (card.destroy) card.destroy();
-						this.remove(card);
+						this.removeComponent(card);
 					}
 				}
 				//ready_card_key 待创建的需要重新生成节点，并替换当前待创建节点
-				card = this.create(name, type as CardType, {
+				card = this.create(name, {
 					value,
 					root: key ? cardNode : undefined,
 				});
@@ -330,6 +494,16 @@ class CardModel implements CardModelInterface {
 					);
 				}
 			}
+		});
+	}
+
+	removeComponent(card: CardInterface): void {
+		this.each((c, index) => {
+			if (c.root.equal(card.root)) {
+				this.components.splice(index!, 1);
+				return false;
+			}
+			return;
 		});
 	}
 

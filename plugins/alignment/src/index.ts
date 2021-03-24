@@ -1,4 +1,4 @@
-import { NodeInterface, Plugin } from '@aomao/engine';
+import { isEngine, NodeInterface, Plugin, SchemaGlobal } from '@aomao/engine';
 
 export type Options = {
 	hotkey?: {
@@ -9,6 +9,24 @@ export type Options = {
 	};
 };
 export default class extends Plugin<Options> {
+	kind = 'block';
+
+	style = {
+		'text-align': '@var0',
+	};
+
+	variable = {
+		'@var0': ['left', 'center', 'right', 'justify'],
+	};
+
+	static get pluginName() {
+		return 'alignment';
+	}
+
+	init() {
+		super.init();
+		this.editor.on('keydown:backspace', event => this.onBackspace(event));
+	}
 	repairListStylePosition(blocks: Array<NodeInterface>, align: string) {
 		if (!blocks || blocks.length === 0) {
 			return;
@@ -26,9 +44,9 @@ export default class extends Plugin<Options> {
 	}
 
 	execute(align: 'left' | 'center' | 'right' | 'justify') {
-		if (!this.engine) return;
-		const { change } = this.engine;
-		change.setBlocks({
+		if (!isEngine(this.editor)) return;
+		const { change, block } = this.editor;
+		block.setBlocks({
 			style: {
 				'text-align': align,
 			},
@@ -37,8 +55,8 @@ export default class extends Plugin<Options> {
 	}
 
 	queryState() {
-		if (!this.engine) return;
-		const { change } = this.engine;
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
 		const blocks = change.blocks;
 
 		if (blocks.length === 0) {
@@ -46,7 +64,7 @@ export default class extends Plugin<Options> {
 		}
 
 		let fisrtBlock = blocks[0];
-		if (['ul', 'ol', 'blockquote'].includes(fisrtBlock.name || '')) {
+		if (['ul', 'ol', 'blockquote'].includes(fisrtBlock.name)) {
 			fisrtBlock = blocks[1] || fisrtBlock.first() || fisrtBlock;
 		}
 
@@ -75,32 +93,11 @@ export default class extends Plugin<Options> {
 		];
 	}
 
-	schema() {
-		return [
-			{
-				block: {
-					style: {
-						'text-align': ['left', 'center', 'right', 'justify'],
-					},
-				},
-			},
-		];
-	}
-
-	onCustomizeKeydown(
-		type:
-			| 'enter'
-			| 'backspace'
-			| 'space'
-			| 'tab'
-			| 'at'
-			| 'slash'
-			| 'selectall',
-		event: KeyboardEvent,
-	) {
-		if (!this.engine || type !== 'backspace') return;
-		const range = this.engine.change.getRange();
-		if (!range.isBlockFirstOffset('start')) return;
+	onBackspace(event: KeyboardEvent) {
+		if (!isEngine(this.editor)) return;
+		const { change, block } = this.editor;
+		const range = change.getRange();
+		if (!block.isFirstOffset(range, 'start')) return;
 		// 改变对齐
 		const align = this.queryState();
 		if (align === 'center') {

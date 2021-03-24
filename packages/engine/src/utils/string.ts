@@ -24,41 +24,6 @@ export const random = (length: number = 5) => {
 };
 
 /**
- * 转换为Map格式
- * @param value 数组或者字符串
- * @param delimiter 字符串时候的分隔符
- * @param callback 回调函数
- */
-export const toMap = <V = boolean>(
-	value: Array<string> | string,
-	delimiter: string = ',',
-	callback: (key: string) => boolean = function() {
-		return true;
-	},
-): { [k: string]: V | boolean } => {
-	const map: { [k: string]: V | boolean } = {};
-
-	const arr: Array<string> = Array.isArray(value)
-		? value
-		: value.split(delimiter);
-	let match;
-	arr.forEach(char => {
-		if ((match = /^(\d+)\.\.(\d+)$/.exec(char))) {
-			for (
-				let i = parseInt(match[1], 10);
-				i <= parseInt(match[2], 10);
-				i++
-			) {
-				map[i.toString()] = callback(i.toString());
-			}
-		} else {
-			map[char] = true;
-		}
-	});
-	return map;
-};
-
-/**
  * 驼峰命名转换枚举
  */
 export enum CamelCaseType {
@@ -255,17 +220,6 @@ export const removeUnit = (value: string) => {
 	return value && (match = /^(-?\d+)/.exec(value))
 		? parseInt(match[1], 10)
 		: 0;
-};
-
-/**
- * 移除光标位置占位标签
- * @param value 需要移除的字符串
- */
-export const removeBookmarkTags = (value: string) => {
-	return value
-		.replace(/<anchor\s*\/>/gi, '')
-		.replace(/<focus\s*\/>/gi, '')
-		.replace(/<cursor\s*\/>/gi, '');
 };
 
 /**

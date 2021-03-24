@@ -1,5 +1,5 @@
 export interface HotkeyInterface {
-	handleKeydown(e: KeyboardEvent): void;
+	trigger(e: KeyboardEvent): void;
 	enable(): void;
 	disable(): void;
 	destroy(): void;

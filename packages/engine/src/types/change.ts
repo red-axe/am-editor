@@ -1,10 +1,5 @@
 import { EventListener, NodeInterface } from './node';
-import {
-	ActiveTrigger,
-	CardInterface,
-	CardModelInterface,
-	CardType,
-} from './card';
+import { ActiveTrigger, CardInterface, CardType } from './card';
 import { RangeInterface } from './range';
 import { Path } from 'sharedb';
 import { ClipboardData } from './clipboard';
@@ -67,6 +62,7 @@ export interface ChangeInterface {
 	rangePathBeforeCommand: Path[] | null;
 	marks: Array<NodeInterface>;
 	blocks: Array<NodeInterface>;
+	inlines: Array<NodeInterface>;
 	onChange: (value: string) => void;
 	onSelect: () => void;
 	onSetValue: () => void;
@@ -80,26 +76,29 @@ export interface ChangeInterface {
 	 */
 	getRange(): RangeInterface;
 	/**
+	 * 获取安全可控的光标对象
+	 * @param range 默认当前光标
+	 */
+	getSafeRange(range?: RangeInterface): RangeInterface;
+	/**
 	 * 选中指定的范围
 	 * @param range 光标
 	 */
 	select(range: RangeInterface): ChangeInterface;
 	/**
-	 * 焦点
+	 * 聚焦编辑器
+	 * @param toStart true:开始位置,false:结束位置，默认为之前操作位置
 	 */
-	focus(): ChangeInterface;
-	/**
-	 * 将焦点放在最前
-	 */
-	focusToStart(): ChangeInterface;
-	/**
-	 * 将焦点放在最后
-	 */
-	focusToEnd(): ChangeInterface;
+	focus(toStart?: boolean): ChangeInterface;
 	/**
 	 * 取消焦点
 	 */
 	blur(): ChangeInterface;
+	/**
+	 * 应用一个具有改变dom结构的操作
+	 * @param range 光标
+	 */
+	apply(range?: RangeInterface): void;
 	combinTextNode(): void;
 	isComposing(): boolean;
 	isSelecting(): boolean;
@@ -110,117 +109,33 @@ export interface ChangeInterface {
 	getRangePathBeforeCommand(): Path[] | null;
 	isEmpty(): boolean;
 	destroy(): void;
-	activateCard(
-		node: NodeInterface,
-		trigger?: ActiveTrigger,
-		event?: MouseEvent,
-	): void;
-	selectCard(card: CardInterface): void;
-	focusCard(card: CardInterface, toStart?: boolean): void;
-	insertCard(name: string, type?: CardType, value?: any): CardInterface;
-	updateCard(component: NodeInterface | Node | string, value: any): void;
-	removeCard(component: NodeInterface | Node | string): void;
 	/**
-	 * 增加mark节点
-	 * @param mark mark节点
-	 * @param supplement mark两侧节点
-	 */
-	addMark(
-		mark: NodeInterface | Node | string,
-		supplement?: NodeInterface,
-	): ChangeInterface;
-	/**
-	 * 插入文本
+	 * 光标位置插入文本
 	 * @param text 文本
+	 * @param range 光标
 	 */
-	insertText(text: string): ChangeInterface;
-	/**
-	 * 插入mark节点
-	 * @param mark mark 节点或选择器
-	 */
-	insertMark(mark: NodeInterface | Node | string): ChangeInterface;
-	/**
-	 * 插入inline节点
-	 * @param inline inline节点或选择器
-	 */
-	insertInline(inline: NodeInterface | Node | string): ChangeInterface;
-	/**
-	 * 插入block节点
-	 * @param block block节点或选择器
-	 * @param keepOld
-	 */
-	insertBlock(
-		block: NodeInterface | Node | string,
-		keepOld: boolean,
-	): ChangeInterface;
+	insertText(text: string, range?: RangeInterface): RangeInterface;
 	/**
 	 * 插入片段
 	 * @param fragment 片段
 	 * @param callback 插入后的回调函数
 	 */
-	insertFragment(
-		fragment: DocumentFragment,
-		callback?: () => void,
-	): ChangeInterface;
-	/**
-	 * 分割mark
-	 * @param mark 需要删除的标签
-	 */
-	splitMark(mark?: NodeInterface | Node | string): ChangeInterface;
-	/**
-	 * 分割block
-	 */
-	splitBlock(): ChangeInterface;
-	/**
-	 * 移除mark标签
-	 * @param mark mark 标签或选择器
-	 */
-	removeMark(mark?: NodeInterface | Node | string): ChangeInterface;
-	/**
-	 * 合并mark标签
-	 */
-	mergeMark(): ChangeInterface;
-	/**
-	 * 合并相邻的List
-	 */
-	mergeAdjacentList(): ChangeInterface;
-	/**
-	 * 合并相邻的Blockquote
-	 */
-	mergeAdjacentBlockquote(): ChangeInterface;
-	/**
-	 * 包裹inline标签
-	 * @param inline inline节点或选择器
-	 */
-	wrapInline(inline: NodeInterface | Node | string): ChangeInterface;
-	/**
-	 * 包裹block标签
-	 * @param block block节点或选择器
-	 */
-	wrapBlock(block: NodeInterface | Node | string): ChangeInterface;
-	/**
-	 * 清除inline包裹标签
-	 */
-	unwrapInline(): ChangeInterface;
-	/**
-	 * 清除block包裹标签
-	 * @param block block节点或选择器
-	 */
-	unwrapBlock(block: NodeInterface | Node | string): ChangeInterface;
-	/**
-	 * 设置标签属性
-	 * @param block 标签或者属性对象集合
-	 */
-	setBlocks(block: string | { [k: string]: any }): ChangeInterface;
+	insertFragment(fragment: DocumentFragment, callback?: () => void): void;
 	/**
 	 * 删除内容
+	 * @param range 光标，默认获取当前光标
 	 * @param isDeepMerge 删除后是否合并
 	 */
-	deleteContent(isDeepMerge?: boolean): ChangeInterface;
+	deleteContent(range?: RangeInterface, isDeepMerge?: boolean): void;
 	/**
-	 * 将选区的列表扣出来，并将切断的列表修复
+	 * 在光标位置插入一个节点
+	 * @param node 节点
+	 * @param range 光标
 	 */
-	separateBlocks(): ChangeInterface;
+	insertNode(
+		node: Node | NodeInterface,
+		range?: RangeInterface,
+	): RangeInterface;
 	/**
 	 * 删除节点，删除后如果是空段落，自动添加 BR
 	 * @param node 要删除的节点

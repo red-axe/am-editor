@@ -1,14 +1,8 @@
-import $ from '../node';
-import { EventListener, NodeInterface } from '../types/node';
-import {
-	ActiveTrigger,
-	CardEntry,
-	CardInterface,
-	CardType,
-} from '../types/card';
+import { EventListener, NodeInterface, isNodeEntry } from '../types/node';
+import { ActiveTrigger, CardEntry, CardType } from '../types/card';
 import { ChangeInterface, ChangeOptions } from '../types/change';
 import { EngineInterface } from '../types/engine';
-import { Bookmark, RangeInterface } from '../types/range';
+import { RangeInterface } from '../types/range';
 import Range from '../range';
 import ChangeEvent from './event';
 import Parser, { TextParser } from '../parser';
@@ -16,34 +10,10 @@ import { ANCHOR_SELECTOR, CURSOR_SELECTOR, FOCUS_SELECTOR } from '../constants';
 import {
 	combinTextNode,
 	formatEngineValue,
-	generateElementIDForDescendant,
-	mergeNode,
-	removeEmptyMarksAndAddBr,
-	repairCustomzieList,
-	unwrapNode,
+	getDocument,
+	getWindow,
 } from '../utils';
 import { getRangePath } from '../ot/utils';
-import {
-	addMark,
-	deleteContent,
-	insertBlock,
-	insertFragment,
-	insertInline,
-	insertMark,
-	insertText,
-	mergeAdjacentBlockquote,
-	mergeAdjacentList,
-	mergeMark,
-	removeMark,
-	separateBlocks,
-	setBlocks,
-	splitBlock,
-	splitMark,
-	unwrapBlock,
-	unwrapInline,
-	wrapBlock,
-	wrapInline,
-} from './utils';
 import { Path } from 'sharedb';
 import {
 	CARD_ELEMENT_KEY,
@@ -53,6 +23,8 @@ import {
 } from '../constants/card';
 import { DATA_ELEMENT, ROOT } from '../constants/root';
 import Paste from './paste';
+import { SelectionInterface } from '../types/selection';
+import Selection from '../selection';
 
 class ChangeModel implements ChangeInterface {
 	private engine: EngineInterface;
@@ -66,6 +38,7 @@ class ChangeModel implements ChangeInterface {
 	rangePathBeforeCommand: Path[] | null = null;
 	marks: Array<NodeInterface> = [];
 	blocks: Array<NodeInterface> = [];
+	inlines: Array<NodeInterface> = [];
 
 	constructor(engine: EngineInterface, options: ChangeOptions = {}) {
 		this.options = options;
@@ -93,7 +66,6 @@ class ChangeModel implements ChangeInterface {
 			});
 			if (!this.valueCached || value !== this.valueCached) {
 				this.onChange(value);
-				if (this.engine) this.engine.setUserChanged();
 				this.valueCached = value;
 			}
 		}
@@ -112,10 +84,10 @@ class ChangeModel implements ChangeInterface {
 
 	getSelectionRange() {
 		const { container } = this.engine;
-		const { win } = container;
-		let range = Range.from(win!, false);
+		const { window } = container;
+		let range = Range.from(this.engine, window!, false);
 		if (!range) {
-			range = Range.create(win!.document)
+			range = Range.create(this.engine, window!.document)
 				.select(container, true)
 				.shrinkToElementNode()
 				.collapse(false);
@@ -128,42 +100,31 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	select(range: RangeInterface) {
-		const { container } = this.engine;
-		const { win } = container;
-		const selection = win?.getSelection();
+		const { container, mark, block, inline } = this.engine;
+		const { window } = container;
+		const selection = window?.getSelection();
 		if (selection) {
 			selection.removeAllRanges();
 			selection.addRange(range.toRange());
 		}
-		this.marks = range.getActiveMarks();
-		this.blocks = range.getActiveBlocks();
+		this.marks = mark.findMarks(range);
+		this.blocks = block.findBlocks(range);
+		this.inlines = inline.findInlines(range);
 		return this;
 	}
 
-	focus() {
+	/**
+	 * 聚焦编辑器
+	 * @param toStart true:开始位置,false:结束位置，默认为之前操作位置
+	 */
+	focus(toStart?: boolean) {
 		const range = this.getRange();
-		this.select(range);
-		this.engine.container.get<HTMLElement>()?.focus();
-		return this;
-	}
-
-	focusToStart() {
-		const range = this.getRange();
-		range
-			.select(this.engine.container, true)
-			.shrinkToElementNode()
-			.collapse(true);
-		this.select(range);
-		this.engine.container.get<HTMLElement>()?.focus();
-		return this;
-	}
-
-	focusToEnd() {
-		const range = this.getRange();
-		range
-			.select(this.engine.container, true)
-			.shrinkToElementNode()
-			.collapse(false);
+		if (toStart !== undefined) {
+			range
+				.select(this.engine.container, true)
+				.shrinkToElementNode()
+				.collapse(toStart);
+		}
 		this.select(range);
 		this.engine.container.get<HTMLElement>()?.focus();
 		return this;
@@ -190,47 +151,51 @@ class ChangeModel implements ChangeInterface {
 			this.select(range);
 		} else {
 			const { schema, conversion } = this.engine;
-			const parser = new Parser(value, this.engine, undefined, node => {
+			const parser = new Parser(value, this.engine, node => {
 				node.allChildren().forEach(child => {
-					removeEmptyMarksAndAddBr($(node));
+					this.engine.mark.removeEmptyMarks(node);
+					if (this.engine.node.isInline(child)) {
+						this.engine.inline.repairCursor(child);
+					}
 					if (onParse) {
 						onParse(child);
 					}
 				});
 			});
 			const { container, history } = this.engine;
-			container.htmlKeepID(
-				parser.toValue(
-					schema.getValue(),
-					conversion.getValue(),
-					false,
-					true,
-				),
+			container.html(
+				parser.toValue(schema, conversion.getValue(), false, true),
 			);
-			generateElementIDForDescendant(container.get<Element>()!);
+			container.allChildren().forEach(child => {
+				if (this.engine.node.isInline(child)) {
+					this.engine.inline.repairCursor(child);
+				}
+			});
+			this.engine.block.generateDataIDForDescendant(
+				container.get<Element>()!,
+			);
 			this.engine.card.render();
 			const cursor = container.find(CURSOR_SELECTOR);
-			let bookmark: Bookmark | null = null;
+			const selection: SelectionInterface = new Selection(
+				this.engine,
+				range,
+			);
 
 			if (cursor.length > 0) {
-				bookmark = {
-					anchor: cursor[0] as HTMLSpanElement,
-					focus: cursor[0] as HTMLSpanElement,
-				};
+				selection.anchor = cursor;
+				selection.focus = cursor;
 			}
 
 			const anchor = container.find(ANCHOR_SELECTOR);
 			const focus = container.find(FOCUS_SELECTOR);
 
 			if (anchor.length > 0 && focus.length > 0) {
-				bookmark = {
-					anchor: anchor[0] as HTMLSpanElement,
-					focus: focus[0] as HTMLSpanElement,
-				};
+				selection.anchor = anchor;
+				selection.focus = focus;
 			}
 
-			if (bookmark) {
-				range.moveToBookmark(bookmark);
+			if (selection.anchor && selection.focus) {
+				selection.move();
 				this.select(range);
 				this.onSelect();
 			}
@@ -243,7 +208,7 @@ class ChangeModel implements ChangeInterface {
 
 	getOriginValue() {
 		return new Parser(this.engine.container, this.engine).toValue(
-			this.engine.schema.getValue(),
+			this.engine.schema,
 		);
 	}
 
@@ -257,14 +222,12 @@ class ChangeModel implements ChangeInterface {
 			value = this.getOriginValue();
 		} else {
 			const range = this.getRange();
-			let bookmark;
+			let selection;
 			if (!range.inCard()) {
-				bookmark = range.createBookmark();
+				selection = range.createSelection();
 			}
 			value = this.getOriginValue();
-			if (bookmark) {
-				range.moveToBookmark(bookmark);
-			}
+			selection?.move();
 		}
 		return formatEngineValue(value);
 	}
@@ -280,13 +243,17 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	isEmpty() {
-		return this.engine.container.isEmptyWithTrim();
+		const { container, node } = this.engine;
+		return node.isEmptyWithTrim(container);
 	}
 
 	private repairInput(range: RangeInterface) {
 		const { commonAncestorNode } = range;
 		const card = this.engine.card.find(commonAncestorNode);
-		if (card && card.type === CardType.INLINE) {
+		if (
+			card &&
+			(card.constructor as CardEntry).cardType === CardType.INLINE
+		) {
 			if (card.isLeftCursor(commonAncestorNode)) {
 				const cardLeft = commonAncestorNode.closest(CARD_LEFT_SELECTOR);
 				let cardLeftText = cardLeft.text().replace(/\u200B/g, '');
@@ -295,9 +262,11 @@ class ChangeModel implements ChangeInterface {
 					range.setStartBefore(card.root);
 					range.collapse(true);
 					this.select(range);
-					cardLeft.html('&#8203;');
-					this.insertMark('<span>'.concat(cardLeftText, '</span>'));
-					this.mergeMark();
+					this.engine.node.html(cardLeft, '&#8203;');
+					this.engine.mark.insert(
+						'<span>'.concat(cardLeftText, '</span>'),
+					);
+					this.engine.mark.merge();
 				}
 			} else if (card.isRightCursor(commonAncestorNode)) {
 				const cardRight = commonAncestorNode.closest(
@@ -309,55 +278,85 @@ class ChangeModel implements ChangeInterface {
 					range.setEndAfter(card.root);
 					range.collapse(false);
 					this.select(range);
-					cardRight.html('&#8203;');
-					this.insertMark('<span>'.concat(cardRightText, '</span>'));
-					this.mergeMark();
+					this.engine.node.html(cardRight, '&#8203;');
+					this.engine.mark.insert(
+						'<span>'.concat(cardRightText, '</span>'),
+					);
+					this.engine.mark.merge();
 				}
-			} else this.repairRange(range);
+			} else this.getSafeRange(range);
+		}
+		const {
+			startNode,
+			endNode,
+			startOffset,
+			endOffset,
+		} = range.cloneRange().shrinkToTextNode();
+		const prev = startNode.prev();
+		const next = endNode.next();
+		if (prev && this.engine.node.isInline(prev)) {
+			const text = startNode.text();
+			if (!/^\u200B/g.test(text)) {
+				this.engine.node.repairBoth(prev);
+				if (range.collapsed) range.setEnd(startNode, startOffset + 1);
+				range.setStart(endNode, startOffset + 1);
+			}
+		}
+		if (next && this.engine.node.isInline(next)) {
+			const text = endNode.text();
+			if (!/\u200B$/g.test(text)) {
+				this.engine.node.repairBoth(next);
+				if (range.collapsed) range.setStart(startNode, startOffset);
+				range.setEnd(endNode, endOffset);
+			}
 		}
 	}
-
-	private repairRange(range: RangeInterface) {
-		// 判断 Range 是否可编辑，不可编辑时焦点自动移到编辑区域内
+	/**
+	 * 获取安全可控的光标对象
+	 * @param range 默认当前光标
+	 */
+	getSafeRange(range: RangeInterface = this.getRange()) {
+		// 如果不在编辑器内，聚焦到编辑器
 		const { commonAncestorNode } = range;
-		if (!commonAncestorNode.isRoot() && !commonAncestorNode.inRoot()) {
+		if (!commonAncestorNode.isRoot() && !commonAncestorNode.inEditor()) {
 			range
 				.select(this.engine.container, true)
 				.shrinkToElementNode()
 				.collapse(false);
 		}
-
+		//卡片
 		let rangeClone = range.cloneRange();
 		rangeClone.collapse(true);
-		this.focusRang(rangeClone);
+		this.focusCardRang(rangeClone);
 		range.setStart(rangeClone.startContainer, rangeClone.startOffset);
 
 		rangeClone = range.cloneRange();
 		rangeClone.collapse(false);
-		this.focusRang(rangeClone);
+		this.focusCardRang(rangeClone);
 		range.setEnd(rangeClone.endContainer, rangeClone.endOffset);
 
 		if (range.collapsed) {
 			rangeClone = range.cloneRange();
 			rangeClone.enlargeFromTextNode();
 
-			const startNode = $(rangeClone.startContainer);
+			const startNode = this.engine.$(rangeClone.startContainer);
 			const startOffset = rangeClone.startOffset;
 
-			if (startNode.name === 'a' && startOffset === 0) {
+			if (this.engine.node.isInline(startNode) && startOffset === 0) {
 				range.setStartBefore(startNode[0]);
 			}
 			if (
-				startNode.name === 'a' &&
+				this.engine.node.isInline(startNode) &&
 				startOffset === startNode[0].childNodes.length
 			) {
 				range.setStartAfter(startNode[0]);
 			}
 			range.collapse(true);
 		}
+		return range;
 	}
 
-	private focusRang(range: RangeInterface) {
+	private focusCardRang(range: RangeInterface) {
 		const { startNode, startOffset } = range;
 		const card = this.engine.card.find(startNode);
 		if (card) {
@@ -366,15 +365,15 @@ class ChangeModel implements ChangeInterface {
 				cardCenter &&
 				(!startNode.isElement() ||
 					startNode[0].parentNode !== card.root[0] ||
-					startNode.attr(CARD_ELEMENT_KEY))
+					startNode.attributes(CARD_ELEMENT_KEY))
 			) {
 				const comparePoint = () => {
-					const doc_rang = Range.create();
+					const doc_rang = Range.create(this.engine);
 					doc_rang.select(cardCenter, true);
 					return doc_rang.comparePoint(startNode, startOffset) < 0;
 				};
 
-				if ('inline' === card.type) {
+				if ('inline' === (card.constructor as CardEntry).cardType) {
 					range.select(card.root);
 					range.collapse(comparePoint());
 					return;
@@ -390,7 +389,6 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	private initNativeEvents() {
-		// 输入文字达到一定数量时候保存历史记录
 		const { container } = this.engine;
 
 		this.event.onInput(() => {
@@ -402,10 +400,10 @@ class ChangeModel implements ChangeInterface {
 		});
 
 		this.event.onDocument('selectionchange', () => {
-			const { win } = container;
-			const selection = win?.getSelection();
+			const { window } = container;
+			const selection = window?.getSelection();
 			if (selection && selection.anchorNode) {
-				const rang = Range.from(selection)!;
+				const rang = Range.from(this.engine, selection)!;
 				this.engine.card.each(card => {
 					const center = card.getCenter();
 					if (center && center.length > 0) {
@@ -423,10 +421,10 @@ class ChangeModel implements ChangeInterface {
 		this.event.onSelect(() => {
 			const range = this.getRange();
 			if (range.containsCard()) {
-				this.repairRange(range);
+				this.getSafeRange(range);
 			}
 			this.select(range);
-			this.activateCard(
+			this.engine.card.activate(
 				range.commonAncestorNode,
 				ActiveTrigger.CUSTOM_SELECT,
 			);
@@ -443,19 +441,29 @@ class ChangeModel implements ChangeInterface {
 
 		this.event.onDocument('click', (e: MouseEvent) => {
 			if (!e.target) return;
+			const { $ } = this.engine;
 			const card = this.engine.card.find($(e.target));
 			if (card) {
-				if (card.type === CardType.INLINE) {
-					this.activateCard(card.root, ActiveTrigger.CLICK, e);
+				if (
+					(card.constructor as CardEntry).cardType === CardType.INLINE
+				) {
+					this.engine.card.activate(
+						card.root,
+						ActiveTrigger.CLICK,
+						e,
+					);
 				}
 			}
 		});
 
 		this.event.onDocument('mousedown', (e: MouseEvent) => {
 			if (!e.target) return;
-			const targetNode = $(e.target);
+			const targetNode = this.engine.$(e.target);
 			const card = this.engine.card.find(targetNode);
-			if (card && card.type === CardType.INLINE) {
+			if (
+				card &&
+				(card.constructor as CardEntry).cardType === CardType.INLINE
+			) {
 				return;
 			}
 			// 点击元素已被移除
@@ -469,13 +477,13 @@ class ChangeModel implements ChangeInterface {
 			// 工具栏、侧边栏、内嵌工具栏的点击
 			let node: NodeInterface | undefined = targetNode;
 			while (node) {
-				const attrValue = node.attr(DATA_ELEMENT);
+				const attrValue = node.attributes(DATA_ELEMENT);
 				if (attrValue && attrValue !== ROOT) {
 					return;
 				}
 				node = node.parent();
 			}
-			this.activateCard(targetNode, ActiveTrigger.MOUSE_DOWN);
+			this.engine.card.activate(targetNode, ActiveTrigger.MOUSE_DOWN);
 		});
 
 		this.event.onDocument('copy', event => {
@@ -544,9 +552,9 @@ class ChangeModel implements ChangeInterface {
 						const plugin = this.engine.plugin.components[name];
 						if (plugin.pasteInsert) plugin.pasteInsert(range);
 					});
-					const bookmark = range.createBookmark();
+					const selection = range.createSelection();
 					this.engine.card.render();
-					if (bookmark) range.moveToBookmark(bookmark);
+					selection.move();
 					range.scrollRangeIntoView();
 				});
 				Object.keys(this.engine.plugin.components).forEach(name => {
@@ -569,10 +577,11 @@ class ChangeModel implements ChangeInterface {
 			if (card) {
 				event.preventDefault();
 				if (insertCardAble(range)) return;
-				const cardName = card.name;
-				this.removeCard(card.root);
+				const cardEntry = card.constructor as CardEntry;
+				const cardName = cardEntry.name;
+				this.engine.card.remove(card.root);
 				this.select(range!);
-				this.insertCard(cardName, card.type);
+				this.engine.card.insert(cardName, cardEntry.cardType);
 			}
 			if (files.length > 0) {
 				event.preventDefault();
@@ -590,233 +599,33 @@ class ChangeModel implements ChangeInterface {
 		combinTextNode(this.engine.container);
 	}
 
-	destroy() {
-		this.event.destroy();
-		this.clearChangeTimer();
-	}
-
-	activateCard(
-		node: NodeInterface,
-		trigger: ActiveTrigger = ActiveTrigger.MANUAL,
-		event?: MouseEvent,
-	) {
-		//获取当前卡片所在编辑器的根节点
-		const container = node.getRoot();
-		//如果当前编辑器根节点和引擎的根节点不匹配就不执行，主要是子父编辑器的情况
-		if (!container.get() || this.engine.container.equal(container)) {
-			let card = this.engine.card.find(node);
-			const blockCard = card
-				? this.engine.card.findBlock(card.root)
-				: undefined;
-			if (blockCard) {
-				card = blockCard;
-			}
-			if (card && card.isCursor(node)) card = undefined;
-			const activeCard = this.engine.card.active;
-			let isCurrentActiveCard =
-				card && activeCard && activeCard.root.equal(card.root);
-			if (trigger === ActiveTrigger.UPDATE_CARD) {
-				isCurrentActiveCard = false;
-			}
-			if (activeCard && !isCurrentActiveCard) {
-				activeCard.toolbar?.hide();
-				activeCard.activate(false);
-				if (activeCard.type === CardType.BLOCK) {
-					this.engine.readonly = false;
-				}
-			}
-			if (card) {
-				if (card.activatedByOther) return;
-				if (!isCurrentActiveCard) {
-					card.toolbar?.show(event);
-					if (
-						card.type === CardType.INLINE &&
-						(card.constructor as CardEntry).autoSelected !==
-							false &&
-						(trigger !== ActiveTrigger.CLICK || !card.readonly)
-					) {
-						this.selectCard(card);
-					}
-					card.activate(true);
-				}
-				if (card.type === CardType.BLOCK) {
-					card.select(false);
-					this.engine.readonly = true;
-				}
-				if (
-					!isCurrentActiveCard &&
-					trigger === ActiveTrigger.MOUSE_DOWN
-				) {
-					this.engine.event.trigger('focus');
-				}
-				this.onSelect();
-			}
-		}
-	}
-
-	selectCard(card: CardInterface) {
-		if (
-			(card.constructor as CardEntry).singleSelectable !== false &&
-			(card.type !== CardType.BLOCK || !card.activated)
-		) {
-			const range = this.getRange();
-			const parentNode = card.root[0].parentNode!;
-			const index = Array.prototype.slice
-				.call(parentNode.childNodes)
-				.indexOf(card.root.get());
-			range.setStart(parentNode, index);
-			range.setEnd(parentNode, index + 1);
-			this.select(range);
-		}
-	}
-
-	focusCard(card: CardInterface, toStart: boolean = false) {
-		const range = this.getRange();
-		card.focus(range, toStart);
-		this.select(range);
-		this.engine.readonly = false;
-		this.activateCard(range.startNode, ActiveTrigger.MOUSE_DOWN);
-		this.onSelect();
-		if (this.engine.scrollNode)
-			range.scrollIntoViewIfNeeded(
-				this.engine.container,
-				this.engine.scrollNode,
-			);
-	}
-
-	// 插入并渲染Card
-	insertCard(name: string, type: CardType = CardType.BLOCK, value?: any) {
-		const component = this.engine.card.create(name, type, {
-			value,
-		});
-
-		const range = this.getRange();
-		this.repairRange(range);
-		const card = this.engine.card.insertNode(range, component);
-
-		if (type === 'inline') {
-			card.focus(range, false);
-		}
-		this.select(range);
-		if (
-			type === 'block' &&
-			(component.constructor as CardEntry).autoActivate !== false
-		) {
-			this.activateCard(card.root, ActiveTrigger.INSERT_CARD);
-		}
-		this.change();
-		return card;
-	}
-	// 更新Card
-	updateCard(component: NodeInterface | Node | string, value: any) {
-		const card = this.engine.card.find(component);
-		if (card) {
-			this.engine.card.updateNode(card, value);
-			const range = this.getRange();
-			card.focus(range, false);
-			this.change();
-		}
-	}
-	// 删除Card
-	removeCard(component: NodeInterface | Node | string) {
-		const range = this.getRange();
-		const card = this.engine.card.find(component);
-		if (!card) return;
-		if (card.type === CardType.INLINE) {
-			range.setEndAfter(card.root[0]);
-			range.collapse(false);
-		} else {
-			card.focusPrevBlock(range, true);
-		}
-		const parent = card.root.parent();
-		this.engine.card.removeNode(card);
-		repairCustomzieList(range);
-		if (parent?.isEmpty()) {
-			if (parent.isRoot()) {
-				parent.html('<p><br /></p>');
-				range.select(parent, true);
-				range.shrinkToElementNode();
-				range.collapse(false);
-			} else {
-				parent.html('<br />');
-				range.select(parent, true);
-				range.collapse(false);
-			}
-		}
-		this.select(range);
-		this.change();
-	}
 	/**
-	 * 增加mark节点
-	 * @param mark mark节点
-	 * @param supplement mark两侧节点
+	 * 应用一个具有改变dom结构的操作
+	 * @param range 光标
 	 */
-	addMark(
-		mark: NodeInterface | Node | string,
-		supplement?: NodeInterface,
-	): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = addMark(range, mark);
+	apply(range?: RangeInterface) {
 		this.combinTextNode();
-		this.select(range);
+		if (range) this.select(range);
 		this.change();
-		return this;
 	}
+
 	/**
-	 * 插入文本
+	 * 光标位置插入文本
 	 * @param text 文本
+	 * @param range 光标
 	 */
-	insertText(text: string): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = insertText(range, text);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 插入mark节点
-	 * @param mark mark 节点或选择器
-	 */
-	insertMark(mark: NodeInterface | Node | string): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = insertMark(range, mark);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 插入inline节点
-	 * @param inline inline节点或选择器
-	 */
-	insertInline(inline: NodeInterface | Node | string): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = insertInline(range, inline);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 插入block节点
-	 * @param block block节点或选择器
-	 */
-	insertBlock(
-		block: NodeInterface | Node | string,
-		keepOld: boolean,
-	): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = insertBlock(range, block, keepOld);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
+	insertText(text: string, range?: RangeInterface) {
+		const safeRange = range || this.getSafeRange();
+
+		const doc = getDocument(safeRange.startContainer);
+		// 范围为折叠状态时先删除内容
+		if (!safeRange.collapsed) {
+			this.deleteContent(range);
+		}
+		const node = doc.createTextNode(text);
+		this.insertNode(node, safeRange).addOrRemoveBr();
+		if (!range) this.apply(safeRange);
+		return safeRange;
 	}
 	/**
 	 * 插入片段
@@ -826,177 +635,321 @@ class ChangeModel implements ChangeInterface {
 	insertFragment(
 		fragment: DocumentFragment,
 		callback: (range: RangeInterface) => void = () => {},
-	): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = insertFragment(range, this.engine.card, fragment, callback);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
+	) {
+		const { block, list, card, $ } = this.engine;
+		const range = this.getSafeRange();
+		const firstBlock = block.closest(range.startNode);
+		const lastBlock = block.closest(range.endNode);
+		const onlyOne = lastBlock[0] === firstBlock[0];
+		const isBlockLast = block.isLastOffset(range, 'end');
+		const blockquoteNode = firstBlock.closest('blockquote');
+		const isCollapsed = range.collapsed;
+		const childNodes = fragment.childNodes;
+		const firstNode = $(fragment.firstChild || []);
+		if (!isCollapsed) {
+			this.deleteContent(range, onlyOne || !isBlockLast);
+		}
+		if (!firstNode[0]) {
+			this.apply(range);
+			return;
+		}
+		if (!this.engine.node.isBlock(firstNode) && !firstNode.isCard()) {
+			range.shrinkToElementNode().insertNode(fragment);
+			this.apply(range.collapse(false));
+			return;
+		}
+		range.deepCut();
+		const startNode =
+			range.startContainer.childNodes[range.startOffset - 1];
+		const endNode = range.startContainer.childNodes[range.startOffset];
+
+		if (blockquoteNode[0]) {
+			childNodes.forEach(node => {
+				if ('blockquote' !== $(node).name) {
+					this.engine.node.wrap(
+						$(node),
+						this.engine.node.clone(blockquoteNode, false),
+					);
+				}
+			});
+		}
+		if (childNodes.length !== 0) {
+			const doc = getDocument(range.startContainer);
+			let lastNode = $(childNodes[childNodes.length - 1]);
+			if ('br' === lastNode.name) {
+				lastNode.remove();
+				lastNode = $(childNodes[childNodes.length - 1]);
+			}
+			const fragment = doc.createDocumentFragment();
+			let node: NodeInterface | null = $(childNodes[0]);
+			while (node && node.length > 0) {
+				this.engine.node.removeSide(node);
+				const next: NodeInterface | null = node.next();
+				if (!next) {
+					lastNode = node;
+				}
+				fragment.appendChild(node[0]);
+				node = next;
+			}
+			range.insertNode(fragment);
+			range.shrinkToElementNode().collapse(false);
+			const component = card.find(range.startNode);
+			if (component) component.focus(range, false);
+		}
+
+		const getFirstChild = (node: NodeInterface) => {
+			let child = node.first();
+			if (!child || !this.engine.node.isBlock(child)) return node;
+			while (
+				['blockquote', 'ul', 'ol'].includes(child ? child.name : '')
+			) {
+				child = child!.first();
+			}
+			return child;
+		};
+
+		const getLastChild = (node: NodeInterface) => {
+			let child = node.last();
+			if (!child || !this.engine.node.isBlock(child)) return node;
+			while (
+				['blockquote', 'ul', 'ol'].includes(child ? child.name : '')
+			) {
+				child = child!.last();
+			}
+			return child;
+		};
+
+		const isSameListChild = (
+			_lastNode: NodeInterface,
+			_firstNode: NodeInterface,
+		) => {
+			return (
+				'p' === _firstNode.name ||
+				(_lastNode.name === _firstNode.name &&
+					!(
+						'li' === _lastNode.name &&
+						!list.isSame(_lastNode.parent()!, _firstNode.parent()!)
+					))
+			);
+		};
+
+		const removeEmptyNode = (node: NodeInterface) => {
+			while (!node.isRoot()) {
+				const parent = node.parent();
+				node.remove();
+				if (!parent || !this.engine.node.isEmpty(parent)) break;
+				node = parent;
+			}
+		};
+
+		const clearList = (
+			lastNode: NodeInterface,
+			nextNode: NodeInterface,
+		) => {
+			if (lastNode.name === nextNode.name && 'p' === lastNode.name) {
+				const attr = nextNode.attributes();
+				if (attr['data-id']) delete attr['data-id'];
+				lastNode.attributes(attr);
+			}
+			if (
+				this.engine.node.isLikeEmpty(lastNode) &&
+				!this.engine.node.isLikeEmpty(nextNode)
+			) {
+				lastNode.get<Element>()!.innerHTML = '';
+			}
+			if (
+				this.engine.node.isCustomize(lastNode) ===
+				this.engine.node.isCustomize(nextNode)
+			)
+				list.unwrapCustomize(nextNode);
+		};
+
+		if (startNode) {
+			const _firstNode = getFirstChild($(startNode.nextSibling || []))!;
+			const _lastNode = getLastChild($(startNode))!;
+			if (isSameListChild(_lastNode, _firstNode)) {
+				clearList(_lastNode, _firstNode);
+				this.engine.node.merge(_lastNode, _firstNode, false);
+				removeEmptyNode(_firstNode);
+			} else {
+				if (
+					this.engine.node.isEmpty(_lastNode) ||
+					list.isEmptyItem(_lastNode)
+				) {
+					removeEmptyNode(_lastNode);
+				}
+			}
+		}
+
+		if (endNode) {
+			const prevNode = getLastChild($(endNode.previousSibling || []))!;
+			const nextNode = getFirstChild($(endNode))!;
+			range
+				.select(prevNode, true)
+				.shrinkToElementNode()
+				.collapse(false);
+			if (nextNode && this.engine.node.isEmpty(nextNode)) {
+				removeEmptyNode(nextNode);
+			} else if (isSameListChild(prevNode, nextNode)) {
+				this.engine.node.merge(prevNode, nextNode, false);
+				removeEmptyNode(nextNode);
+			}
+		}
+		block.merge(range);
+		list.merge(undefined, range);
+		if (callback) callback(range);
+		this.apply(range);
 	}
 	/**
-	 * 分割mark
-	 * @param mark 需要删除的标签
+	 * 在光标位置插入一个节点
+	 * @param node 节点
+	 * @param range 光标
 	 */
-	splitMark(mark?: NodeInterface | Node | string): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = splitMark(range, mark);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 分割block
-	 */
-	splitBlock(): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = splitBlock(range);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 移除mark标签
-	 * @param mark mark 标签或选择器
-	 */
-	removeMark(mark?: NodeInterface | Node | string): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = removeMark(range, mark);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 合并mark标签
-	 */
-	mergeMark(): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = mergeMark(range);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 合并相邻的List
-	 */
-	mergeAdjacentList(): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = mergeAdjacentList(range);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 合并相邻的Blockquote
-	 */
-	mergeAdjacentBlockquote(): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = mergeAdjacentBlockquote(range);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 包裹inline标签
-	 * @param inline inline节点或选择器
-	 */
-	wrapInline(inline: NodeInterface | Node | string): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = wrapInline(range, inline);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 包裹block标签
-	 * @param block block节点或选择器
-	 */
-	wrapBlock(block: NodeInterface | Node | string): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = wrapBlock(range, block);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 清除inline包裹标签
-	 */
-	unwrapInline(): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = unwrapInline(range);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 清除block包裹标签
-	 * @param block block节点或选择器
-	 */
-	unwrapBlock(block: NodeInterface | Node | string): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = unwrapBlock(range, block);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 设置标签属性
-	 * @param block 标签或者属性对象集合
-	 */
-	setBlocks(block: string | { [k: string]: any }): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = setBlocks(range, block);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
+	insertNode(
+		node: Node | NodeInterface,
+		range: RangeInterface = this.getRange(),
+	) {
+		if (isNodeEntry(node)) {
+			if (node.length === 0) throw 'Not found node';
+			node = node[0];
+		}
+		range.insertNode(node);
+		return range
+			.select(node, true)
+			.shrinkToElementNode()
+			.collapse(false);
 	}
 	/**
 	 * 删除内容
+	 * @param range 光标，默认获取当前光标
 	 * @param isDeepMerge 删除后是否合并
 	 */
-	deleteContent(isDeepMerge?: boolean): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = deleteContent(range, isDeepMerge);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
-	}
-	/**
-	 * 将选区的列表扣出来，并将切断的列表修复
-	 */
-	separateBlocks(): ChangeInterface {
-		let range = this.getRange();
-		this.repairRange(range);
-		range = separateBlocks(range);
-		this.combinTextNode();
-		this.select(range);
-		this.change();
-		return this;
+	deleteContent(range?: RangeInterface, isDeepMerge?: boolean) {
+		const safeRange = range || this.getSafeRange();
+		if (safeRange.collapsed) {
+			return;
+		}
+		const { mark, node, $ } = this.engine;
+		let cloneRange = safeRange.cloneRange();
+		cloneRange.collapse(true);
+		const activeMarks = mark.findMarks(cloneRange);
+		safeRange.enlargeToElementNode();
+		// 获取上面第一个 Block
+		const block = this.engine.block.closest(safeRange.startNode);
+		// 获取的 block 超出编辑范围
+		if (!block.isRoot() && !block.inEditor()) {
+			if (!range) this.apply(safeRange);
+			return;
+		}
+		// 先删除范围内的所有内容
+		safeRange.extractContents();
+		safeRange.collapse(true);
+		// 后续处理
+		const { startNode, startOffset } = safeRange;
+		// 只删除了文本，不做处理
+		if (startNode.isText()) {
+			if (!range) this.apply(safeRange);
+			return;
+		}
+
+		const prevNode = startNode[0].childNodes[startOffset - 1];
+		const nextNode = startNode[0].childNodes[startOffset];
+		let isEmptyNode = startNode[0].childNodes.length === 0;
+		if (!isEmptyNode) {
+			const firstChild = startNode[0].firstChild!;
+			if (
+				startNode[0].childNodes.length === 1 &&
+				firstChild.nodeType === getWindow().Node.ELEMENT_NODE &&
+				this.engine.node.isCustomize(startNode) &&
+				startNode.first()?.isCard()
+			)
+				isEmptyNode = true;
+		}
+		if (isEmptyNode && node.isBlock(startNode)) {
+			let html = this.engine.node.getBatchAppendHTML(
+				activeMarks,
+				'<br />',
+			);
+			if (startNode.isRoot()) {
+				html = '<p>'.concat(html, '</p>');
+			}
+			startNode.append($(html));
+			safeRange.select(startNode.find('br'));
+			safeRange.collapse(false);
+			if (!range) this.apply(safeRange);
+			return;
+		}
+		//深度合并
+		const deepMergeNode = (
+			range: RangeInterface,
+			prevNode: NodeInterface,
+			nextNode: NodeInterface,
+			marks: Array<NodeInterface>,
+		) => {
+			if (
+				node.isBlock(prevNode) &&
+				!node.isVoid(prevNode) &&
+				!prevNode.isCard()
+			) {
+				range.select(prevNode, true);
+				range.collapse(false);
+				const selection = range.createSelection();
+				this.engine.node.merge(prevNode, nextNode);
+				selection.move();
+				const prev = range.getPrevNode();
+				const next = range.getNextNode();
+				// 合并之后变成空 Block
+				const { startNode } = range;
+				if (!prev && !next && node.isBlock(startNode)) {
+					startNode.append(
+						$(this.engine.node.getBatchAppendHTML(marks, '<br />')),
+					);
+					range.select(startNode.find('br'), true);
+					range.collapse(false);
+				}
+
+				if (prev && next && !prev.isCard() && !next.isCard()) {
+					deepMergeNode(range, prev, next, marks);
+				}
+			}
+		};
+		if (
+			prevNode &&
+			nextNode &&
+			node.isBlock(prevNode) &&
+			node.isBlock(nextNode) &&
+			isDeepMerge
+		) {
+			deepMergeNode(safeRange, $(prevNode), $(nextNode), activeMarks);
+		}
+		startNode.children().each(node => {
+			const domNode = $(node);
+			if (
+				!this.engine.node.isVoid(domNode) &&
+				domNode.isElement() &&
+				'' === this.engine.node.html(domNode)
+			)
+				domNode.remove();
+			//给inline节点添加零宽字符，用于光标选择
+			if (this.engine.node.isInline(domNode)) {
+				this.engine.inline.repairCursor(domNode);
+			}
+		});
+		//修复inline节点光标选择在最后的零宽字符上时，将光标位置移到inline节点末尾
+		cloneRange = safeRange.cloneRange().shrinkToTextNode();
+		if (
+			cloneRange.startNode.isText() &&
+			/^\u200B/g.test(cloneRange.startNode.text()) &&
+			cloneRange.startOffset === 0
+		) {
+			const prev = cloneRange.startNode.prev();
+			if (prev && this.engine.node.isInline(prev)) {
+				safeRange.select(prev, true);
+				safeRange.collapse(false);
+			}
+		}
+
+		if (!range) this.apply(safeRange);
 	}
 
 	/**
@@ -1007,15 +960,15 @@ class ChangeModel implements ChangeInterface {
 		const range = this.getRange();
 		const parent = node.parent();
 		node.remove();
-		if (parent && parent.isEmpty()) {
+		if (parent && this.engine.node.isEmpty(parent)) {
 			if (parent.isRoot()) {
-				parent.html('<p><br /></p>');
+				this.engine.node.html(parent, '<p><br /></p>');
 				range
 					.select(parent, true)
 					.shrinkToElementNode()
 					.collapse(false);
 			} else {
-				parent.html('<br />');
+				this.engine.node.html(parent, '<br />');
 				range.select(parent, true).collapse(false);
 			}
 			this.select(range);
@@ -1027,15 +980,16 @@ class ChangeModel implements ChangeInterface {
 	 * @param node 节点
 	 */
 	unwrapNode(node?: NodeInterface) {
+		const { block } = this.engine;
 		const range = this.getRange();
-		node = node || range.startNode.getClosestBlock();
-		if (!node.inRoot() || node.isTable()) {
+		node = node || block.closest(range.startNode);
+		if (!node.inEditor()) {
 			return;
 		}
 
-		const bookmark = range.createBookmark();
-		unwrapNode(node);
-		if (bookmark) range.moveToBookmark(bookmark);
+		const selection = range.createSelection();
+		this.engine.node.unwrap(node);
+		selection.move();
 		this.select(range);
 	}
 
@@ -1044,8 +998,9 @@ class ChangeModel implements ChangeInterface {
 	 * @param node 节点
 	 */
 	mergeAfterDeletePrevNode(node?: NodeInterface) {
+		const { block, $ } = this.engine;
 		const range = this.getRange();
-		node = node || range.startNode.getClosestBlock();
+		node = node || block.closest(range.startNode);
 		// <p><br />foo</p>，先删除 BR
 		if (node.children().length > 1 && node.first()?.name === 'br') {
 			node.first()?.remove();
@@ -1054,19 +1009,7 @@ class ChangeModel implements ChangeInterface {
 		let prevBlock = node.prev();
 		// 前面没有 DOM 节点
 		if (!prevBlock) {
-			if (
-				node.parent()?.isTable() &&
-				/^<p(\s[^>]*?)?><br><\/p>$/i.test(
-					node
-						.parent()
-						?.html()
-						?.trim() || '',
-				)
-			) {
-				return;
-			}
-
-			if (node.parent()?.inRoot()) {
+			if (node.parent()?.inEditor()) {
 				this.unwrapNode(node);
 			}
 			return;
@@ -1081,12 +1024,15 @@ class ChangeModel implements ChangeInterface {
 			}
 		}
 		// 前面是 void 节点
-		if (prevBlock.isVoid()) {
+		if (this.engine.node.isVoid(prevBlock)) {
 			prevBlock.remove();
 			return;
 		}
 		// 前面是空段落
-		if (prevBlock.isHeading() && prevBlock.isEmpty()) {
+		if (
+			this.engine.node.isRootBlock(prevBlock) &&
+			this.engine.node.isEmpty(prevBlock)
+		) {
 			prevBlock.remove();
 			return;
 		}
@@ -1098,7 +1044,7 @@ class ChangeModel implements ChangeInterface {
 			paragraph.append(prevBlock);
 			prevBlock = paragraph;
 		}
-		if (['ol', 'ul'].indexOf(prevBlock.name || '') >= 0) {
+		if (['ol', 'ul'].indexOf(prevBlock.name) >= 0) {
 			prevBlock = prevBlock.last();
 		}
 		// 只有一个 <br /> 时先删除
@@ -1115,12 +1061,12 @@ class ChangeModel implements ChangeInterface {
 		if (!prevBlock || prevBlock.isText()) {
 			this.unwrapNode(node);
 		} else {
-			const bookmark = range.createBookmark();
-			mergeNode(prevBlock, node);
-			if (bookmark) range.moveToBookmark(bookmark);
+			const selection = range.createSelection();
+			this.engine.node.merge(prevBlock, node);
+			selection.move();
 			this.select(range);
-			this.mergeMark();
-			this.mergeAdjacentList();
+			this.engine.mark.merge();
+			this.engine.list.merge();
 		}
 	}
 
@@ -1131,7 +1077,7 @@ class ChangeModel implements ChangeInterface {
 	 */
 	focusPrevBlock(block?: NodeInterface, isRemoveEmptyBlock: boolean = false) {
 		const range = this.getRange();
-		block = block || range.startNode.getClosestBlock();
+		block = block || this.engine.block.closest(range.startNode);
 		let prevBlock = block.prev();
 		if (!prevBlock) {
 			return;
@@ -1143,7 +1089,7 @@ class ChangeModel implements ChangeInterface {
 			return;
 		}
 		// 前面是列表
-		if (['ol', 'ul'].indexOf(prevBlock.name || '') >= 0) {
+		if (['ol', 'ul'].indexOf(prevBlock.name) >= 0) {
 			prevBlock = prevBlock.last();
 		}
 
@@ -1151,7 +1097,7 @@ class ChangeModel implements ChangeInterface {
 			return;
 		}
 
-		if (isRemoveEmptyBlock && prevBlock.isEmptyWithTrim()) {
+		if (isRemoveEmptyBlock && this.engine.node.isEmptyWithTrim(prevBlock)) {
 			prevBlock.remove();
 			return;
 		}
@@ -1159,6 +1105,11 @@ class ChangeModel implements ChangeInterface {
 		range.select(prevBlock, true);
 		range.collapse(false);
 		this.select(range);
+	}
+
+	destroy() {
+		this.event.destroy();
+		this.clearChangeTimer();
 	}
 }
 

@@ -1,31 +1,29 @@
-import { Plugin } from '@aomao/engine';
+import { isEngine, Plugin } from '@aomao/engine';
 
 export default class extends Plugin {
-	execute() {
-		if (!this.engine) return;
-		const { change } = this.engine;
-		const range = change.getRange();
-		range.select(this.engine.container, true);
-		change.select(range);
-		this.engine.event.trigger('select');
+	static get pluginName() {
+		return 'selectall';
 	}
 
-	onCustomizeKeydown(
-		type:
-			| 'enter'
-			| 'backspace'
-			| 'space'
-			| 'tab'
-			| 'shift-tab'
-			| 'at'
-			| 'slash'
-			| 'selectall',
-		event: KeyboardEvent,
-	) {
-		if (!this.engine || type !== 'selectall') return;
+	init() {
+		super.init();
+		this.editor.on('keydown:all', event => this.onSelectAll(event));
+	}
 
-		const { command } = this.engine;
+	execute() {
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
+		const range = change.getRange();
+		range.select(this.editor.container, true);
+		change.select(range);
+		this.editor.event.trigger('select');
+	}
+
+	onSelectAll(event: KeyboardEvent) {
+		if (!isEngine(this.editor)) return;
+
+		const { command } = this.editor;
 		event.preventDefault();
-		command.execute(this.name);
+		command.execute('selectall');
 	}
 }

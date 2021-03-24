@@ -14,3 +14,7 @@ export * from './plugin';
 export * from './range';
 export * from './schema';
 export * from './toolbar';
+export * from './typing';
+export * from './mark';
+export * from './inline';
+export * from './block';

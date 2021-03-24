@@ -1,5 +1,5 @@
 import {
-	$,
+	isEngine,
 	isNode,
 	NodeInterface,
 	Plugin,
@@ -24,25 +24,31 @@ export default class extends Plugin<Options> {
 	private event?: (event: KeyboardEvent) => void;
 	private isFormat: boolean = false;
 
-	initialize() {
-		if (!this.engine) return;
-		this.engine.on('beforeCommandExecute', name => {
-			if (this.name !== name && !this.isFormat && this.event) {
+	static get pluginName() {
+		return 'paintformat';
+	}
+
+	init() {
+		super.init();
+		if (!isEngine(this.editor)) return;
+
+		this.editor.on('beforeCommandExecute', name => {
+			if ('paintformat' !== name && !this.isFormat && this.event) {
 				this.removeActiveNodes(
-					this.engine!.container[0].ownerDocument!,
+					this.editor!.container[0].ownerDocument!,
 				);
 			}
 		});
 
 		// 鼠标选中文本之后添加样式
-		this.engine.container.on('mouseup', e => {
+		this.editor.container.on('mouseup', e => {
 			if (!this.activeMarks) {
 				return;
 			}
 			// 在Card里不生效
-			if (this.engine!.card.closest(e.target)) {
+			if (this.editor!.card.closest(e.target)) {
 				this.removeActiveNodes(
-					this.engine!.container[0].ownerDocument!,
+					this.editor!.container[0].ownerDocument!,
 				);
 				return;
 			}
@@ -51,21 +57,22 @@ export default class extends Plugin<Options> {
 			this.isFormat = false;
 			if (this.type === 'single')
 				this.removeActiveNodes(
-					this.engine!.container[0].ownerDocument!,
+					this.editor!.container[0].ownerDocument!,
 				);
 		});
 	}
 
 	removeActiveNodes(node: NodeInterface | Node) {
+		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
-		this.engine!.container.removeClass(PAINTFORMAT_CLASS);
+		this.editor!.container.removeClass(PAINTFORMAT_CLASS);
 		this.activeMarks = undefined;
 		this.activeBlocks = undefined;
 		if (this.event) {
 			node.off('keydown', this.event);
 			this.event = undefined;
 		}
-		this.engine!.event.trigger('select');
+		this.editor!.event.trigger('select');
 	}
 
 	bindEvent(node: NodeInterface) {
@@ -80,21 +87,22 @@ export default class extends Plugin<Options> {
 			}
 		};
 		if (ownerDocument) {
+			const { $ } = this.editor;
 			$(ownerDocument).on('keydown', keyEvent);
 			this.event = keyEvent;
 		}
 	}
 
 	paintFormat(activeMarks: NodeInterface[], activeBlocks?: NodeInterface[]) {
-		if (!this.engine) return;
-		const { change, command } = this.engine;
+		if (!isEngine(this.editor)) return;
+		const { change, command, block, $ } = this.editor;
 		const range = change.getRange();
 		const removeCommand = this.options.removeCommand || 'removeformat';
 		// 选择范围为折叠状态，应用在整个段落，包括段落自己的样式
 		if (range.collapsed) {
 			const dummy = $('<img style="display: none;" />');
 			range.insertNode(dummy[0]);
-			const currentBlock = range.startNode.getClosestBlock();
+			const currentBlock = block.closest(range.startNode);
 			range.select(currentBlock, true);
 			change.select(range);
 			if (typeof removeCommand === 'function') removeCommand(range);
@@ -110,7 +118,7 @@ export default class extends Plugin<Options> {
 			if (typeof removeCommand === 'function') removeCommand(range);
 			else command.execute(removeCommand);
 			this.paintMarks(activeMarks);
-			const blocks = range.getBlocks();
+			const blocks = block.getBlocks(range);
 			blocks.forEach(block => {
 				if (activeBlocks) this.paintBlocks(block, activeBlocks);
 			});
@@ -118,14 +126,15 @@ export default class extends Plugin<Options> {
 	}
 
 	paintMarks(activeMarks: NodeInterface[]) {
-		const { change } = this.engine!;
-		activeMarks.forEach(mark => {
-			change.addMark(mark.clone());
+		const { mark } = this.editor!;
+		activeMarks.forEach(node => {
+			mark.wrap(this.editor.node.clone(node));
 		});
 	}
 
 	paintBlocks(currentBlock: NodeInterface, activeBlocks: NodeInterface[]) {
-		const { change, command } = this.engine!;
+		if (!isEngine(this.editor)) return;
+		const { command } = this.editor!;
 		activeBlocks.forEach(block => {
 			if (this.options.paintBlock) {
 				const paintResult = this.options.paintBlock(
@@ -135,8 +144,11 @@ export default class extends Plugin<Options> {
 				if (paintResult === false) return;
 			}
 			if (block.name !== currentBlock.name) {
-				if (block.isHeading()) {
+				if (block.name === 'p') {
 					command.execute('heading', block.name);
+				} else if (this.editor.node.isRootBlock(block)) {
+					const plugins = this.editor.block.findPlugin(block);
+					plugins.forEach(plugin => plugin.execute(block.name));
 				}
 				if (block.name === 'ol') {
 					command.execute('orderlist');
@@ -147,7 +159,7 @@ export default class extends Plugin<Options> {
 			}
 			const css = block.css();
 			if (Object.keys(css).length > 0) {
-				change.setBlocks({
+				this.editor.block.setBlocks({
 					style: css,
 				});
 			}
@@ -155,18 +167,19 @@ export default class extends Plugin<Options> {
 	}
 
 	execute(type: string = 'single') {
-		if (!this.engine) return;
+		if (!isEngine(this.editor)) return;
 		if (this.activeMarks) {
-			this.removeActiveNodes(this.engine.container);
+			this.removeActiveNodes(this.editor.container);
 			return;
 		}
 		this.type = type;
-		this.bindEvent(this.engine.container);
-		const range = this.engine.change.getRange();
-		this.activeMarks = range.getActiveMarks();
-		this.activeBlocks = range.getActiveBlocks();
-		this.engine.event.trigger('select');
-		this.engine.container.addClass('data-paintformat-mode');
+		this.bindEvent(this.editor.container);
+		const { change, mark, block } = this.editor;
+		const range = change.getRange();
+		this.activeMarks = mark.findMarks(range);
+		this.activeBlocks = block.findBlocks(range);
+		this.editor.event.trigger('select');
+		this.editor.container.addClass('data-paintformat-mode');
 	}
 
 	queryState() {

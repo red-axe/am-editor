@@ -89,18 +89,23 @@ export const getToolbarDefaultConfig = (
 			className: 'toolbar-dropdown-fontsize',
 			title: language['fontsize']['title'],
 			items: [
-				{ key: '9', content: '12px', hotkey: false },
-				{ key: '10', content: '13px', hotkey: false },
-				{ key: '11', content: '14px', hotkey: false },
-				{ key: '1515', content: '15px', hotkey: false },
-				{ key: '12', content: '16px', hotkey: false },
-				{ key: '14', content: '19px', hotkey: false },
-				{ key: '16', content: '22px', hotkey: false },
-				{ key: '18', content: '24px', hotkey: false },
-				{ key: '22', content: '29px', hotkey: false },
-				{ key: '24', content: '32px', hotkey: false },
-				{ key: '30', content: '40px', hotkey: false },
-				{ key: '36', content: '48px', hotkey: false },
+				{ key: '12px', content: '12px', hotkey: false },
+				{ key: '13px', content: '13px', hotkey: false },
+				{
+					key: '14px',
+					content: '14px',
+					isDefault: true,
+					hotkey: false,
+				},
+				{ key: '15px', content: '15px', hotkey: false },
+				{ key: '16px', content: '16px', hotkey: false },
+				{ key: '19px', content: '19px', hotkey: false },
+				{ key: '22px', content: '22px', hotkey: false },
+				{ key: '24px', content: '24px', hotkey: false },
+				{ key: '29px', content: '29px', hotkey: false },
+				{ key: '32px', content: '32px', hotkey: false },
+				{ key: '40px', content: '40px', hotkey: false },
+				{ key: '48px', content: '48px', hotkey: false },
 			],
 			onDisabled: () => {
 				const tag = engine.command.queryState('heading') || 'p';
@@ -139,6 +144,7 @@ export const getToolbarDefaultConfig = (
 			type: 'dropdown',
 			name: 'moremark',
 			icon: 'moremark',
+			single: false,
 			title: language['moremark']['title'],
 			items: [
 				{

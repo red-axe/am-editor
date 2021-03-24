@@ -1,20 +1,25 @@
-import { Plugin } from '@aomao/engine';
+import { isEngine, Plugin } from '@aomao/engine';
 
 export type Options = {
-  hotkey?: string | Array<string>;
+	hotkey?: string | Array<string>;
 };
 export default class extends Plugin<Options> {
-  execute() {
-    if (!this.engine) return;
-    this.engine.readonly = false;
-    this.engine.history.undo();
-  }
+	static get pluginName() {
+		return 'undo';
+	}
 
-  queryState() {
-    return this.engine?.history.hasUndo();
-  }
+	execute() {
+		if (!isEngine(this.editor)) return;
+		this.editor.readonly = false;
+		this.editor.history.undo();
+	}
 
-  hotkey() {
-    return this.options.hotkey || ['mod+z', 'shift+mod+z'];
-  }
+	queryState() {
+		if (!isEngine(this.editor)) return;
+		return this.editor.history.hasUndo();
+	}
+
+	hotkey() {
+		return this.options.hotkey || ['mod+z', 'shift+mod+z'];
+	}
 }

@@ -1,5 +1,4 @@
 import tinycolor2 from 'tinycolor2';
-import $ from '../node';
 import { NodeInterface } from '../..';
 import {
 	CARD_SELECTOR,
@@ -9,16 +8,6 @@ import {
 import { ROOT_SELECTOR } from '../constants/root';
 import Parser from '../parser';
 import { EngineInterface } from '../types/engine';
-import {
-	addListStartNumber,
-	brToParagraph,
-	generateRandomIDForDescendant,
-	normalize,
-	removeMinusStyle,
-	removeSideBr,
-	setNode,
-	unwrapNode,
-} from '../utils';
 
 export default class Paste {
 	protected source: string;
@@ -33,9 +22,14 @@ export default class Paste {
 		const schema = this.engine.schema.clone();
 		const conversion = this.engine.conversion.clone();
 		schema.add([
-			'pre',
 			{
-				span: {
+				name: 'pre',
+				type: 'block',
+			},
+			{
+				name: 'span',
+				type: 'mark',
+				attributes: {
 					'data-type': '*',
 					style: {
 						'font-size': '@length',
@@ -43,17 +37,21 @@ export default class Paste {
 				},
 			},
 			{
-				p: {
+				name: 'p',
+				type: 'block',
+				attributes: {
 					'data-type': '*',
 				},
 			},
 			{
-				mark: {
+				type: 'mark',
+				attributes: {
 					id: '*',
 				},
 			},
 			{
-				block: {
+				type: 'block',
+				attributes: {
 					id: '*',
 				},
 			},
@@ -62,12 +60,12 @@ export default class Paste {
 			const plugin = this.engine.plugin.components[name];
 			if (plugin.pasteSchema) plugin.pasteSchema(schema);
 		});
-		return new Parser(this.source, this.engine, undefined, root => {
+		return new Parser(this.source, this.engine, root => {
 			Object.keys(this.engine.plugin.components).forEach(name => {
 				const plugin = this.engine.plugin.components[name];
 				if (plugin.pasteOrigin) plugin.pasteOrigin(root);
 			});
-		}).toDOM(schema.getValue(), conversion.getValue());
+		}).toDOM(schema, conversion.getValue());
 	}
 
 	getDefaultStyle() {
@@ -100,6 +98,7 @@ export default class Paste {
 
 	commonNormalize(fragment: DocumentFragment) {
 		const defaultStyle = this.getDefaultStyle();
+		const { $ } = this.engine;
 		// 第一轮预处理，主要处理 span 节点
 		let nodes = $(fragment).allChildren();
 		nodes.forEach(child => {
@@ -124,32 +123,33 @@ export default class Paste {
 					}
 				});
 			}
-			removeMinusStyle(node, 'text-indent');
-			if (['ol', 'ul'].includes(node.name || '')) {
+			this.engine.node.removeMinusStyle(node, 'text-indent');
+			if (['ol', 'ul'].includes(node.name)) {
 				node.css('padding-left', '');
 			}
 			// 删除空 style 属性
 			if (node.isElement()) {
-				if (!node.attr('style')) {
-					node.removeAttr('style');
+				if (!node.attributes('style')) {
+					node.removeAttributes('style');
 				}
 			}
 			// 删除空 span
 			if (
 				node.name === 'span' &&
-				Object.keys(node.attr()).length === 0 &&
+				Object.keys(node.attributes()).length === 0 &&
 				Object.keys(node.css()).length === 0 &&
 				(node.text().trim() === '' ||
 					(node.first() &&
-						(node.first()!.isMark() || node.first()!.isBlock())))
+						(this.engine.node.isMark(node.first()!) ||
+							this.engine.node.isBlock(node.first()!))))
 			) {
-				unwrapNode(node);
+				this.engine.node.unwrap(node);
 				return;
 			}
 
 			// br 换行改成正常段落
-			if (node.isBlock()) {
-				brToParagraph(node);
+			if (this.engine.node.isBlock(node)) {
+				this.engine.block.brToBlock(node);
 			}
 		});
 		// 第二轮处理
@@ -162,28 +162,28 @@ export default class Paste {
 			}
 			// 删除 google docs 根节点
 			// <b style="font-weight:normal;" id="docs-internal-guid-e0280780-7fff-85c2-f58a-6e615d93f1f2">
-			if (/^docs-internal-guid-/.test(node.attr('id'))) {
-				unwrapNode(node);
+			if (/^docs-internal-guid-/.test(node.attributes('id'))) {
+				this.engine.node.unwrap(node);
 				return;
 			}
 			// 跳过Card
-			if (node.attr(READY_CARD_KEY)) {
+			if (node.attributes(READY_CARD_KEY)) {
 				return;
 			}
 			// 删除零高度的空行
 			if (
-				node.isBlock() &&
-				node.attr('data-type') !== 'p' &&
-				!node.isVoid() &&
-				!node.isSolid() &&
-				node.html() === ''
+				this.engine.node.isBlock(node) &&
+				node.attributes('data-type') !== 'p' &&
+				!this.engine.node.isVoid(node) &&
+				//!node.isSolid() &&
+				this.engine.node.html(node) === ''
 			) {
 				node.remove();
 				return;
 			}
 			// 段落
-			if (node.attr('data-type') === 'p') {
-				node.removeAttr('data-type');
+			if (node.attributes('data-type') === 'p') {
+				node.removeAttributes('data-type');
 			}
 			// 补齐 ul 或 ol
 			if (
@@ -197,7 +197,7 @@ export default class Paste {
 			}
 			// 补齐 li
 			if (
-				['ol', 'ul'].indexOf(node.name || '') >= 0 &&
+				['ol', 'ul'].indexOf(node.name) >= 0 &&
 				['ol', 'ul'].indexOf(node.parent()?.name || '') >= 0
 			) {
 				const li = $('<li />');
@@ -207,7 +207,7 @@ export default class Paste {
 			}
 			// <li>two<ol><li>three</li></ol>four</li>
 			if (
-				['ol', 'ul'].indexOf(node.name || '') >= 0 &&
+				['ol', 'ul'].indexOf(node.name) >= 0 &&
 				node.parent()?.name === 'li' &&
 				(node.prev() || node.next())
 			) {
@@ -216,13 +216,13 @@ export default class Paste {
 				const isCustomizeList = parent?.parent()?.hasClass('data-list');
 				parent?.children().each(child => {
 					const node = $(child);
-					if (node.isEmptyWithTrim()) {
+					if (this.engine.node.isEmptyWithTrim(node)) {
 						return;
 					}
-					const isList = ['ol', 'ul'].indexOf(node.name || '') >= 0;
+					const isList = ['ol', 'ul'].indexOf(node.name) >= 0;
 					if (!li || isList) {
 						li = isCustomizeList
-							? $('<li class="data-list-node" />')
+							? $('<li class="data-list-item" />')
 							: $('<li />');
 						parent.before(li);
 					}
@@ -239,18 +239,25 @@ export default class Paste {
 				node.name === 'p' &&
 				['ol', 'ul'].indexOf(node.parent()?.name || '') >= 0
 			) {
-				setNode(node, $('<li />'));
+				this.engine.node.replace(node, $('<li />'));
 				return;
 			}
 			// 处理空 Block
-			if (node.isBlock() && !node.isVoid() && node.html().trim() === '') {
+			if (
+				this.engine.node.isBlock(node) &&
+				!this.engine.node.isVoid(node) &&
+				this.engine.node.html(node).trim() === ''
+			) {
 				// <p></p> to <p><br /></p>
-				if (node.isHeading() || node.name === 'li') {
-					node.html('<br />');
+				if (this.engine.node.isRootBlock(node) || node.name === 'li') {
+					this.engine.node.html(node, '<br />');
 				}
 			}
 			// <li><p>foo</p></li>
-			if (node.isHeading() && node.parent()?.name === 'li') {
+			if (
+				this.engine.node.isRootBlock(node) &&
+				node.parent()?.name === 'li'
+			) {
 				// <li><p><br /></p></li>
 				if (
 					node.children().length === 1 &&
@@ -260,15 +267,16 @@ export default class Paste {
 				} else {
 					node.after('<br />');
 				}
-				unwrapNode(node);
+				this.engine.node.unwrap(node);
 				return;
 			}
 			// 移除两边的 BR
-			removeSideBr(node);
+			this.engine.node.removeSide(node);
 		});
 	}
 
 	normalize() {
+		const { $ } = this.engine;
 		const fragment = this.parser();
 		this.commonNormalize(fragment);
 		const range = this.engine.change.getRange();
@@ -308,28 +316,29 @@ export default class Paste {
 				node.name === 'pre' &&
 				node.find(READY_CARD_SELECTOR).length > 0
 			) {
-				unwrapNode(node);
+				this.engine.node.unwrap(node);
 			}
 		});
-		normalize($(fragment));
+		this.engine.node.normalize($(fragment));
 		fragment.normalize();
 		nodes = $(fragment).allChildren();
 		nodes.forEach(child => {
 			const node = $(child);
-			if (['ol', 'ul'].includes(node.name || '')) {
-				addListStartNumber(node);
+			if (['ol', 'ul'].includes(node.name)) {
+				this.engine.list.addStart(node);
 			}
 		});
-		generateRandomIDForDescendant(fragment, true);
+		this.engine.block.generateRandomIDForDescendant(fragment, true);
 		return fragment;
 	}
 
 	removeElementNodes(fragment: NodeInterface) {
+		const { $ } = this.engine;
 		const nodes = fragment.allChildren();
 		nodes.forEach(child => {
 			const node = $(child);
 			if (node.isElement()) {
-				unwrapNode(node);
+				this.engine.node.unwrap(node);
 			}
 		});
 	}

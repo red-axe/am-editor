@@ -1,39 +1,23 @@
-import { NodeInterface } from './types/node';
-import $, { isNodeEntry } from './node';
-import { Bookmark, RangeInterface } from './types/range';
-import {
-	createSideBlock,
-	getWindow,
-	inlineCardHasBlockStyle,
-	isEdge,
-	isMobile,
-	isSafari,
-	removeZeroWidthSpace,
-} from './utils';
-import {
-	CARD_ELEMENT_KEY,
-	CARD_KEY,
-	CARD_LEFT_SELECTOR,
-	CARD_RIGHT_SELECTOR,
-	CARD_SELECTOR,
-} from './constants/card';
-import {
-	ANCHOR,
-	ANCHOR_SELECTOR,
-	CURSOR,
-	CURSOR_SELECTOR,
-	FOCUS,
-	FOCUS_SELECTOR,
-} from './constants/selection';
-import { ROOT, DATA_ELEMENT, ROOT_SELECTOR } from './constants/root';
+import { isNodeEntry, NodeInterface } from './types/node';
+import { isRange, isSelection, RangeInterface } from './types/range';
+import { getWindow, isMobile } from './utils';
+import { CARD_SELECTOR } from './constants/card';
+import { ANCHOR, CURSOR, FOCUS } from './constants/selection';
+import { DATA_ELEMENT } from './constants/root';
+import Selection from './selection';
+import { SelectionInterface } from './types/selection';
+import { EditorInterface } from './types/engine';
 
 class Range implements RangeInterface {
+	private editor: EditorInterface;
 	static create: (
+		editor: EditorInterface,
 		doc?: Document,
 		point?: { x: number; y: number },
 	) => RangeInterface;
 	static from: (
-		win?: Window | Selection | globalThis.Range,
+		editor: EditorInterface,
+		win?: Window | globalThis.Selection | globalThis.Range,
 		clone?: boolean,
 	) => RangeInterface | null;
 	base: globalThis.Range;
@@ -62,7 +46,8 @@ class Range implements RangeInterface {
 		return this.base.commonAncestorContainer;
 	}
 
-	constructor(range: globalThis.Range) {
+	constructor(editor: EditorInterface, range: globalThis.Range) {
+		this.editor = editor;
 		this.base = range;
 	}
 
@@ -129,15 +114,15 @@ class Range implements RangeInterface {
 	}
 
 	get startNode() {
-		return $(this.base.startContainer);
+		return this.editor.$(this.base.startContainer);
 	}
 
 	get endNode() {
-		return $(this.base.endContainer);
+		return this.editor.$(this.base.endContainer);
 	}
 
 	get commonAncestorNode() {
-		return $(this.base.commonAncestorContainer);
+		return this.editor.$(this.base.commonAncestorContainer);
 	}
 
 	toRange = (): globalThis.Range => {
@@ -150,7 +135,7 @@ class Range implements RangeInterface {
 	};
 
 	cloneRange = () => {
-		return Range.from(this.base.cloneRange())!;
+		return Range.from(this.editor, this.base.cloneRange())!;
 	};
 	/**
 	 * 选中一个节点
@@ -285,11 +270,10 @@ class Range implements RangeInterface {
 			offset: number,
 			isStart: boolean,
 		) => {
-			let domNode = $(node);
+			let domNode = this.editor.$(node);
 			if (
 				domNode.type === getWindow().Node.TEXT_NODE ||
-				domNode.isSolid() ||
-				(!toBlock && domNode.isBlock()) ||
+				(!toBlock && this.editor.node.isBlock(domNode)) ||
 				domNode.isRoot()
 			) {
 				return;
@@ -300,12 +284,11 @@ class Range implements RangeInterface {
 					parent = domNode.parent();
 					if (
 						!parent ||
-						parent.isSolid() ||
-						(!toBlock && parent.isBlock())
+						(!toBlock && this.editor.node.isBlock(parent))
 					) {
 						break;
 					}
-					if (!parent.inRoot()) {
+					if (!parent.inEditor()) {
 						break;
 					}
 					domNode = parent;
@@ -320,12 +303,11 @@ class Range implements RangeInterface {
 					parent = domNode.parent();
 					if (
 						!parent ||
-						parent.isSolid() ||
-						(!toBlock && parent.isBlock())
+						(!toBlock && this.editor.node.isBlock(parent))
 					) {
 						break;
 					}
-					if (!parent.inRoot()) {
+					if (!parent.inEditor()) {
 						break;
 					}
 					domNode = parent;
@@ -350,12 +332,13 @@ class Range implements RangeInterface {
 	 * @param range 选区
 	 */
 	shrinkToElementNode = () => {
+		const { node, $ } = this.editor;
 		let child;
 		while (
 			this.startContainer.nodeType === getWindow().Node.ELEMENT_NODE &&
 			(child = this.startContainer.childNodes[this.startOffset]) &&
 			child.nodeType === getWindow().Node.ELEMENT_NODE &&
-			!$(child).isVoid() &&
+			!node.isVoid(child) &&
 			!$(child).isCard()
 		) {
 			this.setStart(child, 0);
@@ -365,7 +348,7 @@ class Range implements RangeInterface {
 			this.endOffset > 0 &&
 			(child = this.endContainer.childNodes[this.endOffset - 1]) &&
 			child.nodeType === getWindow().Node.ELEMENT_NODE &&
-			!$(child).isVoid() &&
+			!node.isVoid(child) &&
 			!$(child).isCard()
 		) {
 			this.setEnd(child, child.childNodes.length);
@@ -374,162 +357,13 @@ class Range implements RangeInterface {
 	};
 
 	/**
-	 * 创建 bookmark，通过插入 span 节点标记位置
+	 * 创建 selection，通过插入 span 节点标记位置
 	 * @param range
 	 */
-	createBookmark = (): Bookmark | undefined => {
-		const ancestor = this.commonAncestorNode;
-		// 超出编辑区域
-		if (!ancestor.isRoot() && !ancestor.inRoot()) {
-			return;
-		}
-
-		const doc = ancestor.doc;
-		// 为了增加容错性，删除已有的标记
-		const root = ancestor.closest(ROOT_SELECTOR);
-		root.find(ANCHOR_SELECTOR).remove();
-		root.find(FOCUS_SELECTOR).remove();
-		root.find(CURSOR_SELECTOR).remove();
-		// card 组件
-		const startCardRoot = this.startNode.closest(CARD_SELECTOR);
-		if (
-			startCardRoot.length > 0 &&
-			!inlineCardHasBlockStyle(startCardRoot)
-		) {
-			const cardLeft = this.startNode.closest(CARD_LEFT_SELECTOR);
-			if (cardLeft.length > 0) {
-				this.setStartBefore(startCardRoot[0]);
-			}
-			const cardRight = this.startNode.closest(CARD_RIGHT_SELECTOR);
-			if (cardRight.length > 0) {
-				this.setStartAfter(startCardRoot[0]);
-			}
-		}
-
-		if (this.startContainer !== this.endContainer) {
-			const endCardRoot = this.endNode.closest(CARD_SELECTOR);
-			// 具有 block css 属性的行内Card，不调整光标位置
-			if (
-				endCardRoot.length > 0 &&
-				!inlineCardHasBlockStyle(endCardRoot)
-			) {
-				const _cardLeft = this.endNode.closest(CARD_LEFT_SELECTOR);
-				if (_cardLeft.length > 0) {
-					this.setEndBefore(endCardRoot[0]);
-				}
-				const _cardRight = this.endNode.closest(CARD_RIGHT_SELECTOR);
-				if (_cardRight.length > 0) {
-					this.setEndAfter(endCardRoot[0]);
-				}
-			}
-		}
-		// cursor
-		if (this.collapsed) {
-			const cursor = doc!.createElement('span');
-			$(cursor).attr(DATA_ELEMENT, CURSOR);
-			this.insertNode(cursor);
-			return {
-				anchor: cursor,
-				focus: cursor,
-			};
-		}
-		// anchor
-		const startRange = this.cloneRange();
-		startRange.collapse(true);
-		const anchor = doc!.createElement('span');
-		$(anchor).attr(DATA_ELEMENT, ANCHOR);
-		startRange.insertNode(anchor);
-		this.setStartAfter(anchor);
-		// focus
-		const endRange = this.cloneRange();
-		endRange.collapse(false);
-		const focus = doc!.createElement('span');
-		$(focus).attr(DATA_ELEMENT, FOCUS);
-		endRange.insertNode(focus);
-		return {
-			anchor,
-			focus,
-		};
-	};
-
-	/**
-	 * 根据 bookmark 重新设置 range，并移除 span 节点
-	 * @param range 选区
-	 * @param bookmark 标记
-	 */
-	moveToBookmark = (bookmark: Bookmark) => {
-		if (!bookmark) {
-			return;
-		}
-		if (bookmark.anchor === bookmark.focus) {
-			const cursor = $(bookmark.anchor);
-			const _parent = cursor.parent();
-			if (!_parent) return;
-			removeZeroWidthSpace(_parent);
-			_parent[0].normalize();
-
-			let isCardCursor = false;
-			const prevNode = cursor.prev();
-			const nextNode = cursor.next();
-			// 具有 block css 属性的行内Card，不调整光标位置
-			if (
-				prevNode &&
-				prevNode.isCard() &&
-				!inlineCardHasBlockStyle(prevNode)
-			) {
-				const cardRight = prevNode.find(CARD_RIGHT_SELECTOR);
-				if (cardRight.length > 0) {
-					this.select(cardRight, true);
-					this.collapse(false);
-					isCardCursor = true;
-				}
-			} else if (
-				nextNode &&
-				nextNode.isCard() &&
-				!inlineCardHasBlockStyle(nextNode)
-			) {
-				const cardLeft = nextNode.find(CARD_LEFT_SELECTOR);
-				if (cardLeft.length > 0) {
-					this.select(cardLeft, true);
-					this.collapse(false);
-					isCardCursor = true;
-				}
-			}
-
-			if (!isCardCursor) {
-				this.setStartBefore(cursor[0]);
-				this.collapse(true);
-			}
-
-			if (isEdge) {
-				_parent![0].normalize();
-				cursor.remove();
-			} else {
-				cursor.remove();
-				_parent![0].normalize();
-			}
-			return;
-		}
-		// collapsed = false
-		// range start
-		const anchorNode = $(bookmark.anchor);
-		let parent = anchorNode.parent();
-		removeZeroWidthSpace(parent!);
-		this.setStartBefore(anchorNode[0]);
-		anchorNode.remove();
-		parent![0].normalize();
-		// range end
-		const focusNode = $(bookmark.focus);
-		parent = focusNode.parent();
-		removeZeroWidthSpace(parent!);
-		this.setEndBefore(focusNode[0]);
-		focusNode.remove();
-		parent![0].normalize();
-		if (isSafari) {
-			const selection = window.getSelection();
-			selection?.removeAllRanges();
-			selection?.addRange(this.base);
-		}
+	createSelection = (): SelectionInterface => {
+		const selection = new Selection(this.editor, this);
+		selection.create();
+		return selection;
 	};
 
 	/**
@@ -545,7 +379,7 @@ class Range implements RangeInterface {
 				const valueLength = childNode.nodeValue?.length || 0;
 				const start = this.comparePoint(childNode, offset);
 				const end = this.comparePoint(childNode, valueLength);
-				const docRange = Range.create();
+				const docRange = Range.create(this.editor);
 				if (start < 0) {
 					if (end < 0) return;
 					if (end === 0) {
@@ -576,7 +410,12 @@ class Range implements RangeInterface {
 		return ranges;
 	};
 
-	setOffset = (node: Node, start: number, end: number): RangeInterface => {
+	setOffset = (
+		node: Node | NodeInterface,
+		start: number,
+		end: number,
+	): RangeInterface => {
+		if (isNodeEntry(node)) node = node[0];
 		this.setStart(node, start);
 		this.setEnd(node, end);
 		return this;
@@ -664,6 +503,7 @@ class Range implements RangeInterface {
 	};
 
 	scrollIntoViewIfNeeded = (node: NodeInterface, view: NodeInterface) => {
+		const { $ } = this.editor;
 		if (this.collapsed) {
 			node.scrollIntoView(view, $(this.getEndOffsetNode()));
 		} else {
@@ -700,12 +540,13 @@ class Range implements RangeInterface {
 	 * @param isLeft
 	 */
 	addOrRemoveBr = (isLeft?: boolean) => {
-		const block = this.commonAncestorNode.getClosestBlock();
+		const { $ } = this.editor;
+		const block = this.editor.block.closest(this.commonAncestorNode);
 		block.find('br').each(br => {
 			const domBr = $(br);
 			if (
 				((!domBr.prev() ||
-					(domBr.parent()?.hasClass('data-list-node') &&
+					(domBr.parent()?.hasClass('data-list-item') &&
 						domBr
 							.parent()
 							?.first()
@@ -713,7 +554,7 @@ class Range implements RangeInterface {
 					domBr.next() &&
 					domBr.next()!.name !== 'br' &&
 					![CURSOR, ANCHOR, FOCUS].includes(
-						domBr.next()!.attr(DATA_ELEMENT),
+						domBr.next()!.attributes(DATA_ELEMENT),
 					)) ||
 				(!domBr.next() && domBr.prev() && domBr.prev()?.name !== 'br')
 			) {
@@ -721,7 +562,7 @@ class Range implements RangeInterface {
 					isLeft &&
 					domBr.prev() &&
 					!(
-						domBr.parent()?.hasClass('data-list-node') &&
+						domBr.parent()?.hasClass('data-list-item') &&
 						domBr
 							.parent()
 							?.first()
@@ -736,7 +577,7 @@ class Range implements RangeInterface {
 		if (
 			!block.first() ||
 			(block.children().length === 1 &&
-				block.hasClass('data-list-node') &&
+				block.hasClass('data-list-item') &&
 				block.first()?.isCard())
 		) {
 			block.append($('<br />'));
@@ -745,10 +586,10 @@ class Range implements RangeInterface {
 
 		if (
 			block.children().length === 2 &&
-			block.hasClass('data-list-node') &&
+			block.hasClass('data-list-item') &&
 			block.first()?.isCard() &&
 			['cursor', 'anchor', 'focus'].includes(
-				block.last()?.attr(DATA_ELEMENT) || '',
+				block.last()?.attributes(DATA_ELEMENT) || '',
 			)
 		) {
 			block.first()?.after('<br />');
@@ -792,314 +633,7 @@ class Range implements RangeInterface {
 		return childNodes.eq(endOffset);
 	};
 
-	/**
-	 * 判断范围的 EdgeOffset 是否在 Block 的开始位置
-	 * @param edge
-	 */
-	isBlockFirstOffset = (edge: 'start' | 'end') => {
-		const container = edge === 'start' ? this.startNode : this.endNode;
-		const offset = edge === 'start' ? this.startOffset : this.endOffset;
-		const newRange = this.cloneRange();
-		const block = container.getClosestBlock();
-		newRange.select(block, true);
-		newRange.setEnd(container[0], offset);
-		const fragment = newRange.cloneContents();
-
-		if (!fragment.firstChild) {
-			return true;
-		}
-
-		if (
-			fragment.childNodes.length === 1 &&
-			$(fragment.firstChild).name === 'br'
-		) {
-			return true;
-		}
-
-		const node = $('<div />');
-		node.append(fragment);
-		return node.isEmpty();
-	};
-
-	/**
-	 * 判断范围的 EdgeOffset 是否在 Block 的最后位置
-	 * @param edge
-	 */
-	isBlockLastOffset = (edge: 'start' | 'end') => {
-		const container = edge === 'start' ? this.startNode : this.endNode;
-		const offset = edge === 'start' ? this.startOffset : this.endOffset;
-		const newRange = this.cloneRange();
-		const block = container.getClosestBlock();
-		newRange.select(block, true);
-		newRange.setStart(container, offset);
-		const fragment = newRange.cloneContents();
-
-		if (!fragment.firstChild) {
-			return true;
-		}
-
-		const node = $('<div />');
-		node.append(fragment);
-
-		return 0 >= node.find('br').length && node.isEmpty();
-	};
-
-	/**
-	 * 获取范围内的所有 Block
-	 */
-	getBlocks = () => {
-		const dupRange = this.cloneRange();
-		dupRange.shrinkToElementNode();
-		dupRange.shrinkToTextNode();
-		const startBlock = dupRange.startNode.getClosestBlock();
-		const endBlock = dupRange.endNode.getClosestBlock();
-		const closestBlock = dupRange.commonAncestorNode.getClosestBlock();
-		const blocks: Array<NodeInterface> = [];
-		let started = false;
-		closestBlock.traverse(node => {
-			const domNode = $(node);
-			if (domNode[0] === startBlock[0]) {
-				started = true;
-			}
-			if (
-				started &&
-				domNode.isBlock() &&
-				!domNode.isCard() &&
-				domNode.inRoot()
-			) {
-				blocks.push(domNode);
-			}
-			if (domNode[0] === endBlock[0]) {
-				started = false;
-				return false;
-			}
-			return;
-		});
-		// 未选中文本时忽略该 Block
-		// 示例：<h3><anchor />word</h3><p><focus />another</p>
-		if (blocks.length > 1 && dupRange.isBlockFirstOffset('end')) {
-			blocks.pop();
-		}
-		return blocks;
-	};
-
-	/**
-	 * 获取对范围有效果的所有 Block
-	 */
-	getActiveBlocks = () => {
-		const range = this.cloneRange();
-		range.shrinkToElementNode();
-		const sc = range.startContainer;
-		const so = range.startOffset;
-		const ec = range.endContainer;
-		const eo = range.endOffset;
-		let startNode = sc;
-		let endNode = ec;
-
-		if (sc.nodeType === getWindow().Node.ELEMENT_NODE) {
-			if (sc.childNodes[so]) {
-				startNode = sc.childNodes[so] || sc;
-			}
-		}
-
-		if (ec.nodeType === getWindow().Node.ELEMENT_NODE) {
-			if (eo > 0 && ec.childNodes[eo - 1]) {
-				endNode = ec.childNodes[eo - 1] || sc;
-			}
-		}
-		// 折叠状态时，按右侧位置的方式处理
-		if (range.collapsed) {
-			startNode = endNode;
-		}
-		// 不存在时添加
-		const addNode = (
-			nodes: Array<NodeInterface>,
-			nodeB: NodeInterface,
-			preppend?: boolean,
-		) => {
-			if (
-				!nodes.some(nodeA => {
-					return nodeA[0] === nodeB[0];
-				})
-			) {
-				if (preppend) {
-					nodes.unshift(nodeB);
-				} else {
-					nodes.push(nodeB);
-				}
-			}
-		};
-		// 向上寻找
-		const findNodes = (node: NodeInterface) => {
-			const nodes = [];
-			while (node) {
-				if (node.isRoot()) {
-					break;
-				}
-				if (node.isBlock()) {
-					nodes.push(node);
-				}
-				const parent = node.parent();
-				if (!parent) break;
-				node = parent;
-			}
-			return nodes;
-		};
-
-		const nodes = range.getBlocks();
-		// rang头部应该往数组头部插入节点
-		findNodes($(startNode)).forEach(node => {
-			return addNode(nodes, node, true);
-		});
-
-		if (!range.collapsed) {
-			findNodes($(endNode)).forEach(node => {
-				return addNode(nodes, node);
-			});
-		}
-		return nodes;
-	};
-
-	/**
-	 * 获取范围内的所有 Inline
-	 */
-	getActiveInlines = () => {
-		const dupRange = this.cloneRange();
-		// 左侧不动，只缩小右侧边界
-		// <anchor /><a>foo</a><focus />bar
-		// 改成s
-		// <anchor /><a>foo<focus /></a>bar
-		if (!this.collapsed) {
-			const rightRange = this.cloneRange();
-			rightRange.shrinkToElementNode();
-			dupRange.setEnd(rightRange.endContainer, rightRange.endOffset);
-		}
-
-		const sc = dupRange.startContainer;
-		const so = dupRange.startOffset;
-		const ec = dupRange.endContainer;
-		const eo = dupRange.endOffset;
-		let startNode = sc;
-		let endNode = ec;
-
-		if (sc.nodeType === getWindow().Node.ELEMENT_NODE) {
-			if (sc.childNodes[so]) {
-				startNode = sc.childNodes[so] || sc;
-			}
-		}
-
-		if (ec.nodeType === getWindow().Node.ELEMENT_NODE) {
-			if (eo > 0 && ec.childNodes[eo - 1]) {
-				endNode = ec.childNodes[eo - 1] || sc;
-			}
-		}
-		// 折叠状态时，按右侧位置的方式处理
-		if (this.collapsed) {
-			startNode = endNode;
-		}
-		// 不存在时添加
-		const addNode = (nodes: Array<NodeInterface>, nodeB: NodeInterface) => {
-			if (!nodes.some(nodeA => nodeA[0] === nodeB[0])) {
-				nodes.push(nodeB);
-			}
-		};
-		// 向上寻找
-		const findNodes = (node: NodeInterface) => {
-			const nodes = [];
-			while (node) {
-				if (node.isRoot()) break;
-				if (node.isInline()) nodes.push(node);
-				const parent = node.parent();
-				if (!parent) break;
-				node = parent;
-			}
-			return nodes;
-		};
-
-		const nodes = findNodes($(startNode));
-		if (!this.collapsed) {
-			findNodes($(endNode)).forEach(nodeB => {
-				return addNode(nodes, nodeB);
-			});
-		}
-		return nodes;
-	};
-
-	/**
-	 * 获取对范围有效果的所有 Mark
-	 * @param range 范围
-	 */
-	getActiveMarks = () => {
-		const dupRange = this.cloneRange();
-		// 左侧不动，只缩小右侧边界
-		// <anchor /><strong>foo</strong><focus />bar
-		// 改成
-		// <anchor /><strong>foo<focus /></strong>bar
-		if (!this.collapsed) {
-			const rightRange = this.cloneRange();
-			rightRange.shrinkToElementNode();
-			dupRange.setEnd(rightRange.endContainer, rightRange.endOffset);
-		}
-		const sc = dupRange.startContainer;
-		const so = dupRange.startOffset;
-		const ec = dupRange.endContainer;
-		const eo = dupRange.endOffset;
-		let startNode = sc;
-		let endNode = ec;
-		if (sc.nodeType === getWindow().Node.ELEMENT_NODE) {
-			if (sc.childNodes[so]) {
-				startNode = sc.childNodes[so] || sc;
-			}
-		}
-		if (ec.nodeType === getWindow().Node.ELEMENT_NODE) {
-			if (eo > 0 && ec.childNodes[eo - 1]) {
-				endNode = ec.childNodes[eo - 1] || sc;
-			}
-		}
-		// 折叠状态时，按右侧位置的方式处理
-		if (this.collapsed) {
-			startNode = endNode;
-		}
-		// 不存在时添加
-		const addNode = (nodes: Array<NodeInterface>, nodeB: NodeInterface) => {
-			if (!nodes.some(nodeA => nodeA[0] === nodeB[0])) {
-				nodes.push(nodeB);
-			}
-		};
-		// 向上寻找
-		const findNodes = (node: NodeInterface) => {
-			let nodes: Array<NodeInterface> = [];
-			while (node) {
-				if (
-					node.type === getWindow().Node.ELEMENT_NODE &&
-					node.attr(DATA_ELEMENT) === ROOT
-				) {
-					break;
-				}
-				if (
-					node.isMark() &&
-					!node.attr(CARD_KEY) &&
-					!node.attr(CARD_ELEMENT_KEY)
-				) {
-					nodes.push(node);
-				}
-				const parent = node.parent();
-				if (!parent) break;
-				node = parent;
-			}
-			return nodes;
-		};
-
-		const nodes = findNodes($(startNode));
-		if (!this.collapsed) {
-			findNodes($(endNode)).forEach(nodeB => {
-				return addNode(nodes, nodeB);
-			});
-		}
-		return nodes;
-	};
-
-	deepCut = () => {
+	deepCut() {
 		if (!this.collapsed) this.extractContents();
 		const { startNode } = this;
 		if (!startNode.isRoot()) {
@@ -1116,125 +650,7 @@ class Range implements RangeInterface {
 				this.collapse(true);
 			}
 		}
-	};
-
-	/**
-	 * 获取 Block 左侧文本
-	 * @param block 节点
-	 */
-	getBlockLeftText = (block: Node) => {
-		const range = this;
-		const leftBlock = createSideBlock({
-			block,
-			range,
-			isLeft: true,
-			clone: true,
-		});
-		return leftBlock.text().trim();
-	};
-
-	/**
-	 * 删除 Block 左侧文本
-	 * @param block 节点
-	 */
-	removeBlockLeftText = (block: Node) => {
-		const domBlock = $(block);
-		this.createBookmark();
-		const cursor = domBlock.find(CURSOR_SELECTOR);
-		let isRemove = false;
-		// 删除左侧文本节点
-		domBlock.traverse(node => {
-			const domNode = $(node);
-			if (domNode[0] === cursor[0]) {
-				cursor.remove();
-				isRemove = true;
-				return;
-			}
-			if (isRemove && domNode.isText()) {
-				domNode.remove();
-			}
-		}, false);
-	};
-
-	/**
-	 * 判断选中的区域是否在List列表的开始
-	 */
-	isListFirst = () => {
-		//获取选区开始节点和位置偏移值
-		const { startNode, startOffset } = this;
-		//复制选区
-		const cloneRange = this.cloneRange();
-		//找到li节点
-		const node =
-			'li' === startNode.name ? startNode : startNode.closest('li');
-		//如果没有li节点
-		if (!node[0]) return false;
-		//让选区选择li节点
-		cloneRange.select(node, true);
-		//设置选区结束位置偏移值
-		cloneRange.setEnd(startNode[0], startOffset);
-		//复制选区内容
-		const contents = cloneRange.cloneContents();
-		//如果选区中没有节点
-		if (!contents.firstChild) return true;
-		//如果选区中只有一个节点，并且是br标签
-		if (
-			1 === contents.childNodes.length &&
-			'br' === $(contents.firstChild).name
-		)
-			return true;
-		//如果选区中只有一个节点，并且是自定义列表并且第一个是Card
-		if (
-			1 === contents.childNodes.length &&
-			node.hasClass('data-list-node') &&
-			$(contents.firstChild).isCard()
-		)
-			return true;
-		//如果选区中只有两个节点，并且是自定义列表并且第一个是Card，最后一个为空节点
-		if (
-			2 === contents.childNodes.length &&
-			node.hasClass('data-list-node') &&
-			$(contents.firstChild).isCard() &&
-			$(contents.lastChild || []).isEmpty()
-		)
-			return true;
-		//判断选区内容是否是空节点
-		const block = $('<div />');
-		block.append(contents);
-		return block.isEmpty();
-	};
-
-	/**
-	 * 判断选中的区域是否在List列表的末尾
-	 */
-	isListLast = () => {
-		//获取选区范围结束节点和结束位置偏移值
-		const { endNode, endOffset } = this;
-		//复制选区
-		const cloneRange = this.cloneRange();
-		//找到li节点
-		const node = 'li' === endNode.name ? endNode : endNode.closest('li');
-		//如果没有li节点
-		if (!node[0]) return false;
-		//让选区选择li节点
-		cloneRange.select(node, true);
-		//设置选区开始位置偏移值
-		cloneRange.setStart(endNode, endOffset);
-		//复制选区内容
-		const contents = cloneRange.cloneContents();
-		//如果选区中没有节点
-		if (!contents.firstChild) return true;
-		//如果选区中只有一个节点，并且是br标签
-		if (
-			1 === contents.childNodes.length &&
-			'br' === $(contents.firstChild).name
-		)
-			return true;
-		//判断选区内容是否是空节点
-		const block = $('<div />');
-		block.append(contents);
-		return block.isEmpty();
-	};
+	}
 
 	/**
 	 * 对比两个范围是否相等
@@ -1264,17 +680,19 @@ class Range implements RangeInterface {
 }
 
 Range.create = (
+	editor: EditorInterface,
 	doc: Document = document,
 	point?: { x: number; y: number },
 ): RangeInterface => {
 	let range: globalThis.Range;
 	if (point) range = doc.caretRangeFromPoint(point.x, point.y);
 	else range = doc.createRange();
-	return Range.from(range)!;
+	return Range.from(editor, range)!;
 };
 
 Range.from = (
-	win: Window | Selection | globalThis.Range = window,
+	editor: EditorInterface,
+	win: Window | globalThis.Selection | globalThis.Range = window,
 ): RangeInterface | null => {
 	if (!isRange(win)) {
 		const selection = isSelection(win) ? win : win.getSelection();
@@ -1282,17 +700,7 @@ Range.from = (
 			win = selection.getRangeAt(0);
 		} else return null;
 	}
-	return new Range(win);
+	return new Range(editor, win);
 };
 
-const isSelection = (
-	param: Window | Selection | globalThis.Range,
-): param is Selection => {
-	return (param as Selection).getRangeAt !== undefined;
-};
-const isRange = (
-	param: Window | Selection | globalThis.Range,
-): param is globalThis.Range => {
-	return (param as globalThis.Range).collapsed !== undefined;
-};
 export default Range;

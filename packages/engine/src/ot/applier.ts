@@ -1,4 +1,3 @@
-import $ from '../node';
 import { toDOM } from './jsonml';
 import Range from '../range';
 import { unescapeDots, unescape } from '../utils/string';
@@ -29,53 +28,78 @@ const elementAtPath = (
 	return elementAtPath(childNode, path.slice(1));
 };
 
-const getSideText = (
-	node: NodeInterface,
-	offset: number,
-): RemoteAttr | undefined => {
-	const idNode = node.closest('[data-id]');
-	if (idNode.length > 0) {
-		const id = idNode.attr('data-id');
-		const leftRange = Range.create();
-		const rightRange = Range.create();
-		leftRange.setStart(idNode[0], 0);
-		leftRange.setEnd(node[0], offset);
-		rightRange.setStart(node[0], offset);
-		rightRange.setEnd(idNode[0], idNode[0].childNodes.length);
-		return {
-			id,
-			leftText: leftRange.toString(),
-			rightText: rightRange.toString(),
-		};
+class Applier implements ApplierInterface {
+	private engine: EngineInterface;
+	constructor(engine: EngineInterface) {
+		this.engine = engine;
 	}
-	return;
-};
-
-const fromRemoteAttr = (attr: RemoteAttr) => {
-	if (!attr) return;
-	const { id, leftText, rightText } = attr;
-	const idNode = $(`[data-id="${id}"]`);
-	if (idNode.length === 0) return;
-	const node = idNode.get()!;
-	const text = node.textContent || '';
-	if (text === '')
-		return {
-			container: node,
-			offset: 0,
-		};
-	if (text?.startsWith(leftText)) {
+	fromRemoteAttr(attr: RemoteAttr) {
+		if (!attr) return;
+		const { $ } = this.engine;
+		const { id, leftText, rightText } = attr;
+		const idNode = $(`[data-id="${id}"]`);
+		if (idNode.length === 0) return;
+		const node = idNode.get()!;
+		const text = node.textContent || '';
+		if (text === '')
+			return {
+				container: node,
+				offset: 0,
+			};
+		if (text?.startsWith(leftText)) {
+			let nextChild: Node | null | undefined = node.firstChild;
+			let offset = leftText.length;
+			while (
+				nextChild &&
+				(nextChild.nodeType !== 3 ||
+					(nextChild.textContent?.length || 0) < offset)
+			) {
+				if ((nextChild.textContent?.length || 0) < offset) {
+					offset -= nextChild.textContent?.length || 0;
+					nextChild = nextChild.nextSibling;
+				} else {
+					nextChild = nextChild.firstChild;
+				}
+			}
+			return {
+				container: nextChild,
+				offset,
+			};
+		}
+		if (text?.endsWith(rightText)) {
+			let offset = rightText.length;
+			let prevChild: Node | null | undefined = node.lastChild;
+			while (
+				prevChild &&
+				(prevChild.nodeType !== 3 ||
+					(prevChild.textContent?.length || 0) < offset)
+			) {
+				if (prevChild.textContent?.length || 0 < offset) {
+					offset -= prevChild?.textContent?.length || 0;
+					prevChild = prevChild.previousSibling;
+				} else {
+					prevChild = prevChild.lastChild;
+				}
+			}
+			return {
+				container: prevChild,
+				offset: prevChild?.textContent?.length || 0 - offset,
+			};
+		}
+		let offset = 0;
+		while (text[offset] === leftText[offset]) {
+			offset++;
+		}
 		let nextChild: Node | null | undefined = node.firstChild;
-		let offset = leftText.length;
 		while (
-			nextChild &&
-			(nextChild.nodeType !== 3 ||
-				(nextChild.textContent?.length || 0) < offset)
+			nextChild?.nodeType !== 3 ||
+			(nextChild.textContent?.length || 0) < offset
 		) {
-			if ((nextChild.textContent?.length || 0) < offset) {
-				offset -= nextChild.textContent?.length || 0;
-				nextChild = nextChild.nextSibling;
+			if (nextChild?.textContent?.length || 0 < offset) {
+				offset -= nextChild?.textContent?.length || 0;
+				nextChild = nextChild?.nextSibling;
 			} else {
-				nextChild = nextChild.firstChild;
+				nextChild = nextChild?.firstChild;
 			}
 		}
 		return {
@@ -83,56 +107,29 @@ const fromRemoteAttr = (attr: RemoteAttr) => {
 			offset,
 		};
 	}
-	if (text?.endsWith(rightText)) {
-		let offset = rightText.length;
-		let prevChild: Node | null | undefined = node.lastChild;
-		while (
-			prevChild &&
-			(prevChild.nodeType !== 3 ||
-				(prevChild.textContent?.length || 0) < offset)
-		) {
-			if (prevChild.textContent?.length || 0 < offset) {
-				offset -= prevChild?.textContent?.length || 0;
-				prevChild = prevChild.previousSibling;
-			} else {
-				prevChild = prevChild.lastChild;
-			}
-		}
-		return {
-			container: prevChild,
-			offset: prevChild?.textContent?.length || 0 - offset,
-		};
-	}
-	let offset = 0;
-	while (text[offset] === leftText[offset]) {
-		offset++;
-	}
-	let nextChild: Node | null | undefined = node.firstChild;
-	while (
-		nextChild?.nodeType !== 3 ||
-		(nextChild.textContent?.length || 0) < offset
-	) {
-		if (nextChild?.textContent?.length || 0 < offset) {
-			offset -= nextChild?.textContent?.length || 0;
-			nextChild = nextChild?.nextSibling;
-		} else {
-			nextChild = nextChild?.firstChild;
-		}
-	}
-	return {
-		container: nextChild,
-		offset,
-	};
-};
 
-class Applier implements ApplierInterface {
-	private engine: EngineInterface;
-	constructor(engine: EngineInterface) {
-		this.engine = engine;
+	getSideText(node: NodeInterface, offset: number): RemoteAttr | undefined {
+		const idNode = node.closest('[data-id]');
+		if (idNode.length > 0) {
+			const id = idNode.attributes('data-id');
+			const leftRange = Range.create(this.engine);
+			const rightRange = Range.create(this.engine);
+			leftRange.setStart(idNode[0], 0);
+			leftRange.setEnd(node[0], offset);
+			rightRange.setStart(node[0], offset);
+			rightRange.setEnd(idNode[0], idNode[0].childNodes.length);
+			return {
+				id,
+				leftText: leftRange.toString(),
+				rightText: rightRange.toString(),
+			};
+		}
+		return;
 	}
 
 	setAttribute(path: Path, attr: string, value: string) {
 		const { engine } = this;
+		const { $ } = this.engine;
 		const [node] = elementAtPath(engine.container[0], path);
 		const domNode = $(node);
 		if (
@@ -150,6 +147,7 @@ class Applier implements ApplierInterface {
 
 	removeAttribute(path: Path, attr: string) {
 		const { engine } = this;
+		const { $ } = this.engine;
 		const [node] = elementAtPath(engine.container[0], path);
 		const domNode = $(node);
 		if (
@@ -162,6 +160,7 @@ class Applier implements ApplierInterface {
 
 	insertNode(path: Path, value: string | Op[] | Op[][]) {
 		const { engine } = this;
+		const { $ } = this.engine;
 		const [begine, beginOffset, end] = elementAtPath(
 			engine.container[0],
 			path,
@@ -185,11 +184,12 @@ class Applier implements ApplierInterface {
 	deleteNode(path: Path) {
 		const { engine } = this;
 		const [begine] = elementAtPath(engine.container[0], path);
+		const { $ } = this.engine;
 		const domBegine = $(begine);
 		if (domBegine.length > 0 && !domBegine.isRoot()) {
 			if (domBegine.isCard()) {
 				engine.readonly = false;
-				engine.change.removeCard(domBegine);
+				engine.card.remove(domBegine);
 				const card = engine.card.find(domBegine);
 				if (card && card.activated && engine.readonly) {
 					engine.readonly = false;
@@ -212,7 +212,7 @@ class Applier implements ApplierInterface {
 			case JSONML.ATTRIBUTE_INDEX:
 				throw Error('Unsupported indexType JSONML.ATTRIBUTE_INDEX (1)');
 			default:
-				if (begine && !$(begine).isText()) return;
+				if (begine && !this.engine.$(begine).isText()) return;
 				const nodeValue =
 					begine && begine.nodeValue ? begine.nodeValue : '';
 				const value =
@@ -241,7 +241,7 @@ class Applier implements ApplierInterface {
 				throw Error('Unsupported indexType JSONML.ATTRIBUTE_INDEX (1)');
 			default:
 				end = begine;
-				if (!$(end).isText()) return;
+				if (!engine.$(end).isText()) return;
 				const nodeValue = end && end.nodeValue ? end.nodeValue : '';
 				const value =
 					nodeValue.substring(0, offset) +
@@ -311,7 +311,7 @@ class Applier implements ApplierInterface {
 			engine.container[0],
 			path,
 		);
-		const range = Range.create();
+		const range = Range.create(this.engine);
 		if ('si' in op || 'sd' in op) {
 			const node = begine['data'] === '' ? end : begine;
 			const stringInsertOp = op as StringInsertOp;
@@ -331,12 +331,12 @@ class Applier implements ApplierInterface {
 	getRangeRemotePath(): RemotePath | undefined {
 		try {
 			if (window.getSelection()?.rangeCount === 0) return;
-			const range = Range.from();
+			const range = Range.from(this.engine);
 			if (!range || range.inCard()) return;
 			const { startNode, startOffset, endNode, endOffset } = range;
 			return {
-				start: getSideText(startNode, startOffset),
-				end: getSideText(endNode, endOffset),
+				start: this.getSideText(startNode, startOffset),
+				end: this.getSideText(endNode, endOffset),
 			};
 		} catch (error) {
 			console.log(error);
@@ -348,15 +348,15 @@ class Applier implements ApplierInterface {
 		try {
 			const selection = window.getSelection();
 			const range = selection
-				? Range.from(selection)?.cloneRange()
+				? Range.from(this.engine, selection)?.cloneRange()
 				: undefined;
 			if (!range) return;
 			const { start, end } = path;
 
 			let startInfo;
 			let endInfo;
-			if (start) startInfo = fromRemoteAttr(start);
-			if (end) endInfo = fromRemoteAttr(end);
+			if (start) startInfo = this.fromRemoteAttr(start);
+			if (end) endInfo = this.fromRemoteAttr(end);
 
 			if (startInfo && startInfo.container) {
 				range.setStart(startInfo.container, startInfo.offset);

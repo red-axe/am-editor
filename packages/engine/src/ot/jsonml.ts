@@ -1,5 +1,4 @@
 import { Op, Path } from 'sharedb';
-import $ from '../node';
 import { NodeInterface } from '../types/node';
 import { RepairOp } from '../types/ot';
 import { unescapeDots, unescape, toHex, getWindow } from '../utils';
@@ -43,11 +42,13 @@ export const toDOM = (ops: Op[] | Op[][]): Node => {
 	}
 };
 
-function fromChildDom(node: Node, values: Array<{} | string>) {
-	const { childNodes } = node;
+function fromChildDom(node: NodeInterface, values: Array<{} | string>) {
+	const childNodes = node.children();
 	if (0 !== childNodes.length) {
 		for (let i = 0; i < childNodes.length; i++) {
-			const data = fromDOM($(childNodes[i]));
+			const child = childNodes.eq(i);
+			if (!child) continue;
+			const data = fromDOM(child);
 			if (data) {
 				values.push(data);
 			}
@@ -77,7 +78,7 @@ export const fromDOM = (node: NodeInterface) => {
 				}
 			}
 			values.push(data);
-			fromChildDom(node[0], values);
+			fromChildDom(node, values);
 			return values;
 		}
 		return nodeType === getWindow().Node.TEXT_NODE

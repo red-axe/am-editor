@@ -1,29 +1,38 @@
-import { ViewInterface } from '../types/view';
-import { EngineInterface } from '../types/engine';
+import { EditorInterface, isEngine } from '../types/engine';
 import {
 	PluginEntry,
 	PluginInterface,
 	PluginModelInterface,
+	PluginOptions,
 } from '../types/plugin';
 
 class Plugin implements PluginModelInterface {
 	protected data: { [k: string]: PluginEntry } = {};
 	components: { [k: string]: PluginInterface } = {};
-	protected engine?: EngineInterface;
-	protected view?: ViewInterface;
-	constructor(engine?: EngineInterface, view?: ViewInterface) {
-		this.engine = engine;
-		this.view = view;
+	protected editor: EditorInterface;
+	constructor(editor: EditorInterface) {
+		this.editor = editor;
 	}
 
-	add(name: string, clazz: PluginEntry) {
-		this.data[name] = clazz;
-		if (this.engine) {
-			const plugin = new clazz(name, {
-				engine: this.engine,
-				view: this.view,
-			});
-			this.components[name] = plugin;
+	init(plugins: Array<PluginEntry>, config: { [k: string]: PluginOptions }) {
+		plugins.forEach(pluginClazz => {
+			this.data[pluginClazz.pluginName] = pluginClazz;
+			const plugin = new pluginClazz(
+				this.editor,
+				config[pluginClazz.pluginName],
+			);
+			this.components[pluginClazz.pluginName] = plugin;
+			plugin.init();
+		});
+	}
+
+	add(clazz: PluginEntry, options?: PluginOptions) {
+		this.data[clazz.pluginName] = clazz;
+		options = { ...options, editor: this.editor };
+		if (isEngine(this.editor)) {
+			const plugin = new clazz(this.editor, options);
+			plugin.init();
+			this.components[clazz.pluginName] = plugin;
 		}
 	}
 
@@ -38,14 +47,6 @@ class Plugin implements PluginModelInterface {
 			if (callback && callback(name, this.data[name], index) === false)
 				return;
 		});
-	}
-
-	setEngine(engine: EngineInterface) {
-		this.engine = engine;
-	}
-
-	setContentView(view: ViewInterface) {
-		this.view = view;
 	}
 }
 export default Plugin;

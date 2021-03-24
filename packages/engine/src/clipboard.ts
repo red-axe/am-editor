@@ -1,12 +1,9 @@
 import copyTo from 'copy-to-clipboard';
 import Parser from './parser';
 import { ClipboardInterface } from './types/clipboard';
-import { ViewInterface } from './types/view';
-import { EngineInterface } from './types/engine';
+import { EditorInterface, EngineInterface } from './types/engine';
 import { RangeInterface } from './types/range';
 import { getWindow, isSafari } from './utils';
-import { deleteContent } from './change/utils';
-import $ from './node';
 import Range from './range';
 
 export const isDragEvent = (
@@ -16,11 +13,9 @@ export const isDragEvent = (
 };
 
 export default class Clipboard implements ClipboardInterface {
-	private engine?: EngineInterface;
-	private view?: ViewInterface;
-	constructor(engine?: EngineInterface, view?: ViewInterface) {
-		this.engine = engine;
-		this.view = view;
+	private editor: EditorInterface;
+	constructor(editor: EditorInterface) {
+		this.editor = editor;
 	}
 
 	getData(event: DragEvent | ClipboardEvent) {
@@ -88,9 +83,10 @@ export default class Clipboard implements ClipboardInterface {
 		range: RangeInterface | null = null,
 		callback?: (data: { html: string; text: string }) => void,
 	) {
-		if (!range) range = Range.from();
+		if (!range) range = Range.from(this.editor);
 		if (!range) throw 'Range is null';
 		range = range.cloneRange();
+		const { $ } = this.editor;
 		let card = range.startNode.closest('[data-card-key]', node => {
 			return $(node).isRoot() ? undefined : node.parentNode || undefined;
 		});
@@ -161,11 +157,10 @@ export default class Clipboard implements ClipboardInterface {
 			root.closest('.am-engine').length > 0;
 		if (card.length <= 0 && (hasChildEngine || hasParentEngine)) {
 			if (hasParentEngine && !root.isRoot()) {
-				const block = root.getClosestBlock();
+				const block = this.editor.block.closest(root);
 				if (
-					['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].indexOf(
-						block.name || '',
-					) > -1
+					['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].indexOf(block.name) >
+					-1
 				) {
 					nodes.push(block[0].cloneNode());
 				}
@@ -177,7 +172,7 @@ export default class Clipboard implements ClipboardInterface {
 			} else {
 				const contents = range.cloneContents();
 				const { inner, outter } = this.setNodes(nodes);
-				const parser = new Parser(contents, this.engine, this.view);
+				const parser = new Parser(contents, this.editor);
 				let { html, text } = parser.toHTML(inner, outter);
 				if (callback) {
 					callback({ html, text });
@@ -194,10 +189,11 @@ export default class Clipboard implements ClipboardInterface {
 		if (typeof data === 'string') {
 			return copyTo(data);
 		}
+		const { $ } = this.editor;
 		const selection = window.getSelection();
 		const range = selection
-			? Range.from(selection) || Range.create()
-			: Range.create();
+			? Range.from(this.editor, selection) || Range.create(this.editor)
+			: Range.create(this.editor);
 		const cloneRange = range.cloneRange();
 		const block = $('<div class="am-engine-view">&#8203;</div>');
 		block.css({
@@ -209,14 +205,11 @@ export default class Clipboard implements ClipboardInterface {
 			this.write(e);
 		});
 		$(document.body).append(block);
-		block.append($(data).clone(true));
+		block.append(this.editor.node.clone($(data), true));
 		if (trigger) {
 			block.allChildren().forEach(child => {
-				Object.keys(
-					(this.engine || this.view)!.plugin.components,
-				).forEach(name => {
-					const plugin = (this.engine || this.view)!.plugin
-						.components[name];
+				Object.keys(this.editor.plugin.components).forEach(name => {
+					const plugin = this.editor.plugin.components[name];
 					if (plugin.copy) plugin.copy($(child));
 				});
 			});
@@ -243,14 +236,13 @@ export default class Clipboard implements ClipboardInterface {
 	}
 
 	cut() {
-		const range = Range.from();
+		const range = Range.from(this.editor);
 		if (!range) return;
 		const root = range.commonAncestorNode;
-		deleteContent(range);
+		(this.editor as EngineInterface).change.deleteContent(range);
 		const listElements =
-			-1 !== ['ul', 'ol'].indexOf(root.name || '')
-				? root
-				: root.find('ul,ol');
+			-1 !== ['ul', 'ol'].indexOf(root.name) ? root : root.find('ul,ol');
+		const { $ } = this.editor;
 		for (let i = 0; i < listElements.length; i++) {
 			const list = $(listElements[i]);
 			const childs = list.find('li');

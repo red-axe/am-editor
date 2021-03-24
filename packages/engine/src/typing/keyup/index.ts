@@ -1,34 +1,39 @@
-import isHotkey from 'is-hotkey';
-import $ from '../../node';
-import { EngineInterface } from '../../types/engine';
-import { pluginKeyupTrigger } from '../utils';
+import { TypingHandle } from '../../types';
+import Enter from './enter';
+import Default from './default';
+import Backspace from './backspace';
+import Tab from './tab';
+import Space from './space';
 
-export default (engine: EngineInterface, event: KeyboardEvent) => {
-	if (engine.readonly) {
-		return;
-	}
-	const card = engine.card.find($(event.target || []));
-	if (card) {
-		return;
-	}
+const defaultHandles: Array<{
+	name: string;
+	triggerName?: string;
+	handle: TypingHandle;
+}> = [
+	{
+		name: 'default',
+		handle: Default,
+	},
+	{
+		name: 'enter',
+		handle: Enter,
+		triggerName: 'keyup:enter',
+	},
+	{
+		name: 'backspace',
+		handle: Backspace,
+		triggerName: 'keyup:backspace',
+	},
+	{
+		name: 'tab',
+		handle: Tab,
+		triggerName: 'keyup:tab',
+	},
+	{
+		name: 'space',
+		handle: Space,
+		triggerName: 'keyup:space',
+	},
+];
 
-	if (isHotkey('enter', event)) {
-		pluginKeyupTrigger(engine, 'enter', event);
-		return;
-	}
-
-	if (isHotkey('backspace', event)) {
-		pluginKeyupTrigger(engine, 'backspace', event);
-		return;
-	}
-
-	if (isHotkey('tab', event)) {
-		pluginKeyupTrigger(engine, 'tab', event);
-		return;
-	}
-
-	if (isHotkey('space', event)) {
-		pluginKeyupTrigger(engine, 'space', event);
-		return;
-	}
-};
+export default defaultHandles;

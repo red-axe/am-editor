@@ -1,5 +1,4 @@
 import DragoverHelper from './dragover';
-import $ from '../node';
 import { EventListener, NodeInterface } from '../types/node';
 import isHotkey from 'is-hotkey';
 import { ChangeEventInterface, ChangeEventOptions } from '../types/change';
@@ -38,12 +37,12 @@ class ChangeEvent implements ChangeEventInterface {
 	// return true：焦点在Card里的其它输入框
 	// return false：焦点在编辑区域，触发 change、select 事件
 	isCardInput(e: Event) {
-		let node = e.target ? $(e.target as Node) : null;
+		let node = e.target ? this.engine.$(e.target as Node) : null;
 		while (node) {
 			if (node.isRoot()) {
 				return false;
 			}
-			if (node.attr(CARD_ELEMENT_KEY) === 'center') {
+			if (node.attributes(CARD_ELEMENT_KEY) === 'center') {
 				return true;
 			}
 			if (node.hasClass('card-toolbar')) {
@@ -111,7 +110,7 @@ class ChangeEvent implements ChangeEventInterface {
 			}, 10);
 		});
 		this.onContainer('keydown', () => {
-			const range = Range.from();
+			const range = Range.from(this.engine);
 			this.keydownRange = range;
 		});
 		// 补齐通过键盘选中的情况
@@ -143,7 +142,7 @@ class ChangeEvent implements ChangeEventInterface {
 				isHotkey('home', e) ||
 				isHotkey('end', e)
 			) {
-				const range = Range.from();
+				const range = Range.from(this.engine);
 				if (
 					this.keydownRange &&
 					range &&
@@ -211,7 +210,7 @@ class ChangeEvent implements ChangeEventInterface {
 	) {
 		const { bindDrop } = this.options;
 		if (bindDrop && !bindDrop()) return;
-
+		const { $ } = this.engine;
 		let cardComponet: CardInterface | undefined;
 		let dragImage: NodeInterface | undefined;
 		let dropRange: RangeInterface | undefined;
@@ -227,7 +226,7 @@ class ChangeEvent implements ChangeEventInterface {
 				dragImage = cardComponet.find('img.data-drag-image');
 
 				if (dragImage.length > 0) {
-					dragImage = dragImage.clone();
+					dragImage = this.engine.node.clone(dragImage);
 				} else {
 					dragImage = $('<div class="data-drag-image" />');
 					const cardRootElement = cardComponet.root.get<Element>();

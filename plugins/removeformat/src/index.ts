@@ -1,18 +1,22 @@
-import { Plugin } from '@aomao/engine';
+import { isEngine, Plugin } from '@aomao/engine';
 
 export type Options = {
 	hotkey?: string | Array<string>;
 };
 export default class extends Plugin<Options> {
+	static get pluginName() {
+		return 'removeformat';
+	}
+
 	execute() {
-		if (!this.engine) return;
-		const { change } = this.engine;
+		if (!isEngine(this.editor)) return;
+		const { change, block, mark } = this.editor;
 		const range = change.getRange();
-		const blocks = range.getBlocks();
+		const blocks = block.getBlocks(range);
 		blocks.forEach(block => {
-			block.removeAttr('style');
+			block.removeAttributes('style');
 		});
-		change.removeMark();
+		mark.unwrap();
 	}
 
 	hotkey() {

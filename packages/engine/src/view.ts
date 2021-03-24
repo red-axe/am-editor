@@ -1,13 +1,17 @@
-import $, { Event } from './node';
+import NodeModel, { Event } from './node';
+import domQuery from './node/query';
 import language from './locales';
 import {
 	EventInterface,
 	NodeInterface,
 	Selector,
 	EventListener,
+	NodeEntry as NodeEntryType,
+	NodeModelInterface,
+	Context,
 } from './types/node';
 import schemaDefaultData from './constants/schema';
-import Schema from './parser/schema';
+import Schema from './schema';
 import Conversion from './parser/conversion';
 import { ViewInterface, ContentViewOptions } from './types/view';
 import { CardModelInterface } from './types/card';
@@ -21,17 +25,32 @@ import Clipboard from './clipboard';
 import { LanguageInterface } from './types/language';
 import Language from './language';
 import Parser from './parser';
-import EngineModel from './engine';
+import { MarkModelInterface } from './types';
+import { BlockModelInterface } from './types/block';
+import { InlineModelInterface } from './types/inline';
+import { ListModelInterface } from './types/list';
+import List from './list';
+import Mark from './mark';
+import Inline from './inline';
+import Block from './block';
 
 class View implements ViewInterface {
 	private options: ContentViewOptions = {
 		lang: 'zh-cn',
+		plugins: [],
+		cards: [],
 	};
+	readonly kind = 'view';
 	root: NodeInterface;
 	language: LanguageInterface;
 	container: NodeInterface;
 	card: CardModelInterface;
 	plugin: PluginModelInterface;
+	node: NodeModelInterface;
+	list: ListModelInterface;
+	mark: MarkModelInterface;
+	inline: InlineModelInterface;
+	block: BlockModelInterface;
 	clipboard: ClipboardInterface;
 	event: EventInterface;
 	schema: SchemaInterface;
@@ -40,37 +59,39 @@ class View implements ViewInterface {
 	constructor(selector: Selector, options?: ContentViewOptions) {
 		this.options = { ...this.options, ...options };
 		this.language = new Language(this.options.lang || 'zh-cn', language);
-		this.container = $(selector);
-		this.root = $(
-			this.options.root || this.container.parent() || document.body,
-		);
-		this.container.addClass('am-engine-view');
 		this.event = new Event();
 		this.schema = new Schema();
 		this.schema.add(schemaDefaultData);
 		this.conversion = new Conversion();
-		this.card = new CardModel();
-		this.card.setContentView(this);
-		const cardClasses = (this.options.card || EngineModel.card).classes;
-		Object.keys(cardClasses).forEach(name => {
-			this.card.add(name, cardClasses[name]!);
-		});
-
-		this.plugin = new PluginModel();
-		this.plugin.setContentView(this);
-		(this.options.plugin || EngineModel.plugin).each((name, clazz) => {
-			this.plugin.add(name, clazz);
-			const config = (this.options.pluginOptions || {})[name];
-			const plugin = new clazz(name, {
-				view: this,
-				...config,
-			});
-			this.plugin.components[name] = plugin;
-			if (plugin.schema) this.schema.add(plugin.schema());
-			if (plugin.locales) this.language.add(plugin.locales());
-		});
-		this.clipboard = new Clipboard(undefined, this);
+		this.card = new CardModel(this);
+		this.clipboard = new Clipboard(this);
+		this.plugin = new PluginModel(this);
+		this.node = new NodeModel(this);
+		this.list = new List(this);
+		this.mark = new Mark(this);
+		this.inline = new Inline(this);
+		this.block = new Block(this);
+		this.clipboard = new Clipboard(this);
+		this.container = this.$(selector);
+		this.root = this.$(
+			this.options.root || this.container.parent() || document.body,
+		);
+		this.container.addClass('am-engine-view');
+		this.list.init();
+		this.block.init();
+		this.mark.init();
+		this.inline.init();
+		this.card.init(this.options.cards || []);
+		this.plugin.init(this.options.plugins || [], this.options.config || {});
 	}
+
+	$ = (
+		selector: Selector,
+		context?: Context | null | false,
+		clazz?: NodeEntryType,
+	): NodeInterface => {
+		return domQuery(this, selector, context, clazz);
+	};
 
 	on(eventType: string, listener: EventListener, rewrite?: boolean) {
 		this.event.on(eventType, listener, rewrite);
@@ -83,13 +104,8 @@ class View implements ViewInterface {
 	}
 
 	render(content: string, trigger: boolean = true) {
-		const parser = new Parser(content, undefined, this);
-		const value = parser.toValue(
-			this.schema.getValue(),
-			undefined,
-			false,
-			true,
-		);
+		const parser = new Parser(content, this);
+		const value = parser.toValue(this.schema, undefined, false, true);
 		this.container.html(value);
 		this.card.render();
 		if (trigger) this.event.trigger('render', this.container);

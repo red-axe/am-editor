@@ -1,8 +1,36 @@
-import { EngineInterface } from '../../types/engine';
+import { EngineInterface, TypingHandleInterface } from '../../types';
 
-export default (engine: EngineInterface, e: Event) => {
-	const { change } = engine;
-	e.preventDefault();
-	change.insertText('    ');
-	return false;
-};
+class Tab implements TypingHandleInterface {
+	private engine: EngineInterface;
+	type: 'keydown' | 'keyup' = 'keydown';
+	hotkey: string | string[] | ((event: KeyboardEvent) => boolean) = 'tab';
+	private listeners: Array<EventListener> = [];
+
+	constructor(engine: EngineInterface) {
+		this.engine = engine;
+	}
+
+	on(listener: EventListener) {
+		this.listeners.push(listener);
+	}
+
+	off(listener: EventListener) {
+		for (let i = 0; i < this.listeners.length; i++) {
+			if (this.listeners[i] === listener) {
+				this.listeners.splice(i, 1);
+				break;
+			}
+		}
+	}
+
+	trigger(event: KeyboardEvent): void {
+		const { change } = this.engine;
+		event.preventDefault();
+		change.insertText('    ');
+	}
+
+	destroy(): void {
+		this.listeners = [];
+	}
+}
+export default Tab;

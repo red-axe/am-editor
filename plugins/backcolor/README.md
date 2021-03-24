@@ -14,7 +14,7 @@ Add Plugin
 $ import Engine, { EngineInterface } from '@aomao/engine';
 $ import Backcolor from '@aomao/plugin-backcolor';
 
-$ Engine.plugin.add('backcolor', Backcolor);
+$ new Engine(...,{ plugins:[Backcolor] })
 ```
 
 Options

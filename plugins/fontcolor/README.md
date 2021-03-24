@@ -14,7 +14,7 @@ Add Plugin
 $ import Engine, { EngineInterface } from '@aomao/engine';
 $ import Fontcolor from '@aomao/plugin-fontcolor';
 
-$ Engine.plugin.add('fontcolor', Fontcolor);
+$ new Engine(...,{ plugins:[Fontcolor] })
 ```
 
 Options

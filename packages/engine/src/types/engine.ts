@@ -1,54 +1,76 @@
-import { EventInterface, NodeInterface, Selector, EventListener } from './node';
+import {
+	EventInterface,
+	NodeInterface,
+	Selector,
+	EventListener,
+	NodeModelInterface,
+	Context,
+	NodeEntry,
+} from './node';
 import { ChangeInterface } from './change';
 import { OTInterface } from './ot';
 import { SchemaInterface } from './schema';
 import { ConversionInterface } from './conversion';
 import { HistoryInterface } from './history';
-import { PluginModelInterface } from './plugin';
+import { PluginEntry, PluginModelInterface, PluginOptions } from './plugin';
 import { CommandInterface } from './command';
-import { CardModelInterface } from './card';
+import { CardEntry, CardModelInterface } from './card';
 import { ClipboardInterface } from './clipboard';
 import { LanguageInterface } from './language';
+import { MarkModelInterface } from './mark';
+import { ListModelInterface } from './list';
+import { TypingInterface } from './typing';
+import { InlineModelInterface } from './inline';
+import { BlockModelInterface } from './block';
 
-export type EngineOptions = {
-	lang?: string;
-	className?: string;
-	tabIndex?: number;
-	root?: Node;
-	scrollNode?: Node;
-	plugin?: { [k: string]: {} };
-};
-
-export interface EngineEntry {
+export interface ContainerInterface {
 	/**
-	 * 构造函数
+	 * 初始化
 	 */
-	new (selector: Selector, options?: EngineOptions): EngineInterface;
-	plugin: PluginModelInterface;
-	card: CardModelInterface;
+	init(): void;
+	/**
+	 * 是否聚焦
+	 */
+	isFocus(): boolean;
+	/**
+	 * 获取节点
+	 */
+	getNode(): NodeInterface;
+	/**
+	 * 设置是否可编辑
+	 * @param readonly 是否可编辑
+	 */
+	setReadonly(readonly: boolean): void;
+	/**
+	 * 销毁
+	 */
+	destroy(): void;
 }
 
-export interface EngineInterface {
+export interface EditorInterface {
 	/**
-	 * 滚动条节点
+	 * 类型
 	 */
-	scrollNode: NodeInterface | null;
+	readonly kind: 'engine' | 'view';
 	/**
-	 * 是否只读
+	 * 节点查询器
+	 * @param selector 表达式
+	 * @param context 上下文根节点，默认为document
+	 * @param clazz 节点解析类
 	 */
-	readonly: boolean;
+	$(
+		selector: Selector,
+		context?: Context | null | false,
+		clazz?: NodeEntry,
+	): NodeInterface;
 	/**
 	 * 语言
 	 */
 	language: LanguageInterface;
 	/**
-	 * 编辑器渲染节点
+	 * 编辑器节点
 	 */
 	container: NodeInterface;
-	/**
-	 * 编辑器根节点，默认为编辑器父节点
-	 */
-	root: NodeInterface;
 	/**
 	 * 卡片
 	 */
@@ -58,21 +80,29 @@ export interface EngineInterface {
 	 */
 	plugin: PluginModelInterface;
 	/**
-	 * 编辑器更改
+	 * 节点s管理
 	 */
-	change: ChangeInterface;
+	node: NodeModelInterface;
+	/**
+	 * List 列表标签管理
+	 */
+	list: ListModelInterface;
+	/**
+	 * Mark 标签管理
+	 */
+	mark: MarkModelInterface;
+	/**
+	 * inline 标签管理
+	 */
+	inline: InlineModelInterface;
+	/**
+	 * block 标签管理
+	 */
+	block: BlockModelInterface;
 	/**
 	 * 事件
 	 */
 	event: EventInterface;
-	/**
-	 * 编辑器命令
-	 */
-	command: CommandInterface;
-	/**
-	 * 协同编辑
-	 */
-	ot: OTInterface;
 	/**
 	 * 标签过滤规则
 	 */
@@ -81,10 +111,6 @@ export interface EngineInterface {
 	 * 标签转换规则
 	 */
 	conversion: ConversionInterface;
-	/**
-	 * 历史记录
-	 */
-	history: HistoryInterface;
 	/**
 	 * 剪切板
 	 */
@@ -103,17 +129,76 @@ export interface EngineInterface {
 	 */
 	off(eventType: string, listener: EventListener): void;
 	/**
-	 * 用户是否有更改
+	 * 显示成功的信息
+	 * @param message 信息
 	 */
-	hasUserChanged(): boolean;
+	messageSuccess(message: string): void;
 	/**
-	 * 重置用户更改变量
+	 * 显示错误信息
+	 * @param error 错误信息
 	 */
-	resetUserChange(): void;
+	messageError(error: string): void;
+}
+
+export type EngineOptions = {
+	lang?: string;
+	className?: string;
+	tabIndex?: number;
+	root?: Node;
+	scrollNode?: Node;
+	plugins?: Array<PluginEntry>;
+	cards?: Array<CardEntry>;
+	config?: { [k: string]: PluginOptions };
+};
+
+export interface EngineEntry {
 	/**
-	 * 标志为用户更改
+	 * 构造函数
 	 */
-	setUserChanged(): void;
+	new (selector: Selector, options?: EngineOptions): EngineInterface;
+}
+
+export interface EngineInterface extends EditorInterface {
+	/**
+	 * 选项
+	 */
+	options: EngineOptions;
+	/**
+	 * 滚动条节点
+	 */
+	scrollNode: NodeInterface | null;
+	/**
+	 * 是否只读
+	 */
+	readonly: boolean;
+	/**
+	 * 编辑器根节点，默认为编辑器父节点
+	 */
+	root: NodeInterface;
+
+	/**
+	 * 编辑器更改
+	 */
+	change: ChangeInterface;
+
+	/**
+	 * 编辑器命令
+	 */
+	command: CommandInterface;
+	/**
+	 * 按键处理
+	 */
+	typing: TypingInterface;
+	/**
+	 * 协同编辑
+	 */
+	ot: OTInterface;
+
+	/**
+	 * 历史记录
+	 */
+	history: HistoryInterface;
+
 	/**
 	 * 聚焦到编辑器
 	 */
@@ -146,17 +231,17 @@ export interface EngineInterface {
 	 */
 	setJsonValue(value: Array<any>): EngineInterface;
 	/**
-	 * 显示成功的信息
-	 * @param message 信息
-	 */
-	messageSuccess(message: string): void;
-	/**
-	 * 显示错误信息
-	 * @param error 错误信息
-	 */
-	messageError(error: string): void;
-	/**
 	 * 销毁
 	 */
 	destroy(): void;
 }
+
+/**
+ * 是否是引擎
+ * @param editor 编辑器
+ */
+export const isEngine = (
+	editor: EditorInterface,
+): editor is EngineInterface => {
+	return editor.kind === 'engine';
+};

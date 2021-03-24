@@ -1,64 +1,73 @@
-import { NodeInterface, Plugin, unwrapNode } from '@aomao/engine';
+import { isEngine, NodeInterface, Block, PluginEntry } from '@aomao/engine';
 import './index.css';
 
-const TAG_NAME = 'blockquote';
 export type Options = {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 };
-export default class extends Plugin<Options> {
+export default class extends Block<Options> {
+	tagName: string = 'blockquote';
+
+	static get pluginName() {
+		return 'blockquote';
+	}
+
+	init() {
+		super.init();
+		this.editor.on('keydow:backspace', event => this.onBackspace(event));
+		this.editor.on('keydow:enter', event => this.onEnter(event));
+	}
+
 	execute() {
-		if (!this.engine) return;
-		const { change } = this.engine;
+		if (!isEngine(this.editor)) return;
+		const { change, block, node } = this.editor;
 		if (!this.queryState()) {
-			change.wrapBlock(`<${TAG_NAME} />`);
+			block.wrap(`<${this.tagName} />`);
 		} else {
 			const range = change.getRange();
-			const blockquote = change.blocks[0].closest(TAG_NAME);
-			const bookmark = range.createBookmark();
-			unwrapNode(blockquote);
-			if (bookmark) range.moveToBookmark(bookmark);
+			const blockquote = change.blocks[0].closest(this.tagName);
+			const selection = range.createSelection();
+			node.unwrap(blockquote);
+			selection.move();
 			change.select(range);
 			return;
 		}
 	}
 
 	queryState() {
-		if (!this.engine) return;
-		const { change } = this.engine;
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
 		const blocks = change.blocks;
 		if (blocks.length === 0) {
 			return false;
 		}
-		const blockquote = blocks[0].closest(TAG_NAME);
-		return blockquote.length > 0 && !!blockquote.get<Element>()?.className;
+		const blockquote = blocks[0].closest(this.tagName);
+		return this.isSelf(blockquote);
 	}
 
 	hotkey() {
 		return this.options.hotkey || 'mod+shift+u';
 	}
 
-	schema() {
-		return TAG_NAME;
-	}
-
 	//设置markdown
-	onKeydownSpace(event: KeyboardEvent, node: NodeInterface) {
-		if (!this.engine || this.options.markdown === false) return;
-
-		const block = node.getClosestBlock();
+	markdown(event: KeyboardEvent, text: string, block: NodeInterface) {
+		if (this.options.markdown === false) return;
+		const plugins = this.editor.block.findPlugin(block);
 		// fix: 列表、引用等 markdown 快捷方式不应该在标题内生效
-		if (!block.isHeading() || /^h\d$/i.test(block.name || '')) {
+		if (
+			block.name !== 'p' ||
+			plugins.find(
+				plugin =>
+					(plugin.constructor as PluginEntry).pluginName ===
+					'heading',
+			)
+		) {
 			return;
 		}
-
-		const { change } = this.engine;
-		const range = change.getRange();
-		const text = range.getBlockLeftText(block[0]);
 		if (['>'].indexOf(text) < 0) return;
 		event.preventDefault();
-		range.removeBlockLeftText(block[0]);
-		if (block.isEmpty()) {
+		this.editor.block.removeLeftText(block);
+		if (this.editor.node.isEmpty(block)) {
 			block.empty();
 			block.append('<br />');
 		}
@@ -66,35 +75,45 @@ export default class extends Plugin<Options> {
 		return false;
 	}
 
-	onCustomizeKeydown(
-		type:
-			| 'enter'
-			| 'backspace'
-			| 'space'
-			| 'tab'
-			| 'at'
-			| 'slash'
-			| 'selectall',
-		event: KeyboardEvent,
-	) {
-		if (!this.engine || type !== 'backspace') return;
-		const { change } = this.engine;
+	onBackspace(event: KeyboardEvent) {
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
 		const range = change.getRange();
-		if (!range.isBlockFirstOffset('start')) return;
-		const block = range.startNode.getClosestBlock();
+		if (!this.editor.block.isFirstOffset(range, 'start')) return;
+		const block = this.editor.block.closest(range.startNode);
 		const parentBlock = block.parent();
 
 		if (
 			parentBlock &&
 			parentBlock.name === 'blockquote' &&
-			block.isHeading()
+			this.editor.node.isRootBlock(block)
 		) {
 			event.preventDefault();
 			if (block.prevElement()) {
 				change.mergeAfterDeletePrevNode(block);
 			} else {
-				change.unwrapBlock('<blockquote />');
+				this.editor.block.unwrap('<blockquote />');
 			}
+			return false;
+		}
+		return;
+	}
+
+	onEnter(event: KeyboardEvent) {
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
+		const range = change.getRange();
+		// 选区选中最后的节点
+		const block = this.editor.block.closest(range.endNode);
+
+		const parent = block.parent();
+		if (
+			parent?.name === this.tagName &&
+			'p' === block.name &&
+			block.nextElement()
+		) {
+			event.preventDefault();
+			this.editor.block.insertOrSplit(range, block);
 			return false;
 		}
 		return;

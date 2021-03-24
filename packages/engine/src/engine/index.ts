@@ -1,18 +1,26 @@
-import $, { Event } from '../node';
+import NodeModel, { Event } from '../node';
+import domQuery from '../node/query';
 import language from '../locales';
 import Change from '../change';
-import { ROOT, DATA_ELEMENT } from '../constants/root';
+import { DATA_ELEMENT } from '../constants/root';
 import schemaDefaultData from '../constants/schema';
-import Schema from '../parser/schema';
+import Schema from '../schema';
 import OT from '../ot';
 import {
 	Selector,
 	NodeInterface,
 	EventInterface,
 	EventListener,
+	NodeModelInterface,
+	Context,
+	NodeEntry as NodeEntryType,
 } from '../types/node';
 import { ChangeInterface } from '../types/change';
-import { EngineEntry, EngineInterface, EngineOptions } from '../types/engine';
+import {
+	ContainerInterface,
+	EngineInterface,
+	EngineOptions,
+} from '../types/engine';
 import { OTInterface } from '../types/ot';
 import { SchemaInterface } from '../types/schema';
 import { ConversionInterface } from '../types/conversion';
@@ -22,15 +30,13 @@ import History from '../history';
 import { CARD_SELECTOR } from '../constants/card';
 import Command from '../command';
 import { CommandInterface } from '../types/command';
-import typingKeydown from '../typing/keydown';
-import typingKeyup from '../typing/keyup';
 import { PluginModelInterface } from '../types/plugin';
 import { HotkeyInterface } from '../types/hotkey';
 import Hotkey from '../hotkey';
 import Plugin from '../plugin';
 import CardModel from '../card';
 import { CardModelInterface } from '../types/card';
-import { removeBookmarkTags, removeMinusStyle } from '../utils';
+import { getDocument } from '../utils';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import { toDOM } from '../ot/jsonml';
 import { ClipboardInterface } from '../types/clipboard';
@@ -38,33 +44,54 @@ import Clipboard from '../clipboard';
 import Parser from '../parser';
 import { LanguageInterface } from '../types/language';
 import Language from '../language';
+import { MarkModelInterface } from '../types/mark';
+import Mark from '../mark';
+import { ListModelInterface } from '../types/list';
+import List from '../list';
+import { TypingInterface } from '../types';
+import Typing from '../typing';
+import Container from './container';
+import { InlineModelInterface } from '../types/inline';
+import { BlockModelInterface } from '../types/block';
+import Inline from '../inline';
+import Block from '../block';
 import './index.css';
+import Selection from '../selection';
 
 class EngineModel implements EngineInterface {
 	private _readonly: boolean = false;
-	private options: EngineOptions = {
+	private _container: ContainerInterface;
+	readonly kind = 'engine';
+	options: EngineOptions = {
 		lang: 'zh-cn',
-		plugin: {},
+		plugins: [],
+		cards: [],
+		config: {},
 	};
 	language: LanguageInterface;
-	container: NodeInterface;
 	root: NodeInterface;
 	change: ChangeInterface;
 	card: CardModelInterface;
 	plugin: PluginModelInterface;
+	node: NodeModelInterface;
+	list: ListModelInterface;
+	mark: MarkModelInterface;
+	inline: InlineModelInterface;
+	block: BlockModelInterface;
 	event: EventInterface;
+	typing: TypingInterface;
 	ot: OTInterface;
 	schema: SchemaInterface;
 	conversion: ConversionInterface;
 	history: HistoryInterface;
 	scrollNode: NodeInterface | null;
-	private _focused: boolean = false;
-	private _userChanged: boolean = false;
 	command: CommandInterface;
 	hotkey: HotkeyInterface;
 	clipboard: ClipboardInterface;
-	static plugin: PluginModelInterface;
-	static card: CardModelInterface;
+
+	get container(): NodeInterface {
+		return this._container.getNode();
+	}
 
 	get readonly(): boolean {
 		return this._readonly;
@@ -74,10 +101,10 @@ class EngineModel implements EngineInterface {
 		if (this.readonly === readonly) return;
 		if (readonly) {
 			this.hotkey.disable();
-			this.container.attr('contenteditable', 'false');
+			this._container.setReadonly(true);
 		} else {
 			this.hotkey.enable();
-			this.container.attr('contenteditable', 'true');
+			this._container.setReadonly(false);
 		}
 		this._readonly = readonly;
 		//广播readonly事件
@@ -87,67 +114,63 @@ class EngineModel implements EngineInterface {
 	constructor(selector: Selector, options?: EngineOptions) {
 		this.options = { ...this.options, ...options };
 		this.language = new Language(this.options.lang || 'zh-cn', language);
-		this.container = this.initContainer(selector);
-		this.root = $(
-			this.options.root || this.container.parent() || document.body,
+		this.event = new Event();
+		this.command = new Command(this);
+		this.schema = new Schema();
+		this.schema.add(schemaDefaultData);
+		this.conversion = new Conversion();
+		this.history = new History(this);
+		this.card = new CardModel(this);
+		this.clipboard = new Clipboard(this);
+		this.plugin = new Plugin(this);
+		this.node = new NodeModel(this);
+		this.list = new List(this);
+		this.mark = new Mark(this);
+		this.inline = new Inline(this);
+		this.block = new Block(this);
+		this._container = new Container(selector, {
+			engine: this,
+			lang: this.options.lang,
+			className: this.options.className,
+			tabIndex: this.options.tabIndex,
+		});
+		this.root = this.$(
+			this.options.root || this.container.parent() || getDocument().body,
 		);
+		this._container.init();
 		this.change = new Change(this, {
 			onChange: value => this.event.trigger('change', value),
 			onSelect: () => this.event.trigger('select'),
 			onSetValue: () => this.event.trigger('setvalue'),
 		});
-		this.event = new Event();
-		this.command = new Command(this);
-		this.ot = new OT(this);
-		this.schema = new Schema();
-		this.schema.add(schemaDefaultData);
-		this.conversion = new Conversion();
-		this.history = new History(this);
+		this.typing = new Typing(this);
+		this.list.init();
+		this.block.init();
+		this.mark.init();
+		this.inline.init();
 		this.hotkey = new Hotkey(this);
-		const EngineClass = this.constructor as EngineEntry;
-		this.card = EngineClass.card || new CardModel();
-		this.card.setEngine(this);
-		this.clipboard = new Clipboard(this);
-		this.plugin = EngineClass.plugin || new Plugin();
-		this.plugin.setEngine(this);
-		this.plugin.each((name, clazz) => {
-			const config = (this.options.plugin || {})[name];
-			const plugin = new clazz(name, {
-				engine: this,
-				...config,
-			});
-			this.plugin.components[name] = plugin;
-			if (plugin.schema) this.schema.add(plugin.schema());
-			if (plugin.locales) this.language.add(plugin.locales());
-		});
-		this._focused =
-			document.activeElement !== null &&
-			this.container.equal(document.activeElement);
 		this.scrollNode = this.options.scrollNode
-			? $(this.options.scrollNode)
+			? this.$(this.options.scrollNode)
 			: null;
-		this.initEvents();
+		this.card.init(this.options.cards || []);
+		this.plugin.init(this.options.plugins || [], this.options.config || {});
+		this.ot = new OT(this);
 	}
 
-	hasUserChanged() {
-		return this._userChanged;
-	}
-
-	resetUserChange() {
-		this._userChanged = false;
-	}
-
-	setUserChanged() {
-		this._userChanged = true;
-		this.event.trigger('userchanged');
-	}
+	$ = (
+		selector: Selector,
+		context?: Context | null | false,
+		clazz?: NodeEntryType,
+	): NodeInterface => {
+		return domQuery(this, selector, context, clazz);
+	};
 
 	isSub() {
 		return this.container.closest(CARD_SELECTOR).length > 0;
 	}
 
 	isFocus() {
-		return this._focused;
+		return this._container.isFocus();
 	}
 
 	focus() {
@@ -166,18 +189,18 @@ class EngineModel implements EngineInterface {
 
 	getValue(ignoreCursor: boolean = false) {
 		const value = this.change.getValue({});
-		return ignoreCursor ? removeBookmarkTags(value) : value;
+		return ignoreCursor ? Selection.removeTags(value) : value;
 	}
 
 	getHtml(): string {
-		const node = $(this.container[0].cloneNode(true));
-		node.removeAttr('contenteditable');
-		node.removeAttr('tabindex');
-		node.removeAttr('autocorrect');
-		node.removeAttr('autocomplete');
-		node.removeAttr('spellcheck');
-		node.removeAttr('data-gramm');
-		node.removeAttr('role');
+		const node = this.$(this.container[0].cloneNode(true));
+		node.removeAttributes('contenteditable');
+		node.removeAttributes('tabindex');
+		node.removeAttributes('autocorrect');
+		node.removeAttributes('autocomplete');
+		node.removeAttributes('spellcheck');
+		node.removeAttributes('data-gramm');
+		node.removeAttributes('role');
 		return new Parser(node, this).toHTML().html;
 	}
 
@@ -190,7 +213,7 @@ class EngineModel implements EngineInterface {
 	}
 
 	setJsonValue(value: Array<any>) {
-		const dom = $(toDOM(value));
+		const dom = this.$(toDOM(value));
 		const attributes = dom.get<Element>()?.attributes;
 		for (let i = 0; attributes && i < attributes.length; i++) {
 			const { nodeName, nodeValue } = attributes.item(i) || {};
@@ -198,10 +221,10 @@ class EngineModel implements EngineInterface {
 				/^data-selection-/.test(nodeName || '') &&
 				nodeValue !== 'null'
 			) {
-				this.container.attr(nodeName, nodeValue!);
+				this.container.attributes(nodeName, nodeValue!);
 			}
 		}
-		const html = dom.html();
+		const html = this.node.html(dom);
 		this.change.setValue(html);
 		const range = this.change.getRange();
 		range.shrinkToElementNode();
@@ -211,19 +234,7 @@ class EngineModel implements EngineInterface {
 	}
 
 	destroy() {
-		this.container.removeAttr(DATA_ELEMENT);
-		this.container.removeAttr('contenteditable');
-		this.container.removeAttr('role');
-		this.container.removeAttr('autocorrect');
-		this.container.removeAttr('autocomplete');
-		this.container.removeAttr('spellcheck');
-		this.container.removeAttr('data-gramm');
-		this.container.removeAttr('tabindex');
-		if (this.options.className)
-			this.container.removeClass(this.options.className);
-		if (this.card.closest(this.container))
-			this.container.removeClass('am-engine');
-		this.container.removeAllEvents();
+		this._container.destroy();
 		this.change.destroy();
 		this.hotkey.destroy();
 		this.card.gc();
@@ -232,112 +243,27 @@ class EngineModel implements EngineInterface {
 		}
 	}
 
-	private initContainer(selector: Selector) {
-		const { lang, tabIndex, className } = this.options;
-		const container = $(selector);
-		container.attr(DATA_ELEMENT, ROOT);
-		container.attr({
-			contenteditable: 'true',
-			role: 'textbox',
-			autocorrect: lang === 'en' ? 'on' : 'off',
-			autocomplete: 'off',
-			spellcheck: lang === 'en' ? 'true' : 'false',
-			'data-gramm': 'false',
-		});
-
-		if (!container.hasClass('am-engine')) {
-			container.addClass('am-engine');
-		}
-
-		if (tabIndex !== undefined) {
-			container.attr('tabindex', tabIndex);
-		}
-
-		if (className !== undefined) {
-			container.addClass(className);
-		}
-
-		return container;
-	}
-
-	private autoAddLineToEnd(event: MouseEvent) {
-		if (event.target && $(event.target).isRoot()) {
-			const lastBlock = this.container.last();
-			if (lastBlock) {
-				if (!lastBlock.isCard() && 'blockquote' !== lastBlock.name)
-					return;
-				if (
-					(lastBlock.get<HTMLElement>()?.offsetTop || 0) +
-						(lastBlock.get<Element>()?.clientHeight || 0) >
-					event.offsetY
-				)
-					return;
-			}
-			const node = $('<p><br /></p>');
-			this.container.append(node);
-			const range = this.change.getRange();
-			range.select(node, true).collapse(false);
-			this.change.select(range);
-		}
-	}
-
-	private initEvents() {
-		// fix：输入文字时，前面存在 BR 标签，导致多一个换行
-		// 不能用 this.domEvent.onInput，因为输入中文时不会被触发
-		this.container.on('input', e => {
-			if (this.readonly) {
-				return;
-			}
-
-			if (this.card.find(e.target)) {
-				return;
-			}
-			const range = this.change.getRange();
-			range.addOrRemoveBr(true);
-			this.setUserChanged();
-		});
-		// 文档尾部始终保持一行
-		this.container.on('click', e => {
-			return this.autoAddLineToEnd(e);
-		});
-		this.container.on('keydown', (event: KeyboardEvent) => {
-			return typingKeydown(this, event);
-		});
-
-		this.container.on('keyup', (event: KeyboardEvent) => {
-			return typingKeyup(this, event);
-		});
-		this.container.on('focus', () => {
-			this._focused = true;
-			return this.event.trigger('focus');
-		});
-		this.container.on('blur', () => {
-			this._focused = false;
-			return this.event.trigger('blur');
-		});
-	}
-
 	private normalizeTree() {
-		let block = $('<p />');
+		let block = this.$('<p />');
 		const range = this.change.getRange();
-		const bookmark = range.createBookmark();
+		const selection = range.createSelection();
 		let anchorNext, focusPrev, anchorParent, focusParent;
-		if (bookmark) {
-			anchorNext = $(bookmark.anchor).next();
-			focusPrev = $(bookmark.focus).prev();
-			anchorParent = $(bookmark.anchor).parent();
-			focusParent = $(bookmark.focus).parent();
+		if (selection.anchor && selection.focus) {
+			anchorNext = selection.anchor.next();
+			focusPrev = selection.focus.prev();
+			anchorParent = selection.anchor.parent();
+			focusParent = selection.focus.parent();
 		}
-		if (anchorNext) bookmark?.anchor.remove();
-		if (focusPrev) bookmark?.focus.remove();
+		if (anchorNext) selection.anchor?.remove();
+		if (focusPrev) selection.focus?.remove();
 		// 保证所有行内元素都在段落内
 		this.container.children().each(child => {
-			const node = $(child);
-			if (node.isBlock()) {
+			const node = this.$(child);
+			if (this.node.isBlock(node)) {
 				if (block.children().length > 0) {
 					node.before(block);
 				}
-				block = $('<p />');
+				block = this.$('<p />');
 			} else {
 				block.append(node);
 			}
@@ -346,22 +272,24 @@ class EngineModel implements EngineInterface {
 		if (block.children().length > 0) {
 			this.container.append(block);
 		}
-		if (anchorNext) anchorNext.before(bookmark!.anchor);
-		if (focusPrev) focusPrev.after(bookmark!.focus);
-		if (bookmark && anchorNext && focusPrev) {
+		if (anchorNext && selection.anchor && selection.anchor.length > 0)
+			anchorNext.before(selection.anchor);
+		if (focusPrev && selection.focus && selection.focus.length > 0)
+			focusPrev.after(selection.focus);
+		if (selection.has() && anchorNext && focusPrev) {
 			if (anchorParent?.isRoot()) {
-				block.append(bookmark.anchor);
+				block.append(selection.anchor!);
 			}
 			if (focusParent?.isRoot()) {
-				block.append(bookmark.focus);
+				block.append(selection.focus!);
 			}
 			if (block.children().length > 0) this.container.append(block);
 		}
 		// 处理空段落
 		this.container.children().each(child => {
-			const node = $(child);
-			removeMinusStyle(node, 'text-indent');
-			if (node.isHeading()) {
+			const node = this.$(child);
+			this.node.removeMinusStyle(node, 'text-indent');
+			if (this.node.isRootBlock(node)) {
 				const childrenLength = node.children().length;
 				if (childrenLength === 0) {
 					node.remove();
@@ -371,15 +299,15 @@ class EngineModel implements EngineInterface {
 						childrenLength === 1 &&
 						child?.name === 'span' &&
 						[CURSOR, ANCHOR, FOCUS].indexOf(
-							child.attr(DATA_ELEMENT),
+							child.attributes(DATA_ELEMENT),
 						) >= 0
 					) {
-						node.prepend($('<br />'));
+						node.prepend(this.$('<br />'));
 					}
 				}
 			}
 		});
-		if (bookmark) range.moveToBookmark(bookmark);
+		selection.move();
 	}
 
 	messageSuccess(message: string) {
@@ -391,6 +319,4 @@ class EngineModel implements EngineInterface {
 	}
 }
 
-EngineModel.plugin = new Plugin();
-EngineModel.card = new CardModel();
 export default EngineModel;

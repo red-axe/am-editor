@@ -1,30 +1,58 @@
 import { ClipboardData } from './clipboard';
-import { ViewInterface } from './view';
-import { EngineInterface } from './engine';
+import { EditorInterface } from './engine';
 import { LanguageInterface } from './language';
 import { NodeInterface } from './node';
 import { RangeInterface } from './range';
-import { SchemaInterface } from './schema';
+import {
+	SchemaGlobal,
+	SchemaInterface,
+	SchemaRule,
+	SchemaValue,
+} from './schema';
 
-export type PluginOptions = {
-	engine?: EngineInterface;
-	view?: ViewInterface;
-};
+export type PluginOptions = {};
 
 export interface PluginEntry {
 	prototype: PluginInterface;
-	new (name: string, options: PluginOptions): PluginInterface;
+	new (editor: EditorInterface, options: PluginOptions): PluginInterface;
+	readonly pluginName: string;
 }
 
 export interface PluginInterface {
+	readonly kind: string;
 	/**
-	 * 插件名称
+	 * 标签名称
 	 */
-	readonly name: string;
+	readonly tagName?: string | Array<string>;
+	/**
+	 * 标签样式，可选
+	 * 使用变量表示值时，固定规则：@var0 @var1 @var2 ... 分别表示执行 command.execute 时传入的 参数1 参数2 参数3 ...
+	 * { value:string,format:(value:string) => string } 可以在获取节点属性值时，对值进行自定义格式化处理
+	 */
+	readonly style?: {
+		[key: string]:
+			| string
+			| { value: string; format: (value: string) => string };
+	};
+	/**
+	 * 标签属性，可选
+	 * 使用变量表示值时，固定规则：@var0 @var1 @var2 ... 分别表示执行 command.execute 时传入的 参数1 参数2 参数3 ...
+	 * { value:string,format:(value:string) => string } 可以在获取节点属性值时，对值进行自定义格式化处理
+	 */
+	readonly attributes?: {
+		[key: string]:
+			| string
+			| { value: string; format: (value: string) => string };
+	};
+	/**
+	 * 在 style 或者 attributes 使用变量表示的值规则
+	 * key 为如上所诉的变量名称 @var0 @var1 @var2 ...
+	 */
+	readonly variable?: { [key: string]: SchemaValue };
 	/**
 	 * 初始化
 	 */
-	initialize?(): void;
+	init(): void;
 	/**
 	 * 获取插件本地化语言
 	 */
@@ -40,9 +68,35 @@ export interface PluginInterface {
 	 */
 	execute(...args: any): void;
 	/**
-	 * 插件本地化语言
+	 * 将当前插件style属性应用到节点
+	 * @param node 节点
+	 * @param args style 对应 variable 中的变量参数
 	 */
-	locales?(): {};
+	setStyle(node: NodeInterface | Node, ...args: Array<any>): void;
+	/**
+	 * 将当前插件attributes属性应用到节点
+	 * @param node 节点
+	 * @param args attributes 对应 variable 中的变量参数
+	 */
+	setAttributes(node: NodeInterface | Node, ...args: Array<any>): void;
+	/**
+	 * 获取节点符合当前插件规则的样式
+	 * @param node 节点
+	 * @returns 样式名称和样式值键值对
+	 */
+	getStyle(node: NodeInterface | Node): { [key: string]: string };
+	/**
+	 * 获取节点符合当前插件规则的属性
+	 * @param node 节点
+	 * @returns 属性名称和属性值键值对
+	 */
+	getAttributes(node: NodeInterface | Node): { [key: string]: string };
+	/**
+	 * 检测当前节点是否符合当前插件设置的规则
+	 * @param node 节点
+	 * @returns true | false
+	 */
+	isSelf(node: NodeInterface | Node): boolean;
 	/**
 	 * 插件热键绑定，返回需要匹配的组合键字符，如 mod+b，匹配成功即执行插件，还可以带上插件执行所需要的参数，多个参数以数组形式返回{key:"mod+b",args:[]}
 	 * @param event 键盘事件
@@ -55,9 +109,9 @@ export interface PluginInterface {
 		| Array<{ key: string; args: any }>
 		| Array<string>;
 	/**
-	 * 设置插件所需保留标签的白名单，以及属性
+	 * 获取插件设置的属性和样式所生成的规则
 	 */
-	schema?(): any;
+	schema?(): SchemaRule | SchemaGlobal | Array<SchemaRule>;
 	/**
 	 * 解析DOM节点，生成符合标准的 XML 代码之前触发
 	 * @param root DOM节点
@@ -138,43 +192,6 @@ export interface PluginInterface {
      * @param files 文件集合
      */
 	dropFiles?(files: Array<File>): void;
-	/**
-	 * 键盘按下指定键事件，返回false时不再执行后面的操作，包括编辑器本身的处理
-	 * @param type 类型
-	 * @param event 事件
-	 */
-	onCustomizeKeydown?(
-		type:
-			| 'enter'
-			| 'backspace'
-			| 'space'
-			| 'tab'
-			| 'shift-tab'
-			| 'at'
-			| 'slash'
-			| 'selectall',
-		event: KeyboardEvent,
-	): boolean | void;
-	/**
-	 * 键盘按下指定键松开事件，返回false时不再执行后面的操作，包括编辑器本身的处理
-	 * @param type 类型
-	 * @param event 事件
-	 */
-	onCustomizeKeyup?(
-		type: 'enter' | 'backspace' | 'space' | 'tab',
-		event: KeyboardEvent,
-	): boolean | void;
-
-	/**
-	 * 按下空格后触发
-	 * @param event 事件
-	 * @param text 空格左边内容
-	 */
-	onKeydownSpace?(
-		event: KeyboardEvent,
-		node: NodeInterface,
-		text: string,
-	): boolean | void;
 }
 
 export interface PluginModelInterface {
@@ -183,11 +200,16 @@ export interface PluginModelInterface {
 	 */
 	components: { [k: string]: PluginInterface };
 	/**
+	 * 实例化插件
+	 * @param plugins 插件集合
+	 * @param config 插件配置
+	 */
+	init(plugins: Array<PluginEntry>, config: { [k: string]: any }): void;
+	/**
 	 * 新增插件
-	 * @param name 插件名称
 	 * @param clazz 插件类
 	 */
-	add(name: string, clazz: PluginEntry): void;
+	add(clazz: PluginEntry, options?: PluginOptions): void;
 	/**
 	 * 遍历插件
 	 * @param callback 回调
@@ -199,14 +221,4 @@ export interface PluginModelInterface {
 			index?: number,
 		) => boolean | void,
 	): void;
-	/**
-	 * 设置引擎实例
-	 * @param engine 引擎实例
-	 */
-	setEngine(engine: EngineInterface): void;
-	/**
-	 * 设置内容渲染实例
-	 * @param engine 引擎实例
-	 */
-	setContentView(view: ViewInterface): void;
 }

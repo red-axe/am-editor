@@ -1,8 +1,16 @@
 import React, { useRef, useEffect } from 'react';
 import { isBrowser } from 'umi';
-import Engine, { $, View, ViewInterface } from '@aomao/engine';
+import { View, ViewInterface, CardEntry, PluginEntry } from '@aomao/engine';
 
-const ContentRender = ({ content }: { content: string }) => {
+const ContentRender = ({
+	content,
+	plugins,
+	cards,
+}: {
+	content: string;
+	plugins?: PluginEntry[];
+	cards?: CardEntry[];
+}) => {
 	const view = useRef<ViewInterface>();
 	const viewRef = useRef<HTMLDivElement | null>(null);
 
@@ -10,8 +18,8 @@ const ContentRender = ({ content }: { content: string }) => {
 		if (viewRef.current && !view.current) {
 			//初始化
 			view.current = new View(viewRef.current, {
-				card: Engine.card,
-				plugin: Engine.plugin,
+				plugins,
+				cards,
 			});
 		}
 	}, []);
@@ -25,16 +33,16 @@ const ContentRender = ({ content }: { content: string }) => {
 
 	//服务端渲染
 	const renderServer = () => {
-		const container = $('<div></div>');
-		const view = new View(container, {
-			card: Engine.card,
-			plugin: Engine.plugin,
+		const view = new View('<div></div>', {
+			plugins,
+			cards,
 		});
 		//渲染内容到container节点下
 		view.render(content);
+		const { container } = view;
 		return (
 			<div
-				className={container.attr('class')}
+				className={container.attributes('class')}
 				dangerouslySetInnerHTML={{ __html: container.html() }}
 			></div>
 		);

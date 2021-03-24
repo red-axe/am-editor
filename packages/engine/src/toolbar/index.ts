@@ -1,4 +1,3 @@
-import $ from '../node';
 import { NodeInterface } from '../types/node';
 import {
 	ButtonOptions,
@@ -13,34 +12,37 @@ import Dropdown from './dropdown';
 import Input from './input';
 import Tooltip from './tooltip';
 import './index.css';
+import { EditorInterface } from '../types';
 
 const template = () => {
 	return '<div class="data-toolbar data-toolbar-active" contenteditable="false"></div>';
 };
 
 class Toolbar implements ToolbarInterface {
+	private editor: EditorInterface;
 	private options: ToolbarOptions;
 	root: NodeInterface;
 	private items: Array<NodeInterface | Button | Input | Dropdown> = [];
 
-	constructor(options: ToolbarOptions) {
+	constructor(editor: EditorInterface, options: ToolbarOptions) {
+		this.editor = editor;
 		this.options = { type: 'block', ...options };
-		this.root = $(template());
+		this.root = this.editor.$(template());
 	}
 
 	addItems(node: NodeInterface) {
 		this.options.items.forEach(options => {
 			let item;
 			if (options.type === 'button') {
-				item = new Button(options as ButtonOptions);
+				item = new Button(this.editor, options as ButtonOptions);
 				item.render(node);
 			}
 			if (options.type === 'input') {
-				item = new Input(options as InputOptions);
+				item = new Input(this.editor, options as InputOptions);
 				item.render(node);
 			}
 			if (options.type === 'dropdown') {
-				item = new Dropdown(options as DropdownOptions);
+				item = new Dropdown(this.editor, options as DropdownOptions);
 				item.render(node);
 			}
 			if (options.type === 'node') {
@@ -98,7 +100,7 @@ class Toolbar implements ToolbarInterface {
 
 	render(container?: NodeInterface) {
 		const { type, align } = this.options;
-		const group = $('<div class="data-toolbar-group"></div>');
+		const group = this.editor.$('<div class="data-toolbar-group"></div>');
 		this.root.append(group);
 		this.addItems(group);
 		if (container) {

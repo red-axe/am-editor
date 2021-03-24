@@ -13,46 +13,42 @@ import {
 	CardInterface,
 	MaximizeInterface,
 	CardToolbarItemOptions,
+	CardEntry as CardEntryType,
 } from '../types/card';
-import { ViewInterface } from '../types/view';
-import { EngineInterface } from '../types/engine';
+import { EditorInterface, isEngine } from '../types/engine';
 import { LanguageInterface } from '../types/language';
 import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { ToolbarItemOptions } from '../types/toolbar';
 import { decodeCardValue, encodeCardValue, random } from '../utils';
-import $ from '../node';
 import Maximize from './maximize';
 import Toolbar from './toolbar';
 
 abstract class CardEntry implements CardInterface {
-	protected readonly engine?: EngineInterface;
-	protected readonly view?: ViewInterface;
+	protected readonly editor: EditorInterface;
 	readonly root: NodeInterface;
 	readonly toolbar: CardToolbarInterface;
 	activatedByOther: string | false = false;
 	selectedByOther: string | false = false;
-	readonly type: CardType;
-	static autoActivate: boolean;
-	static autoSelected: boolean = true;
-	static singleSelectable: boolean;
-	static collab: boolean = true;
-	static focus: boolean;
+	static readonly cardName: string;
+	static readonly cardType: CardType;
+	static readonly autoActivate: boolean;
+	static readonly autoSelected: boolean = true;
+	static readonly singleSelectable: boolean;
+	static readonly collab: boolean = true;
+	static readonly focus: boolean;
 	private defaultMaximize: MaximizeInterface;
 	isMaximize: boolean = false;
-	private _activated: boolean = false;
-	private _selected: boolean = false;
 
 	get readonly() {
-		return !this.engine;
+		return !isEngine(this.editor);
 	}
 
 	get activated() {
-		return this._activated;
+		return this.root.hasClass('card-activated');
 	}
 
 	private setActivated(activated: boolean) {
-		this._activated = activated;
 		if (!this.onActivate) return;
 		activated
 			? this.root.addClass('card-activated')
@@ -64,7 +60,6 @@ abstract class CardEntry implements CardInterface {
 	}
 
 	private setSelected(selected: boolean) {
-		this._selected = selected;
 		if (!this.onSelect) return;
 		selected
 			? this.root.addClass('card-selected')
@@ -77,32 +72,30 @@ abstract class CardEntry implements CardInterface {
 	}
 
 	get name() {
-		return this.root.attr(CARD_KEY);
+		return this.root.attributes(CARD_KEY);
 	}
 
-	constructor({ engine, view, type, value, root }: CardOptions) {
-		this.engine = engine;
-		this.view = view;
+	constructor({ editor, value, root }: CardOptions) {
+		this.editor = editor;
+		const { $ } = this.editor;
+		const type = (this.constructor as CardEntryType).cardType;
 		const tagName = type === 'inline' ? 'span' : 'div';
 		this.root = root ? root : $('<'.concat(tagName, ' />'));
-		this.type = type;
 		if (typeof value === 'string') value = decodeCardValue(value);
 
-		if (engine && type === CardType.BLOCK) {
+		if (isEngine(this.editor) && type === CardType.BLOCK) {
 			value = value || {};
 			value.id = this.getId(value.id);
 		}
 		this.setValue(value);
-		if (this.id) this.root.attr('id', this.id);
 
-		this.toolbar = new Toolbar(this);
-		this.defaultMaximize = new Maximize(this);
+		this.toolbar = new Toolbar(this.editor, this);
+		this.defaultMaximize = new Maximize(this.editor, this);
 	}
 
 	private getId(curId?: string) {
-		if (!this.engine && !this.view) return curId || '';
 		const idCache: Array<string> = [];
-		(this.engine || this.view)!.card.each(card => {
+		this.editor.card.each(card => {
 			idCache.push(card.id);
 		});
 		if (curId && idCache.indexOf(curId) < 0) return curId;
@@ -112,11 +105,7 @@ abstract class CardEntry implements CardInterface {
 	}
 
 	getLang(): LanguageInterface {
-		return this.getEngine().language;
-	}
-
-	getEngine() {
-		return (this.engine || this.view)!;
+		return this.editor.language;
 	}
 
 	// 设置 DOM 属性里的数据
@@ -128,11 +117,11 @@ abstract class CardEntry implements CardInterface {
 		if (this.id) value.id = this.id;
 
 		value = encodeCardValue(value);
-		this.root.attr(CARD_VALUE_KEY, value);
+		this.root.attributes(CARD_VALUE_KEY, value);
 	}
 	// 获取 DOM 属性里的数据
 	getValue(): any {
-		const value = this.root.attr(CARD_VALUE_KEY);
+		const value = this.root.attributes(CARD_VALUE_KEY);
 		if (!value) return;
 
 		return decodeCardValue(value);
@@ -146,12 +135,12 @@ abstract class CardEntry implements CardInterface {
 		const nodes = this.root.find(selector);
 		const children: Array<Node> = [];
 		nodes.each(item => {
-			const card = (this.engine || this.view)!.card.find(item);
+			const card = this.editor.card.find(item);
 			if (card && card.root.equal(this.root)) {
 				children.push(item);
 			}
 		});
-		return $(children);
+		return this.editor.$(children);
 	}
 
 	findByKey(key: string) {
@@ -226,11 +215,10 @@ abstract class CardEntry implements CardInterface {
 
 	// 焦点移动到上一个 Block
 	focusPrevBlock(range: RangeInterface, hasModify: boolean) {
-		if (!this.engine) throw 'Engine not initialized';
+		if (!isEngine(this.editor)) throw 'Engine not initialized';
 		let prevBlock;
-
-		if (this.type === 'inline') {
-			const block = this.root.getClosestBlock();
+		if ((this.constructor as CardEntryType).cardType === 'inline') {
+			const block = this.editor.block.closest(this.root);
 			if (block.isRoot()) {
 				prevBlock = this.root.prevElement();
 			} else {
@@ -241,8 +229,8 @@ abstract class CardEntry implements CardInterface {
 		}
 
 		if (hasModify) {
-			if (!prevBlock || prevBlock.attr(CARD_KEY)) {
-				const _block = $('<p><br /></p>');
+			if (!prevBlock || prevBlock.attributes(CARD_KEY)) {
+				const _block = this.editor.$('<p><br /></p>');
 				this.root.before(_block);
 				range.select(_block, true);
 				range.collapse(false);
@@ -253,8 +241,8 @@ abstract class CardEntry implements CardInterface {
 				return;
 			}
 
-			if (prevBlock.attr(CARD_KEY)) {
-				this.engine?.card.find(prevBlock)?.focus(range, false);
+			if (prevBlock.attributes(CARD_KEY)) {
+				this.editor.card.find(prevBlock)?.focus(range, false);
 				return;
 			}
 		}
@@ -266,10 +254,10 @@ abstract class CardEntry implements CardInterface {
 	}
 	// 焦点移动到下一个 Block
 	focusNextBlock(range: RangeInterface, hasModify: boolean) {
-		if (!this.engine) throw 'Engine not initialized';
+		if (!isEngine(this.editor)) throw 'Engine not initialized';
 		let nextBlock;
-		if (this.type === 'inline') {
-			const block = this.root.getClosestBlock();
+		if ((this.constructor as CardEntryType).cardType === 'inline') {
+			const block = this.editor.block.closest(this.root);
 
 			if (block.isRoot()) {
 				nextBlock = this.root.nextElement();
@@ -281,8 +269,8 @@ abstract class CardEntry implements CardInterface {
 		}
 
 		if (hasModify) {
-			if (!nextBlock || nextBlock.attr(CARD_KEY)) {
-				const _block = $('<p><br /></p>');
+			if (!nextBlock || nextBlock.attributes(CARD_KEY)) {
+				const _block = this.editor.$('<p><br /></p>');
 				this.root.after(_block);
 				range.select(_block, true);
 				range.collapse(false);
@@ -293,8 +281,8 @@ abstract class CardEntry implements CardInterface {
 				return;
 			}
 
-			if (nextBlock.attr(CARD_KEY)) {
-				this.engine?.card.find(nextBlock)?.focus(range, false);
+			if (nextBlock.attributes(CARD_KEY)) {
+				this.editor.card.find(nextBlock)?.focus(range, false);
 				return;
 			}
 		}

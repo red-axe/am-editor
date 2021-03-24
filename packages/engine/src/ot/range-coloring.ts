@@ -1,11 +1,10 @@
 import tinycolor2 from 'tinycolor2';
 import { removeUnit, escape } from '../utils';
-import $ from '../node';
 import TinyCanvas from './tiny-canvas';
 import { Tooltip } from '../toolbar';
 import { fromPath } from './utils';
 import { EngineInterface } from '../types/engine';
-import { isRange, RangeInterface } from '../types/range';
+import { RangeInterface, isRangeInterface } from '../types/range';
 import { NodeInterface } from '../types/node';
 import {
 	Attribute,
@@ -105,6 +104,7 @@ class RangeColoring implements RangeColoringInterface {
 		range: RangeInterface,
 		options: { uuid: string; color: string },
 	) {
+		const { $ } = this.engine;
 		const { uuid, color } = options;
 		const tinyColor = tinycolor2(color);
 		tinyColor.setAlpha(0.3);
@@ -114,7 +114,7 @@ class RangeColoring implements RangeColoringInterface {
 			`.${USER_BACKGROUND_CLASS}[data-uuid="${uuid}"]`,
 		);
 		if (child && child.length > 0) {
-			child.attr('data-color', color.toString());
+			child.attributes('data-color', color.toString());
 			targetCanvas = child[0]['__targetCanvas'];
 			targetCanvas.clear();
 		} else {
@@ -159,7 +159,7 @@ class RangeColoring implements RangeColoringInterface {
 		//自定义列表项的第一个card跳过
 		if (
 			node.isCard() &&
-			node.parent()?.hasClass('data-list-node') &&
+			node.parent()?.hasClass('data-list-item') &&
 			node
 				.parent()
 				?.first()
@@ -174,7 +174,7 @@ class RangeColoring implements RangeColoringInterface {
 		}
 
 		if (node.isText()) {
-			const range = Range.create();
+			const range = Range.create(this.engine);
 			range.select(node, true);
 			rect = range.getClientRect();
 		}
@@ -192,13 +192,13 @@ class RangeColoring implements RangeColoringInterface {
 			left: 0,
 		};
 
-		if (isRange(selector)) {
+		if (isRangeInterface(selector)) {
 			const range = selector;
 			const { startNode } = range;
 			range.shrinkToElementNode();
 			let rect = range.getClientRect();
 			if (startNode.isElement() && rect.height === 0) {
-				let childNode: NodeInterface | null = $(
+				let childNode: NodeInterface | null = this.engine.$(
 					startNode[0].childNodes[range.startOffset],
 				);
 				if (childNode && childNode.length > 0) {
@@ -260,7 +260,7 @@ class RangeColoring implements RangeColoringInterface {
 
 		const trigger = node.find(`.${USER_CURSOR_TRIGGER_CLASS}`);
 		const bgColor = node.css('background-color');
-		node.attr('data-old-background-color', bgColor);
+		node.attributes('data-old-background-color', bgColor);
 		trigger.addClass(`${USER_CURSOR_TRIGGER_ACTIVE_CLASS}`);
 		node.css('background-color', color);
 		trigger.css('background-color', color);
@@ -268,7 +268,7 @@ class RangeColoring implements RangeColoringInterface {
 
 	hideCursorInfo(node: NodeInterface) {
 		const trigger = node.find(`.${USER_CURSOR_TRIGGER_CLASS}`);
-		const bgColor = node.attr('data-old-background-color');
+		const bgColor = node.attributes('data-old-background-color');
 		trigger.removeClass(`${USER_CURSOR_TRIGGER_ACTIVE_CLASS}`);
 		node.css('background-color', bgColor);
 		trigger.css('background-color', bgColor);
@@ -276,7 +276,7 @@ class RangeColoring implements RangeColoringInterface {
 
 	drawCursor(selector: RangeInterface | NodeInterface, member: Member) {
 		const { uuid, name, color } = member;
-
+		const { $ } = this.engine;
 		const cursorRect = this.getCursorRect(selector);
 		let childCursor = this.root.children(
 			`.${USER_CURSOR_CLASS}[data-uuid="${uuid}"]`,
@@ -344,6 +344,7 @@ class RangeColoring implements RangeColoringInterface {
 			width: 0,
 			height: 0,
 		};
+		const { $ } = this.engine;
 		let mask = this.root.children(
 			`.${USER_MASK_CLASS}[data-uuid="${member.uuid}"]`,
 		);
@@ -365,10 +366,10 @@ class RangeColoring implements RangeColoringInterface {
 			width: nodeRect.width + 'px',
 			height: nodeRect.height + 'px',
 		});
-
+		const tooltip = new Tooltip(this.engine);
 		mask.on('mouseenter', () => {
 			this.showCursorInfo(cursor, member);
-			Tooltip.show(mask, language.get('card', 'lockAlert').toString(), {
+			tooltip.show(mask, language.get('card', 'lockAlert').toString(), {
 				placement: 'bottomLeft',
 			});
 		});
@@ -383,7 +384,7 @@ class RangeColoring implements RangeColoringInterface {
 
 		mask.on('mouseleave', () => {
 			this.hideCursorInfo(cursor);
-			Tooltip.hide();
+			tooltip.hide();
 		});
 
 		mask.on('click', (event: MouseEvent) => {
@@ -505,11 +506,12 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	updateBackgroundPosition() {
+		const { $ } = this.engine;
 		this.root.children(`.${USER_BACKGROUND_CLASS}`).each(child => {
 			const node = $(child);
 			const range = child['__targetRange'];
-			const uuid = node.attr('data-uuid');
-			const color = node.attr('data-color');
+			const uuid = node.attributes('data-uuid');
+			const color = node.attributes('data-color');
 			this.drawBackground(range, {
 				uuid,
 				color,
@@ -518,6 +520,7 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	updateCursorPosition() {
+		const { $ } = this.engine;
 		this.root.children(`.${USER_CURSOR_CLASS}`).each(child => {
 			const node = $(child);
 			const target = child['__target'];
@@ -538,6 +541,7 @@ class RangeColoring implements RangeColoringInterface {
 			left: 0,
 			top: 0,
 		};
+		const { $ } = this.engine;
 		this.root.children(`.${USER_MASK_CLASS}`).each(child => {
 			const node = $(child);
 			const target = child['__targetNode'];
@@ -559,6 +563,7 @@ class RangeColoring implements RangeColoringInterface {
 
 	updateBackgroundAlpha(range: RangeInterface) {
 		const cursorRect = this.getCursorRect(range);
+		const { $ } = this.engine;
 		this.root.children(`.${USER_CURSOR_CLASS}`).each(child => {
 			const node = $(child);
 			const trigger = node.find(`.${USER_CURSOR_TRIGGER_CLASS}`);
@@ -583,7 +588,7 @@ class RangeColoring implements RangeColoringInterface {
 			const member = members.find(m => m.uuid === uuid);
 			if (member && (idDraw || active)) {
 				if (path.length !== 0) {
-					const range = fromPath(engine.container, path);
+					const range = fromPath(engine, engine.container, path);
 					this.drawRange(range, member);
 				} else {
 					info[uuid] = true;
@@ -591,8 +596,9 @@ class RangeColoring implements RangeColoringInterface {
 			}
 		});
 		this.root.children('[data-uuid]').each(child => {
+			const { $ } = this.engine;
 			const domChild = $(child);
-			const uuid = domChild.attr('data-uuid');
+			const uuid = domChild.attributes('data-uuid');
 			const member = members.find(m => m.uuid === uuid);
 			if (!member || info[uuid]) {
 				if (domChild.hasClass(USER_MASK_CLASS)) {

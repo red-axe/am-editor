@@ -14,7 +14,7 @@ Add Plugin
 $ import Engine, { EngineInterface } from '@aomao/engine';
 $ import Heading from '@aomao/plugin-heading';
 
-$ Engine.plugin.add('heading', Heading);
+$ new Engine(...,{ plugins:[Heading] })
 ```
 
 Options

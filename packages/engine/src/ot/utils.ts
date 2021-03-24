@@ -1,8 +1,7 @@
 import { isEqual } from 'lodash';
 import OTJSON from 'ot-json0';
-import { NodeInterface } from '../types/node';
+import { NodeInterface, isNode } from '../types/node';
 import { RangeInterface } from '../types/range';
-import $, { isNode } from '../node';
 import { FOCUS, ANCHOR, CURSOR } from '../constants/selection';
 import { CARD_SELECTOR } from '../constants/card';
 import Range from '../range';
@@ -19,6 +18,7 @@ import {
 import { Operation } from '../types/ot';
 import { DATA_ELEMENT } from '../constants/root';
 import { getWindow } from '../utils';
+import { EngineInterface } from '../types';
 
 /**
  * 随机一个数字
@@ -40,14 +40,13 @@ export const randomString = (length: number = 8) => {
 	return word;
 };
 
-export const isTransientElement = (node: Node | NodeInterface) => {
-	if (isNode(node)) node = $(node);
+export const isTransientElement = (node: NodeInterface) => {
 	if (node.isElement()) {
 		//范围标记
-		if ([CURSOR, ANCHOR, FOCUS].includes(node.attr(DATA_ELEMENT)))
+		if ([CURSOR, ANCHOR, FOCUS].includes(node.attributes(DATA_ELEMENT)))
 			return true;
 		//data-transient属性
-		if (node.attr('data-transient')) return true;
+		if (node.attributes('data-transient')) return true;
 		//在卡片里面
 		if (!node.isCard() && node.closest(CARD_SELECTOR).length > 0)
 			return true;
@@ -59,11 +58,7 @@ export const isTransientElement = (node: Node | NodeInterface) => {
 	return false;
 };
 
-export const isTransientAttribute = (
-	node: Node | NodeInterface,
-	attr: string,
-) => {
-	if (isNode(node)) node = $(node);
+export const isTransientAttribute = (node: NodeInterface, attr: string) => {
 	if (node.isRoot() && !/^data-selection-/.test(attr)) return true;
 	if (node.isCard() && ['id', 'class', 'style'].includes(attr)) return true;
 	return false;
@@ -71,17 +66,17 @@ export const isTransientAttribute = (
 
 export const toPath = (range: RangeInterface): Path[] => {
 	const node = range.commonAncestorNode;
-	if (!node.isRoot() && !node.inRoot()) return [];
+	if (!node.isRoot() && !node.inEditor()) return [];
 	range.shrinkToTextNode();
 
 	const getPath = (node: NodeInterface, offset: number): Path => {
-		let domNode: NodeInterface | undefined = $(node);
+		let domNode: NodeInterface | undefined = node;
 		const path = [];
 		while (domNode && domNode.length > 0 && !domNode.isRoot()) {
 			let prev = domNode.prev();
 			let i = 0;
 			while (prev && prev.length > 0) {
-				if (!prev.attr('data-transient')) i++;
+				if (!prev.attributes('data-transient')) i++;
 				prev = prev.prev();
 			}
 			path.unshift(i);
@@ -96,14 +91,18 @@ export const toPath = (range: RangeInterface): Path[] => {
 	];
 };
 
-export const fromPath = (node: NodeInterface, path: Path[]) => {
+export const fromPath = (
+	engine: EngineInterface,
+	node: NodeInterface,
+	path: Path[],
+) => {
 	const startPath = path[0].slice();
 	const endPath = path[1].slice();
 	const startOffset = startPath.pop();
 	const endOffset = endPath.pop();
 
 	const getNode = (path: Path) => {
-		let domNode = $(node);
+		let domNode = node;
 		for (let i = 0; i < path.length; i++) {
 			let p = path[i];
 			if (p < 0) {
@@ -113,7 +112,7 @@ export const fromPath = (node: NodeInterface, path: Path[]) => {
 			let domChild = domNode.first();
 			let offset = 0;
 			while (domChild && domChild.length > 0) {
-				if (domChild.attr('data-transient')) {
+				if (domChild.attributes('data-transient')) {
 					domChild = domChild.next();
 				} else {
 					if (offset === p || !domChild.next()) {
@@ -157,7 +156,7 @@ export const fromPath = (node: NodeInterface, path: Path[]) => {
 	};
 	const startNode = getNode(startPath);
 	const endNode = getNode(endPath);
-	const range = Range.create(document);
+	const range = Range.create(engine, document);
 	setRange(
 		'setStart',
 		range,

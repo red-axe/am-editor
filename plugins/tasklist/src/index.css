@@ -1,4 +1,4 @@
-.am-engine .am-list-node [data-card-key="checkbox"],.am-engine-view .am-list-node [data-card-key="checkbox"] {
+.am-engine .data-list-item [data-card-key="checkbox"],.am-engine-view .data-list-item [data-card-key="checkbox"] {
 	margin-left: 0;
 	margin-right: 5px;
 }

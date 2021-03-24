@@ -1,7 +1,14 @@
-import Node, { isNode } from './entry';
-import { NodeInterface, Selector, Context, NodeEntry } from '../types/node';
+import Node from './entry';
+import {
+	NodeInterface,
+	Selector,
+	Context,
+	NodeEntry,
+	isNode,
+} from '../types/node';
 import { getDocument, getWindow } from '../utils';
 import Parse from './parse';
+import { EditorInterface } from '../types';
 
 /**
  * 查询节点返回NodeInterface
@@ -10,13 +17,18 @@ import Parse from './parse';
  * @param nodeConstructor 需要使用的模型，默认 DOMNOde
  */
 export default (
+	editor: EditorInterface,
 	selector: Selector,
 	context?: Context | null | false,
 	clazz?: NodeEntry,
 ): NodeInterface => {
 	if (context === undefined) context = getDocument();
-	const nodes = Parse(selector, context);
-	const entry = new (clazz || Node)(nodes);
+	const nodes = Parse(editor, selector, context);
+	const entry = new (clazz || Node)(
+		editor,
+		nodes,
+		context ? context : undefined,
+	);
 	if (
 		isNode(selector) &&
 		selector.nodeType === getWindow().Node.DOCUMENT_FRAGMENT_NODE

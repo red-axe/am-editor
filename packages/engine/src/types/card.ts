@@ -1,5 +1,4 @@
-import { ViewInterface } from './view';
-import { EngineInterface } from './engine';
+import { EditorInterface } from './engine';
 import { LanguageInterface } from './language';
 import { NodeInterface } from './node';
 import { RangeInterface } from './range';
@@ -15,9 +14,7 @@ export enum CardType {
 }
 
 export type CardOptions = {
-	engine?: EngineInterface;
-	view?: ViewInterface;
-	type: CardType;
+	editor: EditorInterface;
 	value?: any;
 	root?: NodeInterface;
 };
@@ -75,25 +72,33 @@ export interface CardEntry {
 	prototype: CardInterface;
 	new (options: CardOptions): CardInterface;
 	/**
+	 * 卡片名称
+	 */
+	readonly cardName: string;
+	/**
+	 * 卡片类型 block inline
+	 */
+	readonly cardType: CardType;
+	/**
 	 * 是否能自动选中
 	 */
-	autoSelected: boolean;
+	readonly autoSelected: boolean;
 	/**
 	 * 是否能自动激活
 	 */
-	autoActivate: boolean;
+	readonly autoActivate: boolean;
 	/**
 	 * 是否能单独选中
 	 */
-	singleSelectable: boolean;
+	readonly singleSelectable: boolean;
 	/**
 	 * 是否能协作，默认为true
 	 */
-	collab: boolean;
+	readonly collab: boolean;
 	/**
 	 * 是否能聚焦
 	 */
-	focus: boolean;
+	readonly focus: boolean;
 }
 
 export interface CardInterface {
@@ -101,14 +106,6 @@ export interface CardInterface {
 	 * 卡片ID
 	 */
 	readonly id: string;
-	/**
-	 * 卡片名称
-	 */
-	readonly name: string;
-	/**
-	 * 卡片类型 block inline
-	 */
-	readonly type: CardType;
 	/**
 	 * 是否只读模式，没有engine
 	 */
@@ -145,10 +142,6 @@ export interface CardInterface {
 	 * 获取语言
 	 */
 	getLang(): LanguageInterface;
-	/**
-	 * 获取引擎，编辑引擎或者渲染引擎
-	 */
-	getEngine(): EngineInterface | ViewInterface;
 	/**
 	 * 获取Card内的 DOM 节点
 	 * @param selector
@@ -286,7 +279,7 @@ export interface CardInterface {
 
 export interface CardModel {
 	prototype: CardModelInterface;
-	new (): CardModelInterface;
+	new (editor: EditorInterface): CardModelInterface;
 }
 
 export interface CardModelInterface {
@@ -300,21 +293,16 @@ export interface CardModelInterface {
 	 */
 	readonly length: number;
 	/**
-	 * 设置引擎实例
-	 * @param engine 引擎实例
+	 * 实例化卡片
+	 * @param cards 卡片集合
 	 */
-	setEngine(engine: EngineInterface): void;
-	/**
-	 * 设置内容渲染实例
-	 * @param engine 引擎实例
-	 */
-	setContentView(view: ViewInterface): void;
+	init(cards: Array<CardEntry>): void;
 	/**
 	 * 增加卡片
 	 * @param name 名称
 	 * @param clazz 类
 	 */
-	add(name: string, clazz: CardEntry): void;
+	add(clazz: CardEntry): void;
 	/**
 	 * 遍历所有已创建的卡片
 	 * @param callback 回调函数
@@ -360,15 +348,9 @@ export interface CardModelInterface {
 	 * 将指定节点替换成等待创建的Card DOM 节点
 	 * @param node 节点
 	 * @param name 卡片名称
-	 * @param type 类型
 	 * @param value 卡片值
 	 */
-	replaceNode(
-		node: NodeInterface,
-		name: string,
-		type: CardType,
-		value?: any,
-	): void;
+	replaceNode(node: NodeInterface, name: string, value?: any): void;
 	/**
 	 * 更新卡片重新渲染
 	 * @param card 卡片
@@ -376,14 +358,51 @@ export interface CardModelInterface {
 	 */
 	updateNode(card: CardInterface, value: any): void;
 	/**
+	 * 激活卡片节点所在的卡片
+	 * @param node 节点
+	 * @param trigger 激活方式
+	 * @param event 事件
+	 */
+	activate(
+		node: NodeInterface,
+		trigger?: ActiveTrigger,
+		event?: MouseEvent,
+	): void;
+	/**
+	 * 选中卡片
+	 * @param card 卡片
+	 */
+	select(card: CardInterface): void;
+	/**
+	 * 聚焦卡片
+	 * @param card 卡片
+	 * @param toStart 是否聚焦到开始位置
+	 */
+	focus(card: CardInterface, toStart?: boolean): void;
+	/**
+	 * 插入卡片
+	 * @param name 卡片名称
+	 * @param value 卡片值
+	 */
+	insert(name: string, value?: any): CardInterface;
+	/**
+	 * 更新卡片
+	 * @param selector 卡片选择器
+	 * @param value 要更新的卡片值
+	 */
+	update(selector: NodeInterface | Node | string, value: any): void;
+	/**
+	 * 移除卡片
+	 * @param selector 卡片选择器
+	 */
+	remove(selector: NodeInterface | Node | string): void;
+	/**
 	 * 创建卡片
 	 * @param name 插件名称
-	 * @param type 类型
 	 * @param options 选项
 	 */
 	create(
 		name: string,
-		type: CardType,
 		options?: {
 			value?: any;
 			root?: NodeInterface;

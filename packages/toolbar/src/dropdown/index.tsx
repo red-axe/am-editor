@@ -14,6 +14,7 @@ export type DropdownProps = {
 	content?: React.ReactNode | (() => React.ReactNode);
 	title?: string;
 	disabled?: boolean;
+	single?: boolean;
 	className?: string;
 	direction?: 'vertical' | 'horizontal';
 	onSelect?: (event: React.MouseEvent, key: string) => void;
@@ -32,6 +33,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 	className,
 	items,
 	disabled,
+	single,
 	values,
 	onSelect,
 	hasArrow,
@@ -80,12 +82,18 @@ const Dropdown: React.FC<DropdownProps> = ({
 			content
 		);
 	};
+	if (single !== false)
+		values =
+			Array.isArray(values) && values.length > 0 ? values[0] : values;
 	const item = items.find(
 		item =>
 			(typeof values === 'string' && item.key === values) ||
-			(Array.isArray(values) && values.indexOf(item.key)) > -1,
+			(Array.isArray(values) && values.indexOf(item.key) > -1),
 	);
-	const firstItem = items.length > 0 ? items[0] : null;
+	const defaultItem =
+		items.length > 0
+			? items.find(item => item.isDefault === true) || items[0]
+			: null;
 	let buttonContent = item
 		? renderContent
 			? renderContent(item)
@@ -96,8 +104,8 @@ const Dropdown: React.FC<DropdownProps> = ({
 		? Array.isArray(values) && values.length > 0
 			? ''
 			: renderCustomeContent(icon, content)
-		: firstItem
-		? renderCustomeContent(firstItem.icon, firstItem.content)
+		: defaultItem
+		? renderCustomeContent(defaultItem.icon, defaultItem.content)
 		: '';
 	if (hasArrow !== false)
 		buttonContent = (
@@ -134,7 +142,8 @@ const Dropdown: React.FC<DropdownProps> = ({
 					name={name}
 					items={items}
 					values={
-						values || (icon || content ? '' : firstItem?.key || '')
+						values ||
+						(icon || content ? '' : defaultItem?.key || '')
 					}
 					onSelect={triggerSelect}
 				/>

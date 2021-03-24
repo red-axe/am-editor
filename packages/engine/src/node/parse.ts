@@ -1,10 +1,12 @@
-import { Selector, Context } from '../types/node';
+import { EditorInterface } from '../types';
 import {
-	generateRandomIDForDescendant,
-	getDocument,
-	getWindow,
-} from '../utils';
-import { isNode, isNodeEntry, isNodeList } from '../node';
+	Selector,
+	Context,
+	isNode,
+	isNodeEntry,
+	isNodeList,
+} from '../types/node';
+import { getDocument, getWindow } from '../utils';
 
 /**
  * 解析节点
@@ -13,9 +15,11 @@ import { isNode, isNodeEntry, isNodeList } from '../node';
  * @param context 上下文节点，默认使用 getDocument 获取document
  */
 function domParser(
+	editor: EditorInterface,
 	selector: Selector,
 	context?: Context | null | false,
 ): NodeList | Array<Node> {
+	if (!selector) return [];
 	//文本字符串
 	if (typeof selector === 'string') {
 		//特殊字符，或者html代码
@@ -43,7 +47,7 @@ function domParser(
 			//创建一个空节点，用来包裹需要生成的节点
 			const container = getDocument().createElement('div');
 			container.innerHTML = selector;
-			generateRandomIDForDescendant(container);
+			editor.block.generateRandomIDForDescendant(container);
 
 			if (isTr) {
 				const tbody = container.querySelector('tbody');

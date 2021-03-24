@@ -1,12 +1,10 @@
 import {
 	addUnit,
-	HEADING_TAG_MAP,
-	INDENT_KEY,
-	MAX_INDENT,
+	isEngine,
 	NodeInterface,
 	Plugin,
 	removeUnit,
-	setNodeProps,
+	SchemaGlobal,
 } from '@aomao/engine';
 
 export type Options = {
@@ -17,86 +15,46 @@ export type Options = {
 	maxPadding?: number;
 };
 
-// value > 0：增加缩进
-// value < 0：减少缩进
-export const addPadding = (
-	block: NodeInterface,
-	padding: number,
-	isTab: boolean,
-	maxPadding: number,
-) => {
-	if (['ul', 'ol'].includes(block.name || '')) {
-		const currentValue = parseInt(block.attr(INDENT_KEY), 10) || 0;
-		let newValue = currentValue + (padding < 0 ? -1 : 1);
-
-		if (newValue > MAX_INDENT) {
-			newValue = MAX_INDENT;
-		}
-		if (newValue < 1) {
-			block.removeAttr(INDENT_KEY);
-		} else {
-			block.attr(INDENT_KEY, newValue);
-		}
-		return;
-	}
-	// 标题、正文
-	if (block.isHeading()) {
-		addTextIndent(block, padding, isTab, maxPadding);
-	}
-};
-// value > 0：增加缩进，第一次先进行文本缩进
-// value < 0：减少缩进，第一次先取消文本缩进
-const addTextIndent = (
-	block: NodeInterface,
-	padding: number,
-	isTab: boolean,
-	maxPadding: number,
-) => {
-	if (padding > 0) {
-		if (removeUnit(block.css('text-indent')) || isTab !== true) {
-			const currentValue = block.css('padding-left');
-			let newValue = removeUnit(currentValue) + padding;
-			newValue = Math.min(newValue, maxPadding);
-			setNodeProps(block, {
-				style: {
-					'padding-left': addUnit(newValue > 0 ? newValue : 0, 'em'),
-				},
-			});
-		} else {
-			setNodeProps(block, {
-				style: {
-					'text-indent': '2em',
-				},
-			});
-		}
-	} else if (removeUnit(block.css('text-indent'))) {
-		setNodeProps(block, {
-			style: {
-				'text-indent': '',
-			},
-		});
-	} else {
-		const currentValue = block.css('padding-left');
-		const newValue = removeUnit(currentValue) + padding;
-		setNodeProps(block, {
-			style: {
-				'padding-left': addUnit(newValue > 0 ? newValue : 0, 'em'),
-			},
-		});
-	}
-};
-
 export default class extends Plugin<Options> {
-	queryState() {
-		if (!this.engine) return;
-		const { change } = this.engine;
+	static get pluginName() {
+		return 'indent';
+	}
+
+	init() {
+		super.init();
+		this.editor.on('keydown:backspace', event => this.onBackspace(event));
+		this.editor.on('keydown:tab', event => this.onTab(event));
+		this.editor.on('keydown:shift-tab', event => this.onShiftTab(event));
+	}
+
+	execute(type: 'in' | 'out' = 'in', isTab: boolean = false) {
+		if (!isEngine(this.editor)) return;
+		const { change, list, block } = this.editor;
+		list.split();
 		const range = change.getRange();
-		const block = range.startNode.getClosestBlock();
+		const blocks = block.findBlocks(range);
+		// 没找到目标 block
+		if (!blocks) {
+			return;
+		}
+		const maxPadding = this.options.maxPadding || 50;
+		// 其它情况
+		blocks.forEach(block => {
+			this.addPadding(block, type === 'in' ? 2 : -2, isTab, maxPadding);
+		});
+		list.merge();
+	}
+
+	queryState() {
+		if (!isEngine(this.editor)) return;
+		const { change, list, node } = this.editor;
+		const range = change.getRange();
+		const block = this.editor.block.closest(range.startNode);
 		if (block.name === 'li') {
-			return parseInt(block.closest('ul,ol').attr(INDENT_KEY), 10) || 0;
+			return list.getIndent(block.closest('ul,ol'));
 		}
 
-		if (block.isHeading()) {
+		if (node.isRootBlock(block)) {
 			const padding = removeUnit(block.css('padding-left'));
 			const textIndent = removeUnit(
 				block.get<HTMLElement>()?.style.textIndent || '',
@@ -106,22 +64,55 @@ export default class extends Plugin<Options> {
 		return 0;
 	}
 
-	execute(type: 'in' | 'out' = 'in', isTab: boolean = false) {
-		if (!this.engine) return;
-		const { change } = this.engine;
-		change.separateBlocks();
-		const range = change.getRange();
-		const blocks = range.getActiveBlocks();
-		// 没找到目标 block
-		if (!blocks) {
-			return;
+	addPadding(
+		block: NodeInterface,
+		padding: number,
+		isTab: boolean,
+		maxPadding: number,
+	) {
+		const { list } = this.editor;
+		if (this.editor.node.isList(block)) {
+			list.addIndent(block, padding, maxPadding);
+		} else if (this.editor.node.isRootBlock(block)) {
+			if (padding > 0) {
+				if (removeUnit(block.css('text-indent')) || isTab !== true) {
+					const currentValue = block.css('padding-left');
+					let newValue = removeUnit(currentValue) + padding;
+					newValue = Math.min(newValue, maxPadding);
+					this.editor.node.setAttributes(block, {
+						style: {
+							'padding-left': addUnit(
+								newValue > 0 ? newValue : 0,
+								'em',
+							),
+						},
+					});
+				} else {
+					this.editor.node.setAttributes(block, {
+						style: {
+							'text-indent': '2em',
+						},
+					});
+				}
+			} else if (removeUnit(block.css('text-indent'))) {
+				this.editor.node.setAttributes(block, {
+					style: {
+						'text-indent': '',
+					},
+				});
+			} else {
+				const currentValue = block.css('padding-left');
+				const newValue = removeUnit(currentValue) + padding;
+				this.editor.node.setAttributes(block, {
+					style: {
+						'padding-left': addUnit(
+							newValue > 0 ? newValue : 0,
+							'em',
+						),
+					},
+				});
+			}
 		}
-		const maxPadding = this.options.maxPadding || 50;
-		// 其它情况
-		blocks.forEach(block => {
-			addPadding(block, type === 'in' ? 2 : -2, isTab, maxPadding);
-		});
-		change.mergeAdjacentList();
 	}
 
 	hotkey() {
@@ -133,72 +124,56 @@ export default class extends Plugin<Options> {
 		];
 	}
 
-	schema() {
-		const tags = Object.keys(HEADING_TAG_MAP);
-		const rules: Array<any> = [];
-		tags.forEach(tag => {
-			const rule = {};
-			rule[tag] = {
+	schema(): SchemaGlobal {
+		return {
+			type: 'block',
+			attributes: {
 				style: {
 					'text-indent': '@length',
 					'padding-left': '@length',
 				},
-			};
-			rules.push(rule);
-		});
-		return rules;
+			},
+		};
 	}
 
-	onCustomizeKeydown(
-		type:
-			| 'enter'
-			| 'backspace'
-			| 'space'
-			| 'tab'
-			| 'shift-tab'
-			| 'at'
-			| 'slash'
-			| 'selectall',
-		event: KeyboardEvent,
-	) {
-		if (type === 'backspace') {
-			if (!this.engine) return;
-			const { change } = this.engine;
-			let range = change.getRange();
-			const block = range.startNode.getClosestBlock();
-			if (
-				range.collapsed &&
-				'li' === block.name &&
-				!range.isListFirst()
-			) {
-				return;
-			}
-			if (this.queryState()) {
-				event.preventDefault();
-				this.execute('out');
-				return false;
-			}
-		} else if (type === 'tab') {
-			if (!this.engine) return;
-			const { change } = this.engine;
-			const range = change.getRange();
-			//列表
-			if (range.collapsed && range.isListFirst()) {
-				event.preventDefault();
-				this.execute('in');
-				return false;
-			}
-			// <p><cursor />foo</p>
-			if (!range.collapsed || range.isBlockFirstOffset('start')) {
-				event.preventDefault();
-				this.execute('in', true);
-				return false;
-			}
-		} else if (type === 'shift-tab') {
+	onBackspace(event: KeyboardEvent) {
+		if (!isEngine(this.editor)) return;
+		const { change, list } = this.editor;
+		let range = change.getRange();
+		const block = this.editor.block.closest(range.startNode);
+		if (range.collapsed && 'li' === block.name && !list.isFirst(range)) {
+			return;
+		}
+		if (this.queryState()) {
 			event.preventDefault();
 			this.execute('out');
 			return false;
 		}
 		return;
+	}
+
+	onTab(event: KeyboardEvent) {
+		if (!isEngine(this.editor)) return;
+		const { change, list, block } = this.editor;
+		const range = change.getRange();
+		//列表
+		if (range.collapsed && list.isFirst(range)) {
+			event.preventDefault();
+			this.execute('in');
+			return false;
+		}
+		// <p><cursor />foo</p>
+		if (!range.collapsed || block.isFirstOffset(range, 'start')) {
+			event.preventDefault();
+			this.execute('in', true);
+			return false;
+		}
+		return;
+	}
+
+	onShiftTab(event: KeyboardEvent) {
+		event.preventDefault();
+		this.execute('out');
+		return false;
 	}
 }

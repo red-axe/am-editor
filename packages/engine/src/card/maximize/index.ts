@@ -1,14 +1,15 @@
 import { NodeInterface } from '../../types/node';
 import { CardInterface, MaximizeInterface } from '../../types/card';
-import { EngineInterface } from '../../types/engine';
-import $ from '../../node';
+import { EditorInterface, isEngine } from '../../types/engine';
 import './index.css';
 
 class Maximize implements MaximizeInterface {
 	protected card: CardInterface;
 	protected node?: NodeInterface;
+	private editor: EditorInterface;
 
-	constructor(card: CardInterface) {
+	constructor(editor: EditorInterface, card: CardInterface) {
+		this.editor = editor;
 		this.card = card;
 	}
 
@@ -18,17 +19,16 @@ class Maximize implements MaximizeInterface {
 			this.node.remove();
 			this.node = undefined;
 		}
-		if (!this.card.readonly) {
+		if (!this.card.readonly && isEngine(this.editor)) {
 			this.card.findByKey('center').removeClass('card-max-edit');
-			(this.card.getEngine() as EngineInterface).event.trigger(
-				'minimizecard',
-			);
-			(this.card.getEngine() as EngineInterface).history.reset();
+			this.editor.event.trigger('minimizecard');
+			this.editor.history.reset();
 		}
 	}
 
 	maximize() {
 		if (this.node) return;
+		const { $ } = this.editor;
 		const language = this.card.getLang();
 		const lang = language.get('maximize', 'back').toString();
 		const node = $(`<div class="card-maximize-header" data-transient="true">
@@ -53,12 +53,10 @@ class Maximize implements MaximizeInterface {
 		const body = this.card.findByKey('body');
 		body.prepend(node);
 
-		if (!this.card.readonly) {
+		if (!this.card.readonly && isEngine(this.editor)) {
 			this.card.findByKey('center').addClass('card-max-edit');
-			(this.card.getEngine() as EngineInterface).event.trigger(
-				'maximizecard',
-			);
-			(this.card.getEngine() as EngineInterface).history.reset();
+			this.editor.event.trigger('maximizecard');
+			this.editor.history.reset();
 		}
 		this.node = node;
 	}
