@@ -1,10 +1,10 @@
 {
   "name": "@aomao/plugin-alignment",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "src/index.ts",
   "author": "me@aomao.com",
   "license": "MIT",
   "dependencies": {
-    "@aomao/engine": "^1.0.0"
+    "@aomao/engine": "^1.1.0"
   }
 }
