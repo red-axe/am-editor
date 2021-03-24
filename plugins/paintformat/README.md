@@ -14,7 +14,7 @@ Add Plugin
 $ import Engine, { EngineInterface } from '@aomao/engine';
 $ import PaintFormat from '@aomao/plugin-paintformat';
 
-$ Engine.plugin.add('paintformat', PaintFormat);
+$ new Engine(...,{ plugins:[PaintFormat] })
 ```
 
 Options

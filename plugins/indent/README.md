@@ -14,7 +14,7 @@ Add Plugin
 $ import Engine, { EngineInterface } from '@aomao/engine';
 $ import Indent from '@aomao/plugin-indent';
 //此插件建议放在第一个增加，以免其它插件拦截了事件，使其无法生效
-$ Engine.plugin.add('indent', Indent);
+$ new Engine(...,{ plugins:[Indent] })
 ```
 
 Options
