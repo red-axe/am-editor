@@ -404,16 +404,31 @@ class Schema implements SchemaInterface {
 	/**
 	 * 查找节点符合规则的最顶层的节点名称
 	 * @param name 节点名称
+	 * @param callback 回调函数，判断是否继续向上查找，返回false继续查找
 	 * @returns 最顶级的block节点名称
 	 */
-	closest(name: string) {
+	closest(
+		name: string,
+		callback?: (current: string, target: string) => boolean,
+	) {
 		let topName = name;
-		this.data.blocks.forEach(block => {
-			const schema = block as SchemaBlock;
-			if (schema.allowIn && schema.allowIn.indexOf(name) > -1) {
-				topName = this.closest(schema.name);
-			}
-		});
+		this.data.blocks
+			.filter(rule => rule.name === name)
+			.forEach(block => {
+				const schema = block as SchemaBlock;
+				if (schema.allowIn) {
+					schema.allowIn.forEach(parentName => {
+						if (this.isAllowIn(parentName, topName)) {
+							topName = parentName;
+						}
+						if (callback && callback(name, parentName)) {
+							topName = parentName;
+						} else {
+							topName = this.closest(parentName);
+						}
+					});
+				}
+			});
 		return topName;
 	}
 	/**
@@ -436,6 +451,28 @@ class Schema implements SchemaInterface {
 			}
 			return;
 		});
+	}
+	/**
+	 * 获取允许有子block节点的标签集合
+	 * @returns
+	 */
+	getAllowInTags() {
+		const tags: Array<string> = [];
+		this.data.blocks.forEach(rule => {
+			const name = this.closest(
+				rule.name,
+				(current: string, target: string) => {
+					if (current !== target && tags.indexOf(target) < 0) {
+						tags.push(target);
+					}
+					return false;
+				},
+			);
+			if (rule.name !== name && tags.indexOf(name) < 0) {
+				tags.push(name);
+			}
+		});
+		return tags;
 	}
 }
 export default Schema;

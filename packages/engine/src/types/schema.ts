@@ -178,9 +178,13 @@ export interface SchemaInterface {
 	/**
 	 * 查找节点符合规则的最顶层的节点名称
 	 * @param name 节点名称
+	 * @param callback 回调函数，判断是否继续向上查找
 	 * @returns 最顶级的block节点名称
 	 */
-	closest(name: string): string;
+	closest(
+		name: string,
+		callback?: (current: string, target: string) => boolean,
+	): string;
 	/**
 	 * 判断子节点名称是否允许放入指定的父节点中
 	 * @param source 父节点名称
@@ -188,6 +192,11 @@ export interface SchemaInterface {
 	 * @returns true | false
 	 */
 	isAllowIn(source: string, target: string): boolean;
+	/**
+	 * 获取允许有子block节点的标签集合
+	 * @returns
+	 */
+	getAllowInTags(): Array<string>;
 }
 
 export const isSchemaRule = (

@@ -414,6 +414,7 @@ class NodeModel implements NodeModelInterface {
 	 * @param node 当前节点
 	 */
 	mergeAdjacent(node: NodeInterface) {
+		const topTags = this.editor.schema.getAllowInTags();
 		//获取第一个子节点
 		let childDom: NodeInterface | null = node.first();
 		//遍历全部子节点
@@ -425,8 +426,9 @@ class NodeModel implements NodeModelInterface {
 				nextNode &&
 				childDom.name === nextNode.name &&
 				//并且上一个节点是 blockquote 或者是 ul、li 并且list列表类型是一致的
-				('blockquote' === childDom.name ||
-					(['ul', 'ol'].includes(childDom.name) &&
+				((topTags.indexOf(childDom.name) > -1 &&
+					!this.editor.node.isList(childDom)) ||
+					(this.editor.node.isList(childDom) &&
 						this.editor.list.isSame(childDom, nextNode)))
 			) {
 				//获取下一个节点的下一个节点
@@ -532,7 +534,7 @@ class NodeModel implements NodeModelInterface {
 	repairBoth(node: NodeInterface | Node) {
 		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
-		if (node.parent() && this.isVoid(node)) {
+		if (node.parent() && !this.isVoid(node)) {
 			const zeroNode = $('\u200b', null);
 			const prev = node.prev();
 			const prevText = prev?.text() || '';

@@ -290,7 +290,11 @@ class Inline implements InlineModelInterface {
 	repairCursor(node: NodeInterface | Node) {
 		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
-		if (!this.editor.node.isInline(node) || this.editor.node.isVoid(node))
+		if (
+			!this.editor.node.isInline(node) ||
+			this.editor.node.isVoid(node) ||
+			node.isCard()
+		)
 			return;
 		this.editor.node.repairBoth(node);
 		const firstChild = node.first();

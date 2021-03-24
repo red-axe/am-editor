@@ -730,10 +730,8 @@ class List implements ListModelInterface {
 		if (Array.isArray(blocks)) {
 			let nodes: Array<NodeInterface> = [];
 			blocks.forEach(block => {
-				if (!this.editor.node.isList(block)) {
-					const node = this.toNormal(block, tagName, start);
-					nodes = nodes.concat(node);
-				}
+				const node = this.toNormal(block, tagName, start);
+				nodes = nodes.concat(node);
 			});
 			return nodes;
 		} else {

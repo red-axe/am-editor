@@ -65,8 +65,7 @@ export default class extends List<Options> {
 		const activeBlocks = block.findBlocks(range);
 		if (activeBlocks) {
 			const selection = range.createSelection();
-			const isList = list.isSpecifiedType(activeBlocks, 'ul', 'checkbox');
-			if (isList) {
+			if (list.isSpecifiedType(activeBlocks, 'ul', 'checkbox')) {
 				list.unwrap(activeBlocks);
 			} else {
 				const listBlocks = list.toCustomize(
@@ -75,7 +74,8 @@ export default class extends List<Options> {
 					value,
 				) as Array<NodeInterface>;
 				listBlocks.forEach(list => {
-					list.addClass('data-list-task');
+					if (this.editor.node.isList(list))
+						list.addClass('data-list-task');
 				});
 			}
 			selection.move();

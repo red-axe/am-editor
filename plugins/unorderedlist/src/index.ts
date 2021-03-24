@@ -55,8 +55,7 @@ export default class extends List<Options> {
 		const activeBlocks = block.findBlocks(range);
 		if (activeBlocks) {
 			const selection = range.createSelection();
-			const isList = list.isSpecifiedType(activeBlocks);
-			if (isList) {
+			if (list.getPluginNameByNodes(activeBlocks) === 'unorderedlist') {
 				list.unwrap(activeBlocks);
 			} else {
 				list.toNormal(activeBlocks, 'ul');

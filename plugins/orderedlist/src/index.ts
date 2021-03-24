@@ -56,8 +56,7 @@ export default class extends List<Options> {
 		if (activeBlocks) {
 			const selection = range.createSelection();
 
-			const isList = list.getPluginNameByNodes(activeBlocks);
-			if (isList) {
+			if (list.getPluginNameByNodes(activeBlocks) === 'orderedlist') {
 				list.unwrap(activeBlocks);
 			} else {
 				list.toNormal(activeBlocks, 'ol', start);

@@ -43,14 +43,6 @@ class Checkbox extends Card {
 		this.setValue({
 			checked: !checked,
 		});
-		this.setListChecked(checked);
-	};
-
-	setListChecked = (checked: boolean) => {
-		const block = this.editor.block.closest(this.root);
-		if (block && block.hasClass('data-list-task')) {
-			block.attributes('data-checked', checked ? 'true' : 'false');
-		}
 	};
 
 	render() {
@@ -68,7 +60,6 @@ class Checkbox extends Card {
 				.find(`.${CHECKBOX_INPUT_CLASS}`)
 				.attributes('checked', 'checked');
 		}
-		this.setListChecked(value);
 		if (this.readonly) {
 			return container;
 		}

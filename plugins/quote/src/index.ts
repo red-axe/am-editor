@@ -9,7 +9,7 @@ export default class extends Block<Options> {
 	tagName: string = 'blockquote';
 
 	static get pluginName() {
-		return 'blockquote';
+		return 'quote';
 	}
 
 	init() {

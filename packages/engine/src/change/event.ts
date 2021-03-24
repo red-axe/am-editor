@@ -64,6 +64,7 @@ class ChangeEvent implements ChangeEventInterface {
 			if (this.engine.readonly) {
 				return;
 			}
+			console.log(this.engine.change.getRange().base);
 			this.isComposing = true;
 		});
 		this.onContainer('compositionend', () => {

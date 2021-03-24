@@ -1,4 +1,10 @@
-import { isEngine, NodeInterface, Plugin, SchemaGlobal } from '@aomao/engine';
+import {
+	isEngine,
+	NodeInterface,
+	Plugin,
+	SchemaBlock,
+	SchemaGlobal,
+} from '@aomao/engine';
 
 export type Options = {
 	hotkey?: {
@@ -56,15 +62,16 @@ export default class extends Plugin<Options> {
 
 	queryState() {
 		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const { change, schema } = this.editor;
 		const blocks = change.blocks;
 
 		if (blocks.length === 0) {
 			return;
 		}
-
+		const temp = schema.closest('li');
 		let fisrtBlock = blocks[0];
-		if (['ul', 'ol', 'blockquote'].includes(fisrtBlock.name)) {
+		const topTags = schema.getAllowInTags();
+		if (topTags.indexOf(fisrtBlock.name) > -1) {
 			fisrtBlock = blocks[1] || fisrtBlock.first() || fisrtBlock;
 		}
 

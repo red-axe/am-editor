@@ -103,7 +103,24 @@ class ChangeModel implements ChangeInterface {
 		const { container, mark, block, inline } = this.engine;
 		const { window } = container;
 		const selection = window?.getSelection();
-		if (selection) {
+		if (range.collapsed) {
+			const { startNode, startOffset } = range;
+			if (
+				startNode.type === Node.ELEMENT_NODE &&
+				1 === startOffset &&
+				1 === startNode.children().length &&
+				'br' === startNode.first()?.name
+			) {
+				range.setStart(startNode, 0);
+				range.collapse(true);
+			}
+		}
+		if (
+			selection &&
+			(range.collapsed ||
+				(selection.rangeCount > 0 &&
+					!range.equal(selection.getRangeAt(0))))
+		) {
 			selection.removeAllRanges();
 			selection.addRange(range.toRange());
 		}
@@ -294,7 +311,12 @@ class ChangeModel implements ChangeInterface {
 		} = range.cloneRange().shrinkToTextNode();
 		const prev = startNode.prev();
 		const next = endNode.next();
-		if (prev && this.engine.node.isInline(prev)) {
+		if (
+			prev &&
+			!prev.isCard() &&
+			!this.engine.node.isVoid(prev) &&
+			this.engine.node.isInline(prev)
+		) {
 			const text = startNode.text();
 			if (!/^\u200B/g.test(text)) {
 				this.engine.node.repairBoth(prev);
@@ -302,7 +324,12 @@ class ChangeModel implements ChangeInterface {
 				range.setStart(endNode, startOffset + 1);
 			}
 		}
-		if (next && this.engine.node.isInline(next)) {
+		if (
+			next &&
+			!next.isCard() &&
+			!this.engine.node.isVoid(next) &&
+			this.engine.node.isInline(next)
+		) {
 			const text = endNode.text();
 			if (!/\u200B$/g.test(text)) {
 				this.engine.node.repairBoth(next);
