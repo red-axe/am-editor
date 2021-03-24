@@ -410,7 +410,7 @@ class NodeModel implements NodeModelInterface {
 	}
 
 	/**
-	 * 合并节点下的子节点，两个相同的相邻节点的子节点，通常是 blockquote、ul、ol 标签
+	 * 合并节点下的子节点，两个相同的相邻节点的子节点
 	 * @param node 当前节点
 	 */
 	mergeAdjacent(node: NodeInterface) {
@@ -425,7 +425,7 @@ class NodeModel implements NodeModelInterface {
 				//如果下一个子节点不为空，并且与上一个子节点名称一样
 				nextNode &&
 				childDom.name === nextNode.name &&
-				//并且上一个节点是 blockquote 或者是 ul、li 并且list列表类型是一致的
+				//并且上一个节点是可拥有block子节点的节点 或者是 ul、li 并且list列表类型是一致的
 				((topTags.indexOf(childDom.name) > -1 &&
 					!this.editor.node.isList(childDom)) ||
 					(this.editor.node.isList(childDom) &&

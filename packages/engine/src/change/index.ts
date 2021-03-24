@@ -103,18 +103,24 @@ class ChangeModel implements ChangeInterface {
 		const { container, mark, block, inline } = this.engine;
 		const { window } = container;
 		const selection = window?.getSelection();
+		//折叠状态
 		if (range.collapsed) {
 			const { startNode, startOffset } = range;
+			//如果节点下只要一个br标签，并且是<p><br /><cursor /></p>,那么选择让光标选择在 <p><cursor /><br /></p>
 			if (
-				startNode.type === Node.ELEMENT_NODE &&
-				1 === startOffset &&
-				1 === startNode.children().length &&
-				'br' === startNode.first()?.name
+				((startNode.isElement() &&
+					1 === startOffset &&
+					1 === startNode.children().length) ||
+					(2 === startOffset &&
+						2 === startNode.children().length &&
+						startNode.first()?.isCard())) &&
+				'br' === startNode.last()?.name
 			) {
-				range.setStart(startNode, 0);
+				range.setStart(startNode, startOffset - 1);
 				range.collapse(true);
 			}
 		}
+		//在非折叠，或者当前range对象和selection中的对象不一致的时候重新设置range
 		if (
 			selection &&
 			(range.collapsed ||
@@ -663,13 +669,15 @@ class ChangeModel implements ChangeInterface {
 		fragment: DocumentFragment,
 		callback: (range: RangeInterface) => void = () => {},
 	) {
-		const { block, list, card, $ } = this.engine;
+		const { block, list, card, $, schema } = this.engine;
 		const range = this.getSafeRange();
 		const firstBlock = block.closest(range.startNode);
 		const lastBlock = block.closest(range.endNode);
 		const onlyOne = lastBlock[0] === firstBlock[0];
 		const isBlockLast = block.isLastOffset(range, 'end');
-		const blockquoteNode = firstBlock.closest('blockquote');
+		const mergeTags = schema.getCanMergeTags();
+		const allowInTags = schema.getAllowInTags();
+		const mergeNode = firstBlock.closest(mergeTags.join(','));
 		const isCollapsed = range.collapsed;
 		const childNodes = fragment.childNodes;
 		const firstNode = $(fragment.firstChild || []);
@@ -690,12 +698,12 @@ class ChangeModel implements ChangeInterface {
 			range.startContainer.childNodes[range.startOffset - 1];
 		const endNode = range.startContainer.childNodes[range.startOffset];
 
-		if (blockquoteNode[0]) {
+		if (mergeNode[0]) {
 			childNodes.forEach(node => {
-				if ('blockquote' !== $(node).name) {
+				if (mergeTags.indexOf($(node).name) < 0) {
 					this.engine.node.wrap(
 						$(node),
-						this.engine.node.clone(blockquoteNode, false),
+						this.engine.node.clone(mergeNode, false),
 					);
 				}
 			});
@@ -727,9 +735,7 @@ class ChangeModel implements ChangeInterface {
 		const getFirstChild = (node: NodeInterface) => {
 			let child = node.first();
 			if (!child || !this.engine.node.isBlock(child)) return node;
-			while (
-				['blockquote', 'ul', 'ol'].includes(child ? child.name : '')
-			) {
+			while (allowInTags.indexOf(child ? child.name : '') > -1) {
 				child = child!.first();
 			}
 			return child;
@@ -738,9 +744,7 @@ class ChangeModel implements ChangeInterface {
 		const getLastChild = (node: NodeInterface) => {
 			let child = node.last();
 			if (!child || !this.engine.node.isBlock(child)) return node;
-			while (
-				['blockquote', 'ul', 'ol'].includes(child ? child.name : '')
-			) {
+			while (allowInTags.indexOf(child ? child.name : '') > -1) {
 				child = child!.last();
 			}
 			return child;

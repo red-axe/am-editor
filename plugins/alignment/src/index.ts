@@ -68,7 +68,7 @@ export default class extends Plugin<Options> {
 		if (blocks.length === 0) {
 			return;
 		}
-		const temp = schema.closest('li');
+
 		let fisrtBlock = blocks[0];
 		const topTags = schema.getAllowInTags();
 		if (topTags.indexOf(fisrtBlock.name) > -1) {

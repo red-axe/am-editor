@@ -11,12 +11,10 @@ import {
 import Range from '../range';
 import {
 	EditorInterface,
-	EngineInterface,
 	isEngine,
 	NodeInterface,
 	RangeInterface,
 	isNode,
-	SchemaBlock,
 } from '../types';
 import {
 	BlockInterface,
@@ -617,22 +615,29 @@ class Block implements BlockModelInterface {
 	 */
 	merge(range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const { change, schema } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const blocks = this.getBlocks(safeRange);
 		if (0 === blocks.length) return;
-		const engine = blocks[0].closest(ROOT_SELECTOR);
-		const blockquote = engine.find('blockquote');
-		if (blockquote.length > 0) {
+		const root = blocks[0].closest(ROOT_SELECTOR);
+		const tags = schema.getCanMergeTags();
+		if (tags.length === 0) return;
+		const block = root.find(tags.join(','));
+		if (block.length > 0) {
 			const selection = safeRange.createSelection();
-			let nextNode = blockquote.next();
+			let nextNode = block.next();
 			while (nextNode) {
 				const prevNode = nextNode.prev();
+				const nextAttributes = nextNode.attributes();
+				const prevAttributes = prevNode?.attributes();
 				if (
-					'blockquote' === nextNode.name &&
 					nextNode.name === prevNode?.name &&
-					nextNode.attributes('class') ===
-						prevNode.attributes('class')
+					nextAttributes['class'] ===
+						(prevAttributes
+							? prevAttributes['class']
+							: undefined) &&
+					Object.keys(nextAttributes).join(',') ===
+						Object.keys(prevAttributes || {}).join(',')
 				) {
 					this.editor.node.merge(prevNode, nextNode);
 				}
@@ -916,23 +921,24 @@ class Block implements BlockModelInterface {
 	 */
 	flatten(domNode: NodeInterface, root: NodeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { $ } = this.editor;
+		const { $, schema } = this.editor;
+		const mergeTags = schema.getCanMergeTags();
 		//获取父级节点
 		let parentNode = domNode[0].parentNode;
 		const rootElement = root.isFragment ? root[0].parentNode : root[0];
 		//在根节点内循环
 		while (parentNode !== rootElement) {
 			const domParentNode = $(parentNode || []);
-			//如果是内容节点，就在父节点前面插入
+			//如果是卡片节点，就在父节点前面插入
 			if (domNode.isCard()) domParentNode.before(domNode);
 			else if (
 				//如果是li标签，并且父级是 ol、ul 列表标签
 				(this.editor.node.isList(domParentNode) &&
 					'li' === domNode.name) ||
-				//如果是父级blockquote标签，并且当前节点是根block节点，并且不是 blockquote
-				('blockquote' === domParentNode.name &&
+				//如果是父级可合并标签，并且当前节点是根block节点，并且不是 父节点一样的block节点
+				(mergeTags.indexOf(domParentNode.name) > -1 &&
 					this.editor.node.isBlock(domNode) &&
-					'blockquote' !== domNode.name)
+					domParentNode.name !== domNode.name)
 			) {
 				//复制节点
 				const cloneNode = this.editor.node.clone(domParentNode, false);

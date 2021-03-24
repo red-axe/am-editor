@@ -407,10 +407,7 @@ class Schema implements SchemaInterface {
 	 * @param callback 回调函数，判断是否继续向上查找，返回false继续查找
 	 * @returns 最顶级的block节点名称
 	 */
-	closest(
-		name: string,
-		callback?: (current: string, target: string) => boolean,
-	) {
+	closest(name: string) {
 		let topName = name;
 		this.data.blocks
 			.filter(rule => rule.name === name)
@@ -421,12 +418,8 @@ class Schema implements SchemaInterface {
 						if (this.isAllowIn(parentName, topName)) {
 							topName = parentName;
 						}
-						if (callback && callback(name, parentName)) {
-							topName = parentName;
-						} else {
-							topName = this.closest(parentName);
-						}
 					});
+					topName = this.closest(topName);
 				}
 			});
 		return topName;
@@ -442,15 +435,15 @@ class Schema implements SchemaInterface {
 		if (source === 'p') return false;
 		//目标节点是p标签
 		if (target === 'p' && source !== 'p') return true;
-		return this.data.blocks.some(block => {
-			const schema = block as SchemaBlock;
-			if (schema.name === source && schema.allowIn) {
-				const isAllowIn = schema.allowIn.indexOf(target) > -1;
-				if (isAllowIn) return true;
-				schema.allowIn.some(name => this.isAllowIn(name, target));
-			}
-			return;
-		});
+		return this.data.blocks
+			.filter(rule => rule.name === target)
+			.some(block => {
+				const schema = block as SchemaBlock;
+				if (schema.allowIn) {
+					if (schema.allowIn.indexOf(source) > -1) return true;
+				}
+				return;
+			});
 	}
 	/**
 	 * 获取允许有子block节点的标签集合
@@ -459,17 +452,25 @@ class Schema implements SchemaInterface {
 	getAllowInTags() {
 		const tags: Array<string> = [];
 		this.data.blocks.forEach(rule => {
-			const name = this.closest(
-				rule.name,
-				(current: string, target: string) => {
-					if (current !== target && tags.indexOf(target) < 0) {
-						tags.push(target);
-					}
-					return false;
-				},
-			);
-			if (rule.name !== name && tags.indexOf(name) < 0) {
-				tags.push(name);
+			const schema = rule as SchemaBlock;
+			if (schema.allowIn) {
+				schema.allowIn.forEach(name => {
+					if (tags.indexOf(name) < 0) tags.push(name);
+				});
+			}
+		});
+		return tags;
+	}
+	/**
+	 * 获取能够合并的block节点的标签集合
+	 * @returns
+	 */
+	getCanMergeTags() {
+		const tags: Array<string> = [];
+		this.data.blocks.forEach(rule => {
+			const schema = rule as SchemaBlock;
+			if (schema.canMerge === true) {
+				if (tags.indexOf(schema.name) < 0) tags.push(schema.name);
 			}
 		});
 		return tags;

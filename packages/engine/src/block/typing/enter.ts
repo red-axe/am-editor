@@ -26,11 +26,12 @@ class Enter {
 				selection.move();
 				block = this.engine.block.closest(range.endNode);
 			}
-
 			if (
 				range.collapsed &&
-				this.engine.block.isLastOffset(range, 'end') &&
-				this.engine.block.isFirstOffset(range, 'end')
+				((range.startContainer.childNodes.length === 1 &&
+					'BR' === range.startContainer.firstChild?.nodeName) ||
+					(this.engine.block.isLastOffset(range, 'end') &&
+						this.engine.block.isFirstOffset(range, 'end')))
 			) {
 				event.preventDefault();
 				if (['li'].indexOf(parent.name) >= 0) {

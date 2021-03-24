@@ -4,3 +4,7 @@
     border-left: 3px solid #eee;
     color: #8C8C8C;
 }
+
+.am-engine blockquote + blockquote, .am-engine-view blockquote + blockquote {
+    margin-top: -5px;
+}
