@@ -111,10 +111,10 @@ class HistoryModel implements HistoryInterface {
 		}
 	}
 
-	hold() {
+	hold(time: number = 10) {
 		this.holded = true;
 		if (this.holdTimer) clearTimeout(this.holdTimer);
-		this.holdTimer = setTimeout(() => this.release, 10);
+		this.holdTimer = setTimeout(() => this.release(), time);
 	}
 
 	release() {

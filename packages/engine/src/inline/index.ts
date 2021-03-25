@@ -170,6 +170,11 @@ class Inline implements InlineModelInterface {
 		}
 		this.editor.inline.repairCursor(inlineClone);
 		selection.move();
+		safeRange.setStart(inlineClone.first()!, 1);
+		safeRange.setEnd(
+			inlineClone.last()!,
+			inlineClone.last()!.text().length - 1,
+		);
 		if (!range) change.apply(safeRange);
 	}
 	/**

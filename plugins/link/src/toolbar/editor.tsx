@@ -52,7 +52,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 					onChange={event => {
 						setLink(event.target.value);
 					}}
-					onPressEnter={() => {
+					onPressEnter={event => {
 						if (link.trim() === '' && text.trim() === '') return;
 						onOk(text, link);
 					}}
