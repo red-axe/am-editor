@@ -1,3 +1,4 @@
+import { CARD_ELEMENT_KEY, CARD_KEY } from '../constants';
 import { EditorInterface, EngineInterface, isEngine } from '../types/engine';
 import { InlineModelInterface, isInlinePlugin } from '../types/inline';
 import { NodeInterface, isNode } from '../types/node';
@@ -84,10 +85,12 @@ class Inline implements InlineModelInterface {
 		if (!node.isInline(inline)) return;
 
 		if (safeRange.collapsed) {
-			if (inline.children().length === 0)
-				inline.append(doc.createTextNode('\u200b'));
 			this.insert(inline, safeRange);
 			this.editor.inline.repairCursor(inline);
+			//让光标选择在两个零宽字符中间
+			const fisrt = inline.first()!;
+			safeRange.setStart(fisrt, 1);
+			safeRange.setEnd(fisrt, 1);
 			if (!range) change.apply(safeRange);
 			return;
 		}
@@ -123,7 +126,6 @@ class Inline implements InlineModelInterface {
 						}
 						if (!inlineClone.parent()) {
 							child.before(inlineClone);
-							this.editor.inline.repairCursor(inlineClone);
 						}
 						inlineClone.append(child);
 						return true;
@@ -142,6 +144,7 @@ class Inline implements InlineModelInterface {
 				return;
 			}
 		});
+
 		const { anchor, focus } = selection;
 		const anchorParent = anchor?.parent();
 
@@ -165,6 +168,7 @@ class Inline implements InlineModelInterface {
 				focus!.before('<br />');
 			}
 		}
+		this.editor.inline.repairCursor(inlineClone);
 		selection.move();
 		if (!range) change.apply(safeRange);
 	}
@@ -180,9 +184,40 @@ class Inline implements InlineModelInterface {
 		const inlineNodes = this.findInlines(safeRange);
 		// 清除 Inline
 		const selection = safeRange.createSelection();
+		const nodes: Array<NodeInterface> = [];
 		inlineNodes.forEach(node => {
+			let prev = node.prev();
+			if (prev && prev.isCursor()) prev = prev.prev();
+			let next = node.next();
+			if (next && next.isCursor()) next = next.prev();
+			let first = node.first();
+			if (first && first.isCursor()) first = first.next();
+			let last = node.last();
+			if (last && last.isCursor()) last = last.prev();
+			const prevText = prev?.text() || '';
+			const nextText = next?.text() || '';
+			const firstText = first?.text() || '';
+			const lastText = last?.text() || '';
+
+			if (prev && prev.isText() && /\u200B$/g.test(prevText)) {
+				if (/^\u200B$/g.test(prevText)) prev.remove();
+				else prev.text(prevText.substr(0, prevText.length - 1));
+			}
+			if (next && next.isText() && /^\u200B/g.test(nextText)) {
+				if (/^\u200B$/g.test(nextText)) next.remove();
+				else next.text(nextText.substr(1));
+			}
+			if (first && first.isText()) {
+				if (/^\u200B$/g.test(firstText)) first.remove();
+				else first.text(firstText.replace(/\u200B/g, ''));
+			}
+			if (last && last.isText()) {
+				if (/^\u200B$/g.test(lastText)) last.remove();
+				else last.text(lastText.replace(/\u200B/g, ''));
+			}
 			this.editor.node.unwrap(node);
 		});
+
 		selection.move();
 		mark.merge(safeRange);
 		if (!range) change.apply(safeRange);
@@ -223,21 +258,109 @@ class Inline implements InlineModelInterface {
 	 * @param range 光标
 	 */
 	findInlines(range: RangeInterface) {
-		const dupRange = range.cloneRange();
-		// 左侧不动，只缩小右侧边界
-		// <anchor /><a>foo</a><focus />bar
-		// 改成s
-		// <anchor /><a>foo<focus /></a>bar
-		if (!range.collapsed) {
-			const rightRange = range.cloneRange();
-			rightRange.shrinkToElementNode();
-			dupRange.setEnd(rightRange.endContainer, rightRange.endOffset);
-		}
+		const cloneRange = range.cloneRange();
 		const { $ } = this.editor;
-		const sc = dupRange.startContainer;
-		const so = dupRange.startOffset;
-		const ec = dupRange.endContainer;
-		const eo = dupRange.endOffset;
+		const handleRange = (
+			allowBlock: boolean,
+			range: RangeInterface,
+			toStart: boolean = false,
+		) => {
+			if (!range.collapsed) return;
+			const { startNode, startOffset } = range;
+			//没有父节点
+			const startParent = startNode.findParent();
+			if (!startParent) return;
+			//选择父节点内容
+			const cloneRange = range.cloneRange();
+			cloneRange.select(startParent, true);
+			//开始位置
+			if (toStart) {
+				cloneRange.setEnd(startNode, startOffset);
+				cloneRange.enlargeFromTextNode();
+				cloneRange.enlargeToElementNode(true);
+				const startChildren = startNode.children();
+				const { endNode, endOffset } = cloneRange;
+				const endChildren = endNode.children();
+				const endOffsetNode = endChildren.eq(endOffset);
+				const startOffsetNode =
+					startChildren.eq(startOffset) ||
+					startChildren.eq(startOffset - 1);
+				if (
+					!allowBlock &&
+					endNode.type === Node.ELEMENT_NODE &&
+					endOffsetNode &&
+					this.editor.node.isBlock(endOffsetNode) &&
+					(startNode.type !== Node.ELEMENT_NODE ||
+						(!!startOffsetNode &&
+							!this.editor.node.isBlock(startOffsetNode)))
+				)
+					return;
+				cloneRange.select(startParent, true);
+				cloneRange.setStart(endNode, endOffset);
+				cloneRange.shrinkToElementNode();
+				cloneRange.shrinkToTextNode();
+				range.setStart(
+					cloneRange.startContainer,
+					cloneRange.startOffset,
+				);
+				range.collapse(true);
+			} else {
+				cloneRange.setStart(startNode, startOffset);
+				cloneRange.enlargeFromTextNode();
+				cloneRange.enlargeToElementNode(true);
+				const startChildren = startNode.children();
+				const startNodeClone = cloneRange.startNode;
+				const startOffsetClone = cloneRange.startOffset;
+				const startNodeCloneChildren = startNodeClone.children();
+				const startOffsetNode = startNodeCloneChildren.eq(
+					startOffsetClone,
+				);
+				const startChildrenOffsetNode =
+					startChildren.eq(startOffset) ||
+					startChildren.eq(startOffset - 1);
+				if (
+					!allowBlock &&
+					startNodeClone.type === Node.ELEMENT_NODE &&
+					startOffsetNode &&
+					this.editor.node.isBlock(startOffsetNode) &&
+					(startNode.type !== Node.ELEMENT_NODE ||
+						(startChildrenOffsetNode &&
+							!this.editor.node.isBlock(startChildrenOffsetNode)))
+				)
+					return;
+				cloneRange.select(startParent, true);
+				cloneRange.setEnd(startNodeClone, startOffsetClone);
+				cloneRange.shrinkToElementNode();
+				cloneRange.shrinkToTextNode();
+				range.setEnd(cloneRange.endContainer, cloneRange.endOffset);
+				range.collapse(false);
+			}
+		};
+		// 左侧不动，只缩小右侧边界
+		// <anchor /><strong>foo</strong><focus />bar
+		// 改成
+		// <anchor /><strong>foo<focus /></strong>bar
+		if (!range.collapsed) {
+			const leftRange = range.cloneRange();
+			const rightRange = range.cloneRange();
+			leftRange.collapse(true);
+			rightRange.collapse(false);
+			handleRange(true, leftRange, true);
+			handleRange(true, rightRange);
+			cloneRange.setStart(
+				leftRange.startContainer,
+				leftRange.startOffset,
+			),
+				cloneRange.setEnd(
+					rightRange.startContainer,
+					rightRange.startOffset,
+				);
+		}
+		handleRange(false, cloneRange);
+		const sc = cloneRange.startContainer;
+		const so = cloneRange.startOffset;
+		const ec = cloneRange.endContainer;
+		const eo = cloneRange.endOffset;
 		let startNode = sc;
 		let endNode = ec;
 
@@ -280,6 +403,34 @@ class Inline implements InlineModelInterface {
 			findNodes($(endNode)).forEach(nodeB => {
 				return addNode(nodes, nodeB);
 			});
+			if (sc !== ec) {
+				let isBegin = false;
+				let isEnd = false;
+				range.commonAncestorNode.traverse(child => {
+					if (isEnd) return false;
+					//节点不是开始节点
+					if (!child.equal(sc)) {
+						if (isBegin) {
+							//节点是结束节点，标记为结束
+							if (child.equal(ec)) {
+								isEnd = true;
+								return false;
+							}
+							if (
+								this.editor.node.isInline(child) &&
+								!child.attributes(CARD_KEY) &&
+								!child.attributes(CARD_ELEMENT_KEY)
+							) {
+								addNode(nodes, child);
+							}
+						}
+					} else {
+						//如果是开始节点，标记为开始
+						isBegin = true;
+					}
+					return;
+				});
+			}
 		}
 		return nodes;
 	}
@@ -297,7 +448,8 @@ class Inline implements InlineModelInterface {
 		)
 			return;
 		this.editor.node.repairBoth(node);
-		const firstChild = node.first();
+		let firstChild = node.first();
+		if (firstChild?.isCursor()) firstChild = firstChild.next();
 		if (
 			!firstChild ||
 			firstChild.type !== Node.TEXT_NODE ||
@@ -305,9 +457,21 @@ class Inline implements InlineModelInterface {
 		) {
 			if (!firstChild) node.append($('\u200b', null));
 			else if (firstChild.isText()) {
-				firstChild.get<Element>()!.textContent =
-					'\u200B' + firstChild.text();
+				firstChild.text('\u200B' + firstChild.text());
 			} else firstChild.before($('\u200b', null));
+		}
+
+		let last = node.last();
+		if (last?.isCursor()) last = last.prev();
+		if (
+			last &&
+			(/^\u200B$/g.test(node.text()) ||
+				last.type !== Node.TEXT_NODE ||
+				!/\u200B$/g.test(last.text()))
+		) {
+			if (last.isText()) {
+				last.text(last.text() + '\u200B');
+			} else last.after($('\u200b', null));
 		}
 	}
 }

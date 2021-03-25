@@ -2,6 +2,7 @@ import isHotkey from 'is-hotkey';
 import {
 	EngineInterface,
 	EventListener,
+	NodeInterface,
 	TypingHandleInterface,
 } from '../../types';
 
@@ -47,9 +48,10 @@ class Left implements TypingHandleInterface {
 			let offset = startOffset - 1;
 			const prevText = prev?.text() || '';
 			const leftText = text.substr(0, startOffset);
+			//<code>&#8203<cursor /></code>
 			if (/\u200B$/g.test(leftText)) {
 				let parent = startNode.parent();
-				if (!prev && parent) {
+				if (!prev && /^\u200B$/g.test(leftText) && parent) {
 					while (
 						!prev &&
 						parent &&
@@ -83,13 +85,31 @@ class Left implements TypingHandleInterface {
 					range.setEnd(node, offset);
 					change.select(range);
 				}
+				if (
+					prev &&
+					/\u200B$/g.test(prevText) &&
+					!/^\u200B$/g.test(prevText)
+				) {
+					while (prev && !prev.isText()) {
+						const last: NodeInterface | null = prev.last();
+						if (last) prev = last;
+					}
+					const length = prev.text().length;
+					range.setStart(prev, length);
+					range.setEnd(prev, length);
+					change.select(range);
+				}
 			} else if (
 				prev &&
-				prev.type === Node.TEXT_NODE &&
 				startOffset === 0 &&
-				/\u200B$/g.test(prevText)
+				/\u200B$/g.test(prevText) &&
+				!/^\u200B$/g.test(prevText)
 			) {
-				let length = prevText.length - 1;
+				while (prev && !prev.isText()) {
+					const last: NodeInterface | null = prev.last();
+					if (last) prev = last;
+				}
+				let length = prev.text().length - 1;
 				if (length < 0) length = 0;
 				range.setStart(prev, length);
 				range.setEnd(prev, length);

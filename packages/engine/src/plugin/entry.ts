@@ -87,7 +87,7 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 					const index = parseInt(regMatch.replace('@var', ''), 10);
 					styleValue = (styleValue as string).replace(
 						new RegExp(regMatch, 'gm'),
-						args[index],
+						args[index] || '',
 					);
 				});
 				(node as NodeInterface).css(styleName, styleValue);
@@ -112,7 +112,7 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 					const index = parseInt(regMatch.replace('@var', ''), 10);
 					attributesValue = (attributesValue as string).replace(
 						new RegExp(regMatch, 'gm'),
-						args[index],
+						args[index] || '',
 					);
 				});
 				(node as NodeInterface).attributes(

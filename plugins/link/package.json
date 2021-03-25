@@ -1,0 +1,27 @@
+{
+  "name": "@aomao/plugin-link",
+  "version": "1.1.0",
+  "description": "> TODO: description",
+  "author": "itellyou <owner@itellyou.com>",
+  "homepage": "https://github.com/itellyou-com/am-editor#readme",
+  "license": "MIT",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itellyou-com/am-editor.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/itellyou-com/am-editor/issues"
+  },
+  "dependencies": {
+    "@aomao/engine": "^1.1.0",
+    "react":"^17.0.1",
+    "antd":"^4.12.3"
+  }
+}

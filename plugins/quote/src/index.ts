@@ -8,6 +8,8 @@ export type Options = {
 export default class extends Block<Options> {
 	tagName: string = 'blockquote';
 
+	canMerge = true;
+
 	static get pluginName() {
 		return 'quote';
 	}

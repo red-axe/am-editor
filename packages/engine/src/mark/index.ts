@@ -830,16 +830,17 @@ class Mark implements MarkModelInterface {
 				const { endNode, endOffset } = cloneRange;
 				const endChildren = endNode.children();
 				const endOffsetNode = endChildren.eq(endOffset);
+				const startOffsetNode =
+					startChildren.eq(startOffset) ||
+					startChildren.eq(startOffset - 1);
 				if (
 					!allowBlock &&
 					endNode.type === Node.ELEMENT_NODE &&
 					endOffsetNode &&
 					this.editor.node.isBlock(endOffsetNode) &&
 					(startNode.type !== Node.ELEMENT_NODE ||
-						!this.editor.node.isBlock(
-							(startChildren.eq(startOffset) ||
-								startChildren.eq(startOffset - 1))!,
-						))
+						(!!startOffsetNode &&
+							!this.editor.node.isBlock(startOffsetNode)))
 				)
 					return;
 				cloneRange.select(startParent, true);
@@ -862,16 +863,17 @@ class Mark implements MarkModelInterface {
 				const startOffsetNode = startNodeCloneChildren.eq(
 					startOffsetClone,
 				);
+				const startChildrenOffsetNode =
+					startChildren.eq(startOffset) ||
+					startChildren.eq(startOffset - 1);
 				if (
 					!allowBlock &&
 					startNodeClone.type === Node.ELEMENT_NODE &&
 					startOffsetNode &&
 					this.editor.node.isBlock(startOffsetNode) &&
 					(startNode.type !== Node.ELEMENT_NODE ||
-						!this.editor.node.isBlock(
-							(startChildren.eq(startOffset) ||
-								startChildren.eq(startOffset - 1))!,
-						))
+						(startChildrenOffsetNode &&
+							!this.editor.node.isBlock(startChildrenOffsetNode)))
 				)
 					return;
 				cloneRange.select(startParent, true);

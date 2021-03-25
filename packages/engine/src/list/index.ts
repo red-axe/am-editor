@@ -703,7 +703,7 @@ class List implements ListModelInterface {
 					blocks = this.editor.node.wrap(blocks, customizeRoot);
 					return blocks;
 				default:
-					if (this.editor.node.isBlock(blocks)) {
+					if (this.editor.node.isRootBlock(blocks)) {
 						blocks = this.editor.node.replace(
 							blocks,
 							customizeItem,
@@ -770,7 +770,7 @@ class List implements ListModelInterface {
 					blocks = this.editor.node.wrap(blocks, targetNode);
 					return blocks;
 				default:
-					if (this.editor.node.isBlock(blocks)) {
+					if (this.editor.node.isRootBlock(blocks)) {
 						blocks = this.editor.node.replace(blocks, itemNode);
 						blocks = this.editor.node.wrap(blocks, targetNode);
 					}

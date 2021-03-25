@@ -145,7 +145,11 @@ export interface NodeInterface {
 	 * 判断当前是否在根节点内
 	 */
 	inEditor(): boolean;
-
+	/**
+	 * 是否是光标标记节点
+	 * @returns
+	 */
+	isCursor(): boolean;
 	/**
 	 * 获取当前Node节点
 	 */
@@ -374,10 +378,11 @@ export interface NodeInterface {
 	html(html?: string): NodeInterface | string;
 
 	/**
-	 * 获取元素节点文本
-	 * @return {String} 文本
+	 * 获取或设置元素节点文本
 	 */
 	text(): string;
+	text(text: string): NodeInterface;
+	text(text?: string): string | NodeInterface;
 
 	/**
 	 * 设置元素节点为显示状态

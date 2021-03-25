@@ -72,6 +72,9 @@ export default {
 			in: '增加缩进',
 			out: '减少缩进',
 		},
+		link: {
+			title: '链接',
+		},
 		quote: {
 			title: '插入引用',
 		},

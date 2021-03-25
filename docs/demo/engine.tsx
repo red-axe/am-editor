@@ -24,6 +24,7 @@ import Quote from '@aomao/plugin-quote';
 import PaintFormat from '@aomao/plugin-paintformat';
 import RemoveFormat from '@aomao/plugin-removeformat';
 import SelectAll from '@aomao/plugin-selectall';
+import Link from '@aomao/plugin-link';
 import Toolbar from '@aomao/toolbar';
 import Content from './content';
 import OTClient from './ot-client';
@@ -53,6 +54,7 @@ const plugins = [
 	PaintFormat,
 	RemoveFormat,
 	SelectAll,
+	Link,
 ];
 const cards = [HrEntry, Checkbox];
 const EngineDemo = () => {
@@ -104,7 +106,7 @@ const EngineDemo = () => {
 						['fontcolor', 'backcolor'],
 						['alignment'],
 						['unorderedlist', 'orderedlist', 'tasklist', 'indent'],
-						['quote', 'hr'],
+						['link', 'quote', 'hr'],
 					]}
 				/>
 			)}

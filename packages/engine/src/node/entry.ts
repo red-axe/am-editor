@@ -22,6 +22,7 @@ import {
 } from '../types/node';
 import { Path } from 'sharedb';
 import { EditorInterface } from '../types';
+import { ANCHOR, CURSOR, FOCUS } from '../constants';
 
 /**
  * 扩展 Node 类
@@ -188,6 +189,14 @@ class NodeEntry implements NodeInterface {
 			return false;
 		}
 		return this.closest(ROOT_SELECTOR).length > 0;
+	}
+
+	/**
+	 * 是否是光标标记节点
+	 * @returns
+	 */
+	isCursor() {
+		return [ANCHOR, FOCUS, CURSOR].indexOf(this.name) > -1;
 	}
 
 	get<E extends Node>(index: number = 0): E | null {
@@ -686,12 +695,19 @@ class NodeEntry implements NodeInterface {
 		return this.length > 0 ? (this[0] as Element).innerHTML : '';
 	}
 	/**
-	 * 获取元素节点文本
-	 * @return {string} 文本
+	 * 获取或设置元素节点文本
 	 */
-	text(): string {
+	text(): string;
+	text(text: string): NodeEntry;
+	text(text?: string): string | NodeEntry {
 		// 返回的数据包含 HTML 特殊字符，innerHTML 之前需要 escape
 		// https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
+		if (text) {
+			this.each(node => {
+				node.textContent = text;
+			});
+			return this;
+		}
 		if (this.length === 0) return '';
 		return this.get()?.textContent || '';
 	}

@@ -212,7 +212,10 @@ export interface BlockInterface extends PluginInterface {
 	 * 禁用的mark插件样式
 	 */
 	readonly disableMark?: Array<string>;
-
+	/**
+	 * 是否能够合并
+	 */
+	readonly canMerge?: boolean;
 	/**
 	 * 获取当前插件定义规则
 	 */

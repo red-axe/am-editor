@@ -341,6 +341,13 @@ export const getToolbarDefaultConfig = (
 		},
 		{
 			type: 'button',
+			name: 'link',
+			icon: 'link',
+			command: { name: 'link', args: ['_blank'] },
+			title: language['link']['title'],
+		},
+		{
+			type: 'button',
 			name: 'quote',
 			icon: 'quote',
 			title: language['quote']['title'],

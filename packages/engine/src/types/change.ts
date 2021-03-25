@@ -60,6 +60,7 @@ export interface ChangeConstructor {
 
 export interface ChangeInterface {
 	rangePathBeforeCommand: Path[] | null;
+	event: ChangeEventInterface;
 	marks: Array<NodeInterface>;
 	blocks: Array<NodeInterface>;
 	inlines: Array<NodeInterface>;

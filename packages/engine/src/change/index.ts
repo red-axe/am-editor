@@ -343,6 +343,17 @@ class ChangeModel implements ChangeInterface {
 				range.setEnd(endNode, endOffset);
 			}
 		}
+
+		const inlineNode = this.engine.mark.closestNotMark(startNode);
+		if (
+			this.engine.node.isInline(inlineNode) &&
+			!this.engine.node.isVoid(inlineNode) &&
+			!/\u200B$/g.test(inlineNode.text())
+		) {
+			this.engine.inline.repairCursor(inlineNode);
+			if (range.collapsed) range.setEnd(startNode, startOffset);
+			range.setStart(endNode, startOffset);
+		}
 	}
 	/**
 	 * 获取安全可控的光标对象

@@ -540,7 +540,7 @@ class NodeModel implements NodeModelInterface {
 			const prevText = prev?.text() || '';
 			if (!prev || !/\u200B$/g.test(prevText)) {
 				if (prev && prev.isText()) {
-					prev.get<Element>()!.textContent = prevText + '\u200b';
+					prev.text(prevText + '\u200b');
 				} else {
 					node.before(this.editor.node.clone(zeroNode, true));
 				}
@@ -549,10 +549,7 @@ class NodeModel implements NodeModelInterface {
 				prev.isText() &&
 				/\u200B\u200B$/g.test(prevText)
 			) {
-				prev.get<Element>()!.textContent = prevText.substr(
-					0,
-					prevText.length - 1,
-				);
+				prev.text(prevText.substr(0, prevText.length - 1));
 			}
 
 			const next = node.next();
@@ -561,7 +558,7 @@ class NodeModel implements NodeModelInterface {
 				(next && next.name !== 'br' && !/^\u200B/g.test(next.text()))
 			) {
 				if (next && next.isText()) {
-					next.get<Element>()!.textContent = '\u200b' + next.text();
+					next.text('\u200b' + next.text());
 				} else {
 					node.after(this.editor.node.clone(zeroNode, true));
 				}

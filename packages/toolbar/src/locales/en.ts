@@ -72,6 +72,9 @@ export default {
 			in: 'Increase indent',
 			out: 'Reduce indent',
 		},
+		link: {
+			title: 'Insert Link',
+		},
 		quote: {
 			title: 'Insert reference',
 		},

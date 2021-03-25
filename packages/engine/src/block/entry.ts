@@ -17,6 +17,10 @@ abstract class BlockEntry<T extends {} = {}> extends PluginEntry<T>
 	 * 禁用的mark插件样式
 	 */
 	readonly disableMark?: Array<string>;
+	/**
+	 * 是否能够合并
+	 */
+	readonly canMerge?: boolean;
 
 	schema(): SchemaBlock | Array<SchemaBlock> {
 		const schema = super.schema();
@@ -33,6 +37,7 @@ abstract class BlockEntry<T extends {} = {}> extends PluginEntry<T>
 			...schema,
 			allowIn: this.allowIn,
 			disableMark: this.disableMark,
+			canMerge: this.canMerge,
 		} as SchemaBlock;
 	}
 	/**
