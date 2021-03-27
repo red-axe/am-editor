@@ -46,6 +46,7 @@ export default class extends Inline<Options> {
 		this.setAttributes(inlineNode, ...arguments);
 		const { inline } = this.editor;
 		if (!this.queryState()) {
+			this.editor.history.startCache();
 			inline.wrap(inlineNode);
 			const { change } = this.editor;
 			if (!change.getRange().collapsed && change.inlines.length > 0) {

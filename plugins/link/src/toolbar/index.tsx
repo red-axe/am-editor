@@ -66,19 +66,24 @@ class Toolbar {
 	}
 
 	private onOk(text: string, link: string) {
-		text = text.trim() === '' ? link : text;
-		if (!this.target || this.target.text() === text) return;
-		this.target.attributes('href', link);
-		this.target.text(text);
-		const { change } = this.engine;
+		if (!this.target) return;
+		const { change, history } = this.engine;
 		const range = change.getRange();
-		this.engine.inline.repairCursor(this.target);
 		range.setStart(this.target.first()!, 1);
 		range.setEnd(
 			this.target.last()!,
 			this.target.last()!.text().length - 1,
 		);
+		change.cacheRangeBeforeCommand();
+		this.target.attributes('href', link);
+		text = text.trim() === '' ? link : text;
+		this.target.text(text);
+
+		this.engine.inline.repairCursor(this.target);
+		range.setStart(this.target.next()!, 1);
+		range.setEnd(this.target.next()!, 1);
 		change.apply(range);
+		history.submitCache();
 		this.mouseInContainer = false;
 		this.hide();
 	}
@@ -109,6 +114,7 @@ class Toolbar {
 					const range = change.getRange();
 					range.select(this.target, true);
 					change.select(range);
+					change.cacheRangeBeforeCommand();
 					inline.unwrap();
 					this.mouseInContainer = false;
 					this.target = undefined;
@@ -151,6 +157,7 @@ class Toolbar {
 				range.select(this.target, true);
 				change.select(range);
 				inline.unwrap();
+				this.engine.history.destroyCache();
 			}
 			if (clearTarget !== false) this.target = undefined;
 		}

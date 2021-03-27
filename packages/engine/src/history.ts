@@ -126,6 +126,24 @@ class HistoryModel implements HistoryInterface {
 			this.reset();
 		}, 10);
 	}
+	/**
+	 * 将后续操作暂时缓存，不会同步到协同服务端，不写入历史记录
+	 */
+	startCache() {
+		this.engine.ot.startMutationCache();
+	}
+	/**
+	 * 将暂时缓存的操作提交，同步到协同服务端，写入历史记录
+	 */
+	submitCache() {
+		this.engine.ot.submitMutationCache();
+	}
+	/**
+	 * 将暂时缓存的操作遗弃
+	 */
+	destroyCache() {
+		this.engine.ot.destroyMutationCache();
+	}
 
 	saveOp() {
 		if (
