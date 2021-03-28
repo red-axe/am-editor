@@ -452,7 +452,10 @@ export default class extends Block<Options> {
 			block.empty();
 			block.append('<br />');
 		}
-		this.execute(type);
+		this.editor.command.execute(
+			(this.constructor as PluginEntry).pluginName,
+			type,
+		);
 		return false;
 	}
 

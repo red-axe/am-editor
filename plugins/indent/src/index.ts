@@ -3,6 +3,7 @@ import {
 	isEngine,
 	NodeInterface,
 	Plugin,
+	PluginEntry,
 	removeUnit,
 	SchemaGlobal,
 } from '@aomao/engine';
@@ -146,7 +147,10 @@ export default class extends Plugin<Options> {
 		}
 		if (this.queryState()) {
 			event.preventDefault();
-			this.execute('out');
+			this.editor.command.execute(
+				(this.constructor as PluginEntry).pluginName,
+				'out',
+			);
 			return false;
 		}
 		return;
@@ -159,21 +163,32 @@ export default class extends Plugin<Options> {
 		//列表
 		if (range.collapsed && list.isFirst(range)) {
 			event.preventDefault();
-			this.execute('in');
+			this.editor.command.execute(
+				(this.constructor as PluginEntry).pluginName,
+				'in',
+			);
 			return false;
 		}
 		// <p><cursor />foo</p>
 		if (!range.collapsed || block.isFirstOffset(range, 'start')) {
 			event.preventDefault();
-			this.execute('in', true);
+			this.editor.command.execute(
+				(this.constructor as PluginEntry).pluginName,
+				'in',
+				true,
+			);
 			return false;
 		}
 		return;
 	}
 
 	onShiftTab(event: KeyboardEvent) {
+		if (!isEngine(this.editor)) return;
 		event.preventDefault();
-		this.execute('out');
+		this.editor.command.execute(
+			(this.constructor as PluginEntry).pluginName,
+			'out',
+		);
 		return false;
 	}
 }

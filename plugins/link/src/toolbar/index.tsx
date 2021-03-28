@@ -67,14 +67,16 @@ class Toolbar {
 
 	private onOk(text: string, link: string) {
 		if (!this.target) return;
-		const { change, history } = this.engine;
+		const { change, history, inline } = this.engine;
 		const range = change.getRange();
-		range.setStart(this.target.first()!, 1);
-		range.setEnd(
-			this.target.last()!,
-			this.target.last()!.text().length - 1,
-		);
-		change.cacheRangeBeforeCommand();
+		if (!change.rangePathBeforeCommand) {
+			if (!range.startNode.inEditor()) {
+				range.select(this.target, true);
+				change.select(range);
+			}
+			change.cacheRangeBeforeCommand();
+		}
+
 		this.target.attributes('href', link);
 		text = text.trim() === '' ? link : text;
 		this.target.text(text);
@@ -113,6 +115,7 @@ class Toolbar {
 					const { change, inline } = this.engine;
 					const range = change.getRange();
 					range.select(this.target, true);
+					inline.repairRange(range);
 					change.select(range);
 					change.cacheRangeBeforeCommand();
 					inline.unwrap();

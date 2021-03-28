@@ -4,6 +4,7 @@ import {
 	CARD_KEY,
 	CARD_VALUE_KEY,
 	isEngine,
+	PluginEntry,
 } from '@aomao/engine';
 import HrEntry from './entry';
 const CARD_NAME = 'hr';
@@ -51,7 +52,9 @@ export default class extends Plugin<Options> {
 		if (match) {
 			event.preventDefault();
 			this.editor.block.removeLeftText(block);
-			this.execute();
+			this.editor.command.execute(
+				(this.constructor as PluginEntry).pluginName,
+			);
 			return false;
 		}
 		return;

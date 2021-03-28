@@ -1,4 +1,4 @@
-import { NodeInterface, Inline, isEngine } from '@aomao/engine';
+import { NodeInterface, Inline, isEngine, PluginEntry } from '@aomao/engine';
 import Toolbar from './toolbar';
 
 import './index.css';
@@ -26,7 +26,8 @@ export default class extends Inline<Options> {
 
 	tagName = 'a';
 
-	//markdown = this.options.markdown !== false ? '`' : '';
+	markdown =
+		this.options.markdown !== false ? '\\[(.+?)\\]\\(([\\S]+?)\\)$' : '';
 
 	init() {
 		super.init();
@@ -41,15 +42,23 @@ export default class extends Inline<Options> {
 
 	execute() {
 		if (!isEngine(this.editor)) return;
-		const inlineNode = this.editor.$(`<${this.tagName} />`);
-		this.setStyle(inlineNode, ...arguments);
-		this.setAttributes(inlineNode, ...arguments);
 		const { inline } = this.editor;
 		if (!this.queryState()) {
-			this.editor.history.startCache();
-			inline.wrap(inlineNode);
+			const inlineNode = this.editor.$(`<${this.tagName} />`);
+			this.setStyle(inlineNode, ...arguments);
+			this.setAttributes(inlineNode, ...arguments);
+			const text = arguments.length > 2 ? arguments[2] : '';
+
+			if (!!text) {
+				inlineNode.text(text);
+				inline.insert(inlineNode);
+			} else {
+				this.editor.history.startCache();
+				inline.wrap(inlineNode);
+			}
 			const { change } = this.editor;
-			if (!change.getRange().collapsed && change.inlines.length > 0) {
+			const range = change.getRange();
+			if (!range.collapsed && change.inlines.length > 0) {
 				this.toolbar?.show(change.inlines[0]);
 			}
 		}
@@ -65,6 +74,32 @@ export default class extends Inline<Options> {
 			return true;
 		}
 		return false;
+	}
+
+	triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface) {
+		if (!isEngine(this.editor) || !this.markdown) return;
+		const match = new RegExp(this.markdown).exec(text);
+		if (match) {
+			const { change, $ } = this.editor;
+			event.preventDefault();
+			const text = match[1];
+			const url = match[2];
+			// 移除 markdown 语法
+			const markdownTextNode = node
+				.get<Text>()!
+				.splitText(node.text().length - match[0].length);
+			markdownTextNode.splitText(match[0].length);
+			$(markdownTextNode).remove();
+			this.editor.command.execute(
+				(this.constructor as PluginEntry).pluginName,
+				'_blank',
+				url,
+				text,
+			);
+			change.insertText('\xA0');
+			return false;
+		}
+		return;
 	}
 
 	parseHtml(root: NodeInterface) {

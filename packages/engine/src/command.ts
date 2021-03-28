@@ -32,7 +32,7 @@ class Command implements CommandInterface {
 				const result = plugin.execute(...args);
 				change.combinTextNode();
 				change.onSelect();
-				event.trigger('beforeCommandExecute', name, ...args);
+				event.trigger('afterCommandExecute', name, ...args);
 				return result;
 			} catch (error) {
 				console.log(error);

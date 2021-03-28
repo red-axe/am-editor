@@ -153,7 +153,10 @@ export default class extends List<Options> {
 			block.empty();
 			block.append('<br />');
 		}
-		this.execute(text === '[x]' ? { checked: true } : undefined);
+		this.editor.command.execute(
+			(this.constructor as PluginEntry).pluginName,
+			text === '[x]' ? { checked: true } : undefined,
+		);
 		return false;
 	}
 }

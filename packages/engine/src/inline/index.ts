@@ -1,4 +1,5 @@
 import { CARD_ELEMENT_KEY, CARD_KEY } from '../constants';
+import { getRangePath } from '../ot/utils';
 import { EditorInterface, EngineInterface, isEngine } from '../types/engine';
 import { InlineModelInterface, isInlinePlugin } from '../types/inline';
 import { NodeInterface, isNode } from '../types/node';
@@ -23,7 +24,43 @@ class Inline implements InlineModelInterface {
 			this.editor.event.on('keydown:space', event =>
 				this.triggerMarkdown(event),
 			);
+			this.editor.on('beforeCommandExecute', () => {
+				if (!isEngine(this.editor)) return;
+				const range = this.repairRange();
+				const { change } = this.editor;
+				change.rangePathBeforeCommand = getRangePath(range);
+			});
 		}
+	}
+
+	/**
+	 * 修复光标选区位置，&#8203;<a>&#8203;<anchor />acde<focus />&#8203;</a>&#8203; -><anchor />&#8203;<a>&#8203;acde&#8203;</a>&#8203;<focus />
+	 * 否则在ot中，可能无法正确的应用inline节点两边&#8203;的更改
+	 */
+	repairRange(range?: RangeInterface) {
+		const { change } = this.editor as EngineInterface;
+		range = range || change.getRange();
+		const { startNode, startOffset, endNode, endOffset, collapsed } = range;
+		if (collapsed) return range;
+		const startInline = this.closest(startNode);
+		//让其选中节点外的 \u200b 零宽字符
+		if (startInline && startOffset <= 1) {
+			const prev = startInline.prev();
+			const text = prev?.text() || '';
+			if (prev && prev.isText() && /\u200B$/g.test(text)) {
+				range.setStart(prev, text.length - 1);
+			}
+		}
+
+		const endInline = this.closest(endNode);
+		if (endInline && endOffset <= endInline.last()!.text().length) {
+			const next = startInline.next();
+			const text = next?.text() || '';
+			if (next && next.isText() && /^\u200B/g.test(text)) {
+				range.setEnd(next, 1);
+			}
+		}
+		return range;
 	}
 
 	/**
@@ -86,11 +123,6 @@ class Inline implements InlineModelInterface {
 
 		if (safeRange.collapsed) {
 			this.insert(inline, safeRange);
-			this.editor.inline.repairCursor(inline);
-			//让光标选择在两个零宽字符中间
-			const fisrt = inline.first()!;
-			safeRange.setStart(fisrt, 1);
-			safeRange.setEnd(fisrt, 1);
 			if (!range) change.apply(safeRange);
 			return;
 		}
@@ -168,7 +200,7 @@ class Inline implements InlineModelInterface {
 				focus!.before('<br />');
 			}
 		}
-		this.editor.inline.repairCursor(inlineClone);
+		this.repairCursor(inlineClone);
 		selection.move();
 		safeRange.setStart(inlineClone.first()!, 1);
 		safeRange.setEnd(
@@ -185,11 +217,11 @@ class Inline implements InlineModelInterface {
 		if (!isEngine(this.editor)) return;
 		const { change, mark } = this.editor;
 		const safeRange = range || change.getSafeRange();
+		this.repairRange(safeRange);
 		mark.split(safeRange);
 		const inlineNodes = this.findInlines(safeRange);
 		// 清除 Inline
 		const selection = safeRange.createSelection();
-		const nodes: Array<NodeInterface> = [];
 		inlineNodes.forEach(node => {
 			let prev = node.prev();
 			if (prev && prev.isCursor()) prev = prev.prev();
@@ -197,12 +229,10 @@ class Inline implements InlineModelInterface {
 			if (next && next.isCursor()) next = next.prev();
 			let first = node.first();
 			if (first && first.isCursor()) first = first.next();
-			let last = node.last();
-			if (last && last.isCursor()) last = last.prev();
+
 			const prevText = prev?.text() || '';
 			const nextText = next?.text() || '';
 			const firstText = first?.text() || '';
-			const lastText = last?.text() || '';
 
 			if (prev && prev.isText() && /\u200B$/g.test(prevText)) {
 				if (/^\u200B$/g.test(prevText)) prev.remove();
@@ -212,13 +242,22 @@ class Inline implements InlineModelInterface {
 				if (/^\u200B$/g.test(nextText)) next.remove();
 				else next.text(nextText.substr(1));
 			}
-			if (first && first.isText()) {
+			if (first && first.isText() && /^\u200B/g.test(firstText)) {
 				if (/^\u200B$/g.test(firstText)) first.remove();
-				else first.text(firstText.replace(/\u200B/g, ''));
+				else {
+					first.get<Text>()!.splitText(1);
+					first.remove();
+				}
 			}
-			if (last && last.isText()) {
+			let last = node.last();
+			if (last && last.isCursor()) last = last.prev();
+			const lastText = last?.text() || '';
+			if (last && last.isText() && /\u200B$/g.test(lastText)) {
 				if (/^\u200B$/g.test(lastText)) last.remove();
-				else last.text(lastText.replace(/\u200B/g, ''));
+				else
+					last.get<Text>()!
+						.splitText(lastText.length - 1)
+						.remove();
 			}
 			this.editor.node.unwrap(node);
 		});
@@ -255,6 +294,21 @@ class Inline implements InlineModelInterface {
 		if (inline.name !== 'br') {
 			safeRange.addOrRemoveBr();
 		}
+		const hasChild = inline.children().length !== 0;
+		this.repairCursor(inline);
+		//如果有内容，就让光标选择在节点外的零宽字符前
+		if (hasChild) {
+			const next = inline.next()!;
+			safeRange.setStart(next, 1);
+			safeRange.setEnd(next, 1);
+		} else {
+			//如果没有子节点，就让光标选择在最后的零宽字符前面
+			const last = inline.last()!;
+			const text = last.text();
+			safeRange.setStart(last, text.length - 1);
+			safeRange.setEnd(last, text.length - 1);
+		}
+
 		if (!range) change.apply(safeRange);
 	}
 

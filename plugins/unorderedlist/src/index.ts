@@ -93,7 +93,9 @@ export default class extends List<Options> {
 			block.empty();
 			block.append('<br />');
 		}
-		this.execute();
+		this.editor.command.execute(
+			(this.constructor as PluginEntry).pluginName,
+		);
 		return false;
 	}
 }

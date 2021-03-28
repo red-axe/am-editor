@@ -52,17 +52,13 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 					onChange={event => {
 						setLink(event.target.value);
 					}}
-					onPressEnter={event => {
-						if (link.trim() === '' && text.trim() === '') return;
-						onOk(text, link);
-					}}
 				/>
 			</p>
 			<p>
 				<Button
 					className="data-link-button"
 					onClick={() => onOk(text, link)}
-					disabled={link.trim() === '' && text.trim() === ''}
+					disabled={link.trim() === ''}
 				>
 					确定
 				</Button>

@@ -38,6 +38,11 @@ export interface InlineModelInterface {
 	 * @param node inlne 节点
 	 */
 	repairCursor(node: NodeInterface | Node): void;
+	/**
+	 * 修复光标选区位置，&#8203;<a>&#8203;<anchor />acde<focus />&#8203;</a>&#8203; -><anchor />&#8203;<a>&#8203;acde&#8203;</a>&#8203;<focus />
+	 * 否则在ot中，可能无法正确的应用inline节点两边&#8203;的更改
+	 */
+	repairRange(range?: RangeInterface): RangeInterface;
 }
 
 export interface InlineInterface extends PluginInterface {

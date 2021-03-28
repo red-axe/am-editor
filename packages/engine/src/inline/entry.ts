@@ -1,5 +1,10 @@
 import PluginEntry from '../plugin/entry';
-import { isEngine, InlineInterface, NodeInterface } from '../types';
+import {
+	isEngine,
+	InlineInterface,
+	NodeInterface,
+	PluginEntry as PluginEntryType,
+} from '../types';
 
 abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 	implements InlineInterface {
@@ -79,7 +84,9 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 			range.setStart(node[0], leftText.length);
 			range.setEnd(node[0], (leftText + codeChar).length);
 			change.select(range);
-			this.execute();
+			this.editor.command.execute(
+				(this.constructor as PluginEntryType).pluginName,
+			);
 			range = change.getRange();
 			range.collapse(false);
 			change.select(range);

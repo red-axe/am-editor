@@ -1,5 +1,11 @@
 import PluginEntry from '../plugin/entry';
-import { isEngine, MarkInterface, NodeInterface, SchemaMark } from '../types';
+import {
+	isEngine,
+	MarkInterface,
+	NodeInterface,
+	SchemaMark,
+	PluginEntry as PluginEntryType,
+} from '../types';
 
 abstract class MarkEntry<T extends {} = {}> extends PluginEntry<T>
 	implements MarkInterface {
@@ -89,7 +95,9 @@ abstract class MarkEntry<T extends {} = {}> extends PluginEntry<T>
 			range.setStart(node[0], leftText.length);
 			range.setEnd(node[0], (leftText + codeChar).length);
 			change.select(range);
-			this.execute();
+			this.editor.command.execute(
+				(this.constructor as PluginEntryType).pluginName,
+			);
 			range = change.getRange();
 			range.collapse(false);
 			change.select(range);

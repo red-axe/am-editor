@@ -196,7 +196,9 @@ class NodeEntry implements NodeInterface {
 	 * @returns
 	 */
 	isCursor() {
-		return [ANCHOR, FOCUS, CURSOR].indexOf(this.name) > -1;
+		return (
+			[ANCHOR, FOCUS, CURSOR].indexOf(this.attributes(DATA_ELEMENT)) > -1
+		);
 	}
 
 	get<E extends Node>(index: number = 0): E | null {

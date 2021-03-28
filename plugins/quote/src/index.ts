@@ -53,7 +53,7 @@ export default class extends Block<Options> {
 
 	//设置markdown
 	markdown(event: KeyboardEvent, text: string, block: NodeInterface) {
-		if (this.options.markdown === false) return;
+		if (this.options.markdown === false || !isEngine(this.editor)) return;
 		const plugins = this.editor.block.findPlugin(block);
 		// fix: 列表、引用等 markdown 快捷方式不应该在标题内生效
 		if (
@@ -73,7 +73,9 @@ export default class extends Block<Options> {
 			block.empty();
 			block.append('<br />');
 		}
-		this.execute();
+		this.editor.command.execute(
+			(this.constructor as PluginEntry).pluginName,
+		);
 		return false;
 	}
 

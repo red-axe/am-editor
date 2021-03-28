@@ -1,10 +1,4 @@
-import {
-	isEngine,
-	NodeInterface,
-	Plugin,
-	SchemaBlock,
-	SchemaGlobal,
-} from '@aomao/engine';
+import { isEngine, NodeInterface, Plugin, PluginEntry } from '@aomao/engine';
 
 export type Options = {
 	hotkey?: {
@@ -109,13 +103,19 @@ export default class extends Plugin<Options> {
 		const align = this.queryState();
 		if (align === 'center') {
 			event.preventDefault();
-			this.execute('left');
+			this.editor.command.execute(
+				(this.constructor as PluginEntry).pluginName,
+				'left',
+			);
 			return false;
 		}
 
 		if (align === 'right') {
 			event.preventDefault();
-			this.execute('center');
+			this.editor.command.execute(
+				(this.constructor as PluginEntry).pluginName,
+				'center',
+			);
 			return false;
 		}
 		return;

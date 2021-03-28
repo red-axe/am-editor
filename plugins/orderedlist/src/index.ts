@@ -4,6 +4,7 @@ import {
 	SchemaRule,
 	isEngine,
 	SchemaBlock,
+	PluginEntry,
 } from '@aomao/engine';
 
 export type Options = {
@@ -85,7 +86,10 @@ export default class extends List<Options> {
 			block.empty();
 			block.append('<br />');
 		}
-		this.execute(parseInt(text.replace(/\./, ''), 10));
+		this.editor.command.execute(
+			(this.constructor as PluginEntry).pluginName,
+			parseInt(text.replace(/\./, ''), 10),
+		);
 		return false;
 	}
 }
