@@ -1,10 +1,10 @@
 {
   "name": "@aomao/plugin-orderedlist",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "src/index.ts",
   "author": "me@aomao.com",
   "license": "MIT",
   "dependencies": {
-    "@aomao/engine": "^1.1.1"
+    "@aomao/engine": "^1.1.2"
   }
 }
