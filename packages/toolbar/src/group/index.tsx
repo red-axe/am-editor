@@ -3,6 +3,7 @@ import { EngineInterface } from '@aomao/engine';
 import Button, { ButtonProps } from '../button';
 import Dropdown, { DropdownProps } from '../dropdown';
 import ColorButton, { ColorButtonProps } from '../color';
+import Collapse, { CollapseProps as CollapseButtonProps } from '../collapse';
 import './index.css';
 
 export type GroupButtonProps = {
@@ -17,15 +18,21 @@ export type GroupColorProps = {
 	type: 'color';
 } & Omit<ColorButtonProps, 'engine'>;
 
+export type CollapseProps = {
+	type: 'collapse';
+} & Omit<CollapseButtonProps, 'engine'>;
+
 export type GroupProps = {
 	engine: EngineInterface;
-	items: Array<GroupButtonProps | GroupDropdownProps | GroupColorProps>;
+	items: Array<
+		GroupButtonProps | GroupDropdownProps | GroupColorProps | CollapseProps
+	>;
 };
 
 const ToolbarGroup: React.FC<GroupProps> = ({ engine, items }) => {
 	return (
 		<div className="editor-toolbar-group">
-			{items.map(item => {
+			{items.map((item, index) => {
 				switch (item.type) {
 					case 'button':
 						return (
@@ -46,6 +53,10 @@ const ToolbarGroup: React.FC<GroupProps> = ({ engine, items }) => {
 								key={item.name}
 								{...item}
 							/>
+						);
+					case 'collapse':
+						return (
+							<Collapse engine={engine} key={index} {...item} />
 						);
 				}
 			})}

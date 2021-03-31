@@ -389,7 +389,7 @@ export interface NodeInterface {
 	 * @param {String} display display值
 	 * @return {NodeInterface} 当前实例
 	 */
-	show(display: string): NodeInterface;
+	show(display?: string): NodeInterface;
 
 	/**
 	 * 设置元素节点为隐藏状态

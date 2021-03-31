@@ -7,27 +7,29 @@ import {
 	CARD_VALUE_KEY,
 } from '../constants/card';
 import {
-	CardToolbarInterface,
 	CardType,
 	CardOptions,
 	CardInterface,
 	MaximizeInterface,
 	CardToolbarItemOptions,
 	CardEntry as CardEntryType,
+	CardToolbarInterface,
+	ResizeInterface,
 } from '../types/card';
 import { EditorInterface, isEngine } from '../types/engine';
-import { LanguageInterface } from '../types/language';
 import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { ToolbarItemOptions } from '../types/toolbar';
 import { decodeCardValue, encodeCardValue, random } from '../utils';
 import Maximize from './maximize';
+import Resize from './resize';
 import Toolbar from './toolbar';
 
 abstract class CardEntry implements CardInterface {
 	protected readonly editor: EditorInterface;
 	readonly root: NodeInterface;
-	readonly toolbar: CardToolbarInterface;
+	toolbarModel?: CardToolbarInterface;
+	resizeModel?: ResizeInterface;
 	activatedByOther: string | false = false;
 	selectedByOther: string | false = false;
 	static readonly cardName: string;
@@ -49,7 +51,6 @@ abstract class CardEntry implements CardInterface {
 	}
 
 	private setActivated(activated: boolean) {
-		if (!this.onActivate) return;
 		activated
 			? this.root.addClass('card-activated')
 			: this.root.removeClass('card-activated');
@@ -60,7 +61,6 @@ abstract class CardEntry implements CardInterface {
 	}
 
 	private setSelected(selected: boolean) {
-		if (!this.onSelect) return;
 		selected
 			? this.root.addClass('card-selected')
 			: this.root.removeClass('card-selected');
@@ -88,10 +88,10 @@ abstract class CardEntry implements CardInterface {
 			value.id = this.getId(value.id);
 		}
 		this.setValue(value);
-
-		this.toolbar = new Toolbar(this.editor, this);
 		this.defaultMaximize = new Maximize(this.editor, this);
 	}
+
+	init?(): void;
 
 	private getId(curId?: string) {
 		const idCache: Array<string> = [];
@@ -102,10 +102,6 @@ abstract class CardEntry implements CardInterface {
 		let id = random();
 		while (idCache.indexOf(id) >= 0) id = random();
 		return id;
-	}
-
-	getLang(): LanguageInterface {
-		return this.editor.language;
 	}
 
 	// 设置 DOM 属性里的数据
@@ -151,11 +147,11 @@ abstract class CardEntry implements CardInterface {
 		if (activated) {
 			if (!this.activated) {
 				this.setActivated(activated);
-				if (this.onActivate) this.onActivate(activated);
+				this.onActivate(activated);
 			}
 		} else if (this.activated) {
 			this.setActivated(activated);
-			if (this.onActivate) this.onActivate(false);
+			this.onActivate(false);
 		}
 	}
 
@@ -211,6 +207,7 @@ abstract class CardEntry implements CardInterface {
 
 		range.select(toStart ? cardLeft : cardRight, true);
 		range.collapse(false);
+		if (this.onFocus) this.onFocus();
 	}
 
 	// 焦点移动到上一个 Block
@@ -293,6 +290,11 @@ abstract class CardEntry implements CardInterface {
 			.collapse(true);
 	}
 
+	/**
+	 * 当卡片聚焦时触发
+	 */
+	onFocus?(): void;
+
 	maximize() {
 		this.isMaximize = true;
 		this.defaultMaximize.maximize();
@@ -303,6 +305,15 @@ abstract class CardEntry implements CardInterface {
 		this.defaultMaximize.restore();
 	}
 
+	/**
+	 * 工具栏配置项
+	 */
+	toolbar?(): Array<CardToolbarItemOptions | ToolbarItemOptions>;
+	/**
+	 * 是否可改变卡片大小，或者传入渲染节点
+	 */
+	resize?: boolean | (() => NodeInterface);
+
 	onSelect?(selected: boolean): void;
 	onSelectByOther?(
 		selected: boolean,
@@ -311,7 +322,11 @@ abstract class CardEntry implements CardInterface {
 			rgb: string;
 		},
 	): NodeInterface | void;
-	onActivate?(activated: boolean): void;
+	onActivate(activated: boolean) {
+		if (!this.resize) return;
+		if (activated) this.resizeModel?.show();
+		else this.resizeModel?.hide();
+	}
 	onActivateByOther?(
 		activated: boolean,
 		value?: {
@@ -319,10 +334,23 @@ abstract class CardEntry implements CardInterface {
 			rgb: string;
 		},
 	): NodeInterface | void;
-	toolbarConfig?(): Array<CardToolbarItemOptions | ToolbarItemOptions>;
 	destroy?(): void;
 	didInsert?(): void;
 	didUpdate?(): void;
+	didRender() {
+		if (this.toolbar) {
+			this.toolbarModel = new Toolbar(this.editor, this);
+			this.toolbarModel.create();
+		}
+		if (this.resize) {
+			const container =
+				typeof this.resize === 'function'
+					? this.resize()
+					: this.findByKey('body');
+			this.resizeModel = new Resize(this.editor, this);
+			this.resizeModel.render(container);
+		}
+	}
 	abstract render(): NodeInterface | string | void;
 }
 

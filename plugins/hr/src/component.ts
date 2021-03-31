@@ -18,16 +18,13 @@ class Hr extends Card {
 		return false;
 	}
 
-	toolbarConfig(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
 		return [
 			{
 				type: 'dnd',
 			},
 			{
 				type: 'copy',
-			},
-			{
-				type: 'separator',
 			},
 			{
 				type: 'delete',

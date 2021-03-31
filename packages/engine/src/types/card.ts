@@ -103,6 +103,10 @@ export interface CardEntry {
 
 export interface CardInterface {
 	/**
+	 * 初始化调用
+	 */
+	init?(): void;
+	/**
 	 * 卡片ID
 	 */
 	readonly id: string;
@@ -114,10 +118,6 @@ export interface CardInterface {
 	 * 卡片根节点
 	 */
 	readonly root: NodeInterface;
-	/**
-	 * 卡片工具栏
-	 */
-	readonly toolbar: CardToolbarInterface;
 	/**
 	 * 是否激活
 	 */
@@ -139,9 +139,13 @@ export interface CardInterface {
 	 */
 	selectedByOther: string | false;
 	/**
-	 * 获取语言
+	 * 工具栏
 	 */
-	getLang(): LanguageInterface;
+	toolbarModel?: CardToolbarInterface;
+	/**
+	 * 大小调整
+	 */
+	resizeModel?: ResizeInterface;
 	/**
 	 * 获取Card内的 DOM 节点
 	 * @param selector
@@ -195,6 +199,10 @@ export interface CardInterface {
 	 */
 	focusNextBlock(range: RangeInterface, hasModify: boolean): void;
 	/**
+	 * 当卡片聚焦时触发
+	 */
+	onFocus?(): void;
+	/**
 	 * 激活Card
 	 * @param activated 是否激活
 	 */
@@ -225,7 +233,7 @@ export interface CardInterface {
 	 * 激活状态变化时触发
 	 * @param activated 是否激活
 	 */
-	onActivate?(activated: boolean): void;
+	onActivate(activated: boolean): void;
 	/**
 	 * 协同状态下，激活状态变化时触发
 	 * @param activated 是否激活
@@ -250,7 +258,11 @@ export interface CardInterface {
 	/**
 	 * 工具栏配置项
 	 */
-	toolbarConfig?(): Array<CardToolbarItemOptions | ToolbarItemOptions>;
+	toolbar?(): Array<CardToolbarItemOptions | ToolbarItemOptions>;
+	/**
+	 * 是否可改变卡片大小，或者传入渲染节点
+	 */
+	resize?: boolean | (() => NodeInterface);
 	/**
 	 * 最大化
 	 */
@@ -275,6 +287,10 @@ export interface CardInterface {
 	 * 更新后触发
 	 */
 	didUpdate?(): void;
+	/**
+	 * 渲染后触发
+	 */
+	didRender(): void;
 }
 
 export interface CardModel {
@@ -437,4 +453,50 @@ export interface MaximizeInterface {
 	 * 最大化
 	 */
 	maximize(): void;
+}
+
+export type ResizeCreateOptions = {
+	dragStart?: (point: { x: number; y: number }) => void;
+	dragMove?: (height: number) => void;
+	dragEnd?: () => void;
+};
+
+export interface ResizeInterface {
+	/**
+	 * 创建并绑定事件
+	 * @param options 可选项
+	 */
+	create(options: ResizeCreateOptions): void;
+	/**
+	 * 渲染
+	 * @param container 渲染到的目标节点，默认为当前卡片根节点
+	 * @param minHeight 最小高度，默认80px
+	 */
+	render(container?: NodeInterface, minHeight?: number): void;
+	/**
+	 * 拉动开始
+	 * @param event 事件
+	 */
+	dragStart(event: MouseEvent): void;
+	/**
+	 * 拉动移动中
+	 * @param event 事件
+	 */
+	dragMove(event: MouseEvent): void;
+	/**
+	 * 拉动结束
+	 */
+	dragEnd(event: MouseEvent): void;
+	/**
+	 * 展示
+	 */
+	show(): void;
+	/**
+	 * 隐藏
+	 */
+	hide(): void;
+	/**
+	 * 注销
+	 */
+	destroy(): void;
 }

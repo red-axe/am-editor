@@ -1,9 +1,10 @@
 import { getWindow } from './node';
 
 const userAgent = (typeof navigator !== 'undefined'
-  ? navigator
-  : getWindow().navigator
+	? navigator
+	: getWindow().navigator
 ).userAgent.toLowerCase();
+export const isServer = typeof navigator === 'undefined';
 /**
  * 是否是 Edge 浏览器
  * Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134

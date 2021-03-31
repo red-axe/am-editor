@@ -2,8 +2,10 @@ import React from 'react';
 import classnames from 'classnames';
 import { Tooltip } from 'antd';
 import 'antd/lib/tooltip/style';
+import { LanguageInterface } from '@aomao/engine';
 
 export type LinkPreviewProps = {
+	language: LanguageInterface;
 	href?: string;
 	className?: string;
 	onEdit: (event: React.MouseEvent) => void;
@@ -11,13 +13,14 @@ export type LinkPreviewProps = {
 };
 
 const LinkPreview: React.FC<LinkPreviewProps> = ({
+	language,
 	href,
 	onEdit,
 	onRemove,
 }) => {
 	return (
 		<div className={classnames('data-link-preview')}>
-			<Tooltip title="打开链接">
+			<Tooltip title={language.get('link', 'link_open')}>
 				<a
 					className="data-icon data-icon-link data-link-preview-open"
 					href={href}
@@ -26,10 +29,10 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({
 					{href}
 				</a>
 			</Tooltip>
-			<Tooltip title="编辑链接">
+			<Tooltip title={language.get('link', 'link_edit')}>
 				<a className="data-icon data-icon-edit" onClick={onEdit} />
 			</Tooltip>
-			<Tooltip title="取消链接">
+			<Tooltip title={language.get('link', 'link_remove')}>
 				<a className="data-icon data-icon-unlink" onClick={onRemove} />
 			</Tooltip>
 		</div>

@@ -1,4 +1,9 @@
-import { GroupButtonProps, GroupDropdownProps, GroupColorProps } from './group';
+import {
+	GroupButtonProps,
+	GroupDropdownProps,
+	GroupColorProps,
+	CollapseProps,
+} from './group';
 
 export type ButtonProps = {
 	onActive?: () => boolean;
@@ -14,3 +19,5 @@ export type ColorProps = {
 	onActive?: () => string | Array<string>;
 	onDisabled?: () => boolean;
 } & GroupColorProps;
+
+export { CollapseProps };

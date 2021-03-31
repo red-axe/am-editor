@@ -174,6 +174,8 @@ class CardModel implements CardModelInterface {
 				typeof result === 'string' ? $(result) : result,
 			);
 		}
+		//创建工具栏
+		card.didRender();
 		if (card.didInsert) {
 			card.didInsert();
 		}
@@ -249,7 +251,7 @@ class CardModel implements CardModelInterface {
 				isCurrentActiveCard = false;
 			}
 			if (this.active && !isCurrentActiveCard) {
-				this.active.toolbar?.hide();
+				this.active.toolbarModel?.hide();
 				const type = (this.active.constructor as CardEntry).cardType;
 				this.active.activate(false);
 				if (type === CardType.BLOCK) {
@@ -259,7 +261,7 @@ class CardModel implements CardModelInterface {
 			if (card) {
 				if (card.activatedByOther) return;
 				if (!isCurrentActiveCard) {
-					card.toolbar?.show(event);
+					card.toolbarModel?.show(event);
 					if (
 						(card.constructor as CardEntry).cardType ===
 							CardType.INLINE &&
@@ -448,7 +450,7 @@ class CardModel implements CardModelInterface {
 		}
 
 		component.root.append(body);
-		component.toolbar.create();
+		if (component.init) component.init();
 		return component;
 	}
 
@@ -493,6 +495,8 @@ class CardModel implements CardModelInterface {
 						typeof result === 'string' ? $(result) : result,
 					);
 				}
+				//创建工具栏
+				card.didRender();
 			}
 		});
 	}

@@ -93,6 +93,7 @@ class Toolbar {
 	editor(text: string, href: string) {
 		return (
 			<Editor
+				language={this.engine.language}
 				defaultText={text}
 				defaultLink={href}
 				onLoad={() => (this.mouseInContainer = true)}
@@ -104,6 +105,7 @@ class Toolbar {
 	preview(href: string) {
 		return (
 			<Preview
+				language={this.engine.language}
 				onEdit={() => {
 					if (!this.target) return;
 					this.mouseInContainer = false;

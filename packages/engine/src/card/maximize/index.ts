@@ -28,8 +28,7 @@ class Maximize implements MaximizeInterface {
 
 	maximize() {
 		if (this.node) return;
-		const { $ } = this.editor;
-		const language = this.card.getLang();
+		const { $, language } = this.editor;
 		const lang = language.get('maximize', 'back').toString();
 		const node = $(`<div class="card-maximize-header" data-transient="true">
             <div class="header-crumb">

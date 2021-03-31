@@ -3,8 +3,10 @@ import { Input, Button } from 'antd';
 import classnames from 'classnames';
 import 'antd/lib/input/style';
 import 'antd/lib/button/style';
+import { LanguageInterface } from '@aomao/engine';
 
 export type LinkEditorProps = {
+	language: LanguageInterface;
 	defaultText?: string;
 	defaultLink?: string;
 	className?: string;
@@ -13,6 +15,7 @@ export type LinkEditorProps = {
 };
 
 const LinkEditor: React.FC<LinkEditorProps> = ({
+	language,
 	defaultLink,
 	defaultText,
 	className,
@@ -31,24 +34,28 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 
 	return (
 		<div className={classnames('data-link-editor', className)}>
-			<p>文本</p>
+			<p>{language.get('link', 'text')}</p>
 			<p>
 				<Input
 					className="data-link-input"
 					value={text}
-					placeholder="添加描述"
+					placeholder={language
+						.get('link', 'text_placeholder')
+						.toString()}
 					onChange={event => {
 						setText(event.target.value);
 					}}
 				/>
 			</p>
-			<p>链接</p>
+			<p>{language.get('link', 'link')}</p>
 			<p>
 				<Input
 					ref={linkRef}
 					className="data-link-input"
 					value={link}
-					placeholder="链接地址"
+					placeholder={language
+						.get('link', 'link_placeholder')
+						.toString()}
 					onChange={event => {
 						setLink(event.target.value);
 					}}
@@ -60,7 +67,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 					onClick={() => onOk(text, link)}
 					disabled={link.trim() === ''}
 				>
-					确定
+					{language.get('link', 'ok_button')}
 				</Button>
 			</p>
 		</div>

@@ -44,7 +44,7 @@ export default class extends Block<Options> {
 
 	init() {
 		super.init();
-		const { $ } = this.editor;
+		const { $, language } = this.editor;
 		//阅读模式处理
 		if (!isEngine(this.editor) && this.options.showAnchor !== false) {
 			this.editor.on('render', (root: Node) => {
@@ -62,12 +62,11 @@ export default class extends Block<Options> {
 								top: (node.height() - 24) / 2 + 'px',
 							});
 						}
-						const lang = this.getLang();
 						const tooltip = new Tooltip(this.editor);
 						button.on('mouseenter', () => {
 							tooltip.show(
 								button,
-								lang.get('copyAnchor', 'title').toString(),
+								language.get('copyAnchor', 'title').toString(),
 							);
 						});
 						button.on('mouseleave', () => {
@@ -83,11 +82,11 @@ export default class extends Block<Options> {
 
 							if (this.editor.clipboard.copy(url)) {
 								this.editor.messageSuccess(
-									lang.get('copy', 'success').toString(),
+									language.get('copy', 'success').toString(),
 								);
 							} else {
 								this.editor.messageError(
-									lang.get('copy', 'error').toString(),
+									language.get('copy', 'error').toString(),
 								);
 							}
 						});
@@ -185,7 +184,7 @@ export default class extends Block<Options> {
 
 	showAnchor() {
 		if (!isEngine(this.editor)) return;
-		const { change, root, clipboard, $ } = this.editor;
+		const { change, root, clipboard, $, language } = this.editor;
 		const range = change.getRange();
 		let button = root.find('.data-anchor-button');
 		const block = range.startNode.closest(this.tagName.join(','));
@@ -236,11 +235,13 @@ export default class extends Block<Options> {
 			top: `${top}px`,
 			left: `${left}px`,
 		});
-		const lang = this.getLang();
 		button.addClass('data-anchor-button-active');
 		const tooltip = new Tooltip(this.editor);
 		button.on('mouseenter', () => {
-			tooltip.show(button, lang.get('copyAnchor', 'title').toString());
+			tooltip.show(
+				button,
+				language.get('copyAnchor', 'title').toString(),
+			);
 		});
 		button.on('mouseleave', () => {
 			tooltip.hide();
@@ -256,10 +257,12 @@ export default class extends Block<Options> {
 
 			if (clipboard.copy(url)) {
 				this.editor!.messageSuccess(
-					lang.get('copy', 'success').toString(),
+					language.get('copy', 'success').toString(),
 				);
 			} else {
-				this.editor!.messageError(lang.get('copy', 'error').toString());
+				this.editor!.messageError(
+					language.get('copy', 'error').toString(),
+				);
 			}
 		});
 	}

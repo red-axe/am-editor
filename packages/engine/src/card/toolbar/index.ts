@@ -8,7 +8,6 @@ import {
 	ToolbarItemOptions,
 	ToolbarInterface as ToolbarBaseInterface,
 } from '../../types/toolbar';
-import { LanguageInterface } from '../../types/language';
 import { EditorInterface } from '../../types/engine';
 import './index.css';
 
@@ -21,19 +20,17 @@ export const isCardToolbarItemOptions = (
 class CardToolbar implements CardToolbarInterface {
 	private card: CardInterface;
 	private toolbar?: ToolbarBaseInterface;
-	private language: LanguageInterface;
 	private editor: EditorInterface;
 
 	constructor(editor: EditorInterface, card: CardInterface) {
 		this.editor = editor;
 		this.card = card;
-		this.language = card.getLang();
 	}
 
 	getDefaultItem(
 		item: CardToolbarItemOptions,
 	): ToolbarItemOptions | undefined {
-		const { $ } = this.editor;
+		const { $, language } = this.editor;
 		switch (item.type) {
 			case 'separator':
 				return {
@@ -49,8 +46,7 @@ class CardToolbar implements CardToolbarInterface {
 						item.content ||
 						`<span class="data-icon data-icon-copy"></span>`,
 					title:
-						item.title ||
-						this.language.get('copy', 'title').toString(),
+						item.title || language.get('copy', 'title').toString(),
 					onClick: () => {
 						const result = this.editor.clipboard.copy(
 							this.card.root[0],
@@ -58,11 +54,11 @@ class CardToolbar implements CardToolbarInterface {
 						);
 						if (result)
 							this.editor.messageSuccess(
-								this.language.get('copy', 'success').toString(),
+								language.get('copy', 'success').toString(),
 							);
 						else
 							this.editor.messageError(
-								this.language.get('copy', 'error').toString(),
+								language.get('copy', 'error').toString(),
 							);
 					},
 				};
@@ -74,7 +70,7 @@ class CardToolbar implements CardToolbarInterface {
 						`<span class="data-icon data-icon-delete"></span>`,
 					title:
 						item.title ||
-						this.language.get('delete', 'title').toString(),
+						language.get('delete', 'title').toString(),
 					onClick: () => {
 						const { card } = this.editor;
 						card.remove(this.card.root);
@@ -88,7 +84,7 @@ class CardToolbar implements CardToolbarInterface {
 						`<span class="data-icon data-icon-maximize"></span>`,
 					title:
 						item.title ||
-						this.language.get('maximize', 'title').toString(),
+						language.get('maximize', 'title').toString(),
 					onClick: () => {
 						this.card.maximize();
 					},
@@ -100,8 +96,7 @@ class CardToolbar implements CardToolbarInterface {
 						item.content ||
 						`<span class="data-icon data-icon-more"></span>`,
 					title:
-						item.title ||
-						this.language.get('more', 'title').toString(),
+						item.title || language.get('more', 'title').toString(),
 					items: item.items,
 				};
 		}
@@ -109,9 +104,9 @@ class CardToolbar implements CardToolbarInterface {
 	}
 
 	create() {
-		if (this.card.toolbarConfig) {
+		if (this.card.toolbar) {
 			//获取客户端配置
-			const config = this.card.toolbarConfig();
+			const config = this.card.toolbar();
 			//获取渲染节点
 			const body = this.card.root.first();
 			if (!body) return;
@@ -126,7 +121,7 @@ class CardToolbar implements CardToolbarInterface {
 								item.content ||
 									'<span class="data-icon data-icon-drag"></span>',
 								item.title ||
-									this.language
+									this.editor.language
 										.get('dnd', 'title')
 										.toString(),
 							);

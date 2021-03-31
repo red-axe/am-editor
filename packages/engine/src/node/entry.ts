@@ -719,7 +719,7 @@ class NodeEntry implements NodeInterface {
 	 * @param {string} display display值
 	 * @return 当前实例
 	 */
-	show(display: string): NodeInterface {
+	show(display?: string): NodeInterface {
 		if (display === undefined) {
 			display = this.display || '';
 		}

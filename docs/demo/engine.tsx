@@ -9,8 +9,8 @@ import Fontcolor from '@aomao/plugin-fontcolor';
 import Fontsize from '@aomao/plugin-fontsize';
 import Italic from '@aomao/plugin-italic';
 import Underline from '@aomao/plugin-underline';
-import Hr, { HrEntry } from '@aomao/plugin-hr';
-import Tasklist, { Checkbox } from '@aomao/plugin-tasklist';
+import Hr, { HrComponent } from '@aomao/plugin-hr';
+import Tasklist, { CheckboxComponent } from '@aomao/plugin-tasklist';
 import Orderedlist from '@aomao/plugin-orderedlist';
 import Unorderedlist from '@aomao/plugin-unorderedlist';
 import Indent from '@aomao/plugin-indent';
@@ -25,9 +25,11 @@ import PaintFormat from '@aomao/plugin-paintformat';
 import RemoveFormat from '@aomao/plugin-removeformat';
 import SelectAll from '@aomao/plugin-selectall';
 import Link from '@aomao/plugin-link';
+import Codeblock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
 import Toolbar from '@aomao/toolbar';
 import Content from './content';
 import OTClient from './ot-client';
+import './engine.less';
 
 const plugins = [
 	Redo,
@@ -55,8 +57,9 @@ const plugins = [
 	RemoveFormat,
 	SelectAll,
 	Link,
+	Codeblock,
 ];
-const cards = [HrEntry, Checkbox];
+const cards = [HrComponent, CheckboxComponent, CodeBlockComponent];
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const [engine, setEngine] = useState<EngineInterface>();
@@ -94,6 +97,7 @@ const EngineDemo = () => {
 				<Toolbar
 					engine={engine}
 					items={[
+						['collapse'],
 						['undo', 'redo', 'paintformat', 'removeformat'],
 						['heading', 'fontsize'],
 						[
@@ -110,7 +114,7 @@ const EngineDemo = () => {
 					]}
 				/>
 			)}
-			<div style={{ position: 'relative' }}>
+			<div className="editor-container">
 				<div ref={ref} />
 			</div>
 			<h4>View:</h4>

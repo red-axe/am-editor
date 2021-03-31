@@ -3,7 +3,7 @@
 	opacity: 0;
 	visibility: hidden;
 	width: auto;
-	line-height: 28px;
+	line-height: 26px;
 	display: flex;
 	flex-direction: row;
 	font-size: 14px;
@@ -36,19 +36,13 @@
 }
 
 .data-toolbar-btn {
-	line-height: 28px;
-	padding: 0 3px;
+	line-height: 26px;
 	min-width: 28px;
 	display: inline-block;
 	text-align: center;
 	color: #595959;
-	border-radius: 2px 2px;
 	transition: background-color 0.3s ease-in-out;
 	cursor: pointer;
-}
-
-.data-toolbar-btn:hover {
-	background-color: #f4f4f4;
 }
 
 .data-toolbar-btn-disabled,.data-toolbar-btn-disabled:hover {
@@ -59,22 +53,33 @@
 
 .data-toolbar-group {
 	border: 1px solid rgba(226, 226, 226, 0.84);
-    border-radius: 2px;
+    border-radius: 4px;
     box-shadow: 0px 2px 4px 0px rgb(225 225 225 / 50%);
     background: #fff;
     position: relative;
     display: inline-flex;
-    padding: 5px 3px;
+    padding: 5px;
+    align-items: center;
 }
 
 .data-toolbar-item {
 	position: relative;
 	display: inline-block;
-	line-height: 28px;
-	margin: 0 3px;
+	line-height: 26px;
 	text-align: left;
 	color: #595959;
 	flex: 0 0 auto;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.data-toolbar-item:hover{
+    background-color: #f4f4f4;
+    border-radius: 2px;
+}
+
+.data-toolbar-item > * {
+    font-size: 12px !important;
 }
 
 .data-toolbar-item[disabled] {

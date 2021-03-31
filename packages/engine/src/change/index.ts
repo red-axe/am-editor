@@ -497,6 +497,9 @@ class ChangeModel implements ChangeInterface {
 						e,
 					);
 				}
+				if (card.onFocus) {
+					card.onFocus();
+				}
 			}
 		});
 
@@ -622,10 +625,10 @@ class ChangeModel implements ChangeInterface {
 				event.preventDefault();
 				if (insertCardAble(range)) return;
 				const cardEntry = card.constructor as CardEntry;
-				const cardName = cardEntry.name;
+				const cardName = cardEntry.cardName;
 				this.engine.card.remove(card.root);
 				this.select(range!);
-				this.engine.card.insert(cardName, cardEntry.cardType);
+				this.engine.card.insert(cardName, card.getValue());
 			}
 			if (files.length > 0) {
 				event.preventDefault();

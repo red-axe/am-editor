@@ -1,0 +1,28 @@
+.data-card-resize {
+    position: absolute;
+    bottom: -3px;
+    right: 0px;
+    left: 0px;
+    margin: 0 auto;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.data-card-resize-btn{
+    background: #d9dbdd;
+    border-radius: 3px;
+    height: 6px;
+    padding: 0 50px;
+    display: block;
+}
+
+.data-card-resize-btn svg {
+    display: block;
+    color: #999;
+}
+
+.data-card-resize-btn:hover {
+    cursor: row-resize;
+}

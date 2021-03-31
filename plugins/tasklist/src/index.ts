@@ -6,7 +6,7 @@ import {
 	isEngine,
 	PluginEntry,
 } from '@aomao/engine';
-import Checkbox from './checkbox';
+import CheckboxComponent from './checkbox';
 import './index.css';
 
 export type Options = {
@@ -160,4 +160,4 @@ export default class extends List<Options> {
 		return false;
 	}
 }
-export { Checkbox };
+export { CheckboxComponent };

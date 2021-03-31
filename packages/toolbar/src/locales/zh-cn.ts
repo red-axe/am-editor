@@ -1,5 +1,12 @@
+import { isMacos } from '@aomao/engine';
+
 export default {
 	toolbar: {
+		collapse: {
+			title: `输入  <code>${
+				isMacos ? '⌘' : 'Ctrl'
+			}</code> + <code>/</code>  快速插入卡片`,
+		},
 		undo: {
 			title: '撤销',
 		},

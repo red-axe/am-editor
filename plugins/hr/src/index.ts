@@ -6,8 +6,7 @@ import {
 	isEngine,
 	PluginEntry,
 } from '@aomao/engine';
-import HrEntry from './entry';
-const CARD_NAME = 'hr';
+import HrComponent from './component';
 
 export type Options = {
 	hotkey?: string | Array<string>;
@@ -26,7 +25,7 @@ export default class extends Plugin<Options> {
 	execute() {
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
-		card.insert(CARD_NAME);
+		card.insert(HrComponent.cardName);
 	}
 
 	hotkey() {
@@ -62,7 +61,7 @@ export default class extends Plugin<Options> {
 
 	parseHtml(root: NodeInterface) {
 		const { $ } = this.editor;
-		root.find(`[${CARD_KEY}=${CARD_NAME}`).each(hrNode => {
+		root.find(`[${CARD_KEY}=${HrComponent.cardName}`).each(hrNode => {
 			const node = $(hrNode);
 			const hr = node.find('hr');
 			hr.css({
@@ -76,4 +75,4 @@ export default class extends Plugin<Options> {
 		});
 	}
 }
-export { HrEntry };
+export { HrComponent };

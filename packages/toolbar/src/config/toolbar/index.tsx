@@ -1,13 +1,72 @@
 import React from 'react';
 import { EngineInterface } from '@aomao/engine';
-import { ButtonProps, DropdownProps, ColorProps } from '../../types';
+import {
+	ButtonProps,
+	DropdownProps,
+	ColorProps,
+	CollapseProps,
+} from '../../types';
 import './index.css';
 
 export const getToolbarDefaultConfig = (
 	engine: EngineInterface,
-): Array<ButtonProps | DropdownProps | ColorProps> => {
+): Array<ButtonProps | DropdownProps | ColorProps | CollapseProps> => {
 	const language = engine.language.get('toolbar');
 	return [
+		{
+			type: 'collapse',
+			header: language['collapse']['title'],
+			icon: 'collapse',
+			groups: [
+				{
+					items: [
+						{
+							name: 'codeblock',
+							icon: (
+								<span>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+									>
+										<g fill="none" fill-rule="evenodd">
+											<rect
+												stroke="#E8E8E8"
+												fill="#FFF"
+												x=".5"
+												y=".5"
+												width="23"
+												height="23"
+												rx="2"
+											/>
+											<path
+												d="M19.331 11.815c-.407-.22-.665-.678-.665-1.181V8.062c0-.202-.148-.367-.33-.367h-.933a.153.153 0 01-.153-.153v-.64c0-.084.068-.152.153-.152h.933c.651 0 1.18.588 1.18 1.312v2.572c0 .14.072.269.186.33l.843.455c.05.026.08.078.08.134v.894c0 .056-.03.108-.08.134l-.843.455a.373.373 0 00-.186.33v2.572c0 .724-.529 1.312-1.18 1.312h-.933a.153.153 0 01-.153-.153v-.64c0-.084.068-.152.153-.152h.933c.182 0 .33-.165.33-.367v-2.572c0-.503.258-.961.665-1.18l.344-.186-.344-.185zM5.044 11.815c.407-.22.665-.678.665-1.181V8.062c0-.202.148-.367.33-.367h.933a.153.153 0 00.153-.153v-.64a.153.153 0 00-.153-.152H6.04c-.651 0-1.18.588-1.18 1.312v2.572c0 .14-.072.269-.186.33l-.843.455a.153.153 0 00-.08.134v.894c0 .056.03.108.08.134l.843.455c.114.061.186.19.186.33v2.572c0 .724.529 1.312 1.18 1.312h.933a.153.153 0 00.153-.153v-.64a.153.153 0 00-.153-.152H6.04c-.182 0-.33-.165-.33-.367v-2.572c0-.503-.258-.961-.665-1.18L4.7 12l.344-.185z"
+												fill="#595959"
+												fill-rule="nonzero"
+											/>
+											<path
+												fill="#1890FF"
+												opacity=".25"
+												d="M8.25 8.25h7.5v1.125h-7.5z"
+											/>
+											<path
+												fill="#D2E8DB"
+												d="M8.25 10.5h4.5v1.125h-4.5z"
+											/>
+											<path
+												fill="#E0E0E0"
+												d="M8.25 12.75h4.5v1.125h-4.5zM8.25 15h6v1.125h-6z"
+											/>
+										</g>
+									</svg>
+								</span>
+							),
+							title: '代码块',
+						},
+					],
+				},
+			],
+		},
 		{
 			type: 'button',
 			name: 'undo',

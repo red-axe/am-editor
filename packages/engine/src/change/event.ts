@@ -45,7 +45,7 @@ class ChangeEvent implements ChangeEventInterface {
 			if (node.attributes(CARD_ELEMENT_KEY) === 'center') {
 				return true;
 			}
-			if (node.hasClass('card-toolbar')) {
+			if (node.hasClass('data-toolbar')) {
 				return true;
 			}
 			const parent = node.parent();
@@ -222,7 +222,7 @@ class ChangeEvent implements ChangeEventInterface {
 			cardComponet = this.engine.card.find($(e.target || []));
 
 			if (cardComponet) {
-				cardComponet.toolbar?.hideCardToolbar();
+				cardComponet.toolbarModel?.hideCardToolbar();
 				// https://kryogenix.org/code/browser/custom-drag-image.html
 				dragImage = cardComponet.find('img.data-drag-image');
 
@@ -277,7 +277,7 @@ class ChangeEvent implements ChangeEventInterface {
 			e.preventDefault();
 
 			if (cardComponet) {
-				cardComponet.toolbar?.showCardToolbar();
+				cardComponet.toolbarModel?.showCardToolbar();
 			}
 
 			this.dragoverHelper.removeCursor();

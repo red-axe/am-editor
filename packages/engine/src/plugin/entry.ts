@@ -64,12 +64,6 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 		this.editor.schema.add(this.schema());
 	}
 	/**
-	 * 获取插件本地化语言
-	 */
-	getLang(): LanguageInterface {
-		return this.editor.language;
-	}
-	/**
 	 * 将当前插件style属性应用到节点
 	 * @param node 节点
 	 * @param args style 对应 variable 中的变量参数
@@ -203,10 +197,6 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 	 * @param args 插件需要的参数
 	 */
 	abstract execute(...args: any): void;
-	/**
-	 * 插件本地化语言
-	 */
-	locales?(): {};
 	/**
 	 * 插件热键绑定，返回需要匹配的组合键字符，如 mod+b，匹配成功即执行插件，还可以带上插件执行所需要的参数，多个参数以数组形式返回{key:"mod+b",args:[]}
 	 * @param event 键盘事件

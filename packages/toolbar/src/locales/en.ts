@@ -1,5 +1,12 @@
+import { isMacos } from '@aomao/engine';
+
 export default {
 	toolbar: {
+		collapse: {
+			title: `Type <code>${
+				isMacos ? '⌘' : 'Ctrl'
+			}</code> + <code>/</code> to quickly insert a card`,
+		},
 		undo: {
 			title: 'Undo',
 		},

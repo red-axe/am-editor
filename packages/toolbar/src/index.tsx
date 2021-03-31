@@ -4,11 +4,15 @@ import classnames from 'classnames';
 import { EngineInterface } from '@aomao/engine';
 import ToolbarGroup from './group';
 import { getToolbarDefaultConfig } from './config/toolbar';
-import { ButtonProps, DropdownProps, ColorProps } from './types';
+import { ButtonProps, DropdownProps, ColorProps, CollapseProps } from './types';
 import locales from './locales';
 import './index.css';
 
-type ToolbarItemProps = ButtonProps | DropdownProps | ColorProps;
+type ToolbarItemProps =
+	| ButtonProps
+	| DropdownProps
+	| ColorProps
+	| CollapseProps;
 
 export type ToolbarProps = {
 	engine: EngineInterface;
@@ -30,13 +34,19 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 			group.forEach(item => {
 				let customItem = undefined;
 				if (typeof item === 'string') {
-					const defaultItem = defaultConfig.find(
-						config => config.name === item,
+					const defaultItem = defaultConfig.find(config =>
+						item === 'collapse'
+							? config.type === item
+							: config.type !== 'collapse' &&
+							  config.name === item,
 					);
 					if (defaultItem) customItem = defaultItem;
 				} else {
-					const defaultItem = defaultConfig.find(
-						config => config.name === item.name,
+					const defaultItem = defaultConfig.find(config =>
+						item.type === 'collapse'
+							? config.type === item.type
+							: config.type !== 'collapse' &&
+							  config.name === item.name,
 					);
 					customItem = merge(omit(item, 'type'), defaultItem);
 				}
@@ -56,7 +66,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 								customItem.name,
 							);
 					}
-					if (customItem.onDisabled)
+					if (customItem.type !== 'collapse' && customItem.onDisabled)
 						customItem.disabled = customItem.onDisabled();
 					dataGroup.push(customItem);
 				}

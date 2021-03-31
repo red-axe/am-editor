@@ -1,8 +1,12 @@
 {
-  "name": "@aomao/plugin-link",
-  "version": "1.1.1",
-  "description": "> TODO: description",
-  "author": "itellyou <owner@itellyou.com>",
+  "name": "@aomao/plugin-codeblock",
+  "version": "1.0.0",
+  "description": "代码块",
+  "keywords": [
+    "codeblock",
+    "editor"
+  ],
+  "author": "AoMao <me@aomao.com>",
   "homepage": "https://github.com/itellyou-com/am-editor#readme",
   "license": "MIT",
   "main": "src/index.ts",
@@ -21,8 +25,12 @@
   },
   "dependencies": {
     "@aomao/engine": "^1.1.1",
-    "antd": "^4.12.3",
-    "react": "^17.0.1",
+    "antd": "^4.14.1",
+    "codemirror": "^5.60.0",
+    "react": "^17.0.2",
     "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@types/codemirror": "^0.0.108"
   }
 }

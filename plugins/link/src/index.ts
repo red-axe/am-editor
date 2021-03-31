@@ -1,5 +1,6 @@
 import { NodeInterface, Inline, isEngine, PluginEntry } from '@aomao/engine';
 import Toolbar from './toolbar';
+import locales from './locales';
 
 import './index.css';
 
@@ -34,6 +35,7 @@ export default class extends Inline<Options> {
 		if (isEngine(this.editor)) {
 			this.toolbar = new Toolbar(this.editor);
 		}
+		this.editor.language.add(locales);
 	}
 
 	hotkey() {

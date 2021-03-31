@@ -54,10 +54,6 @@ export interface PluginInterface {
 	 */
 	init(): void;
 	/**
-	 * 获取插件本地化语言
-	 */
-	getLang(): LanguageInterface;
-	/**
 	 * 查询插件状态
 	 * @param args 插件需要的参数
 	 */
