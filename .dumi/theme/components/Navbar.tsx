@@ -7,12 +7,16 @@ import './Navbar.less';
 interface INavbarProps {
 	location: any;
 	navPrefix?: React.ReactNode;
+	navSuffix?: React.ReactNode;
+	navLast?: React.ReactNode;
 	onMobileMenuClick: (ev: MouseEvent<HTMLButtonElement>) => void;
 }
 
 const Navbar: FC<INavbarProps> = ({
 	onMobileMenuClick,
 	navPrefix,
+	navSuffix,
+	navLast,
 	location,
 }) => {
 	const {
@@ -68,8 +72,10 @@ const Navbar: FC<INavbarProps> = ({
 						</span>
 					);
 				})}
+				{navSuffix}
 				<LocaleSelect location={location} />
 			</nav>
+			{navLast}
 		</div>
 	);
 };

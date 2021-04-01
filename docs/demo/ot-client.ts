@@ -175,7 +175,7 @@ class OTClient extends EventEmitter {
 	initOt(doc: Doc) {
 		this.engine.ot.init(doc);
 		this.engine.focus();
-		this.emit('ready');
+		this.emit('ready', this.engine.ot.getCurrentMember());
 	}
 
 	reset() {
@@ -186,7 +186,10 @@ class OTClient extends EventEmitter {
 	}
 
 	addMembers(member: Array<Member>) {
-		this.members.concat(member);
+		member.forEach(member => {
+			if (!this.members.find(m => member.id === m.id))
+				this.members.push(member);
+		});
 		setTimeout(() => {
 			this.emit(EVENT.membersChange, this.normalizeMembers());
 		}, 1000);
@@ -213,9 +216,7 @@ class OTClient extends EventEmitter {
 				const cloneMember = { ...member };
 				cloneMember.color = colorMap[member.uuid];
 				memberMap[member.id] = member;
-				if (member.id !== this.current?.id) {
-					members.push(cloneMember);
-				}
+				members.push(cloneMember);
 			}
 		}
 		return members;

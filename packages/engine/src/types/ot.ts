@@ -230,6 +230,7 @@ export interface OTInterface extends EventEmitter2 {
 	addMember(member: Member): void;
 	removeMember(member: Member): void;
 	setCurrentMember(member: Member): void;
+	getCurrentMember(): Member | undefined;
 	doRangeColoring(attrs: Array<Attribute>, isDraw?: boolean): void;
 	updateSelectionData(): void;
 	initSelection(): void;

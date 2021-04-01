@@ -251,6 +251,12 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.currentMember = findMember;
 	}
 
+	getCurrentMember() {
+		return this.currentMember && !!this.currentMember.id
+			? this.currentMember
+			: undefined;
+	}
+
 	doRangeColoring(attrs: Array<Attribute>, isDraw: boolean = false) {
 		const { members, currentMember } = this;
 		attrs = attrs.filter(item => item.uuid !== currentMember?.uuid);

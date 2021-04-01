@@ -1,5 +1,5 @@
 ---
-title: 标题内容
+title: AoMao Collaborative Editor
 sidemenu: false
 ---
 

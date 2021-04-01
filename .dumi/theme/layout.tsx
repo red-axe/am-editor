@@ -4,7 +4,7 @@ import { context, Link } from 'dumi/theme';
 import Navbar from './components/Navbar';
 import SideMenu from './components/SideMenu';
 import SlugList from './components/SlugList';
-import SearchBar from './components/SearchBar';
+import NavRight from './components/NavRight';
 import './style/layout.less';
 
 const Hero = hero => (
@@ -91,7 +91,7 @@ const Layout: React.FC<IRouteComponentProps> = ({ children, location }) => {
 		>
 			<Navbar
 				location={location}
-				navPrefix={<SearchBar />}
+				navLast={<NavRight />}
 				onMobileMenuClick={ev => {
 					setMenuCollapsed(val => !val);
 					ev.stopPropagation();
