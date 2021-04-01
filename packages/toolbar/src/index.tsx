@@ -5,6 +5,7 @@ import { EngineInterface } from '@aomao/engine';
 import ToolbarGroup from './group';
 import { getToolbarDefaultConfig } from './config/toolbar';
 import { ButtonProps, DropdownProps, ColorProps, CollapseProps } from './types';
+import ToolbarPlugin, { ToolbarComponent } from './plugin';
 import locales from './locales';
 import './index.css';
 
@@ -102,7 +103,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 	return (
 		<div
 			className={classnames('editor-toolbar', className)}
-			data-element="toolbar"
+			data-element="ui"
 			onMouseDown={onMouseDown}
 			onMouseOver={event => event.preventDefault()}
 			onMouseMove={event => event.preventDefault()}
@@ -118,3 +119,4 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 };
 
 export default Toolbar;
+export { ToolbarPlugin, ToolbarComponent };

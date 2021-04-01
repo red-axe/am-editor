@@ -162,5 +162,8 @@ export default {
 			'#22075E': '紫色 5',
 			'#780650': '玫红 5',
 		},
+		component: {
+			placeholder: '卡片名称',
+		},
 	},
 };

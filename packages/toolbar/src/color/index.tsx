@@ -65,10 +65,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 	};
 
 	const hideDropdown = (event?: MouseEvent) => {
-		if (
-			event &&
-			(event.target as Element).closest('[data-element-ui="colorpicker"]')
-		)
+		if (event && (event.target as Element).closest('[data-element="ui"]'))
 			return;
 		document.removeEventListener('click', hideDropdown);
 		setPickerVisible(false);
@@ -130,10 +127,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 				/>
 			</div>
 			{pickerVisible && (
-				<div
-					className="toolbar-dropdown-list"
-					data-element-ui="colorpicker"
-				>
+				<div className="toolbar-dropdown-list" data-element="ui">
 					<ColorPicker
 						engine={engine}
 						colors={colors}

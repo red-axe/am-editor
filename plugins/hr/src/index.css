@@ -17,10 +17,6 @@
     border: 1px solid transparent;
 }
 
-.am-engine .card-hr.hr-selected {
-    background-color: rgba(27, 162, 227, 0.2);
-}
-
 .am-engine .card-hr:hover , .am-engine .card-hr.hr-activated {
     background-color: #f4f4f4;
 }

@@ -1,23 +1,23 @@
-.editor-toolbar .toolbar-dropdown {
+.toolbar-dropdown {
     position: relative;
     display: inline-block;
     z-index: 10;
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-trigger {
+.toolbar-dropdown .toolbar-dropdown-trigger {
     display: inline-block;
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-trigger .toolbar-dropdown-button-text {
+.toolbar-dropdown .toolbar-dropdown-trigger .toolbar-dropdown-button-text {
     font-size: 12px;
     vertical-align: top;
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-trigger-arrow .toolbar-button{
+.toolbar-dropdown .toolbar-dropdown-trigger-arrow .toolbar-button{
     padding-right: 20px;
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-trigger-arrow .data-icon-arrow {
+.toolbar-dropdown .toolbar-dropdown-trigger-arrow .data-icon-arrow {
     position: absolute;
     right: 6px;
     top: 14px;
@@ -28,7 +28,7 @@
     transition: all 0.25s cubic-bezier(0.3, 1.2, 0.2, 1);
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-list {
+.toolbar-dropdown .toolbar-dropdown-list {
     position: absolute;
     top: 32px;
     left: 0px;
@@ -43,7 +43,7 @@
     z-index: 999;
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item {
+.toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item {
     padding: 2px 10px 2px 16px;
     line-height: 30px;
     color: #595959;
@@ -53,26 +53,26 @@
     white-space: nowrap;
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item:hover {
+.toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item:hover {
     color: #262626;
     background-color: #f5f5f5;
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item .data-icon {
+.toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item .data-icon {
     margin-right: 8px;
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-list.toolbar-dropdown-horizontal .toolbar-dropdown-list-item {
+.toolbar-dropdown .toolbar-dropdown-list.toolbar-dropdown-horizontal .toolbar-dropdown-list-item {
     display: inline-block;
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-list.toolbar-dropdown-dot .toolbar-dropdown-list-item {
+.toolbar-dropdown .toolbar-dropdown-list.toolbar-dropdown-dot .toolbar-dropdown-list-item {
     padding-left: 30px;
     padding-right: 16px;
     white-space: nowrap;
 }
 
-.editor-toolbar .toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item .data-icon-dot
+.toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item .data-icon-dot
 {
     position: absolute;
     top: 50%;

@@ -37,7 +37,7 @@ export type DropdownListProps = {
 	items: Array<DropdownListItem>;
 	values: string | Array<string>;
 	className?: string;
-	onSelect?: (event: React.MouseEvent, key: string) => void;
+	onSelect?: (event: React.MouseEvent, key: string) => void | boolean;
 	hasDot?: boolean;
 };
 
@@ -59,7 +59,7 @@ const DropdownList: React.FC<DropdownListProps> = ({
 		const item = items.find(item => item.key === key);
 		if (!item) return;
 		const { autoExecute, command } = item;
-
+		if (onSelect && onSelect(event, key) === false) return;
 		if (autoExecute !== false) {
 			let commandName = name;
 			let commandArgs = [key];
@@ -73,7 +73,6 @@ const DropdownList: React.FC<DropdownListProps> = ({
 			}
 			engine?.command.execute(commandName, ...commandArgs);
 		}
-		if (onSelect) onSelect(event, key);
 	};
 
 	const renderItem = ({

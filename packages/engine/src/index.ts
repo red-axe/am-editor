@@ -1,3 +1,4 @@
+import isHotkey from 'is-hotkey';
 import Engine from './engine';
 import Plugin from './plugin/entry';
 import Card from './card/entry';
@@ -9,6 +10,7 @@ import View from './view';
 import Toolbar, { Tooltip } from './toolbar';
 import Range from './range';
 import Parser from './parser';
+
 export * from './types';
 export * from './utils';
 export * from './constants';
@@ -27,4 +29,5 @@ export {
 	Toolbar,
 	Tooltip,
 	Parser,
+	isHotkey,
 };

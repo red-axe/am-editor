@@ -8,6 +8,7 @@ import { RangeInterface } from '../types/range';
 import Range from '../range';
 import { CARD_ELEMENT_KEY } from '../constants/card';
 import { ClipboardData } from '../types/clipboard';
+import { DATA_ELEMENT, UI } from '../constants';
 
 class ChangeEvent implements ChangeEventInterface {
 	private events: Array<{
@@ -45,7 +46,7 @@ class ChangeEvent implements ChangeEventInterface {
 			if (node.attributes(CARD_ELEMENT_KEY) === 'center') {
 				return true;
 			}
-			if (node.hasClass('data-toolbar')) {
+			if (node.attributes(DATA_ELEMENT) === UI) {
 				return true;
 			}
 			const parent = node.parent();

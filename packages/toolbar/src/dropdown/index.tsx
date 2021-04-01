@@ -17,7 +17,7 @@ export type DropdownProps = {
 	single?: boolean;
 	className?: string;
 	direction?: 'vertical' | 'horizontal';
-	onSelect?: (event: React.MouseEvent, key: string) => void;
+	onSelect?: (event: React.MouseEvent, key: string) => void | boolean;
 	hasArrow?: boolean;
 	hasDot?: boolean;
 	renderContent?: (item: DropdownListItem) => React.ReactNode;

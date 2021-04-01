@@ -20,6 +20,15 @@
     min-width: 200px
 }
 
+.toolbar-collapse-group-title {
+    padding: 2px 16px;
+    text-align: left;
+    color: #8c8c8c;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 24px;
+}
+
 .toolbar-collapse-item {
     display: flex;
     cursor: pointer;

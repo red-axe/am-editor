@@ -31,7 +31,7 @@ export type ButtonProps = {
 	className?: string;
 	active?: boolean;
 	disabled?: boolean;
-	onClick?: (event: React.MouseEvent) => void;
+	onClick?: (event: React.MouseEvent) => void | boolean;
 	onMouseDown?: (event: React.MouseEvent) => void;
 	onMouseEnter?: (event: React.MouseEvent) => void;
 	onMouseLeave?: (event: React.MouseEvent) => void;
@@ -50,6 +50,7 @@ const ToolbarButton: React.FC<ButtonProps> = props => {
 			event.preventDefault();
 
 		if (disabled) return;
+		if (onClick && onClick(event) === false) return;
 		if (autoExecute !== false) {
 			let commandName = name;
 			let commandArgs = [];
@@ -63,7 +64,6 @@ const ToolbarButton: React.FC<ButtonProps> = props => {
 			}
 			engine?.command.execute(commandName, ...commandArgs);
 		}
-		if (onClick) onClick(event);
 	};
 
 	const onMouseDown = (event: React.MouseEvent) => {

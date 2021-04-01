@@ -18,7 +18,8 @@ import { NodeInterface, isNode, isNodeEntry } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { EditorInterface, EngineInterface, isEngine } from '../types/engine';
 import { encodeCardValue, transformCustomTags } from '../utils';
-import { Backspace, Directional, Enter } from './typing';
+import { Backspace, Enter, Left, Right, Up, Down, Default } from './typing';
+import './index.css';
 
 class CardModel implements CardModelInterface {
 	classes: {
@@ -54,10 +55,30 @@ class CardModel implements CardModelInterface {
 				.getHandleListener('backspace', 'keydown')
 				?.on(event => backspace.trigger(event));
 			//方向键事件
-			const directional = new Directional(this.editor);
+			const left = new Left(this.editor);
+			this.editor.typing
+				.getHandleListener('left', 'keydown')
+				?.on(event => left.trigger(event));
+
+			const right = new Right(this.editor);
+			this.editor.typing
+				.getHandleListener('right', 'keydown')
+				?.on(event => right.trigger(event));
+
+			const up = new Up(this.editor);
+			this.editor.typing
+				.getHandleListener('up', 'keydown')
+				?.on(event => up.trigger(event));
+
+			const down = new Down(this.editor);
+			this.editor.typing
+				.getHandleListener('down', 'keydown')
+				?.on(event => down.trigger(event));
+
+			const _default = new Default(this.editor);
 			this.editor.typing
 				.getHandleListener('default', 'keydown')
-				?.on(event => directional.trigger(event));
+				?.on(event => _default.trigger(event));
 		}
 
 		cards.forEach(card => {

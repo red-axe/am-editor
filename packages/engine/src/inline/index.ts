@@ -297,16 +297,18 @@ class Inline implements InlineModelInterface {
 		const hasChild = inline.children().length !== 0;
 		this.repairCursor(inline);
 		//如果有内容，就让光标选择在节点外的零宽字符前
-		if (hasChild) {
-			const next = inline.next()!;
-			safeRange.setStart(next, 1);
-			safeRange.setEnd(next, 1);
-		} else {
-			//如果没有子节点，就让光标选择在最后的零宽字符前面
-			const last = inline.last()!;
-			const text = last.text();
-			safeRange.setStart(last, text.length - 1);
-			safeRange.setEnd(last, text.length - 1);
+		if (!inline.isCard()) {
+			if (hasChild) {
+				const next = inline.next()!;
+				safeRange.setStart(next, 1);
+				safeRange.setEnd(next, 1);
+			} else {
+				//如果没有子节点，就让光标选择在最后的零宽字符前面
+				const last = inline.last()!;
+				const text = last.text();
+				safeRange.setStart(last, text.length - 1);
+				safeRange.setEnd(last, text.length - 1);
+			}
 		}
 
 		if (!range) change.apply(safeRange);

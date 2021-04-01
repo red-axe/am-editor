@@ -1,0 +1,7 @@
+.am-engine .card-selected [data-card-element="center"].data-card-background-selected {
+    background: rgba(27, 162, 227, 0.2);
+}
+
+.am-engine .card-selected [data-card-element="center"].data-card-border-selected {
+    outline: 2px solid #1890FF;
+}

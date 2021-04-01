@@ -406,7 +406,7 @@ class RangeColoring implements RangeColoringInterface {
 			tinyColor.setAlpha(0.3);
 			const rgb = tinyColor.toRgbString();
 			let customNode;
-			if (card.onSelectByOther && !card.selectedByOther) {
+			if (!card.selectedByOther) {
 				customNode = card.onSelectByOther(true, {
 					color,
 					rgb,
@@ -415,7 +415,7 @@ class RangeColoring implements RangeColoringInterface {
 			card.selectedByOther = uuid!;
 			return customNode;
 		}
-		if (card.onSelectByOther && card.selectedByOther) {
+		if (card.selectedByOther) {
 			card.onSelectByOther(false);
 		}
 		card.selectedByOther = false;
@@ -428,7 +428,7 @@ class RangeColoring implements RangeColoringInterface {
 			tinyColor.setAlpha(0.3);
 			const rgb = tinyColor.toRgbString();
 			let customNode;
-			if (card.onActivateByOther && !card.activatedByOther) {
+			if (!card.activatedByOther) {
 				customNode = card.onActivateByOther(true, {
 					color,
 					rgb,
@@ -437,7 +437,7 @@ class RangeColoring implements RangeColoringInterface {
 			card.activatedByOther = uuid!;
 			return customNode;
 		}
-		if (card.onActivateByOther && card.activatedByOther) {
+		if (card.activatedByOther) {
 			card.onActivateByOther(false);
 		}
 		card.activatedByOther = false;

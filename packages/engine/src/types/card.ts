@@ -99,6 +99,10 @@ export interface CardEntry {
 	 * 是否能聚焦
 	 */
 	readonly focus: boolean;
+	/**
+	 * 卡片选中后的样式效果，默认为 border
+	 */
+	readonly selectStyleType: 'border' | 'background';
 }
 
 export interface CardInterface {
@@ -216,13 +220,13 @@ export interface CardInterface {
 	 * 选中状态变化时触发
 	 * @param selected 是否选中
 	 */
-	onSelect?(selected: boolean): void;
+	onSelect(selected: boolean): void;
 	/**
 	 * 协同状态下，选中状态变化时触发
 	 * @param selected 是否选中
 	 * @param value { color:协同者颜色 , rgb:颜色rgb格式 }
 	 */
-	onSelectByOther?(
+	onSelectByOther(
 		selected: boolean,
 		value?: {
 			color: string;
@@ -239,7 +243,7 @@ export interface CardInterface {
 	 * @param activated 是否激活
 	 * @param value { color:协同者颜色 , rgb:颜色rgb格式 }
 	 */
-	onActivateByOther?(
+	onActivateByOther(
 		activated: boolean,
 		value?: {
 			color: string;

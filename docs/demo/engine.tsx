@@ -27,7 +27,7 @@ import RemoveFormat from '@aomao/plugin-removeformat';
 import SelectAll from '@aomao/plugin-selectall';
 import Link from '@aomao/plugin-link';
 import Codeblock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
-import Toolbar from '@aomao/toolbar';
+import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 import OTClient from './ot-client';
 import 'antd/lib/avatar/style';
 import './engine.less';
@@ -59,8 +59,14 @@ const plugins = [
 	SelectAll,
 	Link,
 	Codeblock,
+	ToolbarPlugin,
 ];
-const cards = [HrComponent, CheckboxComponent, CodeBlockComponent];
+const cards = [
+	HrComponent,
+	CheckboxComponent,
+	CodeBlockComponent,
+	ToolbarComponent,
+];
 
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
@@ -105,7 +111,6 @@ const EngineDemo = () => {
 		});
 		//用户加入或退出改变
 		otClient.on('membersChange', members => {
-			console.log(members);
 			setMembers(members);
 		});
 		setEngine(engine);

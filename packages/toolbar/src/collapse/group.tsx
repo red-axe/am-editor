@@ -6,19 +6,28 @@ export type CollapseGroupProps = {
 	engine?: EngineInterface;
 	title?: React.ReactNode;
 	items: Array<Omit<CollapseItemProps, 'engine'>>;
+	onSelect?: (event: React.MouseEvent, name: string) => void | boolean;
 };
 
 const CollapseGroup: React.FC<CollapseGroupProps> = ({
 	engine,
 	title,
 	items,
+	onSelect,
 }) => {
 	return (
 		<div className="toolbar-collapse-group">
-			{title && <div>{title}</div>}
+			{title && (
+				<div className="toolbar-collapse-group-title">{title}</div>
+			)}
 			{items.map(item => {
 				return (
-					<CollapseItem key={item.name} engine={engine} {...item} />
+					<CollapseItem
+						key={item.name}
+						engine={engine}
+						{...item}
+						onClick={onSelect}
+					/>
 				);
 			})}
 		</div>

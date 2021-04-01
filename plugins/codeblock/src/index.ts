@@ -41,7 +41,7 @@ export default class extends Plugin<Options> {
 	}
 
 	hotkey() {
-		return this.options.hotkey || 'mod+l';
+		return this.options.hotkey || '';
 	}
 
 	markdown(event: KeyboardEvent) {

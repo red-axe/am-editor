@@ -162,5 +162,8 @@ export default {
 			'#22075E': 'Purple 5',
 			'#780650': 'Magenta 5',
 		},
+		component: {
+			placeholder: 'Card name',
+		},
 	},
 };

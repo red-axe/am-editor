@@ -346,6 +346,7 @@ class ChangeModel implements ChangeInterface {
 
 		const inlineNode = this.engine.mark.closestNotMark(startNode);
 		if (
+			!inlineNode.isCard() &&
 			this.engine.node.isInline(inlineNode) &&
 			!this.engine.node.isVoid(inlineNode) &&
 			!/\u200B$/g.test(inlineNode.text())
@@ -1063,7 +1064,7 @@ class ChangeModel implements ChangeInterface {
 		if (prevBlock.isCard()) {
 			const card = this.engine.card.find(prevBlock);
 			if (card) {
-				card.focus(range);
+				this.engine.card.focus(card);
 				this.select(range);
 				return;
 			}

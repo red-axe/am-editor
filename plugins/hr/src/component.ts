@@ -18,6 +18,10 @@ class Hr extends Card {
 		return false;
 	}
 
+	static get selectStyleType(): 'background' {
+		return 'background';
+	}
+
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
 		return [
 			{
@@ -32,14 +36,8 @@ class Hr extends Card {
 		];
 	}
 
-	onSelect(selected: boolean) {
-		const selectedClass = 'hr-selected';
-		const center = this.getCenter();
-		if (selected) center.addClass(selectedClass);
-		else center.removeClass(selectedClass);
-	}
-
 	onActivate(activated: boolean) {
+		super.onActivate(activated);
 		const activatedClass = 'hr-activated';
 		const center = this.getCenter();
 		if (activated) center.addClass(activatedClass);
@@ -47,9 +45,10 @@ class Hr extends Card {
 	}
 
 	onSelectByOther(selected: boolean, value?: { color: string; rgb: string }) {
-		const center = this.getCenter();
-		center.css('background-color', selected ? value!.rgb : '');
-		center.find('hr').css('background-color', selected ? value!.rgb : '');
+		super.onSelectByOther(selected, value);
+		this.getCenter()
+			.find('hr')
+			.css('background-color', selected ? value!.rgb : '');
 	}
 
 	onActivateByOther(

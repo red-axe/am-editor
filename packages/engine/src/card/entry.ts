@@ -39,6 +39,7 @@ abstract class CardEntry implements CardInterface {
 	static readonly singleSelectable: boolean;
 	static readonly collab: boolean = true;
 	static readonly focus: boolean;
+	static readonly selectStyleType: 'border' | 'background' = 'border';
 	private defaultMaximize: MaximizeInterface;
 	isMaximize: boolean = false;
 
@@ -83,7 +84,7 @@ abstract class CardEntry implements CardInterface {
 		this.root = root ? root : $('<'.concat(tagName, ' />'));
 		if (typeof value === 'string') value = decodeCardValue(value);
 
-		if (isEngine(this.editor) && type === CardType.BLOCK) {
+		if (isEngine(this.editor)) {
 			value = value || {};
 			value.id = this.getId(value.id);
 		}
@@ -162,11 +163,11 @@ abstract class CardEntry implements CardInterface {
 		if (selected) {
 			if (!this.selected) {
 				this.setSelected(selected);
-				if (this.onSelect) this.onSelect(selected);
+				this.onSelect(selected);
 			}
 		} else if (this.selected) {
 			this.setSelected(selected);
-			if (this.onSelect) this.onSelect(false);
+			this.onSelect(false);
 		}
 	}
 
@@ -314,26 +315,44 @@ abstract class CardEntry implements CardInterface {
 	 */
 	resize?: boolean | (() => NodeInterface);
 
-	onSelect?(selected: boolean): void;
-	onSelectByOther?(
+	onSelect(selected: boolean): void {
+		const selectedClass = `data-card-${
+			(this.constructor as CardEntryType).selectStyleType
+		}-selected`;
+		const center = this.getCenter();
+		if (selected) center.addClass(selectedClass);
+		else center.removeClass(selectedClass);
+	}
+	onSelectByOther(
 		selected: boolean,
 		value?: {
 			color: string;
 			rgb: string;
 		},
-	): NodeInterface | void;
+	): NodeInterface | void {
+		const center = this.getCenter();
+		if (
+			(this.constructor as CardEntryType).selectStyleType === 'background'
+		) {
+			center.css('background-color', selected ? value!.rgb : '');
+		} else {
+			center.css('outline', selected ? '2px solid ' + value!.color : '');
+		}
+	}
 	onActivate(activated: boolean) {
 		if (!this.resize) return;
 		if (activated) this.resizeModel?.show();
 		else this.resizeModel?.hide();
 	}
-	onActivateByOther?(
+	onActivateByOther(
 		activated: boolean,
 		value?: {
 			color: string;
 			rgb: string;
 		},
-	): NodeInterface | void;
+	): NodeInterface | void {
+		this.onSelectByOther(activated, value);
+	}
 	destroy?(): void;
 	didInsert?(): void;
 	didUpdate?(): void;

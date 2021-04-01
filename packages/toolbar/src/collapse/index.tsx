@@ -6,12 +6,13 @@ import CollapseGroup, { CollapseGroupProps } from './group';
 import './index.css';
 
 export type CollapseProps = {
-	header: React.ReactNode;
+	header?: React.ReactNode;
 	groups: Array<CollapseGroupProps>;
 	engine?: EngineInterface;
 	className?: string;
 	icon?: React.ReactNode;
 	content?: React.ReactNode | (() => React.ReactNode);
+	onSelect?: (event: React.MouseEvent, name: string) => void | boolean;
 };
 
 const Collapse: React.FC<CollapseProps> = ({
@@ -21,13 +22,16 @@ const Collapse: React.FC<CollapseProps> = ({
 	groups,
 	engine,
 	className,
+	onSelect,
 }) => {
-	const [visible, setVisible] = useState(false);
+	const isCustomize = !!!(icon || content);
+	const [visible, setVisible] = useState(isCustomize);
 	const collapseRef = useRef();
-
 	useEffect(() => {
-		return () => document.removeEventListener('click', hide);
-	}, []);
+		if (!isCustomize)
+			return () => document.removeEventListener('click', hide);
+		return;
+	}, [isCustomize]);
 
 	const show = () => {
 		document.addEventListener('click', hide);
@@ -64,25 +68,28 @@ const Collapse: React.FC<CollapseProps> = ({
 			)}
 			ref={collapseRef.current}
 		>
-			<Button
-				name="collapse"
-				icon={icon}
-				content={content}
-				onClick={toggle}
-				active={visible}
-			/>
+			{!isCustomize && (
+				<Button
+					name="collapse"
+					icon={icon}
+					content={content}
+					onClick={toggle}
+					active={visible}
+				/>
+			)}
 			{visible && (
-				<div
-					className="toolbar-dropdown-list"
-					data-element-ui="collapse"
-				>
+				<div className="toolbar-dropdown-list" data-element="ui">
 					{typeof header === 'string' ? (
 						<div
 							className="toolbar-collapse-header"
 							dangerouslySetInnerHTML={{ __html: header }}
 						/>
 					) : (
-						<div className="toolbar-collapse-header">{header}</div>
+						header && (
+							<div className="toolbar-collapse-header">
+								{header}
+							</div>
+						)
 					)}
 					<div className="toolbar-collapse-content">
 						{groups.map((group, index) => {
@@ -91,6 +98,7 @@ const Collapse: React.FC<CollapseProps> = ({
 									key={index}
 									engine={engine}
 									{...group}
+									onSelect={onSelect}
 								/>
 							);
 						})}

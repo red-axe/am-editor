@@ -8,7 +8,7 @@ class Backspace {
 	}
 
 	trigger(event: KeyboardEvent) {
-		const { change, node, block } = this.engine;
+		const { change, node, block, card } = this.engine;
 		const range = change.getRange();
 		if (!range.collapsed) return;
 		const prevNode = range.getPrevNode();
@@ -23,7 +23,8 @@ class Backspace {
 			return false;
 		}
 		// 光标不在段落开始位置时
-		if (!block.isFirstOffset(range, 'start')) {
+		const isCard = !!card.closest(range.startNode);
+		if (!isCard && !block.isFirstOffset(range, 'start')) {
 			let cloneRange = range
 				.cloneRange()
 				.shrinkToElementNode()
@@ -61,7 +62,7 @@ class Backspace {
 		}
 		const blockNode = block.closest(range.startNode);
 		// 在正文里
-		if (this.engine.node.isRootBlock(blockNode)) {
+		if (!isCard && this.engine.node.isRootBlock(blockNode)) {
 			event.preventDefault();
 			change.mergeAfterDeletePrevNode(blockNode);
 			return false;

@@ -9,6 +9,7 @@ export type CollapseItemProps = {
 	engine?: EngineInterface;
 	icon?: React.ReactNode;
 	title?: React.ReactNode | (() => React.ReactNode);
+	search: string;
 	description?: React.ReactNode | (() => React.ReactNode);
 	prompt?: React.ReactNode | (() => React.ReactNode);
 	command?: { name: string; args: Array<any> } | Array<any>;
@@ -27,7 +28,7 @@ export type CollapseItemProps = {
 		| 'leftBottom'
 		| 'rightTop'
 		| 'rightBottom';
-	onClick?: (event: React.MouseEvent) => void;
+	onClick?: (event: React.MouseEvent, name: string) => void | boolean;
 	onMouseDown?: (event: React.MouseEvent) => void;
 };
 
@@ -44,7 +45,6 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 	...props
 }) => {
 	const [active, setActive] = useState(false);
-
 	const onClick = (event: React.MouseEvent) => {
 		const { command, onClick, autoExecute } = props;
 
@@ -52,6 +52,9 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 		if (nodeName !== 'INPUT' && nodeName !== 'TEXTAREA')
 			event.preventDefault();
 
+		if (onClick && onClick(event, name) === false) {
+			return;
+		}
 		if (autoExecute !== false) {
 			let commandName = name;
 			let commandArgs = [];
@@ -65,7 +68,6 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 			}
 			engine?.command.execute(commandName, ...commandArgs);
 		}
-		if (onClick) onClick(event);
 	};
 
 	const render = () => {
