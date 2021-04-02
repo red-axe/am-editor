@@ -13,34 +13,35 @@ am-editor，一个基于[ShareDB](https://github.com/share/sharedb)Web 多人协
 
 ## 所有插件
 
-[x] `@aomao/plugin-alignment`,
-[x] `@aomao/plugin-backcolor`,
-[x] `@aomao/plugin-bold`,
-[x] `@aomao/plugin-code`,
-[x] `@aomao/plugin-codelock`,
-[x] `@aomao/plugin-fontcolor`,
-[x] `@aomao/plugin-fontsize`,
-[x] `@aomao/plugin-heading`,
-[x] `@aomao/plugin-hr`,
-[x] `@aomao/plugin-indent`,
-[x] `@aomao/plugin-italic`,
-[x] `@aomao/plugin-link`,
-[x] `@aomao/plugin-mark`,
-[x] `@aomao/plugin-orderedlist`,
-[x] `@aomao/plugin-paintformat`,
-[x] `@aomao/plugin-quote`,
-[x] `@aomao/plugin-redo`,
-[x] `@aomao/plugin-removeformat`,
-[x] `@aomao/plugin-selectall`,
-[x] `@aomao/plugin-strikethrough`,
-[x] `@aomao/plugin-sub`,
-[x] `@aomao/plugin-sup`,
-[x] `@aomao/plugin-tasklist`,
-[x] `@aomao/plugin-underline`,
-[x] `@aomao/plugin-undo`,
-[x] `@aomao/plugin-unorderedlist`,
-[] `@aomao/plugin-image`
-[] `@aomao/plugin-video`
+- [x] `@aomao/plugin-alignment` 对齐方式
+- [x] `@aomao/plugin-backcolor` 背景色
+- [x] `@aomao/plugin-bold` 加粗
+- [x] `@aomao/plugin-code` 行内代码
+- [x] `@aomao/plugin-codelock` 块级代码
+- [x] `@aomao/plugin-fontcolor` 前景色
+- [x] `@aomao/plugin-fontsize` 字体大小
+- [x] `@aomao/plugin-heading` 标题
+- [x] `@aomao/plugin-hr` 分割线
+- [x] `@aomao/plugin-indent` 缩进
+- [x] `@aomao/plugin-italic` 斜体
+- [x] `@aomao/plugin-link` 链接
+- [x] `@aomao/plugin-mark` 标记
+- [x] `@aomao/plugin-orderedlist` 有序列表
+- [x] `@aomao/plugin-paintformat` 格式刷
+- [x] `@aomao/plugin-quote` 引用
+- [x] `@aomao/plugin-redo` 重做历史
+- [x] `@aomao/plugin-removeformat` 移除格式
+- [x] `@aomao/plugin-selectall` 全选
+- [x] `@aomao/plugin-strikethrough` 删除线
+- [x] `@aomao/plugin-sub` 下标
+- [x] `@aomao/plugin-sup` 上标
+- [x] `@aomao/plugin-tasklist` 任务列表
+- [x] `@aomao/plugin-underline` 下划线
+- [x] `@aomao/plugin-undo` 撤销历史
+- [x] `@aomao/plugin-unorderedlist` 无序列表
+- [ ] `@aomao/plugin-image` 图片
+- [ ] `@aomao/plugin-video` 视频
+- [ ] `@aomao/plugin-table` 表格
 
 ## 快速上手
 
