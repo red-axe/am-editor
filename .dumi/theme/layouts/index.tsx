@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
 import { IRouteComponentProps } from '@umijs/types';
 import { context, Link } from 'dumi/theme';
-import Navbar from './components/Navbar';
-import SideMenu from './components/SideMenu';
-import SlugList from './components/SlugList';
-import NavRight from './components/NavRight';
-import './style/layout.less';
+import Navbar from '../components/Navbar';
+import SideMenu from '../components/SideMenu';
+import SlugList from '../components/SlugList';
+import NavRight from '../components/NavRight';
+import './layout.less';
 
 const Hero = hero => (
 	<>
@@ -75,7 +75,6 @@ const Layout: React.FC<IRouteComponentProps> = ({ children, location }) => {
 		{ github: 'GitHub', gitlab: 'GitLab' }[
 			(repoUrl || '').match(/(github|gitlab)/)?.[1] || 'nothing'
 		] || platform;
-
 	return (
 		<div
 			className="__dumi-default-layout"
@@ -108,26 +107,30 @@ const Layout: React.FC<IRouteComponentProps> = ({ children, location }) => {
 			{showFeatures && Features(meta.features)}
 			<div className="__dumi-default-layout-content">
 				{children}
-				{!showHero && !showFeatures && meta.filePath && !meta.gapless && (
-					<div className="__dumi-default-layout-footer-meta">
-						{repoPlatform && (
-							<Link
-								to={`${repoUrl}/edit/${branch}/${meta.filePath}`}
+				{!showHero &&
+					!showFeatures &&
+					meta.filePath &&
+					meta.showFooter !== false &&
+					!meta.gapless && (
+						<div className="__dumi-default-layout-footer-meta">
+							{repoPlatform && (
+								<Link
+									to={`${repoUrl}/edit/${branch}/${meta.filePath}`}
+								>
+									{isCN
+										? `在 ${repoPlatform} 上编辑此页`
+										: `Edit this doc on ${repoPlatform}`}
+								</Link>
+							)}
+							<span
+								data-updated-text={
+									isCN ? '最后更新时间：' : 'Last update: '
+								}
 							>
-								{isCN
-									? `在 ${repoPlatform} 上编辑此页`
-									: `Edit this doc on ${repoPlatform}`}
-							</Link>
-						)}
-						<span
-							data-updated-text={
-								isCN ? '最后更新时间：' : 'Last update: '
-							}
-						>
-							{updatedTime}
-						</span>
-					</div>
-				)}
+								{updatedTime}
+							</span>
+						</div>
+					)}
 				{(showHero || showFeatures) && meta.footer && (
 					<div
 						className="__dumi-default-layout-footer"

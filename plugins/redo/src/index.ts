@@ -20,6 +20,6 @@ export default class extends Plugin<Options> {
 	}
 
 	hotkey() {
-		return this.options.hotkey || ['mod+y', 'shift+mod+z'];
+		return this.options.hotkey || ['mod+y', 'shift+mod+y'];
 	}
 }

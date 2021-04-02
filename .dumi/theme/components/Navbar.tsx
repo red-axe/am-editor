@@ -62,7 +62,28 @@ const Navbar: FC<INavbarProps> = ({
 					return (
 						<span key={nav.title || nav.path}>
 							{nav.path ? (
-								<NavLink to={nav.path} key={nav.path}>
+								<NavLink
+									isActive={(match, location) => {
+										if (
+											match &&
+											(match.url === '' ||
+												match.url === '/')
+										) {
+											return (
+												'' === location.pathname ||
+												'/' === location.pathname
+											);
+										}
+										return (
+											match &&
+											location.pathname.indexOf(
+												match.url,
+											) === 0
+										);
+									}}
+									to={nav.path}
+									key={nav.path}
+								>
 									{nav.title}
 								</NavLink>
 							) : (

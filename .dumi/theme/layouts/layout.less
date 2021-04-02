@@ -1,5 +1,5 @@
-@import './markdown.less';
-@import './variables.less';
+@import '../style/markdown.less';
+@import '../style/variables.less';
 
 @s-toc-width: 136px;
 
@@ -15,8 +15,8 @@ body {
 .@{prefix}-layout {
 	box-sizing: border-box;
 	min-height: 100vh;
-	padding: 16px (@s-content-margin + @s-toc-width) 50px @s-menu-width +
-		@s-content-margin;
+	//padding: 16px (@s-content-margin + @s-toc-width) 50px @s-menu-width +
+	//@s-content-margin;
 
 	@media @mobile {
 		padding-top: 66px !important;
@@ -47,11 +47,14 @@ body {
 		padding-top: 64px;
 
 		&[data-show-sidemenu='true'] {
-			padding-left: 0;
+			padding-top: @s-nav-height + 50px;
+			padding-left: @s-site-menu-width + 50px;
+			padding-right: 50px;
+			padding-bottom: 50px;
 		}
 
 		&[data-show-slugs='true'] {
-			padding-right: 0;
+			padding-right: @s-content-margin + @s-toc-width + 14;
 		}
 
 		.@{prefix}-layout-content > .markdown:first-child > *:first-child {

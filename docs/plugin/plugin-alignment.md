@@ -19,6 +19,18 @@ new Engine(...,{ plugins:[Alignment] })
 
 ## 可选项
 
+### 快捷键
+
+默认快捷键为
+
+左对齐: `mod+shift+l`
+
+居中对齐: `mod+shift+c`
+
+右对齐: `mod+shift+r`
+
+两端对齐: `mod+shift+j`
+
 ```ts
 //快捷键
 hotkey?: {

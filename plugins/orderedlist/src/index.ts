@@ -1,7 +1,6 @@
 import {
 	NodeInterface,
 	List,
-	SchemaRule,
 	isEngine,
 	SchemaBlock,
 	PluginEntry,

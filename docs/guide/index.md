@@ -1,8 +1,15 @@
-# am-editor
+---
+title: 介绍
+order: 1
+toc: menu
+nav:
+    title: 指南
+    order: 1
+---
+
+## 是什么？
 
 am-editor，一个基于[ShareDB](https://github.com/share/sharedb)Web 多人协同富文本编辑器，适用于`React`、`Vue`（部分插件还没有 vue 版本）框架，与主流的现代浏览器兼容。
-
-[查看在线文档及演示](https://editor.aomao.com)
 
 ## 特性
 
@@ -10,37 +17,6 @@ am-editor，一个基于[ShareDB](https://github.com/share/sharedb)Web 多人协
 -   📋 丰富的多媒体支持，不仅支持图片和音视频，更支持插入嵌入式多媒体内容
 -   🏷 引擎基于原生 JavaScript 开发，插件 UI 支持 React、Vue 等框架渲染
 -   📡 内置协同编辑方案，轻量配置即可使用
-
-## 所有插件
-
-[x] `@aomao/plugin-alignment`,
-[x] `@aomao/plugin-backcolor`,
-[x] `@aomao/plugin-bold`,
-[x] `@aomao/plugin-code`,
-[x] `@aomao/plugin-codelock`,
-[x] `@aomao/plugin-fontcolor`,
-[x] `@aomao/plugin-fontsize`,
-[x] `@aomao/plugin-heading`,
-[x] `@aomao/plugin-hr`,
-[x] `@aomao/plugin-indent`,
-[x] `@aomao/plugin-italic`,
-[x] `@aomao/plugin-link`,
-[x] `@aomao/plugin-mark`,
-[x] `@aomao/plugin-orderedlist`,
-[x] `@aomao/plugin-paintformat`,
-[x] `@aomao/plugin-quote`,
-[x] `@aomao/plugin-redo`,
-[x] `@aomao/plugin-removeformat`,
-[x] `@aomao/plugin-selectall`,
-[x] `@aomao/plugin-strikethrough`,
-[x] `@aomao/plugin-sub`,
-[x] `@aomao/plugin-sup`,
-[x] `@aomao/plugin-tasklist`,
-[x] `@aomao/plugin-underline`,
-[x] `@aomao/plugin-undo`,
-[x] `@aomao/plugin-unorderedlist`,
-[] `@aomao/plugin-image`
-[] `@aomao/plugin-video`
 
 ## 快速上手
 
@@ -58,9 +34,12 @@ $ yarn add @aomao/engine
 
 ### 使用
 
-我们按照惯例先输出一个`Hello word!`
+我们按照惯例先输出一个`Hello word!`。现在你可以在下方编辑了。
 
 ```tsx
+/**
+ * defaultShowCode: true
+ */
 import React, { useEffect, useRef, useState } from 'react';
 import Engine, { EngineInterface } from '@aomao/engine';
 
@@ -98,17 +77,58 @@ export default EngineDemo;
 
 现在我们在上诉代码基础上，引入`@aomao/plugin-bold`加粗插件
 
-```tsx
+```tsx | pure
 import Bold from '@aomao/plugin-bold';
 ```
 
 然后将`Bold`插件加入引擎
 
-```tsx
+```tsx | pure
 //实例化引擎
 const engine = new Engine(ref.current, {
 	plugin: [Bold],
 });
+```
+
+`Bold`插件的默认快捷键为 windows `ctrl+b` 或 mac `⌘+b`，现在试试加粗效果吧
+
+```tsx
+import React, { useEffect, useRef, useState } from 'react';
+import Engine, { EngineInterface } from '@aomao/engine';
+import Bold from '@aomao/plugin-bold';
+
+const EngineDemo = () => {
+	//编辑器容器
+	const ref = useRef<HTMLDivElement | null>(null);
+	//引擎实例
+	const [engine, setEngine] = useState<EngineInterface>();
+	//编辑器内容
+	const [content, setContent] = useState<string>(
+		'Hello <strong>word</strong>!',
+	);
+
+	useEffect(() => {
+		if (!ref.current) return;
+		//实例化引擎
+		const engine = new Engine(ref.current, {
+			plugins: [Bold],
+		});
+		//初始化本地协作，用作记录历史
+		engine.ot.initLockMode();
+		//设置编辑器值
+		engine.setValue(content);
+		//监听编辑器值改变事件
+		engine.on('change', value => {
+			setContent(value);
+			console.log(`value:${value}`);
+		});
+		//设置引擎实例
+		setEngine(engine);
+	}, []);
+
+	return <div ref={ref} />;
+};
+export default EngineDemo;
 ```
 
 ### 卡片
@@ -117,13 +137,13 @@ const engine = new Engine(ref.current, {
 
 引入`@aomao/plugin-codeblock`代码块插件
 
-```tsx
+```tsx | pure
 import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
 ```
 
 将`CodeBlock`插件和`CodeBlockComponent`卡片组件加入引擎
 
-```tsx
+```tsx | pure
 //实例化引擎
 const engine = new Engine(ref.current, {
 	plugins: [CodeBlock],
@@ -132,6 +152,46 @@ const engine = new Engine(ref.current, {
 ```
 
 `CodeBlock`插件默认支持`markdown`，在编辑器一行开头位置输入代码块语法` ```javascript `回车后，看看效果吧
+
+```tsx
+import React, { useEffect, useRef, useState } from 'react';
+import Engine, { EngineInterface } from '@aomao/engine';
+import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
+
+const EngineDemo = () => {
+	//编辑器容器
+	const ref = useRef<HTMLDivElement | null>(null);
+	//引擎实例
+	const [engine, setEngine] = useState<EngineInterface>();
+	//编辑器内容
+	const [content, setContent] = useState<string>(
+		'Hello <strong>word</strong>!',
+	);
+
+	useEffect(() => {
+		if (!ref.current) return;
+		//实例化引擎
+		const engine = new Engine(ref.current, {
+			plugins: [CodeBlock],
+			cards: [CodeBlockComponent],
+		});
+		//初始化本地协作，用作记录历史
+		engine.ot.initLockMode();
+		//设置编辑器值
+		engine.setValue(content);
+		//监听编辑器值改变事件
+		engine.on('change', value => {
+			setContent(value);
+			console.log(`value:${value}`);
+		});
+		//设置引擎实例
+		setEngine(engine);
+	}, []);
+
+	return <div ref={ref} />;
+};
+export default EngineDemo;
+```
 
 ### 工具栏
 
@@ -143,7 +203,7 @@ import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 
 将`ToolbarPlugin`插件和`ToolbarComponent`卡片组件加入引擎，它将让我们在编辑器中可以使用快捷键`/`唤醒出工具栏
 
-```tsx
+```tsx | pure
 //实例化引擎
 const engine = new Engine(ref.current, {
 	plugins: [ToolbarPlugin],
@@ -153,7 +213,7 @@ const engine = new Engine(ref.current, {
 
 渲染工具栏，工具栏已配置好所有插件，这里我们只需要传入插件名称即可
 
-```tsx
+```tsx | pure
 return (
     ...
     {
@@ -171,6 +231,55 @@ return (
     }
     ...
 )
+```
+
+```tsx
+import React, { useEffect, useRef, useState } from 'react';
+import Engine, { EngineInterface } from '@aomao/engine';
+import Bold from '@aomao/plugin-bold';
+import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
+import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
+
+const EngineDemo = () => {
+	//编辑器容器
+	const ref = useRef<HTMLDivElement | null>(null);
+	//引擎实例
+	const [engine, setEngine] = useState<EngineInterface>();
+	//编辑器内容
+	const [content, setContent] = useState<string>(
+		'Hello <strong>word</strong>!',
+	);
+
+	useEffect(() => {
+		if (!ref.current) return;
+		//实例化引擎
+		const engine = new Engine(ref.current, {
+			plugins: [CodeBlock, Bold, ToolbarPlugin],
+			cards: [CodeBlockComponent, ToolbarComponent],
+		});
+		//初始化本地协作，用作记录历史
+		engine.ot.initLockMode();
+		//设置编辑器值
+		engine.setValue(content);
+		//监听编辑器值改变事件
+		engine.on('change', value => {
+			setContent(value);
+			console.log(`value:${value}`);
+		});
+		//设置引擎实例
+		setEngine(engine);
+	}, []);
+
+	return (
+		<>
+			{engine && (
+				<Toolbar engine={engine} items={[['collapse'], ['bold']]} />
+			)}
+			<div ref={ref} />
+		</>
+	);
+};
+export default EngineDemo;
 ```
 
 ### 协同编辑

@@ -157,8 +157,10 @@ const EngineDemo = () => {
 					]}
 				/>
 			)}
-			<div className="editor-container">
-				<div ref={ref} />
+			<div className="editor-wrapper">
+				<div className="editor-container">
+					<div ref={ref} />
+				</div>
 			</div>
 		</>
 	);

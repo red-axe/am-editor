@@ -33,11 +33,10 @@ export default class extends Plugin<Options> {
 	execute(mode: string, value: string) {
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
-		const component = card.insert(CodeBlockComponent.cardName, {
+		card.insert(CodeBlockComponent.cardName, {
 			mode,
 			code: value,
 		});
-		card.focus(component);
 	}
 
 	hotkey() {
