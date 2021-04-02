@@ -1,7 +1,7 @@
 import { defineConfig } from 'dumi';
 
 export default defineConfig({
-	title: 'AoMao Collaborative Editor',
+	title: 'am-editor 多人协同编辑器',
 	favicon: 'https://cdn-object.itellyou.com/icon/shortcut.png',
 	logo: 'https://cdn-object.itellyou.com/icon/icon.svg',
 	outputPath: 'docs-dist',
