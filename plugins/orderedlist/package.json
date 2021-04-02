@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-orderedlist",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "main": "src/index.ts",
   "author": "me@aomao.com",
   "license": "MIT",
