@@ -77,6 +77,7 @@ class NodeModel implements NodeModelInterface {
 		}
 		return true;
 	}
+
 	/**
 	 * 判断节点是否是顶级根节点，父级为编辑器根节点，且，子级节点没有block节点
 	 * @param node 节点
