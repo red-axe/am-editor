@@ -1,12 +1,3 @@
----
-title: 介绍
-order: 1
-toc: menu
-nav:
-    title: 指南
-    order: 1
----
-
 ## 是什么？
 
 am-editor，一个基于[ShareDB](https://github.com/share/sharedb)Web 多人协同富文本编辑器，适用于`React`、`Vue`（部分插件还没有 vue 版本）框架，与主流的现代浏览器兼容。
