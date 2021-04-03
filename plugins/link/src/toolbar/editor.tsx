@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Input, Button } from 'antd';
-import classnames from 'classnames';
+import classnames from 'classnames-es-ts';
 import 'antd/lib/input/style';
 import 'antd/lib/button/style';
 import { LanguageInterface } from '@aomao/engine';

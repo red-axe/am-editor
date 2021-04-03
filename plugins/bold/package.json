@@ -1,9 +1,22 @@
 {
   "name": "@aomao/plugin-bold",
   "version": "1.1.5",
-  "main": "src/index.ts",
+  "main": "dist/index.ts",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": ["dist",
+    "lib",
+    "src"],
   "author": "me@aomao.com",
   "license": "MIT",
+  "homepage": "https://github.com/itellyou-com/am-editor#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itellyou-com/am-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itellyou-com/am-editor/issues"
+  },
   "dependencies": {
     "@aomao/engine": "^1.1.5"
   }

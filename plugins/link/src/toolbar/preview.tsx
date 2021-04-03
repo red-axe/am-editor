@@ -1,5 +1,5 @@
 import React from 'react';
-import classnames from 'classnames';
+import classnames from 'classnames-es-ts';
 import { Tooltip } from 'antd';
 import 'antd/lib/tooltip/style';
 import { LanguageInterface } from '@aomao/engine';

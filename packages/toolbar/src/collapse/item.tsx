@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import classnames from 'classnames';
+import classnames from 'classnames-es-ts';
 import { EngineInterface } from '@aomao/engine';
 import { Popover } from 'antd';
 import 'antd/lib/popover/style';

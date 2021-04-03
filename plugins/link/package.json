@@ -2,13 +2,15 @@
   "name": "@aomao/plugin-link",
   "version": "1.1.5",
   "description": "> TODO: description",
-  "author": "itellyou <owner@itellyou.com>",
-  "homepage": "https://github.com/itellyou-com/am-editor#readme",
+  "main": "dist/index.ts",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": ["dist",
+    "lib",
+    "src"],
+  "author": "me@aomao.com",
   "license": "MIT",
-  "main": "src/index.ts",
-  "publishConfig": {
-    "access": "public"
-  },
+  "homepage": "https://github.com/itellyou-com/am-editor#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/itellyou-com/am-editor.git"
@@ -21,6 +23,7 @@
   },
   "dependencies": {
     "@aomao/engine": "^1.1.5",
+    "classnames-es-ts": "^2.2.7",
     "antd": "^4.12.3",
     "react": "^17.0.1",
     "react-dom": "^17.0.2"

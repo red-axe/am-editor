@@ -1,5 +1,5 @@
 import { EventEmitter2 } from 'eventemitter2';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import {
 	diff_match_patch,
 	DIFF_DELETE,

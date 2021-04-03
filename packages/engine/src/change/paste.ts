@@ -1,5 +1,5 @@
 import tinycolor2 from 'tinycolor2';
-import { NodeInterface } from '../..';
+import { NodeInterface } from '../types';
 import {
 	CARD_SELECTOR,
 	READY_CARD_KEY,

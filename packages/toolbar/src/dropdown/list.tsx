@@ -1,5 +1,5 @@
 import React from 'react';
-import classnames from 'classnames';
+import classnames from 'classnames-es-ts';
 import { Tooltip } from 'antd';
 import { EngineInterface, formatHotkey } from '@aomao/engine';
 import { autoGetHotkey } from '../utils';

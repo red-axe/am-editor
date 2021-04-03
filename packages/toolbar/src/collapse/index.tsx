@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { EngineInterface } from '@aomao/engine';
-import classnames from 'classnames';
+import classnames from 'classnames-es-ts';
 import Button from '../button';
 import CollapseGroup, { CollapseGroupProps } from './group';
 import './index.css';

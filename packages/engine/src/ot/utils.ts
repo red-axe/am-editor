@@ -1,6 +1,6 @@
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import OTJSON from 'ot-json0';
-import { NodeInterface, isNode } from '../types/node';
+import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { FOCUS, ANCHOR, CURSOR } from '../constants/selection';
 import { CARD_SELECTOR } from '../constants/card';

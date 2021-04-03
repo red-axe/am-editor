@@ -1,5 +1,5 @@
 import CodeMirror, { EditorConfiguration, Editor } from 'codemirror';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import { EditorInterface, isEngine, NodeInterface } from '@aomao/engine';
 import { SYNTAX_MAP } from './mode';
 import { CodeBlockEditorInterface, Options } from './types';

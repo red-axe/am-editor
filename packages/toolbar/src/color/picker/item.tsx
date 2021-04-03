@@ -1,5 +1,5 @@
 import React from 'react';
-import classnames from 'classnames';
+import classnames from 'classnames-es-ts';
 import tinycolor2, { ColorInput } from 'tinycolor2';
 import { EngineInterface } from '@aomao/engine';
 import Palette from './palette';

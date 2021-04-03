@@ -62,5 +62,8 @@ export default defineConfig({
 			},
 		],
 	},
+	manifest: {
+		fileName: 'manifest.json',
+	},
 	// more config: https://d.umijs.org/config
 });

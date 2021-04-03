@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import classNames from 'classnames';
+import classNames from 'classnames-es-ts';
 import { EngineInterface } from '@aomao/engine';
 import Button from '../button';
 import ColorPicker, { ColorPickerProps, Palette } from './picker';

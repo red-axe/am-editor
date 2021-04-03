@@ -1,6 +1,6 @@
-import { merge, omit } from 'lodash';
+import { merge, omit } from 'lodash-es';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import classnames from 'classnames';
+import classnames from 'classnames-es-ts';
 import { EngineInterface } from '@aomao/engine';
 import ToolbarGroup from './group';
 import { getToolbarDefaultConfig } from './config/toolbar';
