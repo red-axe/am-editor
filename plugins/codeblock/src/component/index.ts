@@ -64,6 +64,10 @@ class CodeBlcok extends Card {
 		];
 	}
 
+	focusEditor() {
+		this.codeEditor?.focus();
+	}
+
 	render() {
 		if (!this.codeEditor) return;
 		this.getCenter().append(this.codeEditor.container);
@@ -72,9 +76,6 @@ class CodeBlcok extends Card {
 		const code = value['code'] || '';
 		if (isEngine(this.editor)) {
 			this.codeEditor.create(mode, code);
-			setTimeout(() => {
-				this.codeEditor?.focus();
-			}, 200);
 		} else {
 			this.codeEditor.render(mode, code);
 		}

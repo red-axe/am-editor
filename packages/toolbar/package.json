@@ -5,7 +5,9 @@
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
     "files": [
-        "dist"
+        "dist",
+        "lib",
+        "src"
     ],
     "author": "me@aomao.com",
     "license": "MIT",

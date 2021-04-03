@@ -12,10 +12,11 @@ import Dropdown from './dropdown';
 import Input from './input';
 import Tooltip from './tooltip';
 import { EditorInterface } from '../types';
+import { DATA_ELEMENT } from '../constants';
 import './index.css';
 
 const template = () => {
-	return '<div class="data-toolbar data-toolbar-active" contenteditable="false"></div>';
+	return `<div ${DATA_ELEMENT}="ui" class="data-toolbar data-toolbar-active" contenteditable="false"></div>`;
 };
 
 class Toolbar implements ToolbarInterface {
