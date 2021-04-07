@@ -10,7 +10,12 @@ import { CodeBlockEditor, CodeBlockEditorInterface } from './types';
 import renderSelect from './select';
 import './index.css';
 
-class CodeBlcok extends Card {
+export type CodeBlockValue = {
+	mode?: string;
+	code?: string;
+};
+
+class CodeBlcok extends Card<CodeBlockValue> {
 	static get cardName() {
 		return 'codeblock';
 	}
@@ -72,8 +77,9 @@ class CodeBlcok extends Card {
 		if (!this.codeEditor) return;
 		this.getCenter().append(this.codeEditor.container);
 		const value = this.getValue();
-		const mode = value['mode'] || 'plain';
-		const code = value['code'] || '';
+
+		const mode = value?.mode || 'plain';
+		const code = value?.code || '';
 		if (isEngine(this.editor)) {
 			this.codeEditor.create(mode, code);
 		} else {

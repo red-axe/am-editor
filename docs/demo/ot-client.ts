@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { EngineInterface } from 'packages/engine/src';
+import { EngineInterface } from '@aomao/engine';
 import ReconnectingWebSocket, { ErrorEvent } from 'reconnecting-websocket';
 import { Doc } from 'sharedb';
 import sharedb from 'sharedb/lib/client';

@@ -13,11 +13,16 @@ import {
 	CardInterface,
 	CardModelInterface,
 	CardType,
+	CardValue,
 } from '../types/card';
 import { NodeInterface, isNode, isNodeEntry } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { EditorInterface, EngineInterface, isEngine } from '../types/engine';
-import { encodeCardValue, transformCustomTags } from '../utils';
+import {
+	decodeCardValue,
+	encodeCardValue,
+	transformCustomTags,
+} from '../utils';
 import { Backspace, Enter, Left, Right, Up, Down, Default } from './typing';
 import './index.css';
 
@@ -215,7 +220,7 @@ class CardModel implements CardModelInterface {
 	}
 
 	// 更新Card
-	updateNode(card: CardInterface, value: any) {
+	updateNode(card: CardInterface, value: CardValue) {
 		const { $ } = this.editor;
 		if (card.destroy) card.destroy();
 		const container = card.findByKey('center');
@@ -236,7 +241,7 @@ class CardModel implements CardModelInterface {
 		node: NodeInterface,
 		name: string,
 		type: CardType,
-		value?: any,
+		value?: CardValue,
 	) {
 		const clazz = this.classes[name];
 		if (!clazz) throw ''.concat(name, ': This card does not exist');
@@ -344,7 +349,7 @@ class CardModel implements CardModelInterface {
 			);
 	}
 
-	insert(name: string, value?: any) {
+	insert(name: string, value?: CardValue) {
 		if (!isEngine(this.editor)) throw 'Engine not found';
 		const component = this.create(name, {
 			value,
@@ -367,7 +372,7 @@ class CardModel implements CardModelInterface {
 		return card;
 	}
 
-	update(selector: NodeInterface | Node | string, value: any) {
+	update(selector: NodeInterface | Node | string, value: CardValue) {
 		if (!isEngine(this.editor)) return;
 		const { change } = this.editor;
 		const card = this.find(selector);
@@ -414,7 +419,7 @@ class CardModel implements CardModelInterface {
 	create(
 		name: string,
 		options?: {
-			value?: any;
+			value?: CardValue;
 			root?: NodeInterface;
 		},
 	): CardInterface {
@@ -504,7 +509,7 @@ class CardModel implements CardModelInterface {
 				}
 				//ready_card_key 待创建的需要重新生成节点，并替换当前待创建节点
 				card = this.create(name, {
-					value,
+					value: decodeCardValue(value),
 					root: key ? cardNode : undefined,
 				});
 				if (readyKey) cardNode.replaceWith(card.root);

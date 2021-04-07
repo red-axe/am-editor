@@ -1,4 +1,3 @@
-import isHotkey from 'is-hotkey';
 import { CARD_LEFT_SELECTOR, CARD_RIGHT_SELECTOR } from '../../constants';
 import {
 	CardEntry,

@@ -15,9 +15,11 @@ export enum CardType {
 
 export type CardOptions = {
 	editor: EditorInterface;
-	value?: any;
+	value?: CardValue;
 	root?: NodeInterface;
 };
+
+export type CardValue = {};
 
 export interface CardToolbarInterface {
 	/**
@@ -254,11 +256,11 @@ export interface CardInterface {
 	 * 设置卡片值
 	 * @param value 值
 	 */
-	setValue(value: any): void;
+	setValue(value: CardValue): void;
 	/**
 	 * 获取卡片值
 	 */
-	getValue(): any;
+	getValue(): (CardValue & { id: string }) | undefined;
 	/**
 	 * 工具栏配置项
 	 */
@@ -370,13 +372,13 @@ export interface CardModelInterface {
 	 * @param name 卡片名称
 	 * @param value 卡片值
 	 */
-	replaceNode(node: NodeInterface, name: string, value?: any): void;
+	replaceNode(node: NodeInterface, name: string, value?: CardValue): void;
 	/**
 	 * 更新卡片重新渲染
 	 * @param card 卡片
 	 * @param value 值
 	 */
-	updateNode(card: CardInterface, value: any): void;
+	updateNode(card: CardInterface, value: CardValue): void;
 	/**
 	 * 激活卡片节点所在的卡片
 	 * @param node 节点
@@ -404,13 +406,13 @@ export interface CardModelInterface {
 	 * @param name 卡片名称
 	 * @param value 卡片值
 	 */
-	insert(name: string, value?: any): CardInterface;
+	insert(name: string, value?: CardValue): CardInterface;
 	/**
 	 * 更新卡片
 	 * @param selector 卡片选择器
 	 * @param value 要更新的卡片值
 	 */
-	update(selector: NodeInterface | Node | string, value: any): void;
+	update(selector: NodeInterface | Node | string, value: CardValue): void;
 	/**
 	 * 移除卡片
 	 * @param selector 卡片选择器
@@ -424,7 +426,7 @@ export interface CardModelInterface {
 	create(
 		name: string,
 		options?: {
-			value?: any;
+			value?: CardValue;
 			root?: NodeInterface;
 		},
 	): CardInterface;

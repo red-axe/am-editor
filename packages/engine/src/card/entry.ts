@@ -15,6 +15,7 @@ import {
 	CardEntry as CardEntryType,
 	CardToolbarInterface,
 	ResizeInterface,
+	CardValue,
 } from '../types/card';
 import { EditorInterface, isEngine } from '../types/engine';
 import { NodeInterface } from '../types/node';
@@ -25,7 +26,7 @@ import Maximize from './maximize';
 import Resize from './resize';
 import Toolbar from './toolbar';
 
-abstract class CardEntry implements CardInterface {
+abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	protected readonly editor: EditorInterface;
 	readonly root: NodeInterface;
 	toolbarModel?: CardToolbarInterface;
@@ -69,7 +70,7 @@ abstract class CardEntry implements CardInterface {
 
 	get id() {
 		const value = this.getValue();
-		return typeof value === 'object' ? value.id : undefined;
+		return typeof value === 'object' ? value.id : '';
 	}
 
 	get name() {
@@ -84,11 +85,10 @@ abstract class CardEntry implements CardInterface {
 		this.root = root ? root : $('<'.concat(tagName, ' />'));
 		if (typeof value === 'string') value = decodeCardValue(value);
 
-		if (isEngine(this.editor)) {
-			value = value || {};
-			value.id = this.getId(value.id);
-		}
-		this.setValue(value);
+		value = value || {};
+		value['id'] = this.getId(value['id']);
+
+		this.setValue(value as T);
 		this.defaultMaximize = new Maximize(this.editor, this);
 	}
 
@@ -106,22 +106,23 @@ abstract class CardEntry implements CardInterface {
 	}
 
 	// 设置 DOM 属性里的数据
-	setValue(value: any) {
+	setValue(value: T) {
 		if (value == null) {
 			return;
 		}
-		value = { ...this.getValue(), ...value };
-		if (this.id) value.id = this.id;
+		value = { ...this.getValue(), ...value } as T;
 
-		value = encodeCardValue(value);
-		this.root.attributes(CARD_VALUE_KEY, value);
+		this.root.attributes(
+			CARD_VALUE_KEY,
+			encodeCardValue({ ...value, id: this.id }),
+		);
 	}
 	// 获取 DOM 属性里的数据
-	getValue(): any {
+	getValue(): (T & { id: string }) | undefined {
 		const value = this.root.attributes(CARD_VALUE_KEY);
 		if (!value) return;
 
-		return decodeCardValue(value);
+		return decodeCardValue(value) as T & { id: string };
 	}
 
 	/**

@@ -6,7 +6,11 @@ const CHECKBOX_INPUT_CLASS = 'data-checkbox-input';
 const CHECKBOX_INNER_CLASS = 'data-checkbox-inner';
 const CHECKBOX_CHECKED_CLASS = 'data-checkbox-checked';
 
-class Checkbox extends Card {
+export type CheckboxValue = {
+	checked: boolean;
+};
+
+class Checkbox extends Card<CheckboxValue> {
 	static get cardName() {
 		return 'checkbox';
 	}
