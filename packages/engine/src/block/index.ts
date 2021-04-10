@@ -885,7 +885,10 @@ class Block implements BlockModelInterface {
 			isLeft: true,
 			clone: true,
 		});
-		return leftBlock.text().trim();
+		return leftBlock
+			.text()
+			.trim()
+			.replace(/\u200B/g, '');
 	}
 
 	/**

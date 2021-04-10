@@ -31,11 +31,11 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 	constructor(editor: EditorInterface, options: Options) {
 		this.editor = editor;
 		this.options = options;
-		this.container =
-			options.container ||
-			editor.$(
-				'<div class="data-codeblock-container"><div class="data-codeblock-content"></div></div>',
-			);
+		this.container = options.container || editor.$(this.renderTemplate());
+	}
+
+	renderTemplate() {
+		return '<div class="data-codeblock-container"><div class="data-codeblock-content"></div></div>';
 	}
 
 	getConfig(value: string, mode?: string): EditorConfiguration {
@@ -138,7 +138,8 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			return;
 		}
 		const value = this.codeMirror.getValue();
-		this.options.onSave(this.mode, value);
+		const { onSave } = this.options;
+		if (onSave) onSave(this.mode, value);
 	}
 
 	focus() {

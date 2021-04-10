@@ -2,7 +2,7 @@ import { Editor, EditorConfiguration } from 'codemirror';
 import { EditorInterface, NodeInterface } from '@aomao/engine';
 
 export type Options = {
-	onSave: (mode: string, value: string) => void;
+	onSave?: (mode: string, value: string) => void;
 	container?: NodeInterface;
 };
 
@@ -14,6 +14,7 @@ export interface CodeBlockEditorInterface {
 	codeMirror?: Editor;
 	mode: string;
 	container: NodeInterface;
+	renderTemplate(): string;
 	getConfig(value: string, mode?: string): EditorConfiguration;
 	getSyntax(mode: string): string;
 	create(mode: string, value: string, options?: EditorConfiguration): void;

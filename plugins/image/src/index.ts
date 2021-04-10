@@ -1,4 +1,4 @@
-import { CardInterface, isEngine, Plugin } from '@aomao/engine';
+import { CARD_KEY, CARD_VALUE_KEY, NodeInterface, Plugin } from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 import ImageUploader from './uploader';
 import locales from './locales';
@@ -13,6 +13,7 @@ export default class extends Plugin {
 	init() {
 		super.init();
 		this.editor.language.add(locales);
+		this.editor.on('paser:html', node => this.parseHtml(node));
 	}
 
 	execute(status: 'uploading' | 'done' | 'error', src: string): void {
@@ -56,6 +57,23 @@ export default class extends Plugin {
 					};
 					wait();
 			  });
+	}
+
+	parseHtml(root: NodeInterface) {
+		const { $ } = this.editor;
+		root.find(`[${CARD_KEY}=${ImageComponent.cardName}`).each(cardNode => {
+			const node = $(cardNode);
+			const card = this.editor.card.find(node) as ImageComponent;
+			const value = card?.getValue();
+			if (value?.src) {
+				const img = $('.data-image-meta > img');
+				node.empty();
+				img.attributes('src', value.src);
+				img.css('visibility', 'visible');
+				node.append(img);
+				node.removeAttributes(CARD_VALUE_KEY);
+			}
+		});
 	}
 }
 

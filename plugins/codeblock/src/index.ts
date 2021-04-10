@@ -1,5 +1,14 @@
-import { Plugin, isEngine, PluginEntry } from '@aomao/engine';
+import {
+	Plugin,
+	isEngine,
+	PluginEntry,
+	NodeInterface,
+	CARD_KEY,
+	isServer,
+	CARD_VALUE_KEY,
+} from '@aomao/engine';
 import CodeBlockComponent from './component';
+import { CodeBlockEditor } from './component/types';
 
 export type Options = {
 	hotkey?: string | Array<string>;
@@ -28,6 +37,7 @@ export default class extends Plugin<Options> {
 	init() {
 		super.init();
 		this.editor.on('keydown:enter', event => this.markdown(event));
+		this.editor.on('paser:html', node => this.parseHtml(node));
 	}
 
 	execute(mode: string, value: string) {
@@ -81,6 +91,62 @@ export default class extends Plugin<Options> {
 			}
 		}
 		return;
+	}
+
+	parseHtml(root: NodeInterface) {
+		const { $ } = this.editor;
+		if (isServer) return;
+
+		root.find(`[${CARD_KEY}=${CodeBlockComponent.cardName}`).each(
+			cardNode => {
+				const node = $(cardNode);
+				const card = this.editor.card.find(node) as CodeBlockComponent;
+				const value = card?.getValue();
+				if (value && value.code) {
+					node.empty();
+					const CodeEditor: CodeBlockEditor = require('./component/editor')
+						.default;
+					const codeEditor = new CodeEditor(this.editor, {});
+
+					const content = codeEditor.container.find(
+						'.data-codeblock-content',
+					);
+					content.css({
+						border: '1px solid #e8e8e8',
+						'max-width': '750px',
+					});
+					codeEditor.render(value.mode || 'plain', value.code);
+					content.addClass('am-engine-view');
+					content.hide();
+					document.body.appendChild(content[0]);
+					content.traverse(node => {
+						if (
+							node.type === Node.ELEMENT_NODE &&
+							(node.get<HTMLElement>()?.classList?.length || 0) >
+								0
+						) {
+							const element = node.get<HTMLElement>()!;
+							const style = window.getComputedStyle(element);
+							[
+								'color',
+								'margin',
+								'padding',
+								'background',
+							].forEach(attr => {
+								element.style[attr] = style.getPropertyValue(
+									attr,
+								);
+							});
+						}
+					});
+					content.show();
+					content.css('background', '#f9f9f9');
+					node.append(content);
+					node.removeAttributes(CARD_VALUE_KEY);
+					content.removeClass('am-engine-view');
+				}
+			},
+		);
 	}
 }
 export { CodeBlockComponent };

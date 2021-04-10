@@ -17,6 +17,10 @@ export type Options = {
 	 */
 	url: string;
 	/**
+	 * Markdown
+	 */
+	markdown?: boolean;
+	/**
 	 * 额外携带数据上传
 	 */
 	data?: {};
@@ -74,6 +78,7 @@ export default class extends Plugin<Options> {
 	init() {
 		super.init();
 		if (isEngine(this.editor)) {
+			this.editor.on('keydown:enter', event => this.markdown(event));
 			this.editor.on('drop:files', files => this.dropFiles(files));
 			this.editor.on('paste:event', ({ files }) =>
 				this.pasteFiles(files),
@@ -170,7 +175,7 @@ export default class extends Plugin<Options> {
 	async execute(files?: Array<File> | MouseEvent) {
 		if (!isEngine(this.editor)) return;
 		const { request, card, language } = this.editor;
-		const { url, data, accept, multiple, parse } = this.options;
+		const { url, data, multiple, parse } = this.options;
 		const limitSize = this.options.limitSize || 5 * 1024 * 1024;
 		if (!Array.isArray(files)) {
 			files = await request.getFiles({
@@ -228,21 +233,23 @@ export default class extends Plugin<Options> {
 						(response.data && response.data.url) ||
 						response.src ||
 						(response.data && response.data.src);
-					if (parse) {
-						const result = parse(response);
-						if (!result.result) {
-							card.update(component.id, {
-								status: 'error',
-								message:
-									result.data ||
-									this.editor.language.get(
-										'image',
-										'uploadError',
-									),
-							});
-						} else {
-							src = result.data;
-						}
+					const result = parse
+						? parse(response)
+						: !!src
+						? { result: true, data: src }
+						: { result: false };
+					if (!result.result) {
+						card.update(component.id, {
+							status: 'error',
+							message:
+								result.data ||
+								this.editor.language.get(
+									'image',
+									'uploadError',
+								),
+						});
+					} else {
+						src = result.data;
 					}
 					const value: any = {
 						status: 'done',
@@ -371,6 +378,59 @@ export default class extends Plugin<Options> {
 		}
 	}
 
+	uploadAddress(src: string, component: ImageComponent) {
+		if (!isEngine(this.editor)) return;
+		const { url, type, data, parse } = this.options;
+		this.editor.request.ajax({
+			url,
+			method: 'POST',
+			type: type === undefined ? 'json' : type,
+			data: {
+				...data,
+				src,
+			},
+			success: response => {
+				let src =
+					response.url ||
+					(response.data && response.data.url) ||
+					response.src ||
+					(response.data && response.data.src);
+
+				const result = parse
+					? parse(response)
+					: !!src
+					? { result: true, data: src }
+					: { result: false };
+				if (!result.result) {
+					this.editor.card.update(component.id, {
+						status: 'error',
+						message:
+							result.data ||
+							this.editor.language.get('image', 'uploadError'),
+					});
+				} else {
+					src = result.data;
+				}
+
+				const value: any = {
+					status: 'done',
+				};
+				if (src) {
+					value.src = src;
+					this.loadImage(component.id, value);
+				}
+			},
+			error: error => {
+				this.editor.card.update(component.id, {
+					status: 'error',
+					message:
+						error.message ||
+						this.editor.language.get('image', 'uploadError'),
+				});
+			},
+		});
+	}
+
 	pasteAfter() {
 		this.editor.container
 			.find('[data-card-key=image]')
@@ -400,59 +460,57 @@ export default class extends Plugin<Options> {
 					this.cardComponents[file.uid] = component;
 					return;
 				}
-				const { isRemote, type, url, parse, data } = this.options;
+				const { isRemote } = this.options;
 				if (isRemote && isRemote(src)) {
-					this.editor.request.ajax({
-						url,
-						method: 'POST',
-						type: type === 'json' ? 'json' : undefined,
-						data: {
-							...data,
-							url: src,
-						},
-						success: response => {
-							let src =
-								response.url ||
-								(response.data && response.data.url) ||
-								response.src ||
-								(response.data && response.data.src);
-							if (parse) {
-								const result = parse(response);
-								if (!result.result) {
-									this.editor.card.update(component.id, {
-										status: 'error',
-										message:
-											result.data ||
-											this.editor.language.get(
-												'image',
-												'uploadError',
-											),
-									});
-								} else {
-									src = result.data;
-								}
-							}
-							const value: any = {
-								status: 'done',
-							};
-							if (src) {
-								value.src = src;
-								this.loadImage(component.id, value);
-							}
-						},
-						error: error => {
-							this.editor.card.update(component.id, {
-								status: 'error',
-								message:
-									error.message ||
-									this.editor.language.get(
-										'image',
-										'uploadError',
-									),
-							});
-						},
-					});
+					this.uploadAddress(src, component);
 				}
 			});
+	}
+
+	markdown(event: KeyboardEvent) {
+		if (!isEngine(this.editor) || this.options.markdown === false) return;
+		const { change } = this.editor;
+		const range = change.getRange();
+
+		if (!range.collapsed || change.isComposing() || !this.markdown) return;
+
+		const block = this.editor.block.closest(range.startNode);
+
+		if (!this.editor.node.isRootBlock(block)) {
+			return;
+		}
+
+		const chars = this.editor.block.getLeftText(block);
+		const match = /^!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)$/.exec(
+			chars,
+		);
+		if (match) {
+			event.preventDefault();
+			const splits = match[1].split('|');
+			const src = match[2];
+			const value = {
+				src: src,
+				alt: splits[0],
+				status: 'uploading',
+			};
+			this.editor.block.removeLeftText(block);
+			const alignment = splits[1];
+			if (alignment === 'center' || alignment === 'right') {
+				this.editor.command.execute('alignment', alignment);
+			}
+			const { isRemote } = this.options;
+			//上传第三方图片
+			if (isRemote && isRemote(src)) {
+				const component = this.editor.card.insert(
+					'image',
+					value,
+				) as ImageComponent;
+				this.uploadAddress(src, component);
+				return;
+			}
+			//当前图片
+			value.status = 'done';
+			this.editor.card.insert('image', value);
+		}
 	}
 }
