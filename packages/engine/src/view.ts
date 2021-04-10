@@ -103,12 +103,16 @@ class View implements ViewInterface {
 		return this;
 	}
 
+	trigger(eventType: string, ...args: any) {
+		return this.event.trigger(eventType, ...args);
+	}
+
 	render(content: string, trigger: boolean = true) {
 		const parser = new Parser(content, this);
 		const value = parser.toValue(this.schema, undefined, false, true);
 		this.container.html(value);
 		this.card.render();
-		if (trigger) this.event.trigger('render', this.container);
+		if (trigger) this.trigger('render', this.container);
 	}
 
 	messageSuccess(message: string) {

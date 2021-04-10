@@ -7,11 +7,23 @@ import { escape } from '../utils';
 const template = (options: InputOptions) => {
 	return `
     <span class="data-toolbar-item data-toolbar-item-input">
-        <input data-role="input" placeholder="${escape(
-			options.placeholder,
-		)}" class="data-toolbar-input" type="input" value="${escape(
-		options.value,
-	)} />
+        ${
+			options.prefix
+				? "<span class='data-toolbar-input-prefix'>" +
+				  escape(options.prefix) +
+				  '</span>'
+				: ''
+		}<input data-role="input" placeholder="${escape(
+		options.placeholder,
+	)}" class="data-toolbar-input" type="input" value="${escape(
+		options.value.toString(),
+	)}" />${
+		options.suffix
+			? "<span class='data-toolbar-input-suffix'>" +
+			  escape(options.suffix) +
+			  '</span>'
+			: ''
+	}
     </span>`;
 };
 
@@ -37,12 +49,12 @@ export default class Input implements InputInterface {
 		return this.root.find(expr);
 	}
 
-	render(container?: NodeInterface) {
-		const { value } = this.options;
+	render(container: NodeInterface) {
+		const { value, didMount } = this.options;
 		const input = this.find('input');
 		const inputElement = input.get<HTMLInputElement>();
 		if (!inputElement) return;
-		inputElement.value = value !== undefined ? value : '';
+		inputElement.value = (value !== undefined ? value : '').toString();
 		input.on('keydown', e => {
 			e.stopPropagation();
 			if (isHotkey('enter', e)) {
@@ -61,7 +73,7 @@ export default class Input implements InputInterface {
 				this.onChange(inputElement.value);
 			}, 10);
 		});
-		container?.append(this.root);
-		return this.root;
+		container.append(this.root);
+		if (didMount) didMount(this.root);
 	}
 }

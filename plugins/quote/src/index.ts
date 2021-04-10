@@ -18,6 +18,7 @@ export default class extends Block<Options> {
 		super.init();
 		this.editor.on('keydow:backspace', event => this.onBackspace(event));
 		this.editor.on('keydow:enter', event => this.onEnter(event));
+		this.editor.on('paser:html', node => this.parseHtml(node));
 	}
 
 	execute() {

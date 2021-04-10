@@ -21,42 +21,44 @@ import {
 	EngineInterface,
 	EngineOptions,
 } from '../types/engine';
+import { HistoryInterface } from '../types/history';
 import { OTInterface } from '../types/ot';
 import { SchemaInterface } from '../types/schema';
 import { ConversionInterface } from '../types/conversion';
-import Conversion from '../parser/conversion';
-import { HistoryInterface } from '../types/history';
-import History from '../history';
-import { CARD_SELECTOR } from '../constants/card';
-import Command from '../command';
 import { CommandInterface } from '../types/command';
 import { PluginModelInterface } from '../types/plugin';
 import { HotkeyInterface } from '../types/hotkey';
+import { CardModelInterface } from '../types/card';
+import { ClipboardInterface } from '../types/clipboard';
+import { LanguageInterface } from '../types/language';
+import { MarkModelInterface } from '../types/mark';
+import { ListModelInterface } from '../types/list';
+import { InlineModelInterface } from '../types/inline';
+import { BlockModelInterface } from '../types/block';
+import { RequestInterface } from '../types/request';
+import Conversion from '../parser/conversion';
+import History from '../history';
+import { CARD_SELECTOR } from '../constants/card';
+import Command from '../command';
 import Hotkey from '../hotkey';
 import Plugin from '../plugin';
 import CardModel from '../card';
-import { CardModelInterface } from '../types/card';
 import { getDocument } from '../utils';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import { toDOM } from '../ot/jsonml';
-import { ClipboardInterface } from '../types/clipboard';
 import Clipboard from '../clipboard';
 import Parser from '../parser';
-import { LanguageInterface } from '../types/language';
 import Language from '../language';
-import { MarkModelInterface } from '../types/mark';
 import Mark from '../mark';
-import { ListModelInterface } from '../types/list';
 import List from '../list';
 import { TypingInterface } from '../types';
 import Typing from '../typing';
 import Container from './container';
-import { InlineModelInterface } from '../types/inline';
-import { BlockModelInterface } from '../types/block';
 import Inline from '../inline';
 import Block from '../block';
-import './index.css';
 import Selection from '../selection';
+import Request from '../request';
+import './index.css';
 
 class EngineModel implements EngineInterface {
 	private _readonly: boolean = false;
@@ -88,6 +90,7 @@ class EngineModel implements EngineInterface {
 	command: CommandInterface;
 	hotkey: HotkeyInterface;
 	clipboard: ClipboardInterface;
+	request: RequestInterface;
 
 	get container(): NodeInterface {
 		return this._container.getNode();
@@ -108,7 +111,7 @@ class EngineModel implements EngineInterface {
 		}
 		this._readonly = readonly;
 		//广播readonly事件
-		this.event.trigger('readonly', readonly);
+		this.trigger('readonly', readonly);
 	}
 
 	constructor(selector: Selector, options?: EngineOptions) {
@@ -122,6 +125,7 @@ class EngineModel implements EngineInterface {
 		this.history = new History(this);
 		this.card = new CardModel(this);
 		this.clipboard = new Clipboard(this);
+		this.request = new Request(this);
 		this.plugin = new Plugin(this);
 		this.node = new NodeModel(this);
 		this.list = new List(this);
@@ -139,9 +143,9 @@ class EngineModel implements EngineInterface {
 		);
 		this._container.init();
 		this.change = new Change(this, {
-			onChange: value => this.event.trigger('change', value),
-			onSelect: () => this.event.trigger('select'),
-			onSetValue: () => this.event.trigger('setvalue'),
+			onChange: value => this.trigger('change', value),
+			onSelect: () => this.trigger('select'),
+			onSetValue: () => this.trigger('afterSetValue'),
 		});
 		this.typing = new Typing(this);
 		this.list.init();
@@ -187,9 +191,23 @@ class EngineModel implements EngineInterface {
 		return this;
 	}
 
+	trigger(eventType: string, ...args: any) {
+		return this.event.trigger(eventType, ...args);
+	}
+
 	getValue(ignoreCursor: boolean = false) {
 		const value = this.change.getValue({});
 		return ignoreCursor ? Selection.removeTags(value) : value;
+	}
+
+	async getValueAsync(ignoreCursor: boolean = false): Promise<string> {
+		return new Promise(resolve => {
+			Object.keys(this.plugin.components).forEach(async pluginName => {
+				const plugin = this.plugin.components[pluginName];
+				if (plugin.waiting) await plugin.waiting();
+			});
+			resolve(this.getValue(ignoreCursor));
+		});
 	}
 
 	getHtml(): string {
@@ -206,7 +224,7 @@ class EngineModel implements EngineInterface {
 
 	setValue(value: string) {
 		this.readonly = false;
-		this.event.trigger('beforesetvalue');
+		value = this.trigger('beforeSetValue', value) || value;
 		this.change.setValue(value);
 		this.normalizeTree();
 		return this;

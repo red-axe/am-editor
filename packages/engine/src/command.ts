@@ -25,14 +25,14 @@ class Command implements CommandInterface {
 	execute(name: string, ...args: any) {
 		const plugin = this.engine.plugin.components[name];
 		if (plugin && plugin.execute) {
-			const { change, event } = this.engine;
+			const { change } = this.engine;
 			change.cacheRangeBeforeCommand();
-			event.trigger('beforeCommandExecute', name, ...args);
+			this.engine.trigger('beforeCommandExecute', name, ...args);
 			try {
 				const result = plugin.execute(...args);
 				change.combinTextNode();
 				change.onSelect();
-				event.trigger('afterCommandExecute', name, ...args);
+				this.engine.trigger('afterCommandExecute', name, ...args);
 				return result;
 			} catch (error) {
 				console.log(error);

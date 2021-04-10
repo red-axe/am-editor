@@ -1,5 +1,6 @@
 import { Path } from 'sharedb';
 import { EditorInterface } from './engine';
+import { SchemaInterface } from './schema';
 
 export type EventListener = (...args: Array<Event | any>) => boolean | void;
 
@@ -26,7 +27,7 @@ export interface EventInterface {
 	 * @param eventType 事件类型
 	 * @param args 事件参数
 	 */
-	trigger(eventType: string, ...args: any): boolean | void;
+	trigger(eventType: string, ...args: any): any;
 }
 export type Selector =
 	| string
@@ -530,22 +531,25 @@ export interface NodeModelInterface {
 	 * 是否是空节点
 	 * @param node 节点或节点名称
 	 */
-	isVoid(node: NodeInterface | Node | string): boolean;
+	isVoid(
+		node: NodeInterface | Node | string,
+		schema?: SchemaInterface,
+	): boolean;
 	/**
 	 * 是否是mark标签
 	 * @param node 节点
 	 */
-	isMark(node: NodeInterface | Node): boolean;
+	isMark(node: NodeInterface | Node, schema?: SchemaInterface): boolean;
 	/**
 	 * 是否是inline标签
 	 * @param node 节点
 	 */
-	isInline(node: NodeInterface | Node): boolean;
+	isInline(node: NodeInterface | Node, schema?: SchemaInterface): boolean;
 	/**
 	 * 是否是block节点
 	 * @param node 节点
 	 */
-	isBlock(node: NodeInterface | Node): boolean;
+	isBlock(node: NodeInterface | Node, schema?: SchemaInterface): boolean;
 	/**
 	 * 判断当前节点是否为block类型的简单节点（子节点不包含blcok标签）
 	 */
@@ -555,7 +559,7 @@ export interface NodeModelInterface {
 	 * @param node 节点
 	 * @returns
 	 */
-	isRootBlock(node: NodeInterface): boolean;
+	isRootBlock(node: NodeInterface, schema?: SchemaInterface): boolean;
 	/**
 	 * 判断节点下的文本是否为空
 	 * @param node 节点
@@ -587,7 +591,10 @@ export interface NodeModelInterface {
 	 * @param node 节点
 	 * @returns
 	 */
-	getType(node: NodeInterface | Node): 'mark' | 'block' | 'inline' | void;
+	getType(
+		node: NodeInterface | Node,
+		schema?: SchemaInterface,
+	): 'mark' | 'block' | 'inline' | void;
 	/**
 	 * 去除包裹
 	 * @param node 需要去除包裹的节点

@@ -1,0 +1,115 @@
+.data-image {
+    position: relative;
+    display: inline-block;
+    font-size: 14px;
+    text-align: left;
+    border-radius: 3px 3px;
+    line-height: 24px;
+    text-indent: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+.data-image-meta {
+    position: relative;
+    color: #595959;
+    line-height: 0;
+}
+
+.data-image-progress {
+    padding-left: 8px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.data-image-progress .data-anticon {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 24px;
+    margin-right: 10px;
+}
+
+.data-image-maximize {
+    position: absolute;
+    z-index: 2;
+    right: 10px;
+    top: 10px;
+    background-color: rgba(0, 0, 0, 0.65);
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    line-height: 20px;
+    border-radius: 4px;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+}
+
+.data-image-maximize .data-icon-maximize {
+    margin-left: 1px;
+}
+
+.data-image-loading , .data-image-loaded {
+    display: inline-block;
+    border-radius: 0 0;
+    padding: 0 0;
+    background: #fff;
+    border-color: transparent;
+}
+
+.data-image-loading .data-image-meta, .data-image-loaded .data-image-meta {
+    display: inline-block;
+}
+
+.data-image-loading  .data-image-meta img,.data-image-loaded .data-image-meta img {
+    border-radius: 2px 2px;
+    display: inline-block;
+    width: 100%;
+    opacity: 0.6;
+    text-align: left;
+    cursor: pointer;
+    transition: opacity 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.data-image-loading  .data-image-meta .data-image-progress,.data-image-loaded .data-image-meta .data-image-progress {
+    font-family: 'Lucida Console', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 12px;
+    line-height: 24px;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0px 6px;
+    border-radius: 2px 2px;
+    background: rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+}
+
+.data-image-loaded .data-image-meta img {
+    opacity: 1;
+}
+
+.data-image-error {
+    padding: 6px 8px;
+    background: #f5f5f5;
+    display: inline-flex;
+    border-radius: 4px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    align-items: center;
+    user-select: none;
+}
+
+.data-image-error .data-icon-error {
+    color: red;
+    margin-right: 8px;
+}
+
+.data-image-error .data-icon-copy {
+    margin-left: 8px;
+    cursor: pointer;
+}

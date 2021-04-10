@@ -44,6 +44,7 @@ export default class extends Block<Options> {
 
 	init() {
 		super.init();
+		this.editor.on('paser:html', node => this.parseHtml(node));
 		const { $, language } = this.editor;
 		//阅读模式处理
 		if (!isEngine(this.editor) && this.options.showAnchor !== false) {

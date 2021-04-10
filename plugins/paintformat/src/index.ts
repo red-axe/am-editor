@@ -72,7 +72,7 @@ export default class extends Plugin<Options> {
 			node.off('keydown', this.event);
 			this.event = undefined;
 		}
-		this.editor!.event.trigger('select');
+		if (isEngine(this.editor)) this.editor.trigger('select');
 	}
 
 	bindEvent(node: NodeInterface) {
@@ -178,7 +178,7 @@ export default class extends Plugin<Options> {
 		const range = change.getRange();
 		this.activeMarks = mark.findMarks(range);
 		this.activeBlocks = block.findBlocks(range);
-		this.editor.event.trigger('select');
+		this.editor.trigger('select');
 		this.editor.container.addClass('data-paintformat-mode');
 	}
 

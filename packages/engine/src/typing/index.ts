@@ -112,8 +112,7 @@ class Typing implements TypingInterface {
 						params = triggerParams(this.engine, event);
 					if (
 						!triggerName ||
-						this.engine.event.trigger(triggerName, ...params) !==
-							false
+						this.engine.trigger(triggerName, ...params) !== false
 					) {
 						handle.trigger(event);
 					}

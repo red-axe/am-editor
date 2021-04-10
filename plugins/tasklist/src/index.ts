@@ -33,6 +33,11 @@ export default class extends List<Options> {
 
 	allowIn = ['blockquote'];
 
+	init() {
+		super.init();
+		this.editor.on('paser:html', node => this.parseHtml(node));
+	}
+
 	schema(): Array<SchemaBlock> {
 		const scheam = super.schema() as SchemaBlock;
 		return [

@@ -18,3 +18,4 @@ export * from './typing';
 export * from './mark';
 export * from './inline';
 export * from './block';
+export * from './request';

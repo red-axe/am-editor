@@ -16,7 +16,7 @@ export default class extends Plugin {
 		const range = change.getRange();
 		range.select(this.editor.container, true);
 		change.select(range);
-		this.editor.event.trigger('select');
+		this.editor.trigger('select');
 	}
 
 	onSelectAll(event: KeyboardEvent) {

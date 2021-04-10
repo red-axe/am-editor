@@ -1,13 +1,9 @@
-import { ClipboardData } from '../types/clipboard';
 import { EditorInterface } from '../types/engine';
-import { LanguageInterface } from '../types/language';
 import { isNode, NodeInterface } from '../types/node';
 import { PluginOptions, PluginInterface } from '../types/plugin';
-import { RangeInterface } from '../types/range';
 import {
 	SchemaAttributes,
 	SchemaGlobal,
-	SchemaInterface,
 	SchemaRule,
 	SchemaStyle,
 	SchemaValue,
@@ -263,86 +259,8 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 
 		return this.sechamCache;
 	}
-	/**
-	 * 解析DOM节点，生成符合标准的 XML 代码之前触发
-	 * @param root DOM节点
-	 */
-	parseValueBefore?(root: NodeInterface): void;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
-	 * @param node 当前遍历的节点
-	 * @param value 当前已经生成的xml代码
-	 */
-	parseValue?(node: NodeInterface, value: Array<string>): void | boolean;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML。生成xml代码结束后触发
-	 * @param value xml代码
-	 */
-	parseValueAfter?(value: Array<string>): void;
-	/**
-	 * 转换为HTML代码之前触发
-	 * @param root 需要转换的根节点
-	 */
-	parseHtmlBefore?(root: NodeInterface): void;
-	/**
-	 * 转换为HTML代码
-	 * @param root 需要转换的根节点
-	 */
-	parseHtml?(root: NodeInterface): void;
-	/**
-	 * 转换为HTML代码之后触发
-	 * @param root 需要转换的根节点
-	 */
-	parseHtmlAfter?(root: NodeInterface): void;
-	/**
-	 * 复制DOM节点时触发
-	 * @param node 当前遍历的子节点
-	 */
-	copy?(node: NodeInterface): void;
-	/**
-	 * 当粘贴到编辑器事件发生时触发，返回false，将不在处理粘贴
-	 * @param data 粘贴板相关数据
-	 * @param value 当前编辑器的值
-	 */
-	pasteEvent?(
-		data: ClipboardData & { isPasteText: boolean },
-		value: string,
-	): boolean | void;
-	/**
-	 * 设置本次粘贴所需保留标签的白名单，以及属性
-	 * @param schema 标签白名单管理实例
-	 */
-	pasteSchema?(schema: SchemaInterface): void;
-	/**
-	 * 解析粘贴数据，还未生成符合编辑器数据的片段之前触发
-	 * @param root 粘贴的DOM节点
-	 */
-	pasteOrigin?(root: NodeInterface): void;
-	/**
-	 * 解析粘贴数据，生成符合编辑器数据的片段之后整理阶段触发
-	 * @param node 粘贴片段遍历的子节点
-	 */
-	pasteEach?(node: NodeInterface): void;
-	/**
-	 * 生成粘贴数据DOM片段后，还未写入到编辑器之前触发
-	 * @param fragment 粘贴的片段
-	 */
-	pasteBefore?(fragment: DocumentFragment): void;
-	/**
-	 * 插入当前粘贴的片段后触发，此时还未渲染卡片
-	 * @param range 当前插入后的光标实例
-	 */
-	pasteInsert?(range: RangeInterface): void;
-	/**
-	 * 粘贴完成后触发
-	 */
-	pasteAfter?(): void;
-	/**
-     * 拖动文件到编辑器时触发
-     
-     * @param files 文件集合
-     */
-	dropFiles?(files: Array<File>): void;
+
+	async waiting?(): Promise<void>;
 }
 
 export default PluginEntry;

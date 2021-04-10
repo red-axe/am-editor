@@ -1,5 +1,5 @@
 import tinycolor2 from 'tinycolor2';
-import { NodeInterface } from '../types';
+import { NodeInterface, SchemaInterface } from '../types';
 import {
 	CARD_SELECTOR,
 	READY_CARD_KEY,
@@ -12,16 +12,17 @@ import { EngineInterface } from '../types/engine';
 export default class Paste {
 	protected source: string;
 	protected engine: EngineInterface;
+	protected schema: SchemaInterface;
 
 	constructor(source: string, engine: EngineInterface) {
 		this.source = source;
 		this.engine = engine;
+		this.schema = this.engine.schema.clone();
 	}
 
 	parser() {
-		const schema = this.engine.schema.clone();
 		const conversion = this.engine.conversion.clone();
-		schema.add([
+		this.schema.add([
 			{
 				name: 'pre',
 				type: 'block',
@@ -56,16 +57,10 @@ export default class Paste {
 				},
 			},
 		]);
-		Object.keys(this.engine.plugin.components).forEach(name => {
-			const plugin = this.engine.plugin.components[name];
-			if (plugin.pasteSchema) plugin.pasteSchema(schema);
-		});
+		this.engine.trigger('paste:schema', this.schema);
 		return new Parser(this.source, this.engine, root => {
-			Object.keys(this.engine.plugin.components).forEach(name => {
-				const plugin = this.engine.plugin.components[name];
-				if (plugin.pasteOrigin) plugin.pasteOrigin(root);
-			});
-		}).toDOM(schema, conversion.getValue());
+			this.engine.trigger('paste:origin', root);
+		}).toDOM(this.schema, conversion.getValue());
 	}
 
 	getDefaultStyle() {
@@ -140,15 +135,18 @@ export default class Paste {
 				Object.keys(node.css()).length === 0 &&
 				(node.text().trim() === '' ||
 					(node.first() &&
-						(this.engine.node.isMark(node.first()!) ||
-							this.engine.node.isBlock(node.first()!))))
+						(this.engine.node.isMark(node.first()!, this.schema) ||
+							this.engine.node.isBlock(
+								node.first()!,
+								this.schema,
+							))))
 			) {
 				this.engine.node.unwrap(node);
 				return;
 			}
 
 			// br 换行改成正常段落
-			if (this.engine.node.isBlock(node)) {
+			if (this.engine.node.isBlock(node, this.schema)) {
 				this.engine.block.brToBlock(node);
 			}
 		});
@@ -172,7 +170,7 @@ export default class Paste {
 			}
 			// 删除零高度的空行
 			if (
-				this.engine.node.isBlock(node) &&
+				this.engine.node.isBlock(node, this.schema) &&
 				node.attributes('data-type') !== 'p' &&
 				!this.engine.node.isVoid(node) &&
 				//!node.isSolid() &&
@@ -244,18 +242,21 @@ export default class Paste {
 			}
 			// 处理空 Block
 			if (
-				this.engine.node.isBlock(node) &&
-				!this.engine.node.isVoid(node) &&
+				this.engine.node.isBlock(node, this.schema) &&
+				!this.engine.node.isVoid(node, this.schema) &&
 				this.engine.node.html(node).trim() === ''
 			) {
 				// <p></p> to <p><br /></p>
-				if (this.engine.node.isRootBlock(node) || node.name === 'li') {
+				if (
+					this.engine.node.isRootBlock(node, this.schema) ||
+					node.name === 'li'
+				) {
 					this.engine.node.html(node, '<br />');
 				}
 			}
 			// <li><p>foo</p></li>
 			if (
-				this.engine.node.isRootBlock(node) &&
+				this.engine.node.isRootBlock(node, this.schema) &&
 				node.parent()?.name === 'li'
 			) {
 				// <li><p><br /></p></li>
@@ -302,11 +303,7 @@ export default class Paste {
 
 		let nodes = $(fragment).allChildren();
 		nodes.forEach(child => {
-			const node = $(child);
-			Object.keys(this.engine.plugin.components).forEach(name => {
-				const plugin = this.engine.plugin.components[name];
-				if (plugin.pasteEach) plugin.pasteEach(node);
-			});
+			this.engine.trigger('paste:each', $(child));
 		});
 		nodes = $(fragment).allChildren();
 		nodes.forEach(child => {

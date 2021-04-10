@@ -1,5 +1,6 @@
 import { CardEntry } from './card';
 import { EditorInterface } from './engine';
+import { NodeInterface } from './node';
 import { PluginEntry } from './plugin';
 
 /**
@@ -12,6 +13,18 @@ export interface ViewInterface extends EditorInterface {
 	 * @param trigger 是否触发渲染完成事件，用来展示插件的特俗效果。例如在heading插件中，展示锚点显示功能。默认为 true
 	 */
 	render(content: string, trigger?: boolean): void;
+	/**
+	 * 触发事件
+	 * @param eventType 事件名称
+	 * @param args 参数
+	 */
+	trigger(eventType: string, ...args: any): any;
+	/**
+	 * 触发render事件
+	 * @param eventType render
+	 * @param value 渲染根节点
+	 */
+	trigger(eventType: 'render', value: NodeInterface): void;
 }
 
 export type ContentViewOptions = {

@@ -39,7 +39,8 @@ class Toolbar implements ToolbarInterface {
 				item.render(node);
 			}
 			if (options.type === 'input') {
-				item = new Input(this.editor, options as InputOptions);
+				const inputOptions = options as InputOptions;
+				item = new Input(this.editor, inputOptions);
 				item.render(node);
 			}
 			if (options.type === 'dropdown') {
@@ -47,11 +48,27 @@ class Toolbar implements ToolbarInterface {
 				item.render(node);
 			}
 			if (options.type === 'node') {
-				options = options as NodeOptions;
-				item = options.node;
-				item.addClass('data-toolbar-item');
-				node.append(item);
-				if (options.load) options.load(item);
+				const nodeOptions = options as NodeOptions;
+				const nodeItem: NodeInterface = nodeOptions.node;
+				nodeItem.addClass('data-toolbar-item');
+				const { title } = nodeOptions;
+				if (title) {
+					const tooltip = new Tooltip(this.editor);
+					nodeItem.on('mouseenter', () => {
+						tooltip.show(
+							nodeItem,
+							typeof title === 'function' ? title() : title,
+						);
+					});
+					nodeItem.on('mouseleave', () => {
+						tooltip.hide();
+					});
+					nodeItem.on('mousedown', () => {
+						tooltip.hide();
+					});
+				}
+				node.append(nodeItem);
+				if (options.didMount) options.didMount(nodeItem);
 			}
 			if (item) this.items.push(item);
 		});

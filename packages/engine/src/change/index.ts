@@ -476,26 +476,17 @@ class ChangeModel implements ChangeInterface {
 			this.onSelect();
 		});
 
-		if (container.closest(CARD_SELECTOR).length === 0) {
-			this.event.onWindow('beforeunload', () => {
-				if (this.engine) {
-					this.engine.event.trigger('save:before');
-				}
-			});
-		}
-
 		this.event.onDocument('click', (e: MouseEvent) => {
 			if (!e.target) return;
 			const { $ } = this.engine;
 			const card = this.engine.card.find($(e.target));
 			if (card) {
-				if (
-					(card.constructor as CardEntry).cardType === CardType.INLINE
-				) {
+				const cardEntry = card.constructor as CardEntry;
+				if (cardEntry.cardType === CardType.INLINE) {
 					this.engine.card.activate(
 						card.root,
 						ActiveTrigger.CLICK,
-						e,
+						cardEntry.toolbarFollowMouse ? e : undefined,
 					);
 				}
 				if (card.onFocus) {
@@ -576,39 +567,19 @@ class ChangeModel implements ChangeInterface {
 					}
 				}
 			}
-			const value = this.getValue();
-			let isStop = false;
-			Object.keys(this.engine.plugin.components).every(name => {
-				const plugin = this.engine.plugin.components[name];
-				if (plugin.pasteEvent) {
-					const result = plugin.pasteEvent(data, value);
-					if (result === false) {
-						isStop = true;
-						return false;
-					}
-				}
-				return true;
-			});
-			if (files.length === 0 && !isStop) {
+			if (this.engine.trigger('paste:event', data, source) === false)
+				return;
+			if (files.length === 0) {
 				const fragment = new Paste(source, this.engine).normalize();
-				Object.keys(this.engine.plugin.components).forEach(name => {
-					const plugin = this.engine.plugin.components[name];
-					if (plugin.pasteBefore) plugin.pasteBefore(fragment);
-				});
+				this.engine.trigger('paste:before', fragment);
 				this.insertFragment(fragment, range => {
-					Object.keys(this.engine.plugin.components).forEach(name => {
-						const plugin = this.engine.plugin.components[name];
-						if (plugin.pasteInsert) plugin.pasteInsert(range);
-					});
+					this.engine.trigger('paste:insert', range);
 					const selection = range.createSelection();
 					this.engine.card.render();
 					selection.move();
 					range.scrollRangeIntoView();
 				});
-				Object.keys(this.engine.plugin.components).forEach(name => {
-					const plugin = this.engine.plugin.components[name];
-					if (plugin.pasteAfter) plugin.pasteAfter();
-				});
+				this.engine.trigger('paste:after');
 			}
 		});
 
@@ -627,18 +598,16 @@ class ChangeModel implements ChangeInterface {
 				if (insertCardAble(range)) return;
 				const cardEntry = card.constructor as CardEntry;
 				const cardName = cardEntry.cardName;
+				const cardValue = card.getValue();
 				this.engine.card.remove(card.root);
 				this.select(range!);
-				this.engine.card.insert(cardName, card.getValue());
+				this.engine.card.insert(cardName, cardValue);
 			}
 			if (files.length > 0) {
 				event.preventDefault();
 				if (insertCardAble(range)) return;
 				this.select(range!);
-				Object.keys(this.engine.plugin.components).forEach(name => {
-					const plugin = this.engine.plugin.components[name];
-					if (plugin.dropFiles) plugin.dropFiles(files);
-				});
+				this.engine.trigger('drop:files', files);
 			}
 		});
 	}

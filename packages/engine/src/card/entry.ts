@@ -41,6 +41,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	static readonly collab: boolean = true;
 	static readonly focus: boolean;
 	static readonly selectStyleType: 'border' | 'background' = 'border';
+	static readonly toolbarFollowMouse: boolean = false;
 	private defaultMaximize: MaximizeInterface;
 	isMaximize: boolean = false;
 
@@ -110,12 +111,11 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		if (value == null) {
 			return;
 		}
+		const currentValue = this.getValue();
+		if (!!currentValue?.id) delete value['id'];
 		value = { ...this.getValue(), ...value } as T;
 
-		this.root.attributes(
-			CARD_VALUE_KEY,
-			encodeCardValue({ ...value, id: this.id }),
-		);
+		this.root.attributes(CARD_VALUE_KEY, encodeCardValue(value));
 	}
 	// 获取 DOM 属性里的数据
 	getValue(): (T & { id: string }) | undefined {

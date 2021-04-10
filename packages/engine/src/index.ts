@@ -10,6 +10,7 @@ import View from './view';
 import Toolbar, { Tooltip } from './toolbar';
 import Range from './range';
 import Parser from './parser';
+import Request, { Ajax, Uploader, getExtensionName } from './request';
 
 export * from './types';
 export * from './utils';
@@ -30,4 +31,8 @@ export {
 	Tooltip,
 	Parser,
 	isHotkey,
+	Request,
+	Uploader,
+	Ajax,
+	getExtensionName,
 };

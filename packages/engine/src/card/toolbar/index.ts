@@ -27,6 +27,10 @@ class CardToolbar implements CardToolbarInterface {
 		this.card = card;
 	}
 
+	getContainer() {
+		return this.toolbar?.root;
+	}
+
 	getDefaultItem(
 		item: CardToolbarItemOptions,
 	): ToolbarItemOptions | undefined {

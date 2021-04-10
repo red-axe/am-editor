@@ -237,18 +237,13 @@ class CardModel implements CardModelInterface {
 		}
 	}
 	// 将指定节点替换成等待创建的Card DOM 节点
-	replaceNode(
-		node: NodeInterface,
-		name: string,
-		type: CardType,
-		value?: CardValue,
-	) {
+	replaceNode(node: NodeInterface, name: string, value?: CardValue) {
 		const clazz = this.classes[name];
 		if (!clazz) throw ''.concat(name, ': This card does not exist');
 		const { $ } = this.editor;
 		value = encodeCardValue(value);
 		const cardNode = transformCustomTags(
-			`<card type="${type}" name="${name}" value="${value}"></card>`,
+			`<card type="${clazz.cardType}" name="${name}" value="${value}"></card>`,
 		);
 		const readyCard = $(cardNode);
 		node.before(readyCard);
@@ -309,7 +304,7 @@ class CardModel implements CardModelInterface {
 					!isCurrentActiveCard &&
 					trigger === ActiveTrigger.MOUSE_DOWN
 				) {
-					this.editor.event.trigger('focus');
+					this.editor.trigger('focus');
 				}
 				this.editor.change.onSelect();
 			}
@@ -324,10 +319,12 @@ class CardModel implements CardModelInterface {
 				!card.activated)
 		) {
 			const range = this.editor.change.getRange();
-			const parentNode = card.root[0].parentNode!;
-			const index = Array.prototype.slice
-				.call(parentNode.childNodes)
-				.indexOf(card.root.get());
+			const center = card.getCenter();
+			const parentNode = center.parent()!;
+			const index = parentNode
+				.children()
+				.toArray()
+				.findIndex(child => child.equal(center));
 			range.setStart(parentNode, index);
 			range.setEnd(parentNode, index + 1);
 			this.editor.change.select(range);

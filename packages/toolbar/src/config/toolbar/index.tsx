@@ -21,6 +21,47 @@ export const getToolbarDefaultConfig = (
 				{
 					items: [
 						{
+							name: 'image-uploader',
+							icon: (
+								<span>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+									>
+										<g fill="none" fillRule="evenodd">
+											<rect
+												stroke="#E8E8E8"
+												strokeWidth=".667"
+												fill="#FFF"
+												x=".333"
+												y=".333"
+												width="23.333"
+												height="23.333"
+												rx="1.333"
+											/>
+											<g fillRule="nonzero">
+												<path
+													d="M8.625 8a1.126 1.126 0 010 2.25 1.126 1.126 0 010-2.25z"
+													fill="#FFD666"
+												/>
+												<path
+													d="M17.95 14.88a.144.144 0 01-.092.033H6.14a.139.139 0 01-.14-.137.14.14 0 01.033-.089l2.981-3.45a.143.143 0 01.198-.018c.005.005.012.01.017.017l1.74 2.016 2.767-3.203a.143.143 0 01.198-.017l.018.017 4.018 4.64a.137.137 0 01-.02.191z"
+													fill="#CCC"
+												/>
+												<path
+													d="M17.91 14.88a.144.144 0 01-.092.033H9.333l4.363-4.864a.143.143 0 01.198-.017l.018.017 4.018 4.64a.137.137 0 01-.02.191z"
+													fill="#737373"
+												/>
+											</g>
+										</g>
+									</svg>
+								</span>
+							),
+							title: '图片',
+							search: '图片,tupian,image,img',
+						},
+						{
 							name: 'codeblock',
 							icon: (
 								<span>

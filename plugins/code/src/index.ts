@@ -10,6 +10,11 @@ export default class extends Inline<Options> {
 		return 'code';
 	}
 
+	init() {
+		super.init();
+		this.editor.on('paser:html', node => this.parseHtml(node));
+	}
+
 	tagName = 'code';
 
 	markdown = this.options.markdown !== false ? '`' : '';

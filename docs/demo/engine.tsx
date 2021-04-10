@@ -27,6 +27,8 @@ import RemoveFormat from '@aomao/plugin-removeformat';
 import SelectAll from '@aomao/plugin-selectall';
 import Link from '@aomao/plugin-link';
 import Codeblock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
+import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
+
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 import OTClient from './ot-client';
 import 'antd/lib/avatar/style';
@@ -59,6 +61,8 @@ const plugins = [
 	SelectAll,
 	Link,
 	Codeblock,
+	Image,
+	ImageUploader,
 	ToolbarPlugin,
 ];
 const cards = [
@@ -66,6 +70,7 @@ const cards = [
 	CheckboxComponent,
 	CodeBlockComponent,
 	ToolbarComponent,
+	ImageComponent,
 ];
 
 const EngineDemo = () => {
@@ -82,6 +87,14 @@ const EngineDemo = () => {
 		const engine = new Engine(ref.current, {
 			plugins,
 			cards,
+			config: {
+				[ImageUploader.pluginName]: {
+					url:
+						'http://localhost:8082/upload/image?type=doc&token=ZU1CMWNHTG5KZnR1OURJVlBjMStCUT09',
+					isRemote: (src: string) =>
+						src.indexOf('http://localhost/') < 0,
+				},
+			},
 		});
 		//初始化本地协作，用作记录历史
 		engine.ot.initLockMode();
@@ -91,7 +104,8 @@ const EngineDemo = () => {
 		//监听编辑器值改变事件
 		engine.on('change', value => {
 			setContent(value);
-			console.log(`value:${value}`);
+			console.log('value', value);
+			console.log('html:', engine.getHtml());
 		});
 		//获取当前保存的用户信息
 		const memberData = localStorage.getItem('member');

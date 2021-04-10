@@ -31,7 +31,7 @@ export default class Button implements ButtonInterface {
 	}
 
 	render(container: NodeInterface) {
-		const { title, onLoad, onClick } = this.options;
+		const { title, didMount, onClick } = this.options;
 		container.append(this.root);
 
 		if (title) {
@@ -56,8 +56,8 @@ export default class Button implements ButtonInterface {
 			if (onClick) onClick();
 		});
 
-		if (onLoad) {
-			onLoad(this.root);
+		if (didMount) {
+			didMount(this.root);
 		}
 	}
 }

@@ -45,7 +45,7 @@ class Event implements EventInterface {
 	 * @param eventType 事件类型
 	 * @param args 事件参数
 	 */
-	trigger(eventType: string, ...args: any): boolean | void {
+	trigger(eventType: string, ...args: any) {
 		const listeners = this.listeners[eventType];
 		if (listeners) {
 			let result;

@@ -44,6 +44,10 @@ export interface CardToolbarInterface {
 	 * @param event 鼠标事件，用于定位
 	 */
 	showCardToolbar(event?: MouseEvent): void;
+	/**
+	 * 获取工具栏容器
+	 */
+	getContainer(): NodeInterface | undefined;
 }
 
 export type CardToolbarItemOptions =
@@ -105,6 +109,10 @@ export interface CardEntry {
 	 * 卡片选中后的样式效果，默认为 border
 	 */
 	readonly selectStyleType: 'border' | 'background';
+	/**
+	 * toolbar 跟随鼠标点击位置
+	 */
+	readonly toolbarFollowMouse: boolean;
 }
 
 export interface CardInterface {

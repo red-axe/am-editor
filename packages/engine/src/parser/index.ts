@@ -86,10 +86,6 @@ const stylesToString = (styles: { [k: string]: string }) => {
 	return stylesString.trim();
 };
 
-const pToDiv = (value: string) => {
-	return value;
-};
-
 class Parser {
 	private root: NodeInterface;
 	private editor: EditorInterface;
@@ -269,35 +265,20 @@ class Parser {
 	) {
 		const result: Array<string> = [];
 		let index: number = 0;
-		Object.keys(this.editor.plugin.components).forEach(name => {
-			const plugin = this.editor.plugin.components[name];
-			if (plugin.parseValueBefore) plugin.parseValueBefore(this.root);
-		});
+		this.editor.trigger('paser:value-before', this.root);
 		this.walkTree(this.root, conversionRules, {
 			onOpen: (child, name, attrs, styles) => {
 				if (schema) {
 					const node = this.editor.$(`<${name} />`);
 					node.attributes(attrs);
 					node.css(styles);
-					const type = this.editor.node.getType(node);
+					const type = this.editor.node.getType(node, schema);
 					if (type === undefined) return;
 					schema.filterAttributes(name, attrs, type);
 					schema.filterStyles(name, styles, type);
 				}
-
-				let isContinue = 0;
-				Object.keys(this.editor.plugin.components).every(name => {
-					const plugin = this.editor.plugin.components[name];
-					if (plugin.parseValue) {
-						const value = plugin.parseValue(child, result);
-						if (value === false) {
-							isContinue = 1;
-							return false;
-						}
-					}
-					return true;
-				});
-				if (isContinue === 1) return false;
+				if (this.editor.trigger('paser:value', child, result) === false)
+					return false;
 				if (name === 'pre') {
 					index++;
 				}
@@ -345,7 +326,7 @@ class Parser {
 					const node = this.editor.$(`<${name} />`);
 					node.attributes(attrs);
 					node.css(styles);
-					const type = this.editor.node.getType(node);
+					const type = this.editor.node.getType(node, schema);
 					if (type === undefined) return;
 					schema.filterAttributes(name, attrs, type);
 					schema.filterStyles(name, styles, type);
@@ -356,10 +337,7 @@ class Parser {
 				result.push('</'.concat(name, '>'));
 			},
 		});
-		Object.keys(this.editor.plugin.components).forEach(name => {
-			const plugin = this.editor.plugin.components[name];
-			if (plugin.parseValueAfter) plugin.parseValueAfter(result);
-		});
+		this.editor.trigger('paser:value-after', result);
 		const value = result.join('');
 		return customTags ? transformCustomTags(value) : value;
 	}
@@ -380,10 +358,7 @@ class Parser {
 		} else {
 			element.append(this.root);
 		}
-		Object.keys(this.editor.plugin.components).forEach(name => {
-			const plugin = this.editor.plugin.components[name];
-			if (plugin.parseHtmlBefore) plugin.parseHtmlBefore(this.root);
-		});
+		this.editor.trigger('paser:html-before', this.root);
 		element.traverse(domNode => {
 			const node = domNode.get<HTMLElement>();
 			if (
@@ -395,15 +370,9 @@ class Parser {
 				node.parentNode.removeChild(node);
 			}
 		});
-		Object.keys(this.editor.plugin.components).forEach(name => {
-			const plugin = this.editor.plugin.components[name];
-			if (plugin.parseHtml) plugin.parseHtml(element);
-		});
+		this.editor.trigger('paser:html', element);
 		element.find('p').css(style);
-		Object.keys(this.editor.plugin.components).forEach(name => {
-			const plugin = this.editor.plugin.components[name];
-			if (plugin.parseHtmlAfter) plugin.parseHtmlAfter(element);
-		});
+		this.editor.trigger('paser:html-after', element);
 		return {
 			html: element.html(),
 			text: new Parser(element, this.editor).toText(null, true),

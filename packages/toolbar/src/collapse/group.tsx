@@ -26,7 +26,13 @@ const CollapseGroup: React.FC<CollapseGroupProps> = ({
 						key={item.name}
 						engine={engine}
 						{...item}
-						onClick={onSelect}
+						onClick={(event, name) => {
+							let result;
+							if (item.onClick)
+								result = item.onClick(event, name);
+							if (onSelect) onSelect(event, name);
+							return result;
+						}}
 					/>
 				);
 			})}

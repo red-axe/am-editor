@@ -23,7 +23,7 @@
     "blueimp-md5": "^2.18.0",
     "copy-to-clipboard": "^3.3.1",
     "diff-match-patch": "^1.0.5",
-    "eventemitter2": "^6.4.3",
+    "eventemitter2": "^6.4.4",
     "is-hotkey": "^0.2.0",
     "lodash-es": "^4.17.21",
     "ot-json0": "^1.1.0",

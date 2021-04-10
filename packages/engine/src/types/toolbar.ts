@@ -9,16 +9,19 @@ export type ButtonOptions = {
 	content: string;
 	title?: string | (() => string);
 	onClick?: () => void;
-	onLoad?: (root: NodeInterface) => void;
+	didMount?: (node: NodeInterface) => void;
 };
 
 export type InputOptions = {
 	type: 'input';
 	placeholder: string;
-	value: string;
+	value: string | number;
+	prefix?: string;
+	suffix?: string;
 	onEnter?: (value: string) => void;
 	onInput?: (value: string) => void;
 	onChange?: (value: string) => void;
+	didMount?: (node: NodeInterface) => void;
 };
 
 export type DropdownSwitchOptions = {
@@ -48,7 +51,8 @@ export type DropdownOptions = {
 export type NodeOptions = {
 	type: 'node';
 	node: NodeInterface;
-	load?: (node: NodeInterface) => void;
+	title?: string | (() => string);
+	didMount?: (node: NodeInterface) => void;
 };
 
 export type ToolbarItemOptions =
@@ -72,7 +76,7 @@ export interface InputInterface {
 	onInput: (value: string) => void;
 	onChange: (value: string) => void;
 	find(role: string): NodeInterface;
-	render(container?: NodeInterface): void;
+	render(container: NodeInterface): void;
 }
 
 export interface DropdownInterface {

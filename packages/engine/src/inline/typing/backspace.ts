@@ -27,6 +27,7 @@ class Backspace {
 				const text = startNode.text().substr(0, startOffset);
 				if (
 					prev &&
+					!prev.isCard() &&
 					this.engine.node.isInline(prev) &&
 					/\u200B$/g.test(text)
 				) {
@@ -37,7 +38,7 @@ class Backspace {
 			}
 			//在inline节点内删除
 			let inlineNode = mark.closestNotMark(startNode);
-			if (this.engine.node.isInline(inlineNode)) {
+			if (this.engine.node.isInline(inlineNode) && !inlineNode.isCard()) {
 				const text = inlineNode.text();
 				if (/^\u200B\u200B$/g.test(text)) {
 					//删除inline前面节点的零宽字符
@@ -62,7 +63,10 @@ class Backspace {
 			}
 			if (!collapsed) {
 				inlineNode = mark.closestNotMark(endNode);
-				if (this.engine.node.isInline(inlineNode)) {
+				if (
+					this.engine.node.isInline(inlineNode) &&
+					!inlineNode.isCard()
+				) {
 					const text = inlineNode.text();
 					if (/^\u200B\u200B$/g.test(text)) {
 						//删除inline前面节点的零宽字符

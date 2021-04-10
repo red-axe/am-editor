@@ -91,11 +91,11 @@ class Container {
 
 		this.node.on('focus', () => {
 			this._focused = true;
-			return engine.event.trigger('focus');
+			return engine.trigger('focus');
 		});
 		this.node.on('blur', () => {
 			this._focused = false;
-			return engine.event.trigger('blur');
+			return engine.trigger('blur');
 		});
 	}
 

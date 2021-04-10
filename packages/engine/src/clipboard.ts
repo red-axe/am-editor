@@ -208,10 +208,7 @@ export default class Clipboard implements ClipboardInterface {
 		block.append(this.editor.node.clone($(data), true));
 		if (trigger) {
 			block.allChildren().forEach(child => {
-				Object.keys(this.editor.plugin.components).forEach(name => {
-					const plugin = this.editor.plugin.components[name];
-					if (plugin.copy) plugin.copy($(child));
-				});
+				this.editor.trigger('copy', $(child));
 			});
 		}
 		block.append($('&#8203;', null));

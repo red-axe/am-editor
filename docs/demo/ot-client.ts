@@ -61,14 +61,50 @@ class OTClient extends EventEmitter {
 	protected current?: Member;
 	protected status?: string;
 	protected doc?: Doc;
+	protected heartbeat?: {
+		timeout: NodeJS.Timeout;
+		datetime: Date;
+	};
 
 	constructor(engine: EngineInterface) {
 		super();
 		this.engine = engine;
 	}
+	/**
+	 * 每隔指定毫秒发送心跳检测
+	 * @param millisecond 毫秒 默认 30000
+	 * @returns
+	 */
+	checkHeartbeat(millisecond: number = 30000) {
+		if (!this.socket) return;
+		const timeout = setTimeout(() => {
+			const now = new Date();
+			if (
+				!this.heartbeat ||
+				now.getTime() - this.heartbeat.datetime.getTime() >= millisecond
+			) {
+				this.socket?.send(
+					JSON.stringify({
+						action: 'heartbeat',
+						data: now.getTime(),
+					}),
+				);
+				this.heartbeat = {
+					timeout,
+					datetime: now,
+				};
+				this.checkHeartbeat();
+			}
+		}, 1000);
+	}
 
 	connect(url: string, documentID: string, collectionName: string = 'aomao') {
-		const socket = new ReconnectingWebSocket(url);
+		const socket = new ReconnectingWebSocket(url, [], {
+			maxReconnectionDelay: 30000,
+			minReconnectionDelay: 10000,
+			reconnectionDelayGrowFactor: 10000,
+			maxRetries: 60,
+		});
 		socket.addEventListener('open', () => {
 			console.log('collab server connected');
 			this.socket = socket as WebSocket;
@@ -104,6 +140,7 @@ class OTClient extends EventEmitter {
 					}
 				}
 			});
+			this.checkHeartbeat();
 		});
 		socket.addEventListener('close', () => {
 			console.log(

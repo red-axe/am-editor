@@ -68,8 +68,7 @@ class Backspace {
 			}
 		}
 		//改变了光标选区，再次触发事件
-		if (this.engine.event.trigger('keydown:backspace') === false)
-			return false;
+		if (this.engine.trigger('keydown:backspace') === false) return false;
 		return true;
 	}
 }

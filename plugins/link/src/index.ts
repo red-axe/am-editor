@@ -35,6 +35,7 @@ export default class extends Inline<Options> {
 		if (isEngine(this.editor)) {
 			this.toolbar = new Toolbar(this.editor);
 		}
+		this.editor.on('paser:html', node => this.parseHtml(node));
 		this.editor.language.add(locales);
 	}
 

@@ -326,7 +326,11 @@ export const validUrl = (url: string) => {
 export const sanitizeUrl = (url: string) => {
 	return validUrl(url) ? url : '';
 };
-
+/**
+ * 格式化编辑器值，移除光标标记标签，以及标签无效属性
+ * @param value
+ * @returns
+ */
 export const formatEngineValue = (value: string) => {
 	if (!value) return value;
 	const newValue = value.replace(/<(anchor|focus|cursor)[^>]*?\/>/gi, '');

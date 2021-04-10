@@ -5,11 +5,9 @@ import {
 	isNodeEntry,
 	NodeInterface,
 	NodeModelInterface,
-	isNodeList,
 	EditorInterface,
-	NodeEntry,
 	PluginEntry,
-	SchemaBlock,
+	SchemaInterface,
 } from '../types';
 import {
 	ANCHOR,
@@ -29,8 +27,8 @@ class NodeModel implements NodeModelInterface {
 		this.editor = editor;
 	}
 
-	isVoid(node: NodeInterface | Node | string) {
-		const { schema } = this.editor;
+	isVoid(node: NodeInterface | Node | string, schema?: SchemaInterface) {
+		schema = schema || this.editor.schema;
 		let name = typeof node === 'string' ? node : '';
 		if (isNode(node)) name = node.nodeName.toLowerCase();
 		else if (isNodeEntry(node)) name = node.name;
@@ -39,8 +37,9 @@ class NodeModel implements NodeModelInterface {
 			.some(rule => rule.isVoid);
 	}
 
-	isMark(node: NodeInterface | Node) {
-		const { schema, $ } = this.editor;
+	isMark(node: NodeInterface | Node, schema?: SchemaInterface) {
+		schema = schema || this.editor.schema;
+		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		return schema.check(node, 'mark');
 	}
@@ -49,8 +48,9 @@ class NodeModel implements NodeModelInterface {
 	 * 是否是inline标签
 	 * @param node 节点
 	 */
-	isInline(node: NodeInterface | Node) {
-		const { schema, $ } = this.editor;
+	isInline(node: NodeInterface | Node, schema?: SchemaInterface) {
+		schema = schema || this.editor.schema;
+		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		return schema.check(node, 'inline');
 	}
@@ -59,8 +59,9 @@ class NodeModel implements NodeModelInterface {
 	 * 是否是块级节点
 	 * @param node 节点
 	 */
-	isBlock(node: NodeInterface | Node): boolean {
-		const { schema, $ } = this.editor;
+	isBlock(node: NodeInterface | Node, schema?: SchemaInterface) {
+		schema = schema || this.editor.schema;
+		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		return schema.check(node, 'block');
 	}
@@ -83,11 +84,11 @@ class NodeModel implements NodeModelInterface {
 	 * @param node 节点
 	 * @returns
 	 */
-	isRootBlock(node: NodeInterface) {
+	isRootBlock(node: NodeInterface, schema?: SchemaInterface) {
 		if (!node.parent()?.isRoot()) return false;
 		if (!this.isSimpleBlock(node)) return false;
 		//并且规则上不可以设置子节点
-		return this.editor.schema
+		return (schema || this.editor.schema)
 			.find(schema => schema.name === node.name)
 			.every(
 				schema => this.editor.schema.closest(schema.name) === node.name,
@@ -190,10 +191,13 @@ class NodeModel implements NodeModelInterface {
 	 * @param node 节点
 	 * @returns
 	 */
-	getType(node: NodeInterface | Node): 'mark' | 'block' | 'inline' | void {
-		if (this.isMark(node)) return 'mark';
-		if (this.isBlock(node)) return 'block';
-		if (this.isInline(node)) return 'inline';
+	getType(
+		node: NodeInterface | Node,
+		schema?: SchemaInterface,
+	): 'mark' | 'block' | 'inline' | void {
+		if (this.isMark(node, schema)) return 'mark';
+		if (this.isBlock(node, schema)) return 'block';
+		if (this.isInline(node, schema)) return 'inline';
 	}
 	/**
 	 * 去除包裹

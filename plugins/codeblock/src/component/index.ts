@@ -58,7 +58,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 			{
 				type: 'node',
 				node: $('<div />'),
-				load: node => {
+				didMount: node => {
 					renderSelect(
 						node.get<HTMLElement>()!,
 						this.codeEditor?.mode || 'plain',

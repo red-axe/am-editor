@@ -20,6 +20,7 @@ export default class extends Plugin<Options> {
 	init() {
 		super.init();
 		this.editor.on('keydown:enter', event => this.markdown(event));
+		this.editor.on('paser:html', node => this.parseHtml(node));
 	}
 
 	execute() {
