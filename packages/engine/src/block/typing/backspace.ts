@@ -56,6 +56,7 @@ class Backspace {
 				})(cloneRange)
 			) {
 				event.preventDefault();
+				event['isDelete'] = true;
 				change.change();
 			}
 			return;

@@ -286,10 +286,7 @@ class ChangeModel implements ChangeInterface {
 					range.collapse(true);
 					this.select(range);
 					this.engine.node.html(cardLeft, '&#8203;');
-					this.engine.mark.insert(
-						'<span>'.concat(cardLeftText, '</span>'),
-					);
-					this.engine.mark.merge();
+					this.engine.change.insertText(cardLeftText);
 				}
 			} else if (card.isRightCursor(commonAncestorNode)) {
 				const cardRight = commonAncestorNode.closest(
@@ -302,10 +299,7 @@ class ChangeModel implements ChangeInterface {
 					range.collapse(false);
 					this.select(range);
 					this.engine.node.html(cardRight, '&#8203;');
-					this.engine.mark.insert(
-						'<span>'.concat(cardRightText, '</span>'),
-					);
-					this.engine.mark.merge();
+					this.engine.change.insertText(cardRightText);
 				}
 			} else this.getSafeRange(range);
 		}

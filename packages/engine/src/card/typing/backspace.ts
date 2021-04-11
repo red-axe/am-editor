@@ -19,6 +19,7 @@ class Backspace {
 			// 光标前面有Card，并且不是自定义列表，移除卡片
 			const prevNode = range.getPrevNode();
 			if (
+				!event['isDelete'] &&
 				prevNode &&
 				prevNode.isCard() &&
 				!this.engine.node.isCustomize(prevNode)

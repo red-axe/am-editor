@@ -13,7 +13,7 @@ export type Options = {
 const defaultConfig: Config = [
 	{
 		title: '常用',
-		items: ['codeblock'],
+		items: ['codeblock', 'image-uploader'],
 	},
 ];
 
