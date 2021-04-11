@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-mark",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,6 +20,6 @@
     "url": "https://github.com/itellyou-com/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^1.2.0"
+    "@aomao/engine": "^1.2.1"
   }
 }
