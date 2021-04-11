@@ -30,14 +30,14 @@ class CollapseComponent implements CollapseComponentInterface {
 		this.engine = engine;
 	}
 
-	handlePreventDefault(event: Event) {
+	handlePreventDefault = (event: Event) => {
 		// Card已被删除
 		if (this.root?.closest('body').length !== 0) {
 			event.preventDefault();
 			return false;
 		}
 		return;
-	}
+	};
 
 	select(index: number) {
 		this.root

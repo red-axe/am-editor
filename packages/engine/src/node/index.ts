@@ -558,14 +558,14 @@ class NodeModel implements NodeModelInterface {
 			}
 
 			const next = node.next();
-			if (
-				!next ||
-				(next && next.name !== 'br' && !/^\u200B/g.test(next.text()))
-			) {
+			if (!next || (next && !/^\u200B/g.test(next.text()))) {
 				if (next && next.isText()) {
 					next.text('\u200b' + next.text());
 				} else {
 					node.after(this.editor.node.clone(zeroNode, true));
+					if (next?.name === 'br') {
+						next.remove();
+					}
 				}
 			}
 		}
