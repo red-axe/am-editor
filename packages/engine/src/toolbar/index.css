@@ -116,6 +116,17 @@
     border-radius: 4px;
 }
 
+.data-toolbar-item-input .data-toolbar-input::selection {
+    color: inherit;
+    background:transparent
+}
+
+.data-toolbar-item-input .data-toolbar-input:focus::selection
+{
+    color: #fff;
+    background: #1890ff;
+}
+
 .data-toolbar-item-dropdown .dropdown-container {
 	display: none;
 	position: absolute;

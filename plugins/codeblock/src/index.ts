@@ -144,7 +144,7 @@ export default class extends Plugin<Options> {
 					node.append(content);
 					node.removeAttributes(CARD_VALUE_KEY);
 					content.removeClass('am-engine-view');
-				}
+				} else node.remove();
 			},
 		);
 	}

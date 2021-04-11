@@ -39,6 +39,8 @@ export interface AjaxInterface {
 
 export type UploaderOptions = {
 	url: string;
+	type?: string;
+	contentType?: string;
 	data?: {};
 	onBefore?: (file: File) => boolean | void;
 	onReady?: (fileInfo: FileInfo, file: File) => void;

@@ -73,6 +73,9 @@ const cards = [
 	ImageComponent,
 ];
 
+const isDev = process.env.NODE_ENV !== 'production';
+const domain = isDev ? 'http://localhost:7001' : 'https://editor.aomao.com';
+
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const [engine, setEngine] = useState<EngineInterface>();
@@ -89,10 +92,13 @@ const EngineDemo = () => {
 			cards,
 			config: {
 				[ImageUploader.pluginName]: {
-					url:
-						'http://localhost:8082/upload/image?type=doc&token=ZU1CMWNHTG5KZnR1OURJVlBjMStCUT09',
-					isRemote: (src: string) =>
-						src.indexOf('http://localhost/') < 0,
+					file: {
+						action: `${domain}/upload/image`,
+					},
+					remote: {
+						action: `${domain}/upload/image`,
+					},
+					isRemote: (src: string) => src.indexOf(domain) < 0,
 				},
 			},
 		});
@@ -113,10 +119,9 @@ const EngineDemo = () => {
 		//实例化协作编辑客户端
 		const otClient = new OTClient(engine);
 		//连接到协作服务端，demo文档
+		const ws = isDev ? 'ws://127.0.0.1:8080' : 'wss://collab.aomao.com';
 		otClient.connect(
-			`ws://127.0.0.1:8080${
-				currentMember ? '?uid=' + currentMember.id : ''
-			}`,
+			`${ws}${currentMember ? '?uid=' + currentMember.id : ''}`,
 			'demo',
 		);
 		otClient.on('ready', member => {

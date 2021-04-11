@@ -8,7 +8,7 @@
     "stop": "egg-scripts stop --title=egg-aomao-ssr",
     "dev": "egg-bin dev --port=7001 --sticky",
     "debug": "cross-env RM_TMPDIR=none COMPRESS=none egg-bin debug",
-    "start-doc":"cd ../ && yarn start",
+    "start-doc": "cd ../ && yarn start",
     "test": "egg-bin test",
     "cov": "egg-bin cov",
     "lint": "eslint .",
@@ -27,6 +27,7 @@
     "jsdom": "^16.4.0",
     "prop-types": "^15.6.2",
     "qs": "^6.7.0",
+    "stream-wormhole": "^1.1.0",
     "url": "^0.11.0"
   },
   "devDependencies": {

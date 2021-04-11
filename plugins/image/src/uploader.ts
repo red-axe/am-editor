@@ -13,33 +13,60 @@ import ImageComponent from './component';
 
 export type Options = {
 	/**
-	 * 上传地址
+	 * 文件上传配置
 	 */
-	url: string;
+	file: {
+		/**
+		 * 文件上传地址
+		 */
+		action: string;
+		/**
+		 * 数据返回类型，默认 json
+		 */
+		type?: '*' | 'json' | 'xml' | 'html' | 'text' | 'js';
+		/**
+		 * 额外携带数据上传
+		 */
+		data?: {};
+		/**
+		 * 请求类型，默认 multipart/form-data;
+		 */
+		contentType?: string;
+		/**
+		 * 图片接收的格式，默认 "svg","png","bmp","jpg","jpeg","gif","tif","tiff","emf","webp"
+		 */
+		accept?: string | Array<string>;
+		/**
+		 * 文件选择限制数量
+		 */
+		multiple?: boolean | number;
+		/**
+		 * 上传大小限制，默认 1024 * 1024 * 5 就是5M
+		 */
+		limitSize?: number;
+	};
+	remote: {
+		/**
+		 * 上传地址
+		 */
+		action: string;
+		/**
+		 * 数据返回类型，默认 json
+		 */
+		type?: '*' | 'json' | 'xml' | 'html' | 'text' | 'js';
+		/**
+		 * 额外携带数据上传
+		 */
+		data?: {};
+		/**
+		 * 请求类型，默认 multipart/form-data;
+		 */
+		contentType?: string;
+	};
 	/**
 	 * Markdown
 	 */
 	markdown?: boolean;
-	/**
-	 * 额外携带数据上传
-	 */
-	data?: {};
-	/**
-	 * 请求类型，在上传第三方图片地址时有效，默认为json，文件上传始终走 FormData
-	 */
-	type?: 'json' | 'formData';
-	/**
-	 * 图片接收的格式，默认 "svg","png","bmp","jpg","jpeg","gif","tif","tiff","emf","webp"
-	 */
-	accept?: string | Array<string>;
-	/**
-	 * 文件选择限制数量
-	 */
-	multiple?: boolean | number;
-	/**
-	 * 上传大小限制，默认 1024 * 1024 * 5 就是5M
-	 */
-	limitSize?: number;
 	/**
 	 * 解析上传后的Respone，返回 result:是否成功，data:成功：图片地址，失败：错误信息
 	 */
@@ -57,6 +84,7 @@ export type Options = {
 
 export default class extends Plugin<Options> {
 	private cardComponents: { [key: string]: ImageComponent } = {};
+	private loadCounts: { [key: string]: number } = {};
 
 	static get pluginName() {
 		return 'image-uploader';
@@ -87,7 +115,7 @@ export default class extends Plugin<Options> {
 			this.editor.on('paste:each', node => this.pasteEach(node));
 			this.editor.on('paste:after', () => this.pasteAfter());
 		}
-		let { accept } = this.options;
+		let { accept } = this.options.file;
 		const names: Array<string> = [];
 		if (typeof accept === 'string') accept = accept.split(',');
 
@@ -131,19 +159,21 @@ export default class extends Plugin<Options> {
 	}
 
 	loadImage(id: string, value: { src: string; status: string }) {
+		if (!this.loadCounts[id]) this.loadCounts[id] = 1;
 		const image = new Image();
 		image.src = value.src;
 		image.onload = () => {
+			delete this.loadCounts[id];
 			this.editor.card.update(id, value);
 		};
-		let i = 0;
 		image.onerror = () => {
-			if (i < 3) {
+			if (this.loadCounts[id] <= 3) {
 				setTimeout(() => {
-					i++;
+					this.loadCounts[id]++;
 					this.loadImage(id, value);
-				}, 500 * i);
+				}, 500);
 			} else {
+				delete this.loadCounts[id];
 				this.editor.card.update(id, value);
 			}
 		};
@@ -172,12 +202,13 @@ export default class extends Plugin<Options> {
 			  });
 	}
 
-	async execute(files?: Array<File> | MouseEvent) {
+	async execute(files?: Array<File> | string | MouseEvent) {
 		if (!isEngine(this.editor)) return;
 		const { request, card, language } = this.editor;
-		const { url, data, multiple, parse } = this.options;
-		const limitSize = this.options.limitSize || 5 * 1024 * 1024;
-		if (!Array.isArray(files)) {
+		const { action, data, type, contentType, multiple } = this.options.file;
+		const { parse } = this.options;
+		const limitSize = this.options.file.limitSize || 5 * 1024 * 1024;
+		if (!Array.isArray(files) && typeof files !== 'string') {
 			files = await request.getFiles({
 				event: files,
 				accept: isAndroid
@@ -187,12 +218,17 @@ export default class extends Plugin<Options> {
 					: '',
 				multiple,
 			});
+		} else if (typeof files === 'string') {
+			this.insertRemote(files);
+			return;
 		}
 		if (files.length === 0) return;
 		request.upload(
 			{
-				url,
+				url: action,
 				data,
+				type,
+				contentType,
 				onBefore: file => {
 					if (file.size > limitSize) {
 						this.editor.messageError(
@@ -380,14 +416,16 @@ export default class extends Plugin<Options> {
 
 	uploadAddress(src: string, component: ImageComponent) {
 		if (!isEngine(this.editor)) return;
-		const { url, type, data, parse } = this.options;
+		const { action, type, data, contentType } = this.options.remote;
+		const { parse } = this.options;
 		this.editor.request.ajax({
-			url,
+			url: action,
 			method: 'POST',
+			contentType: contentType || 'application/json',
 			type: type === undefined ? 'json' : type,
 			data: {
 				...data,
-				src,
+				url: src,
 			},
 			success: response => {
 				let src =
@@ -429,6 +467,27 @@ export default class extends Plugin<Options> {
 				});
 			},
 		});
+	}
+
+	insertRemote(src: string, alt?: string) {
+		const value = {
+			src,
+			alt,
+			status: 'uploading',
+		};
+		const { isRemote } = this.options;
+		//上传第三方图片
+		if (isRemote && isRemote(src)) {
+			const component = this.editor.card.insert(
+				'image',
+				value,
+			) as ImageComponent;
+			this.uploadAddress(src, component);
+			return;
+		}
+		//当前图片
+		value.status = 'done';
+		this.editor.card.insert('image', value);
 	}
 
 	pasteAfter() {
@@ -488,29 +547,12 @@ export default class extends Plugin<Options> {
 			event.preventDefault();
 			const splits = match[1].split('|');
 			const src = match[2];
-			const value = {
-				src: src,
-				alt: splits[0],
-				status: 'uploading',
-			};
 			this.editor.block.removeLeftText(block);
 			const alignment = splits[1];
 			if (alignment === 'center' || alignment === 'right') {
 				this.editor.command.execute('alignment', alignment);
 			}
-			const { isRemote } = this.options;
-			//上传第三方图片
-			if (isRemote && isRemote(src)) {
-				const component = this.editor.card.insert(
-					'image',
-					value,
-				) as ImageComponent;
-				this.uploadAddress(src, component);
-				return;
-			}
-			//当前图片
-			value.status = 'done';
-			this.editor.card.insert('image', value);
+			this.insertRemote(src, splits[0]);
 		}
 	}
 }

@@ -165,9 +165,7 @@ class Ajax implements AjaxInterface {
 		}
 		if (!headers[CONTENT_TYPE] && !isFormData(this.options.data)) {
 			headers[CONTENT_TYPE] =
-				(this.options.type && globalSetup.accept[this.options.type]) ||
-				this.options.contentType ||
-				globalSetup.contentType;
+				this.options.contentType || globalSetup.contentType;
 		}
 		Object.keys(headers).forEach(name => {
 			request.setRequestHeader(name, headers[name]);
@@ -283,7 +281,10 @@ class Ajax implements AjaxInterface {
 		if (!context) return;
 
 		let { data, url } = this.options;
-		if (type === 'json' && typeof data === 'object') {
+		if (
+			(this.options.contentType?.indexOf('json') || -1) > -1 &&
+			typeof data === 'object'
+		) {
 			data = JSON.stringify(data);
 		}
 		data =

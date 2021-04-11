@@ -126,9 +126,20 @@ class CardModel implements CardModelInterface {
 			if (!cardNode) return;
 			selector = cardNode;
 		}
+
+		const getValue = (
+			node: Node | NodeInterface,
+		): CardValue & { id: string } => {
+			if (isNode(node)) node = this.editor.$(node);
+			const value = node.attributes(CARD_VALUE_KEY);
+			return value ? decodeCardValue(value) : {};
+		};
+
 		const cards = this.components.filter(item => {
 			if (typeof selector === 'string') return item.id === selector;
-			return item.root.equal(selector);
+			return (
+				item.root.equal(selector) || item.id === getValue(selector).id
+			);
 		});
 		if (cards.length === 0) return;
 
@@ -319,12 +330,12 @@ class CardModel implements CardModelInterface {
 				!card.activated)
 		) {
 			const range = this.editor.change.getRange();
-			const center = card.getCenter();
-			const parentNode = center.parent()!;
+			const root = card.root;
+			const parentNode = root.parent()!;
 			const index = parentNode
 				.children()
 				.toArray()
-				.findIndex(child => child.equal(center));
+				.findIndex(child => child.equal(root));
 			range.setStart(parentNode, index);
 			range.setEnd(parentNode, index + 1);
 			this.editor.change.select(range);

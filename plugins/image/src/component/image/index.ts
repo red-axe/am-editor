@@ -117,21 +117,15 @@ class Image {
 	}
 
 	renderTemplate(message?: string) {
-		const {
-			link,
-			status,
-			percent,
-			className,
-			onBeforeRender,
-		} = this.options;
+		const { link, percent, className, onBeforeRender } = this.options;
 
-		if (status === 'error') {
+		if (this.status === 'error') {
 			return `<span class="data-image-error"><span class="data-icon data-icon-error"></span>${message ||
 				this.options
 					.message}<span class="data-icon data-icon-copy"></span></span>`;
 		}
 		const src = onBeforeRender
-			? onBeforeRender(status, this.options.src)
+			? onBeforeRender(this.status, this.options.src)
 			: this.options.src;
 		const progress = `<span class="data-image-progress">
                             <i class="data-anticon">
@@ -170,6 +164,31 @@ class Image {
                 </span>
             </span>
         </span>`;
+	}
+
+	bindErrorEvent(node: NodeInterface) {
+		const copyNode = node.find('.data-icon-copy');
+		const tooltip = new Tooltip(this.editor);
+		copyNode.on('mouseenter', () => {
+			tooltip.show(
+				copyNode,
+				this.editor.language
+					.get('image', 'errorMessageCopy')
+					.toString(),
+			);
+		});
+		copyNode.on('mouseleave', () => {
+			tooltip.hide();
+		});
+		copyNode.on('mousedown', (event: MouseEvent) => {
+			event.stopPropagation();
+			event.preventDefault();
+			tooltip.hide();
+			this.editor.clipboard.copy(this.options.message || 'Error message');
+			this.editor.messageSuccess(
+				this.editor.language.get('copy', 'success').toString(),
+			);
+		});
 	}
 
 	setProgressPercent(percent: number) {
@@ -241,6 +260,7 @@ class Image {
 				this.editor.language.get('image', 'loadError').toString(),
 			),
 		);
+		this.bindErrorEvent(container);
 		const { onError } = this.options;
 		if (onError) onError();
 	}
@@ -444,28 +464,7 @@ class Image {
 		//阅读模式不展示错误
 		const { container } = this.options;
 		if (this.status === 'error' && isEngine(this.editor)) {
-			const copyNode = this.root.find('.data-icon-copy');
-			const tooltip = new Tooltip(this.editor);
-			copyNode.on('mouseenter', () => {
-				tooltip.show(
-					copyNode,
-					this.editor.language
-						.get('image', 'errorMessageCopy')
-						.toString(),
-				);
-			});
-			copyNode.on('mouseleave', () => {
-				tooltip.hide();
-			});
-			copyNode.on('mousedown', (event: MouseEvent) => {
-				event.stopPropagation();
-				event.preventDefault();
-				tooltip.hide();
-				this.editor.clipboard.copy(
-					this.options.message || 'Error message',
-				);
-			});
-
+			this.bindErrorEvent(this.root);
 			container.append(this.root);
 			return;
 		}

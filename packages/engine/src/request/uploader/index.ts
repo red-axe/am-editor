@@ -69,7 +69,8 @@ class Uploader implements UploaderInterface {
 				},
 				url,
 				data: formData,
-				type: 'json',
+				contentType: this.options.contentType,
+				type: this.options.type || 'json',
 				success: (response: any) => {
 					if (onSuccess) onSuccess(response, file);
 				},

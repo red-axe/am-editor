@@ -69,6 +69,7 @@ class ImageComponent extends Card<ImageValue> {
 	private image?: Image;
 	private widthInput?: NodeInterface;
 	private heightInput?: NodeInterface;
+	private isLocalError?: boolean;
 
 	static get cardName() {
 		return 'image';
@@ -126,6 +127,13 @@ class ImageComponent extends Card<ImageValue> {
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
 		const { language } = this.editor;
 		let value = this.getValue();
+		if (this.isLocalError === true || value?.status === 'error')
+			return [
+				{
+					type: 'delete',
+				},
+			];
+
 		return [
 			{
 				type: 'copy',
@@ -210,8 +218,17 @@ class ImageComponent extends Card<ImageValue> {
 			onChange: size => {
 				if (size) this.setSize(size);
 			},
+			onError: () => {
+				this.isLocalError = true;
+				this.didUpdate();
+			},
 		});
 		this.image.render();
+	}
+
+	didUpdate() {
+		this.toolbarModel?.getContainer()?.remove();
+		this.toolbarModel?.create();
 	}
 }
 

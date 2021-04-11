@@ -16,10 +16,15 @@ export default class extends Plugin {
 		this.editor.on('paser:html', node => this.parseHtml(node));
 	}
 
-	execute(status: 'uploading' | 'done' | 'error', src: string): void {
+	execute(
+		status: 'uploading' | 'done' | 'error',
+		src: string,
+		alt?: string,
+	): void {
 		const value: ImageValue = {
 			status,
 			src,
+			alt,
 		};
 		if (status === 'error') {
 			value.src = '';
@@ -66,13 +71,13 @@ export default class extends Plugin {
 			const card = this.editor.card.find(node) as ImageComponent;
 			const value = card?.getValue();
 			if (value?.src) {
-				const img = $('.data-image-meta > img');
+				const img = node.find('.data-image-meta > img');
 				node.empty();
 				img.attributes('src', value.src);
 				img.css('visibility', 'visible');
 				node.append(img);
 				node.removeAttributes(CARD_VALUE_KEY);
-			}
+			} else node.remove();
 		});
 	}
 }

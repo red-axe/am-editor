@@ -43,6 +43,7 @@ export default defineConfig({
 					'/plugin/plugin-hr',
 					'/plugin/plugin-indent',
 					'/plugin/plugin-italic',
+					'/plugin/plugin-image',
 					'/plugin/plugin-link',
 					'/plugin/plugin-mark',
 					'/plugin/plugin-orderedlist',
