@@ -16,6 +16,7 @@ export default class EngineDemo extends Vue {
             const engine = new Engine(container,{
                 plugins:[Bold]
             });
+            engine.setValue("<strong>我在这里哟～</strong>")
         }
     }
 }
