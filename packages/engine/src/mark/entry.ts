@@ -169,8 +169,9 @@ abstract class MarkEntry<T extends {} = {}> extends PluginEntry<T>
 			//追加node
 			node.after(markNode);
 		}
-		if (match) {
+		if (match && textNode.textContent && textNode.textContent !== '') {
 			node.after(textNode);
+			this.editor.trigger('paste:each', textNode);
 		}
 		//如果有解析到节点，就再次触发事件，可能节点内还有markdown字符没有解析
 		marks.forEach(mark => {
