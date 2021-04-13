@@ -551,7 +551,7 @@ class ChangeModel implements ChangeInterface {
 							-1
 					) {
 						source = html;
-					} else if (text && /^((http|https):\/\/)?\S+$/.test(text)) {
+					} else if (text && /^https?:\/\/\S+$/.test(text)) {
 						const value = escape(text);
 						source = `<a href="${value}" target="_blank">${value}</a>`;
 					} else if (html) {
@@ -732,9 +732,12 @@ class ChangeModel implements ChangeInterface {
 			_lastNode: NodeInterface,
 			_firstNode: NodeInterface,
 		) => {
+			const isSameParent =
+				_firstNode.parent()?.name === _lastNode.parent()?.name;
 			return (
-				'p' === _firstNode.name ||
+				('p' === _firstNode.name && isSameParent) ||
 				(_lastNode.name === _firstNode.name &&
+					isSameParent &&
 					!(
 						'li' === _lastNode.name &&
 						!list.isSame(_lastNode.parent()!, _firstNode.parent()!)

@@ -1,3 +1,4 @@
+import md5 from 'blueimp-md5';
 import { cloneDeep, merge, omit } from 'lodash-es';
 import {
 	isSchemaRule,
@@ -17,11 +18,12 @@ import { validUrl } from './utils';
  */
 class Schema implements SchemaInterface {
 	private _map: { [key: string]: SchemaMap } = {};
+	private _nodeCache: { [key: string]: boolean } = {};
 	data: {
 		blocks: Array<SchemaRule>;
 		inlines: Array<SchemaRule>;
 		marks: Array<SchemaRule>;
-		globals: SchemaAttributes | SchemaStyle;
+		globals: { [key: string]: SchemaAttributes | SchemaStyle };
 	} = {
 		blocks: [],
 		inlines: [],
@@ -42,6 +44,34 @@ class Schema implements SchemaInterface {
 
 		rules.forEach(rule => {
 			if (isSchemaRule(rule)) {
+				//删除全局属性已有的规则
+				if (rule.attributes) {
+					Object.keys(rule.attributes).forEach(key => {
+						if (!this.data.globals[rule.type]) return;
+						if (key === 'style') {
+							Object.keys(rule.attributes!.style).forEach(
+								styleName => {
+									if (
+										this.data.globals[rule.type][key] &&
+										this.data.globals[rule.type][key][
+											styleName
+										] === rule.attributes!.style[styleName]
+									) {
+										delete rule.attributes!.style[
+											styleName
+										];
+									}
+								},
+							);
+						} else if (
+							this.data.globals[rule.type][key] ===
+							rule.attributes![key]
+						) {
+							delete rule.attributes![key];
+						}
+					});
+				}
+
 				if (rule.type === 'block') {
 					this.data.blocks.push(rule);
 				} else if (rule.type === 'inline') {
@@ -57,6 +87,7 @@ class Schema implements SchemaInterface {
 			}
 		});
 		this._map = {};
+		this._nodeCache = {};
 	}
 	/**
 	 * 克隆当前schema对象
@@ -97,7 +128,80 @@ class Schema implements SchemaInterface {
 		const attributes = node.attributes();
 		const styles = node.css();
 		delete attributes['style'];
-		return (
+
+		let md5Text = `${node.name}_${type}`;
+		Object.keys(attributes).forEach(key => {
+			md5Text += `_${key}`;
+			if (['type' || 'name' || 'data-type'].indexOf(key) > -1) {
+				md5Text += `_${attributes[key]}`;
+			}
+		});
+		Object.keys(styles).forEach(key => {
+			md5Text += `_${key}`;
+		});
+		const md5Key = md5(md5Text);
+		if (this._nodeCache[md5Key] !== undefined)
+			return this._nodeCache[md5Key];
+
+		//如果节点属性和样式在排除全局后都没有，就查看有没有什么属性都没有的规则，如果没有就返回false
+		const tempAttributes = { ...attributes };
+		const tempStyles = { ...styles };
+		['block', 'mark', 'inline'].forEach(type => {
+			Object.keys(this.data.globals[type] || {}).forEach(key => {
+				if (key === 'style') {
+					Object.keys(this.data.globals[type][key] || {}).forEach(
+						styleName => {
+							delete tempStyles[styleName];
+						},
+					);
+				} else {
+					delete tempAttributes[key];
+				}
+			});
+		});
+
+		if (Object.keys(tempStyles).length === 0) {
+			if (
+				!(type ? [`${type}s`] : ['blocks', 'marks', 'inlines']).some(
+					types => {
+						return (this.data[types] as Array<SchemaRule>).some(
+							rule => {
+								if (rule.name !== node.name) return false;
+								return (
+									!rule.attributes?.style ||
+									Object.keys(rule.attributes.style)
+										.length === 0
+								);
+							},
+						);
+					},
+				)
+			) {
+				this._nodeCache[md5Key] = false;
+				return false;
+			}
+		}
+		if (Object.keys(tempAttributes).length === 0) {
+			if (
+				!(type ? [`${type}s`] : ['blocks', 'marks', 'inlines']).some(
+					types => {
+						return (this.data[types] as Array<SchemaRule>).some(
+							rule => {
+								if (rule.name !== node.name) return false;
+								return (
+									!rule.attributes ||
+									Object.keys(rule.attributes).length === 0
+								);
+							},
+						);
+					},
+				)
+			) {
+				this._nodeCache[md5Key] = false;
+				return false;
+			}
+		}
+		const result =
 			Object.keys(styles).every(styleName =>
 				this.checkStyle(node.name, styleName, styles[styleName], type),
 			) &&
@@ -108,8 +212,9 @@ class Schema implements SchemaInterface {
 					attributes[attributesName],
 					type,
 				),
-			)
-		);
+			);
+		this._nodeCache[md5Key] = result;
+		return result;
 	}
 	/**
 	 * 检测节点是否符合某一属性规则
@@ -127,7 +232,7 @@ class Schema implements SchemaInterface {
 		const nodeStyles = node.css();
 		delete nodeAttributes['style'];
 		//将全局属性合并到属性
-		attributes = { ...this.data.globals[type], ...attributes };
+		attributes = merge(this.data.globals[type], attributes);
 
 		const styles = (attributes || {}).style as SchemaAttributes;
 		attributes = omit(attributes, 'style');

@@ -6,9 +6,6 @@ const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 	{
 		name: 'p',
 		type: 'block',
-		attributes: {
-			'data-id': '*',
-		},
 	},
 	{
 		name: 'br',

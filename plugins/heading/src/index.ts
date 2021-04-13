@@ -96,10 +96,12 @@ export default class extends Block<Options> {
 				});
 			});
 		}
-		if (isEngine(this.editor))
+		if (isEngine(this.editor)) {
 			this.editor.on('keydown:backspace', event =>
 				this.onBackspace(event),
 			);
+			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+		}
 		//引擎处理
 		if (!isEngine(this.editor) || this.options.showAnchor === false) return;
 
@@ -425,9 +427,6 @@ export default class extends Block<Options> {
 	markdown(event: KeyboardEvent, text: string, block: NodeInterface) {
 		if (!isEngine(this.editor) || this.options.markdown === false)
 			return false;
-
-		const { change } = this.editor;
-		const range = change.getRange();
 		let type: any = '';
 		switch (text) {
 			case '#':
@@ -461,6 +460,39 @@ export default class extends Block<Options> {
 			type,
 		);
 		return false;
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		if (!isEngine(this.editor) || !this.markdown) return;
+		if (
+			this.editor.node.isBlock(node) ||
+			(node.parent()?.isFragment && node.isText())
+		) {
+			const textNode = node.isText() ? node : node.first();
+			if (!textNode?.isText()) return;
+			const text = textNode.text();
+			const match = /^(#{1,6})/.exec(text);
+			if (!match) return;
+			const { $ } = this.editor;
+			const codeLength = match[1].length;
+			const newTextNode = textNode
+				.get<Text>()!
+				.splitText(
+					/^\s+/.test(text.substr(codeLength))
+						? codeLength + 1
+						: codeLength,
+				);
+			textNode.replaceWith(newTextNode);
+			let heading = $(`<h${codeLength} />`);
+			if (node.isText()) {
+				newTextNode.before(heading[0]);
+				heading.append(newTextNode.cloneNode(true));
+				newTextNode.remove();
+			} else {
+				heading = this.editor.node.replace(node, heading);
+			}
+			this.editor.trigger('paste:each', heading.first());
+		}
 	}
 
 	onBackspace(event: KeyboardEvent) {

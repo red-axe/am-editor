@@ -76,6 +76,11 @@ export interface InlineInterface extends PluginInterface {
 		text: string,
 		node: NodeInterface,
 	): boolean | void;
+	/**
+	 * 解析粘贴markdown
+	 * @param node 节点
+	 */
+	pasteMarkdown(node: NodeInterface): boolean | void;
 }
 
 export const isInlinePlugin = (

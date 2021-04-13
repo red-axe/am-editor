@@ -106,8 +106,8 @@ class Parser {
 			// 变成
 			// <p></p><div>foo</div><p></p>
 			source = source
-				.replace(/<p(>|\s+[^>]*>)/gi, '<paragraph$1')
-				.replace(/<\/p>/gi, '</paragraph>');
+				.replace(/<p(>|\s+[^>]*>)/gi, '<div$1')
+				.replace(/<\/p>/gi, '</div>');
 			source = transformCustomTags(source);
 			const doc = new (getWindow().DOMParser)().parseFromString(
 				source,

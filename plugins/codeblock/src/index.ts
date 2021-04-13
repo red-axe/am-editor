@@ -6,6 +6,9 @@ import {
 	CARD_KEY,
 	isServer,
 	CARD_VALUE_KEY,
+	Parser,
+	SchemaInterface,
+	unescape,
 } from '@aomao/engine';
 import CodeBlockComponent from './component';
 import { CodeBlockEditor } from './component/types';
@@ -36,8 +39,13 @@ export default class extends Plugin<Options> {
 
 	init() {
 		super.init();
-		this.editor.on('keydown:enter', event => this.markdown(event));
 		this.editor.on('paser:html', node => this.parseHtml(node));
+		if (isEngine(this.editor) && this.markdown) {
+			this.editor.on('keydown:enter', event => this.markdown(event));
+			this.editor.on('paste:schema', schema => this.pasteSchema(schema));
+			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+			this.editor.on('paste:each', child => this.pasteHtml(child));
+		}
 	}
 
 	execute(mode: string, value: string) {
@@ -70,7 +78,7 @@ export default class extends Plugin<Options> {
 		}
 
 		const chars = this.editor.block.getLeftText(block);
-		const match = /^```(.*){0,10}$/.exec(chars);
+		const match = /^```(.*){0,20}$/.exec(chars);
 
 		if (match) {
 			const modeText = (undefined === match[1]
@@ -91,6 +99,63 @@ export default class extends Plugin<Options> {
 			}
 		}
 		return;
+	}
+
+	pasteSchema(schema: SchemaInterface) {
+		schema.add({
+			type: 'block',
+			name: 'pre',
+			attributes: {
+				'data-syntax': '*',
+			},
+		});
+	}
+
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor) || node.name !== 'pre') return;
+		if (node.attributes('data-syntax') || node.first()?.name === 'code') {
+			let code = new Parser(node, this.editor).toText();
+			code = unescape(code);
+			this.editor.card.replaceNode(node, 'codeblock', {
+				mode: node.attributes('data-syntax') || 'plain',
+				code,
+			});
+			node.remove();
+		}
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		if (
+			!isEngine(this.editor) ||
+			!this.markdown ||
+			!this.editor.node.isBlock(node)
+		)
+			return;
+		const text = node.text();
+		const match = /^```(.*){0,20}$/.exec(text);
+		if (!match) return;
+		const modeText = (undefined === match[1] ? '' : match[1]).toLowerCase();
+		const mode = MODE_ALIAS[modeText] || modeText;
+		let code = '';
+		let next = node.next();
+		while (next) {
+			const text = next.text();
+			if (/^```/.test(text)) {
+				next.remove();
+				break;
+			}
+			const codeText = new Parser(next.html(), this.editor).toText();
+			code += unescape(codeText) + '\n';
+			const temp = next.next();
+			next.remove();
+			next = temp;
+		}
+		if (code.endsWith('\n')) code = code.substr(0, code.length - 1);
+		this.editor.card.replaceNode(node, 'codeblock', {
+			mode,
+			code,
+		});
+		node.remove();
 	}
 
 	parseHtml(root: NodeInterface) {

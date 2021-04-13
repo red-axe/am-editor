@@ -16,9 +16,14 @@ export default class extends Block<Options> {
 
 	init() {
 		super.init();
-		this.editor.on('keydow:backspace', event => this.onBackspace(event));
-		this.editor.on('keydow:enter', event => this.onEnter(event));
 		this.editor.on('paser:html', node => this.parseHtml(node));
+		if (isEngine(this.editor)) {
+			this.editor.on('keydow:backspace', event =>
+				this.onBackspace(event),
+			);
+			this.editor.on('keydow:enter', event => this.onEnter(event));
+			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+		}
 	}
 
 	execute() {
@@ -78,6 +83,77 @@ export default class extends Block<Options> {
 			(this.constructor as PluginEntry).pluginName,
 		);
 		return false;
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		if (!isEngine(this.editor) || !this.markdown) return;
+		if (
+			(node.name === 'p' && this.editor.node.isBlock(node)) ||
+			(node.parent()?.isFragment && node.isText())
+		) {
+			const { $ } = this.editor;
+			const reg = /^([>]{1,})/;
+			const convertToNode = (node: NodeInterface) => {
+				const textNode = node.isText() ? node : node.first();
+				if (!textNode?.isText()) return;
+				const text = textNode.text();
+				const match = reg.exec(text);
+				if (!match) return;
+
+				const codeLength = match[1].length;
+				const newTextNode = $(
+					textNode
+						.get<Text>()!
+						.splitText(
+							/^\s+/.test(text.substr(codeLength))
+								? codeLength + 1
+								: codeLength,
+						),
+				);
+				let quoteNode = $(`<${this.tagName} />`);
+				if (!node.isText()) {
+					textNode.remove();
+					node.get<Element>()?.normalize();
+					node.children().each(child => {
+						if (child.nodeType === Node.TEXT_NODE) {
+							const pNode = $('<p />');
+							pNode.append(child);
+							quoteNode.append(pNode);
+						} else quoteNode.append(child);
+					});
+				} else {
+					const pNode = $('<p />');
+					pNode.append(newTextNode);
+					quoteNode.append(pNode);
+				}
+				return quoteNode;
+			};
+			const startQuote = convertToNode(node);
+			if (!startQuote) return;
+			const nodes = [];
+			nodes.push(startQuote);
+
+			if (!node.isText()) {
+				let next = node.next();
+				while (next) {
+					const quoteNode = convertToNode(next);
+					if (!quoteNode) break;
+					nodes.push(quoteNode);
+					const temp = next.next();
+					next.remove();
+					next = temp;
+				}
+			}
+			let prevNode = node;
+			nodes.forEach(quoteNode => {
+				prevNode.after(quoteNode);
+				quoteNode.allChildren().forEach(child => {
+					if (child) this.editor.trigger('paste:each', $(child));
+				});
+				prevNode = quoteNode;
+			});
+			node.remove();
+		}
 	}
 
 	onBackspace(event: KeyboardEvent) {

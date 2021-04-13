@@ -36,6 +36,9 @@ export default class extends List<Options> {
 	init() {
 		super.init();
 		this.editor.on('paser:html', node => this.parseHtml(node));
+		if (isEngine(this.editor)) {
+			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+		}
 	}
 
 	schema(): Array<SchemaBlock> {
@@ -163,6 +166,81 @@ export default class extends List<Options> {
 			text === '[x]' ? { checked: true } : undefined,
 		);
 		return false;
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		if (!isEngine(this.editor) || !this.markdown) return;
+		if (
+			this.editor.node.isBlock(node) ||
+			(node.parent()?.isFragment && node.isText())
+		) {
+			const { $ } = this.editor;
+			const reg = /^(\[[\sx]{0,1}\])/;
+			const convertToNode = (node: NodeInterface) => {
+				const textNode = node.isText() ? node : node.first();
+				if (!textNode?.isText()) return;
+				const text = textNode.text();
+				const match = reg.exec(text);
+				if (!match) return;
+
+				const codeLength = match[1].length;
+				const newTextNode = $(
+					textNode
+						.get<Text>()!
+						.splitText(
+							/^\s+/.test(text.substr(codeLength))
+								? codeLength + 1
+								: codeLength,
+						),
+				);
+				let li = $('<li />');
+				if (!node.isText()) {
+					textNode.remove();
+					node.children().each(child => {
+						li.append(child);
+					});
+				} else {
+					li.append(newTextNode);
+				}
+				const tempNode = $('<span />');
+				li.first()?.before(tempNode);
+				this.editor.card.replaceNode(tempNode, this.cardName, {
+					checked: match[1].indexOf('x') > 0,
+				});
+				tempNode.remove();
+				li.addClass(this.editor.list.CUSTOMZIE_LI_CLASS);
+				return li;
+			};
+			const startLi = convertToNode(node);
+			if (!startLi) return;
+			const nodes = [];
+			nodes.push(startLi);
+
+			if (!node.isText()) {
+				let next = node.next();
+				while (next) {
+					const li = convertToNode(next);
+					if (!li) break;
+					nodes.push(li);
+					const temp = next.next();
+					next.remove();
+					next = temp;
+				}
+			}
+
+			const root = $(
+				`<${this.tagName} class="${this.editor.list.CUSTOMZIE_UL_CLASS} data-list-task" />`,
+			);
+			nodes.forEach(li => {
+				root.append(li);
+			});
+			node.before(root);
+			node.remove();
+			this.editor.list.addBr(root);
+			root.allChildren().forEach(child => {
+				if (child) this.editor.trigger('paste:each', $(child));
+			});
+		}
 	}
 }
 export { CheckboxComponent };

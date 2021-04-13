@@ -114,6 +114,7 @@ export default class extends Plugin<Options> {
 			this.editor.on('paste:schema', schema => this.pasteSchema(schema));
 			this.editor.on('paste:each', node => this.pasteEach(node));
 			this.editor.on('paste:after', () => this.pasteAfter());
+			this.editor.on('paste:each', child => this.pasteMarkdown(child));
 		}
 		let { accept } = this.options.file;
 		const names: Array<string> = [];
@@ -553,6 +554,48 @@ export default class extends Plugin<Options> {
 				this.editor.command.execute('alignment', alignment);
 			}
 			this.insertRemote(src, splits[0]);
+		}
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		if (!isEngine(this.editor) || !this.markdown) return;
+		if (!node.isText()) return;
+		const parent = node.parent();
+		if (!parent) return;
+
+		let textNode = node.get<Text>()!;
+		if (!textNode.textContent) return;
+		const { isRemote } = this.options;
+		let match;
+		while (
+			textNode.textContent &&
+			(match = /(!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\))/.exec(
+				textNode.textContent,
+			))
+		) {
+			//从匹配到的位置切断
+			let regNode = textNode.splitText(match.index);
+			//从匹配结束位置分割
+			textNode = regNode.splitText(match[0].length);
+
+			const alt = match[2];
+			const src = match[3];
+			//追加node
+			const cardNode = this.editor.$(regNode);
+			node.after(cardNode);
+			this.editor.card.replaceNode(cardNode, 'image', {
+				src,
+				status:
+					(isRemote && isRemote(src)) || /^data:image\//i.test(src)
+						? 'uploading'
+						: 'done',
+				alt,
+				percent: 0,
+			});
+			cardNode.remove();
+		}
+		if (match) {
+			node.after(textNode);
 		}
 	}
 }

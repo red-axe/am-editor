@@ -18,6 +18,13 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 	 */
 	readonly markdown?: string;
 
+	init() {
+		super.init();
+		if (isEngine(this.editor) && this.markdown) {
+			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+		}
+	}
+
 	execute() {
 		if (!isEngine(this.editor)) return;
 		const inlineNode = this.editor.$(`<${this.tagName} />`);
@@ -62,7 +69,7 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 	 */
 	triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown) return;
-		const key = this.markdown.replace(/(\*|\^)/g, '\\$1');
+		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
 		const match = new RegExp(`^(.*)${key}(.+?)${key}$`).exec(text);
 		if (match) {
 			const { change } = this.editor;
@@ -89,11 +96,64 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 			);
 			range = change.getRange();
 			range.collapse(false);
+			const inline = this.editor.inline.closest(range.startNode);
+			const inlineNext = inline.next();
+			if (
+				inline &&
+				inlineNext &&
+				inlineNext.isText() &&
+				/^\u200B/g.test(inlineNext.text())
+			) {
+				range.setStart(inlineNext, 1);
+				range.setEnd(inlineNext, 1);
+			}
 			change.select(range);
 			change.insertText('\xa0');
 			return false;
 		}
 		return;
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		if (!isEngine(this.editor) || !this.markdown) return;
+		if (!node.isText()) return;
+		const parent = node.parent();
+		if (!parent) return;
+
+		let textNode = node.get<Text>()!;
+		if (!textNode.textContent) return;
+		const inlines: Array<NodeInterface> = [];
+		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
+		const reg = new RegExp(`(${key}([^${key}\r\n]+)${key})`);
+		let match;
+		while (
+			textNode.textContent &&
+			(match = reg.exec(textNode.textContent))
+		) {
+			//从匹配到的位置切断
+			let regNode = textNode.splitText(match.index);
+			//从匹配结束位置分割
+			textNode = regNode.splitText(match[0].length);
+			//移除匹配到的字符
+			regNode.remove();
+			//获取中间字符
+			const inlineNode = this.editor.$(
+				`<${this.tagName}>${match[2]}</${this.tagName}>`,
+			);
+			inlines.push(inlineNode);
+			//追加node
+			node.after(inlineNode);
+			this.editor.inline.repairCursor(inlineNode);
+		}
+		if (match && textNode.textContent && textNode.textContent !== '') {
+			node.after(textNode);
+			this.editor.trigger('paste:each', textNode);
+		}
+		//如果有解析到节点，就再次触发事件，可能节点内还有markdown字符没有解析
+		inlines.forEach(inline => {
+			const child = inline.first();
+			if (child?.isText()) this.editor.trigger('paste:each', child);
+		});
 	}
 }
 

@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom';
-import React, { useState } from 'react';
+import React from 'react';
 import { Select } from 'antd';
 import modeData from './mode';
 import 'antd/lib/select/style';

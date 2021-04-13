@@ -17,7 +17,10 @@ class Doc {
 	) {
 		const doc = connection.get(collectionName, this.id);
 		doc.fetch(function(err) {
-			if (err) throw err;
+			if (err) {
+				console.error(err);
+				return;
+			}
 			if (doc.type === null) {
 				doc.create([], callback);
 				return;
@@ -42,13 +45,17 @@ class Doc {
 		const member = this.members.find(member => member.uuid === uuid);
 		const socket = this.sockets[uuid];
 		if (member && socket) {
-			socket.send(
-				JSON.stringify({
-					action,
-					data: message,
-				}),
-				callback,
-			);
+			try {
+				socket.send(
+					JSON.stringify({
+						action,
+						data: message,
+					}),
+					callback,
+				);
+			} catch (error) {
+				console.error(err);
+			}
 		}
 	}
 
@@ -78,35 +85,39 @@ class Doc {
 		this.broadcast('join', member, m => m.uuid !== member.uuid);
 		// 通知用户当前文档的所有用户
 		this.sendMessage(member.uuid, 'members', this.members);
-		// 建立协作 socket 连接
-		const stream = new WebSocketJSONStream(ws);
-		// 监听消息
-		this.backend.listen(stream);
-		// 中间件处理 action 消息
-		this.backend.use(
-			Object.keys(this.backend.MIDDLEWARE_ACTIONS),
-			(context, next) => {
-				const { action, data } = context.data || {};
-				// 自定义消息
-				if (!!action) {
-					//广播消息
-					if (action === 'broadcast') {
-						this.broadcast('broadcast', data.data);
+		try {
+			// 建立协作 socket 连接
+			const stream = new WebSocketJSONStream(ws);
+			// 监听消息
+			this.backend.listen(stream);
+			// 中间件处理 action 消息
+			this.backend.use(
+				Object.keys(this.backend.MIDDLEWARE_ACTIONS),
+				(context, next) => {
+					const { action, data } = context.data || {};
+					// 自定义消息
+					if (!!action) {
+						//广播消息
+						if (action === 'broadcast') {
+							this.broadcast('broadcast', data.data);
+						}
+						//心跳检测
+						else if (action === 'heartbeat') {
+							this.sendMessage(
+								member.uuid,
+								'heartbeat',
+								new Date().getTime(),
+							);
+						}
+						return;
 					}
-					//心跳检测
-					else if (action === 'heartbeat') {
-						this.sendMessage(
-							member.uuid,
-							'heartbeat',
-							new Date().getTime(),
-						);
-					}
-					return;
-				}
-				// sharedb消息
-				next();
-			},
-		);
+					// sharedb消息
+					next();
+				},
+			);
+		} catch (error) {
+			console.error(error);
+		}
 		// 通知用户准备好了
 		this.sendMessage(member.uuid, 'ready', member);
 	}

@@ -748,6 +748,8 @@ class List implements ListModelInterface {
 				case 'ol':
 				case 'ul':
 					targetNode.attributes(blocks.attributes());
+					if (targetNode.name === 'ul')
+						targetNode.removeAttributes('start');
 					blocks = this.editor.node.replace(blocks, targetNode);
 					return blocks;
 

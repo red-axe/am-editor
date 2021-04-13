@@ -10,6 +10,17 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 	cardName?: string;
 	private isPasteList: boolean = false;
 
+	init() {
+		super.init();
+		if (isEngine(this.editor)) {
+			this.editor.on('paste:before', fragment =>
+				this.pasteBefore(fragment),
+			);
+			this.editor.on('paste:insert', () => this.pasteInsert());
+			this.editor.on('paste:before', () => this.pasteAfter());
+		}
+	}
+
 	queryState() {
 		if (!isEngine(this.editor)) return false;
 		return (

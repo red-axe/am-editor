@@ -24,10 +24,6 @@ export default class Paste {
 		const conversion = this.engine.conversion.clone();
 		this.schema.add([
 			{
-				name: 'pre',
-				type: 'block',
-			},
-			{
 				name: 'span',
 				type: 'mark',
 				attributes: {
@@ -282,8 +278,8 @@ export default class Paste {
 		this.commonNormalize(fragment);
 		const range = this.engine.change.getRange();
 		const root = range.commonAncestorNode;
-		// 光标在行内代码里
-		if (root.closest('code').length > 0) {
+		const inline = this.engine.inline.closest(root);
+		if (this.engine.node.isInline(inline)) {
 			this.removeElementNodes($(fragment));
 			return fragment;
 		}
@@ -303,7 +299,8 @@ export default class Paste {
 
 		let nodes = $(fragment).allChildren();
 		nodes.forEach(child => {
-			this.engine.trigger('paste:each', $(child));
+			const node = $(child);
+			if (node.parent()) this.engine.trigger('paste:each', node);
 		});
 		nodes = $(fragment).allChildren();
 		nodes.forEach(child => {

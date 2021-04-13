@@ -24,7 +24,7 @@ class Mark implements MarkModelInterface {
 
 	init() {
 		if (isEngine(this.editor)) {
-			this.editor.event.on('keydown:space', event =>
+			this.editor.on('keydown:space', event =>
 				this.triggerMarkdown(event),
 			);
 		}

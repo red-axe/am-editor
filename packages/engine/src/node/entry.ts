@@ -82,7 +82,7 @@ class NodeEntry implements NodeInterface {
 			return false;
 		}
 		const defaultMatches = (element: Element, selector: string) => {
-			const domNode = new NodeEntry(this.editor, [element]);
+			const domNode = new NodeEntry(this.editor, element);
 			let matches = domNode.document?.querySelectorAll(selector),
 				i = matches ? matches.length : 0;
 			while (--i >= 0 && matches?.item(i) !== domNode.get()) {}
@@ -212,7 +212,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	eq(index: number): NodeInterface | undefined {
 		return index > -1 && index < this.length
-			? new NodeEntry(this.editor, [this[index]])
+			? new NodeEntry(this.editor, this[index])
 			: undefined;
 	}
 
@@ -237,7 +237,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	parent(): NodeInterface | undefined {
 		const node = this.get()?.parentNode;
-		return node ? new NodeEntry(this.editor, [node]) : undefined;
+		return node ? new NodeEntry(this.editor, node) : undefined;
 	}
 
 	/**
@@ -268,7 +268,7 @@ class NodeEntry implements NodeInterface {
 	first(): NodeInterface | null {
 		if (this.isFragment) return this.eq(0) || null;
 		const node = this.length === 0 ? null : this.get()?.firstChild;
-		return node ? new NodeEntry(this.editor, [node]) : null;
+		return node ? new NodeEntry(this.editor, node) : null;
 	}
 
 	/**
@@ -278,7 +278,7 @@ class NodeEntry implements NodeInterface {
 	last(): NodeInterface | null {
 		if (this.isFragment) return this.eq(this.length - 1) || null;
 		const node = this.length === 0 ? null : this.get()?.lastChild;
-		return node ? new NodeEntry(this.editor, [node]) : null;
+		return node ? new NodeEntry(this.editor, node) : null;
 	}
 
 	/**
@@ -287,7 +287,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	prev(): NodeInterface | null {
 		const node = this.length === 0 ? null : this.get()?.previousSibling;
-		return node ? new NodeEntry(this.editor, [node]) : null;
+		return node ? new NodeEntry(this.editor, node) : null;
 	}
 
 	/**
@@ -296,7 +296,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	next(): NodeInterface | null {
 		const node = this.length === 0 ? null : this.get()?.nextSibling;
-		return node ? new NodeEntry(this.editor, [node]) : null;
+		return node ? new NodeEntry(this.editor, node) : null;
 	}
 
 	/**
@@ -308,7 +308,7 @@ class NodeEntry implements NodeInterface {
 			this.length === 0 || !this.isElement()
 				? null
 				: this.get<Element>()!.previousElementSibling;
-		return node ? new NodeEntry(this.editor, [node]) : null;
+		return node ? new NodeEntry(this.editor, node) : null;
 	}
 
 	/**
@@ -320,7 +320,7 @@ class NodeEntry implements NodeInterface {
 			this.length === 0 || !this.isElement()
 				? null
 				: this.get<Element>()!.nextElementSibling;
-		return node ? new NodeEntry(this.editor, [node]) : null;
+		return node ? new NodeEntry(this.editor, node) : null;
 	}
 
 	/**

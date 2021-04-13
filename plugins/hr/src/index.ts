@@ -19,8 +19,11 @@ export default class extends Plugin<Options> {
 
 	init() {
 		super.init();
-		this.editor.on('keydown:enter', event => this.markdown(event));
 		this.editor.on('paser:html', node => this.parseHtml(node));
+		if (isEngine(this.editor)) {
+			this.editor.on('keydown:enter', event => this.markdown(event));
+			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+		}
 	}
 
 	execute() {
@@ -47,7 +50,7 @@ export default class extends Plugin<Options> {
 		}
 
 		const chars = this.editor.block.getLeftText(block);
-		const match = /^---$/.exec(chars);
+		const match = /^[-]{3,}$/.exec(chars);
 
 		if (match) {
 			event.preventDefault();
@@ -58,6 +61,22 @@ export default class extends Plugin<Options> {
 			return false;
 		}
 		return;
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		if (!isEngine(this.editor) || !this.markdown) return;
+		if (
+			this.editor.node.isBlock(node) ||
+			(node.parent()?.isFragment && node.isText())
+		) {
+			const textNode = node.isText() ? node : node.first();
+			if (!textNode?.isText()) return;
+			const text = textNode.text();
+			const match = /^([-]{3,})\s?$/.exec(text);
+			if (!match) return;
+			this.editor.card.replaceNode(node, 'hr');
+			node.remove();
+		}
 	}
 
 	parseHtml(root: NodeInterface) {

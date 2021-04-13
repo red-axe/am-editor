@@ -228,7 +228,7 @@ export const removeUnit = (value: string) => {
  */
 export const encodeCardValue = (value: any): string => {
 	try {
-		value = encodeURIComponent(JSON.stringify(value));
+		value = encodeURIComponent(JSON.stringify(value || ''));
 	} catch (e) {
 		value = '';
 	}

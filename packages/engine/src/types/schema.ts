@@ -53,7 +53,7 @@ export interface SchemaInterface {
 		blocks: Array<SchemaRule>;
 		inlines: Array<SchemaRule>;
 		marks: Array<SchemaRule>;
-		globals: SchemaAttributes | SchemaStyle;
+		globals: { [key: string]: SchemaAttributes | SchemaStyle };
 	};
 	/**
 	 * 增加规则，不允许设置div标签，div将用作card使用

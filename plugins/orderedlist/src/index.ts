@@ -30,10 +30,21 @@ export default class extends List<Options> {
 		return 'orderedlist';
 	}
 
+	init() {
+		super.init();
+		if (isEngine(this.editor)) {
+			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+		}
+	}
+
 	schema(): Array<SchemaBlock> {
 		const scheam = super.schema() as SchemaBlock;
 		return [
 			scheam,
+			{
+				name: 'ol',
+				type: 'block',
+			},
 			{
 				name: 'li',
 				type: 'block',
@@ -90,5 +101,75 @@ export default class extends List<Options> {
 			parseInt(text.replace(/\./, ''), 10),
 		);
 		return false;
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		if (!isEngine(this.editor) || !this.markdown) return;
+		if (
+			this.editor.node.isBlock(node) ||
+			(node.parent()?.isFragment && node.isText())
+		) {
+			const { $ } = this.editor;
+			const reg = /^(\d{1,9}\.)/;
+			let start: number | undefined = undefined;
+			const convertToNode = (node: NodeInterface) => {
+				const textNode = node.isText() ? node : node.first();
+				if (!textNode?.isText()) return;
+				const text = textNode.text();
+				const match = reg.exec(text);
+				if (!match) return;
+
+				const codeLength = match[1].length;
+				if (!start)
+					start = parseInt(match[1].substr(0, codeLength - 1), 10);
+
+				const newTextNode = $(
+					textNode
+						.get<Text>()!
+						.splitText(
+							/^\s+/.test(text.substr(codeLength))
+								? codeLength + 1
+								: codeLength,
+						),
+				);
+				let li = $('<li />');
+				if (!node.isText()) {
+					textNode.remove();
+					node.children().each(child => {
+						li.append(child);
+					});
+				} else {
+					li.append(newTextNode);
+				}
+				return li;
+			};
+			const startLi = convertToNode(node);
+			if (!startLi) return;
+			const nodes = [];
+			nodes.push(startLi);
+
+			if (!node.isText()) {
+				let next = node.next();
+				while (next) {
+					const li = convertToNode(next);
+					if (!li) break;
+					nodes.push(li);
+					const temp = next.next();
+					next.remove();
+					next = temp;
+				}
+			}
+
+			const root = $(`<${this.tagName} start="${start || 1}" />`);
+			nodes.forEach(li => {
+				root.append(li);
+			});
+			node.before(root);
+			node.remove();
+			this.editor.list.addBr(root);
+			root.allChildren().forEach(child => {
+				if (child) this.editor.trigger('paste:each', $(child));
+			});
+		}
 	}
 }

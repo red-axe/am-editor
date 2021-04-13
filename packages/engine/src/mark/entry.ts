@@ -23,6 +23,13 @@ abstract class MarkEntry<T extends {} = {}> extends PluginEntry<T>
 	 */
 	readonly copyOnEnter?: boolean;
 
+	init() {
+		super.init();
+		if (isEngine(this.editor) && this.markdown) {
+			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+		}
+	}
+
 	execute() {
 		if (!isEngine(this.editor)) return;
 		const markNode = this.editor.$(`<${this.tagName} />`);
@@ -73,9 +80,21 @@ abstract class MarkEntry<T extends {} = {}> extends PluginEntry<T>
 	 */
 	triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown) return;
-		const key = this.markdown.replace(/(\*|\^)/g, '\\$1');
+		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
 		const match = new RegExp(`^(.*)${key}(.+?)${key}$`).exec(text);
+
 		if (match) {
+			//限制block下某些禁用的mark插件
+			const blockPlugin = this.editor.block.findPlugin(node);
+			const pluginName = (this.constructor as PluginEntryType).pluginName;
+			if (
+				blockPlugin.some(
+					plugin =>
+						plugin.disableMark &&
+						plugin.disableMark.indexOf(pluginName) > -1,
+				)
+			)
+				return;
 			const { change } = this.editor;
 			let range = change.getRange();
 			const visibleChar = match[1] && /\S$/.test(match[1]);
@@ -105,6 +124,59 @@ abstract class MarkEntry<T extends {} = {}> extends PluginEntry<T>
 			return false;
 		}
 		return;
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		if (!isEngine(this.editor) || !this.markdown) return;
+		if (!node.isText()) return;
+		const parent = node.parent();
+		if (!parent) return;
+
+		let textNode = node.get<Text>()!;
+		if (!textNode.textContent) return;
+		const marks: Array<NodeInterface> = [];
+		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
+		const reg = new RegExp(`(${key}([^${key}\r\n]+)${key})`);
+		let match = reg.exec(textNode.textContent);
+		if (match) {
+			//限制block下某些禁用的mark插件
+			const blockPlugin = this.editor.block.findPlugin(node);
+			const pluginName = (this.constructor as PluginEntryType).pluginName;
+			if (
+				blockPlugin.some(
+					plugin =>
+						plugin.disableMark &&
+						plugin.disableMark.indexOf(pluginName) > -1,
+				)
+			)
+				return;
+		}
+		while (
+			textNode.textContent &&
+			(match = reg.exec(textNode.textContent))
+		) {
+			//从匹配到的位置切断
+			let regNode = textNode.splitText(match.index);
+			//从匹配结束位置分割
+			textNode = regNode.splitText(match[0].length);
+			//移除匹配到的字符
+			regNode.remove();
+			//获取中间字符
+			const markNode = this.editor.$(
+				`<${this.tagName}>${match[2]}</${this.tagName}>`,
+			);
+			marks.push(markNode);
+			//追加node
+			node.after(markNode);
+		}
+		if (match) {
+			node.after(textNode);
+		}
+		//如果有解析到节点，就再次触发事件，可能节点内还有markdown字符没有解析
+		marks.forEach(mark => {
+			const child = mark.first();
+			if (child?.isText()) this.editor.trigger('paste:each', child);
+		});
 	}
 }
 

@@ -6,7 +6,7 @@ export default (
 	styles: { [k: string]: string },
 	isCardNode?: boolean,
 ): string => {
-	if (name === 'paragraph') {
+	if (name === 'paragraph' || name === 'div') {
 		name = 'p';
 	}
 

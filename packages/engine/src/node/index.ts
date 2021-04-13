@@ -498,12 +498,13 @@ class NodeModel implements NodeModelInterface {
 			//获取下一个兄弟节点
 			let nextNode = childNode.next();
 			//如果当前子节点是块级的Card组件或者是表格，或者是简单的block
-			if (childNode.isBlockCard() || this.isSimpleBlock(childNode))
+			if (childNode.isBlockCard() || this.isSimpleBlock(childNode)) {
 				this.editor.block.flatten(childNode, $(rootElement || []));
+			}
 			//如果当前是块级标签，递归循环
-			else if (this.isBlock(childNode))
+			else if (this.isBlock(childNode)) {
 				this.flatten(childNode, $(rootElement || []));
-			else {
+			} else {
 				const cloneNode = this.editor.node.clone(tempNode, false);
 				const isLI = 'li' === cloneNode.name;
 				childNode.before(cloneNode);
