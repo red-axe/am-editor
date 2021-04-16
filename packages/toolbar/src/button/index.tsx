@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tooltip } from 'antd';
+import Tooltip from 'antd/lib/tooltip';
 import classnames from 'classnames-es-ts';
 import { EngineInterface, formatHotkey } from '@aomao/engine';
 import { autoGetHotkey } from '../utils';

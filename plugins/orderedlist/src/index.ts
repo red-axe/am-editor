@@ -24,7 +24,7 @@ export default class extends List<Options> {
 		'@var1': '@number',
 	};
 
-	allowIn = ['blockquote'];
+	allowIn = ['blockquote', '$root'];
 
 	static get pluginName() {
 		return 'orderedlist';

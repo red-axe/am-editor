@@ -8,6 +8,7 @@ import {
 	EditorInterface,
 	PluginEntry,
 	SchemaInterface,
+	SchemaBlock,
 } from '../types';
 import {
 	ANCHOR,
@@ -90,9 +91,12 @@ class NodeModel implements NodeModelInterface {
 		//并且规则上不可以设置子节点
 		return (schema || this.editor.schema)
 			.find(schema => schema.name === node.name)
-			.every(
-				schema => this.editor.schema.closest(schema.name) === node.name,
-			);
+			.every(schema => {
+				if (schema.type !== 'block') return false;
+				const allowIn = (schema as SchemaBlock).allowIn;
+				if (!allowIn) return true;
+				return allowIn.indexOf('$root') > -1;
+			});
 	}
 	/**
 	 * 判断节点下的文本是否为空

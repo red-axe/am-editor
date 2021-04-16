@@ -1,7 +1,7 @@
-import keymaster, { deleteScope, unbind, setScope } from 'keymaster';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { EngineInterface, NodeInterface } from '@aomao/engine';
+import { omit } from 'lodash-es';
+import { EngineInterface, isServer, NodeInterface } from '@aomao/engine';
 import Collapse from '../../collapse';
 import { CollapseGroupProps } from '../../collapse/group';
 
@@ -17,6 +17,26 @@ export interface CollapseComponentInterface {
 	bindEvents(): void;
 	remove(): void;
 	render(container: NodeInterface, data: Array<CollapseGroupProps>): void;
+}
+
+let keymasterMoudle:
+	| {
+			keymaster: Keymaster;
+			setScope(scopeName: string): void;
+			getScope(): string;
+			deleteScope(scopeName: string): void;
+
+			unbind(key: string): void;
+			unbind(key: string, scopeName: string): void;
+	  }
+	| undefined = undefined;
+if (!isServer) {
+	import('keymaster').then(moudle => {
+		keymasterMoudle = {
+			keymaster: moudle.default,
+			...omit(moudle, 'default'),
+		};
+	});
 }
 
 class CollapseComponent implements CollapseComponentInterface {
@@ -75,6 +95,8 @@ class CollapseComponent implements CollapseComponentInterface {
 	}
 
 	unbindEvents() {
+		if (!keymasterMoudle) return;
+		const { deleteScope, unbind } = keymasterMoudle;
 		deleteScope(this.SCOPE_NAME);
 		unbind('enter', this.SCOPE_NAME);
 		unbind('up', this.SCOPE_NAME);
@@ -85,6 +107,8 @@ class CollapseComponent implements CollapseComponentInterface {
 
 	bindEvents() {
 		this.unbindEvents();
+		if (!keymasterMoudle) return;
+		const { setScope, keymaster } = keymasterMoudle;
 		setScope(this.SCOPE_NAME);
 		//回车
 		keymaster('enter', this.SCOPE_NAME, event => {

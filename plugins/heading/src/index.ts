@@ -34,7 +34,7 @@ export default class extends Block<Options> {
 	};
 	tagName = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 
-	allowIn = ['blockquote'];
+	allowIn = ['blockquote', '$root'];
 
 	disableMark = this.options.disableMark || ['fontsize', 'bold'];
 
@@ -136,7 +136,7 @@ export default class extends Block<Options> {
 			}
 
 			let id = node.attributes('id');
-			if (!id) {
+			if (!id || id === 'temp') {
 				id = random();
 				node.attributes('id', id);
 			}
@@ -392,7 +392,7 @@ export default class extends Block<Options> {
 		this.beforeProcess();
 		const { list, block } = this.editor;
 		list.split();
-		block.setBlocks(`<${type} />`);
+		block.setBlocks(`<${type}${type !== 'p' ? ' id="temp"' : ''} />`);
 		this.afterProcess();
 	}
 

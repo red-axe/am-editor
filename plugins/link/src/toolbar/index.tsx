@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ConfigProvider } from 'antd';
+import ConfigProvider from 'antd/lib/config-provider';
 import { EngineInterface, NodeInterface } from '@aomao/engine';
 import Editor from './editor';
 import Preview from './preview';

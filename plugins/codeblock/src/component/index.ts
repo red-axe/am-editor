@@ -6,8 +6,9 @@ import {
 	isServer,
 	ToolbarItemOptions,
 } from '@aomao/engine';
-import { CodeBlockEditor, CodeBlockEditorInterface } from './types';
+import CodeBlockEditor from './editor';
 import renderSelect from './select';
+import { CodeBlockEditorInterface } from './types';
 import './index.css';
 
 export type CodeBlockValue = {
@@ -32,8 +33,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 
 	init() {
 		if (isServer) return;
-		const CodeEditor: CodeBlockEditor = require('./editor').default;
-		this.codeEditor = new CodeEditor(this.editor, {
+		this.codeEditor = new CodeBlockEditor(this.editor, {
 			onSave: (mode, value) => {
 				this.setValue({
 					mode,
@@ -89,3 +89,4 @@ class CodeBlcok extends Card<CodeBlockValue> {
 }
 
 export default CodeBlcok;
+export { CodeBlockEditor };

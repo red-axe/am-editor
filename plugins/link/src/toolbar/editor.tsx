@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Input, Button } from 'antd';
+import { LanguageInterface } from '@aomao/engine';
+import Input from 'antd/lib/input';
+import Button from 'antd/lib/button';
 import classnames from 'classnames-es-ts';
 import 'antd/lib/input/style';
 import 'antd/lib/button/style';
-import { LanguageInterface } from '@aomao/engine';
 
 export type LinkEditorProps = {
 	language: LanguageInterface;

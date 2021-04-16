@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Avatar } from 'antd';
+import Avatar from 'antd/lib/avatar';
 import Engine, { EngineInterface } from '@aomao/engine';
 import Redo from '@aomao/plugin-redo';
 import Undo from '@aomao/plugin-undo';

@@ -10,7 +10,7 @@ import { CollapseGroupProps } from '../../collapse/group';
 import { CollapseItemProps } from '../../collapse/item';
 import { getToolbarDefaultConfig } from '../../config/toolbar';
 import { CollapseProps } from '../../types';
-import { CollapseComponentInterface } from './collapse';
+import CollapseComponent, { CollapseComponentInterface } from './collapse';
 import './index.css';
 
 export type Data = Array<CollapseGroupProps>;
@@ -72,7 +72,6 @@ class ToolbarComponent extends Card {
 				items,
 			});
 		});
-		const CollapseComponent = require('./collapse').default;
 		this.component = new CollapseComponent(this.editor, {
 			onCancel: () => {
 				this.changeToText();

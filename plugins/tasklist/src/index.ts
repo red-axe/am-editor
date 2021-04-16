@@ -31,7 +31,7 @@ export default class extends List<Options> {
 		'@var0': [this.editor.list.CUSTOMZIE_UL_CLASS, 'data-list-task'],
 	};
 
-	allowIn = ['blockquote'];
+	allowIn = ['blockquote', '$root'];
 
 	init() {
 		super.init();

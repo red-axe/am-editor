@@ -8,6 +8,12 @@
 $ yarn add @aomao/plugin-link
 ```
 
+`Vue` 使用
+
+```bash
+$ yarn add @aomao/plugin-link-vue
+```
+
 添加到引擎
 
 ```ts

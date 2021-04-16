@@ -8,6 +8,12 @@
 $ yarn add @aomao/plugin-codeblock
 ```
 
+`Vue` 使用
+
+```bash
+$ yarn add @aomao/plugin-codeblock-vue
+```
+
 添加到引擎
 
 ```ts

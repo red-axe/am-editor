@@ -1,18 +1,19 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <EngineDemo />
+    <engine-demo />
   </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
-import EngineDemo from '@/components/EngineDemo.vue'; // @ is an alias to /src
+import { defineComponent } from 'vue'
+import { Select } from 'ant-design-vue'
+import EngineDemo from '@/components/demo.vue';
 
-@Options({
-  components: {
-    EngineDemo,
-  },
+export default defineComponent({
+    components: {
+        "a-select":Select,
+        "a-select-option":Select.Option,
+        EngineDemo
+    }
 })
-export default class Home extends Vue {}
 </script>

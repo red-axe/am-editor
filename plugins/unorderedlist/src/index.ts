@@ -26,7 +26,7 @@ export default class extends List<Options> {
 		'@var0': '@number',
 	};
 
-	allowIn = ['blockquote'];
+	allowIn = ['blockquote', '$root'];
 
 	init() {
 		super.init();

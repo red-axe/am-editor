@@ -160,7 +160,10 @@ class Schema implements SchemaInterface {
 			});
 		});
 
-		if (Object.keys(tempStyles).length === 0) {
+		if (
+			Object.keys(tempStyles).length === 0 &&
+			Object.keys(tempAttributes).length === 0
+		) {
 			if (
 				!(type ? [`${type}s`] : ['blocks', 'marks', 'inlines']).some(
 					types => {
@@ -180,8 +183,6 @@ class Schema implements SchemaInterface {
 				this._nodeCache[md5Key] = false;
 				return false;
 			}
-		}
-		if (Object.keys(tempAttributes).length === 0) {
 			if (
 				!(type ? [`${type}s`] : ['blocks', 'marks', 'inlines']).some(
 					types => {
@@ -236,23 +237,20 @@ class Schema implements SchemaInterface {
 
 		const styles = (attributes || {}).style as SchemaAttributes;
 		attributes = omit(attributes, 'style');
-		//需要属性和规则数量匹配一致，并且每一项都能效验通过
-		return (
-			Object.keys(nodeAttributes || {}).every(attributesName => {
+		//需要属性和规则数量匹配一致，并且属性每一项都能效验通过
+		const attrResult = Object.keys(nodeAttributes || {}).every(
+			attributesName => {
 				return this.checkValue(
 					attributes as SchemaAttributes,
 					attributesName,
 					nodeAttributes[attributesName],
 				);
-			}) &&
-			Object.keys(nodeStyles).every(styleName => {
-				return this.checkValue(
-					styles,
-					styleName,
-					nodeStyles[styleName],
-				);
-			})
+			},
 		);
+		if (!attrResult) return false;
+		return Object.keys(styles || {}).every(styleName => {
+			return this.checkValue(styles, styleName, nodeStyles[styleName]);
+		});
 	}
 	/**
 	 * 检测样式值是否符合节点样式规则

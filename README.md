@@ -1,6 +1,6 @@
 # am-editor
 
-am-editor，一个基于[ShareDB](https://github.com/share/sharedb)Web 多人协同富文本编辑器，适用于`React`、`Vue`（部分插件还没有 vue 版本）框架，与主流的现代浏览器兼容。
+am-editor，一个基于[ShareDB](https://github.com/share/sharedb)Web 多人协同富文本编辑器，适用于`React`、`Vue`框架，与主流的现代浏览器兼容。
 
 [查看在线文档及演示](https://editor.aomao.com)
 
@@ -56,6 +56,8 @@ $ npm install @aomao/engine
 # or
 $ yarn add @aomao/engine
 ```
+
+`Vue` 使用者请看 [https://github.com/itellyou-com/am-editor/tree/master/demo-vue](https://github.com/itellyou-com/am-editor/tree/master/demo-vue)
 
 ### 使用
 
@@ -116,7 +118,7 @@ const engine = new Engine(ref.current, {
 
 卡片是编辑器中单独划分的一个区域，其 UI 以及逻辑在卡片内部可以使用 React、Vue 或其它框架自定义渲染内容，最后再挂载到编辑器上。
 
-引入`@aomao/plugin-codeblock`代码块插件
+引入`@aomao/plugin-codeblock`代码块插件，这个插件部分 UI 使用框架渲染，所以有区分。 `vue`开发者使用 `@aomao/plugin-codeblock-vue`
 
 ```tsx
 import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
@@ -136,7 +138,7 @@ const engine = new Engine(ref.current, {
 
 ### 工具栏
 
-引入`@aomao/toolbar`工具栏
+引入`@aomao/toolbar`工具栏，工具栏基本上都是使用框架渲染，`vue`开发者使用 `@aomao/toolbar-vue`
 
 ```tsx | pure
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';

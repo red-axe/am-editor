@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import classnames from 'classnames-es-ts';
 import { EngineInterface } from '@aomao/engine';
-import { Popover } from 'antd';
+import Popover from 'antd/lib/popover';
 import 'antd/lib/popover/style';
 
 export type CollapseItemProps = {

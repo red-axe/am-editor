@@ -1,0 +1,14 @@
+.data-toolbar-component-list {
+    position: absolute;
+    min-height: 0px;
+    top: 10px;
+    left: 0;
+}
+
+.data-toolbar-component-list  .toolbar-dropdown-list {
+    top:0px;
+}
+
+.data-toolbar-component-placeholder {
+    color: rgba(0,0,0,0.25);pointer-events: none;position: absolute;width: 76px;left: 7px;
+}

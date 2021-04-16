@@ -10,8 +10,7 @@ import {
 	SchemaInterface,
 	unescape,
 } from '@aomao/engine';
-import CodeBlockComponent from './component';
-import { CodeBlockEditor } from './component/types';
+import CodeBlockComponent, { CodeBlockEditor } from './component';
 
 export type Options = {
 	hotkey?: string | Array<string>;
@@ -169,9 +168,7 @@ export default class extends Plugin<Options> {
 				const value = card?.getValue();
 				if (value && value.code) {
 					node.empty();
-					const CodeEditor: CodeBlockEditor = require('./component/editor')
-						.default;
-					const codeEditor = new CodeEditor(this.editor, {});
+					const codeEditor = new CodeBlockEditor(this.editor, {});
 
 					const content = codeEditor.container.find(
 						'.data-codeblock-content',

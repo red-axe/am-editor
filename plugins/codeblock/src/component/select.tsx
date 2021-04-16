@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
-import { Select } from 'antd';
+import Select from 'antd/lib/select';
 import modeData from './mode';
 import 'antd/lib/select/style';
 

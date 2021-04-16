@@ -1,0 +1,44 @@
+{
+  "name": "@aomao/plugin-codeblock-vue",
+  "version": "1.0.0",
+  "description": "代码块 Vue",
+  "keywords": [
+    "codeblock",
+    "editor"
+  ],
+  "main": "dist/index.ts",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "author": "me@aomao.com",
+  "license": "MIT",
+  "homepage": "https://github.com/itellyou-com/am-editor#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itellyou-com/am-editor.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/itellyou-com/am-editor/issues"
+  },
+  "dependencies": {
+    "@babel/runtime":"^7.13.10",
+    "@aomao/engine": "^1.2.2",
+    "ant-design-vue": "^2.1.2",
+    "codemirror": "^5.60.0",
+    "lodash-es": "^4.17.21",
+    "vue": "^3.0.11"
+    },
+    "devDependencies": {
+        "@vue/compiler-sfc": "^3.0.11",
+        "rollup-plugin-vue": "^6.0.0-beta.10",
+        "@types/codemirror": "^0.0.108",
+        "@types/lodash-es": "^4.17.4"
+  }
+}
