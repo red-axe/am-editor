@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-link",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "> TODO: description",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
@@ -24,8 +24,8 @@
     "url": "https://github.com/itellyou-com/am-editor/issues"
   },
   "dependencies": {
-    "@babel/runtime":"^7.13.10",
-    "@aomao/engine": "^1.2.2",
+    "@aomao/engine": "^1.3.0",
+    "@babel/runtime": "^7.13.10",
     "antd": "^4.12.3",
     "classnames-es-ts": "^2.2.7",
     "react": "^17.0.1",

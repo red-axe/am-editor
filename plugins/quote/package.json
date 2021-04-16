@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-quote",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/itellyou-com/am-editor/issues"
   },
   "dependencies": {
-    "@babel/runtime":"^7.13.10",
-    "@aomao/engine": "^1.2.2"
+    "@aomao/engine": "^1.3.0",
+    "@babel/runtime": "^7.13.10"
   }
 }

@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-image",
-    "version": "1.2.2",
+    "version": "1.3.0",
     "description": "图片",
     "main": "dist/index.ts",
     "module": "dist/index.esm.js",
@@ -24,8 +24,8 @@
         "access": "public"
     },
     "dependencies": {
-        "@babel/runtime":"^7.13.10",
-        "@aomao/engine": "^1.2.2",
+        "@aomao/engine": "^1.3.0",
+        "@babel/runtime": "^7.13.10",
         "eventemitter2": "^6.4.4",
         "photoswipe": "^4.1.3"
     },

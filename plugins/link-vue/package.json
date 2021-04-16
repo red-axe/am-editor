@@ -24,13 +24,13 @@
     "url": "https://github.com/itellyou-com/am-editor/issues"
   },
   "dependencies": {
-    "@babel/runtime":"^7.13.10",
-    "@aomao/engine": "^1.2.2",
+    "@aomao/engine": "^1.3.0",
+    "@babel/runtime": "^7.13.10",
     "ant-design-vue": "^2.1.2",
     "vue": "^3.0.11"
   },
   "devDependencies": {
-      "@vue/compiler-sfc": "^3.0.11",
-      "rollup-plugin-vue": "^6.0.0-beta.10"
-}
+    "@vue/compiler-sfc": "^3.0.11",
+    "rollup-plugin-vue": "^6.0.0-beta.10"
+  }
 }
