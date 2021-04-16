@@ -21,6 +21,15 @@
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
+    "author": "me@aomao.com",
+    "homepage": "https://github.com/itellyou-com/am-editor#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/itellyou-com/am-editor.git"
+    },
+    "bugs": {
+        "url": "https://github.com/itellyou-com/am-editor/issues"
+    },
     "gitHooks": {
         "pre-commit": "lint-staged"
     },
