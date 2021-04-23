@@ -2,6 +2,7 @@ import md5 from 'blueimp-md5';
 import {
 	CARD_KEY,
 	CARD_SELECTOR,
+	CARD_TYPE_KEY,
 	CURSOR,
 	CURSOR_SELECTOR,
 	DATA_ELEMENT,
@@ -542,7 +543,19 @@ class Block implements BlockModelInterface {
 		if (!node.isEmpty(containerClone)) {
 			container.after(containerClone);
 		}
+		// 如果是列表，增加br标签
+		const containerParent = container.parent();
+		if (containerParent && this.editor.node.isList(containerParent)) {
+			const cardNode = container.first();
+			if (cardNode?.isCard()) {
+				const cardName = cardNode.attributes(CARD_KEY);
+				this.editor.list.addCardToCustomize(containerClone, cardName);
+			}
 
+			if (this.editor.node.isCustomize(container)) {
+				this.editor.list.addBr(container);
+			}
+		}
 		// 移除范围的开始和结束标记
 		selection.move();
 		// 移除原 Block

@@ -1028,6 +1028,12 @@ class ChangeModel implements ChangeInterface {
 		}
 		// 前面是Card
 		if (prevBlock.isCard()) {
+			if (
+				(node.children().length === 1 && node.first()?.name === 'br') ||
+				this.engine.node.isEmpty(node)
+			) {
+				node.remove();
+			}
 			const card = this.engine.card.find(prevBlock);
 			if (card) {
 				this.engine.card.focus(card);

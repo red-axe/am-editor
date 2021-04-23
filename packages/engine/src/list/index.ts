@@ -615,6 +615,7 @@ class List implements ListModelInterface {
 			});
 		} else if (node.name === 'li') {
 			let child = node.last();
+			if (child?.isCursor()) child = child.prev();
 			if (child) {
 				//最后一个节点是br节点
 				if (child.name === 'br') return;

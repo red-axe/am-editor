@@ -46,7 +46,7 @@ class Enter {
 				return false;
 			}
 		}
-		if (this.engine.node.isRootBlock(block)) {
+		if (this.engine.node.isRootBlock(block) && !block.isCard()) {
 			event.preventDefault();
 			this.engine.block.insertOrSplit(range, block);
 			return false;

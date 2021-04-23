@@ -378,7 +378,7 @@ export default class extends Block<Options> {
 			//列表
 			if (parent && this.editor.node.isList(parent)) {
 				if (this.editor.node.isCustomize(parent)) {
-					parent.first()?.remove();
+					block.first()?.remove();
 				}
 				this.editor.node.unwrap(parent);
 			}
