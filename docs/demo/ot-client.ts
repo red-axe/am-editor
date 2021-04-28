@@ -89,12 +89,12 @@ class OTClient extends EventEmitter {
 						data: now.getTime(),
 					}),
 				);
-				this.heartbeat = {
-					timeout,
-					datetime: now,
-				};
-				this.checkHeartbeat();
 			}
+			this.heartbeat = {
+				timeout,
+				datetime: now,
+			};
+			this.checkHeartbeat(millisecond);
 		}, 1000);
 	}
 
