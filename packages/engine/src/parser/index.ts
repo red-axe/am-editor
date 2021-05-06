@@ -207,10 +207,7 @@ class Parser {
 					);
 				}
 				// 执行回调函数
-				if (
-					attrs[CARD_ELEMENT_KEY] !== 'center' &&
-					!this.editor.node.isVoid(name)
-				) {
+				if (attrs[CARD_ELEMENT_KEY] !== 'center') {
 					if (callbacks.onClose) {
 						callbacks.onClose(child, name, attrs, styles);
 					}
@@ -297,7 +294,9 @@ class Parser {
 					}
 				}
 
-				if (this.editor.node.isVoid(name)) {
+				if (
+					this.editor.node.isVoid(name, schema ? schema : undefined)
+				) {
 					result.push(' />');
 				} else {
 					result.push('>');
@@ -317,6 +316,8 @@ class Parser {
 				result.push(text);
 			},
 			onClose: (child, name, attrs, styles) => {
+				if (this.editor.node.isVoid(name, schema ? schema : undefined))
+					return;
 				if (schema) {
 					let node = child;
 					if (child.name !== name) {

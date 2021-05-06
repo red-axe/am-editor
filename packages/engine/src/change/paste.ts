@@ -168,7 +168,7 @@ export default class Paste {
 			if (
 				this.engine.node.isBlock(node, this.schema) &&
 				node.attributes('data-type') !== 'p' &&
-				!this.engine.node.isVoid(node) &&
+				!this.engine.node.isVoid(node, this.schema) &&
 				//!node.isSolid() &&
 				this.engine.node.html(node) === ''
 			) {

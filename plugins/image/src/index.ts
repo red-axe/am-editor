@@ -80,10 +80,7 @@ export default class extends Plugin {
 				node.empty();
 				img.attributes('src', value.src);
 				img.css('visibility', 'visible');
-				node.append(img);
-				node.removeAttributes(CARD_KEY);
-				node.removeAttributes(CARD_TYPE_KEY);
-				node.removeAttributes(CARD_VALUE_KEY);
+				node.replaceWith(img);
 			} else node.remove();
 		});
 	}

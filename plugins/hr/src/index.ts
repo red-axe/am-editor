@@ -2,10 +2,9 @@ import {
 	Plugin,
 	NodeInterface,
 	CARD_KEY,
-	CARD_VALUE_KEY,
 	isEngine,
 	PluginEntry,
-	CARD_TYPE_KEY,
+	SchemaInterface,
 } from '@aomao/engine';
 import HrComponent from './component';
 
@@ -20,6 +19,8 @@ export default class extends Plugin<Options> {
 
 	init() {
 		this.editor.on('paser:html', node => this.parseHtml(node));
+		this.editor.on('paste:schema', schema => this.pasteSchema(schema));
+		this.editor.on('paste:each', child => this.pasteHtml(child));
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:enter', event => this.markdown(event));
 			this.editor.on('paste:each', child => this.pasteMarkdown(child));
@@ -79,6 +80,23 @@ export default class extends Plugin<Options> {
 		}
 	}
 
+	pasteSchema(schema: SchemaInterface) {
+		schema.add([
+			{
+				type: 'block',
+				name: 'hr',
+				isVoid: true,
+			},
+		]);
+	}
+
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.name === 'hr') {
+			this.editor.card.replaceNode(node, HrComponent.cardName);
+		}
+	}
+
 	parseHtml(root: NodeInterface) {
 		const { $ } = this.editor;
 		root.find(`[${CARD_KEY}=${HrComponent.cardName}`).each(hrNode => {
@@ -89,11 +107,7 @@ export default class extends Plugin<Options> {
 				border: '1px solid transparent',
 				margin: '18px 0',
 			});
-			node.removeAttributes(CARD_KEY);
-			node.removeAttributes(CARD_TYPE_KEY);
-			node.removeAttributes(CARD_VALUE_KEY);
-			node.empty();
-			node.append(hr);
+			node.replaceWith(hr);
 		});
 	}
 }

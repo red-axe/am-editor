@@ -39,11 +39,11 @@ export default class extends Plugin<Options> {
 
 	init() {
 		this.editor.on('paser:html', node => this.parseHtml(node));
+		this.editor.on('paste:schema', schema => this.pasteSchema(schema));
+		this.editor.on('paste:each', child => this.pasteHtml(child));
 		if (isEngine(this.editor) && this.markdown) {
 			this.editor.on('keydown:enter', event => this.markdown(event));
-			this.editor.on('paste:schema', schema => this.pasteSchema(schema));
 			this.editor.on('paste:each', child => this.pasteMarkdown(child));
-			this.editor.on('paste:each', child => this.pasteHtml(child));
 		}
 	}
 
