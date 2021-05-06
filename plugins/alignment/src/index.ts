@@ -1,4 +1,9 @@
-import { isEngine, NodeInterface, Plugin, PluginEntry } from '@aomao/engine';
+import {
+	isEngine,
+	NodeInterface,
+	ElementPlugin,
+	PluginEntry,
+} from '@aomao/engine';
 
 export type Options = {
 	hotkey?: {
@@ -8,7 +13,7 @@ export type Options = {
 		justify?: string;
 	};
 };
-export default class extends Plugin<Options> {
+export default class extends ElementPlugin<Options> {
 	kind = 'block';
 
 	style = {

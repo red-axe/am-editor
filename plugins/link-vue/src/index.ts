@@ -1,4 +1,9 @@
-import { NodeInterface, Inline, isEngine, PluginEntry } from '@aomao/engine';
+import {
+	NodeInterface,
+	InlinePlugin,
+	isEngine,
+	PluginEntry,
+} from '@aomao/engine';
 import Toolbar from './toolbar';
 import locales from './locales';
 
@@ -8,7 +13,7 @@ export type Options = {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 };
-export default class extends Inline<Options> {
+export default class extends InlinePlugin<Options> {
 	private toolbar?: Toolbar;
 
 	static get pluginName() {

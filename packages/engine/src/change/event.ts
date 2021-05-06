@@ -40,7 +40,7 @@ class ChangeEvent implements ChangeEventInterface {
 	isCardInput(e: Event) {
 		let node = e.target ? this.engine.$(e.target as Node) : null;
 		while (node) {
-			if (node.isRoot()) {
+			if (node.isEditable()) {
 				return false;
 			}
 			if (node.attributes(CARD_ELEMENT_KEY) === 'center') {
@@ -217,10 +217,16 @@ class ChangeEvent implements ChangeEventInterface {
 		let dragImage: NodeInterface | undefined;
 		let dropRange: RangeInterface | undefined;
 
-		this.onContainer('dragstart', (e: DragEvent) => {
+		const dragStart = (e: DragEvent) => {
+			if (!e.target) return;
+			e.stopPropagation();
 			this.dragoverHelper.setCursor();
+			const targetNode = $(e.target);
 			// 拖动Card
-			cardComponet = this.engine.card.find($(e.target || []));
+			const dragCardTrigger = targetNode.attributes('drag-card-trigger');
+			cardComponet = this.engine.card.find(
+				!!dragCardTrigger ? dragCardTrigger : targetNode,
+			);
 
 			if (cardComponet) {
 				cardComponet.toolbarModel?.hideCardToolbar();
@@ -248,7 +254,9 @@ class ChangeEvent implements ChangeEventInterface {
 				$(document.body).append(dragImage);
 				e.dataTransfer?.setDragImage(dragImage[0] as Element, 0, 0);
 			}
-		});
+		};
+		this.onRoot('dragstart', dragStart);
+		this.onContainer('dragstart', dragStart);
 		this.onContainer('dragover', (e: DragEvent) => {
 			const { dragoverHelper } = this;
 			const cursor = dragoverHelper.getCursor();
@@ -278,7 +286,7 @@ class ChangeEvent implements ChangeEventInterface {
 			e.preventDefault();
 
 			if (cardComponet) {
-				cardComponet.toolbarModel?.showCardToolbar();
+				//cardComponet.toolbarModel?.show();
 			}
 
 			this.dragoverHelper.removeCursor();
@@ -343,16 +351,23 @@ class ChangeEvent implements ChangeEventInterface {
 	}
 
 	onContainer(eventType: string, listener: EventListener): void {
-		const { bindContainer } = this.options;
-		if (bindContainer) {
-			bindContainer(eventType, listener);
-			this.events.push({
-				type: 'container',
-				eventType,
-				listener,
-				rewrite: false,
-			});
-		}
+		this.engine.container.on(eventType, listener);
+		this.events.push({
+			type: 'container',
+			eventType,
+			listener,
+			rewrite: false,
+		});
+	}
+
+	onRoot(eventType: string, listener: EventListener): void {
+		this.engine.root.on(eventType, listener);
+		this.events.push({
+			type: 'root',
+			eventType,
+			listener,
+			rewrite: false,
+		});
 	}
 
 	destroy() {
@@ -363,20 +378,16 @@ class ChangeEvent implements ChangeEventInterface {
 					item.listener,
 					item.rewrite,
 				);
-			}
-
-			if (item.type === 'document') {
+			} else if (item.type === 'document') {
 				document.removeEventListener(
 					item.eventType,
 					item.listener,
 					item.rewrite,
 				);
-			}
-
-			if (item.type === 'container') {
-				const { unbindContainer } = this.options;
-				if (unbindContainer)
-					unbindContainer(item.eventType, item.listener);
+			} else if (item.type === 'container') {
+				this.engine.container.off(item.eventType, item.listener);
+			} else if (item.type === 'root') {
+				this.engine.root.off(item.eventType, item.listener);
 			}
 		});
 	}

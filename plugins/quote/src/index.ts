@@ -1,11 +1,16 @@
-import { isEngine, NodeInterface, Block, PluginEntry } from '@aomao/engine';
+import {
+	isEngine,
+	NodeInterface,
+	BlockPlugin,
+	PluginEntry,
+} from '@aomao/engine';
 import './index.css';
 
 export type Options = {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 };
-export default class extends Block<Options> {
+export default class extends BlockPlugin<Options> {
 	tagName: string = 'blockquote';
 
 	canMerge = true;

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Avatar from 'antd/lib/avatar';
+import Message from 'antd/lib/message';
 import Engine, { EngineInterface } from '@aomao/engine';
 import Redo from '@aomao/plugin-redo';
 import Undo from '@aomao/plugin-undo';
@@ -28,10 +29,12 @@ import SelectAll from '@aomao/plugin-selectall';
 import Link from '@aomao/plugin-link';
 import Codeblock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
 import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
+import Table, { TableComponent } from '@aomao/plugin-table';
 
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 import OTClient from './ot-client';
 import 'antd/lib/avatar/style';
+import 'antd/lib/message/style';
 import './engine.less';
 
 const plugins = [
@@ -64,6 +67,7 @@ const plugins = [
 	Image,
 	ImageUploader,
 	ToolbarPlugin,
+	Table,
 ];
 const cards = [
 	HrComponent,
@@ -71,6 +75,7 @@ const cards = [
 	CodeBlockComponent,
 	ToolbarComponent,
 	ImageComponent,
+	TableComponent,
 ];
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -102,6 +107,12 @@ const EngineDemo = () => {
 				},
 			},
 		});
+		engine.messageSuccess = (msg: string) => {
+			Message.success(msg);
+		};
+		engine.messageError = (error: string) => {
+			Message.error(error);
+		};
 		//初始化本地协作，用作记录历史
 		engine.ot.initLockMode();
 
@@ -111,7 +122,7 @@ const EngineDemo = () => {
 		engine.on('change', value => {
 			setContent(value);
 			console.log('value', value);
-			console.log('html:', engine.getHtml());
+			//console.log('html:', engine.getHtml());
 		});
 		//获取当前保存的用户信息
 		const memberData = localStorage.getItem('member');

@@ -23,7 +23,6 @@ class ToolbarPlugin extends Plugin<Options> {
 	}
 
 	init() {
-		super.init();
 		this.editor.on('keydown:slash', event => this.onSlash(event));
 	}
 

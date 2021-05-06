@@ -33,6 +33,10 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	resizeModel?: ResizeInterface;
 	activatedByOther: string | false = false;
 	selectedByOther: string | false = false;
+	/**
+	 * 可编辑的节点
+	 */
+	readonly contenteditable: Array<string> = [];
 	static readonly cardName: string;
 	static readonly cardType: CardType;
 	static readonly autoActivate: boolean;
@@ -44,6 +48,10 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	static readonly toolbarFollowMouse: boolean = false;
 	private defaultMaximize: MaximizeInterface;
 	isMaximize: boolean = false;
+
+	get isEditable() {
+		return this.contenteditable.length > 0;
+	}
 
 	get readonly() {
 		return !isEngine(this.editor);
@@ -88,8 +96,8 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 
 		value = value || {};
 		value['id'] = this.getId(value['id']);
-
 		this.setValue(value as T);
+		if (this.toolbar) this.toolbarModel = new Toolbar(this.editor, this);
 		this.defaultMaximize = new Maximize(this.editor, this);
 	}
 
@@ -218,7 +226,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		let prevBlock;
 		if ((this.constructor as CardEntryType).cardType === 'inline') {
 			const block = this.editor.block.closest(this.root);
-			if (block.isRoot()) {
+			if (block.isEditable()) {
 				prevBlock = this.root.prevElement();
 			} else {
 				prevBlock = block.prevElement();
@@ -258,7 +266,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		if ((this.constructor as CardEntryType).cardType === 'inline') {
 			const block = this.editor.block.closest(this.root);
 
-			if (block.isRoot()) {
+			if (block.isEditable()) {
 				nextBlock = this.root.nextElement();
 			} else {
 				nextBlock = block.nextElement();
@@ -354,14 +362,13 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	): NodeInterface | void {
 		this.onSelectByOther(activated, value);
 	}
-	destroy?(): void;
+	onChange?(node: NodeInterface): void;
+	destroy() {
+		this.toolbarModel?.hide();
+	}
 	didInsert?(): void;
 	didUpdate?(): void;
 	didRender() {
-		if (this.toolbar) {
-			this.toolbarModel = new Toolbar(this.editor, this);
-			this.toolbarModel.create();
-		}
 		if (this.resize) {
 			const container =
 				typeof this.resize === 'function'

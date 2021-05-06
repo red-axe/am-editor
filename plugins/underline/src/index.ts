@@ -1,9 +1,9 @@
-import { Mark } from '@aomao/engine';
+import { MarkPlugin } from '@aomao/engine';
 
 export type Options = {
 	hotkey?: string | Array<string>;
 };
-export default class extends Mark<Options> {
+export default class extends MarkPlugin<Options> {
 	tagName = 'u';
 
 	static get pluginName() {

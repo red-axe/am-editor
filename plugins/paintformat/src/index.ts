@@ -29,7 +29,6 @@ export default class extends Plugin<Options> {
 	}
 
 	init() {
-		super.init();
 		if (!isEngine(this.editor)) return;
 
 		this.editor.on('beforeCommandExecute', name => {

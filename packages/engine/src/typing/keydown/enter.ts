@@ -32,7 +32,7 @@ class Enter implements TypingHandleInterface {
 		// 选区选中最后的节点
 		const block = this.engine.block.closest(range.endNode);
 		// 无段落
-		if (block.isRoot()) {
+		if (block.isEditable()) {
 			this.engine.block.wrap('<p />');
 		}
 		for (let i = 0; i < this.listeners.length; i++) {

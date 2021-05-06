@@ -19,9 +19,13 @@ import {
 	CARD_ELEMENT_KEY,
 	CARD_LEFT_SELECTOR,
 	CARD_RIGHT_SELECTOR,
-	CARD_SELECTOR,
 } from '../constants/card';
-import { DATA_ELEMENT, ROOT } from '../constants/root';
+import {
+	DATA_ELEMENT,
+	EDITABLE,
+	EDITABLE_SELECTOR,
+	ROOT,
+} from '../constants/root';
 import Paste from './paste';
 import { SelectionInterface } from '../types/selection';
 import Selection from '../selection';
@@ -43,13 +47,7 @@ class ChangeModel implements ChangeInterface {
 	constructor(engine: EngineInterface, options: ChangeOptions = {}) {
 		this.options = options;
 		this.engine = engine;
-		this.event = new ChangeEvent(engine, {
-			bindDrop: () => !engine.isSub(),
-			bindContainer: (eventType: string, listener: EventListener) =>
-				engine.container.on(eventType, listener),
-			unbindContainer: (eventType: string, listener: EventListener) =>
-				engine.container.off(eventType, listener),
-		});
+		this.event = new ChangeEvent(engine, {});
 
 		this.onChange = this.options.onChange || function() {};
 		this.onSelect = this.options.onSelect || function() {};
@@ -61,7 +59,7 @@ class ChangeModel implements ChangeInterface {
 	private _change() {
 		if (!this.isComposing()) {
 			this.engine.card.gc();
-			let value = this.getValue({
+			const value = this.getValue({
 				ignoreCursor: true,
 			});
 			if (!this.valueCached || value !== this.valueCached) {
@@ -72,6 +70,12 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	change() {
+		const range = this.getRange();
+		const editableElement = range.startNode.closest(EDITABLE_SELECTOR);
+		if (editableElement.length > 0) {
+			const card = this.engine.card.find(editableElement, true);
+			if (card?.onChange) card?.onChange(editableElement);
+		}
 		this.clearChangeTimer();
 		this.changeTimer = setTimeout(() => {
 			this._change();
@@ -357,7 +361,10 @@ class ChangeModel implements ChangeInterface {
 	getSafeRange(range: RangeInterface = this.getRange()) {
 		// 如果不在编辑器内，聚焦到编辑器
 		const { commonAncestorNode } = range;
-		if (!commonAncestorNode.isRoot() && !commonAncestorNode.inEditor()) {
+		if (
+			!commonAncestorNode.isEditable() &&
+			!commonAncestorNode.inEditor()
+		) {
 			range
 				.select(this.engine.container, true)
 				.shrinkToElementNode()
@@ -367,12 +374,20 @@ class ChangeModel implements ChangeInterface {
 		let rangeClone = range.cloneRange();
 		rangeClone.collapse(true);
 		this.focusCardRang(rangeClone);
-		range.setStart(rangeClone.startContainer, rangeClone.startOffset);
+		if (
+			!range.startNode.equal(rangeClone.startNode) ||
+			range.startOffset !== rangeClone.startOffset
+		)
+			range.setStart(rangeClone.startContainer, rangeClone.startOffset);
 
 		rangeClone = range.cloneRange();
 		rangeClone.collapse(false);
 		this.focusCardRang(rangeClone);
-		range.setEnd(rangeClone.endContainer, rangeClone.endOffset);
+		if (
+			!range.endNode.equal(rangeClone.endNode) ||
+			range.endOffset !== rangeClone.endOffset
+		)
+			range.setEnd(rangeClone.endContainer, rangeClone.endOffset);
 
 		if (range.collapsed) {
 			rangeClone = range.cloneRange();
@@ -398,7 +413,7 @@ class ChangeModel implements ChangeInterface {
 	private focusCardRang(range: RangeInterface) {
 		const { startNode, startOffset } = range;
 		const card = this.engine.card.find(startNode);
-		if (card) {
+		if (card && !card.isEditable) {
 			const cardCenter = card.getCenter().get();
 			if (
 				cardCenter &&
@@ -511,7 +526,7 @@ class ChangeModel implements ChangeInterface {
 			let node: NodeInterface | undefined = targetNode;
 			while (node) {
 				const attrValue = node.attributes(DATA_ELEMENT);
-				if (attrValue && attrValue !== ROOT) {
+				if (attrValue && [ROOT, EDITABLE].indexOf(attrValue) < 0) {
 					return;
 				}
 				node = node.parent();
@@ -746,7 +761,7 @@ class ChangeModel implements ChangeInterface {
 		};
 
 		const removeEmptyNode = (node: NodeInterface) => {
-			while (!node.isRoot()) {
+			while (!node.isEditable()) {
 				const parent = node.parent();
 				node.remove();
 				if (!parent || !this.engine.node.isEmpty(parent)) break;
@@ -849,7 +864,7 @@ class ChangeModel implements ChangeInterface {
 		// 获取上面第一个 Block
 		const block = this.engine.block.closest(safeRange.startNode);
 		// 获取的 block 超出编辑范围
-		if (!block.isRoot() && !block.inEditor()) {
+		if (!block.isEditable() && !block.inEditor()) {
 			if (!range) this.apply(safeRange);
 			return;
 		}
@@ -882,7 +897,7 @@ class ChangeModel implements ChangeInterface {
 				activeMarks,
 				'<br />',
 			);
-			if (startNode.isRoot()) {
+			if (startNode.isEditable()) {
 				html = '<p>'.concat(html, '</p>');
 			}
 			startNode.append($(html));
@@ -973,7 +988,7 @@ class ChangeModel implements ChangeInterface {
 		const parent = node.parent();
 		node.remove();
 		if (parent && this.engine.node.isEmpty(parent)) {
-			if (parent.isRoot()) {
+			if (parent.isEditable()) {
 				this.engine.node.html(parent, '<p><br /></p>');
 				range
 					.select(parent, true)

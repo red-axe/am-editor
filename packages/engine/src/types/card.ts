@@ -125,6 +125,10 @@ export interface CardInterface {
 	 */
 	readonly id: string;
 	/**
+	 * 卡片是否可编辑
+	 */
+	readonly isEditable: boolean;
+	/**
 	 * 是否只读模式，没有engine
 	 */
 	readonly readonly: boolean;
@@ -140,6 +144,10 @@ export interface CardInterface {
 	 * 是否选中
 	 */
 	readonly selected: boolean;
+	/**
+	 * 可编辑的节点
+	 */
+	readonly contenteditable: Array<string>;
 	/**
 	 * 是否最大化
 	 */
@@ -261,6 +269,11 @@ export interface CardInterface {
 		},
 	): NodeInterface | void;
 	/**
+	 * 可编辑器区域值改变时触发
+	 * @param node 可编辑器区域节点
+	 */
+	onChange?(node: NodeInterface): void;
+	/**
 	 * 设置卡片值
 	 * @param value 值
 	 */
@@ -341,13 +354,21 @@ export interface CardModelInterface {
 	/**
 	 * 查询父节点距离最近的卡片
 	 * @param selector 查询器
+	 * @param ignoreEditable 是否忽略可编辑节点
 	 */
-	closest(selector: Node | NodeInterface): NodeInterface | undefined;
+	closest(
+		selector: Node | NodeInterface,
+		ignoreEditable?: boolean,
+	): NodeInterface | undefined;
 	/**
 	 * 根据选择器查找Card
 	 * @param selector 卡片ID，或者子节点
+	 * @param ignoreEditable 是否忽略可编辑节点
 	 */
-	find(selector: NodeInterface | Node | string): CardInterface | undefined;
+	find(
+		selector: NodeInterface | Node | string,
+		ignoreEditable?: boolean,
+	): CardInterface | undefined;
 	/**
 	 * 根据选择器查找Block 类型 Card
 	 * @param selector 卡片ID，或者子节点

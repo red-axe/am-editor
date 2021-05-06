@@ -1,6 +1,9 @@
-import { EditorInterface } from '../types/engine';
-import { isNode, NodeInterface } from '../types/node';
-import { PluginOptions, PluginInterface } from '../types/plugin';
+import {
+	PluginOptions,
+	ElementPluginInterface,
+	isNode,
+	NodeInterface,
+} from '../types';
 import {
 	SchemaAttributes,
 	SchemaGlobal,
@@ -9,17 +12,11 @@ import {
 	SchemaValue,
 } from '../types/schema';
 import { toHex } from '../utils';
+import PluginEntry from './base';
 
-abstract class PluginEntry<T extends PluginOptions = {}>
-	implements PluginInterface {
-	protected readonly editor: EditorInterface;
-	protected options: T;
-	constructor(editor: EditorInterface, options: PluginOptions) {
-		this.editor = editor;
-		this.options = (options || {}) as T;
-	}
-	static readonly pluginName: string;
-	readonly kind: string = 'plugin';
+abstract class ElementPluginEntry<T extends PluginOptions = {}>
+	extends PluginEntry<T>
+	implements ElementPluginInterface {
 	/**
 	 * 规则缓存
 	 */
@@ -183,27 +180,7 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 			this.editor.schema.checkNode(node, schema.type, schema.attributes)
 		);
 	}
-	/**
-	 * 查询插件状态
-	 * @param args 插件需要的参数
-	 */
-	queryState?(...args: any): any;
-	/**
-	 * 执行插件
-	 * @param args 插件需要的参数
-	 */
-	abstract execute(...args: any): void;
-	/**
-	 * 插件热键绑定，返回需要匹配的组合键字符，如 mod+b，匹配成功即执行插件，还可以带上插件执行所需要的参数，多个参数以数组形式返回{key:"mod+b",args:[]}
-	 * @param event 键盘事件
-	 */
-	hotkey?(
-		event?: KeyboardEvent,
-	):
-		| string
-		| { key: string; args: any }
-		| Array<{ key: string; args: any }>
-		| Array<string>;
+
 	/**
 	 * 获取插件设置的属性和样式所生成的规则
 	 */
@@ -259,8 +236,6 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 
 		return this.sechamCache;
 	}
-
-	async waiting?(): Promise<void>;
 }
 
-export default PluginEntry;
+export default ElementPluginEntry;

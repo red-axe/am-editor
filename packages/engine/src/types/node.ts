@@ -131,7 +131,11 @@ export interface NodeInterface {
 	 * @returns
 	 */
 	isInlineCard(): boolean;
-
+	/**
+	 * 是否是可编辑器卡片
+	 * @returns
+	 */
+	isEditableCard(): boolean;
 	/**
 	 * 具有 display:block css 属性的inline card
 	 */
@@ -141,6 +145,11 @@ export interface NodeInterface {
 	 * 判断当前节点是否为根节点
 	 */
 	isRoot(): boolean;
+
+	/**
+	 * 判断当前是否为可编辑节点
+	 */
+	isEditable(): boolean;
 
 	/**
 	 * 判断当前是否在根节点内
@@ -474,7 +483,7 @@ export interface NodeInterface {
 	 * 根据路径获取子节点
 	 * @param path 路径
 	 */
-	getChildByPath(path: Path): Node;
+	getChildByPath(path: Path, filter?: (node: Node) => boolean): Node;
 
 	/**
 	 * 检查当前节点是否在目标节点内
@@ -485,7 +494,7 @@ export interface NodeInterface {
 	/**
 	 * 获取当前节点所在父节点中的索引
 	 */
-	getIndex(): number;
+	getIndex(filter?: (node: Node) => boolean): number;
 
 	/**
 	 * 在指定容器里获取父节点
@@ -586,15 +595,6 @@ export interface NodeModelInterface {
 	 * @param node 节点
 	 */
 	isCustomize(node: NodeInterface): boolean;
-	/**
-	 * 获取节点所属类型
-	 * @param node 节点
-	 * @returns
-	 */
-	getType(
-		node: NodeInterface | Node,
-		schema?: SchemaInterface,
-	): 'mark' | 'block' | 'inline' | void;
 	/**
 	 * 去除包裹
 	 * @param node 需要去除包裹的节点

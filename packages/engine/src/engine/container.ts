@@ -67,7 +67,7 @@ class Container {
 		});
 		// 编辑器文档尾部始终保持一行
 		this.node.on('click', (event: MouseEvent) => {
-			if (event.target && $(event.target).isRoot()) {
+			if (event.target && $(event.target).isEditable()) {
 				//获取到编辑器内最后一个子节点
 				const block = this.node.last();
 				if (block) {

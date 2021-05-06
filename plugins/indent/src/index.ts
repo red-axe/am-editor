@@ -22,7 +22,7 @@ export default class extends Plugin<Options> {
 	}
 
 	init() {
-		super.init();
+		this.editor.schema.add(this.schema());
 		this.editor.on('keydown:backspace', event => this.onBackspace(event));
 		this.editor.on('keydown:tab', event => this.onTab(event));
 		this.editor.on('keydown:shift-tab', event => this.onShiftTab(event));

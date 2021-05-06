@@ -10,6 +10,8 @@ import {
 	SchemaMap,
 	SchemaRule,
 	SchemaStyle,
+	SchemaValue,
+	SchemaValueObject,
 } from './types';
 import { validUrl } from './utils';
 
@@ -18,7 +20,8 @@ import { validUrl } from './utils';
  */
 class Schema implements SchemaInterface {
 	private _map: { [key: string]: SchemaMap } = {};
-	private _nodeCache: { [key: string]: boolean } = {};
+	private _all: Array<SchemaRule> = [];
+
 	data: {
 		blocks: Array<SchemaRule>;
 		inlines: Array<SchemaRule>;
@@ -32,7 +35,7 @@ class Schema implements SchemaInterface {
 	};
 
 	/**
-	 * 增加规则，不允许设置div标签，div将用作card使用
+	 * 增加规则
 	 * 只有 type 和 attributes 时，将作为此类型全局属性，与其它所有同类型标签属性将合并
 	 * @param rules 规则
 	 */
@@ -71,7 +74,6 @@ class Schema implements SchemaInterface {
 						}
 					});
 				}
-
 				if (rule.type === 'block') {
 					this.data.blocks.push(rule);
 				} else if (rule.type === 'inline') {
@@ -81,13 +83,44 @@ class Schema implements SchemaInterface {
 				}
 			} else if (!!this.data[`${rule.type}s`]) {
 				this.data.globals[rule.type] = merge(
-					this.data.globals[rule.type],
+					{ ...this.data.globals[rule.type] },
 					rule.attributes,
 				);
 			}
 		});
+
+		//按照必要属性个数排序
+		const getCount = (rule: SchemaRule) => {
+			const aAttributes = rule.attributes || {};
+			const aStyles = aAttributes.style || {};
+			let aCount = 0;
+			let sCount = 0;
+			Object.keys(aAttributes).forEach(attributesName => {
+				const attributesValue = aAttributes[attributesName];
+				if (
+					isSchemaValueObject(attributesValue) &&
+					attributesValue.required
+				)
+					aCount++;
+			});
+			Object.keys(aStyles).forEach(stylesName => {
+				const stylesValue = aStyles[stylesName];
+				if (isSchemaValueObject(stylesValue) && stylesValue.required)
+					sCount++;
+			});
+			return [aCount, sCount];
+		};
+		const { blocks, marks, inlines } = this.data;
+		this._all = [...blocks, ...marks, ...inlines].sort((a, b) => {
+			const [aACount, aSCount] = getCount(a);
+			const [bACount, bSCount] = getCount(b);
+
+			if (aACount > bACount) return -1;
+			if (aACount === bACount)
+				return aSCount === bSCount ? 0 : aSCount > bSCount ? -1 : 1;
+			return 1;
+		});
 		this._map = {};
-		this._nodeCache = {};
 	}
 	/**
 	 * 克隆当前schema对象
@@ -117,136 +150,42 @@ class Schema implements SchemaInterface {
 		});
 		return schemas;
 	}
-	/**
-	 * 检测节点的属性和值是否符合规则
-	 * @param node 节点
-	 * @param type 指定类型
-	 */
-	check(node: NodeInterface, type?: 'block' | 'mark' | 'inline'): boolean {
-		const map = this.getMapCache(type);
-		if (!map[node.name]) return false;
-		const attributes = node.attributes();
-		const styles = node.css();
-		delete attributes['style'];
 
-		let md5Text = `${node.name}_${type}`;
-		Object.keys(attributes).forEach(key => {
-			md5Text += `_${key}`;
-			if (['type' || 'name' || 'data-type'].indexOf(key) > -1) {
-				md5Text += `_${attributes[key]}`;
-			}
-		});
-		Object.keys(styles).forEach(key => {
-			md5Text += `_${key}`;
-		});
-		const md5Key = md5(md5Text);
-		if (this._nodeCache[md5Key] !== undefined)
-			return this._nodeCache[md5Key];
-
-		//如果节点属性和样式在排除全局后都没有，就查看有没有什么属性都没有的规则，如果没有就返回false
-		const tempAttributes = { ...attributes };
-		const tempStyles = { ...styles };
-		['block', 'mark', 'inline'].forEach(type => {
-			Object.keys(this.data.globals[type] || {}).forEach(key => {
-				if (key === 'style') {
-					Object.keys(this.data.globals[type][key] || {}).forEach(
-						styleName => {
-							delete tempStyles[styleName];
-						},
-					);
-				} else {
-					delete tempAttributes[key];
-				}
-			});
-		});
-
-		if (
-			Object.keys(tempStyles).length === 0 &&
-			Object.keys(tempAttributes).length === 0
-		) {
+	getType(node: NodeInterface) {
+		for (let i = 0; i < this._all.length; i++) {
+			const rule = this._all[i];
 			if (
-				!(type ? [`${type}s`] : ['blocks', 'marks', 'inlines']).some(
-					types => {
-						return (this.data[types] as Array<SchemaRule>).some(
-							rule => {
-								if (rule.name !== node.name) return false;
-								return (
-									!rule.attributes?.style ||
-									Object.keys(rule.attributes.style)
-										.length === 0
-								);
-							},
-						);
-					},
-				)
-			) {
-				this._nodeCache[md5Key] = false;
-				return false;
-			}
-			if (
-				!(type ? [`${type}s`] : ['blocks', 'marks', 'inlines']).some(
-					types => {
-						return (this.data[types] as Array<SchemaRule>).some(
-							rule => {
-								if (rule.name !== node.name) return false;
-								return (
-									!rule.attributes ||
-									Object.keys(rule.attributes).length === 0
-								);
-							},
-						);
-					},
-				)
-			) {
-				this._nodeCache[md5Key] = false;
-				return false;
-			}
+				rule.name === node.name &&
+				this.checkNode(node, rule.attributes)
+			)
+				return rule.type;
 		}
-		const result =
-			Object.keys(styles).every(styleName =>
-				this.checkStyle(node.name, styleName, styles[styleName], type),
-			) &&
-			Object.keys(attributes).every(attributesName =>
-				this.checkAttributes(
-					node.name,
-					attributesName,
-					attributes[attributesName],
-					type,
-				),
-			);
-		this._nodeCache[md5Key] = result;
-		return result;
+		return;
 	}
+
 	/**
 	 * 检测节点是否符合某一属性规则
 	 * @param node 节点
-	 * @param type 节点类型 "block" | "mark" | "inline"
 	 * @param attributes 属性规则
 	 */
 	checkNode(
 		node: NodeInterface,
-		type: 'block' | 'mark' | 'inline',
 		attributes?: SchemaAttributes | SchemaStyle,
 	): boolean {
 		//获取节点属性
 		const nodeAttributes = node.attributes();
 		const nodeStyles = node.css();
 		delete nodeAttributes['style'];
-		//将全局属性合并到属性
-		attributes = merge(this.data.globals[type], attributes);
-
 		const styles = (attributes || {}).style as SchemaAttributes;
-		attributes = omit(attributes, 'style');
-		//需要属性和规则数量匹配一致，并且属性每一项都能效验通过
-		const attrResult = Object.keys(nodeAttributes || {}).every(
-			attributesName => {
-				return this.checkValue(
-					attributes as SchemaAttributes,
-					attributesName,
-					nodeAttributes[attributesName],
-				);
-			},
-		);
+		attributes = omit({ ...attributes }, 'style');
+		//需要属性每一项都能效验通过
+		const attrResult = Object.keys(attributes).every(attributesName => {
+			return this.checkValue(
+				attributes as SchemaAttributes,
+				attributesName,
+				nodeAttributes[attributesName],
+			);
+		});
 		if (!attrResult) return false;
 		return Object.keys(styles || {}).every(styleName => {
 			return this.checkValue(styles, styleName, nodeStyles[styleName]);
@@ -292,7 +231,11 @@ class Schema implements SchemaInterface {
 		if (!map[name]) return false;
 		let rule = map[name] as SchemaAttributes;
 		if (!rule) return false;
-		return this.checkValue(rule, attributesName, attributesValue);
+		return this.checkValue(
+			{ ...omit(rule, 'style') },
+			attributesName,
+			attributesValue,
+		);
 	}
 	/**
 	 * 检测值是否符合规则
@@ -307,6 +250,14 @@ class Schema implements SchemaInterface {
 	): boolean {
 		if (!schema[attributesName]) return false;
 		let rule = schema[attributesName];
+		if (isSchemaValueObject(rule)) {
+			//不是强制的，并且没有值，不用验证
+			if (attributesValue === undefined && rule.required === false)
+				return true;
+			rule = rule.value;
+		}
+		//默认都不为强制的
+		else if (attributesValue === undefined) return true;
 		/**
 		 * 自定义规则解析
 		 */
@@ -488,7 +439,7 @@ class Schema implements SchemaInterface {
 						}
 					});
 				}
-				data[rule.name] = merge(data[rule.name], attributes);
+				data[rule.name] = merge({ ...data[rule.name] }, attributes);
 			});
 		});
 		return data;
@@ -542,8 +493,8 @@ class Schema implements SchemaInterface {
 			.filter(rule => rule.name === target)
 			.some(block => {
 				const schema = block as SchemaBlock;
-				if (schema.allowIn) {
-					if (schema.allowIn.indexOf(source) > -1) return true;
+				if (schema.allowIn && schema.allowIn.indexOf(source) > -1) {
+					return true;
 				}
 				return;
 			});
@@ -580,3 +531,9 @@ class Schema implements SchemaInterface {
 	}
 }
 export default Schema;
+
+export const isSchemaValueObject = (
+	value: SchemaValue,
+): value is SchemaValueObject => {
+	return (value as SchemaValueObject).required !== undefined;
+};

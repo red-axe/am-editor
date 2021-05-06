@@ -16,7 +16,13 @@ import {
 	StringDeleteOp,
 } from 'sharedb';
 import { Operation } from '../types/ot';
-import { DATA_ELEMENT } from '../constants/root';
+import {
+	DATA_ELEMENT,
+	DATA_TRANSIENT_ATTRIBUTES,
+	DATA_TRANSIENT_ELEMENT,
+	UI,
+	UI_SELECTOR,
+} from '../constants/root';
 import { getWindow } from '../utils';
 import { EngineInterface } from '../types';
 
@@ -43,16 +49,29 @@ export const randomString = (length: number = 8) => {
 export const isTransientElement = (node: NodeInterface) => {
 	if (node.isElement()) {
 		//范围标记
-		if ([CURSOR, ANCHOR, FOCUS].includes(node.attributes(DATA_ELEMENT)))
+		if ([CURSOR, ANCHOR, FOCUS].indexOf(node.attributes(DATA_ELEMENT)) > -1)
 			return true;
-		//data-transient属性
-		if (node.attributes('data-transient')) return true;
+		//data-element=ui 属性
+		if (
+			!!node.attributes(DATA_TRANSIENT_ELEMENT) ||
+			node.attributes(DATA_ELEMENT) === UI ||
+			node.closest(UI_SELECTOR).length > 0
+		)
+			return true;
 		//在卡片里面
-		if (!node.isCard() && node.closest(CARD_SELECTOR).length > 0)
+		let card = node.closest(CARD_SELECTOR);
+		if (!node.isCard() && card.isCard() && !card.isEditableCard())
 			return true;
 		//当前是卡片，父级也是卡片
 		const parent = node.parent();
-		if (node.isCard() && parent && parent.closest(CARD_SELECTOR).length > 0)
+		const parentCard = parent?.closest(CARD_SELECTOR);
+		if (
+			node.isCard() &&
+			!node.isEditableCard() &&
+			parentCard &&
+			parentCard.isCard() &&
+			!parentCard.isEditableCard()
+		)
 			return true;
 	}
 	return false;
@@ -61,6 +80,14 @@ export const isTransientElement = (node: NodeInterface) => {
 export const isTransientAttribute = (node: NodeInterface, attr: string) => {
 	if (node.isRoot() && !/^data-selection-/.test(attr)) return true;
 	if (node.isCard() && ['id', 'class', 'style'].includes(attr)) return true;
+	const transient = node.attributes(DATA_TRANSIENT_ATTRIBUTES);
+	if (
+		transient === '*' ||
+		transient
+			.split(',')
+			.some(value => value.trim().toLowerCase() === attr.toLowerCase())
+	)
+		return true;
 	return false;
 };
 
@@ -76,7 +103,11 @@ export const toPath = (range: RangeInterface): Path[] => {
 			let prev = domNode.prev();
 			let i = 0;
 			while (prev && prev.length > 0) {
-				if (!prev.attributes('data-transient')) i++;
+				if (
+					!prev.attributes(DATA_TRANSIENT_ELEMENT) &&
+					prev.attributes(DATA_ELEMENT) !== UI
+				)
+					i++;
 				prev = prev.prev();
 			}
 			path.unshift(i);
@@ -112,7 +143,10 @@ export const fromPath = (
 			let domChild = domNode.first();
 			let offset = 0;
 			while (domChild && domChild.length > 0) {
-				if (domChild.attributes('data-transient')) {
+				if (
+					!!domChild.attributes(DATA_TRANSIENT_ELEMENT) ||
+					domChild.attributes(DATA_ELEMENT) === UI
+				) {
 					domChild = domChild.next();
 				} else {
 					if (offset === p || !domChild.next()) {

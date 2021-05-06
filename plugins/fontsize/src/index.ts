@@ -1,4 +1,4 @@
-import { NodeInterface, Mark } from '@aomao/engine';
+import { NodeInterface, MarkPlugin } from '@aomao/engine';
 
 export type Options = {
 	hotkey?: { key: string; args: Array<string> };
@@ -6,7 +6,7 @@ export type Options = {
 	data?: Array<string> | { [key: string]: string };
 };
 
-export default class extends Mark<Options> {
+export default class extends MarkPlugin<Options> {
 	static get pluginName() {
 		return 'fontsize';
 	}
@@ -31,7 +31,10 @@ export default class extends Mark<Options> {
 	};
 
 	variable = {
-		'@var0': /[\d\.]+(pt|px)$/,
+		'@var0': {
+			required: true,
+			value: /[\d\.]+(pt|px)$/,
+		},
 	};
 
 	isTrigger(

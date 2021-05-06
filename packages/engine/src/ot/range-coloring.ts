@@ -422,6 +422,7 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	setCardActivatedByOther(card: CardInterface, member?: Member) {
+		if (card.isEditable) return;
 		const { uuid, color } = member || {};
 		if (color) {
 			const tinyColor = tinycolor2(color);
@@ -449,10 +450,13 @@ class RangeColoring implements RangeColoringInterface {
 
 		let cardInfo = card.find(range.commonAncestorNode);
 		//如果是卡片，并且选区不在内容模块中，而是在卡片两侧的光标位置处，就不算作卡片
-		if (cardInfo && !cardInfo.isCenter(range.commonAncestorNode)) {
+		if (cardInfo?.isEditable) {
+			cardInfo = undefined;
+		} else if (cardInfo && !cardInfo.isCenter(range.commonAncestorNode)) {
 			cardInfo = undefined;
 		}
 		card.each(cardComponent => {
+			if (cardComponent.isEditable) return;
 			if (!cardInfo || !cardComponent.root.equal(cardInfo.root)) {
 				if (cardComponent.activatedByOther === uuid) {
 					this.setCardActivatedByOther(cardComponent);
@@ -472,6 +476,7 @@ class RangeColoring implements RangeColoringInterface {
 			}
 		} else {
 			card.each(cardComponent => {
+				if (cardComponent.isEditable) return;
 				const centerNode = cardComponent.getCenter();
 				if (centerNode && centerNode.length > 0) {
 					if (range.isPointInRange(centerNode.get()!, 0)) {
@@ -483,7 +488,7 @@ class RangeColoring implements RangeColoringInterface {
 			});
 
 			const singleCard = card.getSingleSelectedCard(range);
-			if (singleCard) {
+			if (singleCard && !singleCard.isEditable) {
 				const root =
 					this.setCardSelectedByOther(singleCard, member) ||
 					singleCard.root;
@@ -604,7 +609,11 @@ class RangeColoring implements RangeColoringInterface {
 				if (domChild.hasClass(USER_MASK_CLASS)) {
 					const target = $(domChild[0]['__targetNode']);
 					const component = engine.card.find(target);
-					if (component && component.activatedByOther === uuid) {
+					if (
+						component &&
+						!component.isEditable &&
+						component.activatedByOther === uuid
+					) {
 						this.setCardActivatedByOther(component);
 					}
 				}
@@ -612,6 +621,7 @@ class RangeColoring implements RangeColoringInterface {
 			}
 		});
 		engine.card.each(component => {
+			if (component.isEditable) return;
 			const member = members.find(
 				m => m.uuid === component.selectedByOther,
 			);

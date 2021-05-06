@@ -42,7 +42,7 @@ class NodeModel implements NodeModelInterface {
 		schema = schema || this.editor.schema;
 		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
-		return schema.check(node, 'mark');
+		return schema.getType(node) === 'mark';
 	}
 
 	/**
@@ -53,7 +53,7 @@ class NodeModel implements NodeModelInterface {
 		schema = schema || this.editor.schema;
 		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
-		return schema.check(node, 'inline');
+		return schema.getType(node) === 'inline';
 	}
 
 	/**
@@ -64,7 +64,7 @@ class NodeModel implements NodeModelInterface {
 		schema = schema || this.editor.schema;
 		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
-		return schema.check(node, 'block');
+		return schema.getType(node) === 'block';
 	}
 
 	/**
@@ -86,7 +86,7 @@ class NodeModel implements NodeModelInterface {
 	 * @returns
 	 */
 	isRootBlock(node: NodeInterface, schema?: SchemaInterface) {
-		if (!node.parent()?.isRoot()) return false;
+		if (!node.parent()?.isEditable()) return false;
 		if (!this.isSimpleBlock(node)) return false;
 		//并且规则上不可以设置子节点
 		return (schema || this.editor.schema)
@@ -189,19 +189,6 @@ class NodeModel implements NodeModelInterface {
 			default:
 				return false;
 		}
-	}
-	/**
-	 * 获取节点所属类型
-	 * @param node 节点
-	 * @returns
-	 */
-	getType(
-		node: NodeInterface | Node,
-		schema?: SchemaInterface,
-	): 'mark' | 'block' | 'inline' | void {
-		if (this.isMark(node, schema)) return 'mark';
-		if (this.isBlock(node, schema)) return 'block';
-		if (this.isInline(node, schema)) return 'inline';
 	}
 	/**
 	 * 去除包裹

@@ -38,7 +38,7 @@ class Backspace implements TypingHandleInterface {
 
 		// 处理 BR
 		const { startNode, startOffset } = range;
-		if (startNode.isRoot()) {
+		if (startNode.isEditable()) {
 			const child = startNode[0].childNodes[startOffset - 1];
 			const lastNode = this.engine.$(child);
 			if (lastNode.name === 'br') {

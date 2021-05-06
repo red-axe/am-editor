@@ -41,8 +41,6 @@ export type ChangeEventOptions = {
 	bindSelect?: () => boolean;
 	bindPaste?: () => boolean;
 	bindDrop?: () => boolean;
-	bindContainer?: (eventType: string, listener: EventListener) => void;
-	unbindContainer?: (eventType: string, listener: EventListener) => void;
 };
 
 export type ChangeOptions = {

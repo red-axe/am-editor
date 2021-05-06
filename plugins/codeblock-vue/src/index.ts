@@ -9,6 +9,7 @@ import {
 	Parser,
 	SchemaInterface,
 	unescape,
+	CARD_TYPE_KEY,
 } from '@aomao/engine';
 import CodeBlockComponent, { CodeBlockEditor } from './component';
 
@@ -37,7 +38,6 @@ export default class extends Plugin<Options> {
 	}
 
 	init() {
-		super.init();
 		this.editor.on('paser:html', node => this.parseHtml(node));
 		if (isEngine(this.editor) && this.markdown) {
 			this.editor.on('keydown:enter', event => this.markdown(event));
@@ -101,18 +101,33 @@ export default class extends Plugin<Options> {
 	}
 
 	pasteSchema(schema: SchemaInterface) {
-		schema.add({
-			type: 'block',
-			name: 'pre',
-			attributes: {
-				'data-syntax': '*',
+		schema.add([
+			{
+				type: 'block',
+				name: 'pre',
+				attributes: {
+					'data-syntax': {
+						required: true,
+						value: '*',
+					},
+				},
 			},
-		});
+			{
+				type: 'block',
+				name: 'div',
+				attributes: {
+					'data-syntax': {
+						required: true,
+						value: '*',
+					},
+				},
+			},
+		]);
 	}
 
 	pasteHtml(node: NodeInterface) {
-		if (!isEngine(this.editor) || node.name !== 'pre') return;
-		if (!!node.attributes('data-syntax') || node.first()?.name === 'code') {
+		if (!isEngine(this.editor)) return;
+		if (node.attributes('data-syntax') || node.first()?.name === 'code') {
 			let code = new Parser(node, this.editor).toText();
 			code = unescape(code);
 			this.editor.card.replaceNode(node, 'codeblock', {
@@ -204,7 +219,10 @@ export default class extends Plugin<Options> {
 					content.show();
 					content.css('background', '#f9f9f9');
 					node.append(content);
+					node.removeAttributes(CARD_KEY);
+					node.removeAttributes(CARD_TYPE_KEY);
 					node.removeAttributes(CARD_VALUE_KEY);
+					node.attributes('data-syntax', value.mode || 'plain');
 					content.removeClass('am-engine-view');
 				} else node.remove();
 			},

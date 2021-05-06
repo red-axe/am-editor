@@ -11,6 +11,7 @@
     font-family: "data-icon" !important;
     font-size: 16px;
     font-style: normal;
+    display: inline-block;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -565,6 +566,11 @@
     background-color: #FFFFFF;
 }
 
+.am-engine ::selection {
+    background: rgba(180, 213, 254, 0.5) !important;
+    color: inherit!important;
+}
+
 .am-engine , .am-engine-view {
     font-family: 'Chinese Quote', 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji';
 	word-wrap: break-word;
@@ -657,5 +663,9 @@
 .am-engine span[data-card-element="body"] [data-card-element="center"],.am-engine-view span[data-card-element="body"] [data-card-element="center"],.am-engine div[data-card-element="body"] [data-card-element="center"],.am-engine-view div[data-card-element="body"] [data-card-element="center"] {
 	-webkit-user-select: text;
 	user-select: text;
+}
+.am-engine span[data-card-element="body"] [data-element="editable"],.am-engine div[data-card-element="body"] [data-element="editable"]
+{
+    cursor: text;
 }
 /*---------------------------卡片 end-----------------------*/

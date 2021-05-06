@@ -5,8 +5,14 @@ import {
 	PluginModelInterface,
 	PluginOptions,
 } from '../types/plugin';
+import Plugin from './base';
+import ElementPlugin from './element';
+import BlockPlugin from './block';
+import InlinePlugin from './inline';
+import ListPlugin from './list';
+import MarkPlugin from './mark';
 
-class Plugin implements PluginModelInterface {
+class PluginModel implements PluginModelInterface {
 	protected data: { [k: string]: PluginEntry } = {};
 	components: { [k: string]: PluginInterface } = {};
 	protected editor: EditorInterface;
@@ -22,7 +28,7 @@ class Plugin implements PluginModelInterface {
 				config[pluginClazz.pluginName],
 			);
 			this.components[pluginClazz.pluginName] = plugin;
-			plugin.init();
+			if (plugin.init) plugin.init();
 		});
 	}
 
@@ -31,7 +37,7 @@ class Plugin implements PluginModelInterface {
 		options = { ...options, editor: this.editor };
 		if (isEngine(this.editor)) {
 			const plugin = new clazz(this.editor, options);
-			plugin.init();
+			if (plugin.init) plugin.init();
 			this.components[clazz.pluginName] = plugin;
 		}
 	}
@@ -49,4 +55,13 @@ class Plugin implements PluginModelInterface {
 		});
 	}
 }
-export default Plugin;
+export default PluginModel;
+
+export {
+	Plugin,
+	ElementPlugin,
+	MarkPlugin,
+	InlinePlugin,
+	BlockPlugin,
+	ListPlugin,
+};

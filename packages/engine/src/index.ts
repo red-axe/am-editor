@@ -1,16 +1,20 @@
 import isHotkey from 'is-hotkey';
 import Engine from './engine';
-import Plugin from './plugin/entry';
+import {
+	Plugin,
+	ElementPlugin,
+	BlockPlugin,
+	MarkPlugin,
+	InlinePlugin,
+	ListPlugin,
+} from './plugin';
 import Card from './card/entry';
-import List from './list/entry';
-import Mark from './mark/entry';
-import Inline from './inline/entry';
-import Block from './block/entry';
 import View from './view';
 import Toolbar, { Tooltip } from './toolbar';
 import Range from './range';
 import Parser from './parser';
 import Request, { Ajax, Uploader, getExtensionName } from './request';
+import Scrollbar from './scrollbar';
 
 export * from './types';
 export * from './utils';
@@ -22,11 +26,12 @@ export {
 	Range,
 	View,
 	Plugin,
-	Mark,
-	Inline,
-	Block,
+	ElementPlugin,
+	BlockPlugin,
+	MarkPlugin,
+	InlinePlugin,
+	ListPlugin,
 	Card,
-	List,
 	Toolbar,
 	Tooltip,
 	Parser,
@@ -35,4 +40,5 @@ export {
 	Uploader,
 	Ajax,
 	getExtensionName,
+	Scrollbar,
 };

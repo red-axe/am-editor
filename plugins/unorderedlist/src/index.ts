@@ -1,6 +1,6 @@
 import {
 	NodeInterface,
-	List,
+	ListPlugin,
 	SchemaBlock,
 	isEngine,
 	PluginEntry,
@@ -11,7 +11,7 @@ export type Options = {
 	markdown?: boolean;
 };
 
-export default class extends List<Options> {
+export default class extends ListPlugin<Options> {
 	static get pluginName() {
 		return 'unorderedlist';
 	}

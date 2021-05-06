@@ -43,7 +43,10 @@ class Selection implements SelectionInterface {
 	create() {
 		const { commonAncestorNode, startNode, endNode } = this.range;
 		// 超出编辑区域
-		if (!commonAncestorNode.isRoot() && !commonAncestorNode.inEditor()) {
+		if (
+			!commonAncestorNode.isEditable() &&
+			!commonAncestorNode.inEditor()
+		) {
 			return;
 		}
 		const { document } = commonAncestorNode;

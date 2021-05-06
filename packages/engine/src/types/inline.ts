@@ -1,5 +1,5 @@
 import { NodeInterface } from './node';
-import { PluginInterface } from './plugin';
+import { PluginInterface, ElementPluginInterface } from './plugin';
 import { RangeInterface } from './range';
 
 export interface InlineModelInterface {
@@ -45,7 +45,7 @@ export interface InlineModelInterface {
 	repairRange(range?: RangeInterface): RangeInterface;
 }
 
-export interface InlineInterface extends PluginInterface {
+export interface InlineInterface extends ElementPluginInterface {
 	readonly kind: string;
 	/**
 	 * 标签名称

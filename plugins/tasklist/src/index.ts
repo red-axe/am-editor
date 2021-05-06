@@ -1,6 +1,6 @@
 import {
 	NodeInterface,
-	List,
+	ListPlugin,
 	CARD_KEY,
 	SchemaBlock,
 	isEngine,
@@ -14,7 +14,7 @@ export type Options = {
 	markdown?: boolean;
 };
 
-export default class extends List<Options> {
+export default class extends ListPlugin<Options> {
 	static get pluginName() {
 		return 'tasklist';
 	}
@@ -28,7 +28,10 @@ export default class extends List<Options> {
 	};
 
 	variable = {
-		'@var0': [this.editor.list.CUSTOMZIE_UL_CLASS, 'data-list-task'],
+		'@var0': {
+			required: true,
+			value: [this.editor.list.CUSTOMZIE_UL_CLASS, 'data-list-task'],
+		},
 	};
 
 	allowIn = ['blockquote', '$root'];

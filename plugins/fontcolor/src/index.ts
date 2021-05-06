@@ -1,9 +1,9 @@
-import { Mark } from '@aomao/engine';
+import { MarkPlugin } from '@aomao/engine';
 
 export type Options = {
 	hotkey?: { key: string; args: Array<string> };
 };
-export default class extends Mark<Options> {
+export default class extends MarkPlugin<Options> {
 	static get pluginName() {
 		return 'fontcolor';
 	}
@@ -15,7 +15,10 @@ export default class extends Mark<Options> {
 	};
 
 	variable = {
-		'@var0': '@color',
+		'@var0': {
+			required: true,
+			value: '@color',
+		},
 	};
 
 	isTrigger(color: string, defaultColor?: string) {

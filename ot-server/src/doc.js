@@ -8,6 +8,7 @@ class Doc {
 		this.destroy = destroy;
 		this.backend = backend;
 		this.indexCount = 0;
+		this.doc = undefined;
 	}
 
 	create(
@@ -27,6 +28,7 @@ class Doc {
 			}
 			callback();
 		});
+		this.doc = doc;
 		return doc;
 	}
 

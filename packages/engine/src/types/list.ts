@@ -1,9 +1,9 @@
 import { CardInterface } from './card';
 import { NodeInterface } from './node';
-import { PluginInterface } from './plugin';
+import { BlockInterface } from './block';
 import { RangeInterface } from './range';
 
-export interface ListInterface extends PluginInterface {
+export interface ListInterface extends BlockInterface {
 	/**
 	 * 自定义列表卡片名称
 	 */

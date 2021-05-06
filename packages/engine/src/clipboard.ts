@@ -88,7 +88,9 @@ export default class Clipboard implements ClipboardInterface {
 		range = range.cloneRange();
 		const { $ } = this.editor;
 		let card = range.startNode.closest('[data-card-key]', node => {
-			return $(node).isRoot() ? undefined : node.parentNode || undefined;
+			return $(node).isEditable()
+				? undefined
+				: node.parentNode || undefined;
 		});
 		if (card.length > 0 && !range.collapsed && range.endOffset === 0) {
 			if (range.endContainer.previousSibling) {
@@ -102,7 +104,7 @@ export default class Clipboard implements ClipboardInterface {
 				const cardCenter = range.startNode.closest(
 					'[data-card-element="center"]',
 					node => {
-						return $(node).isRoot()
+						return $(node).isEditable()
 							? undefined
 							: node.parentNode || undefined;
 					},
@@ -119,13 +121,15 @@ export default class Clipboard implements ClipboardInterface {
 		}
 		let root = range.commonAncestorNode;
 		card = root.closest('[data-card-key]', node => {
-			return $(node).isRoot() ? undefined : node.parentNode || undefined;
+			return $(node).isEditable()
+				? undefined
+				: node.parentNode || undefined;
 		});
 		if (card.length > 0) {
 			const cardCenter = root.closest(
 				'[data-card-element="center"]',
 				node => {
-					return $(node).isRoot()
+					return $(node).isEditable()
 						? undefined
 						: node.parentNode || undefined;
 				},
@@ -138,7 +142,7 @@ export default class Clipboard implements ClipboardInterface {
 		const nodes: Array<Node> =
 			root.name === '#text' ? [document.createElement('span')] : [];
 		card = root.closest('[data-card-key]', node => {
-			if ($(node).isRoot()) return;
+			if ($(node).isEditable()) return;
 			if (node.nodeType === getWindow().Node.ELEMENT_NODE) {
 				const display = window
 					.getComputedStyle(node as Element)
@@ -156,7 +160,7 @@ export default class Clipboard implements ClipboardInterface {
 			root.closest('.am-engine-view').length > 0 ||
 			root.closest('.am-engine').length > 0;
 		if (card.length <= 0 && (hasChildEngine || hasParentEngine)) {
-			if (hasParentEngine && !root.isRoot()) {
+			if (hasParentEngine && !root.isEditable()) {
 				const block = this.editor.block.closest(root);
 				if (
 					['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].indexOf(block.name) >

@@ -98,7 +98,7 @@ class Inline implements InlineModelInterface {
 	 */
 	closest(node: NodeInterface) {
 		while (node && node.parent() && !this.editor.node.isBlock(node)) {
-			if (node.isRoot()) break;
+			if (node.isEditable()) break;
 			if (this.editor.node.isInline(node)) return node;
 			const parentNode = node.parent();
 			if (!parentNode) break;
@@ -450,7 +450,7 @@ class Inline implements InlineModelInterface {
 		const findNodes = (node: NodeInterface) => {
 			const nodes = [];
 			while (node) {
-				if (node.isRoot()) break;
+				if (node.isEditable()) break;
 				if (this.editor.node.isInline(node)) nodes.push(node);
 				const parent = node.parent();
 				if (!parent) break;

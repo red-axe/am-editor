@@ -1,4 +1,4 @@
-import { isEngine, Plugin } from '@aomao/engine';
+import { isEngine, Plugin, EDITABLE_SELECTOR } from '@aomao/engine';
 
 export default class extends Plugin {
 	static get pluginName() {
@@ -6,7 +6,6 @@ export default class extends Plugin {
 	}
 
 	init() {
-		super.init();
 		this.editor.on('keydown:all', event => this.onSelectAll(event));
 	}
 
@@ -14,7 +13,12 @@ export default class extends Plugin {
 		if (!isEngine(this.editor)) return;
 		const { change } = this.editor;
 		const range = change.getRange();
-		range.select(this.editor.container, true);
+		const editableElement = range.startNode.closest(EDITABLE_SELECTOR);
+		if (editableElement.length > 0) {
+			range.select(editableElement, true);
+		} else {
+			range.select(this.editor.container, true);
+		}
 		change.select(range);
 		this.editor.trigger('select');
 	}

@@ -6,7 +6,11 @@ import {
 	CARD_VALUE_KEY,
 	READY_CARD_KEY,
 	READY_CARD_SELECTOR,
-} from '../constants/card';
+	DATA_ELEMENT,
+	EDITABLE,
+	EDITABLE_SELECTOR,
+	DATA_TRANSIENT_ELEMENT,
+} from '../constants';
 import {
 	ActiveTrigger,
 	CardEntry,
@@ -104,12 +108,19 @@ class CardModel implements CardModelInterface {
 		});
 	}
 
-	closest(selector: Node | NodeInterface): NodeInterface | undefined {
+	closest(
+		selector: Node | NodeInterface,
+		ignoreEditable?: boolean,
+	): NodeInterface | undefined {
 		const { $ } = this.editor;
 		if (isNode(selector)) selector = $(selector);
 		if (isNodeEntry(selector) && !selector.isCard()) {
 			const card = selector.closest(CARD_SELECTOR, (node: Node) => {
-				if (node && $(node).isRoot()) {
+				if (
+					node && ignoreEditable
+						? $(node).isRoot()
+						: $(node).isEditable()
+				) {
 					return;
 				}
 				return node.parentNode || undefined;
@@ -120,9 +131,12 @@ class CardModel implements CardModelInterface {
 		return selector;
 	}
 
-	find(selector: string | Node | NodeInterface): CardInterface | undefined {
+	find(
+		selector: string | Node | NodeInterface,
+		ignoreEditable?: boolean,
+	): CardInterface | undefined {
 		if (typeof selector !== 'string') {
-			const cardNode = this.closest(selector);
+			const cardNode = this.closest(selector, ignoreEditable);
 			if (!cardNode) return;
 			selector = cardNode;
 		}
@@ -203,13 +217,21 @@ class CardModel implements CardModelInterface {
 			rootParent.inEditor() &&
 			this.editor.node.isBlock(rootParent)
 		) {
-			editor.block.unwrap(card.root.parent()!, range);
+			editor.block.unwrap(rootParent, range);
 		}
 		const result = card.render();
+		const center = card.getCenter();
 		if (result !== undefined) {
 			card.getCenter().append(
 				typeof result === 'string' ? $(result) : result,
 			);
+		}
+		if (card.contenteditable.length > 0) {
+			center.find(card.contenteditable.join(',')).each(node => {
+				const child = $(node);
+				child.attributes('contenteditable', 'true');
+				child.attributes(DATA_ELEMENT, EDITABLE);
+			});
 		}
 		//创建工具栏
 		card.didRender();
@@ -272,6 +294,11 @@ class CardModel implements CardModelInterface {
 		//如果当前编辑器根节点和引擎的根节点不匹配就不执行，主要是子父编辑器的情况
 		if (!container.get() || this.editor.container.equal(container)) {
 			let card = this.find(node);
+			const editableElement = node.closest(EDITABLE_SELECTOR);
+			if (!card && editableElement.length > 0) {
+				const editableParent = editableElement.parent();
+				card = editableParent ? this.find(editableParent) : undefined;
+			}
 			const blockCard = card ? this.findBlock(card.root) : undefined;
 			if (blockCard) {
 				card = blockCard;
@@ -293,7 +320,7 @@ class CardModel implements CardModelInterface {
 			if (card) {
 				if (card.activatedByOther) return;
 				if (!isCurrentActiveCard) {
-					card.toolbarModel?.show(event);
+					card!.toolbarModel?.show(event);
 					if (
 						(card.constructor as CardEntry).cardType ===
 							CardType.INLINE &&
@@ -309,7 +336,10 @@ class CardModel implements CardModelInterface {
 					(card.constructor as CardEntry).cardType === CardType.BLOCK
 				) {
 					card.select(false);
-					this.editor.readonly = true;
+					//不在可编辑器区域内，设置为只读
+					if (editableElement.length === 0)
+						this.editor.readonly = true;
+					else this.editor.readonly = false;
 				}
 				if (
 					!isCurrentActiveCard &&
@@ -408,7 +438,7 @@ class CardModel implements CardModelInterface {
 		this.removeNode(card);
 		list.addBr(range.startNode);
 		if (parent && node.isEmpty(parent)) {
-			if (parent.isRoot()) {
+			if (parent.isEditable()) {
 				this.editor.node.html(parent, '<p><br /></p>');
 				range.select(parent, true);
 				range.shrinkToElementNode();
@@ -470,11 +500,11 @@ class CardModel implements CardModelInterface {
 		if (hasFocus) {
 			//left
 			const left = $(
-				'<span '.concat(CARD_ELEMENT_KEY, '="left">&#8203;</span>'),
+				`<span ${CARD_ELEMENT_KEY}="left" ${DATA_TRANSIENT_ELEMENT}="true">&#8203;</span>`,
 			);
 			//right
 			const right = $(
-				'<span '.concat(CARD_ELEMENT_KEY, '="right">&#8203;</span>'),
+				`<span ${CARD_ELEMENT_KEY}="right" ${DATA_TRANSIENT_ELEMENT}="true">&#8203;</span>`,
 			);
 			body.append(left);
 			body.append(center);
@@ -497,7 +527,7 @@ class CardModel implements CardModelInterface {
 		const cards = container
 			? container.isCard()
 				? container
-				: container.find(CARD_SELECTOR)
+				: container.find(READY_CARD_SELECTOR)
 			: this.editor.container.find(READY_CARD_SELECTOR);
 		this.gc();
 		cards.each(node => {
@@ -524,10 +554,18 @@ class CardModel implements CardModelInterface {
 				this.components.push(card);
 				// 重新渲染
 				const result = card.render();
+				const center = card.getCenter();
 				if (result !== undefined) {
-					card.getCenter().append(
+					center.append(
 						typeof result === 'string' ? $(result) : result,
 					);
+				}
+				if (card.contenteditable.length > 0) {
+					center.find(card.contenteditable.join(',')).each(node => {
+						const child = $(node);
+						child.attributes('contenteditable', 'true');
+						child.attributes(DATA_ELEMENT, EDITABLE);
+					});
 				}
 				//创建工具栏
 				card.didRender();

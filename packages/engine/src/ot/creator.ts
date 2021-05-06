@@ -170,7 +170,12 @@ class Creator extends EventEmitter2 {
 								let p: Path = [];
 								p = p.concat(
 									[...path],
-									[domAddedNode.getIndex() + 2],
+									[
+										domAddedNode.getIndex(
+											node =>
+												!isTransientElement($(node)),
+										) + 2,
+									],
 								);
 								pushAndRepair(ops, {
 									li: data,
@@ -266,7 +271,9 @@ class Creator extends EventEmitter2 {
 			const mutations = node['mutations'];
 			delete node['mutations'];
 			if (node !== null) {
-				const index = $(node).getIndex();
+				const index = $(node).getIndex(
+					node => !isTransientElement($(node)),
+				);
 				const oldIndex = getOldIndex(index, ops);
 				const p: Path = [];
 				allOps = allOps.concat(
@@ -287,15 +294,12 @@ class Creator extends EventEmitter2 {
 		records: MutationRecord[],
 	): number {
 		const { target, nextSibling, previousSibling, addedNodes } = record;
-		const addedIndex = Array.from(target.childNodes).indexOf(
-			addedNodes[0] as ChildNode,
+		const childNodes = Array.from(target.childNodes).filter(
+			node => !isTransientElement(this.engine.$(node)),
 		);
-		const prevIndex = Array.from(target.childNodes).indexOf(
-			previousSibling as ChildNode,
-		);
-		const nextIndex = Array.from(target.childNodes).indexOf(
-			nextSibling as ChildNode,
-		);
+		const addedIndex = childNodes.indexOf(addedNodes[0] as ChildNode);
+		const prevIndex = childNodes.indexOf(previousSibling as ChildNode);
+		const nextIndex = childNodes.indexOf(nextSibling as ChildNode);
 		let index;
 		if (prevIndex !== -1) {
 			index = prevIndex + 1;

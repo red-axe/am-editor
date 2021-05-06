@@ -4,7 +4,7 @@ import {
 	READY_CARD_KEY,
 	CARD_VALUE_KEY,
 	CARD_TYPE_KEY,
-} from '../constants/card';
+} from '../constants';
 import {
 	escape,
 	unescape,
@@ -17,7 +17,7 @@ import {
 import transform from './transform';
 import TextParser from './text';
 import { NodeInterface } from '../types/node';
-import { DATA_ELEMENT } from '../constants/root';
+import { DATA_ELEMENT, EDITABLE } from '../constants/root';
 import { EditorInterface } from '../types/engine';
 import { SchemaInterface, isNodeEntry } from '../types';
 
@@ -106,8 +106,8 @@ class Parser {
 			// 变成
 			// <p></p><div>foo</div><p></p>
 			source = source
-				.replace(/<p(>|\s+[^>]*>)/gi, '<div$1')
-				.replace(/<\/p>/gi, '</div>');
+				.replace(/<p(>|\s+[^>]*>)/gi, '<paragraph$1')
+				.replace(/<\/p>/gi, '</paragraph>');
 			source = transformCustomTags(source);
 			const doc = new (getWindow().DOMParser)().parseFromString(
 				source,
@@ -148,12 +148,12 @@ class Parser {
 				//删除属性中的style属性
 				delete attrs.style;
 				// 光标相关节点
-				if (attrs[DATA_ELEMENT]) {
+				if (child.isCursor()) {
 					name = attrs[DATA_ELEMENT].toLowerCase();
 					attrs = {};
 					styles = {};
 				}
-				// Card相关节点
+				// Card Combine 相关节点
 				if (['left', 'right'].indexOf(attrs[CARD_ELEMENT_KEY]) >= 0) {
 					child = child.next();
 					continue;
@@ -174,7 +174,6 @@ class Parser {
 					}
 					styles = {};
 				}
-				// 转换标签
 				name = transform(
 					conversionRules,
 					name,
@@ -264,24 +263,23 @@ class Parser {
 		customTags: boolean = false,
 	) {
 		const result: Array<string> = [];
-		let index: number = 0;
 		this.editor.trigger('paser:value-before', this.root);
 		this.walkTree(this.root, conversionRules, {
 			onOpen: (child, name, attrs, styles) => {
-				if (schema) {
-					const node = this.editor.$(`<${name} />`);
-					node.attributes(attrs);
-					node.css(styles);
-					const type = this.editor.node.getType(node, schema);
+				if (schema && attrs[DATA_ELEMENT] !== EDITABLE) {
+					let node = child;
+					if (child.name !== name) {
+						node = this.editor.$(`<${name} />`);
+						node.attributes(attrs);
+						node.css(styles);
+					}
+					const type = schema.getType(node);
 					if (type === undefined) return;
 					schema.filterAttributes(name, attrs, type);
 					schema.filterStyles(name, styles, type);
 				}
 				if (this.editor.trigger('paser:value', child, result) === false)
 					return false;
-				if (name === 'pre') {
-					index++;
-				}
 
 				result.push('<');
 				result.push(name);
@@ -307,9 +305,6 @@ class Parser {
 				return;
 			},
 			onText: (_, text) => {
-				if (index === 0) {
-					text = text.replace(/^\n|\n$/g, '').replace(/\n+/g, ' ');
-				}
 				if (replaceSpaces && text.length > 1) {
 					text = text.replace(/[\u00a0 ]+/g, item => {
 						const strArray = [];
@@ -321,18 +316,18 @@ class Parser {
 				}
 				result.push(text);
 			},
-			onClose: (_, name, attrs, styles) => {
+			onClose: (child, name, attrs, styles) => {
 				if (schema) {
-					const node = this.editor.$(`<${name} />`);
-					node.attributes(attrs);
-					node.css(styles);
-					const type = this.editor.node.getType(node, schema);
+					let node = child;
+					if (child.name !== name) {
+						node = this.editor.$(`<${name} />`);
+						node.attributes(attrs);
+						node.css(styles);
+					}
+					const type = schema.getType(node);
 					if (type === undefined) return;
 					schema.filterAttributes(name, attrs, type);
 					schema.filterStyles(name, styles, type);
-				}
-				if (name === 'pre' && --index < 0) {
-					index = 0;
 				}
 				result.push('</'.concat(name, '>'));
 			},

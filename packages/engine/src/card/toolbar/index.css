@@ -11,6 +11,7 @@
     font-weight: normal;
     display: none;
     opacity: 0;
+    z-index: 125;
     transition: all 0.3s ease-in-out;
     background: rgba(255, 255, 255, 0.9);
 }

@@ -5,6 +5,7 @@ import {
 	CARD_VALUE_KEY,
 	isEngine,
 	PluginEntry,
+	CARD_TYPE_KEY,
 } from '@aomao/engine';
 import HrComponent from './component';
 
@@ -18,7 +19,6 @@ export default class extends Plugin<Options> {
 	}
 
 	init() {
-		super.init();
 		this.editor.on('paser:html', node => this.parseHtml(node));
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:enter', event => this.markdown(event));
@@ -89,6 +89,8 @@ export default class extends Plugin<Options> {
 				border: '1px solid transparent',
 				margin: '18px 0',
 			});
+			node.removeAttributes(CARD_KEY);
+			node.removeAttributes(CARD_TYPE_KEY);
 			node.removeAttributes(CARD_VALUE_KEY);
 			node.empty();
 			node.append(hr);

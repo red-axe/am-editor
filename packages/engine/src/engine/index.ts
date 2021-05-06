@@ -60,7 +60,7 @@ import Selection from '../selection';
 import Request from '../request';
 import './index.css';
 
-class EngineModel implements EngineInterface {
+class Engine implements EngineInterface {
 	private _readonly: boolean = false;
 	private _container: ContainerInterface;
 	readonly kind = 'engine';
@@ -295,10 +295,10 @@ class EngineModel implements EngineInterface {
 		if (focusPrev && selection.focus && selection.focus.length > 0)
 			focusPrev.after(selection.focus);
 		if (selection.has() && anchorNext && focusPrev) {
-			if (anchorParent?.isRoot()) {
+			if (anchorParent?.isEditable()) {
 				block.append(selection.anchor!);
 			}
-			if (focusParent?.isRoot()) {
+			if (focusParent?.isEditable()) {
 				block.append(selection.focus!);
 			}
 			if (block.children().length > 0) this.container.append(block);
@@ -337,4 +337,4 @@ class EngineModel implements EngineInterface {
 	}
 }
 
-export default EngineModel;
+export default Engine;

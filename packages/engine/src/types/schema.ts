@@ -1,6 +1,6 @@
 import { NodeInterface } from './node';
 
-export type SchemaValue =
+export type SchemaValueBase =
 	| RegExp
 	| Array<string>
 	| string
@@ -10,6 +10,13 @@ export type SchemaValue =
 	| '@color'
 	| '@url'
 	| '*';
+
+export type SchemaValueObject = {
+	required: boolean;
+	value: SchemaValueBase;
+};
+
+export type SchemaValue = SchemaValueObject | SchemaValueBase;
 export type SchemaAttributes = {
 	[key: string]: SchemaValue;
 };
@@ -32,17 +39,16 @@ export type SchemaRule = {
 	type: 'block' | 'mark' | 'inline';
 	attributes?: SchemaAttributes | SchemaStyle;
 	isVoid?: boolean;
-	isLimit?: boolean;
-};
-
-export type SchemaMark = SchemaRule & {
-	copyOnEnter?: boolean;
 };
 
 export type SchemaBlock = SchemaRule & {
 	allowIn?: Array<string>;
 	disableMark?: Array<string>;
 	canMerge?: boolean;
+};
+
+export type SchemaMark = SchemaRule & {
+	copyOnEnter?: boolean;
 };
 
 export interface SchemaInterface {
@@ -69,20 +75,17 @@ export interface SchemaInterface {
 	 */
 	find(callback: (rule: SchemaRule) => boolean): Array<SchemaRule>;
 	/**
-	 * 检测节点的属性和值是否符合规则
+	 * 获取节点类型
 	 * @param node 节点
-	 * @param type 指定类型
 	 */
-	check(node: NodeInterface, type?: 'block' | 'mark' | 'inline'): boolean;
+	getType(node: NodeInterface): 'block' | 'mark' | 'inline' | undefined;
 	/**
 	 * 检测节点是否符合某一属性规则
 	 * @param node 节点
-	 * @param type 节点类型 "block" | "mark" | "inline"
 	 * @param attributes 属性规则
 	 */
 	checkNode(
 		node: NodeInterface,
-		type: 'block' | 'mark' | 'inline',
 		attributes?: SchemaAttributes | SchemaStyle,
 	): boolean;
 	/**

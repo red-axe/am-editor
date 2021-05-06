@@ -6,6 +6,7 @@ import {
 	ColorProps,
 	CollapseProps,
 } from '../../types';
+import TableSelector from '../../table';
 import './index.css';
 
 export const getToolbarDefaultConfig = (
@@ -104,6 +105,132 @@ export const getToolbarDefaultConfig = (
 							),
 							title: '代码块',
 							search: '代码块,daimakuai,code',
+						},
+						{
+							name: 'table',
+							command: { name: 'table', args: [3, 3] },
+							placement: 'rightTop',
+							prompt: (
+								<TableSelector
+									onSelect={(event, rows, cols) => {
+										event.preventDefault();
+										event.stopPropagation();
+										engine.command.execute(
+											'table',
+											rows,
+											cols,
+										);
+									}}
+								/>
+							),
+							icon: (
+								<svg
+									width="24px"
+									height="24px"
+									viewBox="0 0 24 24"
+									version="1.1"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<g
+										stroke="none"
+										strokeWidth="1"
+										fill="none"
+										fillRule="evenodd"
+									>
+										<g transform="translate(-16.000000, -93.000000)">
+											<g>
+												<g transform="translate(16.000000, 53.000000)">
+													<g transform="translate(0.000000, 40.000000)">
+														<g>
+															<rect
+																stroke="#E8E8E8"
+																strokeWidth="0.666666667"
+																fill="#FFFFFF"
+																x="0.333333333"
+																y="0.333333333"
+																width="23.3333333"
+																height="23.3333333"
+																rx="1.33333333"
+															></rect>
+															<g transform="translate(5.250000, 6.750000)">
+																<path
+																	d="M0.75,0 L3.75,0 L3.75,10.5 L0.75,10.5 C0.335786438,10.5 5.07265313e-17,10.1642136 0,9.75 L0,0.75 C-5.07265313e-17,0.335786438 0.335786438,7.6089797e-17 0.75,0 Z"
+																	id="Rectangle"
+																	fill="#F0F0F0"
+																></path>
+																<path
+																	d="M0.25,2.75 L13.25,2.75 L13.25,0.75 C13.25,0.473857625 13.0261424,0.25 12.75,0.25 L0.75,0.25 C0.473857625,0.25 0.25,0.473857625 0.25,0.75 L0.25,2.75 Z"
+																	id="Rectangle"
+																	stroke="#595959"
+																	strokeWidth="0.5"
+																	fillOpacity="0.15"
+																	fill="#25B864"
+																></path>
+																<rect
+																	id="Rectangle"
+																	fill="#E8E8E8"
+																	x="0"
+																	y="5.25"
+																	width="13.5"
+																	height="1"
+																></rect>
+																<rect
+																	id="Rectangle-Copy"
+																	fill="#E8E8E8"
+																	x="0"
+																	y="7.5"
+																	width="13.5"
+																	height="1"
+																></rect>
+																<rect
+																	id="Rectangle"
+																	fill="#E8E8E8"
+																	x="6.75"
+																	y="0"
+																	width="1"
+																	height="10.5"
+																></rect>
+																<rect
+																	id="Rectangle-Copy-5"
+																	fill="#E8E8E8"
+																	x="9.75"
+																	y="0"
+																	width="1"
+																	height="10.5"
+																></rect>
+																<rect
+																	id="Rectangle"
+																	stroke="#737373"
+																	strokeWidth="0.75"
+																	x="0.375"
+																	y="0.375"
+																	width="12.75"
+																	height="9.75"
+																	rx="0.75"
+																></rect>
+																<path
+																	d="M3.5,10.25 L3.5,0.25 L0.75,0.25 C0.473857625,0.25 0.25,0.473857625 0.25,0.75 L0.25,9.75 C0.25,10.0261424 0.473857625,10.25 0.75,10.25 L3.5,10.25 Z"
+																	id="Rectangle"
+																	stroke="#737373"
+																	strokeWidth="0.5"
+																></path>
+																<path
+																	d="M0.25,2.75 L13.25,2.75 L13.25,0.75 C13.25,0.473857625 13.0261424,0.25 12.75,0.25 L0.75,0.25 C0.473857625,0.25 0.25,0.473857625 0.25,0.75 L0.25,2.75 Z"
+																	id="Rectangle"
+																	stroke="#737373"
+																	strokeWidth="0.5"
+																></path>
+															</g>
+														</g>
+													</g>
+												</g>
+											</g>
+										</g>
+									</g>
+								</svg>
+							),
+							title: '表格',
+							search: 'biaoge,table',
 						},
 					],
 				},

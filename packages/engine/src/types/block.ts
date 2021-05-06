@@ -1,5 +1,5 @@
 import { NodeInterface } from './node';
-import { PluginInterface } from './plugin';
+import { PluginInterface, ElementPluginInterface } from './plugin';
 import { RangeInterface } from './range';
 import { SchemaBlock } from './schema';
 
@@ -198,7 +198,7 @@ export interface BlockModelInterface {
 	insertOrSplit(range: RangeInterface, block: NodeInterface): void;
 }
 
-export interface BlockInterface extends PluginInterface {
+export interface BlockInterface extends ElementPluginInterface {
 	readonly kind: string;
 	/**
 	 * 标签名称

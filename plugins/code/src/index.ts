@@ -1,11 +1,11 @@
-import { NodeInterface, Inline } from '@aomao/engine';
+import { NodeInterface, InlinePlugin } from '@aomao/engine';
 import './index.css';
 
 export type Options = {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 };
-export default class extends Inline<Options> {
+export default class extends InlinePlugin<Options> {
 	static get pluginName() {
 		return 'code';
 	}

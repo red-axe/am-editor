@@ -274,7 +274,7 @@ class Range implements RangeInterface {
 			if (
 				domNode.type === getWindow().Node.TEXT_NODE ||
 				(!toBlock && this.editor.node.isBlock(domNode)) ||
-				domNode.isRoot()
+				domNode.isEditable()
 			) {
 				return;
 			}
@@ -636,11 +636,11 @@ class Range implements RangeInterface {
 	deepCut() {
 		if (!this.collapsed) this.extractContents();
 		const { startNode } = this;
-		if (!startNode.isRoot()) {
+		if (!startNode.isEditable()) {
 			let node = startNode;
-			if (node && !node.isRoot()) {
+			if (node && !node.isEditable()) {
 				let parentNode = node.parent();
-				while (parentNode && !parentNode.isRoot()) {
+				while (parentNode && !parentNode.isEditable()) {
 					node = parentNode;
 					parentNode = parentNode.parent();
 				}
@@ -669,10 +669,10 @@ class Range implements RangeInterface {
 	 * 获取当前选区最近的根节点
 	 */
 	getRootBlock() {
-		if (this.startNode.isRoot())
+		if (this.startNode.isEditable())
 			return this.startNode.children().eq(this.startOffset);
 		let node: NodeInterface | undefined = this.startNode;
-		while (node?.parent() && !node.parent()!.isRoot()) {
+		while (node?.parent() && !node.parent()!.isEditable()) {
 			node = node.parent();
 		}
 		return node;

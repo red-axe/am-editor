@@ -37,8 +37,14 @@ const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 		name: 'card',
 		type: 'inline',
 		attributes: {
-			name: /\w+/,
-			type: 'inline',
+			name: {
+				required: true,
+				value: /\w+/,
+			},
+			type: {
+				required: true,
+				value: 'inline',
+			},
 			value: '*',
 		},
 	},
@@ -46,8 +52,14 @@ const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 		name: 'span',
 		type: 'inline',
 		attributes: {
-			[CARD_KEY]: /\w+/,
-			[CARD_TYPE_KEY]: 'inline',
+			[CARD_KEY]: {
+				required: true,
+				value: /\w+/,
+			},
+			[CARD_TYPE_KEY]: {
+				required: true,
+				value: 'inline',
+			},
 			[CARD_VALUE_KEY]: '*',
 			class: '*',
 			contenteditable: '*',
@@ -57,8 +69,14 @@ const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 		name: 'card',
 		type: 'block',
 		attributes: {
-			name: /\w+/,
-			type: 'block',
+			name: {
+				required: true,
+				value: /\w+/,
+			},
+			type: {
+				required: true,
+				value: 'block',
+			},
 			value: '*',
 		},
 	},
@@ -66,8 +84,14 @@ const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 		name: 'div',
 		type: 'block',
 		attributes: {
-			[CARD_KEY]: /\w+/,
-			[CARD_TYPE_KEY]: 'block',
+			[CARD_KEY]: {
+				required: true,
+				value: /\w+/,
+			},
+			[CARD_TYPE_KEY]: {
+				required: true,
+				value: 'block',
+			},
 			[CARD_VALUE_KEY]: '*',
 			class: '*',
 			contenteditable: '*',

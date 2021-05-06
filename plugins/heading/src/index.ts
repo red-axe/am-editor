@@ -6,7 +6,7 @@ import {
 	NodeInterface,
 	random,
 	Tooltip,
-	Block,
+	BlockPlugin,
 	PluginEntry,
 } from '@aomao/engine';
 import './index.css';
@@ -25,7 +25,7 @@ export type Options = {
 	markdown?: boolean;
 	disableMark?: Array<string>;
 };
-export default class extends Block<Options> {
+export default class extends BlockPlugin<Options> {
 	attributes = {
 		id: '@var0',
 	};
@@ -130,13 +130,13 @@ export default class extends Block<Options> {
 		this.editor.container.find(this.tagName.join(',')).each(titleNode => {
 			const node = $(titleNode);
 
-			if (!node.parent()?.isRoot()) {
+			if (!node.parent()?.isEditable()) {
 				node.removeAttributes('id');
 				return;
 			}
 
 			let id = node.attributes('id');
-			if (!id || id === 'temp') {
+			if (!id) {
 				id = random();
 				node.attributes('id', id);
 			}
@@ -204,7 +204,7 @@ export default class extends Block<Options> {
 			return;
 		}
 
-		if (!block.parent()?.isRoot()) {
+		if (!block.parent()?.isEditable()) {
 			return;
 		}
 
@@ -392,7 +392,7 @@ export default class extends Block<Options> {
 		this.beforeProcess();
 		const { list, block } = this.editor;
 		list.split();
-		block.setBlocks(`<${type}${type !== 'p' ? ' id="temp"' : ''} />`);
+		block.setBlocks(`<${type} />`);
 		this.afterProcess();
 	}
 
@@ -505,7 +505,7 @@ export default class extends Block<Options> {
 		if (
 			this.tagName.indexOf(block.name) > -1 &&
 			this.editor.node.isEmptyWithTrim(block) &&
-			block.parent()?.isRoot()
+			block.parent()?.isEditable()
 		) {
 			event.preventDefault();
 			this.editor.block.setBlocks('<p />');

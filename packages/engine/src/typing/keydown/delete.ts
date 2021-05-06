@@ -32,7 +32,7 @@ class Delete implements TypingHandleInterface {
 	}
 
 	getNext(node: Node): Node | null {
-		return this.engine.$(node).isRoot()
+		return this.engine.$(node).isEditable()
 			? null
 			: node.nextSibling
 			? node.nextSibling
@@ -43,7 +43,7 @@ class Delete implements TypingHandleInterface {
 
 	getRange(node: Node, hasNext: boolean = false): RangeInterface | null {
 		const { $ } = this.engine;
-		if ($(node).isRoot()) return null;
+		if ($(node).isEditable()) return null;
 		if (!hasNext) {
 			const next = this.getNext(node);
 			if (!next) return null;

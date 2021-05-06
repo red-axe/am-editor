@@ -1,5 +1,15 @@
-import { CARD_TAG, CARD_TYPE_KEY } from '../constants/card';
-import { DATA_ELEMENT, ROOT, ROOT_SELECTOR } from '../constants/root';
+import {
+	DATA_ELEMENT,
+	ROOT,
+	ROOT_SELECTOR,
+	ANCHOR,
+	CURSOR,
+	FOCUS,
+	CARD_TAG,
+	CARD_TYPE_KEY,
+	EDITABLE,
+	EDITABLE_SELECTOR,
+} from '../constants';
 import DOMEvent from './event';
 import domParse from './parse';
 import {
@@ -10,7 +20,9 @@ import {
 	getDocument,
 	getWindow,
 } from '../utils';
+import { Path } from 'sharedb';
 import {
+	EditorInterface,
 	NodeInterface,
 	EventInterface,
 	Selector,
@@ -19,10 +31,7 @@ import {
 	isNode,
 	isNodeEntry,
 	ElementInterface,
-} from '../types/node';
-import { Path } from 'sharedb';
-import { EditorInterface } from '../types';
-import { ANCHOR, CURSOR, FOCUS } from '../constants';
+} from '../types';
 
 /**
  * 扩展 Node 类
@@ -150,7 +159,6 @@ class NodeEntry implements NodeInterface {
 	isCard() {
 		return this.name === CARD_TAG || !!this.attributes(CARD_TYPE_KEY);
 	}
-
 	/**
 	 * 判断当前节点是否为block类型的Card组件
 	 */
@@ -163,6 +171,13 @@ class NodeEntry implements NodeInterface {
 	 */
 	isInlineCard() {
 		return 'inline' === this.attributes(CARD_TYPE_KEY);
+	}
+	/**
+	 * 是否是可编辑器卡片
+	 * @returns
+	 */
+	isEditableCard() {
+		return this.find(EDITABLE_SELECTOR).length > 0;
 	}
 	/**
 	 * 具有 display:block css 属性的inline card
@@ -179,6 +194,10 @@ class NodeEntry implements NodeInterface {
 	 */
 	isRoot() {
 		return this.attributes(DATA_ELEMENT) === ROOT;
+	}
+
+	isEditable() {
+		return this.isRoot() || this.attributes(DATA_ELEMENT) === EDITABLE;
 	}
 
 	/**
@@ -915,10 +934,17 @@ class NodeEntry implements NodeInterface {
 		walk(this);
 	}
 
-	getChildByPath(path: Path): Node {
+	getChildByPath(path: Path, filter?: (node: Node) => boolean): Node {
 		let node = this.get()!;
-		for (let i = 0; path[i] !== undefined && node.childNodes[path[i]]; ) {
-			node = node.childNodes[path[i]];
+		const getChildNodes = () => {
+			return filter
+				? Array.from(node.childNodes).filter(filter)
+				: Array.from(node.childNodes);
+		};
+		let childNodes = getChildNodes();
+		for (let i = 0; path[i] !== undefined && childNodes[path[i]]; ) {
+			node = childNodes[path[i]];
+			childNodes = getChildNodes();
 			i++;
 		}
 		return node;
@@ -933,13 +959,15 @@ class NodeEntry implements NodeInterface {
 		return false;
 	}
 
-	getIndex() {
+	getIndex(filter?: (node: Node) => boolean) {
 		let index = 0;
 		const parent = this[0].parentNode;
 		if (!parent) return index;
-		Array.from(parent.childNodes).forEach((child, i) => {
-			if (child === this.get()) index = i;
-		});
+		Array.from(parent.childNodes)
+			.filter(filter || (() => true))
+			.forEach((child, i) => {
+				if (child === this.get()) index = i;
+			});
 		return index;
 	}
 

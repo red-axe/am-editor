@@ -68,7 +68,7 @@ class Backspace {
 			event.preventDefault();
 			const listRoot = block.closest('ul');
 
-			if (block.parent()?.isRoot()) {
+			if (block.parent()?.isEditable()) {
 				// <p>foo</p><li><cursor />bar</li>
 				change.mergeAfterDeletePrevNode(block);
 				return false;

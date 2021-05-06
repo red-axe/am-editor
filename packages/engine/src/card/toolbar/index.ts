@@ -1,5 +1,6 @@
 import Toolbar, { Tooltip } from '../../toolbar';
 import {
+	CardEntry,
 	CardInterface,
 	CardToolbarInterface,
 	CardToolbarItemOptions,
@@ -10,6 +11,7 @@ import {
 } from '../../types/toolbar';
 import { EditorInterface } from '../../types/engine';
 import './index.css';
+import { DATA_ELEMENT, UI } from '../../constants';
 
 export const isCardToolbarItemOptions = (
 	item: ToolbarItemOptions | CardToolbarItemOptions,
@@ -112,9 +114,8 @@ class CardToolbar implements CardToolbarInterface {
 			//获取客户端配置
 			const config = this.card.toolbar();
 			//获取渲染节点
-			const body = this.card.root.first();
-			if (!body) return;
-
+			const { root } = this.editor;
+			this.hide();
 			const items: Array<ToolbarItemOptions> = [];
 			config.forEach(item => {
 				//默认项
@@ -129,7 +130,7 @@ class CardToolbar implements CardToolbarInterface {
 										.get('dnd', 'title')
 										.toString(),
 							);
-							body.append(dndNode);
+							root.append(dndNode);
 							break;
 						default:
 							const resultItem = this.getDefaultItem(item);
@@ -139,13 +140,14 @@ class CardToolbar implements CardToolbarInterface {
 					items.push(item);
 				}
 			});
+
 			if (items.length > 0) {
 				const toolbar = new Toolbar(this.editor, {
 					items,
 				});
 				toolbar.root.addClass('data-card-toolbar');
 				//渲染工具栏
-				toolbar.render(body);
+				toolbar.render(root);
 				toolbar.hide();
 				this.toolbar = toolbar;
 			}
@@ -153,32 +155,28 @@ class CardToolbar implements CardToolbarInterface {
 	}
 
 	hide() {
-		this.card.find('.data-card-dnd').removeClass('data-card-dnd-active');
+		const { root } = this.editor;
+		root.find('.data-card-dnd').remove();
 		this.hideCardToolbar();
 	}
 
 	show(event?: MouseEvent) {
-		this.card.find('.data-card-dnd').addClass('data-card-dnd-active');
 		this.showCardToolbar(event);
 	}
 
 	hideCardToolbar(): void {
-		this.card.find('.data-card-toolbar').removeClass('data-toolbar-active');
-		this.card.root.removeClass('data-card-toolbar-active');
+		this.toolbar?.destroy();
 	}
 
 	showCardToolbar(event?: MouseEvent): void {
-		const toolbarElement = this.card.find('.data-card-toolbar');
-		if (toolbarElement.length > 0) {
-			const element = toolbarElement.get<HTMLElement>()!;
+		this.create();
+		const container = this.getContainer();
+		if (container && container.length > 0) {
+			const element = container.get<HTMLElement>()!;
 			element.style.left = '0px';
-			this.card.root.addClass('data-card-toolbar-active');
-			if (this.toolbar) this.toolbar.show();
-			toolbarElement.addClass('data-toolbar-active');
-
 			if (event) {
 				const { clientX } = event;
-				const groupElement = toolbarElement.first();
+				const groupElement = container.first();
 				const cardRect = this.card.root
 					.get<Element>()!
 					.getBoundingClientRect();
@@ -198,14 +196,45 @@ class CardToolbar implements CardToolbarInterface {
 							Math.max(Math.min(left, space), 0) + 'px';
 					}
 				}
+			} else {
+				const cardRect = this.card.root.getBoundingClientRect() || {
+					left: 0,
+					top: 0,
+				};
+				const { root } = this.editor;
+				const rootRect = root.getBoundingClientRect() || {
+					left: 0,
+					top: 0,
+				};
+				const top = cardRect.top - rootRect.top;
+				const left = cardRect.left - rootRect.left;
+				element.style.top = `${top - 48}px`;
+				element.style.left = `${left}px`;
+
+				const dnd = root.find('.data-card-dnd');
+				const dndElement = dnd.get<HTMLElement>();
+				if (dndElement) {
+					dndElement.style.top = `${top}px`;
+					dndElement.style.left = `${left - 21}px`;
+					dnd.addClass('data-card-dnd-active');
+				}
 			}
+
+			container.addClass('data-toolbar-active');
+			container.attributes(
+				'toolbar-trigger-key',
+				(this.card.constructor as CardEntry).cardName,
+			);
+			if (this.toolbar) this.toolbar.show();
 		}
 	}
 
 	private createDnd(content: string, title: string) {
 		const { $ } = this.editor;
 		const dndNode = $(
-			`<div class="data-card-dnd" draggable="true" contenteditable="false">
+			`<div ${DATA_ELEMENT}="${UI}" class="data-card-dnd" draggable="true" dnd-trigger-key="${
+				(this.card.constructor as CardEntry).cardName
+			}" drag-card-trigger="${this.card.id}" contenteditable="false">
                 <div class="data-card-dnd-trigger">
                     ${content}
                 </div>

@@ -154,7 +154,7 @@ class Block implements BlockModelInterface {
 	closest(node: NodeInterface) {
 		const originNode = node;
 		while (node) {
-			if (node.isRoot() || this.editor.node.isBlock(node)) {
+			if (node.isEditable() || this.editor.node.isBlock(node)) {
 				return node;
 			}
 			const parentNode = node.parent();
@@ -371,11 +371,11 @@ class Block implements BlockModelInterface {
 		// 获取上面第一个 Block
 		const block = this.closest(safeRange.startNode);
 		// 获取的 block 超出编辑范围
-		if (!block.isRoot() && !block.inEditor()) {
+		if (!block.isEditable() && !block.inEditor()) {
 			return;
 		}
 
-		if (block.isRoot()) {
+		if (block.isEditable()) {
 			// <p>wo</p><cursor /><p>other</p>
 			// to
 			// <p>wo</p><p><cursor />other</p>
@@ -494,12 +494,12 @@ class Block implements BlockModelInterface {
 		// 获取上面第一个 Block
 		const container = this.closest(safeRange.startNode);
 		// 超出编辑范围
-		if (!container.isRoot() && !container.inEditor()) {
+		if (!container.isEditable() && !container.inEditor()) {
 			if (!range) change.apply(safeRange);
 			return;
 		}
 		// 当前选择范围在段落外面
-		if (container.isRoot()) {
+		if (container.isEditable()) {
 			change.insertNode(block, safeRange);
 			safeRange.collapse(false);
 			if (!range) change.apply(safeRange);
@@ -590,7 +590,7 @@ class Block implements BlockModelInterface {
 		const blocks = this.getBlocks(safeRange);
 		// 编辑器根节点，无段落
 		const { startNode } = safeRange;
-		if (startNode.isRoot() && blocks.length === 0) {
+		if (startNode.isEditable() && blocks.length === 0) {
 			const newBlock = targetNode || $('<p></p>');
 			this.editor.node.setAttributes(newBlock, attributes);
 
@@ -711,7 +711,7 @@ class Block implements BlockModelInterface {
 		const findNodes = (node: NodeInterface) => {
 			const nodes = [];
 			while (node) {
-				if (node.isRoot()) {
+				if (node.isEditable()) {
 					break;
 				}
 				if (this.editor.node.isBlock(node)) {

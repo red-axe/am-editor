@@ -92,7 +92,7 @@ class Mark implements MarkModelInterface {
 	 */
 	closestNotMark(node: NodeInterface) {
 		while (this.editor.node.isMark(node) || node.isText()) {
-			if (node.isRoot()) break;
+			if (node.isEditable()) break;
 			const parent = node.parent();
 			if (!parent) break;
 			node = parent;
@@ -940,7 +940,7 @@ class Mark implements MarkModelInterface {
 			while (node) {
 				if (
 					node.type === getWindow().Node.ELEMENT_NODE &&
-					node.isRoot()
+					node.isEditable()
 				) {
 					break;
 				}
@@ -1003,7 +1003,7 @@ class Mark implements MarkModelInterface {
 	removeEmptyMarks(node: NodeInterface, addBr?: boolean) {
 		if (
 			node.length === 0 ||
-			node.isRoot() ||
+			node.isEditable() ||
 			node.isCard() ||
 			node.attributes(DATA_ELEMENT)
 		) {

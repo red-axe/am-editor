@@ -1,5 +1,5 @@
 import { NodeInterface } from './node';
-import { PluginInterface } from './plugin';
+import { ElementPluginInterface, PluginInterface } from './plugin';
 import { RangeInterface } from './range';
 import { SchemaMark } from './schema';
 
@@ -110,7 +110,7 @@ export interface MarkModelInterface {
 	removeEmptyMarks(node: NodeInterface, addBr?: boolean): void;
 }
 
-export interface MarkInterface extends PluginInterface {
+export interface MarkInterface extends ElementPluginInterface {
 	readonly kind: string;
 	/**
 	 * 标签名称

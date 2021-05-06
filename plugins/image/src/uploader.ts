@@ -104,7 +104,6 @@ export default class extends Plugin<Options> {
 	];
 
 	init() {
-		super.init();
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:enter', event => this.markdown(event));
 			this.editor.on('drop:files', files => this.dropFiles(files));

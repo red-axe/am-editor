@@ -1,14 +1,15 @@
-import PluginEntry from '../plugin/entry';
+import ElementPluginEntry from './element';
 import {
 	isEngine,
-	InlineInterface,
+	MarkInterface,
 	NodeInterface,
+	SchemaMark,
 	PluginEntry as PluginEntryType,
 } from '../types';
 
-abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
-	implements InlineInterface {
-	readonly kind: string = 'inline';
+abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
+	implements MarkInterface {
+	readonly kind: string = 'mark';
 	/**
 	 * 标签名称
 	 */
@@ -17,6 +18,10 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 	 * Markdown 规则，可选
 	 */
 	readonly markdown?: string;
+	/**
+	 * 回车后是否复制mark效果，默认为true，允许
+	 */
+	readonly copyOnEnter?: boolean;
 
 	init() {
 		super.init();
@@ -27,17 +32,17 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 
 	execute() {
 		if (!isEngine(this.editor)) return;
-		const inlineNode = this.editor.$(`<${this.tagName} />`);
-		this.setStyle(inlineNode, ...arguments);
-		this.setAttributes(inlineNode, ...arguments);
-		const { inline } = this.editor;
+		const markNode = this.editor.$(`<${this.tagName} />`);
+		this.setStyle(markNode, ...arguments);
+		this.setAttributes(markNode, ...arguments);
+		const { mark } = this.editor;
 		const trigger = this.isTrigger
 			? this.isTrigger(...arguments)
 			: !this.queryState();
 		if (trigger) {
-			inline.wrap(inlineNode);
+			mark.wrap(markNode);
 		} else {
-			inline.unwrap();
+			mark.unwrap(markNode);
 		}
 	}
 
@@ -46,16 +51,22 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 		const { change } = this.editor;
 		//如果没有属性和样式限制，直接查询是否包含当前标签名称
 		if (!this.style && !this.attributes)
-			return change.inlines.some(node => node.name === this.tagName);
+			return change.marks.some(node => node.name === this.tagName);
 		//获取属性和样式限制内的值集合
 		const values: Array<string> = [];
-		change.inlines.forEach(node => {
+		change.marks.forEach(node => {
 			values.push(...Object.values(this.getStyle(node)));
 			values.push(...Object.values(this.getAttributes(node)));
 		});
 		return values.length === 0 ? undefined : values;
 	}
 
+	schema(): SchemaMark {
+		return {
+			...super.schema(),
+			copyOnEnter: this.copyOnEnter,
+		} as SchemaMark;
+	}
 	/**
 	 * 是否触发执行增加当前mark标签包裹，否则将移除当前mark标签的包裹
 	 * @param args 在调用 command.execute 执行插件传入时的参数
@@ -71,7 +82,19 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 		if (!isEngine(this.editor) || !this.markdown) return;
 		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
 		const match = new RegExp(`^(.*)${key}(.+?)${key}$`).exec(text);
+
 		if (match) {
+			//限制block下某些禁用的mark插件
+			const blockPlugin = this.editor.block.findPlugin(node);
+			const pluginName = (this.constructor as PluginEntryType).pluginName;
+			if (
+				blockPlugin.some(
+					plugin =>
+						plugin.disableMark &&
+						plugin.disableMark.indexOf(pluginName) > -1,
+				)
+			)
+				return;
 			const { change } = this.editor;
 			let range = change.getRange();
 			const visibleChar = match[1] && /\S$/.test(match[1]);
@@ -96,17 +119,6 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 			);
 			range = change.getRange();
 			range.collapse(false);
-			const inline = this.editor.inline.closest(range.startNode);
-			const inlineNext = inline.next();
-			if (
-				inline &&
-				inlineNext &&
-				inlineNext.isText() &&
-				/^\u200B/g.test(inlineNext.text())
-			) {
-				range.setStart(inlineNext, 1);
-				range.setEnd(inlineNext, 1);
-			}
 			change.select(range);
 			change.insertText('\xa0');
 			return false;
@@ -122,10 +134,23 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 
 		let textNode = node.get<Text>()!;
 		if (!textNode.textContent) return;
-		const inlines: Array<NodeInterface> = [];
+		const marks: Array<NodeInterface> = [];
 		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
 		const reg = new RegExp(`(${key}([^${key}\r\n]+)${key})`);
-		let match;
+		let match = reg.exec(textNode.textContent);
+		if (match) {
+			//限制block下某些禁用的mark插件
+			const blockPlugin = this.editor.block.findPlugin(node);
+			const pluginName = (this.constructor as PluginEntryType).pluginName;
+			if (
+				blockPlugin.some(
+					plugin =>
+						plugin.disableMark &&
+						plugin.disableMark.indexOf(pluginName) > -1,
+				)
+			)
+				return;
+		}
 		while (
 			textNode.textContent &&
 			(match = reg.exec(textNode.textContent))
@@ -137,24 +162,23 @@ abstract class InlineEntry<T extends {} = {}> extends PluginEntry<T>
 			//移除匹配到的字符
 			regNode.remove();
 			//获取中间字符
-			const inlineNode = this.editor.$(
+			const markNode = this.editor.$(
 				`<${this.tagName}>${match[2]}</${this.tagName}>`,
 			);
-			inlines.push(inlineNode);
+			marks.push(markNode);
 			//追加node
-			node.after(inlineNode);
-			this.editor.inline.repairCursor(inlineNode);
+			node.after(markNode);
 		}
 		if (match && textNode.textContent && textNode.textContent !== '') {
 			node.after(textNode);
 			this.editor.trigger('paste:each', textNode);
 		}
 		//如果有解析到节点，就再次触发事件，可能节点内还有markdown字符没有解析
-		inlines.forEach(inline => {
-			const child = inline.first();
+		marks.forEach(mark => {
+			const child = mark.first();
 			if (child?.isText()) this.editor.trigger('paste:each', child);
 		});
 	}
 }
 
-export default InlineEntry;
+export default MarkEntry;

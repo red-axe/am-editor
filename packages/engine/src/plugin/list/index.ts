@@ -1,9 +1,9 @@
-import { isEngine, NodeInterface } from '../types';
-import { CARD_KEY, READY_CARD_KEY } from '../constants';
-import { ListInterface } from '../types/list';
-import { PluginEntry as PluginEntryType } from '../types/plugin';
+import { isEngine, NodeInterface } from '../../types';
+import { CARD_KEY, READY_CARD_KEY } from '../../constants';
+import { ListInterface } from '../../types/list';
+import { PluginEntry as PluginEntryType } from '../../types/plugin';
+import BlockEntry from '../block';
 import './index.css';
-import BlockEntry from '../block/entry';
 
 abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 	implements ListInterface {

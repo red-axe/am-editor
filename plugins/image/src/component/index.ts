@@ -6,7 +6,6 @@ import {
 	ToolbarItemOptions,
 } from '@aomao/engine';
 import Image, { Size } from './image';
-import './index.css';
 
 export type ImageValue = {
 	/**

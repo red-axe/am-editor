@@ -7,32 +7,38 @@ import { Op, Path, StringInsertOp } from 'sharedb';
 import { ApplierInterface, RemoteAttr, RemotePath } from '../types/ot';
 import { NodeInterface } from '../types/node';
 import { getWindow } from '../utils';
-
-const elementAtPath = (
-	node: Node,
-	path: Path,
-): [Node, undefined | number, Node, number] => {
-	const index = path[0] as number;
-	if (index === JSONML.ATTRIBUTE_INDEX) return [node, undefined, node, index];
-	const offset = index - JSONML.ELEMENT_LIST_OFFSET;
-	const childNode = node.childNodes[offset];
-	const pathOffset = path[1];
-	if (
-		1 === path.length ||
-		pathOffset === JSONML.TAG_NAME_INDEX ||
-		pathOffset === JSONML.ATTRIBUTE_INDEX ||
-		childNode.nodeType === getWindow().Node.TEXT_NODE
-	) {
-		return [childNode, offset, node, pathOffset as number];
-	}
-	return elementAtPath(childNode, path.slice(1));
-};
+import { isTransientElement } from './utils';
 
 class Applier implements ApplierInterface {
 	private engine: EngineInterface;
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
 	}
+
+	elementAtPath = (
+		node: Node,
+		path: Path,
+	): [Node, undefined | number, Node, number] => {
+		const index = path[0] as number;
+		if (index === JSONML.ATTRIBUTE_INDEX)
+			return [node, undefined, node, index];
+		const offset = index - JSONML.ELEMENT_LIST_OFFSET;
+		const childNode = Array.from(node.childNodes).filter(node => {
+			const childNode = this.engine.$(node);
+			return !isTransientElement(childNode);
+		})[offset];
+		const pathOffset = path[1];
+		if (
+			1 === path.length ||
+			pathOffset === JSONML.TAG_NAME_INDEX ||
+			pathOffset === JSONML.ATTRIBUTE_INDEX ||
+			childNode.nodeType === getWindow().Node.TEXT_NODE
+		) {
+			return [childNode, offset, node, pathOffset as number];
+		}
+		return this.elementAtPath(childNode, path.slice(1));
+	};
+
 	fromRemoteAttr(attr: RemoteAttr) {
 		if (!attr) return;
 		const { $ } = this.engine;
@@ -129,8 +135,8 @@ class Applier implements ApplierInterface {
 
 	setAttribute(path: Path, attr: string, value: string) {
 		const { engine } = this;
-		const { $ } = this.engine;
-		const [node] = elementAtPath(engine.container[0], path);
+		const { $, card } = this.engine;
+		const [node] = this.elementAtPath(engine.container[0], path);
 		const domNode = $(node);
 		if (
 			(domNode && domNode.length > 0 && !domNode.isRoot()) ||
@@ -140,7 +146,8 @@ class Applier implements ApplierInterface {
 			value = unescape(value);
 			domNode.get<Element>()?.setAttribute(attr, value);
 			if (domNode.isCard()) {
-				engine.card.render($(node));
+				const component = card.find(domNode);
+				if (!component?.isEditable) card.render($(node));
 			}
 		}
 	}
@@ -148,7 +155,7 @@ class Applier implements ApplierInterface {
 	removeAttribute(path: Path, attr: string) {
 		const { engine } = this;
 		const { $ } = this.engine;
-		const [node] = elementAtPath(engine.container[0], path);
+		const [node] = this.elementAtPath(engine.container[0], path);
 		const domNode = $(node);
 		if (
 			(domNode.length > 0 && !domNode.isRoot()) ||
@@ -161,7 +168,7 @@ class Applier implements ApplierInterface {
 	insertNode(path: Path, value: string | Op[] | Op[][]) {
 		const { engine } = this;
 		const { $ } = this.engine;
-		const [begine, beginOffset, end] = elementAtPath(
+		const [begine, beginOffset, end] = this.elementAtPath(
 			engine.container[0],
 			path,
 		);
@@ -183,7 +190,7 @@ class Applier implements ApplierInterface {
 
 	deleteNode(path: Path) {
 		const { engine } = this;
-		const [begine] = elementAtPath(engine.container[0], path);
+		const [begine] = this.elementAtPath(engine.container[0], path);
 		const { $ } = this.engine;
 		const domBegine = $(begine);
 		if (domBegine.length > 0 && !domBegine.isRoot()) {
@@ -201,7 +208,7 @@ class Applier implements ApplierInterface {
 
 	insertInText(path: Path, offset: number, text: string) {
 		const { engine } = this;
-		let [begine, beginOffset, end, endOffset] = elementAtPath(
+		let [begine, beginOffset, end, endOffset] = this.elementAtPath(
 			engine.container[0],
 			path,
 		);
@@ -230,7 +237,7 @@ class Applier implements ApplierInterface {
 
 	deleteInText(path: Path, offset: number, text: string) {
 		const { engine } = this;
-		let [begine, beginOffset, end, endOffset] = elementAtPath(
+		let [begine, beginOffset, end, endOffset] = this.elementAtPath(
 			engine.container[0],
 			path,
 		);
@@ -307,7 +314,7 @@ class Applier implements ApplierInterface {
 		if ('oi' in op || 'od' in op) {
 			path = path.slice(0, -1);
 		}
-		const [begine, beginOffset, end] = elementAtPath(
+		const [begine, beginOffset, end] = this.elementAtPath(
 			engine.container[0],
 			path,
 		);
@@ -373,6 +380,7 @@ class Applier implements ApplierInterface {
 
 	setRangeByPath(path: Path[]) {
 		if (path) {
+			const { $ } = this.engine;
 			let [start, end] = path;
 			if (start && end) {
 				const beginOffset = start[start.length - 1] as number;
@@ -382,8 +390,14 @@ class Applier implements ApplierInterface {
 				startClone.pop();
 				endClone.pop();
 				const { container, change } = this.engine;
-				const startChild = container.getChildByPath(startClone);
-				const endChild = container.getChildByPath(endClone);
+				const startChild = container.getChildByPath(
+					startClone,
+					child => !isTransientElement($(child)),
+				);
+				const endChild = container.getChildByPath(
+					endClone,
+					child => !isTransientElement($(child)),
+				);
 				try {
 					const range = change.getRange();
 					range.setStart(startChild, beginOffset);

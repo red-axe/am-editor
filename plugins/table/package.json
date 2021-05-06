@@ -1,0 +1,28 @@
+{
+  "name": "@aomao/plugin-table",
+  "version": "1.0.0",
+  "description": "table plugin",
+  "author": "itellyou <owner@itellyou.com>",
+  "homepage": "https://github.com/itellyou-com/am-editor/tree/master/plugins/plugin-table#readme",
+  "license": "MIT",
+  "main": "dist/index.ts",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itellyou-com/am-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itellyou-com/am-editor/issues"
+  },
+  "dependencies": {
+    "@aomao/engine": "^1.3.0",
+    "@babel/runtime": "^7.13.10",
+    "eventemitter2": "^6.4.4"
+  }
+}

@@ -74,6 +74,10 @@ export interface EditorInterface {
 	 */
 	container: NodeInterface;
 	/**
+	 * 编辑器根节点，默认为编辑器父节点
+	 */
+	root: NodeInterface;
+	/**
 	 * 卡片
 	 */
 	card: CardModelInterface;
@@ -392,7 +396,7 @@ export type EngineOptions = {
 	config?: { [k: string]: PluginOptions };
 };
 
-export interface EngineEntry {
+export interface Engine {
 	/**
 	 * 构造函数
 	 */
@@ -412,11 +416,6 @@ export interface EngineInterface extends EditorInterface {
 	 * 是否只读
 	 */
 	readonly: boolean;
-	/**
-	 * 编辑器根节点，默认为编辑器父节点
-	 */
-	root: NodeInterface;
-
 	/**
 	 * 编辑器更改
 	 */
