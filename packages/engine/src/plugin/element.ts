@@ -177,7 +177,7 @@ abstract class ElementPluginEntry<T extends PluginOptions = {}>
 			(Array.isArray(this.tagName)
 				? this.tagName.indexOf(node.name) > -1
 				: node.name === this.tagName) &&
-			this.editor.schema.checkNode(node, schema.type, schema.attributes)
+			this.editor.schema.checkNode(node, schema.attributes)
 		);
 	}
 

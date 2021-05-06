@@ -75,7 +75,6 @@ class Mark implements MarkModelInterface {
 						(plugin.attributes || plugin.style) &&
 						!this.editor.schema.checkNode(
 							node,
-							'mark',
 							plugin.schema().attributes!,
 						)
 					)

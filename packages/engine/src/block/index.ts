@@ -102,13 +102,7 @@ class Block implements BlockModelInterface {
 						if (!targetSchema) return;
 						schema = targetSchema;
 					}
-					if (
-						!this.editor.schema.checkNode(
-							node,
-							'block',
-							schema.attributes,
-						)
-					)
+					if (!this.editor.schema.checkNode(node, schema.attributes))
 						return;
 					plugins.push(plugin);
 				}
