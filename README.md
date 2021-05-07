@@ -4,7 +4,7 @@ am-editor，一个基于[ShareDB](https://github.com/share/sharedb)Web 多人协
 
 [查看在线文档及演示](https://editor.aomao.com)
 
-技术交流QQ群：907664876
+技术交流 QQ 群：907664876
 
 ## 特性
 
@@ -43,7 +43,7 @@ am-editor，一个基于[ShareDB](https://github.com/share/sharedb)Web 多人协
 -   [x] `@aomao/plugin-unorderedlist` 无序列表
 -   [x] `@aomao/plugin-image` 图片
 -   [ ] `@aomao/plugin-video` 视频
--   [ ] `@aomao/plugin-table` 表格
+-   [x] `@aomao/plugin-table` 表格
 
 ## 快速上手
 
