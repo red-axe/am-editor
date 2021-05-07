@@ -572,11 +572,11 @@ export const getToolbarDefaultConfig = (
 			command: { name: 'link', args: ['_blank'] },
 			title: language['link']['title'],
 			onDisabled: () => {
-				const { change } = engine;
+				const { change, card } = engine;
 				const range = change.getRange();
 				return (
-					range.startNode.closest(CARD_SELECTOR).length > 0 ||
-					range.containsCard()
+					!!card.find(range.startNode) ||
+					range.commonAncestorNode.find(CARD_SELECTOR).length > 0
 				);
 			},
 		},
