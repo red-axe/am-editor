@@ -1,5 +1,5 @@
 import React from 'react';
-import { EngineInterface } from '@aomao/engine';
+import { CARD_SELECTOR, EngineInterface } from '@aomao/engine';
 import {
 	ButtonProps,
 	DropdownProps,
@@ -113,8 +113,6 @@ export const getToolbarDefaultConfig = (
 							prompt: (
 								<TableSelector
 									onSelect={(event, rows, cols) => {
-										event.preventDefault();
-										event.stopPropagation();
 										engine.command.execute(
 											'table',
 											rows,
@@ -573,6 +571,14 @@ export const getToolbarDefaultConfig = (
 			icon: 'link',
 			command: { name: 'link', args: ['_blank'] },
 			title: language['link']['title'],
+			onDisabled: () => {
+				const { change } = engine;
+				const range = change.getRange();
+				return (
+					range.startNode.closest(CARD_SELECTOR).length > 0 ||
+					range.containsCard()
+				);
+			},
 		},
 		{
 			type: 'button',

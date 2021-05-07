@@ -1,11 +1,6 @@
 import tinycolor2 from 'tinycolor2';
 import { NodeInterface, SchemaInterface } from '../types';
-import {
-	CARD_SELECTOR,
-	READY_CARD_KEY,
-	READY_CARD_SELECTOR,
-} from '../constants/card';
-import { ROOT_SELECTOR } from '../constants/root';
+import { READY_CARD_KEY, READY_CARD_SELECTOR } from '../constants/card';
 import Parser from '../parser';
 import { EngineInterface } from '../types/engine';
 
@@ -71,19 +66,6 @@ export default class Paste {
 				'font-size': this.engine.container.css('font-size'),
 			},
 		];
-		// 表格里的子编辑器，需要添加主编辑器的颜色
-		const card = this.engine.container.closest(CARD_SELECTOR);
-		if (card.length > 0) {
-			const container = card.closest(ROOT_SELECTOR);
-			defaultStyle.push({
-				color: tinycolor2(container.css('color')).toHex(),
-			});
-			defaultStyle.push({
-				'background-color': tinycolor2(
-					container.css('background-color'),
-				).toHex(),
-			});
-		}
 		return defaultStyle;
 	}
 
@@ -305,6 +287,7 @@ export default class Paste {
 		nodes = $(fragment).allChildren();
 		nodes.forEach(child => {
 			const node = $(child);
+			this.engine.trigger('paste:each-after', node);
 			// 删除包含Card的 pre 标签
 			if (
 				node.name === 'pre' &&

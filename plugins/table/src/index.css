@@ -1,7 +1,7 @@
 div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
     margin-left: -13px;
     margin-top: -13px;
-    z-index: 0;
+    z-index: 1;
 }
 
 .data-table {

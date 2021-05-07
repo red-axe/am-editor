@@ -40,8 +40,9 @@ class Hr extends Card {
 		super.onActivate(activated);
 		const activatedClass = 'hr-activated';
 		const center = this.getCenter();
-		if (activated) center.addClass(activatedClass);
-		else center.removeClass(activatedClass);
+		if (activated) {
+			center.addClass(activatedClass);
+		} else center.removeClass(activatedClass);
 	}
 
 	onSelectByOther(selected: boolean, value?: { color: string; rgb: string }) {

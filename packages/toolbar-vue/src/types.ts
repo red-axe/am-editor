@@ -1,5 +1,5 @@
 import { EngineInterface } from '@aomao/engine';
-import { ExtractPropTypes, PropType } from 'vue';
+import { ExtractPropTypes, PropType, VNode } from 'vue';
 import { omit } from 'lodash-es';
 
 //命令
@@ -29,7 +29,7 @@ export const buttonProps = {
 		required: true,
 	} as const,
 	icon: String,
-	content: [String, Function] as PropType<string | (() => string)>,
+	content: [String, Function] as PropType<string | (() => string) | VNode>,
 	title: String,
 	placement: String as PropType<Placement>,
 	hotkey: [String, Boolean] as PropType<boolean | string>,

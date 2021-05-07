@@ -172,13 +172,20 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		const { $ } = this.editor;
 		const value = this.getValue();
 		if (!value) return 'Error value';
+		if (value.html) {
+			const model = this.helper.getTableModel($(value.html));
+			value.rows = model.rows;
+			value.cols = model.cols;
+		}
 		//渲染卡片
-		this.wrapper = $(
-			this.template.htmlEdit(
-				value,
-				menuData(this.editor.language.get('table')),
-			),
-		);
+		this.wrapper = isEngine(this.editor)
+			? $(
+					this.template.htmlEdit(
+						value,
+						menuData(this.editor.language.get('table')),
+					),
+			  )
+			: $(this.template.htmlView(value));
 		return this.wrapper;
 	}
 }

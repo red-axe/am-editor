@@ -159,13 +159,13 @@ class ToolbarComponent extends Card {
 		const keyword = content.substr(1);
 		// 搜索关键词为空
 		if (keyword === '') {
-			this.component?.render(this.getCenter(), this.data);
+			this.component?.render(this.editor.root, this.root, this.data);
 			return;
 		}
 		const data = this.search(keyword);
 		// 有搜索结果
 		if (data.length > 0) {
-			this.component?.render(this.getCenter(), this.data);
+			this.component?.render(this.editor.root, this.root, this.data);
 			return;
 		}
 		// 搜索结果为空
@@ -223,7 +223,7 @@ class ToolbarComponent extends Card {
 			}, 10);
 		});
 		// 显示下拉列表
-		this.component?.render(center, this.data);
+		this.component?.render(this.editor.root, this.root, this.data);
 	}
 }
 

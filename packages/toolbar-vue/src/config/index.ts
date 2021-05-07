@@ -1,5 +1,7 @@
-import { EngineInterface } from '@aomao/engine';
+import { h } from 'vue';
+import { CARD_SELECTOR, EngineInterface } from '@aomao/engine';
 import { ToolbarItemProps } from '../types';
+import TableSelector from '../components/table.vue';
 import './index.css';
 
 export const getToolbarDefaultConfig = (
@@ -24,10 +26,10 @@ export const getToolbarDefaultConfig = (
 										width="24"
 										height="24"
 									>
-										<g fill="none" fillRule="evenodd">
+										<g fill="none" fill-rule="evenodd">
 											<rect
 												stroke="#E8E8E8"
-												strokeWidth=".667"
+												stroke-width=".667"
 												fill="#FFF"
 												x=".333"
 												y=".333"
@@ -35,7 +37,7 @@ export const getToolbarDefaultConfig = (
 												height="23.333"
 												rx="1.333"
 											/>
-											<g fillRule="nonzero">
+											<g fill-rule="nonzero">
 												<path
 													d="M8.625 8a1.126 1.126 0 010 2.25 1.126 1.126 0 010-2.25z"
 													fill="#FFD666"
@@ -63,7 +65,7 @@ export const getToolbarDefaultConfig = (
 										width="24"
 										height="24"
 									>
-										<g fill="none" fillRule="evenodd">
+										<g fill="none" fill-rule="evenodd">
 											<rect
 												stroke="#E8E8E8"
 												fill="#FFF"
@@ -76,7 +78,7 @@ export const getToolbarDefaultConfig = (
 											<path
 												d="M19.331 11.815c-.407-.22-.665-.678-.665-1.181V8.062c0-.202-.148-.367-.33-.367h-.933a.153.153 0 01-.153-.153v-.64c0-.084.068-.152.153-.152h.933c.651 0 1.18.588 1.18 1.312v2.572c0 .14.072.269.186.33l.843.455c.05.026.08.078.08.134v.894c0 .056-.03.108-.08.134l-.843.455a.373.373 0 00-.186.33v2.572c0 .724-.529 1.312-1.18 1.312h-.933a.153.153 0 01-.153-.153v-.64c0-.084.068-.152.153-.152h.933c.182 0 .33-.165.33-.367v-2.572c0-.503.258-.961.665-1.18l.344-.186-.344-.185zM5.044 11.815c.407-.22.665-.678.665-1.181V8.062c0-.202.148-.367.33-.367h.933a.153.153 0 00.153-.153v-.64a.153.153 0 00-.153-.152H6.04c-.651 0-1.18.588-1.18 1.312v2.572c0 .14-.072.269-.186.33l-.843.455a.153.153 0 00-.08.134v.894c0 .056.03.108.08.134l.843.455c.114.061.186.19.186.33v2.572c0 .724.529 1.312 1.18 1.312h.933a.153.153 0 00.153-.153v-.64a.153.153 0 00-.153-.152H6.04c-.182 0-.33-.165-.33-.367v-2.572c0-.503-.258-.961-.665-1.18L4.7 12l.344-.185z"
 												fill="#595959"
-												fillRule="nonzero"
+												fill-rule="nonzero"
 											/>
 											<path
 												fill="#1890FF"
@@ -96,6 +98,126 @@ export const getToolbarDefaultConfig = (
 								</span>`,
 							title: '代码块',
 							search: '代码块,daimakuai,code',
+						},
+						{
+							name: 'table',
+							command: { name: 'table', args: [3, 3] },
+							placement: 'rightTop',
+							prompt: h(TableSelector, {
+								onSelect: (
+									event: MouseEvent,
+									rows: number,
+									cols: number,
+								) => {
+									engine.command.execute('table', rows, cols);
+								},
+							}),
+							icon: `<span><svg
+									width="24px"
+									height="24px"
+									view-box="0 0 24 24"
+									version="1.1"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<g
+										stroke="none"
+										stroke-width="1"
+										fill="none"
+										fill-rule="evenodd"
+									>
+										<g transform="translate(-16.000000, -93.000000)">
+											<g>
+												<g transform="translate(16.000000, 53.000000)">
+													<g transform="translate(0.000000, 40.000000)">
+														<g>
+															<rect
+																stroke="#E8E8E8"
+																stroke-width="0.666666667"
+																fill="#FFFFFF"
+																x="0.333333333"
+																y="0.333333333"
+																width="23.3333333"
+																height="23.3333333"
+																rx="1.33333333"
+															></rect>
+															<g transform="translate(5.250000, 6.750000)">
+																<path
+																	d="M0.75,0 L3.75,0 L3.75,10.5 L0.75,10.5 C0.335786438,10.5 5.07265313e-17,10.1642136 0,9.75 L0,0.75 C-5.07265313e-17,0.335786438 0.335786438,7.6089797e-17 0.75,0 Z"
+																	id="Rectangle"
+																	fill="#F0F0F0"
+																></path>
+																<path
+																	d="M0.25,2.75 L13.25,2.75 L13.25,0.75 C13.25,0.473857625 13.0261424,0.25 12.75,0.25 L0.75,0.25 C0.473857625,0.25 0.25,0.473857625 0.25,0.75 L0.25,2.75 Z"
+																	id="Rectangle"
+																	stroke="#595959"
+																	stroke-width="0.5"
+																	fill-opacity="0.15"
+																	fill="#25B864"
+																></path>
+																<rect
+																	id="Rectangle"
+																	fill="#E8E8E8"
+																	x="0"
+																	y="5.25"
+																	width="13.5"
+																	height="1"
+																></rect>
+																<rect
+																	id="Rectangle-Copy"
+																	fill="#E8E8E8"
+																	x="0"
+																	y="7.5"
+																	width="13.5"
+																	height="1"
+																></rect>
+																<rect
+																	id="Rectangle"
+																	fill="#E8E8E8"
+																	x="6.75"
+																	y="0"
+																	width="1"
+																	height="10.5"
+																></rect>
+																<rect
+																	id="Rectangle-Copy-5"
+																	fill="#E8E8E8"
+																	x="9.75"
+																	y="0"
+																	width="1"
+																	height="10.5"
+																></rect>
+																<rect
+																	id="Rectangle"
+																	stroke="#737373"
+																	stroke-width="0.75"
+																	x="0.375"
+																	y="0.375"
+																	width="12.75"
+																	height="9.75"
+																	rx="0.75"
+																></rect>
+																<path
+																	d="M3.5,10.25 L3.5,0.25 L0.75,0.25 C0.473857625,0.25 0.25,0.473857625 0.25,0.75 L0.25,9.75 C0.25,10.0261424 0.473857625,10.25 0.75,10.25 L3.5,10.25 Z"
+																	id="Rectangle"
+																	stroke="#737373"
+																	stroke-width="0.5"
+																></path>
+																<path
+																	d="M0.25,2.75 L13.25,2.75 L13.25,0.75 C13.25,0.473857625 13.0261424,0.25 12.75,0.25 L0.75,0.25 C0.473857625,0.25 0.25,0.473857625 0.25,0.75 L0.25,2.75 Z"
+																	id="Rectangle"
+																	stroke="#737373"
+																	stroke-width="0.5"
+																></path>
+															</g>
+														</g>
+													</g>
+												</g>
+											</g>
+										</g>
+									</g>
+								</svg></span>`,
+							title: '表格',
+							search: 'biaoge,table',
 						},
 					],
 				},
@@ -293,14 +415,14 @@ export const getToolbarDefaultConfig = (
 						<g
 							id="color-font"
 							stroke="none"
-							strokeWidth="1"
+							stroke-width="1"
 							fill="none"
-							fillRule="evenodd"
+							fill-rule="evenodd"
 						>
 							<rect
 								id="Rectangle-55"
 								stroke=${stroke}
-								strokeWidth="0.5"
+								stroke-width="0.5"
 								fill=${color}
 								x="2"
 								y="12.75"
@@ -340,9 +462,9 @@ export const getToolbarDefaultConfig = (
 						<g
 							id="color-bg"
 							stroke="none"
-							strokeWidth="1"
+							stroke-width="1"
 							fill="none"
-							fillRule="evenodd"
+							fill-rule="evenodd"
 						>
 							<path
                             d="M11.9745711,7.921875 C11.9745711,7.921875 13.2147672,9.2863447 13.2147672,10.1226326 C13.2147672,10.8142992 12.6566789,11.3802083 11.9745711,11.3802083 C11.2924632,11.3802083 10.734375,10.8142992 10.734375,10.1226326 C10.734375,9.2863447 11.9745711,7.921875 11.9745711,7.921875 Z M9.07958999,6.47535893 L6.28501575,3.68078468 L3.4904415,6.47535893 L9.07958999,6.47535893 Z M5.3326566,3.04215357 L4.28223263,1.9917296 C4.22692962,1.93642659 4.22692962,1.84676271 4.28223263,1.7914597 L5.03228902,1.0414033 C5.08759203,0.986100299 5.17725591,0.986100299 5.23255892,1.0414033 L6.4546098,2.26345418 C6.46530408,2.27146914 6.4755605,2.28033918 6.48528564,2.29006432 L10.4848531,6.28963174 C10.5954591,6.40023775 10.5954591,6.57956552 10.4848531,6.69017153 L6.4838816,10.691143 C6.37327559,10.801749 6.19394782,10.801749 6.08334181,10.691143 L2.08377439,6.69157557 C1.97316838,6.58096956 1.97316838,6.40164179 2.08377439,6.29103578 L5.3326566,3.04215357 Z"
@@ -352,7 +474,7 @@ export const getToolbarDefaultConfig = (
 							<rect
 								id="Rectangle-55"
 								stroke=${stroke}
-								strokeWidth="0.5"
+								stroke-width="0.5"
 								fill=${color}
 								x="2"
 								y="12.75"
@@ -434,6 +556,14 @@ export const getToolbarDefaultConfig = (
 			icon: 'link',
 			command: { name: 'link', args: ['_blank'] },
 			title: language['link']['title'],
+			onDisabled: () => {
+				const { change } = engine;
+				const range = change.getRange();
+				return (
+					range.startNode.closest(CARD_SELECTOR).length > 0 ||
+					range.containsCard()
+				);
+			},
 		},
 		{
 			type: 'button',

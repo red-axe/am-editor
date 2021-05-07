@@ -402,6 +402,7 @@
     
     /* Prevent dragging from highlighting the element */
      position: relative;
+     z-index: 0;
     
 }
 

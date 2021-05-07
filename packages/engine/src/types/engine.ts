@@ -616,6 +616,15 @@ export interface EngineInterface extends EditorInterface {
 		rewrite?: boolean,
 	): void;
 	/**
+	 * 解析粘贴数据，生成符合编辑器数据的片段之后整理阶段触发
+	 * @param node 所有粘贴片段遍历后的子节点
+	 */
+	on(
+		eventType: 'paste:each-after',
+		listener: (root: NodeInterface) => void,
+		rewrite?: boolean,
+	): void;
+	/**
 	 * 生成粘贴数据DOM片段后，还未写入到编辑器之前触发
 	 * @param fragment 粘贴的片段
 	 */
@@ -759,6 +768,14 @@ export interface EngineInterface extends EditorInterface {
 	 */
 	off(eventType: 'paste:each', listener: (root: NodeInterface) => void): void;
 	/**
+	 * 解析粘贴数据，生成符合编辑器数据的片段之后整理阶段触发
+	 * @param node 所有粘贴片段遍历后的子节点
+	 */
+	off(
+		eventType: 'paste:each-after',
+		listener: (root: NodeInterface) => void,
+	): void;
+	/**
 	 * 生成粘贴数据DOM片段后，还未写入到编辑器之前触发
 	 * @param fragment 粘贴的片段
 	 */
@@ -867,6 +884,11 @@ export interface EngineInterface extends EditorInterface {
 	 * @param node 粘贴片段遍历的子节点
 	 */
 	trigger(eventType: 'paste:each', root: NodeInterface): void;
+	/**
+	 * 解析粘贴数据，生成符合编辑器数据的片段之后整理阶段触发
+	 * @param node 所有粘贴片段遍历后的子节点
+	 */
+	trigger(eventType: 'paste:each-after', root: NodeInterface): void;
 	/**
 	 * 生成粘贴数据DOM片段后，还未写入到编辑器之前触发
 	 * @param fragment 粘贴的片段

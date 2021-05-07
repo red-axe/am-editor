@@ -16,7 +16,11 @@ export interface CollapseComponentInterface {
 	unbindEvents(): void;
 	bindEvents(): void;
 	remove(): void;
-	render(container: NodeInterface, data: Array<CollapseGroupProps>): void;
+	render(
+		container: NodeInterface,
+		target: NodeInterface,
+		data: Array<CollapseGroupProps>,
+	): void;
 }
 
 let keymasterMoudle:
@@ -153,20 +157,49 @@ class CollapseComponent implements CollapseComponentInterface {
 		this.root = undefined;
 	}
 
-	render(container: NodeInterface, data: Array<CollapseGroupProps>) {
+	render(
+		container: NodeInterface,
+		target: NodeInterface,
+		data: Array<CollapseGroupProps>,
+	) {
 		this.unbindEvents();
 		this.remove();
 		this.root = this.engine.$(
 			'<div class="data-toolbar-component-list" />',
 		);
 		container.append(this.root);
+		const rootElement = this.root.get<HTMLElement>()!;
 		ReactDOM.render(
 			<Collapse
 				engine={this.engine}
 				groups={data}
 				onSelect={this.otpions.onSelect}
 			/>,
-			this.root.get<Element>(),
+			rootElement,
+			() => {
+				let [top, left] = [0, 0];
+				let rectNode: NodeInterface | undefined = target;
+				while (rectNode) {
+					const targetRect = rectNode.getBoundingClientRect() || {
+						left: 0,
+						top: 0,
+					};
+
+					const parent: NodeInterface | undefined = rectNode.parent();
+					if (!parent) break;
+					const parentRect = parent.getBoundingClientRect() || {
+						left: 0,
+						top: 0,
+					};
+					top += targetRect.top - parentRect.top;
+					left += targetRect.left - parentRect.left;
+					if (parent.equal(container)) break;
+					rectNode = parent;
+				}
+
+				rootElement.style.top = `${top + target.height() / 2}px`;
+				rootElement.style.left = `${left}px`;
+			},
 		);
 		this.select(0);
 		this.bindEvents();

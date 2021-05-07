@@ -2,7 +2,9 @@
     <div
     :class="['toolbar-dropdown-list',`toolbar-dropdown-${direction || 'vertical'}`,{'toolbar-dropdown-dot': hasDot !== false},className]"
     >
-        <a-tooltip v-for="{ key , placement , title , hotkey , direction , hasDot , content , className , icon } in items" :key="key" :placement="placement || 'right'" :visible="!!title || !!hotkey ? undefined : false">
+        <a-tooltip v-for="{ key , placement , title , hotkey , direction , hasDot , content , className , icon } in items" :key="key" :placement="placement || 'right'" 
+        :overlayStyle="!!title || !!hotkey ? {} : {display:'none'}"
+        >
             <template #title>
                 <div v-if="!!title" class="toolbar-tooltip-title">{{title}}</div>
                 <div v-if="!!hotkey" class="toolbar-tooltip-hotkey" v-html="hotkey"></div>

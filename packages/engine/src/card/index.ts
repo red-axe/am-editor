@@ -330,6 +330,8 @@ class CardModel implements CardModelInterface {
 					) {
 						this.select(card);
 					}
+					//const range = this.editor.change.getRange()
+					//console.log(range.startNode)
 					card.activate(true);
 				}
 				if (

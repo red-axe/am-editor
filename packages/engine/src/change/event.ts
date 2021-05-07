@@ -285,10 +285,6 @@ class ChangeEvent implements ChangeEventInterface {
 			// 禁止拖图进浏览器，浏览器默认打开图片文件
 			e.preventDefault();
 
-			if (cardComponet) {
-				//cardComponet.toolbarModel?.show();
-			}
-
 			this.dragoverHelper.removeCursor();
 			if (dragImage) {
 				dragImage.remove();

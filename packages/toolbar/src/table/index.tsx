@@ -75,10 +75,7 @@ const Selector: React.FC<Selector> = props => {
 	const rows = selectedRows === undefined ? 0 : selectedRows;
 	const cols = selectedCols === undefined ? 0 : selectedCols;
 	return (
-		<div
-			className="data-toolbar-table-selector"
-			data-element="table-selector"
-		>
+		<div className="data-toolbar-table-selector" data-element="ui">
 			{renderTable(currentRows, currentCols)}
 			<div className="data-toolbar-table-selector-info">
 				{rows}x{cols}

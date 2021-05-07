@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
-import { Avatar } from 'ant-design-vue'
+import { Avatar, message } from 'ant-design-vue'
 import Engine, { EngineInterface } from "@aomao/engine"
 import Redo from '@aomao/plugin-redo';
 import Undo from '@aomao/plugin-undo';
@@ -53,7 +53,8 @@ import SelectAll from '@aomao/plugin-selectall';
 import Link from '@aomao/plugin-link-vue';
 import Codeblock, { CodeBlockComponent } from '@aomao/plugin-codeblock-vue';
 import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
-import AmToolbar , { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar-vue'
+import Table, { TableComponent } from '@aomao/plugin-table'
+import AmToolbar , { ToolbarPlugin, ToolbarComponent } from '../../../packages/toolbar-vue/src'
 import OTClient from './ot-client'
 
 const plugins = [
@@ -85,7 +86,8 @@ const plugins = [
 	Codeblock,
 	Image,
 	ImageUploader,
-	ToolbarPlugin,
+    Table,
+	ToolbarPlugin
 ];
 const cards = [
 	HrComponent,
@@ -93,6 +95,7 @@ const cards = [
 	CodeBlockComponent,
 	ToolbarComponent,
 	ImageComponent,
+    TableComponent
 ];
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -145,6 +148,12 @@ export default defineComponent({
                     },
                 });
                 const engineInstance = engine.value
+                engineInstance.messageSuccess = (msg: string) => {
+                    message.success(msg);
+                };
+                engineInstance.messageError = (error: string) => {
+                    message.error(error);
+                };
                 //初始化本地协作，用作记录历史
                 engineInstance.ot.initLockMode();
 

@@ -1,8 +1,8 @@
 <template>
     <a-popover
-    :visible="prompt ? undefined : false"
     :placement="placement || 'right'"
     :content="typeof prompt === 'function' ? prompt() : prompt"
+    :overlayStyle="prompt ? {} : {display:'none'}"
     >
         <div
         :class="['toolbar-collapse-item', { 'toolbar-collapse-item-active': active }, className]"
@@ -30,6 +30,7 @@
 import { defineComponent, ref } from 'vue'
 import APopover from 'ant-design-vue/lib/popover'
 import { collapseItemProps } from '../../types'
+import 'ant-design-vue/lib/popover/style/css'
 
 export default defineComponent({
     name:"am-collapse-item",

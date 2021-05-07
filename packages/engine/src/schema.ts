@@ -291,7 +291,7 @@ class Schema implements SchemaInterface {
 			}
 
 			if (attributesName === 'class') {
-				return attributesValue
+				return (attributesValue || '')
 					.split(/\s+/)
 					.some(value => value.trim() === rule);
 			}
@@ -303,7 +303,7 @@ class Schema implements SchemaInterface {
 		 */
 		if (Array.isArray(rule)) {
 			if (attributesName === 'class') {
-				return attributesValue
+				return (attributesValue || '')
 					.split(/\s+/)
 					.every(value =>
 						value.trim() === ''
@@ -319,7 +319,7 @@ class Schema implements SchemaInterface {
 		 */
 		if (typeof rule === 'object' && typeof rule.test === 'function') {
 			if (attributesName === 'class') {
-				return attributesValue
+				return (attributesValue || '')
 					.split(/\s+/)
 					.every(value =>
 						value.trim() === ''
@@ -327,7 +327,7 @@ class Schema implements SchemaInterface {
 							: (rule as RegExp).test(value.trim()),
 					);
 			}
-			return rule.test(attributesValue);
+			return rule.test(attributesValue || '');
 		}
 		/**
 		 * 自定义函数解析

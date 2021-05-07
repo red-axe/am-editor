@@ -531,6 +531,11 @@ class ChangeModel implements ChangeInterface {
 				}
 				node = node.parent();
 			}
+			//如果当前target是卡片，但是光标不在卡片上，让其选中
+			const { startNode } = this.getRange();
+			if (card && !this.engine.card.find(startNode, true)) {
+				this.engine.card.select(card);
+			}
 			this.engine.card.activate(targetNode, ActiveTrigger.MOUSE_DOWN);
 		});
 

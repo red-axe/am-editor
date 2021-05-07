@@ -296,11 +296,13 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				if (this.hideRowAddButtonTimeount)
 					clearTimeout(this.hideRowAddButtonTimeount);
 			})
-			.on('mousemove', (event: MouseEvent) =>
-				this.onMouseMoveRowsHeader(event),
-			)
+			.on('mousemove', (event: MouseEvent) => {
+				this.onMouseMoveRowsHeader(event);
+				this.rowsHeader?.css('z-index', 2);
+			})
 			.on('mouseleave', () => {
 				this.hideRowAddButtonTimeount = setTimeout(() => {
+					this.rowsHeader?.css('z-index', '');
 					this.rowAddButton?.hide();
 				}, 200);
 			});

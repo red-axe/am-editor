@@ -1,10 +1,12 @@
 import {
+	CARD_KEY,
 	EDITABLE_SELECTOR,
 	isEngine,
+	NodeInterface,
 	Plugin,
 	SchemaBlock,
 } from '@aomao/engine';
-import TableComponent from './component';
+import TableComponent, { Template } from './component';
 import locales from './locale';
 import './index.css';
 
@@ -16,6 +18,8 @@ class Table extends Plugin {
 	init() {
 		this.editor.language.add(locales);
 		this.editor.schema.add(this.schema());
+		this.editor.on('paser:html', node => this.parseHtml(node));
+		this.editor.on('paste:each-after', child => this.pasteHtml(child));
 	}
 
 	schema(): Array<SchemaBlock> {
@@ -98,6 +102,45 @@ class Table extends Plugin {
 		this.editor.card.insert(TableComponent.cardName, {
 			rows: rows || 3,
 			cols: cols || 3,
+		});
+	}
+
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.name === 'table') {
+			this.editor.card.replaceNode(node, TableComponent.cardName, {
+				html: node.get<HTMLElement>()!.outerHTML,
+			});
+		}
+	}
+
+	parseHtml(root: NodeInterface) {
+		const { $ } = this.editor;
+		root.find(`[${CARD_KEY}=${TableComponent.cardName}`).each(tableNode => {
+			const node = $(tableNode);
+			const table = node.find('table');
+			if (table.length === 0) {
+				node.remove();
+				return;
+			}
+			table.css({
+				outline: 'none',
+				'border-collapse': 'collapse',
+			});
+			table.find('td').css({
+				'min-width': '90px',
+				'font-size': '14px',
+				'white-space': 'normal',
+				'word-wrap': 'break-word',
+				border: '1px solid #d9d9d9',
+				padding: '4px 8px',
+				cursor: 'default',
+			});
+			table.find(Template.TABLE_TD_BG_CLASS).remove();
+			table.find(Template.TABLE_TD_CONTENT_CLASS).each(content => {
+				this.editor.node.unwrap($(content));
+			});
+			node.replaceWith(table);
 		});
 	}
 }
