@@ -85,9 +85,11 @@ class Template implements TemplateInterface {
 	 * @return {string} 返回 html 字符串
 	 */
 	htmlEdit({ rows, cols, html }: TableValue, menus: TableMenu): string {
-		const tds = `<td>${Template.EmptyCell}</td>`.repeat(cols);
+		const tds = `<td ${DATA_TRANSIENT_ATTRIBUTES}="table-cell-selection">${Template.EmptyCell}</td>`.repeat(
+			cols,
+		);
 		const trs = `<tr>${tds}</tr>`.repeat(rows);
-		const col = '<col />'.repeat(cols);
+		const col = `<col />`.repeat(cols);
 		const colgroup = `<colgroup>${col}</colgroup>`;
 		const colsHeader =
 			`<div ${DATA_ELEMENT}="${UI}" class="${COLS_HEADER_CLASS_NAME}">` +

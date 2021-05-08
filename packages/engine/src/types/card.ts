@@ -1,6 +1,6 @@
 import { EditorInterface } from './engine';
-import { LanguageInterface } from './language';
 import { NodeInterface } from './node';
+import { TinyCanvasInterface } from './tiny-canvas';
 import { RangeInterface } from './range';
 import {
 	DropdownButtonOptions,
@@ -318,6 +318,21 @@ export interface CardInterface {
 	 * 渲染后触发
 	 */
 	didRender(): void;
+	/**
+	 * 更新可编辑器卡片协同选择区域
+	 * @param range 光标
+	 */
+	updateBackgroundSelection?(range: RangeInterface): void;
+	/**
+	 * 渲染可编辑器卡片协同选择区域
+	 * @param node 背景画布
+	 * @param range 渲染光标
+	 */
+	drawBackground?(
+		node: NodeInterface,
+		range: RangeInterface,
+		targetCanvas: TinyCanvasInterface,
+	): DOMRect | RangeInterface[] | void | false;
 }
 
 export interface CardModel {

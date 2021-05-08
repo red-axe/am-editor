@@ -9,14 +9,13 @@ import { NodeInterface } from '../types/node';
 import {
 	Attribute,
 	CursorRect,
-	DrawStyle,
 	Member,
 	RangeColoringInterface,
-	TinyCanvasInterface,
 } from '../types/ot';
+import { DrawStyle, TinyCanvasInterface } from '../types/tiny-canvas';
 import Range from '../range';
 import { CardEntry, CardInterface } from '../types/card';
-import { DATA_ELEMENT } from '../constants';
+import { DATA_ELEMENT, EDITABLE_SELECTOR } from '../constants';
 
 const USER_BACKGROUND_CLASS = 'ot-user-background';
 const USER_CURSOR_CLASS = 'ot-user-cursor';
@@ -104,7 +103,7 @@ class RangeColoring implements RangeColoringInterface {
 		range: RangeInterface,
 		options: { uuid: string; color: string },
 	) {
-		const { $ } = this.engine;
+		const { $, card } = this.engine;
 		const { uuid, color } = options;
 		const tinyColor = tinycolor2(color);
 		tinyColor.setAlpha(0.3);
@@ -138,16 +137,36 @@ class RangeColoring implements RangeColoringInterface {
 		const parentWidth = this.root.width();
 		const parentHeight = this.root.height();
 		targetCanvas.resize(parentWidth, parentHeight);
+		let cardInfo = card.find(range.commonAncestorNode, true);
+		//如果是卡片，并且选区不在内容模块中，而是在卡片两侧的光标位置处，就不算作卡片
+		if (cardInfo && !cardInfo.isCenter(range.commonAncestorNode)) {
+			cardInfo = undefined;
+		}
 
-		const subRanges = range.getSubRanges();
 		const fill = {
 			fill: rgb,
 		};
+
+		let subRanges = range.getSubRanges();
+
+		if (cardInfo?.isEditable && cardInfo.drawBackground) {
+			const result = cardInfo.drawBackground(child, range, targetCanvas);
+			if (result === false) return [range];
+			if (!!result) {
+				if (Array.isArray(result)) subRanges = result;
+				else {
+					targetCanvas.clearRect(result);
+					targetCanvas.draw('Rect', { ...result.toJSON(), ...fill });
+					return [range];
+				}
+			}
+		}
+
 		subRanges.forEach(subRange => {
 			if (this.isRangeWrap(subRange)) {
-				this.drawOneByOne(child!, targetCanvas, subRange, fill);
+				this.drawOneByOne(child, targetCanvas, subRange, fill);
 			} else {
-				const rect = this.getRelativeRect(child!, subRange);
+				const rect = this.getRelativeRect(child, subRange);
 				targetCanvas.clearRect(rect);
 				targetCanvas.draw('Rect', { ...rect.toJSON(), ...fill });
 			}
@@ -450,11 +469,10 @@ class RangeColoring implements RangeColoringInterface {
 
 		let cardInfo = card.find(range.commonAncestorNode);
 		//如果是卡片，并且选区不在内容模块中，而是在卡片两侧的光标位置处，就不算作卡片
-		if (cardInfo?.isEditable) {
-			cardInfo = undefined;
-		} else if (cardInfo && !cardInfo.isCenter(range.commonAncestorNode)) {
+		if (cardInfo && !cardInfo.isCenter(range.commonAncestorNode)) {
 			cardInfo = undefined;
 		}
+
 		card.each(cardComponent => {
 			if (cardComponent.isEditable) return;
 			if (!cardInfo || !cardComponent.root.equal(cardInfo.root)) {
@@ -466,7 +484,7 @@ class RangeColoring implements RangeColoringInterface {
 					.remove();
 			}
 		});
-		if (cardInfo) {
+		if (cardInfo && !cardInfo.isEditable) {
 			const root =
 				this.setCardActivatedByOther(cardInfo, member) || cardInfo.root;
 			const cursor = this.drawCursor(root, member);
@@ -474,11 +492,29 @@ class RangeColoring implements RangeColoringInterface {
 			if ((collab === undefined || collab === true) && cursor) {
 				this.drawCardMask(root, cursor, member);
 			}
+			this.drawBackground(range, member);
 		} else {
+			//可编辑卡片
+			if (cardInfo) {
+				this.drawBackground(range, member);
+				return;
+			}
 			card.each(cardComponent => {
-				if (cardComponent.isEditable) return;
 				const centerNode = cardComponent.getCenter();
 				if (centerNode && centerNode.length > 0) {
+					if (cardComponent.isEditable) {
+						if (
+							centerNode.contains(range.startNode) &&
+							centerNode.contains(range.endNode) &&
+							(range.startNode.closest(EDITABLE_SELECTOR).length >
+								0 ||
+								range.endNode.closest(EDITABLE_SELECTOR)
+									.length > 0)
+						) {
+							this.setCardSelectedByOther(cardComponent);
+							return;
+						}
+					}
 					if (range.isPointInRange(centerNode.get()!, 0)) {
 						this.setCardSelectedByOther(cardComponent, member);
 					} else if (cardComponent.selectedByOther === uuid) {
@@ -486,9 +522,20 @@ class RangeColoring implements RangeColoringInterface {
 					}
 				}
 			});
-
 			const singleCard = card.getSingleSelectedCard(range);
-			if (singleCard && !singleCard.isEditable) {
+			if (singleCard) {
+				if (singleCard.isEditable) {
+					const center = singleCard.getCenter();
+					if (
+						center.contains(range.startNode) &&
+						center.contains(range.endNode) &&
+						(range.startNode.closest(EDITABLE_SELECTOR).length >
+							0 ||
+							range.endNode.closest(EDITABLE_SELECTOR).length > 0)
+					) {
+						return;
+					}
+				}
 				const root =
 					this.setCardSelectedByOther(singleCard, member) ||
 					singleCard.root;

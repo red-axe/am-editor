@@ -333,8 +333,8 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		let endCol = Math.max(begin.col, end.col);
 
 		this.tableRoot
-			?.find('td.table-cell-selection')
-			.removeClass('table-cell-selection');
+			?.find('td[table-cell-selection]')
+			.removeAttributes('table-cell-selection');
 
 		const fBeginRow = beginRow;
 		const fEndRow = endRow;
@@ -385,8 +385,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				for (let c = beginCol; c <= endCol; c++) {
 					const col = this.tableModel.table[r][c];
 					if (!this.table.helper.isEmptyModelCol(col)) {
-						if (!isSame) {
-							col.element?.classList.add('table-cell-selection');
+						if (!isSame && col.element) {
+							this.editor
+								.$(col.element)
+								.attributes('table-cell-selection', 'true');
 						}
 						count++;
 					}
@@ -468,7 +470,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		if (td.length === 0) return;
 		const range = change.getRange();
 		const [row, col] = this.getCellPoint(td);
-		const isSelection = td.hasClass('table-cell-selection');
+		const isSelection = !!td.attributes('table-cell-selection');
 		//shift 多选
 		if (this.isShift) {
 			let begin = { row: 0, col: 0 };
@@ -496,9 +498,14 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		//点击单元格空白处，聚焦内部编辑区域
 		if (
 			target.name === 'td' &&
-			(isSelection || !range.startNode.closest('td').equal(td))
+			(isSelection ||
+				!range.startNode.closest('td').equal(td) ||
+				!range.endNode.closest('td').equal(td))
 		) {
-			if (event.button === 2 && target.hasClass('table-cell-selection')) {
+			if (
+				event.button === 2 &&
+				!!target.attributes('table-cell-selection')
+			) {
 				return;
 			}
 			event.preventDefault();
@@ -508,7 +515,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		}
 		// 右键不触发拖选
 		if (event.button === 2) {
-			if (target.hasClass('table-cell-selection')) {
+			if (!!target.attributes('table-cell-selection')) {
 				event.preventDefault();
 			}
 			return;

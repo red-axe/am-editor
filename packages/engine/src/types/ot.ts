@@ -3,6 +3,7 @@ import { Doc, Op, Path } from 'sharedb';
 import { CardInterface } from './card';
 import { NodeInterface } from './node';
 import { RangeInterface } from './range';
+import { DrawStyle, TinyCanvasInterface } from './tiny-canvas';
 
 export type Attribute = {
 	uuid: string;
@@ -108,22 +109,6 @@ export interface RangeColoringInterface {
 		members: Array<Member>,
 		idDraw: boolean,
 	): void;
-}
-
-export type DrawStyle = {
-	fill?: string;
-	stroke?: string;
-};
-
-export type DrawOptions = DOMRect & DrawStyle;
-
-export interface TinyCanvasInterface {
-	resize(width: number, height: number): void;
-	getImageData(options: DOMRect): ImageData | undefined;
-	draw(type: 'Rect', options: DrawOptions): void;
-	clearRect(options: DOMRect): void;
-	clear(): void;
-	destroy(): void;
 }
 
 export type RemotePath = {

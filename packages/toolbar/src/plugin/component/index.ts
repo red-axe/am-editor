@@ -146,7 +146,10 @@ class ToolbarComponent extends Card {
 		if (change.isComposing()) {
 			return;
 		}
-		const content = this.keyword?.get<HTMLElement>()?.innerText || '';
+		const content =
+			this.keyword
+				?.get<HTMLElement>()
+				?.innerText.replaceAll(/[\r\n]/g, '') || '';
 		// 内容为空
 		if (content === '') {
 			this.component?.remove();
@@ -163,7 +166,7 @@ class ToolbarComponent extends Card {
 		const data = this.search(keyword);
 		// 有搜索结果
 		if (data.length > 0) {
-			this.component?.render(this.editor.root, this.root, this.data);
+			this.component?.render(this.editor.root, this.root, data);
 			return;
 		}
 		// 搜索结果为空

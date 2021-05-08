@@ -6,6 +6,7 @@ import {
 	isEngine,
 	NodeInterface,
 	Parser,
+	RangeInterface,
 	Scrollbar,
 	ToolbarItemOptions,
 } from '@aomao/engine';
@@ -92,6 +93,46 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			width,
 			html,
 		};
+	}
+
+	updateBackgroundSelection?(range: RangeInterface): void {
+		const { selectArea, tableModel } = this.selection;
+		if (selectArea && selectArea.count > 1 && tableModel) {
+			const { begin, end } = selectArea;
+			const startModel = tableModel.table[begin.row][begin.col];
+			if (
+				!this.helper.isEmptyModelCol(startModel) &&
+				startModel.element
+			) {
+				range.setStart(startModel.element, 0);
+			}
+			const endModel = tableModel.table[end.row][end.col];
+			if (!this.helper.isEmptyModelCol(endModel) && endModel.element) {
+				range.setEnd(endModel.element, 0);
+			}
+		}
+	}
+
+	drawBackground?(
+		node: NodeInterface,
+		range: RangeInterface,
+	): DOMRect | void {
+		const backgroundRect = node.get<HTMLElement>()!.getBoundingClientRect();
+		const domRect = new DOMRect(backgroundRect.x, backgroundRect.y, 0, 0);
+		const { startNode, endNode } = range;
+		if (startNode.name !== 'td' || endNode.name !== 'td') return;
+
+		const startRect = startNode.get<HTMLElement>()!.getBoundingClientRect();
+
+		domRect.x = startRect.left - backgroundRect.left;
+		domRect.y = startRect.top - backgroundRect.top;
+		domRect.width = startRect.right - startRect.left;
+		domRect.height = startRect.bottom - startRect.top;
+
+		const rect = endNode.get<HTMLElement>()!.getBoundingClientRect();
+		domRect.width = rect.right - startRect.left;
+		domRect.height = rect.bottom - startRect.top;
+		return domRect;
 	}
 
 	activate(activated: boolean) {

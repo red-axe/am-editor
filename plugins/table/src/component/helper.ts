@@ -175,6 +175,10 @@ class Helper implements HelperInterface {
 		//补充可编辑器区域
 		table.find('td').each(tdElement => {
 			const tdNode = $(tdElement);
+			tdNode.attributes(
+				DATA_TRANSIENT_ATTRIBUTES,
+				'table-cell-selection',
+			);
 			let editableElement = tdNode.find(EDITABLE_SELECTOR);
 			if (editableElement.length === 0) {
 				const content = tdNode.html();

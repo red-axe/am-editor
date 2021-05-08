@@ -1,5 +1,6 @@
 import { Path } from 'sharedb';
 import { EngineInterface } from '../types/engine';
+import { CardEntry, CardType } from '../types/card';
 import { Attribute, Member, SelectionDataInterface } from '../types/ot';
 import { toPath } from './utils';
 
@@ -67,9 +68,31 @@ class SelectionData implements SelectionDataInterface {
 		const activeCard = card.active;
 		if (activeCard && !activeCard.isEditable) {
 			const center = activeCard.getCenter();
-			if (center && center.length > 0) range.select(center.get()!, true);
+			if (center && center.length > 0) {
+				range.select(center.get()!, true);
+			}
+		} else if (
+			activeCard?.isEditable &&
+			activeCard.updateBackgroundSelection
+		) {
+			activeCard.updateBackgroundSelection(range);
 		}
-
+		if (!activeCard && !range.collapsed) {
+			const startCard = this.engine.card.find(range.startNode, true);
+			if (
+				startCard &&
+				(startCard.constructor as CardEntry).cardType === CardType.BLOCK
+			) {
+				range.setStart(startCard.getCenter().parent()!, 1);
+			}
+			const endCard = this.engine.card.find(range.endNode, true);
+			if (
+				endCard &&
+				(endCard.constructor as CardEntry).cardType === CardType.BLOCK
+			) {
+				range.setEnd(endCard.getCenter().parent()!, 1);
+			}
+		}
 		const path = toPath(range);
 		this.currentRangePath = path;
 		const pathString = JSON.stringify(path);

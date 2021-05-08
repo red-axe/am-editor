@@ -457,14 +457,35 @@ class ChangeModel implements ChangeInterface {
 			const { window } = container;
 			const selection = window?.getSelection();
 			if (selection && selection.anchorNode) {
-				const rang = Range.from(this.engine, selection)!;
+				const range = Range.from(this.engine, selection)!;
 				this.engine.card.each(card => {
 					const center = card.getCenter();
 					if (center && center.length > 0) {
-						card.select(selection.containsNode(center[0]));
+						let isSelect = selection.containsNode(center[0]);
+						if (
+							!isSelect &&
+							!range.collapsed &&
+							selection.focusNode
+						) {
+							const focusCard = this.engine.card.find(
+								selection.focusNode,
+								true,
+							);
+							if (
+								focusCard &&
+								card.root.equal(focusCard.root) &&
+								(!selection.anchorNode ||
+									!focusCard.root.contains(
+										selection.anchorNode,
+									))
+							) {
+								isSelect = true;
+							}
+						}
+						card.select(isSelect);
 					}
 				});
-				const card = this.engine.card.getSingleSelectedCard(rang);
+				const card = this.engine.card.getSingleSelectedCard(range);
 				if (card) {
 					card.select(true);
 				}
@@ -474,7 +495,7 @@ class ChangeModel implements ChangeInterface {
 		});
 		this.event.onSelect(() => {
 			const range = this.getRange();
-			if (range.containsCard()) {
+			if (range.collapsed && range.containsCard()) {
 				this.getSafeRange(range);
 			}
 			this.select(range);

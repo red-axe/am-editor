@@ -21,6 +21,7 @@ import { EditorInterface, isEngine } from '../types/engine';
 import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { ToolbarItemOptions } from '../types/toolbar';
+import { TinyCanvasInterface } from '../types/tiny-canvas';
 import { decodeCardValue, encodeCardValue, random } from '../utils';
 import Maximize from './maximize';
 import Resize from './resize';
@@ -379,6 +380,14 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		}
 	}
 	abstract render(): NodeInterface | string | void;
+
+	updateBackgroundSelection?(range: RangeInterface): void;
+
+	drawBackground?(
+		node: NodeInterface,
+		range: RangeInterface,
+		targetCanvas: TinyCanvasInterface,
+	): DOMRect | RangeInterface[] | void | false;
 }
 
 export default CardEntry;

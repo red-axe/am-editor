@@ -10,6 +10,7 @@ import {
 	EDITABLE,
 	EDITABLE_SELECTOR,
 	DATA_TRANSIENT_ELEMENT,
+	DATA_TRANSIENT_ATTRIBUTES,
 } from '../constants';
 import {
 	ActiveTrigger,
@@ -213,6 +214,7 @@ class CardModel implements CardModelInterface {
 		// 矫正错误 HTML 结构
 		const rootParent = card.root.parent();
 		if (
+			!isInline &&
 			rootParent &&
 			rootParent.inEditor() &&
 			this.editor.node.isBlock(rootParent)
@@ -486,7 +488,11 @@ class CardModel implements CardModelInterface {
 			clazz.focus !== undefined ? clazz.focus : !component.readonly;
 		const tagName = clazz.cardType === CardType.INLINE ? 'span' : 'div';
 		//center
-		const center = $(`<${tagName} />`);
+		const center = $(
+			`<${tagName} ${
+				component.isEditable ? DATA_TRANSIENT_ATTRIBUTES + "='*'" : ''
+			}/>`,
+		);
 		center.attributes(CARD_ELEMENT_KEY, 'center');
 
 		if (hasFocus) {
