@@ -203,11 +203,12 @@ class Creator extends EventEmitter2 {
 				if (node.equal(target)) {
 					if (!isDataString) {
 						if (
-							typeof getPathValue(this.doc?.data, path) ===
+							typeof getPathValue(this.doc?.data, oldPath) ===
 							'string'
 						) {
 							attrOps.push({
 								path,
+								oldPath,
 								newValue: target['data'],
 							});
 							isDataString = true;
@@ -396,9 +397,10 @@ class Creator extends EventEmitter2 {
 
 	readyToEmitOps(ops: any[]) {
 		let emitOps: Op[] = [];
+		let removeCount = 0;
 		ops.forEach(op => {
 			if ('path' in op && op.newValue !== undefined) {
-				const pathValue = getPathValue(this.doc?.data, op.path);
+				const pathValue = getPathValue(this.doc?.data, op.oldPath);
 				emitOps = emitOps.concat(
 					this.patchesToOps([...op.path], pathValue, op.newValue),
 				);

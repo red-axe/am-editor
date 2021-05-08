@@ -93,7 +93,7 @@ class RangeColoring implements RangeColoringInterface {
 			range.setEnd(cacheRange.commonAncestorContainer, startOffset + 1);
 			const rect = this.getRelativeRect(node, range);
 			canvas.clearRect(rect);
-			canvas.draw('Rect', { ...rect, ...style });
+			canvas.draw('Rect', { ...rect.toJSON(), ...style });
 			startOffset++;
 		}
 		range.setStart(cacheRange.startContainer, cacheRange.startOffset);
@@ -149,7 +149,7 @@ class RangeColoring implements RangeColoringInterface {
 			} else {
 				const rect = this.getRelativeRect(child!, subRange);
 				targetCanvas.clearRect(rect);
-				targetCanvas.draw('Rect', { ...rect, ...fill });
+				targetCanvas.draw('Rect', { ...rect.toJSON(), ...fill });
 			}
 		});
 		return subRanges;

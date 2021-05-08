@@ -95,7 +95,7 @@ class TinyCanvas implements TinyCanvasInterface {
 				height,
 			);
 			callback({
-				...rect,
+				...rect.toJSON(),
 				context,
 			});
 		}
@@ -112,7 +112,7 @@ class TinyCanvas implements TinyCanvasInterface {
 		};
 		const rect = new DOMRect(x, y, width, height);
 		this.handleRect({
-			...rect,
+			...rect.toJSON(),
 			callback,
 		});
 	}
@@ -127,9 +127,13 @@ class TinyCanvas implements TinyCanvasInterface {
 		const dftIndex = Math.ceil(y / (limitHeight || 0));
 		const lastIndex = Math.ceil(last.y / (limitHeight || 0));
 		const rect = new DOMRect(x, y, width, height);
-		this.handleSingleRect({ ...rect, index: dftIndex, callback });
+		this.handleSingleRect({ ...rect.toJSON(), index: dftIndex, callback });
 		if (dftIndex !== lastIndex) {
-			this.handleSingleRect({ ...rect, index: lastIndex, callback });
+			this.handleSingleRect({
+				...rect.toJSON(),
+				index: lastIndex,
+				callback,
+			});
 		}
 	}
 
@@ -154,7 +158,7 @@ class TinyCanvas implements TinyCanvasInterface {
 		};
 		const rect = new DOMRect(x, y, width, height);
 		this.handleRect({
-			...rect,
+			...rect.toJSON(),
 			callback,
 		});
 	}
