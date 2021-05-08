@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-removeformat",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/itellyou-com/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.0.0",
+    "@aomao/engine": "^2.0.1",
     "@babel/runtime": "^7.13.10"
   }
 }
