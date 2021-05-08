@@ -1,4 +1,4 @@
-import { DrawOptions, TinyCanvasInterface } from '../types/ot';
+import { DrawOptions, TinyCanvasInterface } from '../types/tiny-canvas';
 
 type Options = {
 	container?: HTMLElement;
@@ -101,7 +101,7 @@ class TinyCanvas implements TinyCanvasInterface {
 		}
 	}
 
-	private drawRect(options: DrawOptions) {
+	drawRect(options: DrawOptions) {
 		const { x, y, width, height, fill, stroke } = options;
 		const callback = (opts: CallbackOptions) => {
 			const { context } = opts;
@@ -144,10 +144,6 @@ class TinyCanvas implements TinyCanvasInterface {
 		const canvas = this.getCanvas(index);
 		const context = canvas?.getContext('2d');
 		return context?.getImageData(x, y, width, height);
-	}
-
-	draw(type: 'Rect', options: DrawOptions) {
-		this['draw' + type](options);
 	}
 
 	clearRect(options: DOMRect) {
