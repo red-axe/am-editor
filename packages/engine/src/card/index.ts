@@ -533,7 +533,7 @@ class CardModel implements CardModelInterface {
 		const cards = container
 			? container.isCard()
 				? container
-				: container.find(READY_CARD_SELECTOR)
+				: container.find(`${READY_CARD_SELECTOR},${CARD_SELECTOR}`)
 			: this.editor.container.find(READY_CARD_SELECTOR);
 		this.gc();
 		cards.each(node => {
