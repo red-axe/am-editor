@@ -1,10 +1,4 @@
-import {
-	CARD_KEY,
-	CARD_TYPE_KEY,
-	CARD_VALUE_KEY,
-	NodeInterface,
-	Plugin,
-} from '@aomao/engine';
+import { CARD_KEY, NodeInterface, Plugin } from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 import ImageUploader from './uploader';
 import locales from './locales';

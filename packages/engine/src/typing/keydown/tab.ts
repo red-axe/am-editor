@@ -24,9 +24,9 @@ class Tab implements TypingHandleInterface {
 	}
 
 	trigger(event: KeyboardEvent): void {
-		const { change } = this.engine;
+		const { node } = this.engine;
 		event.preventDefault();
-		change.insertText('    ');
+		node.insertText('    ');
 	}
 
 	destroy(): void {

@@ -1,5 +1,6 @@
 import { Path } from 'sharedb';
 import { EditorInterface } from './engine';
+import { RangeInterface } from './range';
 import { SchemaInterface } from './schema';
 
 export type EventListener = (...args: Array<Event | any>) => boolean | void;
@@ -230,9 +231,9 @@ export interface NodeInterface {
 	/**
 	 * 返回元素节点所在根节点路径，默认根节点为 document.body
 	 * @param {Node} context 根节点，默认为 document.body
-	 * @return {string} 路径
+	 * @return {number} 路径
 	 */
-	getPath(context: Node): Array<string>;
+	getPath(context?: Node | NodeInterface): Array<number>;
 
 	/**
 	 * 判断元素节点是否包含要查询的节点
@@ -301,14 +302,9 @@ export interface NodeInterface {
 	removeAllEvents(): NodeInterface;
 
 	/**
-	 * 获取当前元素节点相对于视口的位置
-	 * @return {Object}
-	 * {
-	 *  top,
-	 *  left
-	 * }
+	 * 获取当前元素节点相对父节点的偏移量
 	 */
-	offset(): { [k: string]: number } | undefined;
+	offset(): number;
 
 	/**
 	 * 获取或设置元素节点属性
@@ -472,7 +468,7 @@ export interface NodeInterface {
 	getRoot(): NodeInterface;
 	/**
 	 * 遍历所有子节点
-	 * @param callback 回调函数，false：停止遍历 ，true：停止遍历当前节点，下一个兄弟节点继续遍历
+	 * @param callback 回调函数，false：停止遍历 ，true：停止遍历当前节点及子节点，继续遍历下一个兄弟节点
 	 * @param order true:顺序 ，false:倒序，默认 true
 	 */
 	traverse(
@@ -533,6 +529,12 @@ export interface NodeInterface {
 		view: NodeInterface,
 		align?: 'start' | 'center' | 'end' | 'nearest',
 	): void;
+
+	/**
+	 * 移除占位符 \u200B
+	 * @param root 节点
+	 */
+	removeZeroWidthSpace(): void;
 }
 
 export interface NodeModelInterface {
@@ -604,8 +606,13 @@ export interface NodeModelInterface {
 	 * 包裹节点
 	 * @param source 需要包裹的节点
 	 * @param outer 包裹的外部节点
+	 * @param mergeSame 合并相同名称的节点样式和属性在同一个节点上
 	 */
-	wrap(source: NodeInterface | Node, outer: NodeInterface): NodeInterface;
+	wrap(
+		source: NodeInterface | Node,
+		outer: NodeInterface,
+		mergeSame?: boolean,
+	): NodeInterface;
 	/**
 	 * 合并节点
 	 * @param source 合并的节点
@@ -619,6 +626,24 @@ export interface NodeModelInterface {
 	 * @param target 新节点
 	 */
 	replace(source: NodeInterface, target: NodeInterface): NodeInterface;
+	/**
+	 * 在光标位置插入一个节点
+	 * @param node 节点
+	 * @param range 光标
+	 */
+	insert(
+		node: Node | NodeInterface,
+		range?: RangeInterface,
+	): RangeInterface | undefined;
+	/**
+	 * 光标位置插入文本
+	 * @param text 文本
+	 * @param range 光标
+	 */
+	insertText(
+		text: string,
+		range?: RangeInterface,
+	): RangeInterface | undefined;
 	/**
 	 * 设置节点属性
 	 * @param node 节点
@@ -653,11 +678,6 @@ export interface NodeModelInterface {
 	 * @param node 节点
 	 */
 	normalize(node: NodeInterface): void;
-	/**
-	 * 修复节点两侧零宽字符占位
-	 * @param node 节点
-	 */
-	repairBoth(node: NodeInterface | Node): void;
 	/**
 	 * 获取或设置元素节点html文本
 	 * @param {string|undefined} val html文本

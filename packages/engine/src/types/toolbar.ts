@@ -63,8 +63,6 @@ export type ToolbarItemOptions =
 
 export type ToolbarOptions = {
 	items: Array<ToolbarItemOptions>;
-	type?: 'inline' | 'block';
-	align?: 'left' | 'center' | 'right';
 };
 
 export interface ButtonInterface {

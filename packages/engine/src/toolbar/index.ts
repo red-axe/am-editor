@@ -27,7 +27,7 @@ class Toolbar implements ToolbarInterface {
 
 	constructor(editor: EditorInterface, options: ToolbarOptions) {
 		this.editor = editor;
-		this.options = { type: 'block', ...options };
+		this.options = { ...options };
 		this.root = this.editor.$(template());
 	}
 
@@ -92,25 +92,13 @@ class Toolbar implements ToolbarInterface {
 	}
 
 	render(container?: NodeInterface) {
-		const { type, align } = this.options;
 		const group = this.editor.$('<div class="data-toolbar-group"></div>');
 		this.root.append(group);
 		this.addItems(group);
 		if (container) {
 			container.append(this.root);
 		}
-
-		// inline 目前用于上传错误提示
-		if (type === 'inline') {
-			this.root.addClass('data-toolbar-inline');
-		} else {
-			this.root.addClass('data-toolbar-block');
-		}
-
-		if (align && ['center', 'right'].indexOf(align) >= 0) {
-			this.root.addClass('data-toolbar-'.concat(align));
-		}
-
+		this.root.addClass('data-toolbar-block');
 		return this.root;
 	}
 }

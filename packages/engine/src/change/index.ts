@@ -13,7 +13,6 @@ import {
 	getDocument,
 	getWindow,
 } from '../utils';
-import { getRangePath } from '../ot/utils';
 import { Path } from 'sharedb';
 import {
 	CARD_ELEMENT_KEY,
@@ -104,7 +103,7 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	select(range: RangeInterface) {
-		const { container, mark, block, inline } = this.engine;
+		const { container, mark, block, inline, node } = this.engine;
 		const { window } = container;
 		const selection = window?.getSelection();
 		//折叠状态
@@ -122,6 +121,70 @@ class ChangeModel implements ChangeInterface {
 			) {
 				range.setStart(startNode, startOffset - 1);
 				range.collapse(true);
+			}
+		}
+		//修复inline光标
+		const {
+			startNode,
+			endNode,
+			startOffset,
+			endOffset,
+		} = range.cloneRange().shrinkToTextNode();
+		const prev = startNode.prev();
+		const next = endNode.next();
+		//光标上一个节点是inline节点，让其选择在inline节点后的零宽字符后面
+		if (
+			prev &&
+			!prev.isCard() &&
+			!node.isVoid(prev) &&
+			node.isInline(prev)
+		) {
+			const text = startNode.text();
+			//前面是inline节点，后面是零宽字符
+			if (/^\u200B/g.test(text) && startOffset === 0) {
+				range.setStart(endNode, startOffset + 1);
+				if (range.collapsed) range.collapse(true);
+			}
+		}
+		//光标下一个节点是inline节点，让其选择在inline节点前面的零宽字符前面
+		if (
+			next &&
+			!next.isCard() &&
+			!node.isVoid(next) &&
+			node.isInline(next)
+		) {
+			const text = endNode.text();
+			if (/\u200B$/g.test(text) && endOffset === text.length) {
+				range.setEnd(endNode, endOffset - 1);
+				if (range.collapsed) range.collapse(false);
+			}
+		}
+		//光标内侧位置
+		const inlineNode = inline.closest(startNode);
+		if (
+			!inlineNode.isCard() &&
+			node.isInline(inlineNode) &&
+			!node.isVoid(inlineNode)
+		) {
+			//左侧
+			if (
+				startNode.isText() &&
+				!startNode.prev() &&
+				startNode.parent()?.equal(inlineNode) &&
+				startOffset === 0
+			) {
+				range.setStart(startNode, startOffset + 1);
+				if (range.collapsed) range.collapse(true);
+			}
+			//右侧
+			if (
+				endNode.isText() &&
+				!endNode.next() &&
+				endNode.parent()?.equal(inlineNode) &&
+				endOffset === endNode.text().length
+			) {
+				range.setEnd(endNode, endOffset - 1);
+				if (range.collapsed) range.collapse(false);
 			}
 		}
 		//在非折叠，或者当前range对象和selection中的对象不一致的时候重新设置range
@@ -234,9 +297,10 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	getOriginValue() {
-		return new Parser(this.engine.container, this.engine).toValue(
-			this.engine.schema,
-		);
+		return new Parser(
+			this.engine.container.clone(true),
+			this.engine,
+		).toValue(this.engine.schema);
 	}
 
 	getValue(
@@ -260,7 +324,7 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	cacheRangeBeforeCommand() {
-		this.rangePathBeforeCommand = getRangePath(this.getSelectionRange());
+		this.rangePathBeforeCommand = this.getSelectionRange().toPath();
 	}
 
 	getRangePathBeforeCommand() {
@@ -274,9 +338,10 @@ class ChangeModel implements ChangeInterface {
 		return node.isEmptyWithTrim(container);
 	}
 
-	private repairInput(range: RangeInterface) {
+	private repairInput(event: InputEvent, range: RangeInterface) {
 		const { commonAncestorNode } = range;
 		const card = this.engine.card.find(commonAncestorNode);
+		const { node, mark, change } = this.engine;
 		if (
 			card &&
 			(card.constructor as CardEntry).cardType === CardType.INLINE
@@ -289,8 +354,8 @@ class ChangeModel implements ChangeInterface {
 					range.setStartBefore(card.root);
 					range.collapse(true);
 					this.select(range);
-					this.engine.node.html(cardLeft, '&#8203;');
-					this.engine.change.insertText(cardLeftText);
+					node.html(cardLeft, '&#8203;');
+					node.insertText(cardLeftText);
 				}
 			} else if (card.isRightCursor(commonAncestorNode)) {
 				const cardRight = commonAncestorNode.closest(
@@ -302,56 +367,200 @@ class ChangeModel implements ChangeInterface {
 					range.setEndAfter(card.root);
 					range.collapse(false);
 					this.select(range);
-					this.engine.node.html(cardRight, '&#8203;');
-					this.engine.change.insertText(cardRightText);
+					node.html(cardRight, '&#8203;');
+					node.insertText(cardRightText);
 				}
 			} else this.getSafeRange(range);
 		}
-		const {
-			startNode,
-			endNode,
-			startOffset,
-			endOffset,
-		} = range.cloneRange().shrinkToTextNode();
-		const prev = startNode.prev();
-		const next = endNode.next();
-		if (
-			prev &&
-			!prev.isCard() &&
-			!this.engine.node.isVoid(prev) &&
-			this.engine.node.isInline(prev)
-		) {
-			const text = startNode.text();
-			if (!/^\u200B/g.test(text)) {
-				this.engine.node.repairBoth(prev);
-				if (range.collapsed) range.setEnd(startNode, startOffset + 1);
-				range.setStart(endNode, startOffset + 1);
-			}
-		}
-		if (
-			next &&
-			!next.isCard() &&
-			!this.engine.node.isVoid(next) &&
-			this.engine.node.isInline(next)
-		) {
-			const text = endNode.text();
-			if (!/\u200B$/g.test(text)) {
-				this.engine.node.repairBoth(next);
-				if (range.collapsed) range.setStart(startNode, startOffset);
-				range.setEnd(endNode, endOffset);
-			}
-		}
 
-		const inlineNode = this.engine.mark.closestNotMark(startNode);
-		if (
-			!inlineNode.isCard() &&
-			this.engine.node.isInline(inlineNode) &&
-			!this.engine.node.isVoid(inlineNode) &&
-			!/\u200B$/g.test(inlineNode.text())
-		) {
-			this.engine.inline.repairCursor(inlineNode);
-			if (range.collapsed) range.setEnd(startNode, startOffset);
-			range.setStart(endNode, startOffset);
+		let { startNode, startOffset } = range.cloneRange().shrinkToTextNode();
+		const parent = startNode.parent();
+		//输入时删除mark标签内零宽字符。
+		if (startNode.isText() && parent && node.isMark(parent)) {
+			let textNode = startNode.get<Text>()!;
+			let text = startNode.text();
+
+			//mark 插件禁止跟随样式时，将输入字符设置到mark标签外
+			//输入光标在mark节点末尾
+			if (
+				startOffset === text.length &&
+				event.data &&
+				event.inputType.indexOf('insert') === 0
+			) {
+				let markParent: NodeInterface | undefined = parent;
+				let markTops: Array<NodeInterface> = [];
+
+				//循环查找
+				while (markParent && node.isMark(markParent)) {
+					const markPlugin = mark.findPlugin(markParent);
+					//插件禁止跟随
+					if (markPlugin && !markPlugin.followStyle) {
+						markTops.push(markParent);
+					}
+					markParent = markParent.parent();
+					//如果还有位于下方的同级节点，并且父级节点也是mark节点，说明当前光标不在末尾了
+					const markParentP = markParent?.parent();
+					if (
+						markParent?.next() &&
+						markParentP &&
+						node.isMark(markParentP)
+					) {
+						break;
+					}
+				}
+				//查看下一个节点是否是紧紧挨着的相同样式如果有，那就继续跟随样式
+				const startNext = startNode.next();
+				markTops.forEach((markTop, index) => {
+					//第一种：<em>abc<cursor /></em><em>123</em> 或者 <em>abc<cursor /></em><strong><em>123</em></strong> 继续跟随
+					//第二种：<span><strong><em>abc<cursor /></em></strong><em>123</em><span> 或者 <strong><em>abc<cursor /></em></strong><strong><em>123</em></strong> 继续跟随
+					//第三种: <span><strong>abc<cursor /><em>123</em></strong></span> 继续跟随
+
+					//是开始节点所在的mark节点，如果开始节点后面有节点就继续跟随
+					if (parent.equal(markTop) && startNext) {
+						markTops.splice(index, 1);
+						return;
+					}
+					let next = markTop.next();
+					let curNode: NodeInterface | undefined = markTop;
+					//循环找到下一个节点，如果没有下一级节点，从父级节点查找父级的下一级。如果有下一级节点，并且父节点
+					while (!next && curNode) {
+						//找到父节点
+						const parent:
+							| NodeInterface
+							| undefined = curNode.parent();
+						//如果父节点是块级节点，就不找了
+						if (parent && node.isBlock(parent)) break;
+						//找到父级节点的下一级
+						next = parent?.next() || null;
+						curNode = parent;
+					}
+					let first = next;
+					while (first && !first.isText()) {
+						if (
+							node.isMark(first) &&
+							mark.compare(first, markTop)
+						) {
+							markTops.splice(index, 1);
+							break;
+						}
+						first = first.first();
+					}
+				});
+				if (markTops.length > 0) {
+					const lastText = textNode.splitText(
+						text.length - event.data.length,
+					);
+					lastText.remove();
+					if (node.isEmpty(parent)) parent.remove();
+					mark.unwrap(markTops.map(mark => mark.clone()));
+					node.insertText(
+						text.substr(text.length - event.data.length),
+					);
+					mark.merge();
+					range = change
+						.getRange()
+						.cloneRange()
+						.shrinkToTextNode();
+					startNode = range.startNode;
+					startOffset = range.startOffset;
+					textNode = startNode.get<Text>()!;
+					text = startNode.text();
+				}
+			}
+			//输入光标在mark节点开始位置
+			else if (
+				event.data &&
+				startOffset === event.data.length &&
+				event.inputType.indexOf('insert') === 0
+			) {
+				let markParent: NodeInterface | undefined = parent;
+				let markTops: Array<NodeInterface> = [];
+
+				//循环查找
+				while (markParent && node.isMark(markParent)) {
+					const markPlugin = mark.findPlugin(markParent);
+					//插件禁止跟随
+					if (markPlugin && !markPlugin.followStyle) {
+						markTops.push(markParent);
+					}
+					markParent = markParent.parent();
+					//如果还有位于下方的同级节点，并且父级节点也是mark节点，说明当前光标不在末尾了
+					const markParentP = markParent?.parent();
+					if (
+						markParent?.prev() &&
+						markParentP &&
+						node.isMark(markParentP)
+					) {
+						break;
+					}
+				}
+				//查看上一个节点是否是紧紧挨着的相同样式如果有，那就继续跟随样式
+				const startPrev = startNode.prev();
+				markTops.forEach((markTop, index) => {
+					//第一种：<em>abc</em><em><cursor />123</em> 或者 <em>abc</em><strong><em><cursor />123</em></strong> 继续跟随
+					//第二种：<span><strong><em>abc</em></strong><em><cursor />123</em><span> 或者 <strong><em>abc</em></strong><strong><em><cursor />123</em></strong> 继续跟随
+					//第三种: <span><strong><em>123</em><cursor />abc</strong></span> 继续跟随
+
+					//是开始节点所在的mark节点，如果开始节点后面有节点就继续跟随
+					if (parent.equal(markTop) && startPrev) {
+						markTops.splice(index, 1);
+						return;
+					}
+					let prev = markTop.prev();
+					let curNode: NodeInterface | undefined = markTop;
+					//循环找到上一个节点，如果没有上一级节点，从父级节点查找父级的上一级。如果有上一级节点，并且父节点
+					while (!prev && curNode) {
+						//找到父节点
+						const parent:
+							| NodeInterface
+							| undefined = curNode.parent();
+						//如果父节点是块级节点，就不找了
+						if (parent && node.isBlock(parent)) break;
+						//找到父级节点的下一级
+						prev = parent?.prev() || null;
+						curNode = parent;
+					}
+					let last = prev;
+					while (last && !last.isText()) {
+						if (node.isMark(last) && mark.compare(last, markTop)) {
+							markTops.splice(index, 1);
+							break;
+						}
+						last = last.last();
+					}
+				});
+				if (markTops.length > 0) {
+					textNode.splitText(event.data.length);
+					textNode.remove();
+					if (node.isEmpty(parent)) parent.remove();
+					mark.unwrap(markTops.map(mark => mark.clone()));
+					node.insertText(event.data);
+					mark.merge();
+					range = change
+						.getRange()
+						.cloneRange()
+						.shrinkToTextNode();
+					startNode = range.startNode;
+					startOffset = range.startOffset;
+					textNode = startNode.get<Text>()!;
+					text = startNode.text();
+				}
+			}
+			//输入时删除mark标签内零宽字符。
+			if (text.length > 0 && /^\u200B$/g.test(text.substr(0, 1))) {
+				textNode.splitText(1);
+				textNode.remove();
+			}
+		}
+		//输入时删除mark标签外最后的零宽字符
+		const prev = startNode.prev();
+		if (startNode.isText() && prev && node.isMark(prev)) {
+			const textNode = startNode.get<Text>()!;
+			const text = startNode.text();
+			if (text.length > 0 && /^\u200B$/g.test(text.substr(0, 1))) {
+				textNode.splitText(1);
+				textNode.remove();
+			}
 		}
 	}
 	/**
@@ -443,11 +652,11 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	private initNativeEvents() {
-		const { container } = this.engine;
+		const { container, $, card, clipboard } = this.engine;
 
-		this.event.onInput(() => {
+		this.event.onInput((event: InputEvent) => {
 			const range = this.getRange();
-			this.repairInput(range);
+			this.repairInput(event, range);
 			this.select(range);
 			this.onSelect();
 			this.change();
@@ -458,7 +667,7 @@ class ChangeModel implements ChangeInterface {
 			const selection = window?.getSelection();
 			if (selection && selection.anchorNode) {
 				const range = Range.from(this.engine, selection)!;
-				this.engine.card.each(card => {
+				card.each(card => {
 					const center = card.getCenter();
 					if (center && center.length > 0) {
 						let isSelect = selection.containsNode(center[0]);
@@ -485,12 +694,12 @@ class ChangeModel implements ChangeInterface {
 						card.select(isSelect);
 					}
 				});
-				const card = this.engine.card.getSingleSelectedCard(range);
-				if (card) {
-					card.select(true);
+				const cardComponent = card.getSingleSelectedCard(range);
+				if (cardComponent) {
+					cardComponent.select(true);
 				}
 			} else {
-				this.engine.card.each(card => card.select(false));
+				card.each(card => card.select(false));
 			}
 		});
 		this.event.onSelect(() => {
@@ -499,7 +708,7 @@ class ChangeModel implements ChangeInterface {
 				this.getSafeRange(range);
 			}
 			this.select(range);
-			this.engine.card.activate(
+			card.activate(
 				range.commonAncestorNode,
 				ActiveTrigger.CUSTOM_SELECT,
 			);
@@ -508,30 +717,30 @@ class ChangeModel implements ChangeInterface {
 
 		this.event.onDocument('click', (e: MouseEvent) => {
 			if (!e.target) return;
-			const { $ } = this.engine;
-			const card = this.engine.card.find($(e.target));
-			if (card) {
-				const cardEntry = card.constructor as CardEntry;
+			const cardComponent = card.find($(e.target));
+			if (cardComponent) {
+				const cardEntry = cardComponent.constructor as CardEntry;
 				if (cardEntry.cardType === CardType.INLINE) {
-					this.engine.card.activate(
-						card.root,
+					card.activate(
+						cardComponent.root,
 						ActiveTrigger.CLICK,
 						cardEntry.toolbarFollowMouse ? e : undefined,
 					);
 				}
-				if (card.onFocus) {
-					card.onFocus();
+				if (cardComponent.onFocus) {
+					cardComponent.onFocus();
 				}
 			}
 		});
 
 		this.event.onDocument('mousedown', (e: MouseEvent) => {
 			if (!e.target) return;
-			const targetNode = this.engine.$(e.target);
-			const card = this.engine.card.find(targetNode);
+			const targetNode = $(e.target);
+			const cardComponent = card.find(targetNode);
 			if (
-				card &&
-				(card.constructor as CardEntry).cardType === CardType.INLINE
+				cardComponent &&
+				(cardComponent.constructor as CardEntry).cardType ===
+					CardType.INLINE
 			) {
 				return;
 			}
@@ -554,19 +763,18 @@ class ChangeModel implements ChangeInterface {
 			}
 			//如果当前target是卡片，但是光标不在卡片上，让其选中
 			const { startNode } = this.getRange();
-			if (card && !this.engine.card.find(startNode, true)) {
-				this.engine.card.select(card);
+			if (cardComponent && !card.find(startNode, true)) {
+				card.select(cardComponent);
 			}
-			this.engine.card.activate(targetNode, ActiveTrigger.MOUSE_DOWN);
+			card.activate(targetNode, ActiveTrigger.MOUSE_DOWN);
 		});
 
 		this.event.onDocument('copy', event => {
-			this.engine.clipboard.write(event);
+			clipboard.write(event);
 		});
 
 		this.event.onContainer('cut', event => {
 			event.stopPropagation();
-			const { clipboard } = this.engine;
 			clipboard.write(event, undefined, () => {
 				clipboard.cut();
 				this.change();
@@ -621,10 +829,7 @@ class ChangeModel implements ChangeInterface {
 		const insertCardAble = (range?: RangeInterface) => {
 			// 找不到目标位置
 			// TODO: 临时解决，如果 drop Range 在Card里则不触发
-			return (
-				!range ||
-				this.engine.card.closest(range.commonAncestorContainer)
-			);
+			return !range || card.closest(range.commonAncestorContainer);
 		};
 
 		this.event.onDrop(({ event, range, card, files }) => {
@@ -661,24 +866,6 @@ class ChangeModel implements ChangeInterface {
 		this.change();
 	}
 
-	/**
-	 * 光标位置插入文本
-	 * @param text 文本
-	 * @param range 光标
-	 */
-	insertText(text: string, range?: RangeInterface) {
-		const safeRange = range || this.getSafeRange();
-
-		const doc = getDocument(safeRange.startContainer);
-		// 范围为折叠状态时先删除内容
-		if (!safeRange.collapsed) {
-			this.deleteContent(range);
-		}
-		const node = doc.createTextNode(text);
-		this.insertNode(node, safeRange).addOrRemoveBr();
-		if (!range) this.apply(safeRange);
-		return safeRange;
-	}
 	/**
 	 * 插入片段
 	 * @param fragment 片段
@@ -853,25 +1040,7 @@ class ChangeModel implements ChangeInterface {
 		if (callback) callback(range);
 		this.apply(range);
 	}
-	/**
-	 * 在光标位置插入一个节点
-	 * @param node 节点
-	 * @param range 光标
-	 */
-	insertNode(
-		node: Node | NodeInterface,
-		range: RangeInterface = this.getRange(),
-	) {
-		if (isNodeEntry(node)) {
-			if (node.length === 0) throw 'Not found node';
-			node = node[0];
-		}
-		range.insertNode(node);
-		return range
-			.select(node, true)
-			.shrinkToElementNode()
-			.collapse(false);
-	}
+
 	/**
 	 * 删除内容
 	 * @param range 光标，默认获取当前光标
@@ -913,21 +1082,26 @@ class ChangeModel implements ChangeInterface {
 			if (
 				startNode[0].childNodes.length === 1 &&
 				firstChild.nodeType === getWindow().Node.ELEMENT_NODE &&
-				this.engine.node.isCustomize(startNode) &&
+				node.isCustomize(startNode) &&
 				startNode.first()?.isCard()
 			)
 				isEmptyNode = true;
 		}
 		if (isEmptyNode && node.isBlock(startNode)) {
-			let html = this.engine.node.getBatchAppendHTML(
-				activeMarks,
-				'<br />',
-			);
+			let html = node.getBatchAppendHTML(activeMarks, '<br />');
 			if (startNode.isEditable()) {
 				html = '<p>'.concat(html, '</p>');
 			}
 			startNode.append($(html));
-			safeRange.select(startNode.find('br'));
+			const br = startNode.find('br');
+			const parent = br.parent();
+			if (parent && node.isMark(parent)) {
+				node.replace(br, $('\u200b', null));
+			}
+			safeRange
+				.select(startNode, true)
+				.shrinkToElementNode()
+				.shrinkToTextNode();
 			safeRange.collapse(false);
 			if (!range) this.apply(safeRange);
 			return;

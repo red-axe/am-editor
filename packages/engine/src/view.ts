@@ -25,7 +25,7 @@ import Clipboard from './clipboard';
 import { LanguageInterface } from './types/language';
 import Language from './language';
 import Parser from './parser';
-import { MarkModelInterface } from './types';
+import { CommandInterface, MarkModelInterface } from './types';
 import { BlockModelInterface } from './types/block';
 import { InlineModelInterface } from './types/inline';
 import { ListModelInterface } from './types/list';
@@ -33,6 +33,7 @@ import List from './list';
 import Mark from './mark';
 import Inline from './inline';
 import Block from './block';
+import Command from './command';
 
 class View implements ViewInterface {
 	private options: ContentViewOptions = {
@@ -55,11 +56,13 @@ class View implements ViewInterface {
 	event: EventInterface;
 	schema: SchemaInterface;
 	conversion: ConversionInterface;
+	command: CommandInterface;
 
 	constructor(selector: Selector, options?: ContentViewOptions) {
 		this.options = { ...this.options, ...options };
 		this.language = new Language(this.options.lang || 'zh-cn', language);
 		this.event = new Event();
+		this.command = new Command(this);
 		this.schema = new Schema();
 		this.schema.add(schemaDefaultData);
 		this.conversion = new Conversion();

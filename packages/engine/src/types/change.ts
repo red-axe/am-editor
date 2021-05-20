@@ -109,12 +109,6 @@ export interface ChangeInterface {
 	isEmpty(): boolean;
 	destroy(): void;
 	/**
-	 * 光标位置插入文本
-	 * @param text 文本
-	 * @param range 光标
-	 */
-	insertText(text: string, range?: RangeInterface): RangeInterface;
-	/**
 	 * 插入片段
 	 * @param fragment 片段
 	 * @param callback 插入后的回调函数
@@ -126,15 +120,6 @@ export interface ChangeInterface {
 	 * @param isDeepMerge 删除后是否合并
 	 */
 	deleteContent(range?: RangeInterface, isDeepMerge?: boolean): void;
-	/**
-	 * 在光标位置插入一个节点
-	 * @param node 节点
-	 * @param range 光标
-	 */
-	insertNode(
-		node: Node | NodeInterface,
-		range?: RangeInterface,
-	): RangeInterface;
 	/**
 	 * 删除节点，删除后如果是空段落，自动添加 BR
 	 * @param node 要删除的节点

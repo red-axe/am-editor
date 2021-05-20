@@ -3,10 +3,12 @@ import { isRange, isSelection, RangeInterface } from './types/range';
 import { getWindow, isMobile } from './utils';
 import { CARD_SELECTOR } from './constants/card';
 import { ANCHOR, CURSOR, FOCUS } from './constants/selection';
-import { DATA_ELEMENT } from './constants/root';
+import { DATA_ELEMENT, DATA_TRANSIENT_ELEMENT, UI } from './constants/root';
 import Selection from './selection';
 import { SelectionInterface } from './types/selection';
 import { EditorInterface } from './types/engine';
+import { Path } from 'sharedb';
+import { CardEntry } from './types/card';
 
 class Range implements RangeInterface {
 	private editor: EditorInterface;
@@ -20,6 +22,13 @@ class Range implements RangeInterface {
 		win?: Window | globalThis.Selection | globalThis.Range,
 		clone?: boolean,
 	) => RangeInterface | null;
+
+	static fromPath: (
+		editor: EditorInterface,
+		path: Path[],
+		context?: NodeInterface,
+	) => RangeInterface;
+
 	base: globalThis.Range;
 
 	get collapsed() {
@@ -265,6 +274,7 @@ class Range implements RangeInterface {
 	 */
 	enlargeToElementNode = (toBlock?: boolean) => {
 		const range = this.enlargeFromTextNode();
+		const nodeApi = this.editor.node;
 		const enlargePosition = (
 			node: Node,
 			offset: number,
@@ -273,7 +283,7 @@ class Range implements RangeInterface {
 			let domNode = this.editor.$(node);
 			if (
 				domNode.type === getWindow().Node.TEXT_NODE ||
-				(!toBlock && this.editor.node.isBlock(domNode)) ||
+				(!toBlock && nodeApi.isBlock(domNode)) ||
 				domNode.isEditable()
 			) {
 				return;
@@ -282,10 +292,7 @@ class Range implements RangeInterface {
 			if (offset === 0) {
 				while (!domNode.prev()) {
 					parent = domNode.parent();
-					if (
-						!parent ||
-						(!toBlock && this.editor.node.isBlock(parent))
-					) {
+					if (!parent || (!toBlock && nodeApi.isBlock(parent))) {
 						break;
 					}
 					if (!parent.inEditor()) {
@@ -301,10 +308,7 @@ class Range implements RangeInterface {
 			} else if (offset === domNode.children().length) {
 				while (!domNode.next()) {
 					parent = domNode.parent();
-					if (
-						!parent ||
-						(!toBlock && this.editor.node.isBlock(parent))
-					) {
+					if (!parent || (!toBlock && nodeApi.isBlock(parent))) {
 						break;
 					}
 					if (!parent.inEditor()) {
@@ -370,7 +374,7 @@ class Range implements RangeInterface {
 	 * 获取子选区集合
 	 * @param range
 	 */
-	getSubRanges = () => {
+	getSubRanges = (includeCard: boolean = false) => {
 		const ranges: Array<RangeInterface> = [];
 		this.commonAncestorNode.traverse(child => {
 			if (child.isText()) {
@@ -402,6 +406,51 @@ class Range implements RangeInterface {
 						docRange.setOffset(childNode, offset, valueLength);
 					} else {
 						docRange.setOffset(childNode, offset, this.endOffset);
+					}
+				}
+				ranges.push(docRange);
+			} else if (
+				includeCard &&
+				child.isCard() &&
+				!child.isEditableCard()
+			) {
+				const cardComponent = this.editor.card.find(child);
+				if (
+					!cardComponent ||
+					(cardComponent.constructor as CardEntry)
+						.singleSelectable === false
+				)
+					return;
+				const center = cardComponent.getCenter();
+				const body = center.get()?.parentNode;
+				if (!body) return;
+				const offset = center.index();
+				const childNode = child.get()!;
+				const start = this.comparePoint(body, offset);
+				const end = this.comparePoint(body, offset + 1);
+				const docRange = Range.create(this.editor);
+				if (start < 0) {
+					if (end < 0) return;
+					if (end === 0) {
+						docRange.setOffset(
+							childNode,
+							this.startOffset,
+							offset + 1,
+						);
+					} else {
+						docRange.setOffset(
+							childNode,
+							this.startOffset,
+							this.endOffset,
+						);
+					}
+				} else {
+					if (start !== 0) return;
+					if (end < 0) return;
+					if (end === 0) {
+						docRange.setOffset(body, offset, offset + 1);
+					} else {
+						docRange.setOffset(body, offset, this.endOffset);
 					}
 				}
 				ranges.push(docRange);
@@ -677,6 +726,38 @@ class Range implements RangeInterface {
 		}
 		return node;
 	}
+
+	toPath() {
+		const range = this.cloneRange();
+		const node = range.commonAncestorNode;
+		if (!node.isRoot() && !node.inEditor()) return [];
+		range.shrinkToTextNode();
+
+		const getPath = (node: NodeInterface, offset: number): Path => {
+			let domNode: NodeInterface | undefined = node;
+			const path = [];
+			while (domNode && domNode.length > 0 && !domNode.isRoot()) {
+				let prev = domNode.prev();
+				let i = 0;
+				while (prev && prev.length > 0) {
+					if (
+						!prev.attributes(DATA_TRANSIENT_ELEMENT) &&
+						prev.attributes(DATA_ELEMENT) !== UI
+					)
+						i++;
+					prev = prev.prev();
+				}
+				path.unshift(i);
+				domNode = domNode.parent();
+			}
+			path.push(offset);
+			return path;
+		};
+		return [
+			getPath(range.startNode, range.startOffset),
+			getPath(range.endNode, range.endOffset),
+		];
+	}
 }
 
 Range.create = (
@@ -701,6 +782,90 @@ Range.from = (
 		} else return null;
 	}
 	return new Range(editor, win);
+};
+
+Range.fromPath = (
+	editor: EditorInterface,
+	path: Path[],
+	context: NodeInterface = editor.container,
+) => {
+	const startPath = path[0].slice();
+	const endPath = path[1].slice();
+	const startOffset = startPath.pop();
+	const endOffset = endPath.pop();
+
+	const getNode = (path: Path) => {
+		let domNode = context;
+		for (let i = 0; i < path.length; i++) {
+			let p = path[i];
+			if (p < 0) {
+				p = 0;
+			}
+			let needNode = undefined;
+			let domChild = domNode.first();
+			let offset = 0;
+			while (domChild && domChild.length > 0) {
+				if (
+					!!domChild.attributes(DATA_TRANSIENT_ELEMENT) ||
+					domChild.attributes(DATA_ELEMENT) === UI
+				) {
+					domChild = domChild.next();
+				} else {
+					if (offset === p || !domChild.next()) {
+						needNode = domChild;
+						break;
+					}
+					offset++;
+					domChild = domChild.next();
+				}
+			}
+			if (!needNode) break;
+			domNode = needNode;
+		}
+		return domNode;
+	};
+
+	const setRange = (
+		method: string,
+		range: RangeInterface,
+		node: Node | null,
+		offset: number,
+	) => {
+		if (node !== null) {
+			if (offset < 0) {
+				offset = 0;
+			}
+			if (
+				node.nodeType === getWindow().Node.ELEMENT_NODE &&
+				offset > node.childNodes.length
+			) {
+				offset = node.childNodes.length;
+			}
+			if (
+				node.nodeType === getWindow().Node.TEXT_NODE &&
+				offset > (node.nodeValue?.length || 0)
+			) {
+				offset = node.nodeValue?.length || 0;
+			}
+			range[method](node, offset);
+		}
+	};
+	const startNode = getNode(startPath);
+	const endNode = getNode(endPath);
+	const range = Range.create(editor, document);
+	setRange(
+		'setStart',
+		range,
+		startNode.get(),
+		startOffset ? parseInt(startOffset.toString()) : 0,
+	);
+	setRange(
+		'setEnd',
+		range,
+		endNode.get(),
+		endOffset ? parseInt(endOffset.toString()) : 0,
+	);
+	return range;
 };
 
 export default Range;

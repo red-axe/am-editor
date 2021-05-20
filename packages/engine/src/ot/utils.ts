@@ -4,7 +4,7 @@ import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { FOCUS, ANCHOR, CURSOR } from '../constants/selection';
 import { CARD_SELECTOR } from '../constants/card';
-import Range from '../range';
+
 import {
 	Op,
 	Path,
@@ -23,8 +23,6 @@ import {
 	UI,
 	UI_SELECTOR,
 } from '../constants/root';
-import { getWindow } from '../utils';
-import { EngineInterface } from '../types';
 
 /**
  * 随机一个数字
@@ -89,121 +87,6 @@ export const isTransientAttribute = (node: NodeInterface, attr: string) => {
 	)
 		return true;
 	return false;
-};
-
-export const toPath = (range: RangeInterface): Path[] => {
-	const node = range.commonAncestorNode;
-	if (!node.isRoot() && !node.inEditor()) return [];
-	range.shrinkToTextNode();
-
-	const getPath = (node: NodeInterface, offset: number): Path => {
-		let domNode: NodeInterface | undefined = node;
-		const path = [];
-		while (domNode && domNode.length > 0 && !domNode.isRoot()) {
-			let prev = domNode.prev();
-			let i = 0;
-			while (prev && prev.length > 0) {
-				if (
-					!prev.attributes(DATA_TRANSIENT_ELEMENT) &&
-					prev.attributes(DATA_ELEMENT) !== UI
-				)
-					i++;
-				prev = prev.prev();
-			}
-			path.unshift(i);
-			domNode = domNode.parent();
-		}
-		path.push(offset);
-		return path;
-	};
-	return [
-		getPath(range.startNode, range.startOffset),
-		getPath(range.endNode, range.endOffset),
-	];
-};
-
-export const fromPath = (
-	engine: EngineInterface,
-	node: NodeInterface,
-	path: Path[],
-) => {
-	const startPath = path[0].slice();
-	const endPath = path[1].slice();
-	const startOffset = startPath.pop();
-	const endOffset = endPath.pop();
-
-	const getNode = (path: Path) => {
-		let domNode = node;
-		for (let i = 0; i < path.length; i++) {
-			let p = path[i];
-			if (p < 0) {
-				p = 0;
-			}
-			let needNode = undefined;
-			let domChild = domNode.first();
-			let offset = 0;
-			while (domChild && domChild.length > 0) {
-				if (
-					!!domChild.attributes(DATA_TRANSIENT_ELEMENT) ||
-					domChild.attributes(DATA_ELEMENT) === UI
-				) {
-					domChild = domChild.next();
-				} else {
-					if (offset === p || !domChild.next()) {
-						needNode = domChild;
-						break;
-					}
-					offset++;
-					domChild = domChild.next();
-				}
-			}
-			if (!needNode) break;
-			domNode = needNode;
-		}
-		return domNode;
-	};
-
-	const setRange = (
-		method: string,
-		range: RangeInterface,
-		node: Node | null,
-		offset: number,
-	) => {
-		if (node !== null) {
-			if (offset < 0) {
-				offset = 0;
-			}
-			if (
-				node.nodeType === getWindow().Node.ELEMENT_NODE &&
-				offset > node.childNodes.length
-			) {
-				offset = node.childNodes.length;
-			}
-			if (
-				node.nodeType === getWindow().Node.TEXT_NODE &&
-				offset > (node.nodeValue?.length || 0)
-			) {
-				offset = node.nodeValue?.length || 0;
-			}
-			range[method](node, offset);
-		}
-	};
-	const startNode = getNode(startPath);
-	const endNode = getNode(endPath);
-	const range = Range.create(engine, document);
-	setRange(
-		'setStart',
-		range,
-		startNode.get(),
-		startOffset ? parseInt(startOffset.toString()) : 0,
-	);
-	setRange(
-		'setEnd',
-		range,
-		endNode.get(),
-		endOffset ? parseInt(endOffset.toString()) : 0,
-	);
-	return range;
 };
 
 export const reduceOperations = (ops: Op[]) => {
@@ -346,10 +229,6 @@ export const affectPath = (path: Path, otherPath: Path) => {
 		}
 	}
 	return true;
-};
-
-export const getRangePath = (range: RangeInterface) => {
-	return toPath(range.cloneRange());
 };
 
 export const getOldIndex = (index: number, ops: Op[]) => {

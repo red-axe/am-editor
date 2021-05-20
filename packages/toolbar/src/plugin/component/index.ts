@@ -124,7 +124,7 @@ class ToolbarComponent extends Card {
 
 		const content = this.keyword?.get<HTMLElement>()?.innerText || '';
 		this.remove();
-		this.editor.change.insertText(content);
+		this.editor.node.insertText(content);
 	}
 
 	destroy() {

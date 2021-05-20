@@ -9,6 +9,7 @@ class Right implements TypingHandleInterface {
 	type: 'keydown' | 'keyup' = 'keydown';
 	hotkey = (event: KeyboardEvent) =>
 		isHotkey('right', event) ||
+		isHotkey('shift+right', event) ||
 		isHotkey('ctrl+e', event) ||
 		isHotkey('ctrl+f', event);
 
@@ -33,32 +34,6 @@ class Right implements TypingHandleInterface {
 	}
 
 	trigger(event: KeyboardEvent) {
-		const { change } = this.engine;
-		const range = change
-			.getRange()
-			.cloneRange()
-			.shrinkToTextNode();
-		const { startNode, startOffset, endNode, endOffset } = range;
-		const card = this.engine.card.getSingleCard(range);
-		if (!card && range.collapsed && startNode.type === Node.TEXT_NODE) {
-			const text = startNode.text();
-			const rightText = text.substr(startOffset);
-			const next = startNode.next();
-			if (/^\u200B/g.test(rightText)) {
-				range.setStart(startNode, startOffset + 1);
-				range.setEnd(endNode, endOffset + 1);
-				change.select(range);
-			} else if (
-				next &&
-				next.type === Node.TEXT_NODE &&
-				startOffset === text.length &&
-				/^\u200B/g.test(next.text())
-			) {
-				range.setStart(next, 1);
-				range.setEnd(next, 1);
-				change.select(range);
-			}
-		}
 		for (let i = 0; i < this.listeners.length; i++) {
 			const listener = this.listeners[i];
 			const result = listener(event);

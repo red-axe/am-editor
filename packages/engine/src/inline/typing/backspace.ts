@@ -1,4 +1,4 @@
-import { EngineInterface } from '../../types';
+import { EngineInterface, NodeInterface } from '../../types';
 
 class Backspace {
 	private engine: EngineInterface;
@@ -9,12 +9,11 @@ class Backspace {
 	 * 在inline节点处按下backspace键
 	 */
 	trigger(event: KeyboardEvent) {
-		const { change, mark } = this.engine;
+		const { change, mark, inline, node } = this.engine;
 		const range = change.getRange();
 		const {
 			collapsed,
 			endNode,
-			endOffset,
 			startNode,
 			startOffset,
 		} = range.cloneRange().shrinkToTextNode();
@@ -22,74 +21,148 @@ class Backspace {
 			endNode.type === Node.TEXT_NODE ||
 			startNode.type === Node.TEXT_NODE
 		) {
-			if (collapsed) {
-				const prev = startNode.prev();
-				const text = startNode.text().substr(0, startOffset);
-				if (
-					prev &&
-					!prev.isCard() &&
-					this.engine.node.isInline(prev) &&
-					/\u200B$/g.test(text)
-				) {
-					range.setEnd(endNode, endOffset - 1);
-					range.setStart(endNode, endOffset - 1);
-					change.select(range);
-				}
-			}
-			//在inline节点内删除
-			let inlineNode = mark.closestNotMark(startNode);
-			if (this.engine.node.isInline(inlineNode) && !inlineNode.isCard()) {
-				const text = inlineNode.text();
-				if (/^\u200B\u200B$/g.test(text)) {
-					//删除inline前面节点的零宽字符
-					const prev = inlineNode.prev();
-					const prevText = prev?.text() || '';
-					if (prev && /\u200B$/g.test(prevText)) {
-						if (/^\u200B$/g.test(prevText)) prev.remove();
-						else prev.text(prevText.substr(0, prevText.length - 1));
-					}
-					//删除inline后面节点的零宽字符
-					const next = inlineNode.next();
-					const nextText = next?.text() || '';
-					if (next && /^\u200B/g.test(nextText)) {
-						if (/^\u200B$/g.test(nextText)) next.remove();
-						else next.text(nextText.substr(1));
-					}
-					//删除内部最后一个零宽字符
-					startNode.text('\u200B');
-					range.setStart(startNode, startOffset);
-					change.select(range);
-				}
-			}
+			//光标展开的情况下，判断光标结束位置是否在inline节点内左侧零宽字符后面，并且inline节点为空
 			if (!collapsed) {
-				inlineNode = mark.closestNotMark(endNode);
+				const inlineNode = inline.closest(endNode);
 				if (
-					this.engine.node.isInline(inlineNode) &&
-					!inlineNode.isCard()
+					node.isInline(inlineNode) &&
+					!inlineNode.isCard() &&
+					node.isEmpty(inlineNode)
 				) {
-					const text = inlineNode.text();
-					if (/^\u200B\u200B$/g.test(text)) {
-						//删除inline前面节点的零宽字符
-						const prev = inlineNode.prev();
-						const prevText = prev?.text() || '';
-						if (prev && /\u200B$/g.test(prevText)) {
-							if (/^\u200B$/g.test(prevText)) prev.remove();
-							else
-								prev.text(
-									prevText.substr(0, prevText.length - 1),
-								);
+					//offset 大于 1 说明至少不在左侧，不处理
+					if (startOffset > 1) return true;
+					let prev = endNode.prev();
+					let parent = endNode.parent();
+					//位于inline 1级子节点下
+					if (parent && node.isInline(parent)) {
+						//前面还有节点，不处理
+						if (prev) return true;
+						const text = endNode.text();
+						const leftText = text.substr(0, startOffset);
+						//不位于零宽字符后，不处理
+						if (!/^\u200b$/.test(leftText)) return true;
+						//光标结束位置选中inline节点零宽字符后
+						const inlineNext = inlineNode.next();
+						const nextText = inlineNext?.text();
+						if (
+							inlineNext &&
+							inlineNext.isText() &&
+							nextText &&
+							/^\u200b/.test(nextText)
+						) {
+							range.setEnd(inlineNext, 1);
+							return false;
 						}
-						//删除inline后面节点的零宽字符
-						const next = inlineNode.next();
-						const nextText = next?.text() || '';
-						if (next && /^\u200B/g.test(nextText)) {
-							if (/^\u200B$/g.test(nextText)) next.remove();
-							else next.text(nextText.substr(1));
+					}
+				}
+				return true;
+			}
+			let inlineNode = inline.closest(startNode);
+			//开始节点在inline标签内
+			if (node.isInline(inlineNode)) {
+				if (inlineNode.isCard()) return true;
+				//offset 大于 1 说明至少不在左侧，不处理
+				if (startOffset > 1) return true;
+				let prev = startNode.prev();
+				let parent = startNode.parent();
+				//位于inline 1级子节点下
+				if (parent && node.isInline(parent)) {
+					//前面还有节点，不处理
+					if (prev) return true;
+					const text = startNode.text();
+					const leftText = text.substr(0, startOffset);
+					//不位于零宽字符后，不处理
+					if (!/\u200b$/.test(leftText)) return true;
+				}
+				// 其它内嵌节点内
+				else if (startOffset === 0) {
+					//循环判断是否处于inline节点内的第一个零宽字符后面，可能inline节点内包含多个mark或其它标签
+					while (!prev && parent && !node.isInline(parent)) {
+						prev = parent.prev();
+						parent = parent?.parent();
+					}
+					//前面有节点，并且不是 text 节点，不处理
+					if (prev && !prev.isText()) return true;
+					//前面有text节点
+					if (prev) {
+						//不位于零宽字符后，不处理
+						if (!/\u200b$/.test(prev.text())) return true;
+					}
+				} else return true;
+				//让光标选择在inline节点前面零宽字符节点前面
+				const inlinePrev = inlineNode.prev();
+				const prevText = inlinePrev?.text();
+				if (
+					inlinePrev &&
+					inlinePrev.isText() &&
+					prevText &&
+					/\u200b$/.test(prevText)
+				) {
+					range.setStart(inlinePrev, prevText.length - 1);
+					//如果inlne节点中没有内容了，选择在inline标签前后零宽字符两侧
+					if (node.isEmpty(inlineNode)) {
+						const inlineNext = inlineNode.next();
+						const nextText = inlineNext?.text();
+						if (
+							inlineNext &&
+							inlineNext.isText() &&
+							nextText &&
+							/^\u200b/.test(nextText)
+						) {
+							range.setEnd(inlineNext, 1);
 						}
-						//删除内部最后一个零宽字符
-						endNode.text('\u200B');
-						range.setStart(endNode, endOffset);
+					} else {
+						range.collapse(true);
+					}
+					change.select(range);
+					return false;
+				}
+				return true;
+			}
+			// 在inline节点外
+			else {
+				let prev = startNode.prev();
+				let parent = startNode.parent();
+				let inlineNode: NodeInterface | undefined = undefined;
+				//在零宽字符后面，并且前面有inline节点
+				if (prev) {
+					if (node.isInline(prev) && !prev.isCard()) {
+						const text = startNode.text();
+						const leftText = text.substr(0, startOffset);
+						//不位于零宽字符后，不处理
+						if (!/^\u200b$/.test(leftText)) return true;
+						inlineNode = prev;
+					}
+				}
+				//前方没有节点，考虑是否在mark节点或其它节点内
+				else if (startOffset === 0) {
+					//循环判断是否处于inline节点内的第一个零宽字符后面，可能inline节点内包含多个mark或其它标签
+					while (!prev && parent && !node.isBlock(parent)) {
+						prev = parent.prev();
+						parent = parent?.parent();
+					}
+					//前面有节点，并且不是 text 节点，不处理
+					if (prev && !prev.isText()) return true;
+					//前面有text节点
+					if (prev) {
+						//不位于零宽字符后，不处理
+						if (!/^\u200b$/.test(prev.text())) return true;
+						//位于零宽字符后，并且零宽字符前面是inline节点
+						prev = prev.prev();
+						if (prev && node.isInline(prev)) {
+							inlineNode = prev;
+						} else return true;
+					}
+				} else return true;
+				//让光标选择inline内部最后一个零宽字符前
+				if (inlineNode) {
+					const last = inlineNode.last();
+					const text = last?.text();
+					if (last && last.isText() && text && /\u200b$/.test(text)) {
+						range.setStart(last, text.length - 1);
+						range.collapse(true);
 						change.select(range);
+						return false;
 					}
 				}
 			}

@@ -14,6 +14,7 @@ import {
 } from '../types';
 import { isMarkPlugin, MarkInterface, MarkModelInterface } from '../types/mark';
 import { getDocument, getWindow } from '../utils';
+import { Backspace } from './typing';
 
 class Mark implements MarkModelInterface {
 	private editor: EditorInterface;
@@ -24,6 +25,12 @@ class Mark implements MarkModelInterface {
 
 	init() {
 		if (isEngine(this.editor)) {
+			//删除事件
+			const backspace = new Backspace(this.editor);
+			this.editor.typing
+				.getHandleListener('backspace', 'keydown')
+				?.on(event => backspace.trigger(event));
+
 			this.editor.on('keydown:space', event =>
 				this.triggerMarkdown(event),
 			);
@@ -64,27 +71,29 @@ class Mark implements MarkModelInterface {
 	 * 根据节点查找mark插件实例
 	 * @param node 节点
 	 */
-	findPlugin(node: NodeInterface) {
-		if (!this.editor.node.isMark(node)) return [];
-		let markPlugin: Array<MarkInterface> = [];
-		Object.keys(this.editor.plugin.components).some(pluginName => {
-			const plugin = this.editor.plugin.components[pluginName];
-			if (isMarkPlugin(plugin)) {
-				if (node.name === plugin.tagName) {
-					if (
-						(plugin.attributes || plugin.style) &&
-						!this.editor.schema.checkNode(
-							node,
-							plugin.schema().attributes!,
-						)
-					)
-						return;
-					markPlugin.push(plugin);
-				}
+	findPlugin(mark: NodeInterface): MarkInterface | undefined {
+		const { node, plugin, schema } = this.editor;
+		if (!node.isMark(mark)) return;
+		let result: MarkInterface | undefined = undefined;
+		Object.keys(plugin.components).some(pluginName => {
+			const markPlugin = plugin.components[pluginName];
+			if (isMarkPlugin(markPlugin) && mark.name === markPlugin.tagName) {
+				const schemaRule = markPlugin.schema();
+				if (
+					(markPlugin.attributes || markPlugin.style) &&
+					!(Array.isArray(schemaRule)
+						? schemaRule.find(rule =>
+								schema.checkNode(mark, rule.attributes),
+						  )
+						: schema.checkNode(mark, schemaRule.attributes))
+				)
+					return;
+				result = markPlugin;
+				return true;
 			}
 			return;
 		});
-		return markPlugin;
+		return result;
 	}
 	/**
 	 * 获取向上第一个非 Mark 节点
@@ -208,29 +217,17 @@ class Mark implements MarkModelInterface {
 	 */
 	contain(source: NodeInterface, target: NodeInterface) {
 		const attributes = target.attributes();
+		const styles = attributes['style'] || {};
 		delete attributes['style'];
-		const styles = target.css();
-		return (
-			Object.keys(attributes).every(key => !!source.attributes(key)) &&
-			Object.keys(styles).every(key => !!source.css(key))
-		);
-	}
 
-	/**
-	 * 如果源节点包含目标节点的所有属性名称和样式名称，那么移除源节点所包含的样式和属性
-	 * @param source 源节点
-	 * @param target 目标节点
-	 */
-	removeByContain(source: NodeInterface, target: NodeInterface) {
-		if (this.contain(source, target)) {
-			const attributes = target.attributes();
-			delete attributes['style'];
-			const styles = target.css();
-			Object.keys(attributes).forEach(key =>
-				source.removeAttributes(key),
-			);
-			Object.keys(styles).forEach(key => source.css(key, ''));
-		}
+		const sourceAttributes = source.attributes();
+		const sourceStyles = sourceAttributes['style'] || {};
+		delete sourceAttributes['style'];
+
+		return (
+			Object.keys(attributes).every(key => !!sourceAttributes[key]) &&
+			Object.keys(styles).every(key => !sourceStyles[key])
+		);
 	}
 
 	/**
@@ -242,24 +239,30 @@ class Mark implements MarkModelInterface {
 		root: NodeInterface,
 		callback?: (node: NodeInterface) => boolean,
 	) {
+		const { $, node } = this.editor;
 		const children = root.allChildren();
-		children.forEach(node => {
-			const child = this.editor.$(node);
+		children.forEach(childNode => {
+			const child = $(childNode);
 			if (
-				this.editor.node.isEmpty(child) &&
-				this.editor.node.isMark(child) &&
+				node.isEmpty(child) &&
+				node.isMark(child) &&
 				(!callback || callback(child))
 			) {
-				this.editor.node.unwrap(child);
+				node.unwrap(child);
 			}
 		});
 	}
 	/**
-	 * 在光标重叠位置时分割
+	 * 在光标重叠位置时分割，在分割时会清空父节点内容再重组，如果需要保持光标右边某节点的追踪，请传入该节点
 	 * @param range 光标
 	 * @param removeMark 要移除的mark空节点
+	 * @param keelpNode 分割光标右侧需要保持追踪的节点
 	 */
-	splitOnCollapsed(range: RangeInterface, removeMark?: NodeInterface) {
+	splitOnCollapsed(
+		range: RangeInterface,
+		removeMark?: NodeInterface | Array<NodeInterface>,
+		keelpNode?: NodeInterface | Node,
+	) {
 		if (!range.collapsed) return;
 		//扩大光标选区
 		range.enlargeFromTextNode();
@@ -270,29 +273,45 @@ class Mark implements MarkModelInterface {
 		const card = startNode.isCard()
 			? startNode
 			: startNode.closest(CARD_SELECTOR);
+		const { $, node } = this.editor;
 		if (
 			(card.length === 0 ||
 				card.attributes(CARD_TYPE_KEY) !== 'inline') &&
-			(this.editor.node.isMark(startNode) ||
-				(startParent && this.editor.node.isMark(startParent)))
+			(node.isMark(startNode) ||
+				(startParent && node.isMark(startParent)))
 		) {
 			// 获取上面第一个非mark标签
 			const parent = this.closestNotMark(startNode);
 			// 插入范围的开始和结束标记
 			const selection = range.createSelection();
-			// 获取标记左右两侧节点
+			// 获取标记左侧节点
 			const left = selection.getNode(parent, 'left');
-			const right = selection.getNode(parent, 'right');
+			const { $ } = this.editor;
+			// 获取标记右侧节点
+			let right: NodeInterface | undefined = undefined;
+			let keelpRoot: NodeInterface | undefined = undefined;
+			let keelpPath: Array<number> = [];
+			if (keelpNode) {
+				if (isNode(keelpNode)) keelpNode = $(keelpNode);
+				// 获取需要跟踪节点的路径
+				const path = keelpNode.getPath(parent.get()!);
+				const cloneParent = parent.clone(true);
+				keelpPath = path.slice(1);
+				// 获取需要跟踪节点的root节点
+				keelpRoot = $(cloneParent.getChildByPath(path.slice(0, 1)));
+				right = selection.getNode(cloneParent, 'right', false);
+			} else right = selection.getNode(parent, 'right');
 			// 删除空标签
 			this.unwrapEmptyMarks(left);
 			this.unwrapEmptyMarks(right, node => {
+				if (removeMark && !Array.isArray(removeMark))
+					removeMark = [removeMark];
+				//没有传指定的mark，那就都移除。否则比较后一致就移除
 				const isUnwrap =
 					!removeMark ||
-					(!node.isCard() && this.compare(node, removeMark));
-				//如果有需要移除的mark，并且，compare返回false，考虑到可能是合并后的，则移除上一层的所有属性
-				if (removeMark && !isUnwrap && node.name === removeMark.name) {
-					this.removeByContain(node, removeMark);
-				}
+					removeMark.length === 0 ||
+					(!node.isCard() &&
+						removeMark.some(mark => this.compare(node, mark)));
 				return isUnwrap;
 			});
 			// 清空原父容器，用新的内容代替
@@ -302,8 +321,20 @@ class Mark implements MarkModelInterface {
 			parent.append(leftChildren);
 			const rightChildren = right.children();
 			const rightNodes = rightChildren.toArray();
+			// 根据跟踪节点的root节点和path获取其在rightNodes中的新节点
+			if (keelpRoot)
+				keelpNode = rightNodes
+					.find(node => node.equal(keelpRoot!))
+					?.getChildByPath(keelpPath);
 			parent.append(rightChildren);
-			const zeroWidthNode = this.editor.$('\u200b', null);
+			// 找到卡片，重新设置卡片根节点的引用
+			parent.find(CARD_SELECTOR).each(cardNode => {
+				const cardComponent = this.editor.card.find(cardNode);
+				if (cardComponent && !cardComponent.root.equal(cardNode)) {
+					cardComponent.root[0] = cardNode;
+				}
+			});
+			let zeroWidthNode = $('\u200b', null);
 
 			// 重新设置范围
 			if (leftNodes.length === 1 && leftNodes[0].name === 'br') {
@@ -317,7 +348,7 @@ class Mark implements MarkModelInterface {
 			if (rightNodes.length > 0) {
 				let rightContainer = rightNodes[0];
 				// 右侧没文本
-				if (this.editor.node.isEmpty(rightContainer)) {
+				if (node.isEmpty(rightContainer)) {
 					let firstChild: NodeInterface | null = rightContainer.first();
 					while (firstChild && !firstChild.isText()) {
 						rightContainer = firstChild;
@@ -329,9 +360,36 @@ class Mark implements MarkModelInterface {
 					} else {
 						rightContainer.prepend(zeroWidthNode);
 					}
-				} else {
-					// 右侧有文本
-					rightContainer.before(zeroWidthNode);
+				}
+				// 右侧有文本
+				else {
+					//在多层mark嵌套的情况下，要移除的mark里面还有其它mark节点，还有要移除的mark外面还有其它mark，需要将其组合起来
+					let markParent = node.isMark(startNode)
+						? startNode
+						: startNode.parent();
+					let wrapZeroNode = zeroWidthNode;
+					if (removeMark && !Array.isArray(removeMark))
+						removeMark = [removeMark];
+					while (
+						removeMark &&
+						removeMark.length > 0 &&
+						markParent &&
+						node.isMark(markParent)
+					) {
+						const markClone = markParent.clone();
+						//不是要移除的mark
+						if (
+							!removeMark.some(mark =>
+								this.compare(markClone, mark),
+							)
+						) {
+							const isZero = zeroWidthNode.equal(wrapZeroNode);
+							wrapZeroNode = node.wrap(wrapZeroNode, markClone);
+							if (isZero) zeroWidthNode = wrapZeroNode.first()!;
+						}
+						markParent = markParent.parent();
+					}
+					rightContainer.before(wrapZeroNode);
 				}
 				range.select(zeroWidthNode).collapse(false);
 			} else if (leftNodes.length > 0) {
@@ -341,6 +399,7 @@ class Mark implements MarkModelInterface {
 			} else {
 				range.select(parent, true).collapse(true);
 			}
+			//替换多个零宽字符为一个零宽字符
 			let textWithEmpty = false;
 			parent.children().each(child => {
 				const childNode = this.editor.$(child);
@@ -351,7 +410,15 @@ class Mark implements MarkModelInterface {
 						child.textContent = text;
 					}
 					if (textWithEmpty) {
-						if (text.startsWith('\u200b')) {
+						//当前第二个连续零宽字符的下一个节点不能是inline节点
+						const next = childNode.next();
+						//当前第二个连续零宽字符没有下一个节点，并且父级节点不能为inline节点
+						const parent = childNode.parent();
+						if (
+							((!next && parent && !node.isInline(parent)) ||
+								(next && !node.isInline(next))) &&
+							text.startsWith('\u200b')
+						) {
 							text = text.substring(1);
 							if (text) child.textContent = text;
 							else childNode.remove();
@@ -360,26 +427,47 @@ class Mark implements MarkModelInterface {
 					if (text.endsWith('\u200b')) textWithEmpty = true;
 				} else textWithEmpty = false;
 			});
+			const nodeApi = node;
+			//移除多余的零宽字符
 			if (zeroWidthNode[0].parentNode) {
 				const at = zeroWidthNode[0];
 				let atText: string | null = null;
 				let atTextLen: number = 0;
-				const handleAt = (node: Node | null, align: boolean) => {
+				const handleAt = (node: Node | null, findPrev: boolean) => {
 					const getAlignNode = (node: Node) => {
-						return align ? node.previousSibling : node.nextSibling;
+						return findPrev
+							? node.previousSibling
+							: node.nextSibling;
 					};
 					while (node) {
 						if (node.nodeType !== at.nodeType) return;
+						const alignNode = getAlignNode(node);
 						if (node.textContent === atText) {
-							const alignNode = getAlignNode(node);
+							//inline 节点位置的零宽字符跳过
+							if (
+								(alignNode && nodeApi.isInline(alignNode)) ||
+								(!alignNode &&
+									node.parentNode &&
+									nodeApi.isInline(node.parentNode))
+							)
+								break;
 							node.parentNode?.removeChild(node);
 							node = alignNode;
 						} else {
-							if (align) {
+							if (findPrev) {
 								while (
 									atText &&
 									node.textContent?.endsWith(atText)
 								) {
+									//inline 节点位置的零宽字符跳过
+									if (
+										(alignNode &&
+											nodeApi.isInline(alignNode)) ||
+										(!alignNode &&
+											node.parentNode &&
+											nodeApi.isInline(node.parentNode))
+									)
+										break;
 									node.textContent = node.textContent.substring(
 										0,
 										node.textContent.length - atTextLen,
@@ -390,13 +478,22 @@ class Mark implements MarkModelInterface {
 									atText &&
 									node.textContent?.startsWith(atText)
 								) {
+									//inline 节点位置的零宽字符跳过
+									if (
+										(alignNode &&
+											nodeApi.isInline(alignNode)) ||
+										(!alignNode &&
+											node.parentNode &&
+											nodeApi.isInline(node.parentNode))
+									)
+										break;
+
 									node.textContent = node.textContent.substring(
 										atText.length,
 									);
 								}
 							}
 							if (node.textContent?.length !== 0) return;
-							const alignNode = getAlignNode(node);
 							node.parentNode?.removeChild(node);
 							node = alignNode;
 						}
@@ -411,13 +508,17 @@ class Mark implements MarkModelInterface {
 				}
 			}
 		}
+		return keelpNode;
 	}
 	/**
 	 * 在光标位置不重合时分割
 	 * @param range 光标
 	 * @param removeMark 要移除的空mark节点
 	 */
-	splitOnExpanded(range: RangeInterface, removeMark?: NodeInterface) {
+	splitOnExpanded(
+		range: RangeInterface,
+		removeMark?: NodeInterface | Array<NodeInterface>,
+	) {
 		if (range.collapsed) return;
 		range.enlargeToElementNode();
 		range.shrinkToElementNode();
@@ -436,23 +537,65 @@ class Mark implements MarkModelInterface {
 					'inline' === cardEnd.attributes(CARD_TYPE_KEY))
 			)
 		) {
-			//开始节点和
-			if (
-				!this.closestNotMark(startNode).equal(
-					this.closestNotMark(endNode),
-				)
-			) {
+			//开始非mark标签父节点
+			const startNotMarkParent = this.closestNotMark(startNode);
+			//结束非mark标签父节点
+			const endNotMarkParent = this.closestNotMark(endNode);
+			if (!startNotMarkParent.equal(endNotMarkParent)) {
 				const startRange = range.cloneRange();
 				startRange.collapse(true);
-				this.splitOnCollapsed(startRange, removeMark);
-				range.setStart(
-					startRange.startContainer,
-					startRange.startOffset,
-				);
+
 				const endRange = range.cloneRange();
 				endRange.collapse(false);
-				this.splitOnCollapsed(endRange, removeMark);
-				range.setEnd(endRange.startContainer, endRange.startOffset);
+
+				//如果开始非mark标签父节点包含结束非mark标签父节点，那么分割的时候会清空 结束非mark标签父节点的内容进行重组。结束非mark标签父节点 将无非找到
+				//所以需要从被包含的节点开始分割
+				let keelpNode: NodeInterface | Node | undefined = undefined;
+				let startOffset = startRange.startOffset;
+				let endOffset = endRange.endOffset;
+				//如果开始节点的父节点包含结尾父节点，会将结尾父节点删除重组，导致光标失效，需要先执行开始节点分割，并跟踪结尾节点
+				if (startNotMarkParent.contains(endNotMarkParent)) {
+					//先分割开始节点，并跟踪结尾节点
+					keelpNode = this.splitOnCollapsed(
+						startRange,
+						removeMark,
+						endRange.endNode,
+					);
+					range.setStart(
+						startRange.startContainer,
+						startRange.startOffset,
+					);
+					//如果有跟踪到，重新设置结尾节点
+					if (keelpNode) {
+						endRange.setOffset(keelpNode, endOffset, endOffset);
+					}
+					//分割结尾节点
+					this.splitOnCollapsed(endRange, removeMark);
+					range.setEnd(endRange.startContainer, endRange.startOffset);
+				} else {
+					//结尾父节点包含开始节点父节点
+					//先分割结尾节点，并跟踪开始节点
+					keelpNode = this.splitOnCollapsed(
+						endRange,
+						removeMark,
+						startRange.startNode,
+					);
+					range.setEnd(endRange.startContainer, endRange.startOffset);
+					//如果有跟踪到，重新设置开始节点
+					if (keelpNode) {
+						startRange.setOffset(
+							keelpNode,
+							startOffset,
+							startOffset,
+						);
+					}
+					//分割开始节点
+					this.splitOnCollapsed(startRange, removeMark);
+					range.setStart(
+						startRange.startContainer,
+						startRange.startOffset,
+					);
+				}
 				return;
 			}
 			const { node } = this.editor;
@@ -492,6 +635,13 @@ class Mark implements MarkModelInterface {
 			const centerNodes = centerChildren.toArray();
 			parent.append(centerChildren);
 			parent.append(right.children());
+			// 找到卡片，重新设置卡片根节点的引用
+			parent.find(CARD_SELECTOR).each(cardNode => {
+				const cardComponent = this.editor.card.find(cardNode);
+				if (cardComponent && !cardComponent.root.equal(cardNode)) {
+					cardComponent.root[0] = cardNode;
+				}
+			});
 			// 重新设置范围
 			range.setStartBefore(centerNodes[0][0]);
 			range.setEndAfter(centerNodes[centerNodes.length - 1][0]);
@@ -500,16 +650,19 @@ class Mark implements MarkModelInterface {
 
 	/**
 	 * 分割mark标签
-	 * @param removeMark 需要移除的空mark标签
+	 * @param removeMark 需要移除的mark标签
 	 */
-	split(range?: RangeInterface, removeMark?: NodeInterface | Node | string) {
+	split(
+		range?: RangeInterface,
+		removeMark?: NodeInterface | Node | string | Array<NodeInterface>,
+	) {
 		if (!isEngine(this.editor)) return;
 		const { change, $ } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (
 			typeof removeMark === 'string' ||
-			(removeMark && isNode(removeMark))
+			(!Array.isArray(removeMark) && removeMark && isNode(removeMark))
 		) {
 			removeMark = $(removeMark, doc);
 		}
@@ -527,9 +680,10 @@ class Mark implements MarkModelInterface {
 	 * @param both mark标签两侧节点
 	 */
 	wrap(mark: NodeInterface | Node | string, range?: RangeInterface) {
-		if (!isEngine(this.editor)) return;
-		const { change, node, $ } = this.editor;
-		const safeRange = range || change.getSafeRange();
+		const change = isEngine(this.editor) ? this.editor.change : undefined;
+		if (!range && !change) return;
+		const { node, $ } = this.editor;
+		const safeRange = range || change!.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof mark === 'string' || isNode(mark)) {
 			mark = $(mark, doc);
@@ -539,9 +693,18 @@ class Mark implements MarkModelInterface {
 		if (safeRange.collapsed) {
 			if (mark.children().length === 0)
 				mark.append(doc.createTextNode('\u200b'));
-			change.insertNode(mark, safeRange);
+			//在相通插件下，值不同，插入到同级，不做嵌套
+			const { startNode } = safeRange;
+			const parent = startNode.parent();
+			if (parent && startNode.isText() && node.isMark(parent)) {
+				if (this.compare(parent, mark)) {
+					this.split(safeRange, parent.clone());
+				}
+			}
+			node.insert(mark, safeRange);
+			this.merge(safeRange);
 			safeRange.addOrRemoveBr();
-			if (!range) change.apply(safeRange);
+			if (!range) change?.apply(safeRange);
 			return;
 		}
 		this.split(safeRange);
@@ -554,13 +717,14 @@ class Mark implements MarkModelInterface {
 		const selection = safeRange.createSelection();
 
 		if (!selection.anchor && !selection.focus) {
-			if (!range) change.apply(safeRange);
+			if (!range) change?.apply(safeRange);
 			return;
 		}
 		// 遍历范围内的节点，添加 Mark
 		let started = false;
+		const nodeApi = node;
 		commonAncestorNode.traverse(node => {
-			const child = $(node);
+			let child = $(node);
 			mark = mark as NodeInterface;
 			if (!child.equal(selection.anchor!)) {
 				if (started) {
@@ -568,41 +732,82 @@ class Mark implements MarkModelInterface {
 						started = false;
 						return false;
 					}
-					if (this.editor.node.isMark(child) && !child.isCard()) {
-						if (!this.editor.node.isEmpty(child)) {
-							//找到最底层mark标签添加包裹，<strong><span style="font-size:16px">abc</span></strong> ，在 span 节点再添加包裹，不在strong外添加包裹
+					if (nodeApi.isMark(child) && !child.isCard()) {
+						if (!nodeApi.isEmpty(child)) {
+							//找到最底层mark标签添加包裹，<strong><span style="font-size:16px">abc</span></strong> ，在 span 节点中的text再添加包裹，不在strong外添加包裹
 							let targetNode = child;
 							let targetChildrens = targetNode.children();
 							while (
-								this.editor.node.isMark(targetNode) &&
+								nodeApi.isMark(targetNode) &&
 								targetChildrens.length === 1
 							) {
 								const targetChild = targetChildrens.eq(0)!;
-								if (this.editor.node.isMark(targetChild)) {
+								if (nodeApi.isMark(targetChild)) {
 									targetNode = targetChild;
 									targetChildrens = targetNode.children();
+								} else if (targetChild.isText()) {
+									targetNode = targetChild;
 								} else break;
 							}
-							this.editor.node.wrap(targetNode, mark);
+							targetNode.removeZeroWidthSpace();
+							const parent = targetNode.parent();
+							//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
+							if (
+								targetNode.isText() &&
+								parent &&
+								nodeApi.isMark(parent)
+							) {
+								if (this.compare(parent.clone(), mark, true))
+									return true;
+								if (parent.children().length === 1) {
+									const plugin = this.findPlugin(mark);
+									const curPlugin = this.findPlugin(parent);
+									//插件一样，并且并表明要合并值
+									if (
+										plugin &&
+										plugin === curPlugin &&
+										plugin.combineValueByWrap === true
+									) {
+										nodeApi.wrap(parent, mark, true);
+										return true;
+									}
+									//插件一样，不合并，直接移除
+									else if (plugin && plugin === curPlugin)
+										nodeApi.unwrap(parent);
+								}
+							}
+							nodeApi.wrap(targetNode, mark);
 							return true;
-						}
-						if (child.name !== mark.name) {
+						} else if (child.name !== mark.name) {
 							child.remove();
 						}
 					}
 
-					if (child.isText() && !this.editor.node.isEmpty(child)) {
-						this.editor.node.wrap(child, mark);
-						if (
-							this.editor.node.isBlock(child) &&
-							this.editor.node.isEmpty(child)
-						) {
-							child.find('br').remove();
-							const cloneMark = this.editor.node.clone(mark);
-							const textNode = doc.createTextNode('\u200b');
-							cloneMark.prepend(textNode);
-							child.append(cloneMark);
+					if (child.isText() && !nodeApi.isEmpty(child)) {
+						child.removeZeroWidthSpace();
+						const parent = child.parent();
+						//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
+						if (parent && nodeApi.isMark(parent)) {
+							if (this.compare(parent.clone(), mark, true))
+								return true;
+							if (parent.children().length === 1) {
+								const plugin = this.findPlugin(mark);
+								const curPlugin = this.findPlugin(parent);
+								//插件一样，并且并表明要合并值
+								if (
+									plugin &&
+									plugin === curPlugin &&
+									plugin.combineValueByWrap === true
+								) {
+									nodeApi.wrap(parent, mark, true);
+									return true;
+								}
+								//插件一样，不合并，直接移除
+								else if (plugin && plugin === curPlugin)
+									nodeApi.unwrap(parent);
+							}
 						}
+						nodeApi.wrap(child, mark);
 					}
 				}
 			} else {
@@ -612,7 +817,7 @@ class Mark implements MarkModelInterface {
 		});
 		selection.move();
 		this.merge(safeRange);
-		if (!range) change.apply(safeRange);
+		if (!range) change?.apply(safeRange);
 	}
 
 	/**
@@ -621,7 +826,7 @@ class Mark implements MarkModelInterface {
 	 */
 	merge(range?: RangeInterface): void {
 		if (!isEngine(this.editor)) return;
-		const { change, $ } = this.editor;
+		const { change, $, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const marks = this.findMarks(safeRange);
 		if (marks.length === 0) {
@@ -637,7 +842,7 @@ class Mark implements MarkModelInterface {
 					const selection = safeRange
 						.shrinkToElementNode()
 						.createSelection();
-					this.editor.node.merge(prevMark, mark);
+					node.merge(prevMark, mark);
 					selection.move();
 					// 原来 mark 已经被移除，重新指向
 					mark = prevMark;
@@ -647,14 +852,14 @@ class Mark implements MarkModelInterface {
 					const selection = safeRange
 						.shrinkToElementNode()
 						.createSelection();
-					this.editor.node.merge(mark, nextMark);
+					node.merge(mark, nextMark);
 					selection.move();
 				}
 				//合并子级mark
 				const childMarks: Array<NodeInterface> = [];
-				mark.children().each(node => {
-					const child = $(node);
-					if (this.editor.node.isMark(child)) {
+				mark.children().each(childNode => {
+					const child = $(childNode);
+					if (node.isMark(child)) {
 						childMarks.push(child);
 					}
 				});
@@ -673,14 +878,18 @@ class Mark implements MarkModelInterface {
 	 * @param range 光标
 	 * @param removeMark 要移除的mark标签
 	 */
-	unwrap(removeMark?: NodeInterface | Node | string, range?: RangeInterface) {
+	unwrap(
+		removeMark?: NodeInterface | Node | string | Array<NodeInterface>,
+		range?: RangeInterface,
+	) {
 		if (!isEngine(this.editor)) return;
-		const { change, $ } = this.editor;
+		const { change, $, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer) || document;
 
 		if (
 			removeMark !== undefined &&
+			!Array.isArray(removeMark) &&
 			(typeof removeMark === 'string' || isNode(removeMark))
 		) {
 			removeMark = $(removeMark, doc);
@@ -706,13 +915,13 @@ class Mark implements MarkModelInterface {
 		// 遍历范围内的节点，获取目标 Mark
 		const markNodes: Array<NodeInterface> = [];
 		let started = false;
-		ancestor.traverse(node => {
-			const child = $(node);
+		ancestor.traverse(childNode => {
+			const child = $(childNode);
 			if (!child.equal(selection.anchor!)) {
 				if (started) {
 					if (!child.equal(selection.focus!)) {
 						if (
-							this.editor.node.isMark(child) &&
+							node.isMark(child) &&
 							!child.isCard() &&
 							safeRange.isPointInRange(child, 0)
 						) {
@@ -725,13 +934,14 @@ class Mark implements MarkModelInterface {
 			}
 		});
 		// 清除 Mark
+		const nodeApi = node;
 		markNodes.forEach(node => {
 			removeMark = removeMark as NodeInterface | undefined;
 			if (
 				!removeMark ||
 				(!node.isCard() && this.compare(node, removeMark))
 			) {
-				this.editor.node.unwrap(node);
+				nodeApi.unwrap(node);
 			} else if (removeMark) {
 				const styleMap = removeMark.css();
 				Object.keys(styleMap).forEach(key => {
@@ -781,7 +991,7 @@ class Mark implements MarkModelInterface {
 	 */
 	insert(mark: NodeInterface | Node | string, range?: RangeInterface): void {
 		if (!isEngine(this.editor)) return;
-		const { change, $ } = this.editor;
+		const { change, node, $ } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		if (typeof mark === 'string' || isNode(mark)) {
 			const doc = getDocument(safeRange.startContainer);
@@ -792,9 +1002,8 @@ class Mark implements MarkModelInterface {
 			change.deleteContent(safeRange);
 		}
 		// 插入新 Mark
-		change
-			.insertNode(mark, safeRange)
-			.addOrRemoveBr()
+		node.insert(mark, safeRange)
+			?.addOrRemoveBr()
 			.select(mark)
 			.collapse(false);
 		if (!range) change.apply(safeRange);
@@ -806,7 +1015,7 @@ class Mark implements MarkModelInterface {
 	 */
 	findMarks(range: RangeInterface) {
 		const cloneRange = range.cloneRange();
-		const { $ } = this.editor;
+		const { $, node } = this.editor;
 		const handleRange = (
 			allowBlock: boolean,
 			range: RangeInterface,
@@ -836,10 +1045,9 @@ class Mark implements MarkModelInterface {
 					!allowBlock &&
 					endNode.type === Node.ELEMENT_NODE &&
 					endOffsetNode &&
-					this.editor.node.isBlock(endOffsetNode) &&
+					node.isBlock(endOffsetNode) &&
 					(startNode.type !== Node.ELEMENT_NODE ||
-						(!!startOffsetNode &&
-							!this.editor.node.isBlock(startOffsetNode)))
+						(!!startOffsetNode && !node.isBlock(startOffsetNode)))
 				)
 					return;
 				cloneRange.select(startParent, true);
@@ -869,10 +1077,10 @@ class Mark implements MarkModelInterface {
 					!allowBlock &&
 					startNodeClone.type === Node.ELEMENT_NODE &&
 					startOffsetNode &&
-					this.editor.node.isBlock(startOffsetNode) &&
+					node.isBlock(startOffsetNode) &&
 					(startNode.type !== Node.ELEMENT_NODE ||
 						(startChildrenOffsetNode &&
-							!this.editor.node.isBlock(startChildrenOffsetNode)))
+							!node.isBlock(startChildrenOffsetNode)))
 				)
 					return;
 				cloneRange.select(startParent, true);
@@ -933,6 +1141,7 @@ class Mark implements MarkModelInterface {
 				nodes.push(nodeB);
 			}
 		};
+		const nodeApi = node;
 		// 向上寻找
 		const findNodes = (node: NodeInterface) => {
 			let nodes: Array<NodeInterface> = [];
@@ -944,7 +1153,7 @@ class Mark implements MarkModelInterface {
 					break;
 				}
 				if (
-					this.editor.node.isMark(node) &&
+					nodeApi.isMark(node) &&
 					!node.attributes(CARD_KEY) &&
 					!node.attributes(CARD_ELEMENT_KEY)
 				) {
@@ -976,7 +1185,7 @@ class Mark implements MarkModelInterface {
 								return false;
 							}
 							if (
-								this.editor.node.isMark(child) &&
+								nodeApi.isMark(child) &&
 								!child.attributes(CARD_KEY) &&
 								!child.attributes(CARD_ELEMENT_KEY)
 							) {
@@ -1008,7 +1217,7 @@ class Mark implements MarkModelInterface {
 		) {
 			return;
 		}
-
+		const nodeApi = this.editor.node;
 		if (!node.attributes(DATA_ELEMENT)) {
 			const parent = node.parent();
 			// 包含光标标签
@@ -1017,24 +1226,24 @@ class Mark implements MarkModelInterface {
 				node.children().length === 1 &&
 				node.first()?.attributes(DATA_ELEMENT)
 			) {
-				if (this.editor.node.isMark(node)) {
+				if (nodeApi.isMark(node)) {
 					node.before(node.first()!);
 					node.remove();
 					if (parent) this.removeEmptyMarks(parent, true);
-				} else if (addBr && this.editor.node.isBlock(node)) {
+				} else if (addBr && nodeApi.isBlock(node)) {
 					node.prepend('<br />');
 				}
 				return;
 			}
 
-			const html = this.editor.node.html(node);
+			const html = nodeApi.html(node);
 
 			if (html === '' || html === '\u200B') {
-				if (this.editor.node.isMark(node)) {
+				if (nodeApi.isMark(node)) {
 					node.remove();
 					if (parent) this.removeEmptyMarks(parent, true);
-				} else if (addBr && this.editor.node.isBlock(node)) {
-					this.editor.node.html(node, '<br />');
+				} else if (addBr && nodeApi.isBlock(node)) {
+					nodeApi.html(node, '<br />');
 				}
 			}
 		}

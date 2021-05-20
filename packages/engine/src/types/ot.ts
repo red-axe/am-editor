@@ -161,6 +161,10 @@ export interface MutationInterface extends EventEmitter2 {
 }
 
 export interface ApplierInterface {
+	elementAtPath(
+		node: Node | NodeInterface,
+		path: Path,
+	): [Node, undefined | number, Node, number];
 	setAttribute(path: Path, attr: string, value: string): void;
 	removeAttribute(path: Path, attr: string): void;
 	insertNode(path: Path, value: string | Op[] | Op[][]): void;

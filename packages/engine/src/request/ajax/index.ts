@@ -453,7 +453,7 @@ class Ajax implements AjaxInterface {
 		this.init();
 	}
 
-	then(success: (data: any) => void, fail: (reason?: any) => void) {
+	then(success: (data: any) => void, fail?: (reason?: any) => void) {
 		return this.promise?.then(success, fail);
 	}
 

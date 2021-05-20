@@ -351,14 +351,13 @@ export default class extends BlockPlugin<Options> {
 		blocks.forEach(block => {
 			block.allChildren().forEach(child => {
 				const node = $(child);
-				const plugins = mark.findPlugin(node);
+				const plugin = mark.findPlugin(node);
 				this.disableMark.forEach(pluginName => {
-					const plugin = plugins.find(
-						plugin =>
-							(plugin.constructor as PluginEntry).pluginName ===
-							pluginName,
-					);
-					if (plugin) {
+					if (
+						plugin &&
+						(plugin.constructor as PluginEntry).pluginName ===
+							pluginName
+					) {
 						this.editor.node.unwrap(node);
 					}
 				});

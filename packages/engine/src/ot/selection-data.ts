@@ -2,7 +2,6 @@ import { Path } from 'sharedb';
 import { EngineInterface } from '../types/engine';
 import { CardEntry, CardType } from '../types/card';
 import { Attribute, Member, SelectionDataInterface } from '../types/ot';
-import { toPath } from './utils';
 
 class SelectionData implements SelectionDataInterface {
 	private engine: EngineInterface;
@@ -93,7 +92,7 @@ class SelectionData implements SelectionDataInterface {
 				range.setEnd(endCard.getCenter().parent()!, 1);
 			}
 		}
-		const path = toPath(range);
+		const path = range.toPath();
 		this.currentRangePath = path;
 		const pathString = JSON.stringify(path);
 		let data: Array<Attribute | null> = this.getAll();

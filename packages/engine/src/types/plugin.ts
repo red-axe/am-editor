@@ -110,7 +110,7 @@ export interface ElementPluginInterface extends PluginInterface {
 	/**
 	 * 获取插件设置的属性和样式所生成的规则
 	 */
-	schema?(): SchemaRule | SchemaGlobal | Array<SchemaRule>;
+	schema(): SchemaRule | SchemaGlobal | Array<SchemaRule>;
 }
 
 export interface PluginModelInterface {

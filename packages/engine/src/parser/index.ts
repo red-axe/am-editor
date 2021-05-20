@@ -139,7 +139,7 @@ class Parser {
 		includeCard?: boolean,
 	) {
 		let child = node.first();
-
+		const nodeApi = this.editor.node;
 		while (child) {
 			if (child.isElement()) {
 				let name = child.name;
@@ -162,12 +162,23 @@ class Parser {
 				if (attrs[CARD_KEY] || attrs[READY_CARD_KEY]) {
 					name = 'card';
 					const value = attrs[CARD_VALUE_KEY];
+
+					const oldAttrs = { ...attrs };
 					attrs = {
 						type: attrs[CARD_TYPE_KEY],
 						name: (
 							attrs[CARD_KEY] || attrs[READY_CARD_KEY]
 						).toLowerCase(),
 					};
+					//其它 data 属性
+					Object.keys(oldAttrs).forEach(attrName => {
+						if (
+							attrName.indexOf('data-') === 0 &&
+							attrName.indexOf('data-card') !== 0
+						) {
+							attrs[attrName] = oldAttrs[attrName];
+						}
+					});
 
 					if (value !== undefined) {
 						attrs.value = value;
@@ -215,7 +226,7 @@ class Parser {
 			} else if (child.isText()) {
 				let text = child[0].nodeValue ? escape(child[0].nodeValue) : '';
 				// 为了简化 DOM 操作复杂度，删除 block 两边的空白字符，不影响渲染展示
-				if (text === '' && this.editor.node.isBlock(child.parent()!)) {
+				if (text === '' && nodeApi.isBlock(child.parent()!)) {
 					if (!child.prev()) {
 						text = text.replace(/^[ \n]+/, '');
 					}
@@ -230,9 +241,9 @@ class Parser {
 				const childNext = child.next();
 				if (
 					childPrev &&
-					this.editor.node.isBlock(childPrev) &&
+					nodeApi.isBlock(childPrev) &&
 					childNext &&
-					this.editor.node.isBlock(childNext) &&
+					nodeApi.isBlock(childNext) &&
 					text.trim() === ''
 				) {
 					text = text.trim();
@@ -260,13 +271,15 @@ class Parser {
 		customTags: boolean = false,
 	) {
 		const result: Array<string> = [];
+		const { $ } = this.editor;
+		const nodeApi = this.editor.node;
 		this.editor.trigger('paser:value-before', this.root);
 		this.walkTree(this.root, conversionRules, {
 			onOpen: (child, name, attrs, styles) => {
 				if (schema && attrs[DATA_ELEMENT] !== EDITABLE) {
 					let node = child;
 					if (child.name !== name) {
-						node = this.editor.$(`<${name} />`);
+						node = $(`<${name} />`);
 						node.attributes(attrs);
 						node.css(styles);
 					}
@@ -275,7 +288,15 @@ class Parser {
 					schema.filterAttributes(name, attrs, type);
 					schema.filterStyles(name, styles, type);
 				}
-				if (this.editor.trigger('paser:value', child, result) === false)
+				if (
+					this.editor.trigger(
+						'paser:value',
+						child,
+						attrs,
+						styles,
+						result,
+					) === false
+				)
 					return false;
 
 				result.push('<');
@@ -294,9 +315,7 @@ class Parser {
 					}
 				}
 
-				if (
-					this.editor.node.isVoid(name, schema ? schema : undefined)
-				) {
+				if (nodeApi.isVoid(name, schema ? schema : undefined)) {
 					result.push(' />');
 				} else {
 					result.push('>');
@@ -316,12 +335,11 @@ class Parser {
 				result.push(text);
 			},
 			onClose: (child, name, attrs, styles) => {
-				if (this.editor.node.isVoid(name, schema ? schema : undefined))
-					return;
+				if (nodeApi.isVoid(name, schema ? schema : undefined)) return;
 				if (schema) {
 					let node = child;
 					if (child.name !== name) {
-						node = this.editor.$(`<${name} />`);
+						node = $(`<${name} />`);
 						node.attributes(attrs);
 						node.css(styles);
 					}

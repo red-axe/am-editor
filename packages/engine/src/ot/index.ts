@@ -118,6 +118,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		if (this.doc!['mode'] !== 'lock') {
 			this.updateRangeColoringPosition();
 		}
+		this.engine.trigger('ops', ops);
 	}
 
 	submitOps(ops: Op[]) {

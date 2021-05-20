@@ -11,7 +11,7 @@ import {
 	ROOT_SELECTOR,
 } from './constants';
 import { EditorInterface, NodeInterface, RangeInterface } from './types';
-import { isEdge, isSafari, removeZeroWidthSpace } from './utils';
+import { isEdge, isSafari } from './utils';
 import { SelectionInterface } from './types/selection';
 
 class Selection implements SelectionInterface {
@@ -114,11 +114,12 @@ class Selection implements SelectionInterface {
 		if (!this.focus || !this.anchor) {
 			return;
 		}
+		const { node } = this.editor;
 		if (this.anchor === this.focus) {
 			const cursor = this.anchor;
 			const _parent = cursor.parent();
 			if (!_parent) return;
-			removeZeroWidthSpace(_parent);
+			_parent.removeZeroWidthSpace();
 			_parent[0].normalize();
 
 			let isCardCursor = false;
@@ -167,7 +168,7 @@ class Selection implements SelectionInterface {
 		// range start
 		let parent = this.anchor.parent();
 		if (parent) {
-			removeZeroWidthSpace(parent);
+			parent.removeZeroWidthSpace();
 			this.range.setStartBefore(this.anchor);
 			this.anchor.remove();
 			parent[0].normalize();
@@ -176,7 +177,7 @@ class Selection implements SelectionInterface {
 		// range end
 		parent = this.focus.parent();
 		if (parent) {
-			removeZeroWidthSpace(parent);
+			parent.removeZeroWidthSpace();
 			this.range.setEndBefore(this.focus);
 			this.focus.remove();
 			parent[0].normalize();
@@ -191,8 +192,9 @@ class Selection implements SelectionInterface {
 	getNode(
 		source: NodeInterface,
 		position: 'left' | 'center' | 'right' = 'center',
+		isClone: boolean = true,
 	) {
-		const node = source.clone(true);
+		const node = isClone ? source.clone(true) : source;
 		if (!this.focus || !this.anchor) {
 			return node;
 		}

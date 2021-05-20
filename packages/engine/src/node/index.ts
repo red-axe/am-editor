@@ -9,6 +9,8 @@ import {
 	PluginEntry,
 	SchemaInterface,
 	SchemaBlock,
+	RangeInterface,
+	isEngine,
 } from '../types';
 import {
 	ANCHOR,
@@ -20,7 +22,7 @@ import {
 	READY_CARD_KEY,
 	READY_CARD_SELECTOR,
 } from '../constants';
-import { getStyleMap, getWindow } from '../utils';
+import { getDocument, getStyleMap, getWindow } from '../utils';
 
 class NodeModel implements NodeModelInterface {
 	private editor: EditorInterface;
@@ -207,36 +209,47 @@ class NodeModel implements NodeModelInterface {
 	 * 包裹节点
 	 * @param source 需要包裹的节点
 	 * @param outer 包裹的外部节点
+	 * @param mergeSame 合并相同名称的节点样式和属性在同一个节点上
 	 */
-	wrap(source: NodeInterface | Node, outer: NodeInterface) {
-		const { $ } = this.editor;
+	wrap(
+		source: NodeInterface | Node,
+		outer: NodeInterface,
+		mergeSame: boolean = false,
+	) {
+		const { $, node, mark } = this.editor;
 		if (isNode(source)) source = $(source);
-		outer = this.editor.node.clone(outer, false);
+		outer = node.clone(outer, false);
 		// 文本节点
 		if (source.isText()) {
-			outer.append(this.editor.node.clone(source, false));
+			outer.append(node.clone(source, false));
 			return source.replaceWith(outer);
 		}
 
 		// 包裹样式节点
-		if (this.isMark(outer)) {
-			//合并样式
-			const outerClone = this.editor.node.clone(outer, false);
+		if (mergeSame && this.isMark(outer)) {
+			//合并属性和样式值
+			const outerClone = node.clone(outer, false);
 			if (source.name === outer.name) {
 				const attrs = source.attributes();
 				delete attrs.style;
 				Object.keys(attrs).forEach(key => {
 					if (!outer.attributes(key))
 						outer.attributes(key, attrs[key]);
+					else {
+						const attributes = outer.attributes(key).split(',');
+						if (attributes.indexOf(attrs[key]) < 0)
+							attributes.push(attrs[key]);
+						outer.attributes(key, attributes.join(','));
+					}
 				});
 
 				const styles = source.css();
 				Object.keys(styles).forEach(key => {
 					if (!outer.css(key)) outer.css(key, styles[key]);
 				});
-				outer.append(this.editor.node.clone(source, true).children());
+				outer.append(node.clone(source, true).children());
 			} else {
-				outer.append(this.editor.node.clone(source, true));
+				outer.append(node.clone(source, true));
 			}
 
 			const children = outer.allChildren();
@@ -245,7 +258,7 @@ class NodeModel implements NodeModelInterface {
 				if (
 					!child.isText() &&
 					this.isMark(child) &&
-					this.editor.mark.compare(child, outerClone)
+					mark.compare(child, outerClone)
 				) {
 					this.unwrap(child);
 				}
@@ -253,7 +266,7 @@ class NodeModel implements NodeModelInterface {
 			return source.replaceWith(outer);
 		}
 		// 其它情况
-		const shadowNode = this.editor.node.clone(source, false);
+		const shadowNode = node.clone(source, false);
 		source.after(shadowNode);
 		outer.append(source);
 		return shadowNode.replaceWith(outer);
@@ -275,7 +288,7 @@ class NodeModel implements NodeModelInterface {
 			source.append(target);
 			return;
 		}
-		const { $ } = this.editor;
+		const { $, node, block, mark } = this.editor;
 		let mergedNode = target;
 		const toIsList = ['ul', 'ol'].includes(source.name);
 		const fromIsList = ['ul', 'ol'].includes(target.name);
@@ -304,23 +317,20 @@ class NodeModel implements NodeModelInterface {
 		//被合并的节点最后一个子节点为br，则移除
 		const toNodeLast = source.last();
 		let child = target.first();
-		const plugins = this.editor.block.findPlugin(source);
+		const plugins = block.findPlugin(source);
 		//循环追加
 		while (child) {
 			const next = child.next();
 			plugins.forEach(plugin => {
-				const markPlugins = this.editor.mark.findPlugin(child!);
+				const markPlugin = mark.findPlugin(child!);
 				if (
+					markPlugin &&
 					plugin.disableMark &&
-					markPlugins.some(
-						markPlugin =>
-							plugin.disableMark!.indexOf(
-								(markPlugin.constructor as PluginEntry)
-									.pluginName,
-							) > -1,
-					)
+					plugin.disableMark!.indexOf(
+						(markPlugin.constructor as PluginEntry).pluginName,
+					) > -1
 				) {
-					this.editor.node.unwrap(child!);
+					node.unwrap(child!);
 				}
 			});
 			//追加到要合并的列表中
@@ -362,6 +372,71 @@ class NodeModel implements NodeModelInterface {
 		}
 
 		return source.replaceWith(clone);
+	}
+
+	/**
+	 * 光标位置插入文本
+	 * @param text 文本
+	 * @param range 光标
+	 */
+	insertText(text: string, range?: RangeInterface) {
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
+		const safeRange = range || change.getSafeRange();
+
+		const doc = getDocument(safeRange.startContainer);
+		// 范围为折叠状态时先删除内容
+		if (!safeRange.collapsed) {
+			change.deleteContent(range);
+		}
+		const node = doc.createTextNode(text);
+		this.insert(node, safeRange)?.addOrRemoveBr();
+		if (!range) change.apply(safeRange);
+		return safeRange;
+	}
+
+	/**
+	 * 在光标位置插入一个节点
+	 * @param node 节点
+	 * @param range 光标
+	 */
+	insert(node: Node | NodeInterface, range?: RangeInterface) {
+		if (isNodeEntry(node)) {
+			if (node.length === 0) throw 'Not found node';
+			node = node[0];
+		}
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
+		range = range || change.getRange();
+		const nodeApi = this.editor.node;
+		const {
+			startNode,
+			startOffset,
+		} = range.cloneRange().shrinkToTextNode();
+		const prev = startNode.prev();
+		const parent = startNode.parent();
+		let text = startNode.text() || '';
+		const leftText = text.substr(0, startOffset);
+		//文本节点
+		if (startNode.isText() && /\u200b$/.test(leftText)) {
+			//零宽字符前面还有其它字符。或者节点前面还有节点，不能是inline节点。或者前面没有节点了，并且父级不是inline节点
+			if (
+				text.length > 1 ||
+				(prev && !nodeApi.isInline(prev)) ||
+				(!prev && parent && !nodeApi.isInline(parent))
+			) {
+				startNode
+					.get<Text>()!
+					.splitText(text.length - 1)
+					.remove();
+			}
+		}
+
+		range.insertNode(node);
+		return range
+			.select(node, true)
+			.shrinkToElementNode()
+			.collapse(false);
 	}
 
 	/**
@@ -410,7 +485,9 @@ class NodeModel implements NodeModelInterface {
 	 * @param node 当前节点
 	 */
 	mergeAdjacent(node: NodeInterface) {
-		const topTags = this.editor.schema.getAllowInTags();
+		const { schema, list } = this.editor;
+		const nodeApi = this.editor.node;
+		const topTags = schema.getAllowInTags();
 		//获取第一个子节点
 		let childDom: NodeInterface | null = node.first();
 		//遍历全部子节点
@@ -423,9 +500,9 @@ class NodeModel implements NodeModelInterface {
 				childDom.name === nextNode.name &&
 				//并且上一个节点是可拥有block子节点的节点 或者是 ul、li 并且list列表类型是一致的
 				((topTags.indexOf(childDom.name) > -1 &&
-					!this.editor.node.isList(childDom)) ||
-					(this.editor.node.isList(childDom) &&
-						this.editor.list.isSame(childDom, nextNode)))
+					!nodeApi.isList(childDom)) ||
+					(nodeApi.isList(childDom) &&
+						list.isSame(childDom, nextNode)))
 			) {
 				//获取下一个节点的下一个节点
 				const nNextNode = nextNode.next();
@@ -476,7 +553,8 @@ class NodeModel implements NodeModelInterface {
 	 * @param root 根节点
 	 */
 	flatten(node: NodeInterface, root: NodeInterface = node) {
-		const { $ } = this.editor;
+		const { $, block } = this.editor;
+		const nodeApi = this.editor.node;
 		//第一个子节点
 		let childNode = node.first();
 		const rootElement = root.isFragment
@@ -484,19 +562,19 @@ class NodeModel implements NodeModelInterface {
 			: root.get();
 		const tempNode = node.isFragment
 			? $('<p />')
-			: this.editor.node.clone(node, false);
+			: nodeApi.clone(node, false);
 		while (childNode) {
 			//获取下一个兄弟节点
 			let nextNode = childNode.next();
 			//如果当前子节点是块级的Card组件或者是表格，或者是简单的block
 			if (childNode.isBlockCard() || this.isSimpleBlock(childNode)) {
-				this.editor.block.flatten(childNode, $(rootElement || []));
+				block.flatten(childNode, $(rootElement || []));
 			}
 			//如果当前是块级标签，递归循环
 			else if (this.isBlock(childNode)) {
 				this.flatten(childNode, $(rootElement || []));
 			} else {
-				const cloneNode = this.editor.node.clone(tempNode, false);
+				const cloneNode = nodeApi.clone(tempNode, false);
 				const isLI = 'li' === cloneNode.name;
 				childNode.before(cloneNode);
 				while (childNode) {
@@ -507,7 +585,7 @@ class NodeModel implements NodeModelInterface {
 					childNode = nextNode;
 				}
 				this.removeSide(cloneNode);
-				this.editor.block.flatten(cloneNode, $(rootElement || []));
+				block.flatten(cloneNode, $(rootElement || []));
 			}
 			childNode = nextNode;
 		}
@@ -523,44 +601,6 @@ class NodeModel implements NodeModelInterface {
 	normalize(node: NodeInterface) {
 		this.flatten(node);
 		this.mergeAdjacent(node);
-	}
-	/**
-	 * 修复节点两侧零宽字符占位
-	 * @param node 节点
-	 */
-	repairBoth(node: NodeInterface | Node) {
-		const { $ } = this.editor;
-		if (isNode(node)) node = $(node);
-		if (node.parent() && !this.isVoid(node)) {
-			const zeroNode = $('\u200b', null);
-			const prev = node.prev();
-			const prevText = prev?.text() || '';
-			if (!prev || !/\u200B$/g.test(prevText)) {
-				if (prev && prev.isText()) {
-					prev.text(prevText + '\u200b');
-				} else {
-					node.before(this.editor.node.clone(zeroNode, true));
-				}
-			} else if (
-				prev &&
-				prev.isText() &&
-				/\u200B\u200B$/g.test(prevText)
-			) {
-				prev.text(prevText.substr(0, prevText.length - 1));
-			}
-
-			const next = node.next();
-			if (!next || (next && !/^\u200B/g.test(next.text()))) {
-				if (next && next.isText()) {
-					next.text('\u200b' + next.text());
-				} else {
-					node.after(this.editor.node.clone(zeroNode, true));
-					if (next?.name === 'br') {
-						next.remove();
-					}
-				}
-			}
-		}
 	}
 
 	/**
@@ -591,16 +631,17 @@ class NodeModel implements NodeModelInterface {
 	 * @return 复制后的元素节点
 	 */
 	clone(node: NodeInterface, deep?: boolean): NodeInterface {
+		const { $, block } = this.editor;
 		const nodes: Array<Node> = [];
 		node.each(node => {
 			const cloneNode = node.cloneNode(deep);
-			this.editor.block.generateRandomIDForDescendant(cloneNode, true);
-			if (this.editor.block.needMarkDataID(cloneNode.nodeName)) {
-				this.editor.block.generateRandomID(cloneNode as Element, true);
+			block.generateRandomIDForDescendant(cloneNode, true);
+			if (block.needMarkDataID(cloneNode.nodeName)) {
+				block.generateRandomID(cloneNode as Element, true);
 			}
 			nodes.push(cloneNode);
 		});
-		return this.editor.$(nodes);
+		return $(nodes);
 	}
 
 	/**

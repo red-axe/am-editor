@@ -1,8 +1,7 @@
 import tinycolor2 from 'tinycolor2';
 import { removeUnit, escape } from '../utils';
-import TinyCanvas from './tiny-canvas';
+import { TinyCanvas } from '../utils';
 import { Tooltip } from '../toolbar';
-import { fromPath } from './utils';
 import { EngineInterface } from '../types/engine';
 import { RangeInterface, isRangeInterface } from '../types/range';
 import { NodeInterface } from '../types/node';
@@ -640,7 +639,7 @@ class RangeColoring implements RangeColoringInterface {
 			const member = members.find(m => m.uuid === uuid);
 			if (member && (idDraw || active)) {
 				if (path.length !== 0) {
-					const range = fromPath(engine, engine.container, path);
+					const range = Range.fromPath(engine, path);
 					this.drawRange(range, member);
 				} else {
 					info[uuid] = true;

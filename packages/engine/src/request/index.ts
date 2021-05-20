@@ -1,5 +1,4 @@
 import {
-	EditorInterface,
 	RequestInterface,
 	AjaxOptions,
 	UploaderOptions,
@@ -9,12 +8,6 @@ import Ajax from './ajax';
 import Uploader, { getExtensionName } from './uploader';
 
 class Request implements RequestInterface {
-	private editor: EditorInterface;
-
-	constructor(editor: EditorInterface) {
-		this.editor = editor;
-	}
-
 	ajax(options: AjaxOptions | string) {
 		return new Ajax(options);
 	}
@@ -27,43 +20,48 @@ class Request implements RequestInterface {
 		let { event, accept, multiple } = options || {};
 		accept = accept || '*';
 		multiple = typeof multiple === undefined ? 100 : multiple;
-		const { $ } = this.editor;
-		const input = $(
-			`<input type="file" accept="${accept}" style="display:none" ${
-				multiple !== false ? "multiple='multiple'" : ''
-			} />`,
-		);
-		const element = input.get<HTMLInputElement>()!;
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = accept;
+		input.style.display = 'none';
+		input.multiple = multiple !== false;
 
 		const remove = () => {
 			input.remove();
 			document.removeEventListener('mousedown', remove);
 		};
+
 		return new Promise<Array<File>>(resolve => {
-			input.on('change', () => {
+			const change = () => {
 				const files = [];
-				for (let i = 0; i < (element.files?.length || 0); i++) {
+				for (let i = 0; i < (input.files?.length || 0); i++) {
 					if (typeof multiple === 'number' && i > multiple) break;
 
-					files.push(element.files![i]);
+					files.push(input.files![i]);
 				}
+				input.removeEventListener('change', change);
 				remove();
 				resolve(files);
-			});
-			$(document.body).append(input);
+			};
+
+			input.addEventListener('change', change);
+
+			document.body.appendChild(input);
 			if (!event) {
 				event = document.createEvent('MouseEvents');
 				event.initEvent('click', true, true);
 			}
 			try {
-				if (!!element.dispatchEvent) {
-					element.dispatchEvent(event);
-				} else if (!!element['fireEvent']) {
-					element['fireEvent'](event);
+				if (!!input.dispatchEvent) {
+					input.dispatchEvent(event);
+				} else if (!!input['fireEvent']) {
+					input['fireEvent'](event);
 				} else throw '';
 
 				document.addEventListener('mousedown', remove);
 			} catch (error) {
+				input.removeEventListener('change', change);
+				remove();
 				resolve([]);
 			}
 		});

@@ -24,6 +24,7 @@ import { InlineModelInterface } from './inline';
 import { BlockModelInterface } from './block';
 import { RequestInterface } from './request';
 import { RangeInterface } from './range';
+import { Op } from 'sharedb';
 
 export interface ContainerInterface {
 	/**
@@ -77,6 +78,10 @@ export interface EditorInterface {
 	 * 编辑器根节点，默认为编辑器父节点
 	 */
 	root: NodeInterface;
+	/**
+	 * 编辑器命令
+	 */
+	command: CommandInterface;
 	/**
 	 * 卡片
 	 */
@@ -173,11 +178,18 @@ export interface EditorInterface {
 	/**
 	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
 	 * @param node 当前遍历的节点
+	 * @param attrs 当前节点已过滤后的属性
+	 * @param styles 当前节点已过滤后的样式
 	 * @param value 当前已经生成的xml代码
 	 */
 	on(
 		eventType: 'paser:value',
-		listener: (node: NodeInterface, value: Array<string>) => boolean | void,
+		listener: (
+			node: NodeInterface,
+			attrs: { [key: string]: string },
+			styles: { [key: string]: string },
+			value: Array<string>,
+		) => boolean | void,
 		rewrite?: boolean,
 	): void;
 	/**
@@ -269,11 +281,18 @@ export interface EditorInterface {
 	/**
 	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
 	 * @param node 当前遍历的节点
+	 * @param attrs 当前节点已过滤后的属性
+	 * @param styles 当前节点已过滤后的样式
 	 * @param value 当前已经生成的xml代码
 	 */
 	off(
 		eventType: 'paser:value',
-		listener: (node: NodeInterface, value: Array<string>) => boolean | void,
+		listener: (
+			node: NodeInterface,
+			attrs: { [key: string]: string },
+			styles: { [key: string]: string },
+			value: Array<string>,
+		) => boolean | void,
 	): void;
 	/**
 	 * 解析DOM节点，生成符合标准的 XML。生成xml代码结束后触发
@@ -341,11 +360,15 @@ export interface EditorInterface {
 	/**
 	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
 	 * @param node 当前遍历的节点
+	 * @param attrs 当前节点已过滤后的属性
+	 * @param styles 当前节点已过滤后的样式
 	 * @param value 当前已经生成的xml代码
 	 */
 	trigger(
 		eventType: 'paser:value',
 		node: NodeInterface,
+		attrs: { [key: string]: string },
+		styles: { [key: string]: string },
 		value: Array<string>,
 	): boolean | void;
 	/**
@@ -420,11 +443,6 @@ export interface EngineInterface extends EditorInterface {
 	 * 编辑器更改
 	 */
 	change: ChangeInterface;
-
-	/**
-	 * 编辑器命令
-	 */
-	command: CommandInterface;
 	/**
 	 * 按键处理
 	 */
@@ -465,7 +483,7 @@ export interface EngineInterface extends EditorInterface {
 	 * 比如插件上传等待中，将等待上传完成后再获取值
 	 * @param ignoreCursor 是否包含光标位置信息
 	 */
-	getValueAsync(ignoreCursor: boolean): Promise<string>;
+	getValueAsync(ignoreCursor?: boolean): Promise<string>;
 	/**
 	 * 获取编辑器的html
 	 */
@@ -532,11 +550,18 @@ export interface EngineInterface extends EditorInterface {
 	/**
 	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
 	 * @param node 当前遍历的节点
+	 * @param attrs 当前节点已过滤后的属性
+	 * @param styles 当前节点已过滤后的样式
 	 * @param value 当前已经生成的xml代码
 	 */
 	on(
 		eventType: 'paser:value',
-		listener: (node: NodeInterface, value: Array<string>) => boolean | void,
+		listener: (
+			node: NodeInterface,
+			attrs: { [key: string]: string },
+			styles: { [key: string]: string },
+			value: Array<string>,
+		) => boolean | void,
 		rewrite?: boolean,
 	): void;
 	/**
@@ -656,6 +681,16 @@ export interface EngineInterface extends EditorInterface {
 		rewrite?: boolean,
 	): void;
 	/**
+	 * DOM改变触发
+	 * @param eventType
+	 * @param ops
+	 */
+	on(
+		eventType: 'ops',
+		listener: (ops: Op[]) => void,
+		rewrite?: boolean,
+	): void;
+	/**
 	 * 移除绑定事件
 	 * @param eventType 事件类型
 	 * @param listener 事件回调
@@ -699,11 +734,18 @@ export interface EngineInterface extends EditorInterface {
 	/**
 	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
 	 * @param node 当前遍历的节点
+	 * @param attrs 当前节点已过滤后的属性
+	 * @param styles 当前节点已过滤后的样式
 	 * @param value 当前已经生成的xml代码
 	 */
 	off(
 		eventType: 'paser:value',
-		listener: (node: NodeInterface, value: Array<string>) => boolean | void,
+		listener: (
+			node: NodeInterface,
+			attrs: { [key: string]: string },
+			styles: { [key: string]: string },
+			value: Array<string>,
+		) => boolean | void,
 	): void;
 	/**
 	 * 解析DOM节点，生成符合标准的 XML。生成xml代码结束后触发
@@ -801,6 +843,12 @@ export interface EngineInterface extends EditorInterface {
 	 */
 	off(eventType: 'copy', listener: (root: NodeInterface) => void): void;
 	/**
+	 * DOM改变触发
+	 * @param eventType
+	 * @param ops
+	 */
+	off(eventType: 'ops', listener: (ops: Op[]) => void): void;
+	/**
 	 * 触发事件
 	 * @param eventType 事件名称
 	 * @param args 触发参数
@@ -832,11 +880,15 @@ export interface EngineInterface extends EditorInterface {
 	/**
 	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
 	 * @param node 当前遍历的节点
+	 * @param attrs 当前节点已过滤后的属性
+	 * @param styles 当前节点已过滤后的样式
 	 * @param value 当前已经生成的xml代码
 	 */
 	trigger(
 		eventType: 'paser:value',
 		node: NodeInterface,
+		attrs: { [key: string]: string },
+		styles: { [key: string]: string },
 		value: Array<string>,
 	): boolean | void;
 	/**
@@ -908,6 +960,12 @@ export interface EngineInterface extends EditorInterface {
 	 * @param node 当前遍历的子节点
 	 */
 	trigger(eventType: 'copy', root: NodeInterface): void;
+	/**
+	 * DOM改变触发
+	 * @param eventType
+	 * @param ops
+	 */
+	trigger(eventType: 'ops', ops: Op[]): void;
 	/**
 	 * 回车键按下，返回false，终止处理其它监听
 	 * @param eventType

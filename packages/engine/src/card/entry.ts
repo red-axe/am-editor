@@ -139,15 +139,16 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	 * @param selector
 	 */
 	find(selector: string) {
+		const { card, $ } = this.editor;
 		const nodes = this.root.find(selector);
 		const children: Array<Node> = [];
 		nodes.each(item => {
-			const card = this.editor.card.find(item);
-			if (card && card.root.equal(this.root)) {
+			const cardComponent = card.find(item);
+			if (cardComponent && cardComponent.root.equal(this.root)) {
 				children.push(item);
 			}
 		});
-		return this.editor.$(children);
+		return $(children);
 	}
 
 	findByKey(key: string) {

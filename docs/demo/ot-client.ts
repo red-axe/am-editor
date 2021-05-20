@@ -131,8 +131,8 @@ class OTClient extends EventEmitter {
 					this.load(documentID, collectionName);
 				}
 				if ('broadcast' === action) {
-					const { body, type } = data;
-					if (body.user.uuid !== this.current?.uuid) {
+					const { sender, body, type } = data;
+					if (sender.uuid !== this.current?.uuid) {
 						this.emit(EVENT.message, {
 							type,
 							body,
@@ -222,6 +222,19 @@ class OTClient extends EventEmitter {
 		this.transmit(STATUS.init);
 	}
 
+	broadcast(type: string, body: any) {
+		this.socket?.send(
+			JSON.stringify({
+				action: 'broadcast',
+				data: {
+					type,
+					body,
+					sender: this.current,
+				},
+			}),
+		);
+	}
+
 	addMembers(member: Array<Member>) {
 		member.forEach(member => {
 			if (!this.members.find(m => member.id === m.id))
@@ -291,6 +304,8 @@ class OTClient extends EventEmitter {
 					ERROR_CODE.STATUS_CODE.FORCE_DISCONNECTED,
 					'FORCE_DISCONNECTED',
 				);
+				if (this.heartbeat?.timeout)
+					clearTimeout(this.heartbeat!.timeout);
 			} catch (e) {
 				console.log(e);
 			}

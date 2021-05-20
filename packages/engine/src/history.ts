@@ -4,7 +4,6 @@ import OTJSON from 'ot-json0';
 import { Operation } from './types/ot';
 import { random } from './utils';
 import {
-	getRangePath,
 	isCursorOp,
 	isReverseOp,
 	transformOp,
@@ -20,7 +19,9 @@ class HistoryModel implements HistoryInterface {
 	private currentAction: Operation = {};
 	private currentActionIndex: number = 0;
 	private holded: boolean = false;
+	private locked: boolean = false;
 	private holdTimer?: NodeJS.Timeout;
+	private lockTimer?: NodeJS.Timeout;
 
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
@@ -110,15 +111,31 @@ class HistoryModel implements HistoryInterface {
 			}
 		}
 	}
-
+	/**
+	 * 多少毫秒内的动作保持为一个历史片段
+	 * @param time 毫秒
+	 */
 	hold(time: number = 10) {
 		this.holded = true;
 		if (this.holdTimer) clearTimeout(this.holdTimer);
-		this.holdTimer = setTimeout(() => this.release(), time);
+		this.holdTimer = setTimeout(() => this.releaseHold(), time);
+	}
+	/**
+	 * 多少毫秒内的动作将不作为历史记录
+	 * @param time 默认10毫秒
+	 */
+	lock(time: number = 10) {
+		this.locked = true;
+		if (this.lockTimer) clearTimeout(this.lockTimer);
+		this.lockTimer = setTimeout(() => this.releaseLock(), time);
 	}
 
-	release() {
+	releaseHold() {
 		this.holded = false;
+	}
+
+	releaseLock() {
+		this.locked = false;
 	}
 
 	clear() {
@@ -147,6 +164,7 @@ class HistoryModel implements HistoryInterface {
 
 	saveOp() {
 		if (
+			!this.locked &&
 			this.currentAction &&
 			this.currentAction.ops &&
 			this.currentAction.ops.length > 0
@@ -165,6 +183,7 @@ class HistoryModel implements HistoryInterface {
 	}
 
 	collectSelfOps(ops: Op[]) {
+		if (this.locked) return;
 		if (!this.currentAction?.self) this.saveOp();
 		let isSave = false;
 		ops.forEach(op => {
@@ -282,10 +301,11 @@ class HistoryModel implements HistoryInterface {
 	}
 
 	getCurrentRangePath() {
-		const currentPath = this.engine.ot.selectionData.currentRangePath;
+		const { ot, change } = this.engine;
+		const currentPath = ot.selectionData.currentRangePath;
 		return currentPath.length !== 0
 			? currentPath
-			: getRangePath(this.engine.change.getRange());
+			: change.getRange().toPath();
 	}
 
 	getRangePathBeforeCommand() {

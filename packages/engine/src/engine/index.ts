@@ -125,7 +125,7 @@ class Engine implements EngineInterface {
 		this.history = new History(this);
 		this.card = new CardModel(this);
 		this.clipboard = new Clipboard(this);
-		this.request = new Request(this);
+		this.request = new Request();
 		this.plugin = new Plugin(this);
 		this.node = new NodeModel(this);
 		this.list = new List(this);
@@ -148,10 +148,10 @@ class Engine implements EngineInterface {
 			onSetValue: () => this.trigger('afterSetValue'),
 		});
 		this.typing = new Typing(this);
-		this.list.init();
-		this.block.init();
 		this.mark.init();
 		this.inline.init();
+		this.list.init();
+		this.block.init();
 		this.hotkey = new Hotkey(this);
 		this.scrollNode = this.options.scrollNode
 			? this.$(this.options.scrollNode)

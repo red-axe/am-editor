@@ -88,7 +88,7 @@ export default class extends InlinePlugin<Options> {
 		if (!isEngine(this.editor) || !this.markdown) return;
 		const match = new RegExp(this.markdown).exec(text);
 		if (match) {
-			const { change, $ } = this.editor;
+			const { command, $ } = this.editor;
 			event.preventDefault();
 			const text = match[1];
 			const url = match[2];
@@ -98,13 +98,13 @@ export default class extends InlinePlugin<Options> {
 				.splitText(node.text().length - match[0].length);
 			markdownTextNode.splitText(match[0].length);
 			$(markdownTextNode).remove();
-			this.editor.command.execute(
+			command.execute(
 				(this.constructor as PluginEntry).pluginName,
 				'_blank',
 				url,
 				text,
 			);
-			change.insertText('\xA0');
+			this.editor.node.insertText('\xA0');
 			return false;
 		}
 		return;

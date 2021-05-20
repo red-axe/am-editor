@@ -42,13 +42,13 @@ export type SchemaRule = {
 };
 
 export type SchemaBlock = SchemaRule & {
+	type: 'block';
 	allowIn?: Array<string>;
-	disableMark?: Array<string>;
 	canMerge?: boolean;
 };
 
 export type SchemaMark = SchemaRule & {
-	copyOnEnter?: boolean;
+	type: 'mark';
 };
 
 export interface SchemaInterface {

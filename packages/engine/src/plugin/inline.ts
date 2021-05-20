@@ -26,14 +26,14 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 		}
 	}
 
-	execute() {
+	execute(...args: any) {
 		if (!isEngine(this.editor)) return;
 		const inlineNode = this.editor.$(`<${this.tagName} />`);
-		this.setStyle(inlineNode, ...arguments);
-		this.setAttributes(inlineNode, ...arguments);
+		this.setStyle(inlineNode, ...args);
+		this.setAttributes(inlineNode, ...args);
 		const { inline } = this.editor;
 		const trigger = this.isTrigger
-			? this.isTrigger(...arguments)
+			? this.isTrigger(...args)
 			: !this.queryState();
 		if (trigger) {
 			inline.wrap(inlineNode);
@@ -109,7 +109,7 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 				range.setEnd(inlineNext, 1);
 			}
 			change.select(range);
-			change.insertText('\xa0');
+			this.editor.node.insertText('\xa0');
 			return false;
 		}
 		return;
@@ -120,7 +120,7 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 		if (!node.isText()) return;
 		const parent = node.parent();
 		if (!parent) return;
-
+		const { $, inline, trigger } = this.editor;
 		let textNode = node.get<Text>()!;
 		if (!textNode.textContent) return;
 		const inlines: Array<NodeInterface> = [];
@@ -138,22 +138,22 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 			//移除匹配到的字符
 			regNode.remove();
 			//获取中间字符
-			const inlineNode = this.editor.$(
+			const inlineNode = $(
 				`<${this.tagName}>${match[2]}</${this.tagName}>`,
 			);
 			inlines.push(inlineNode);
 			//追加node
 			node.after(inlineNode);
-			this.editor.inline.repairCursor(inlineNode);
+			inline.repairCursor(inlineNode);
 		}
 		if (match && textNode.textContent && textNode.textContent !== '') {
 			node.after(textNode);
-			this.editor.trigger('paste:each', textNode);
+			trigger('paste:each', textNode);
 		}
 		//如果有解析到节点，就再次触发事件，可能节点内还有markdown字符没有解析
 		inlines.forEach(inline => {
 			const child = inline.first();
-			if (child?.isText()) this.editor.trigger('paste:each', child);
+			if (child?.isText()) trigger('paste:each', child);
 		});
 	}
 }

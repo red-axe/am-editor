@@ -345,18 +345,18 @@ class NodeEntry implements NodeInterface {
 	/**
 	 * 返回元素节点所在根节点路径，默认根节点为 document.body
 	 * @param {Node} context 根节点，默认为 document.body
-	 * @return {string} 路径
+	 * @return {number} 路径
 	 */
-	getPath(context: Node): Array<string> {
+	getPath(context?: Node | NodeInterface): Array<number> {
 		context = context || document.body;
-		const path: Array<string> = [];
+		const path: Array<number> = [];
 		if (this.length > 0) {
-			path.push(this.name!);
-			let parent = this.parent();
-			while (parent && !this.equal(context) && !parent.equal(context)) {
-				path.push(parent.name!);
-				parent = parent.parent();
-			}
+			path.unshift(this.offset());
+		}
+		let parent = this.parent();
+		while (parent && !parent.equal(context)) {
+			path.unshift(parent.offset());
+			parent = parent.parent();
 		}
 		return path;
 	}
@@ -518,19 +518,12 @@ class NodeEntry implements NodeInterface {
 	 *  left
 	 * }
 	 */
-	offset(): { [k: string]: number } | undefined {
-		if (this.length === 0) return undefined;
-		try {
-			const element = this.get<Element>()!;
-			const rect = element.getBoundingClientRect();
-			return {
-				top: rect.top,
-				left: rect.left,
-			};
-		} catch (error) {
-			console.error(error);
-			return undefined;
-		}
+	offset(): number {
+		if (this.length === 0) return -1;
+		const parent = this.parent();
+		if (!parent) return -1;
+		const children = parent.get()!.childNodes;
+		return Array.from(children).indexOf(this.get<ChildNode>()!);
 	}
 
 	/**
@@ -1076,6 +1069,56 @@ class NodeEntry implements NodeInterface {
 			}
 			if (viewElement) viewElement.parentNode?.removeChild(viewElement);
 		}
+	}
+
+	removeZeroWidthSpace() {
+		const nodeApi = this.editor.node;
+		this.traverse(child => {
+			const node = child[0];
+			if (node.nodeType !== getWindow().Node.TEXT_NODE) {
+				return;
+			}
+			const text = node.nodeValue;
+			if (text?.length !== 2) {
+				return;
+			}
+			const next = node.nextSibling;
+			const prev = node.previousSibling;
+			if (
+				text.charCodeAt(1) === 0x200b &&
+				next &&
+				next.nodeType === getWindow().Node.ELEMENT_NODE &&
+				[ANCHOR, FOCUS, CURSOR].indexOf(
+					(<Element>next).getAttribute(DATA_ELEMENT) || '',
+				) >= 0
+			) {
+				return;
+			}
+
+			const parent = child.parent();
+
+			if (
+				text.charCodeAt(1) === 0x200b &&
+				((!next && parent && nodeApi.isInline(parent)) ||
+					(next && nodeApi.isInline(next)))
+			) {
+				return;
+			}
+
+			if (
+				text.charCodeAt(0) === 0x200b &&
+				((!prev && parent && nodeApi.isInline(parent)) ||
+					(prev && nodeApi.isInline(prev)))
+			) {
+				return;
+			}
+
+			if (text.charCodeAt(0) === 0x200b) {
+				const newNode = (<Text>node).splitText(1);
+				if (newNode.previousSibling)
+					newNode.parentNode?.removeChild(newNode.previousSibling);
+			}
+		});
 	}
 }
 export default NodeEntry;

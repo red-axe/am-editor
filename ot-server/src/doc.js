@@ -61,11 +61,6 @@ class Doc {
 		}
 	}
 
-	removeMember(uuid) {
-		const member = this.members.find(member => member.uuid === uuid);
-		if (member && this.sockets[uuid]) this.sockets[uuid].close();
-	}
-
 	addMember(ws, member) {
 		this.indexCount++;
 		// 设置用户序号
@@ -101,7 +96,7 @@ class Doc {
 					if (!!action) {
 						//广播消息
 						if (action === 'broadcast') {
-							this.broadcast('broadcast', data.data);
+							this.broadcast('broadcast', data);
 						}
 						//心跳检测
 						else if (action === 'heartbeat') {
@@ -114,7 +109,11 @@ class Doc {
 						return;
 					}
 					// sharedb消息
-					next();
+					try {
+						next();
+					} catch (error) {
+						console.error(error);
+					}
 				},
 			);
 		} catch (error) {

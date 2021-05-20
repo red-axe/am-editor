@@ -47,8 +47,50 @@ class Backspace {
 								?.length || 0) <= 1 &&
 							1 === commonAncestorContainer.textContent?.length
 						) {
-							range.select(commonAncestorContainer, true);
+							const { startNode, startOffset } = range;
+							let markNode = startNode.parent();
+							//开始节点在mark标签内
+							if (
+								markNode &&
+								node.isMark(markNode) &&
+								startOffset > 0
+							) {
+								const text = startNode.text();
+								const leftText = text.substr(
+									startOffset - 1,
+									1,
+								);
+								//不位于零宽字符后，不处理
+								if (/^\u200b$/.test(leftText)) {
+									//选中上一个节点
+									if (startOffset === 1) {
+										const prev = markNode.prev();
+										if (prev && !node.isEmpty(prev)) {
+											const {
+												startNode,
+												startOffset,
+											} = range
+												.cloneRange()
+												.select(prev, true)
+												.shrinkToTextNode()
+												.collapse(false);
+											range.setStart(
+												startNode,
+												startOffset - 1,
+											);
+										}
+									} else {
+										range.setStart(
+											startNode,
+											startOffset - 1,
+										);
+									}
+								}
+							}
+							if (range.collapsed)
+								range.select(commonAncestorContainer, true);
 							change.deleteContent(range, true);
+							change.apply(range);
 							return true;
 						}
 					}

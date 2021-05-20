@@ -101,6 +101,7 @@ class List implements ListModelInterface {
 		name: 'ul' | 'ol' = 'ul',
 		card?: string,
 	) {
+		const { node } = this.editor;
 		let isSame = true;
 		blocks.forEach(block => {
 			//如果节点内包含了列表节点，则跳过此节点
@@ -116,11 +117,11 @@ class List implements ListModelInterface {
 					if (card) {
 						isSame =
 							isSame &&
-							this.editor.node.isCustomize(block) &&
+							node.isCustomize(block) &&
 							(block.first()?.attributes(CARD_KEY) || '') ===
 								card;
 					} else {
-						isSame = isSame && !this.editor.node.isCustomize(block);
+						isSame = isSame && !node.isCustomize(block);
 					}
 					break;
 				case 'p':
@@ -239,20 +240,21 @@ class List implements ListModelInterface {
 	 */
 	unwrap(blocks: Array<NodeInterface>) {
 		let indent = 0;
-		const normalBlock = this.editor.$('<p />');
+		const { node, $ } = this.editor;
+		const normalBlock = $('<p />');
 		blocks.forEach(block => {
 			this.unwrapCustomize(block);
-			if (this.editor.node.isList(block)) {
+			if (node.isList(block)) {
 				indent = parseInt(block.attributes(this.INDENT_KEY), 10) || 0;
-				this.editor.node.unwrap(block);
+				node.unwrap(block);
 			}
 
 			if (block.name === 'li') {
-				const toBlock = this.editor.node.clone(normalBlock, false);
+				const toBlock = node.clone(normalBlock, false);
 				if (indent !== 0) {
 					toBlock.css('padding-left', indent * 2 + 'em');
 				}
-				this.editor.node.replace(block, toBlock);
+				node.replace(block, toBlock);
 			}
 		});
 	}
@@ -262,8 +264,9 @@ class List implements ListModelInterface {
 	 */
 	normalize() {
 		if (!isEngine(this.editor)) return [];
-		const range = this.editor.change.getRange();
-		const blocks = this.editor.block.getBlocks(range);
+		const { $, change, block, node } = this.editor;
+		const range = change.getRange();
+		const blocks = block.getBlocks(range);
 		const listNodes: Array<NodeInterface> = [];
 		blocks.forEach((block, i) => {
 			const parent = block.parent();
@@ -275,15 +278,12 @@ class List implements ListModelInterface {
 						listNodes.push(parent);
 					}
 					//去除包裹
-					this.editor.node.unwrap(block);
+					node.unwrap(block);
 					return;
 				}
 				// <ul><p>a</p></ul> => <ul><li>a</li></ul>
 				if (parent && ['ul', 'ol'].indexOf(parent.name) > -1) {
-					block = this.editor.node.replace(
-						block,
-						this.editor.$('<li />'),
-					);
+					block = node.replace(block, $('<li />'));
 					listNodes.push(block);
 					return;
 				}
@@ -295,14 +295,14 @@ class List implements ListModelInterface {
 					listNodes.push(parent);
 				}
 
-				this.editor.node.unwrap(block);
+				node.unwrap(block);
 				return;
 			}
 
 			if (['ul', 'ol'].indexOf(block.name) > -1) {
 				// <li><ul>...</ul></li> => <li>...</li>
 				if (parent?.name === 'li') {
-					this.editor.node.unwrap(block);
+					node.unwrap(block);
 					return;
 				}
 			}
@@ -327,7 +327,7 @@ class List implements ListModelInterface {
 	 */
 	split() {
 		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const { change, node } = this.editor;
 		const range = change.getSafeRange();
 		const blocks = this.normalize();
 		if (
@@ -370,10 +370,7 @@ class List implements ListModelInterface {
 			let afterListElementClone: NodeInterface | undefined;
 
 			if (rightList.length > 0 && afterListElement) {
-				afterListElementClone = this.editor.node.clone(
-					afterListElement,
-					false,
-				);
+				afterListElementClone = node.clone(afterListElement, false);
 				rightList.forEach(li => {
 					afterListElementClone?.append(li[0]);
 				});
@@ -383,10 +380,7 @@ class List implements ListModelInterface {
 			let beforeListElementClone: NodeInterface | undefined;
 			//将 middleList 集合添加到前方列表节点内
 			if (middleList.length > 0 && beforeListElement) {
-				beforeListElementClone = this.editor.node.clone(
-					beforeListElement,
-					false,
-				);
+				beforeListElementClone = node.clone(beforeListElement, false);
 				middleList.forEach(li => {
 					beforeListElementClone?.append(li[0]);
 				});
@@ -411,12 +405,12 @@ class List implements ListModelInterface {
 
 	merge(blocks?: Array<NodeInterface>, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { change, block } = this.editor;
+		const { change, block, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		blocks = blocks || block.getBlocks(safeRange);
 		blocks.forEach(block => {
 			block = block.closest('ul,ol');
-			if (!this.editor.node.isList(block)) {
+			if (!node.isList(block)) {
 				return;
 			}
 			const prevBlock = block.prev();
@@ -424,7 +418,7 @@ class List implements ListModelInterface {
 
 			if (prevBlock && this.isSame(prevBlock, block)) {
 				const selection = safeRange.createSelection();
-				this.editor.node.merge(prevBlock, block);
+				node.merge(prevBlock, block);
 				selection.move();
 				// 原来 block 已经被移除，重新指向
 				block = prevBlock;
@@ -432,7 +426,7 @@ class List implements ListModelInterface {
 
 			if (nextBlock && this.isSame(nextBlock, block)) {
 				const selection = safeRange.createSelection();
-				this.editor.node.merge(block, nextBlock);
+				node.merge(block, nextBlock);
 				selection.move();
 			}
 		});
@@ -449,13 +443,13 @@ class List implements ListModelInterface {
 	 */
 	addStart(block?: NodeInterface) {
 		if (!isEngine(this.editor)) return;
+		const { change, node } = this.editor;
 		if (!block) {
-			const { change } = this.editor;
 			const blocks = this.editor.block.getBlocks(change.getRange());
 			if (blocks.length === 0) return;
 			block = blocks[0].closest('ul,ol');
 		}
-		if (!block || !this.editor.node.isList(block)) return;
+		if (!block || !node.isList(block)) return;
 		const startIndent =
 			parseInt(block.attributes(this.INDENT_KEY), 10) || 0;
 		// 当前选区起始位置如果不是第一层级，需要向前遍历，找到各层级的前序序号
@@ -465,7 +459,7 @@ class List implements ListModelInterface {
 		let cacheIndent = startIndent;
 		let prevNode = block.prev();
 
-		while (prevNode && this.editor.node.isList(prevNode)) {
+		while (prevNode && node.isList(prevNode)) {
 			if (prevNode.name === 'ol') {
 				const prevIndent =
 					parseInt(prevNode.attributes(this.INDENT_KEY), 10) || 0;
@@ -490,7 +484,7 @@ class List implements ListModelInterface {
 
 		let nextNode = block;
 		while (nextNode) {
-			if (this.editor.node.isList(nextNode)) {
+			if (node.isList(nextNode)) {
 				const nextIndent =
 					parseInt(nextNode.attributes(this.INDENT_KEY), 10) || 0;
 				const nextStart = parseInt(nextNode.attributes('start'), 10);
@@ -609,7 +603,8 @@ class List implements ListModelInterface {
 	 */
 	addBr(node: NodeInterface) {
 		const { $ } = this.editor;
-		if (this.editor.node.isList(node)) {
+		const nodeApi = this.editor.node;
+		if (nodeApi.isList(node)) {
 			node.find('li').each(node => {
 				this.addBr($(node));
 			});
@@ -620,7 +615,7 @@ class List implements ListModelInterface {
 				//最后一个节点是br节点
 				if (child.name === 'br') return;
 				//自定义节点，并且最后一个是卡片
-				if (this.editor.node.isCustomize(node) && child.isCard()) {
+				if (nodeApi.isCustomize(node) && child.isCard()) {
 					node.append($('<br />'));
 					return;
 				}
@@ -639,10 +634,7 @@ class List implements ListModelInterface {
 					}
 					//节点
 					else if (child.type === getWindow().Node.ELEMENT_NODE) {
-						if (
-							!this.editor.node.isMark(child) ||
-							child.text() !== ''
-						)
+						if (!nodeApi.isMark(child) || child.text() !== '')
 							return;
 						child = node.prev();
 					}
@@ -663,11 +655,11 @@ class List implements ListModelInterface {
 		cardName: string,
 		value?: any,
 	) {
-		const { $ } = this.editor;
+		const { $, node } = this.editor;
 		if (Array.isArray(blocks)) {
 			let nodes: Array<NodeInterface> = [];
 			blocks.forEach(block => {
-				if (!this.editor.node.isCustomize(block)) {
+				if (!node.isCustomize(block)) {
 					const node = this.toCustomize(block, cardName, value);
 					nodes = nodes.concat(node);
 				}
@@ -689,28 +681,25 @@ class List implements ListModelInterface {
 
 				case 'ol':
 					customizeRoot.attributes(blocks.attributes());
-					blocks = this.editor.node.replace(blocks, customizeRoot);
+					blocks = node.replace(blocks, customizeRoot);
 					return blocks;
 
 				case 'p':
 					indent = removeUnit(blocks.css('padding-left')) / 2;
-					blocks = this.editor.node.replace(blocks, customizeItem);
+					blocks = node.replace(blocks, customizeItem);
 					this.addCardToCustomize(blocks, cardName, value);
 
 					if (indent) {
 						customizeRoot.attributes(this.INDENT_KEY, indent);
 					}
 
-					blocks = this.editor.node.wrap(blocks, customizeRoot);
+					blocks = node.wrap(blocks, customizeRoot);
 					return blocks;
 				default:
-					if (this.editor.node.isRootBlock(blocks)) {
-						blocks = this.editor.node.replace(
-							blocks,
-							customizeItem,
-						);
+					if (node.isRootBlock(blocks)) {
+						blocks = node.replace(blocks, customizeItem);
 						this.addCardToCustomize(blocks, cardName, value);
-						blocks = this.editor.node.wrap(blocks, customizeRoot);
+						blocks = node.wrap(blocks, customizeRoot);
 					}
 					return blocks;
 			}
@@ -727,7 +716,7 @@ class List implements ListModelInterface {
 		tagName: 'ul' | 'ol' = 'ul',
 		start?: number,
 	) {
-		const { $ } = this.editor;
+		const { $, node } = this.editor;
 		if (Array.isArray(blocks)) {
 			let nodes: Array<NodeInterface> = [];
 			blocks.forEach(block => {
@@ -751,17 +740,17 @@ class List implements ListModelInterface {
 					targetNode.attributes(blocks.attributes());
 					if (targetNode.name === 'ul')
 						targetNode.removeAttributes('start');
-					blocks = this.editor.node.replace(blocks, targetNode);
+					blocks = node.replace(blocks, targetNode);
 					return blocks;
 
 				case 'p':
 					if (blocks.parent()?.name === 'li') {
-						this.editor.node.unwrap(blocks);
+						node.unwrap(blocks);
 						return blocks;
 					}
 
 					indent = removeUnit(blocks.css('padding-left')) / 2;
-					blocks = this.editor.node.replace(blocks, itemNode);
+					blocks = node.replace(blocks, itemNode);
 
 					if (indent) {
 						targetNode.attributes(this.INDENT_KEY, indent);
@@ -770,12 +759,12 @@ class List implements ListModelInterface {
 					if (start) {
 						targetNode.attributes('start', start);
 					}
-					blocks = this.editor.node.wrap(blocks, targetNode);
+					blocks = node.wrap(blocks, targetNode);
 					return blocks;
 				default:
-					if (this.editor.node.isRootBlock(blocks)) {
-						blocks = this.editor.node.replace(blocks, itemNode);
-						blocks = this.editor.node.wrap(blocks, targetNode);
+					if (node.isRootBlock(blocks)) {
+						blocks = node.replace(blocks, itemNode);
+						blocks = node.wrap(blocks, targetNode);
 					}
 					return blocks;
 			}
@@ -817,18 +806,19 @@ class List implements ListModelInterface {
 			$(contents.firstChild).isCard()
 		)
 			return true;
+		const nodeApi = this.editor.node;
 		//如果选区中只有两个节点，并且是自定义列表并且第一个是Card，最后一个为空节点
 		if (
 			2 === contents.childNodes.length &&
 			node.hasClass('data-list-item') &&
 			$(contents.firstChild).isCard() &&
-			this.editor.node.isEmpty($(contents.lastChild || []))
+			nodeApi.isEmpty($(contents.lastChild || []))
 		)
 			return true;
 		//判断选区内容是否是空节点
 		const block = $('<div />');
 		block.append(contents);
-		return this.editor.node.isEmpty(block);
+		return nodeApi.isEmpty(block);
 	}
 
 	/**

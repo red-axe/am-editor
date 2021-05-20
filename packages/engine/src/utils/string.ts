@@ -276,7 +276,18 @@ export const transformCustomTags = (value: string) => {
 			const list = ['<'.concat(tagName)];
 			list.push(' '.concat(CARD_TYPE_KEY, '="').concat(type || '', '"'));
 			list.push(' '.concat(READY_CARD_KEY, '="').concat(name || '', '"'));
-
+			Object.keys(attrs).forEach(attrsName => {
+				if (
+					attrsName.indexOf('data-') === 0 &&
+					attrsName.indexOf('data-card') !== 0
+				) {
+					list.push(
+						' '
+							.concat(attrsName, '="')
+							.concat(attrs[attrsName] || '', '"'),
+					);
+				}
+			});
 			if (value !== undefined) {
 				list.push(' '.concat(CARD_VALUE_KEY, '="').concat(value, '"'));
 			}

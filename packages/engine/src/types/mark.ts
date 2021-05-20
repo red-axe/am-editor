@@ -12,7 +12,7 @@ export interface MarkModelInterface {
 	 * 根据节点查找mark插件实例
 	 * @param node 节点
 	 */
-	findPlugin(node: NodeInterface): Array<MarkInterface>;
+	findPlugin(node: NodeInterface): MarkInterface | undefined;
 	/**
 	 * 获取向上第一个非 Mark 节点
 	 */
@@ -35,41 +35,13 @@ export interface MarkModelInterface {
 	 */
 	contain(source: NodeInterface, target: NodeInterface): boolean;
 	/**
-	 * 如果源节点包含目标节点的所有属性和样式，那么移除源节点所包含的样式和属性
-	 * @param source 源节点
-	 * @param target 目标节点
-	 */
-	removeByContain(source: NodeInterface, target: NodeInterface): void;
-	/**
-	 * 移除一个节点下的所有空 Mark，通过 callback 可以设置其它条件
-	 * @param root 节点
-	 * @param callback 回调
-	 */
-	unwrapEmptyMarks(
-		root: NodeInterface,
-		callback?: (node: NodeInterface) => boolean,
-	): void;
-
-	/**
-	 * 在光标重叠位置时分割
-	 * @param range 光标
-	 * @param removeMark 要移除的mark空节点
-	 */
-	splitOnCollapsed(range: RangeInterface, removeMark?: NodeInterface): void;
-	/**
-	 * 在光标位置不重合时分割
-	 * @param range 光标
-	 * @param removeMark 要移除的空mark节点
-	 */
-	splitOnExpanded(range: RangeInterface, removeMark?: NodeInterface): void;
-	/**
 	 * 分割mark标签
 	 * @param range 光标，默认获取当前光标
 	 * @param removeMark 需要移除的空mark标签
 	 */
 	split(
 		range?: RangeInterface,
-		removeMark?: NodeInterface | Node | string,
+		removeMark?: NodeInterface | Node | string | Array<NodeInterface>,
 	): void;
 	/**
 	 * 在当前光标选区包裹mark标签
@@ -83,7 +55,7 @@ export interface MarkModelInterface {
 	 * @param removeMark 要移除的mark标签
 	 */
 	unwrap(
-		removeMark?: NodeInterface | Node | string,
+		removeMark?: NodeInterface | Node | string | Array<NodeInterface>,
 		range?: RangeInterface,
 	): void;
 	/**
@@ -121,15 +93,33 @@ export interface MarkInterface extends ElementPluginInterface {
 	 */
 	readonly markdown?: string;
 	/**
-	 * 回车后是否复制mark效果，默认为true，允许
+	 * 回车后是否复制mark效果，默认为 true，允许
+	 * <p><strong>abc<cursor /></strong></p>
+	 * 在光标处回车后，第二行默认会继续 strong 样式，如果为 false，将不在加 strong 样式
 	 */
 	readonly copyOnEnter?: boolean;
+	/**
+	 * 是否跟随样式，开启后在此标签后输入将不在有mark标签效果，光标重合状态下也无非执行此mark命令。默认 true 跟随
+	 * <strong>abc<cursor /></strong> 或者 <strong><cursor />abc</strong>
+	 * 在此处输入，如果 followStyle 为 true，那么就会在 strong 节点后输入 或者 strong 节点前输入
+	 * <strong>ab<cursor />c</strong> 如果光标在中间为值，还是会继续跟随样式效果
+	 * <strong>abc<cursor /></strong><em><strong>123</strong></em> 如果 followStyle 为 true，后方还是有 strong 节点效果，那么还是会继续跟随样式，在 strong abc 后面完成输入
+	 */
+	readonly followStyle?: boolean;
+	/**
+	 * 在包裹相通节点并且属性名称一致，值不一致的mark节点的时候，是合并前者的值到新的节点还是移除前者mark节点，默认 false 移除
+	 * 节点样式(style)的值将始终覆盖掉
+	 * <span a="1">abc</span>
+	 * 在使用 <span a="2"></span> 包裹上方节点时
+	 * 如果合并值，就是 <span a="1,2">abc</span> 否则就是 <span a="2">abc</span>
+	 */
+	readonly combineValueByWrap?: boolean;
 
 	init(): void;
 
 	queryState(): any;
 
-	schema(): SchemaMark;
+	schema(): SchemaMark | Array<SchemaMark>;
 
 	/**
 	 * 是否触发执行增加当前mark标签包裹，否则将移除当前mark标签的包裹

@@ -12,6 +12,10 @@ export interface InlineModelInterface {
 	 */
 	closest(node: NodeInterface): NodeInterface;
 	/**
+	 * 获取向上第一个非 Inline 节点
+	 */
+	closestNotInline(node: NodeInterface): NodeInterface;
+	/**
 	 * 给当前光标节点添加inline包裹
 	 * @param inline inline标签
 	 * @param range 光标，默认获取当前光标
@@ -19,15 +23,20 @@ export interface InlineModelInterface {
 	wrap(inline: NodeInterface | Node | string, range?: RangeInterface): void;
 	/**
 	 * 移除inline包裹
-	 * @param range 光标，默认当前编辑器光标
+	 * @param range 光标，默认当前编辑器光标,或者需要移除的inline节点
 	 */
-	unwrap(range?: RangeInterface): void;
+	unwrap(range?: RangeInterface | NodeInterface): void;
 	/**
 	 * 插入inline标签
 	 * @param inline inline标签
 	 * @param range 光标
 	 */
 	insert(inline: NodeInterface | Node | string, range?: RangeInterface): void;
+	/**
+	 * 分割inline标签
+	 * @param range 光标，默认获取当前光标
+	 */
+	split(range?: RangeInterface): void;
 	/**
 	 * 获取光标范围内的所有 inline 标签
 	 * @param range 光标

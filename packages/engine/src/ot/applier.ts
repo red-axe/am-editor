@@ -5,7 +5,7 @@ import { JSONML } from '../constants/ot';
 import { EngineInterface } from '../types/engine';
 import { Op, Path, StringInsertOp } from 'sharedb';
 import { ApplierInterface, RemoteAttr, RemotePath } from '../types/ot';
-import { NodeInterface } from '../types/node';
+import { isNodeEntry, NodeInterface } from '../types/node';
 import { getWindow } from '../utils';
 import { isTransientElement } from './utils';
 
@@ -16,9 +16,10 @@ class Applier implements ApplierInterface {
 	}
 
 	elementAtPath = (
-		node: Node,
+		node: Node | NodeInterface,
 		path: Path,
 	): [Node, undefined | number, Node, number] => {
+		if (isNodeEntry(node)) node = node[0];
 		const index = path[0] as number;
 		if (index === JSONML.ATTRIBUTE_INDEX)
 			return [node, undefined, node, index];

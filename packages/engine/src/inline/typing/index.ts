@@ -1,3 +1,5 @@
 import Backspace from './backspace';
+import Left from './left';
+import Right from './right';
 
-export { Backspace };
+export { Backspace, Left, Right };

@@ -1,18 +1,19 @@
+import { ChangeInterface } from './types';
 import { CommandInterface } from './types/command';
-import { EngineInterface } from './types/engine';
+import { EditorInterface, isEngine } from './types/engine';
 
 class Command implements CommandInterface {
-	private engine: EngineInterface;
-	constructor(engine: EngineInterface) {
-		this.engine = engine;
+	private editor: EditorInterface;
+	constructor(editor: EditorInterface) {
+		this.editor = editor;
 	}
 
 	queryEnabled(name: string) {
-		return !!this.engine.plugin.components[name];
+		return !!this.editor.plugin.components[name];
 	}
 
 	queryState(name: string, ...args: any) {
-		const plugin = this.engine.plugin.components[name];
+		const plugin = this.editor.plugin.components[name];
 		if (plugin && plugin.queryState) {
 			try {
 				return plugin.queryState(args);
@@ -23,16 +24,19 @@ class Command implements CommandInterface {
 	}
 
 	execute(name: string, ...args: any) {
-		const plugin = this.engine.plugin.components[name];
+		const plugin = this.editor.plugin.components[name];
 		if (plugin && plugin.execute) {
-			const { change } = this.engine;
-			change.cacheRangeBeforeCommand();
-			this.engine.trigger('beforeCommandExecute', name, ...args);
+			let change: ChangeInterface | undefined;
+			if (isEngine(this.editor)) {
+				change = this.editor.change;
+				change.cacheRangeBeforeCommand();
+			}
+			this.editor.trigger('beforeCommandExecute', name, ...args);
 			try {
 				const result = plugin.execute(...args);
-				change.combinTextNode();
-				change.onSelect();
-				this.engine.trigger('afterCommandExecute', name, ...args);
+				change?.combinTextNode();
+				change?.onSelect();
+				this.editor.trigger('afterCommandExecute', name, ...args);
 				return result;
 			} catch (error) {
 				console.log(error);

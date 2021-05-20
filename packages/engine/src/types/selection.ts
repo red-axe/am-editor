@@ -22,12 +22,13 @@ export interface SelectionInterface {
 	 */
 	move(): void;
 	/**
-	 * 获取节点相对于标记位置的节点
+	 * 获取节点相对于标记位置的节点，获取后会移除标记
 	 * @param node 节点
 	 * @param position 位置
 	 */
 	getNode(
 		node: NodeInterface,
 		position?: 'left' | 'center' | 'right',
+		isClone?: boolean,
 	): NodeInterface;
 }

@@ -30,26 +30,29 @@ class Tooltip {
 	}
 	show(
 		node: NodeInterface,
-		title: string,
+		title: string | NodeInterface,
 		options: { placement: Placement } = { placement: 'top' },
 	) {
 		this.hide();
 		const { $ } = this.editor;
 		const root = $(template(options));
 		// 设置提示文字
-		root.find('[data-role=tooltip]').html(title);
+		if (typeof title === 'string')
+			root.find('[data-role=tooltip]').html(title);
+		else root.find('[data-role=tooltip]').append(title);
 		// 计算定位
 		const body = $(document.body);
 		body.append(root);
 		const element = root.get<Element>();
 		const width = element?.clientWidth || 0;
 		const height = element?.clientHeight || 0;
-		const nodeWidth = node.get<Element>()?.clientWidth || 0;
-		const offset = node.offset() || {};
+		const nodeElement = node.get<Element>()!;
+		const nodeWidth = nodeElement.clientWidth;
+		const nodeRect = nodeElement.getBoundingClientRect();
 		const left = Math.round(
-			window.pageXOffset + offset.left + nodeWidth / 2 - width / 2,
+			window.pageXOffset + nodeRect.left + nodeWidth / 2 - width / 2,
 		);
-		const top = Math.round(window.pageYOffset + offset.top - height - 2);
+		const top = Math.round(window.pageYOffset + nodeRect.top - height - 2);
 		root.css({
 			left: left + 'px',
 			top: top + 'px',

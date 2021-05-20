@@ -184,6 +184,11 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.scrollbar?.refresh();
 		this.selection.on('select', () => {
 			this.conltrollBar.refresh();
+			if (!isEngine(this.editor)) return;
+			const { selectArea, tableModel } = this.selection;
+			if (selectArea && selectArea.count > 1 && tableModel) {
+				this.editor.ot.updateSelectionData();
+			}
 		});
 
 		this.conltrollBar.on('sizeChanged', () => {

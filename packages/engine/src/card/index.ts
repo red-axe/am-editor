@@ -332,8 +332,6 @@ class CardModel implements CardModelInterface {
 					) {
 						this.select(card);
 					}
-					//const range = this.editor.change.getRange()
-					//console.log(range.startNode)
 					card.activate(true);
 				}
 				if (
@@ -545,6 +543,8 @@ class CardModel implements CardModelInterface {
 			const name = readyKey || key;
 			if (this.classes[name]) {
 				const value = cardNode.attributes(CARD_VALUE_KEY);
+				const attributes = cardNode.attributes();
+
 				let card: CardInterface | undefined;
 				if (key) {
 					card = this.find(cardNode);
@@ -557,6 +557,17 @@ class CardModel implements CardModelInterface {
 				card = this.create(name, {
 					value: decodeCardValue(value),
 					root: key ? cardNode : undefined,
+				});
+				Object.keys(attributes).forEach(attributesName => {
+					if (
+						attributesName.indexOf('data-') === 0 &&
+						attributesName.indexOf('data-card') !== 0
+					) {
+						card!.root.attributes(
+							attributesName,
+							attributes[attributesName],
+						);
+					}
 				});
 				if (readyKey) cardNode.replaceWith(card.root);
 				this.components.push(card);

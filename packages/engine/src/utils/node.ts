@@ -29,39 +29,6 @@ export const getWindow = (node?: Node): Window & typeof globalThis => {
 };
 
 /**
- * 移除占位符 \u200B
- * @param root 节点
- */
-export const removeZeroWidthSpace = (root: NodeInterface) => {
-	root.traverse(child => {
-		const node = child[0];
-		if (node.nodeType !== getWindow().Node.TEXT_NODE) {
-			return;
-		}
-		const text = node.nodeValue;
-		if (text?.length !== 2) {
-			return;
-		}
-		if (
-			text.charCodeAt(1) === 0x200b &&
-			node.nextSibling &&
-			node.nextSibling.nodeType === getWindow().Node.ELEMENT_NODE &&
-			[ANCHOR, FOCUS, CURSOR].indexOf(
-				(<Element>node.nextSibling).getAttribute(DATA_ELEMENT) || '',
-			) >= 0
-		) {
-			return;
-		}
-
-		if (text.charCodeAt(0) === 0x200b) {
-			const newNode = (<Text>node).splitText(1);
-			if (newNode.previousSibling)
-				newNode.parentNode?.removeChild(newNode.previousSibling);
-		}
-	});
-};
-
-/**
  * 移除空的文本节点，并连接相邻的文本节点
  * @param node 节点
  */

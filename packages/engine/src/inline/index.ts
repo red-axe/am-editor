@@ -1,11 +1,15 @@
-import { CARD_ELEMENT_KEY, CARD_KEY } from '../constants';
-import { getRangePath } from '../ot/utils';
+import {
+	CARD_ELEMENT_KEY,
+	CARD_KEY,
+	CARD_SELECTOR,
+	CARD_TYPE_KEY,
+} from '../constants';
 import { EditorInterface, EngineInterface, isEngine } from '../types/engine';
 import { InlineModelInterface, isInlinePlugin } from '../types/inline';
 import { NodeInterface, isNode } from '../types/node';
-import { RangeInterface } from '../types/range';
+import { isRangeInterface, RangeInterface } from '../types/range';
 import { getDocument, getWindow } from '../utils';
-import { Backspace } from './typing';
+import { Backspace, Left, Right } from './typing';
 
 class Inline implements InlineModelInterface {
 	private editor: EditorInterface;
@@ -21,43 +25,82 @@ class Inline implements InlineModelInterface {
 			this.editor.typing
 				.getHandleListener('backspace', 'keydown')
 				?.on(event => backspace.trigger(event));
+			//左方向键
+			const left = new Left(this.editor);
+			this.editor.typing
+				.getHandleListener('left', 'keydown')
+				?.on(event => left.trigger(event));
+			//右方向键
+			const right = new Right(this.editor);
+			this.editor.typing
+				.getHandleListener('right', 'keydown')
+				?.on(event => right.trigger(event));
+			//markdown
 			this.editor.event.on('keydown:space', event =>
 				this.triggerMarkdown(event),
 			);
-			this.editor.on('beforeCommandExecute', () => {
+			/**this.editor.on('beforeCommandExecute', () => {
 				if (!isEngine(this.editor)) return;
 				const range = this.repairRange();
 				const { change } = this.editor;
 				change.rangePathBeforeCommand = getRangePath(range);
-			});
+			});**/
 		}
 	}
 
 	/**
-	 * 修复光标选区位置，&#8203;<a>&#8203;<anchor />acde<focus />&#8203;</a>&#8203; -><anchor />&#8203;<a>&#8203;acde&#8203;</a>&#8203;<focus />
+	 * 修复光标选区位置，&#8203;<a>&#8203;<anchor />acde<focus />&#8203;</a>&#8203; -> <anchor />&#8203;<a>&#8203;acde&#8203;</a>&#8203;<focus />
 	 * 否则在ot中，可能无法正确的应用inline节点两边&#8203;的更改
 	 */
 	repairRange(range?: RangeInterface) {
-		const { change } = this.editor as EngineInterface;
+		const { change, node } = this.editor as EngineInterface;
 		range = range || change.getRange();
 		const { startNode, startOffset, endNode, endOffset, collapsed } = range;
 		if (collapsed) return range;
 		const startInline = this.closest(startNode);
 		//让其选中节点外的 \u200b 零宽字符
-		if (startInline && startOffset <= 1) {
-			const prev = startInline.prev();
-			const text = prev?.text() || '';
-			if (prev && prev.isText() && /\u200B$/g.test(text)) {
-				range.setStart(prev, text.length - 1);
+		if (startInline && node.isInline(startInline) && startOffset <= 1) {
+			//检测是否处于inline标签内部左侧
+			let atBefore = true;
+			let childNode: NodeInterface | undefined = startNode;
+			while (childNode && !childNode.equal(startInline)) {
+				if (childNode.prev()) {
+					atBefore = false;
+					break;
+				}
+				childNode = childNode.parent();
+			}
+			if (atBefore) {
+				const prev = startInline.prev();
+				const text = prev?.text() || '';
+				if (prev && prev.isText() && /\u200B$/g.test(text)) {
+					range.setStart(prev, text.length - 1);
+				}
 			}
 		}
 
 		const endInline = this.closest(endNode);
-		if (endInline && endOffset <= endInline.last()!.text().length) {
-			const next = startInline.next();
-			const text = next?.text() || '';
-			if (next && next.isText() && /^\u200B/g.test(text)) {
-				range.setEnd(next, 1);
+		if (
+			endInline &&
+			node.isInline(endInline) &&
+			endOffset <= endInline.last()!.text().length
+		) {
+			//检测是否处于inline标签内部右侧
+			let atAfter = true;
+			let childNode: NodeInterface | undefined = startNode;
+			while (childNode && !childNode.equal(endInline)) {
+				if (childNode.next()) {
+					atAfter = false;
+					break;
+				}
+				childNode = childNode.parent();
+			}
+			if (atAfter) {
+				const next = endInline.next();
+				const text = next?.text() || '';
+				if (next && next.isText() && /^\u200B/g.test(text)) {
+					range.setEnd(next, 1);
+				}
 			}
 		}
 		return range;
@@ -97,12 +140,30 @@ class Inline implements InlineModelInterface {
 	 * 获取最近的 Inline 节点，找不到返回 node
 	 */
 	closest(node: NodeInterface) {
-		while (node && node.parent() && !this.editor.node.isBlock(node)) {
+		const nodeApi = this.editor.node;
+		while (node && node.parent() && !nodeApi.isBlock(node)) {
 			if (node.isEditable()) break;
-			if (this.editor.node.isInline(node)) return node;
+			if (nodeApi.isInline(node)) return node;
 			const parentNode = node.parent();
 			if (!parentNode) break;
 			node = parentNode;
+		}
+		return node;
+	}
+	/**
+	 * 获取向上第一个非 Inline 节点
+	 */
+	closestNotInline(node: NodeInterface) {
+		const nodeApi = this.editor.node;
+		while (
+			nodeApi.isInline(node) ||
+			nodeApi.isMark(node) ||
+			node.isText()
+		) {
+			if (node.isEditable()) break;
+			const parent = node.parent();
+			if (!parent) break;
+			node = parent;
 		}
 		return node;
 	}
@@ -127,26 +188,38 @@ class Inline implements InlineModelInterface {
 			return;
 		}
 		mark.split(safeRange);
+		this.split(safeRange);
 		let { commonAncestorNode } = safeRange;
-		if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
+		if (
+			commonAncestorNode.type === getWindow().Node.TEXT_NODE ||
+			node.isMark(commonAncestorNode)
+		) {
 			commonAncestorNode = commonAncestorNode.parent()!;
+			while (node.isMark(commonAncestorNode)) {
+				commonAncestorNode = commonAncestorNode.parent()!;
+			}
 		}
 
 		// 插入范围的开始和结束标记
-		const selection = safeRange.createSelection();
+		const selection = safeRange.enlargeToElementNode().createSelection();
 		if (!selection.has()) {
 			if (!range) change.apply(safeRange);
 			return;
 		}
 		// 遍历范围内的节点，添加 Inline
 		let started = false;
-		let inlineClone = this.editor.node.clone(inline, false);
+		let inlineClone = node.clone(inline, false);
 		commonAncestorNode.traverse(child => {
 			if (!child.equal(selection.anchor!)) {
 				if (started) {
 					if (child.equal(selection.focus!)) {
 						started = false;
 						return false;
+					}
+					if (node.isInline(child)) {
+						const children = child.children();
+						node.unwrap(child);
+						child = children;
 					}
 					if (
 						(node.isMark(child) && !child.isCard()) ||
@@ -163,10 +236,7 @@ class Inline implements InlineModelInterface {
 						return true;
 					}
 					if (inlineClone[0].childNodes.length !== 0) {
-						inlineClone = this.editor.node.clone(
-							inlineClone,
-							false,
-						);
+						inlineClone = node.clone(inlineClone, false);
 					}
 					return;
 				}
@@ -182,7 +252,7 @@ class Inline implements InlineModelInterface {
 
 		if (
 			anchorParent &&
-			this.editor.node.isRootBlock(anchorParent) &&
+			node.isRootBlock(anchorParent) &&
 			!anchor!.prev() &&
 			!anchor!.next()
 		) {
@@ -193,7 +263,7 @@ class Inline implements InlineModelInterface {
 			const focusParent = focus?.parent();
 			if (
 				focusParent &&
-				this.editor.node.isRootBlock(focusParent) &&
+				node.isRootBlock(focusParent) &&
 				!focus!.prev() &&
 				!focus!.next()
 			) {
@@ -211,15 +281,19 @@ class Inline implements InlineModelInterface {
 	}
 	/**
 	 * 移除inline包裹
-	 * @param range 光标，默认当前编辑器光标
+	 * @param range 光标，默认当前编辑器光标,或者需要移除的inline节点
 	 */
-	unwrap(range?: RangeInterface) {
+	unwrap(range?: RangeInterface | NodeInterface) {
 		if (!isEngine(this.editor)) return;
 		const { change, mark } = this.editor;
-		const safeRange = range || change.getSafeRange();
+		const safeRange =
+			!range || !isRangeInterface(range) ? change.getSafeRange() : range;
 		this.repairRange(safeRange);
 		mark.split(safeRange);
-		const inlineNodes = this.findInlines(safeRange);
+		const inlineNodes =
+			range && !isRangeInterface(range)
+				? [range]
+				: this.findInlines(safeRange);
 		// 清除 Inline
 		const selection = safeRange.createSelection();
 		inlineNodes.forEach(node => {
@@ -274,7 +348,7 @@ class Inline implements InlineModelInterface {
 	 */
 	insert(inline: NodeInterface | Node | string, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { change, node, $ } = this.editor;
+		const { change, node, $, mark } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof inline === 'string' || isNode(inline)) {
@@ -285,10 +359,10 @@ class Inline implements InlineModelInterface {
 		if (!safeRange.collapsed) {
 			change.deleteContent(safeRange);
 		}
+		mark.split(safeRange);
 		// 插入新 Inline
-		change
-			.insertNode(inline, safeRange)
-			.select(inline)
+		node.insert(inline, safeRange)
+			?.select(inline)
 			.collapse(false);
 
 		if (inline.name !== 'br') {
@@ -315,12 +389,273 @@ class Inline implements InlineModelInterface {
 	}
 
 	/**
+	 * 去除一个节点下的所有空 Inline callback 可以设置其它条件
+	 * @param root 节点
+	 * @param callback 回调
+	 */
+	unwrapEmptyInlines(
+		root: NodeInterface,
+		callback?: (node: NodeInterface) => boolean,
+	) {
+		const { node } = this.editor;
+		const children = root.allChildren();
+		children.forEach(childNode => {
+			const child = this.editor.$(childNode);
+			if (
+				node.isEmpty(child) &&
+				node.isInline(child) &&
+				(!callback || callback(child))
+			) {
+				node.unwrap(child);
+			}
+		});
+	}
+
+	/**
+	 * 在光标重叠位置时分割
+	 * @param range 光标
+	 */
+	splitOnCollapsed(range: RangeInterface, keelpNode?: NodeInterface | Node) {
+		if (!range.collapsed) return;
+		//扩大光标选区
+		range.enlargeFromTextNode();
+		range.shrinkToElementNode();
+		const { startNode } = range;
+		const startParent = startNode.parent();
+		//获取卡片
+		const { node, $ } = this.editor;
+		const card = startNode.isCard()
+			? startNode
+			: startNode.closest(CARD_SELECTOR);
+		if (
+			(card.length === 0 ||
+				card.attributes(CARD_TYPE_KEY) !== 'inline') &&
+			(node.isInline(startNode) ||
+				(startParent && node.isInline(startParent)))
+		) {
+			// 获取上面第一个非inline标签
+			const parent = this.closestNotInline(startNode);
+			// 插入范围的开始和结束标记
+			const selection = range.createSelection();
+			// 获取标记左右两侧节点
+			const left = selection.getNode(parent, 'left');
+			let right: NodeInterface | undefined = undefined;
+			let keelpRoot: NodeInterface | undefined = undefined;
+			let keelpPath: Array<number> = [];
+			if (keelpNode) {
+				if (isNode(keelpNode)) keelpNode = $(keelpNode);
+				// 获取需要跟踪节点的路径
+				const path = keelpNode.getPath(parent.get()!);
+				const cloneParent = parent.clone(true);
+				keelpPath = path.slice(1);
+				// 获取需要跟踪节点的root节点
+				keelpRoot = $(cloneParent.getChildByPath(path.slice(0, 1)));
+				right = selection.getNode(cloneParent, 'right', false);
+			} else right = selection.getNode(parent, 'right');
+			// 删除空标签
+			this.unwrapEmptyInlines(left);
+			this.unwrapEmptyInlines(right);
+			// 清空原父容器，用新的内容代替
+			parent.empty();
+			const leftChildren = left.children();
+			const leftNodes = leftChildren.toArray();
+			parent.append(leftChildren);
+			const rightChildren = right.children();
+			const rightNodes = rightChildren.toArray();
+			// 根据跟踪节点的root节点和path获取其在rightNodes中的新节点
+			if (keelpRoot)
+				keelpNode = rightNodes
+					.find(node => node.equal(keelpRoot!))
+					?.getChildByPath(keelpPath);
+			parent.append(rightChildren);
+			// 找到卡片，重新设置卡片根节点的引用
+			parent.find(CARD_SELECTOR).each(cardNode => {
+				const cardComponent = this.editor.card.find(cardNode);
+				if (cardComponent && !cardComponent.root.equal(cardNode)) {
+					cardComponent.root[0] = cardNode;
+				}
+			});
+			// 重新设置范围
+			//移除左右两边的 br 标签
+			if (leftNodes.length === 1 && leftNodes[0].name === 'br') {
+				leftNodes[0].remove();
+				leftNodes.splice(0, 1);
+			}
+			if (rightNodes.length === 1 && rightNodes[0].name === 'br') {
+				rightNodes[0].remove();
+				rightNodes.splice(0, 1);
+			}
+			parent.traverse(child => {
+				if (node.isInline(child)) {
+					this.repairCursor(child);
+				}
+			});
+		}
+		return keelpNode;
+	}
+	/**
+	 * 在光标位置不重合时分割
+	 * @param range 光标
+	 * @param removeMark 要移除的空mark节点
+	 */
+	splitOnExpanded(range: RangeInterface) {
+		if (range.collapsed) return;
+		range.enlargeToElementNode();
+		range.shrinkToElementNode();
+		const { startNode, endNode } = range;
+		const cardStart = startNode.isCard()
+			? startNode
+			: startNode.closest(CARD_SELECTOR);
+		const cardEnd = endNode.isCard()
+			? endNode
+			: endNode.closest(CARD_SELECTOR);
+		if (
+			!(
+				(cardStart.length > 0 &&
+					'inline' === cardStart.attributes(CARD_TYPE_KEY)) ||
+				(cardEnd.length > 0 &&
+					'inline' === cardEnd.attributes(CARD_TYPE_KEY))
+			)
+		) {
+			//开始非inline标签父节点
+			const startNotInlineParent = this.closestNotInline(startNode);
+			//结束非inine标签父节点
+			const endNotInlineParent = this.closestNotInline(endNode);
+			if (!startNotInlineParent.equal(endNotInlineParent)) {
+				//开始位置
+				const startRange = range.cloneRange();
+				startRange.collapse(true);
+				//结束位置
+				const endRange = range.cloneRange();
+				endRange.collapse(false);
+
+				//如果开始非inline标签父节点包含结束非inline标签父节点，那么分割的时候会清空 结束非inline标签父节点的内容进行重组。结束非inline标签父节点 将无非找到
+				//所以需要从被包含的节点开始分割
+				let keelpNode: NodeInterface | Node | undefined = undefined;
+				let startOffset = startRange.startOffset;
+				let endOffset = endRange.endOffset;
+				//如果开始节点的父节点包含结尾父节点，会将结尾父节点删除重组，导致光标失效，需要先执行开始节点分割，并跟踪结尾节点
+				if (startNotInlineParent.contains(endNotInlineParent)) {
+					//先分割开始节点，并跟踪结尾节点
+					keelpNode = this.splitOnCollapsed(
+						startRange,
+						endRange.endNode,
+					);
+					range.setStart(
+						startRange.startContainer,
+						startRange.startOffset,
+					);
+					//如果有跟踪到，重新设置结尾节点
+					if (keelpNode) {
+						endRange.setOffset(keelpNode, endOffset, endOffset);
+					}
+					//分割结尾节点
+					this.splitOnCollapsed(endRange);
+					range.setEnd(endRange.startContainer, endRange.startOffset);
+				} else {
+					//结尾父节点包含开始节点父节点
+					//先分割结尾节点，并跟踪开始节点
+					keelpNode = this.splitOnCollapsed(
+						endRange,
+						startRange.startNode,
+					);
+					range.setEnd(endRange.startContainer, endRange.startOffset);
+					//如果有跟踪到，重新设置开始节点
+					if (keelpNode) {
+						startRange.setOffset(
+							keelpNode,
+							startOffset,
+							startOffset,
+						);
+					}
+					//分割开始节点
+					this.splitOnCollapsed(startRange);
+					range.setStart(
+						startRange.startContainer,
+						startRange.startOffset,
+					);
+				}
+				return;
+			}
+			const { node } = this.editor;
+			// 节点不是Inline，文本节点时判断父节点
+			const startParent = startNode.parent();
+			const startIsInline =
+				node.isInline(startNode) ||
+				(startParent && node.isInline(startParent));
+			const endParent = endNode.parent();
+			const endIsInline =
+				node.isInline(endNode) ||
+				(endParent && node.isInline(endParent));
+			// 开始节点和结束节点都不是Inline，无需分割
+			if (!startIsInline && !endIsInline) {
+				return;
+			}
+			let { commonAncestorNode } = range;
+			if (commonAncestorNode.isText()) {
+				commonAncestorNode = commonAncestorNode.parent()!;
+			}
+			// 获取上面第一个非样式标签
+			const parent = this.closestNotInline(commonAncestorNode);
+			// 插入范围的开始和结束标记
+			const selection = range.createSelection();
+			// 标记的左边
+			const left = selection.getNode(parent, 'left');
+			// 标记的节点
+			const center = selection.getNode(parent);
+			// 标记的右边
+			const right = selection.getNode(parent, 'right');
+			// 删除空标签
+			this.unwrapEmptyInlines(left);
+			this.unwrapEmptyInlines(right);
+			// 清空原父容器，用新的内容代替
+			parent.empty();
+			parent.append(left.children());
+			const centerChildren = center.children();
+			const centerNodes = centerChildren.toArray();
+			parent.append(centerChildren);
+			parent.append(right.children());
+			// 找到卡片，重新设置卡片根节点的引用
+			parent.find(CARD_SELECTOR).each(cardNode => {
+				const cardComponent = this.editor.card.find(cardNode);
+				if (cardComponent && !cardComponent.root.equal(cardNode)) {
+					cardComponent.root[0] = cardNode;
+				}
+			});
+			parent.traverse(child => {
+				if (node.isInline(child)) {
+					this.repairCursor(child);
+				}
+			});
+			// 重新设置范围
+			range.setStartBefore(centerNodes[0][0]);
+			range.setEndAfter(centerNodes[centerNodes.length - 1][0]);
+		}
+	}
+
+	/**
+	 * 分割inline标签
+	 */
+	split(range?: RangeInterface) {
+		if (!isEngine(this.editor)) return;
+		const { change } = this.editor;
+		const safeRange = range || change.getSafeRange();
+		if (safeRange.collapsed) {
+			this.splitOnCollapsed(safeRange);
+		} else {
+			this.splitOnExpanded(safeRange);
+		}
+		if (!range) change.apply(safeRange);
+	}
+
+	/**
 	 * 获取光标范围内的所有 inline 标签
 	 * @param range 光标
 	 */
 	findInlines(range: RangeInterface) {
 		const cloneRange = range.cloneRange();
 		const { $ } = this.editor;
+		const nodeApi = this.editor.node;
 		const handleRange = (
 			allowBlock: boolean,
 			range: RangeInterface,
@@ -350,10 +685,10 @@ class Inline implements InlineModelInterface {
 					!allowBlock &&
 					endNode.type === Node.ELEMENT_NODE &&
 					endOffsetNode &&
-					this.editor.node.isBlock(endOffsetNode) &&
+					nodeApi.isBlock(endOffsetNode) &&
 					(startNode.type !== Node.ELEMENT_NODE ||
 						(!!startOffsetNode &&
-							!this.editor.node.isBlock(startOffsetNode)))
+							!nodeApi.isBlock(startOffsetNode)))
 				)
 					return;
 				cloneRange.select(startParent, true);
@@ -383,10 +718,10 @@ class Inline implements InlineModelInterface {
 					!allowBlock &&
 					startNodeClone.type === Node.ELEMENT_NODE &&
 					startOffsetNode &&
-					this.editor.node.isBlock(startOffsetNode) &&
+					nodeApi.isBlock(startOffsetNode) &&
 					(startNode.type !== Node.ELEMENT_NODE ||
 						(startChildrenOffsetNode &&
-							!this.editor.node.isBlock(startChildrenOffsetNode)))
+							!nodeApi.isBlock(startChildrenOffsetNode)))
 				)
 					return;
 				cloneRange.select(startParent, true);
@@ -451,7 +786,7 @@ class Inline implements InlineModelInterface {
 			const nodes = [];
 			while (node) {
 				if (node.isEditable()) break;
-				if (this.editor.node.isInline(node)) nodes.push(node);
+				if (nodeApi.isInline(node)) nodes.push(node);
 				const parent = node.parent();
 				if (!parent) break;
 				node = parent;
@@ -478,7 +813,7 @@ class Inline implements InlineModelInterface {
 								return false;
 							}
 							if (
-								this.editor.node.isInline(child) &&
+								nodeApi.isInline(child) &&
 								!child.attributes(CARD_KEY) &&
 								!child.attributes(CARD_ELEMENT_KEY)
 							) {
@@ -501,14 +836,11 @@ class Inline implements InlineModelInterface {
 	 */
 	repairCursor(node: NodeInterface | Node) {
 		const { $ } = this.editor;
+		const nodeApi = this.editor.node;
 		if (isNode(node)) node = $(node);
-		if (
-			!this.editor.node.isInline(node) ||
-			this.editor.node.isVoid(node) ||
-			node.isCard()
-		)
+		if (!nodeApi.isInline(node) || nodeApi.isVoid(node) || node.isCard())
 			return;
-		this.editor.node.repairBoth(node);
+		this.repairBoth(node);
 		let firstChild = node.first();
 		if (firstChild?.isCursor()) firstChild = firstChild.next();
 		if (
@@ -533,6 +865,65 @@ class Inline implements InlineModelInterface {
 			if (last.isText()) {
 				last.text(last.text() + '\u200B');
 			} else last.after($('\u200b', null));
+		}
+	}
+
+	/**
+	 * 修复节点两侧零宽字符占位
+	 * @param node 节点
+	 */
+	repairBoth(node: NodeInterface | Node) {
+		const { $ } = this.editor;
+		const nodeApi = this.editor.node;
+		if (isNode(node)) node = $(node);
+		if (node.parent() && !nodeApi.isVoid(node)) {
+			const zeroNode = $('\u200b', null);
+			const prev = node.prev();
+			const prevPrev = prev?.prev();
+			const prevText = prev?.text() || '';
+			if (
+				!prev ||
+				!prev.isText() ||
+				!/\u200B$/g.test(prevText) ||
+				(prevPrev &&
+					nodeApi.isInline(prevPrev) &&
+					!/\u200B\u200B$/g.test(prevText))
+			) {
+				if (prev && prev.isText()) {
+					prev.text(prevText + '\u200b');
+				} else {
+					node.before(nodeApi.clone(zeroNode, true));
+				}
+			} else if (
+				prev &&
+				prev.isText() &&
+				/\u200B\u200B$/g.test(prevText) &&
+				prevPrev &&
+				!nodeApi.isInline(prevPrev)
+			) {
+				prev.text(prevText.substr(0, prevText.length - 1));
+			}
+
+			const next = node.next();
+			const nextText = next?.text() || '';
+			const nextNext = next?.next();
+			if (
+				!next ||
+				!next.isText() ||
+				!/^\u200B/g.test(nextText) ||
+				(nextNext &&
+					nodeApi.isInline(nextNext) &&
+					!/^\u200B\u200B/g.test(nextText))
+			) {
+				if (next && next.isText()) {
+					next.text('\u200b' + next.text());
+				} else {
+					node.after(this.editor.node.clone(zeroNode, true));
+					if (next?.name === 'br') {
+						next.remove();
+					}
+				}
+			}
 		}
 	}
 }

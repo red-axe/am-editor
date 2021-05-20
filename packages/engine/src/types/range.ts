@@ -1,3 +1,4 @@
+import { Path } from 'sharedb';
 import { EditorInterface } from './engine';
 import { NodeInterface } from './node';
 import { SelectionInterface } from './selection';
@@ -5,15 +6,27 @@ import { SelectionInterface } from './selection';
 export interface Range {
 	prototype: RangeInterface;
 	new (): RangeInterface;
+	/**
+	 * 从一个 Point 位置获取 RangeInterface 对象
+	 */
 	create: (
 		editor: EditorInterface,
 		doc?: Document,
 		point?: { x: number; y: number },
 	) => RangeInterface;
+	/**
+	 * 从 Window 、Selection、Range 中创建 RangeInterface 对象
+	 */
 	from: (
 		editor: EditorInterface,
 		win?: Window | globalThis.Selection | globalThis.Range,
 	) => RangeInterface | null;
+	/**
+	 * 从路径转换为光标
+	 * @param path
+	 * @param 上下文，默认编辑器节点
+	 */
+	fromPath(path: Path[], context?: NodeInterface): RangeInterface;
 }
 
 export interface RangeInterface {
@@ -91,8 +104,9 @@ export interface RangeInterface {
 	createSelection(): SelectionInterface;
 	/**
 	 * 获取子选区集合
+	 * @param includeCard 是否包含卡片
 	 */
-	getSubRanges(): Array<RangeInterface>;
+	getSubRanges(includeCard?: boolean): Array<RangeInterface>;
 
 	setOffset(
 		node: Node | NodeInterface,
@@ -149,14 +163,18 @@ export interface RangeInterface {
 	deepCut(): void;
 
 	/**
-   * 对比两个范围是否相等
- 范围
-   */
+	 * 对比两个范围是否相等
+	 *范围
+	 */
 	equal(range: RangeInterface | globalThis.Range): boolean;
 	/**
 	 * 获取当前选区最近的根节点
 	 */
 	getRootBlock(): NodeInterface | undefined;
+	/**
+	 * 获取光标路径
+	 */
+	toPath(): Path[];
 }
 
 export const isSelection = (

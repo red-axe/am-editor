@@ -29,14 +29,12 @@ abstract class BlockEntry<T extends {} = {}> extends ElementPluginEntry<T>
 				return {
 					...schema,
 					allowIn: this.allowIn,
-					disableMark: this.disableMark,
 				} as SchemaBlock;
 			});
 		}
 		return {
 			...schema,
 			allowIn: this.allowIn,
-			disableMark: this.disableMark,
 			canMerge: this.canMerge,
 		} as SchemaBlock;
 	}
