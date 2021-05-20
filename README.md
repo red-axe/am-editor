@@ -42,8 +42,9 @@ am-editor，一个基于[ShareDB](https://github.com/share/sharedb)Web 多人协
 -   [x] `@aomao/plugin-undo` 撤销历史
 -   [x] `@aomao/plugin-unorderedlist` 无序列表
 -   [x] `@aomao/plugin-image` 图片
--   [ ] `@aomao/plugin-video` 视频
 -   [x] `@aomao/plugin-table` 表格
+-   [x] `@aomao/plugin-mark-range` 光标范围标记
+-   [ ] `@aomao/plugin-video` 视频
 
 ## 快速上手
 
