@@ -27,12 +27,6 @@ export type Options = {
 	) => void;
 };
 
-export type Selection = {
-	text: string;
-	path: Path[];
-	range: RangeInterface;
-};
-
 const PLUGIN_NAME = 'mark-range';
 
 export default class extends MarkPlugin<Options> {
