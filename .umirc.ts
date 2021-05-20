@@ -26,6 +26,14 @@ export default defineConfig({
 			title: '插件',
 			path: '/plugin',
 		},
+		{
+			title: 'AoMao',
+			path: 'https://www.aomao.com',
+		},
+		{
+			title: 'Github',
+			path: 'https://github.com/itellyou-com/am-editor',
+		},
 	],
 	menus: {
 		'/plugin': [

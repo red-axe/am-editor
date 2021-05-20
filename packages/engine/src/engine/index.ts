@@ -150,8 +150,9 @@ class Engine implements EngineInterface {
 		this.typing = new Typing(this);
 		this.mark.init();
 		this.inline.init();
-		this.list.init();
 		this.block.init();
+		this.list.init();
+
 		this.hotkey = new Hotkey(this);
 		this.scrollNode = this.options.scrollNode
 			? this.$(this.options.scrollNode)

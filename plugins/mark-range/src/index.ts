@@ -38,6 +38,8 @@ export default class extends MarkPlugin<Options> {
 
 	readonly followStyle: boolean = false;
 
+	readonly copyOnEnter: boolean = false;
+
 	static get pluginName() {
 		return PLUGIN_NAME;
 	}

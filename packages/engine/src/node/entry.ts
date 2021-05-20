@@ -431,7 +431,7 @@ class NodeEntry implements NodeInterface {
 	on(eventType: string, listener: EventListener): NodeInterface {
 		this.each((node, i) => {
 			node.addEventListener(eventType, listener, false);
-			this.events[i].on(eventType, listener);
+			if (i < this.events.length) this.events[i].on(eventType, listener);
 		});
 		return this;
 	}
@@ -445,8 +445,7 @@ class NodeEntry implements NodeInterface {
 	off(eventType: string, listener: EventListener): NodeInterface {
 		this.each((node, i) => {
 			node.removeEventListener(eventType, listener, false);
-
-			this.events[i].off(eventType, listener);
+			if (i < this.events.length) this.events[i].off(eventType, listener);
 		});
 		return this;
 	}

@@ -80,10 +80,10 @@ class View implements ViewInterface {
 			this.options.root || this.container.parent() || document.body,
 		);
 		this.container.addClass('am-engine-view');
-		this.list.init();
-		this.block.init();
 		this.mark.init();
 		this.inline.init();
+		this.block.init();
+		this.list.init();
 		this.card.init(this.options.cards || []);
 		this.plugin.init(this.options.plugins || [], this.options.config || {});
 	}

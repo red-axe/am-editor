@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import debounce from 'lodash-es/debounce';
 import Avatar from 'antd/lib/avatar';
 import Message from 'antd/lib/message';
+import Space from 'antd/lib/space';
 //引入编辑器引擎
 import Engine, {
 	EngineInterface,
@@ -27,6 +28,7 @@ import {
 } from './config';
 import 'antd/lib/avatar/style';
 import 'antd/lib/message/style';
+import 'antd/lib/space/style';
 import './engine.less';
 
 const localMember =
@@ -249,22 +251,22 @@ const EngineDemo = () => {
 	return (
 		<>
 			<div className="editor-ot-users">
-				<p style={{ color: '#888888' }}>
-					当前在线用户：<strong>{members.length}</strong> 人
-				</p>
-				<div className="editor-ot-users-content">
+				<Space className="editor-ot-users-content" size="small">
+					<span style={{ color: '#888888' }}>
+						当前在线<strong>{members.length}</strong>人
+					</span>
 					{members.map(member => {
 						return (
 							<Avatar
 								key={member['id']}
-								size={30}
+								size={24}
 								style={{ backgroundColor: member['color'] }}
 							>
 								{member['name']}
 							</Avatar>
 						);
 					})}
-				</div>
+				</Space>
 			</div>
 			{!editorLoading && (
 				<Toolbar

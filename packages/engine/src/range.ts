@@ -338,12 +338,15 @@ class Range implements RangeInterface {
 	shrinkToElementNode = () => {
 		const { node, $ } = this.editor;
 		let child;
+		let childDom;
 		while (
 			this.startContainer.nodeType === getWindow().Node.ELEMENT_NODE &&
 			(child = this.startContainer.childNodes[this.startOffset]) &&
+			(childDom = $(child)) &&
 			child.nodeType === getWindow().Node.ELEMENT_NODE &&
+			!childDom.isCursor() &&
 			!node.isVoid(child) &&
-			!$(child).isCard()
+			!childDom.isCard()
 		) {
 			this.setStart(child, 0);
 		}
@@ -351,9 +354,11 @@ class Range implements RangeInterface {
 			this.endContainer.nodeType === getWindow().Node.ELEMENT_NODE &&
 			this.endOffset > 0 &&
 			(child = this.endContainer.childNodes[this.endOffset - 1]) &&
+			(childDom = $(child)) &&
 			child.nodeType === getWindow().Node.ELEMENT_NODE &&
 			!node.isVoid(child) &&
-			!$(child).isCard()
+			!childDom.isCursor() &&
+			!childDom.isCard()
 		) {
 			this.setEnd(child, child.childNodes.length);
 		}
