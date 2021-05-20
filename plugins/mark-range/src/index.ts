@@ -354,7 +354,10 @@ export default class extends MarkPlugin<Options> {
 						ids.push(oldId);
 					}
 					//未增加就驾到末尾
-					if (ids.length === oldIds.length) {
+					if (
+						ids.length === oldIds.length &&
+						oldIds.indexOf(id) < 0
+					) {
 						ids.push(id);
 					}
 				} else {
@@ -600,12 +603,12 @@ export default class extends MarkPlugin<Options> {
 
 		card.render(container);
 
-		const parser = new Parser(container, this.editor);
-
 		const selection = container.window?.getSelection();
 		const range = selection
 			? Range.from(this.editor, selection) || Range.create(this.editor)
 			: Range.create(this.editor);
+
+		const parser = new Parser(container, this.editor);
 
 		if (!range) {
 			container.remove();

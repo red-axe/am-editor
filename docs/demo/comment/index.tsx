@@ -482,8 +482,11 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 								//最后在当前评论id内渲染为可继续添加评论
 								item.type = 'add';
 								updateEditItem(item);
-								//增加成功，将评论标识应用到编辑器中
-								if (isEngine(editor)) {
+								//第一次增加成功，将评论标识应用到编辑器中
+								if (
+									!editItem.editId &&
+									item.children.length === 1
+								) {
 									editor.command.execute(
 										'mark-range',
 										'comment',
