@@ -198,6 +198,7 @@ const EngineDemo = () => {
 			}
 		});
 		//设置编辑器值
+		console.log(content.current);
 		const wrapValue = engine.command.execute(
 			MarkRange.pluginName,
 			'comment',
@@ -205,6 +206,7 @@ const EngineDemo = () => {
 			content.current.paths,
 			content.current.value,
 		);
+		console.log(wrapValue);
 		engine.setValue(wrapValue);
 		//监听编辑器值改变事件
 		engine.on('change', editorValue => {

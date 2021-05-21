@@ -1,0 +1,22 @@
+{
+	"id": "demo",
+	"content": {
+		"value": "<p data-id=\"daab65504017af77a36594f98ab4875d\">Hello<strong>AoMaosdfdfsdffsdfs</strong></p><card type=\"block\" name=\"hr\" data-id=\"5123338604ad9fb9eac7e040206406eb\" value=\"data:%7B%22id%22%3A%22eIxTM%22%7D\"></card><p data-id=\"11d1795347c4579112e754b43e9a928a\"><cursor /></p>",
+		"paths": [
+			{
+				"id": ["gqjlKCoNP6hR8ynrO0"],
+				"path": [
+					[2, 0, 0],
+					[2, 0, 0]
+				]
+			},
+			{
+				"id": ["oMgUJJECSSXh8hv5lQ"],
+				"path": [
+					[0, 1, 0, 8],
+					[0, 1, 0, 16]
+				]
+			}
+		]
+	}
+}
