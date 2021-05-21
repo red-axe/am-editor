@@ -103,7 +103,8 @@ class Scrollbar extends EventEmitter2 {
 	}
 
 	refresh() {
-		if (!isFirefox && !isMobile) {
+		const element = this.container.get<HTMLElement>();
+		if (!isFirefox && !isMobile && element) {
 			const {
 				offsetWidth,
 				offsetHeight,
@@ -111,7 +112,7 @@ class Scrollbar extends EventEmitter2 {
 				scrollHeight,
 				scrollLeft,
 				scrollTop,
-			} = this.container.get<HTMLElement>()!;
+			} = element;
 
 			this.oWidth = offsetWidth;
 			this.oHeight = offsetHeight;

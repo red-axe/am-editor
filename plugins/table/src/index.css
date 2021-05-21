@@ -633,3 +633,8 @@ div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
 .table-wrapper .table-row-add-button:hover .table-row-add-split-button{
     display: block;
 }
+
+.data-table-reader .data-table tr td {
+    border: 1px solid rgb(217, 217, 217);
+    cursor: auto;
+}

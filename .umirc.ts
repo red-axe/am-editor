@@ -11,8 +11,12 @@ export default defineConfig({
 	},
 	navs: [
 		{
-			title: '首页',
+			title: '编辑',
 			path: '/',
+		},
+		{
+			title: '阅读',
+			path: '/view',
 		},
 		{
 			title: '指南',

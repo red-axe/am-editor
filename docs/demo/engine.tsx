@@ -15,7 +15,7 @@ import Engine, {
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 //协同客户端
 import OTClient, { Member } from './ot-client';
-//Deomo相关
+//Demo相关
 import Loading from './loading';
 import CommentLayer from './comment';
 import {
