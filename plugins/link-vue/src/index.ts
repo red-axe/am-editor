@@ -122,16 +122,15 @@ export default class extends InlinePlugin<Options> {
 
 		let newText = '';
 		let textNode = node.clone(true).get<Text>()!;
-		const { $, card } = this.editor;
 		while (
 			textNode.textContent &&
 			(match = reg.exec(textNode.textContent))
 		) {
 			//从匹配到的位置切断
-			let regNode = textNode.splitText(match.index);
+			let regNode = textNode.splitText(match.index + 1);
 			newText += textNode.textContent;
 			//从匹配结束位置分割
-			textNode = regNode.splitText(match[0].length);
+			textNode = regNode.splitText(match[0].length - 1);
 
 			const text = match[2];
 			const url = match[3];

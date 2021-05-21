@@ -201,6 +201,8 @@ export default EngineDemo;
 
 引入`@aomao/toolbar`工具栏，工具栏基本上都是使用框架渲染，`vue`开发者使用 `@aomao/toolbar-vue`
 
+`vue` 请使用 vue3.0 @vue/cli-service @vue/cli-plugin-babel 相关脚手架 vite 无法使用此插件
+
 ```tsx | pure
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 ```

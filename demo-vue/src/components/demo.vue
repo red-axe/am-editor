@@ -187,7 +187,7 @@ export default defineComponent({
         })
 
         onUnmounted(() => {
-            //if(engine.value) engine.value.destroy()
+            if(engine.value) engine.value.destroy()
         })
 
         return {

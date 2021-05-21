@@ -31,7 +31,7 @@ class Table extends Plugin<Options> {
 	}
 
 	hotkey() {
-		return this.options.hotkey || 'mod+shift+e';
+		return this.options.hotkey || '';
 	}
 
 	schema(): Array<SchemaBlock> {
