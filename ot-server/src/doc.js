@@ -61,6 +61,11 @@ class Doc {
 		}
 	}
 
+	removeMember(uuid) {
+		const member = this.members.find(member => member.uuid === uuid);
+		if (member && this.sockets[uuid]) this.sockets[uuid].close();
+	}
+
 	addMember(ws, member) {
 		this.indexCount++;
 		// 设置用户序号
