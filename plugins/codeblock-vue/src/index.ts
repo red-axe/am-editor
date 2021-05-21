@@ -11,7 +11,7 @@ import {
 	unescape,
 	CARD_TYPE_KEY,
 } from '@aomao/engine';
-import CodeBlockComponent, { CodeBlockEditor } from './component';
+import CodeBlockComponent, { CodeBlockEditor, NAME_MAP } from './component';
 
 export type Options = {
 	hotkey?: string | Array<string>;
@@ -43,7 +43,9 @@ export default class extends Plugin<Options> {
 		this.editor.on('paste:each', child => this.pasteHtml(child));
 		if (isEngine(this.editor) && this.markdown) {
 			this.editor.on('keydown:enter', event => this.markdown(event));
-			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+			this.editor.on('paste:markdown-before', child =>
+				this.pasteMarkdown(child),
+			);
 		}
 	}
 
@@ -139,37 +141,75 @@ export default class extends Plugin<Options> {
 	}
 
 	pasteMarkdown(node: NodeInterface) {
-		if (
-			!isEngine(this.editor) ||
-			!this.markdown ||
-			!this.editor.node.isBlock(node)
-		)
-			return;
-		const text = node.text();
-		const match = /^```(.*){0,20}$/.exec(text);
+		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
+
+		let text = node.text();
+		if (!text) return;
+		const reg = /```/;
+		let match = reg.exec(text);
 		if (!match) return;
-		const modeText = (undefined === match[1] ? '' : match[1]).toLowerCase();
-		const mode = MODE_ALIAS[modeText] || modeText;
-		let code = '';
-		let next = node.next();
-		while (next) {
-			const text = next.text();
-			if (/^```/.test(text)) {
-				next.remove();
-				break;
+		const { $, card } = this.editor;
+
+		let newText = '';
+		const langs = Object.keys(NAME_MAP)
+			.concat(Object.keys(MODE_ALIAS))
+			.sort((a, b) => (a.length > b.length ? -1 : 1));
+
+		const createCodeblock = (
+			nodes: Array<string>,
+			mode: string = 'text',
+		) => {
+			//获取中间字符
+			const codeText = new Parser(nodes.join('\n'), this.editor).toText();
+			let code = unescape(codeText);
+
+			if (code.endsWith('\n')) code = code.substr(0, code.length - 2);
+			const tempNode = $('<div></div>');
+			const carNode = card.replaceNode(tempNode, 'codeblock', {
+				mode,
+				code,
+			});
+			tempNode.remove();
+
+			return carNode.get<Element>()?.outerHTML;
+		};
+
+		const rows = text.split(/\n|\r\n/);
+		let nodes: Array<string> = [];
+		let isCode: boolean = false;
+		let mode = 'text';
+		rows.forEach(row => {
+			let match = /^(.*)```(\s)*$/.exec(row);
+			if (match && isCode) {
+				nodes.push(match[1]);
+				newText += createCodeblock(nodes, mode) + '\n';
+				mode = 'text';
+				isCode = false;
+				nodes = [];
+				return;
 			}
-			const codeText = new Parser(next.html(), this.editor).toText();
-			code += unescape(codeText) + '\n';
-			const temp = next.next();
-			next.remove();
-			next = temp;
-		}
-		if (code.endsWith('\n')) code = code.substr(0, code.length - 1);
-		this.editor.card.replaceNode(node, 'codeblock', {
-			mode,
-			code,
+			match = /^```(.*)/.exec(row);
+			if (match) {
+				isCode = true;
+				mode =
+					langs.find(key => match && match[1].indexOf(key) === 0) ||
+					'text';
+				let code =
+					match[1].indexOf(mode) === 0
+						? match[1].substr(mode.length + 1)
+						: match[1];
+				mode = MODE_ALIAS[mode] || mode;
+				nodes.push(code);
+			} else if (isCode) {
+				nodes.push(row);
+			} else {
+				newText += row + '\n';
+			}
 		});
-		node.remove();
+		if (nodes.length > 0) {
+			newText += createCodeblock(nodes, mode) + '\n';
+		}
+		node.text(newText);
 	}
 
 	parseHtml(root: NodeInterface) {

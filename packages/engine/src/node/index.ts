@@ -581,7 +581,13 @@ class NodeModel implements NodeModelInterface {
 					nextNode = childNode.next();
 					const isBR = 'br' === childNode.name && !isLI;
 					cloneNode.append(childNode);
-					if (isBR || !nextNode || this.isBlock(nextNode)) break;
+					if (
+						isBR ||
+						!nextNode ||
+						this.isBlock(nextNode) ||
+						nextNode.isBlockCard()
+					)
+						break;
 					childNode = nextNode;
 				}
 				this.removeSide(cloneNode);

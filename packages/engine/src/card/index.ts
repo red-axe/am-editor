@@ -283,6 +283,7 @@ class CardModel implements CardModelInterface {
 		const readyCard = $(cardNode);
 		node.before(readyCard);
 		readyCard.append(node);
+		return readyCard;
 	}
 
 	activate(

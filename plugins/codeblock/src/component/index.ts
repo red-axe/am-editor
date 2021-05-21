@@ -8,6 +8,7 @@ import {
 } from '@aomao/engine';
 import CodeBlockEditor from './editor';
 import renderSelect from './select';
+import { NAME_MAP, SYNTAX_MAP } from './mode';
 import { CodeBlockEditorInterface } from './types';
 import './index.css';
 
@@ -89,4 +90,4 @@ class CodeBlcok extends Card<CodeBlockValue> {
 }
 
 export default CodeBlcok;
-export { CodeBlockEditor };
+export { CodeBlockEditor, NAME_MAP, SYNTAX_MAP };

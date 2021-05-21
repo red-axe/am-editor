@@ -3,6 +3,7 @@ import debounce from 'lodash-es/debounce';
 import Avatar from 'antd/lib/avatar';
 import Message from 'antd/lib/message';
 import Space from 'antd/lib/space';
+import Modal from 'antd/lib/modal';
 //引入编辑器引擎
 import Engine, {
 	EngineInterface,
@@ -29,6 +30,7 @@ import {
 import 'antd/lib/avatar/style';
 import 'antd/lib/message/style';
 import 'antd/lib/space/style';
+import 'antd/lib/modal/style';
 import './engine.less';
 
 const localMember =
@@ -167,6 +169,15 @@ const EngineDemo = () => {
 		};
 		engine.messageError = (error: string) => {
 			Message.error(error);
+		};
+		engine.messageConfirm = (msg: string) => {
+			return new Promise<boolean>((resolve, reject) => {
+				Modal.confirm({
+					content: msg,
+					onOk: () => resolve(true),
+					onCancel: () => reject(),
+				});
+			});
 		};
 		//初始化本地协作，用作记录历史
 		engine.ot.initLockMode();

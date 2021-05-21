@@ -22,7 +22,9 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	init() {
 		super.init();
 		if (isEngine(this.editor) && this.markdown) {
-			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+			this.editor.on('paste:markdown', child =>
+				this.pasteMarkdown(child),
+			);
 		}
 	}
 
@@ -118,43 +120,42 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	pasteMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown) return;
 		if (!node.isText()) return;
-		const parent = node.parent();
-		if (!parent) return;
-		const { $, inline, trigger } = this.editor;
-		let textNode = node.get<Text>()!;
-		if (!textNode.textContent) return;
-		const inlines: Array<NodeInterface> = [];
+
+		const { $, inline } = this.editor;
+		let text = node.text();
+		if (!text) return;
+
 		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
 		const reg = new RegExp(`(${key}([^${key}\r\n]+)${key})`);
-		let match;
+
+		let match = reg.exec(text);
+
+		if (!match) return;
+		let newText = '';
+		let textNode = node.clone(true).get<Text>()!;
+
 		while (
 			textNode.textContent &&
 			(match = reg.exec(textNode.textContent))
 		) {
 			//从匹配到的位置切断
 			let regNode = textNode.splitText(match.index);
+			newText += textNode.textContent;
 			//从匹配结束位置分割
 			textNode = regNode.splitText(match[0].length);
-			//移除匹配到的字符
-			regNode.remove();
+
 			//获取中间字符
 			const inlineNode = $(
 				`<${this.tagName}>${match[2]}</${this.tagName}>`,
 			);
-			inlines.push(inlineNode);
-			//追加node
-			node.after(inlineNode);
-			inline.repairCursor(inlineNode);
+
+			this.setStyle(inlineNode);
+			this.setAttributes(inlineNode);
+			newText += inlineNode.get<Element>()?.outerHTML;
 		}
-		if (match && textNode.textContent && textNode.textContent !== '') {
-			node.after(textNode);
-			trigger('paste:each', textNode);
-		}
-		//如果有解析到节点，就再次触发事件，可能节点内还有markdown字符没有解析
-		inlines.forEach(inline => {
-			const child = inline.first();
-			if (child?.isText()) trigger('paste:each', child);
-		});
+		newText += textNode.textContent;
+
+		node.text(newText);
 	}
 }
 

@@ -416,7 +416,11 @@ export interface CardModelInterface {
 	 * @param name 卡片名称
 	 * @param value 卡片值
 	 */
-	replaceNode(node: NodeInterface, name: string, value?: CardValue): void;
+	replaceNode(
+		node: NodeInterface,
+		name: string,
+		value?: CardValue,
+	): NodeInterface;
 	/**
 	 * 更新卡片重新渲染
 	 * @param card 卡片

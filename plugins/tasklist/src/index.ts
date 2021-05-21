@@ -40,7 +40,9 @@ export default class extends ListPlugin<Options> {
 		super.init();
 		this.editor.on('paser:html', node => this.parseHtml(node));
 		if (isEngine(this.editor)) {
-			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+			this.editor.on('paste:markdown', child =>
+				this.pasteMarkdown(child),
+			);
 		}
 	}
 
@@ -172,78 +174,60 @@ export default class extends ListPlugin<Options> {
 	}
 
 	pasteMarkdown(node: NodeInterface) {
-		if (!isEngine(this.editor) || !this.markdown) return;
-		if (
-			this.editor.node.isBlock(node) ||
-			(node.parent()?.isFragment && node.isText())
-		) {
-			const { $ } = this.editor;
-			const reg = /^(\[[\sx]{0,1}\])/;
-			const convertToNode = (node: NodeInterface) => {
-				const textNode = node.isText() ? node : node.first();
-				if (!textNode?.isText()) return;
-				const text = textNode.text();
-				const match = reg.exec(text);
-				if (!match) return;
+		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
-				const codeLength = match[1].length;
-				const newTextNode = $(
-					textNode
-						.get<Text>()!
-						.splitText(
-							/^\s+/.test(text.substr(codeLength))
-								? codeLength + 1
-								: codeLength,
-						),
+		const text = node.text();
+		if (!text) return;
+
+		const reg = /(^|\r\n|\n)(-\s*)?(\[[\sx]{0,1}\])/;
+		let match = reg.exec(text);
+		if (!match) return;
+
+		const { $, list, card } = this.editor;
+
+		const createList = (nodes: Array<string>) => {
+			const listNode = $(
+				`<${this.tagName} class="${
+					list.CUSTOMZIE_UL_CLASS
+				} data-list-task">${nodes.join('')}</${this.tagName}>`,
+			);
+			list.addBr(listNode);
+			return listNode.get<Element>()?.outerHTML;
+		};
+
+		let newText = '';
+		const rows = text.split(/\n|\r\n/);
+		let nodes: Array<string> = [];
+		rows.forEach(row => {
+			const match = /^(-\s*)?(\[[\sx]{0,1}\])/.exec(row);
+			if (match) {
+				const codeLength = match[0].length;
+				const content = row.substr(
+					/^\s+/.test(row.substr(codeLength))
+						? codeLength + 1
+						: codeLength,
 				);
-				let li = $('<li />');
-				if (!node.isText()) {
-					textNode.remove();
-					node.children().each(child => {
-						li.append(child);
-					});
-				} else {
-					li.append(newTextNode);
-				}
 				const tempNode = $('<span />');
-				li.first()?.before(tempNode);
-				this.editor.card.replaceNode(tempNode, this.cardName, {
-					checked: match[1].indexOf('x') > 0,
+				const cardNode = card.replaceNode(tempNode, this.cardName, {
+					checked: match[0].indexOf('x') > 0,
 				});
 				tempNode.remove();
-				li.addClass(this.editor.list.CUSTOMZIE_LI_CLASS);
-				return li;
-			};
-			const startLi = convertToNode(node);
-			if (!startLi) return;
-			const nodes = [];
-			nodes.push(startLi);
-
-			if (!node.isText()) {
-				let next = node.next();
-				while (next) {
-					const li = convertToNode(next);
-					if (!li) break;
-					nodes.push(li);
-					const temp = next.next();
-					next.remove();
-					next = temp;
-				}
+				nodes.push(
+					`<li class="${list.CUSTOMZIE_LI_CLASS}">${
+						cardNode.get<Element>()?.outerHTML
+					}${content}</li>`,
+				);
+			} else if (nodes.length > 0) {
+				newText += createList(nodes) + '\n' + row + '\n';
+				nodes = [];
+			} else {
+				newText += row + '\n';
 			}
-
-			const root = $(
-				`<${this.tagName} class="${this.editor.list.CUSTOMZIE_UL_CLASS} data-list-task" />`,
-			);
-			nodes.forEach(li => {
-				root.append(li);
-			});
-			node.before(root);
-			node.remove();
-			this.editor.list.addBr(root);
-			root.allChildren().forEach(child => {
-				if (child) this.editor.trigger('paste:each', $(child));
-			});
+		});
+		if (nodes.length > 0) {
+			newText += createList(nodes) + '\n';
 		}
+		node.text(newText);
 	}
 }
 export { CheckboxComponent };

@@ -31,7 +31,9 @@ export default class extends ListPlugin<Options> {
 	init() {
 		super.init();
 		if (isEngine(this.editor)) {
-			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+			this.editor.on('paste:markdown', child =>
+				this.pasteMarkdown(child),
+			);
 		}
 	}
 
@@ -111,62 +113,46 @@ export default class extends ListPlugin<Options> {
 	}
 
 	pasteMarkdown(node: NodeInterface) {
-		if (!isEngine(this.editor) || !this.markdown) return;
-		if (
-			this.editor.node.isBlock(node) ||
-			(node.parent()?.isFragment && node.isText())
-		) {
-			const { $ } = this.editor;
-			const reg = /^([\*-\+]{1,}\s+)/;
-			const convertToNode = (node: NodeInterface) => {
-				const textNode = node.isText() ? node : node.first();
-				if (!textNode?.isText()) return;
-				const text = textNode.text();
-				const match = reg.exec(text);
-				if (!match) return;
+		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
+		const text = node.text();
+		if (!text) return;
+
+		const reg = /(\r\n|\n)?([\*\-\+]{1,}\s+)/g;
+		let match = reg.exec(text);
+		if (!match) return;
+
+		const { $, list } = this.editor;
+
+		const createList = (nodes: Array<string>, start?: number) => {
+			const listNode = $(
+				`<${this.tagName} start="${start || 1}">${nodes.join('')}</${
+					this.tagName
+				}>`,
+			);
+			list.addBr(listNode);
+			return listNode.get<Element>()?.outerHTML;
+		};
+
+		let newText = '';
+		const rows = text.split(/\n|\r\n/);
+		let nodes: Array<string> = [];
+		rows.forEach(row => {
+			const match = /^([\*\-\+]{1,}\s+)/.exec(row);
+			if (match) {
 				const codeLength = match[1].length;
-				const newTextNode = $(
-					textNode.get<Text>()!.splitText(codeLength),
-				);
-				let li = $('<li />');
-				if (!node.isText()) {
-					textNode.remove();
-					node.children().each(child => {
-						li.append(child);
-					});
-				} else {
-					li.append(newTextNode);
-				}
-				return li;
-			};
-			const startLi = convertToNode(node);
-			if (!startLi) return;
-			const nodes = [];
-			nodes.push(startLi);
-
-			if (!node.isText()) {
-				let next = node.next();
-				while (next) {
-					const li = convertToNode(next);
-					if (!li) break;
-					nodes.push(li);
-					const temp = next.next();
-					next.remove();
-					next = temp;
-				}
+				const content = row.substr(codeLength);
+				nodes.push(`<li>${content}</li>`);
+			} else if (nodes.length > 0) {
+				newText += createList(nodes) + '\n' + row + '\n';
+				nodes = [];
+			} else {
+				newText += row + '\n';
 			}
-
-			const root = $(`<${this.tagName} />`);
-			nodes.forEach(li => {
-				root.append(li);
-			});
-			node.before(root);
-			node.remove();
-			this.editor.list.addBr(root);
-			root.allChildren().forEach(child => {
-				if (child) this.editor.trigger('paste:each', $(child));
-			});
+		});
+		if (nodes.length > 0) {
+			newText += createList(nodes) + '\n';
 		}
+		node.text(newText);
 	}
 }

@@ -10,7 +10,12 @@ import TableComponent, { Template } from './component';
 import locales from './locale';
 import './index.css';
 
-class Table extends Plugin {
+export type Options = {
+	hotkey?: string | Array<string>;
+	markdown?: boolean;
+};
+
+class Table extends Plugin<Options> {
 	static get pluginName() {
 		return 'table';
 	}
@@ -20,6 +25,13 @@ class Table extends Plugin {
 		this.editor.schema.add(this.schema());
 		this.editor.on('paser:html', node => this.parseHtml(node));
 		this.editor.on('paste:each-after', child => this.pasteHtml(child));
+		this.editor.on('paste:markdown-after', child =>
+			this.pasteMarkdown(child),
+		);
+	}
+
+	hotkey() {
+		return this.options.hotkey || 'mod+shift+e';
 	}
 
 	schema(): Array<SchemaBlock> {
@@ -142,6 +154,55 @@ class Table extends Plugin {
 			});
 			node.replaceWith(table);
 		});
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		if (
+			!isEngine(this.editor) ||
+			this.options.markdown === false ||
+			!node.isText()
+		)
+			return;
+
+		const text = node.text();
+		if (!text) return;
+
+		const reg = /\|(?:(?:[^\|]+?)\|){2,}/;
+		let match = reg.exec(text);
+		if (!match) return;
+
+		const { $ } = this.editor;
+
+		const createTable = (nodes: Array<string>) => {
+			const tableNode = $(`<table>${nodes.join('')}</table>`);
+			return tableNode.get<Element>()?.outerHTML;
+		};
+
+		let newText = '';
+		const rows = text.split(/\n|\r\n/);
+		let nodes: Array<string> = [];
+		rows.forEach(row => {
+			const match = /^\s*\|(?:(?:[^\|]+?)\|){2,}\s*$/.exec(row);
+			if (match) {
+				const cols = match[0].split('|');
+				const colNodes: Array<string> = [];
+				cols.forEach(col => {
+					if (col.trim().indexOf('---') === 0) return;
+					colNodes.push(`<td>${col}</td>`);
+				});
+				if (colNodes.length === cols.length)
+					nodes.push(`<tr>${colNodes.join('')}</tr>`);
+			} else if (nodes.length > 0) {
+				newText += createTable(nodes) + '\n' + row + '\n';
+				nodes = [];
+			} else {
+				newText += row + '\n';
+			}
+		});
+		if (nodes.length > 0) {
+			newText += createTable(nodes) + '\n';
+		}
+		node.text(newText);
 	}
 }
 

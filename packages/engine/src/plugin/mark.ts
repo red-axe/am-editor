@@ -1,4 +1,5 @@
 import ElementPluginEntry from './element';
+import { unescape } from '../utils';
 import {
 	isEngine,
 	MarkInterface,
@@ -44,7 +45,7 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	init() {
 		super.init();
 		if (isEngine(this.editor) && this.markdown) {
-			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+			this.editor.on('paste:markdown', node => this.pasteMarkdown(node));
 		}
 	}
 
@@ -158,55 +159,37 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	pasteMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown) return;
 		if (!node.isText()) return;
-		const parent = node.parent();
-		if (!parent) return;
 
-		let textNode = node.get<Text>()!;
-		if (!textNode.textContent) return;
-		const marks: Array<NodeInterface> = [];
+		let text = node.text();
+		if (!text) return;
 		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
 		const reg = new RegExp(`(${key}([^${key}\r\n]+)${key})`);
-		let match = reg.exec(textNode.textContent);
-		if (match) {
-			//限制block下某些禁用的mark插件
-			const blockPlugin = this.editor.block.findPlugin(node);
-			const pluginName = (this.constructor as PluginEntryType).pluginName;
-			if (
-				blockPlugin.some(
-					plugin =>
-						plugin.disableMark &&
-						plugin.disableMark.indexOf(pluginName) > -1,
-				)
-			)
-				return;
-		}
+		let match = reg.exec(text);
+		if (!match) return;
+		let newText = '';
+		let textNode = node.clone(true).get<Text>()!;
+
 		while (
 			textNode.textContent &&
 			(match = reg.exec(textNode.textContent))
 		) {
 			//从匹配到的位置切断
 			let regNode = textNode.splitText(match.index);
+			newText += textNode.textContent;
 			//从匹配结束位置分割
 			textNode = regNode.splitText(match[0].length);
-			//移除匹配到的字符
-			regNode.remove();
+
 			//获取中间字符
 			const markNode = this.editor.$(
 				`<${this.tagName}>${match[2]}</${this.tagName}>`,
 			);
-			marks.push(markNode);
-			//追加node
-			node.after(markNode);
+			this.setStyle(markNode);
+			this.setAttributes(markNode);
+			newText += markNode.get<Element>()?.outerHTML;
 		}
-		if (match && textNode.textContent && textNode.textContent !== '') {
-			node.after(textNode);
-			this.editor.trigger('paste:each', textNode);
-		}
-		//如果有解析到节点，就再次触发事件，可能节点内还有markdown字符没有解析
-		marks.forEach(mark => {
-			const child = mark.first();
-			if (child?.isText()) this.editor.trigger('paste:each', child);
-		});
+		newText += textNode.textContent;
+
+		node.text(newText);
 	}
 }
 

@@ -687,7 +687,7 @@ export default class extends MarkPlugin<Options> {
 
 		range.select(container, true).collapse(true);
 
-		paths.forEach(({ id, path }) => {
+		(paths || []).forEach(({ id, path }) => {
 			const pathRange = Range.fromPath(this.editor, path, container);
 			const elements = pathRange.findElementsInSimpleRange();
 			elements.forEach(element => {

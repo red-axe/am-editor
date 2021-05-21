@@ -27,7 +27,9 @@ export default class extends BlockPlugin<Options> {
 				this.onBackspace(event),
 			);
 			this.editor.on('keydow:enter', event => this.onEnter(event));
-			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+			this.editor.on('paste:markdown', child =>
+				this.pasteMarkdown(child),
+			);
 		}
 	}
 
@@ -91,74 +93,58 @@ export default class extends BlockPlugin<Options> {
 	}
 
 	pasteMarkdown(node: NodeInterface) {
-		if (!isEngine(this.editor) || !this.markdown) return;
-		if (
-			(node.name === 'p' && this.editor.node.isBlock(node)) ||
-			(node.parent()?.isFragment && node.isText())
-		) {
-			const { $ } = this.editor;
-			const reg = /^([>]{1,})/;
-			const convertToNode = (node: NodeInterface) => {
-				const textNode = node.isText() ? node : node.first();
-				if (!textNode?.isText()) return;
-				const text = textNode.text();
-				const match = reg.exec(text);
-				if (!match) return;
+		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
+		const text = node.text();
+		if (!text) return;
+
+		const reg = /(^|\r\n|\n)([>]{1,})/;
+		let match = reg.exec(text);
+		if (!match) return;
+
+		const { $ } = this.editor;
+
+		let newText = '';
+		const rows = text.split(/\n|\r\n/);
+		let nodes: Array<string> = [];
+		rows.forEach(row => {
+			const match = /^([>]{1,})/.exec(row);
+			if (match) {
 				const codeLength = match[1].length;
-				const newTextNode = $(
-					textNode
-						.get<Text>()!
-						.splitText(
-							/^\s+/.test(text.substr(codeLength))
-								? codeLength + 1
-								: codeLength,
-						),
+				const content = row.substr(
+					/^\s+/.test(row.substr(codeLength))
+						? codeLength + 1
+						: codeLength,
 				);
-				let quoteNode = $(`<${this.tagName} />`);
-				if (!node.isText()) {
-					textNode.remove();
-					node.get<Element>()?.normalize();
-					node.children().each(child => {
-						if (child.nodeType === Node.TEXT_NODE) {
-							const pNode = $('<p />');
-							pNode.append(child);
-							quoteNode.append(pNode);
-						} else quoteNode.append(child);
-					});
+				const container = $('<div></div>');
+				container.html(content);
+				const childNodes = container.children();
+				if (
+					childNodes.length > 1 ||
+					(childNodes.length === 1 &&
+						!this.editor.node.isBlock(childNodes[0]) &&
+						!childNodes.eq(0)?.isBlockCard())
+				) {
+					nodes.push(`<p>${content}</p>`);
 				} else {
-					const pNode = $('<p />');
-					pNode.append(newTextNode);
-					quoteNode.append(pNode);
+					nodes.push(content);
 				}
-				return quoteNode;
-			};
-			const startQuote = convertToNode(node);
-			if (!startQuote) return;
-			const nodes = [];
-			nodes.push(startQuote);
-
-			if (!node.isText()) {
-				let next = node.next();
-				while (next) {
-					const quoteNode = convertToNode(next);
-					if (!quoteNode) break;
-					nodes.push(quoteNode);
-					const temp = next.next();
-					next.remove();
-					next = temp;
-				}
+			} else if (nodes.length > 0) {
+				newText +=
+					`<${this.tagName}>${nodes.join('')}</${this.tagName}>` +
+					'\n' +
+					row +
+					'\n';
+				nodes = [];
+			} else {
+				newText += row + '\n';
 			}
-			let prevNode = node;
-			nodes.forEach(quoteNode => {
-				prevNode.after(quoteNode);
-				quoteNode.allChildren().forEach(child => {
-					if (child) this.editor.trigger('paste:each', $(child));
-				});
-				prevNode = quoteNode;
-			});
-			node.remove();
+		});
+		if (nodes.length > 0) {
+			newText +=
+				`<${this.tagName}>${nodes.join('')}</${this.tagName}>` + '\n';
 		}
+		node.text(newText);
 	}
 
 	onBackspace(event: KeyboardEvent) {

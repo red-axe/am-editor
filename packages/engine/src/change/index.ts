@@ -1,4 +1,4 @@
-import { EventListener, NodeInterface, isNodeEntry } from '../types/node';
+import { NodeInterface } from '../types/node';
 import { ActiveTrigger, CardEntry, CardType } from '../types/card';
 import { ChangeInterface, ChangeOptions } from '../types/change';
 import { EngineInterface } from '../types/engine';
@@ -28,6 +28,7 @@ import {
 import Paste from './paste';
 import { SelectionInterface } from '../types/selection';
 import Selection from '../selection';
+import { ClipboardData } from '../types';
 
 class ChangeModel implements ChangeInterface {
 	private engine: EngineInterface;
@@ -781,6 +782,44 @@ class ChangeModel implements ChangeInterface {
 			});
 		});
 
+		const pasteMarkdown = async (source: string) => {
+			const oldValue = this.getValue({ ignoreCursor: false });
+
+			const parser = new Parser(source, this.engine);
+			const schema = this.engine.schema.clone();
+			schema.add([
+				{
+					name: 'span',
+					type: 'mark',
+				},
+				{
+					name: 'div',
+					type: 'block',
+				},
+			]);
+			const text = parser.toText(schema);
+			const textNode = $(document.createTextNode(text));
+			this.engine.trigger('paste:markdown-before', textNode);
+			this.engine.trigger('paste:markdown', textNode);
+			this.engine.trigger('paste:markdown-after', textNode);
+
+			const newText = textNode.text();
+			if (newText !== text) {
+				this.engine
+					.messageConfirm(
+						this.engine.language.get<string>(
+							'checkMarkdown',
+							'title',
+						),
+					)
+					.then(() => {
+						this.setValue(oldValue);
+						textNode.get<Text>()?.normalize();
+						this.paste(textNode.text());
+					});
+			}
+		};
+
 		this.event.onPaste(data => {
 			const { html, text, files, isPasteText } = data;
 			let source = '';
@@ -813,16 +852,8 @@ class ChangeModel implements ChangeInterface {
 			if (this.engine.trigger('paste:event', data, source) === false)
 				return;
 			if (files.length === 0) {
-				const fragment = new Paste(source, this.engine).normalize();
-				this.engine.trigger('paste:before', fragment);
-				this.insertFragment(fragment, range => {
-					this.engine.trigger('paste:insert', range);
-					const selection = range.createSelection();
-					this.engine.card.render();
-					selection.move();
-					range.scrollRangeIntoView();
-				});
-				this.engine.trigger('paste:after');
+				pasteMarkdown(source);
+				this.paste(source);
 			}
 		});
 
@@ -852,6 +883,19 @@ class ChangeModel implements ChangeInterface {
 		});
 	}
 
+	paste(source: string) {
+		const fragment = new Paste(source, this.engine).normalize();
+		this.engine.trigger('paste:before', fragment);
+		this.insertFragment(fragment, range => {
+			this.engine.trigger('paste:insert', range);
+			const selection = range.createSelection();
+			this.engine.card.render();
+			selection.move();
+			range.scrollRangeIntoView();
+		});
+		this.engine.trigger('paste:after');
+	}
+
 	combinTextNode() {
 		combinTextNode(this.engine.container);
 	}
@@ -876,6 +920,7 @@ class ChangeModel implements ChangeInterface {
 		callback: (range: RangeInterface) => void = () => {},
 	) {
 		const { block, list, card, $, schema } = this.engine;
+		const nodeApi = this.engine.node;
 		const range = this.getSafeRange();
 		const firstBlock = block.closest(range.startNode);
 		const lastBlock = block.closest(range.endNode);
@@ -894,7 +939,7 @@ class ChangeModel implements ChangeInterface {
 			this.apply(range);
 			return;
 		}
-		if (!this.engine.node.isBlock(firstNode) && !firstNode.isCard()) {
+		if (!nodeApi.isBlock(firstNode) && !firstNode.isCard()) {
 			range.shrinkToElementNode().insertNode(fragment);
 			this.apply(range.collapse(false));
 			return;
@@ -907,10 +952,7 @@ class ChangeModel implements ChangeInterface {
 		if (mergeNode[0]) {
 			childNodes.forEach(node => {
 				if (mergeTags.indexOf($(node).name) < 0) {
-					this.engine.node.wrap(
-						$(node),
-						this.engine.node.clone(mergeNode, false),
-					);
+					nodeApi.wrap($(node), nodeApi.clone(mergeNode, false));
 				}
 			});
 		}
@@ -924,7 +966,7 @@ class ChangeModel implements ChangeInterface {
 			const fragment = doc.createDocumentFragment();
 			let node: NodeInterface | null = $(childNodes[0]);
 			while (node && node.length > 0) {
-				this.engine.node.removeSide(node);
+				nodeApi.removeSide(node);
 				const next: NodeInterface | null = node.next();
 				if (!next) {
 					lastNode = node;
@@ -940,7 +982,7 @@ class ChangeModel implements ChangeInterface {
 
 		const getFirstChild = (node: NodeInterface) => {
 			let child = node.first();
-			if (!child || !this.engine.node.isBlock(child)) return node;
+			if (!child || !nodeApi.isBlock(child)) return node;
 			while (allowInTags.indexOf(child ? child.name : '') > -1) {
 				child = child!.first();
 			}
@@ -949,7 +991,7 @@ class ChangeModel implements ChangeInterface {
 
 		const getLastChild = (node: NodeInterface) => {
 			let child = node.last();
-			if (!child || !this.engine.node.isBlock(child)) return node;
+			if (!child || !nodeApi.isBlock(child)) return node;
 			while (allowInTags.indexOf(child ? child.name : '') > -1) {
 				child = child!.last();
 			}
@@ -977,7 +1019,7 @@ class ChangeModel implements ChangeInterface {
 			while (!node.isEditable()) {
 				const parent = node.parent();
 				node.remove();
-				if (!parent || !this.engine.node.isEmpty(parent)) break;
+				if (!parent || !nodeApi.isEmpty(parent)) break;
 				node = parent;
 			}
 		};
@@ -992,15 +1034,12 @@ class ChangeModel implements ChangeInterface {
 				lastNode.attributes(attr);
 			}
 			if (
-				this.engine.node.isLikeEmpty(lastNode) &&
-				!this.engine.node.isLikeEmpty(nextNode)
+				nodeApi.isLikeEmpty(lastNode) &&
+				!nodeApi.isLikeEmpty(nextNode)
 			) {
 				lastNode.get<Element>()!.innerHTML = '';
 			}
-			if (
-				this.engine.node.isCustomize(lastNode) ===
-				this.engine.node.isCustomize(nextNode)
-			)
+			if (nodeApi.isCustomize(lastNode) === nodeApi.isCustomize(nextNode))
 				list.unwrapCustomize(nextNode);
 		};
 
@@ -1009,13 +1048,10 @@ class ChangeModel implements ChangeInterface {
 			const _lastNode = getLastChild($(startNode))!;
 			if (isSameListChild(_lastNode, _firstNode)) {
 				clearList(_lastNode, _firstNode);
-				this.engine.node.merge(_lastNode, _firstNode, false);
+				nodeApi.merge(_lastNode, _firstNode, false);
 				removeEmptyNode(_firstNode);
 			} else {
-				if (
-					this.engine.node.isEmpty(_lastNode) ||
-					list.isEmptyItem(_lastNode)
-				) {
+				if (nodeApi.isEmpty(_lastNode) || list.isEmptyItem(_lastNode)) {
 					removeEmptyNode(_lastNode);
 				}
 			}
@@ -1028,10 +1064,10 @@ class ChangeModel implements ChangeInterface {
 				.select(prevNode, true)
 				.shrinkToElementNode()
 				.collapse(false);
-			if (nextNode && this.engine.node.isEmpty(nextNode)) {
+			if (nextNode && nodeApi.isEmpty(nextNode)) {
 				removeEmptyNode(nextNode);
 			} else if (isSameListChild(prevNode, nextNode)) {
-				this.engine.node.merge(prevNode, nextNode, false);
+				nodeApi.merge(prevNode, nextNode, false);
 				removeEmptyNode(nextNode);
 			}
 		}

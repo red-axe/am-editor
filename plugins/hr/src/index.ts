@@ -23,7 +23,9 @@ export default class extends Plugin<Options> {
 		this.editor.on('paste:each', child => this.pasteHtml(child));
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:enter', event => this.markdown(event));
-			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+			this.editor.on('paste:markdown', child =>
+				this.pasteMarkdown(child),
+			);
 		}
 	}
 
@@ -65,19 +67,33 @@ export default class extends Plugin<Options> {
 	}
 
 	pasteMarkdown(node: NodeInterface) {
-		if (!isEngine(this.editor) || !this.markdown) return;
-		if (
-			this.editor.node.isBlock(node) ||
-			(node.parent()?.isFragment && node.isText())
+		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
+
+		const text = node.text();
+		const reg = /(^|\r\n|\n)([-]{3,})\s?(\r\n|\n|$)/;
+		let match = reg.exec(text);
+		if (!match) return;
+
+		let newText = '';
+		let textNode = node.clone(true).get<Text>()!;
+		const { $, card } = this.editor;
+		while (
+			textNode.textContent &&
+			(match = reg.exec(textNode.textContent))
 		) {
-			const textNode = node.isText() ? node : node.first();
-			if (!textNode?.isText()) return;
-			const text = textNode.text();
-			const match = /^([-]{3,})\s?$/.exec(text);
-			if (!match) return;
-			this.editor.card.replaceNode(node, 'hr');
-			node.remove();
+			//从匹配到的位置切断
+			let regNode = textNode.splitText(match.index);
+			newText += textNode.textContent;
+			//从匹配结束位置分割
+			textNode = regNode.splitText(match[0].length);
+
+			const cardNode = card.replaceNode($(regNode), 'hr');
+			regNode.remove();
+
+			newText += cardNode.get<Element>()?.outerHTML + '\n';
 		}
+		newText += textNode.textContent;
+		node.text(newText);
 	}
 
 	pasteSchema(schema: SchemaInterface) {

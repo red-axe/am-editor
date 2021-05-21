@@ -100,7 +100,9 @@ export default class extends BlockPlugin<Options> {
 			this.editor.on('keydown:backspace', event =>
 				this.onBackspace(event),
 			);
-			this.editor.on('paste:each', child => this.pasteMarkdown(child));
+			this.editor.on('paste:markdown', child =>
+				this.pasteMarkdown(child),
+			);
 		}
 		//引擎处理
 		if (!isEngine(this.editor) || this.options.showAnchor === false) return;
@@ -462,36 +464,32 @@ export default class extends BlockPlugin<Options> {
 	}
 
 	pasteMarkdown(node: NodeInterface) {
-		if (!isEngine(this.editor) || !this.markdown) return;
-		if (
-			this.editor.node.isBlock(node) ||
-			(node.parent()?.isFragment && node.isText())
+		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
+
+		const text = node.text();
+		const reg = /(^|\r\n|\n)(#{1,6})(.*)/;
+		let match = reg.exec(text);
+		if (!match) return;
+
+		let newText = '';
+		let textNode = node.clone(true).get<Text>()!;
+
+		while (
+			textNode.textContent &&
+			(match = reg.exec(textNode.textContent))
 		) {
-			const textNode = node.isText() ? node : node.first();
-			if (!textNode?.isText()) return;
-			const text = textNode.text();
-			const match = /^(#{1,6})/.exec(text);
-			if (!match) return;
-			const { $ } = this.editor;
-			const codeLength = match[1].length;
-			const newTextNode = textNode
-				.get<Text>()!
-				.splitText(
-					/^\s+/.test(text.substr(codeLength))
-						? codeLength + 1
-						: codeLength,
-				);
-			textNode.replaceWith(newTextNode);
-			let heading = $(`<h${codeLength} />`);
-			if (node.isText()) {
-				newTextNode.before(heading[0]);
-				heading.append(newTextNode.cloneNode(true));
-				newTextNode.remove();
-			} else {
-				heading = this.editor.node.replace(node, heading);
-			}
-			this.editor.trigger('paste:each', heading.first());
+			const codeLength = match[2].length;
+			//从匹配到的位置切断
+			let regNode = textNode.splitText(match.index);
+			newText += textNode.textContent;
+			//从匹配结束位置分割
+			textNode = regNode.splitText(match[0].length);
+
+			newText += `<h${codeLength}>${match[3].trim()}</h${codeLength}>\n`;
 		}
+		newText += textNode.textContent;
+
+		node.text(newText);
 	}
 
 	onBackspace(event: KeyboardEvent) {

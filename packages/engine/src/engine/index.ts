@@ -336,6 +336,11 @@ class Engine implements EngineInterface {
 	messageError(error: string) {
 		console.log(`error:${error}`);
 	}
+
+	messageConfirm(message: string) {
+		console.log(`confirm:${message}`);
+		return Promise.reject(false);
+	}
 }
 
 export default Engine;

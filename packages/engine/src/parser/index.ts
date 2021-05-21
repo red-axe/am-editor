@@ -413,7 +413,11 @@ class Parser {
 	 * @param conversionRules 标签转换规则
 	 * @param includeCard 是否包含卡片
 	 */
-	toText(conversionRules: any = null, includeCard?: boolean) {
+	toText(
+		schema: SchemaInterface | null = null,
+		conversionRules: any = null,
+		includeCard?: boolean,
+	) {
 		const result: Array<string> = [];
 
 		this.walkTree(
@@ -465,7 +469,7 @@ class Parser {
 					result.push(text);
 				},
 				onClose: node => {
-					if (this.editor.node.isBlock(node)) {
+					if (this.editor.node.isBlock(node, schema || undefined)) {
 						result.push('\n');
 					}
 				},

@@ -49,9 +49,10 @@ export default class Paste {
 			},
 		]);
 		this.engine.trigger('paste:schema', this.schema);
-		return new Parser(this.source, this.engine, root => {
+		const parser = new Parser(this.source, this.engine, root => {
 			this.engine.trigger('paste:origin', root);
-		}).toDOM(this.schema, conversion.getValue());
+		});
+		return parser.toDOM(this.schema, conversion.getValue());
 	}
 
 	getDefaultStyle() {
@@ -71,7 +72,8 @@ export default class Paste {
 
 	commonNormalize(fragment: DocumentFragment) {
 		const defaultStyle = this.getDefaultStyle();
-		const { $ } = this.engine;
+		const { $, inline } = this.engine;
+		const nodeApi = this.engine.node;
 		// 第一轮预处理，主要处理 span 节点
 		let nodes = $(fragment).allChildren();
 		nodes.forEach(child => {
@@ -96,7 +98,7 @@ export default class Paste {
 					}
 				});
 			}
-			this.engine.node.removeMinusStyle(node, 'text-indent');
+			nodeApi.removeMinusStyle(node, 'text-indent');
 			if (['ol', 'ul'].includes(node.name)) {
 				node.css('padding-left', '');
 			}
@@ -113,18 +115,15 @@ export default class Paste {
 				Object.keys(node.css()).length === 0 &&
 				(node.text().trim() === '' ||
 					(node.first() &&
-						(this.engine.node.isMark(node.first()!, this.schema) ||
-							this.engine.node.isBlock(
-								node.first()!,
-								this.schema,
-							))))
+						(nodeApi.isMark(node.first()!, this.schema) ||
+							nodeApi.isBlock(node.first()!, this.schema))))
 			) {
-				this.engine.node.unwrap(node);
+				nodeApi.unwrap(node);
 				return;
 			}
 
 			// br 换行改成正常段落
-			if (this.engine.node.isBlock(node, this.schema)) {
+			if (nodeApi.isBlock(node, this.schema)) {
 				this.engine.block.brToBlock(node);
 			}
 		});
@@ -139,7 +138,7 @@ export default class Paste {
 			// 删除 google docs 根节点
 			// <b style="font-weight:normal;" id="docs-internal-guid-e0280780-7fff-85c2-f58a-6e615d93f1f2">
 			if (/^docs-internal-guid-/.test(node.attributes('id'))) {
-				this.engine.node.unwrap(node);
+				nodeApi.unwrap(node);
 				return;
 			}
 			// 跳过Card
@@ -148,11 +147,11 @@ export default class Paste {
 			}
 			// 删除零高度的空行
 			if (
-				this.engine.node.isBlock(node, this.schema) &&
+				nodeApi.isBlock(node, this.schema) &&
 				node.attributes('data-type') !== 'p' &&
-				!this.engine.node.isVoid(node, this.schema) &&
+				!nodeApi.isVoid(node, this.schema) &&
 				//!node.isSolid() &&
-				this.engine.node.html(node) === ''
+				nodeApi.html(node) === ''
 			) {
 				node.remove();
 				return;
@@ -192,7 +191,7 @@ export default class Paste {
 				const isCustomizeList = parent?.parent()?.hasClass('data-list');
 				parent?.children().each(child => {
 					const node = $(child);
-					if (this.engine.node.isEmptyWithTrim(node)) {
+					if (nodeApi.isEmptyWithTrim(node)) {
 						return;
 					}
 					const isList = ['ol', 'ul'].indexOf(node.name) >= 0;
@@ -215,26 +214,26 @@ export default class Paste {
 				node.name === 'p' &&
 				['ol', 'ul'].indexOf(node.parent()?.name || '') >= 0
 			) {
-				this.engine.node.replace(node, $('<li />'));
+				nodeApi.replace(node, $('<li />'));
 				return;
 			}
 			// 处理空 Block
 			if (
-				this.engine.node.isBlock(node, this.schema) &&
-				!this.engine.node.isVoid(node, this.schema) &&
-				this.engine.node.html(node).trim() === ''
+				nodeApi.isBlock(node, this.schema) &&
+				!nodeApi.isVoid(node, this.schema) &&
+				nodeApi.html(node).trim() === ''
 			) {
 				// <p></p> to <p><br /></p>
 				if (
-					this.engine.node.isRootBlock(node, this.schema) ||
+					nodeApi.isRootBlock(node, this.schema) ||
 					node.name === 'li'
 				) {
-					this.engine.node.html(node, '<br />');
+					nodeApi.html(node, '<br />');
 				}
 			}
 			// <li><p>foo</p></li>
 			if (
-				this.engine.node.isRootBlock(node, this.schema) &&
+				nodeApi.isRootBlock(node, this.schema) &&
 				node.parent()?.name === 'li'
 			) {
 				// <li><p><br /></p></li>
@@ -246,22 +245,26 @@ export default class Paste {
 				} else {
 					node.after('<br />');
 				}
-				this.engine.node.unwrap(node);
+				nodeApi.unwrap(node);
 				return;
 			}
+			if (nodeApi.isInline(node)) {
+				inline.repairCursor(node);
+			}
 			// 移除两边的 BR
-			this.engine.node.removeSide(node);
+			nodeApi.removeSide(node);
 		});
 	}
 
 	normalize() {
 		const { $ } = this.engine;
+		const nodeApi = this.engine.node;
 		const fragment = this.parser();
 		this.commonNormalize(fragment);
 		const range = this.engine.change.getRange();
 		const root = range.commonAncestorNode;
 		const inline = this.engine.inline.closest(root);
-		if (this.engine.node.isInline(inline)) {
+		if (nodeApi.isInline(inline)) {
 			this.removeElementNodes($(fragment));
 			return fragment;
 		}
@@ -293,10 +296,10 @@ export default class Paste {
 				node.name === 'pre' &&
 				node.find(READY_CARD_SELECTOR).length > 0
 			) {
-				this.engine.node.unwrap(node);
+				nodeApi.unwrap(node);
 			}
 		});
-		this.engine.node.normalize($(fragment));
+		nodeApi.normalize($(fragment));
 		fragment.normalize();
 		nodes = $(fragment).allChildren();
 		nodes.forEach(child => {

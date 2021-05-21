@@ -406,6 +406,11 @@ export interface EditorInterface {
 	 * @param error 错误信息
 	 */
 	messageError(error: string): void;
+	/**
+	 * 消息确认
+	 * @param message 消息
+	 */
+	messageConfirm(message: string): Promise<boolean>;
 }
 
 export type EngineOptions = {
