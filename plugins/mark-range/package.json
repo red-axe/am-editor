@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-mark-range",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "description": "范围标记",
     "publishConfig": {
         "access": "public"
@@ -24,7 +24,7 @@
         "url": "https://github.com/itellyou-com/am-editor/issues"
     },
     "dependencies": {
-        "@aomao/engine": "^2.0.1",
+        "@aomao/engine": "^2.1.0",
         "@babel/runtime": "^7.13.10",
         "tinycolor2": "^1.4.2"
     }
