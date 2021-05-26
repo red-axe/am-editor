@@ -75,7 +75,7 @@ $ npm install @aomao/engine
 $ yarn add @aomao/engine
 ```
 
-`Vue` users please see [https://github.com/itellyou-com/am-editor/tree/master/demo-vue](https://github.com/itellyou-com/am-editor/tree /master/demo-vue)
+`Vue` users please see [https://github.com/itellyou-com/am-editor/tree/master/demo-vue](https://github.com/itellyou-com/am-editor/tree/master/demo-vue)
 
 ### Use
 
