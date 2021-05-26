@@ -6,7 +6,7 @@
 
 [中文简体](https://github.com/itellyou-com/am-editor/blob/master/README.zh-CN.md)
 
-am-editor, a multi-person collaborative rich text editor based on [ShareDB](https://github.com/share/sharedb)Web, suitable for `React` and `Vue` frameworks, compatible with mainstream modern browsers.
+am-editor, a web multi-person collaborative rich text editor based on [ShareDB](https://github.com/share/sharedb), suitable for `React` and `Vue` frameworks, compatible with mainstream modern browsers .
 
 [View online documentation and demo](https://editor.aomao.com)
 
