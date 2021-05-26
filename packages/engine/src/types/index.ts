@@ -20,3 +20,4 @@ export * from './inline';
 export * from './block';
 export * from './request';
 export * from './tiny-canvas';
+export * from './parser';

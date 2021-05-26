@@ -4,6 +4,8 @@
 
 可用来配合开发类似于批注、划线评论
 
+[批注/评论案例](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/comment/index.tsx)
+
 ## 安装
 
 ```bash

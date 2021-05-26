@@ -28,7 +28,6 @@ import {
 import Paste from './paste';
 import { SelectionInterface } from '../types/selection';
 import Selection from '../selection';
-import { ClipboardData } from '../types';
 
 class ChangeModel implements ChangeInterface {
 	private engine: EngineInterface;
@@ -86,7 +85,7 @@ class ChangeModel implements ChangeInterface {
 		if (this.changeTimer) clearTimeout(this.changeTimer);
 	}
 
-	getSelectionRange() {
+	getRange() {
 		const { container } = this.engine;
 		const { window } = container;
 		let range = Range.from(this.engine, window!, false);
@@ -97,10 +96,6 @@ class ChangeModel implements ChangeInterface {
 				.collapse(false);
 		}
 		return range;
-	}
-
-	getRange() {
-		return this.getSelectionRange();
 	}
 
 	select(range: RangeInterface) {
@@ -325,7 +320,7 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	cacheRangeBeforeCommand() {
-		this.rangePathBeforeCommand = this.getSelectionRange().toPath();
+		this.rangePathBeforeCommand = this.getRange().toPath();
 	}
 
 	getRangePathBeforeCommand() {

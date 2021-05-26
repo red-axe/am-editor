@@ -78,7 +78,7 @@ export interface RangeInterface {
 	 */
 	enlargeFromTextNode(): RangeInterface;
 	/**
-	 * 将选择标记从非 TextNode 缩小到TextNode节点上，与 enlargeFromTextNodeOutside 相反
+	 * 将选择标记从非 TextNode 缩小到TextNode节点上，与 enlargeFromTextNode 相反
 	 * range 实质所选择的内容不变
 	 */
 	shrinkToTextNode(): RangeInterface;

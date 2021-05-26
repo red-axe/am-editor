@@ -1,6 +1,6 @@
 # am-editor
 
-![火狐截图_2021-05-26T06-29-35 124Z](https://user-images.githubusercontent.com/55792257/119612837-f6018580-be2e-11eb-8bde-60f55f1ffecc.png)
+![DEMO截图](https://user-images.githubusercontent.com/55792257/119612837-f6018580-be2e-11eb-8bde-60f55f1ffecc.png)
 
 am-editor，一个基于[ShareDB](https://github.com/share/sharedb)Web 多人协同富文本编辑器，适用于`React`、`Vue`框架，与主流的现代浏览器兼容。
 

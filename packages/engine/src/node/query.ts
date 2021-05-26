@@ -5,7 +5,6 @@ import {
 	Context,
 	NodeEntry,
 	isNode,
-	isNodeEntry,
 } from '../types/node';
 import { getDocument, getWindow } from '../utils';
 import Parse from './parse';

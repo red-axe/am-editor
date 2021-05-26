@@ -19,7 +19,12 @@ import TextParser from './text';
 import { NodeInterface } from '../types/node';
 import { DATA_ELEMENT, EDITABLE } from '../constants/root';
 import { EditorInterface } from '../types/engine';
-import { SchemaInterface, isNodeEntry } from '../types';
+import {
+	SchemaInterface,
+	isNodeEntry,
+	ParserInterface,
+	Callbacks,
+} from '../types';
 
 const style = {
 	'font-size': '14px',
@@ -28,22 +33,6 @@ const style = {
 	'letter-spacing': '.05em',
 	'outline-style': 'none',
 	'overflow-wrap': 'break-word',
-};
-
-type Callbacks = {
-	onOpen?: (
-		node: NodeInterface,
-		name: string,
-		attrs: { [k: string]: string },
-		styles: { [k: string]: string },
-	) => boolean | void;
-	onClose?: (
-		node: NodeInterface,
-		name: string,
-		attrs: { [k: string]: string },
-		styles: { [k: string]: string },
-	) => void;
-	onText?: (node: NodeInterface, test: string) => void;
 };
 
 const escapeAttr = (value: string) => {
@@ -86,7 +75,7 @@ const stylesToString = (styles: { [k: string]: string }) => {
 	return stylesString.trim();
 };
 
-class Parser {
+class Parser implements ParserInterface {
 	private root: NodeInterface;
 	private editor: EditorInterface;
 	constructor(

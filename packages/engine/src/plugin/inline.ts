@@ -60,7 +60,7 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	}
 
 	/**
-	 * 是否触发执行增加当前mark标签包裹，否则将移除当前mark标签的包裹
+	 * 是否触发执行增加当前inline标签包裹，否则将移除当前inline标签的包裹
 	 * @param args 在调用 command.execute 执行插件传入时的参数
 	 */
 	isTrigger?(...args: any): boolean;

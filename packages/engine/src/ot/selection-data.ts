@@ -63,7 +63,7 @@ class SelectionData implements SelectionDataInterface {
 
 	updateAll(currentMember: Member, members: Array<Member>) {
 		const { change, card } = this.engine;
-		const range = change.getSelectionRange().cloneRange();
+		const range = change.getRange().cloneRange();
 		const activeCard = card.active;
 		if (activeCard && !activeCard.isEditable) {
 			const center = activeCard.getCenter();

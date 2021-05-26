@@ -1,5 +1,5 @@
 import { EventListener, NodeInterface } from './node';
-import { ActiveTrigger, CardInterface, CardType } from './card';
+import { CardInterface } from './card';
 import { RangeInterface } from './range';
 import { Path } from 'sharedb';
 import { ClipboardData } from './clipboard';
@@ -66,10 +66,6 @@ export interface ChangeInterface {
 	onSelect: () => void;
 	onSetValue: () => void;
 	change(): void;
-	/**
-	 * 获取当前选区
-	 */
-	getSelectionRange(): RangeInterface;
 	/**
 	 * 获取当前选区的范围
 	 */

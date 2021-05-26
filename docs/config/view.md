@@ -3,13 +3,14 @@ translateHelp: true
 toc: menu
 ---
 
-# 引擎配置
+# 阅读器配置
 
-在实例化引擎时传入
+在实例化阅读器时传入
 
 ```ts
+import { View } from '@aomao/engine';
 //实例化引擎
-const engine = new Engine(渲染节点, {
+const view = new View(渲染节点, {
 	...配置项,
 });
 ```
@@ -18,37 +19,25 @@ const engine = new Engine(渲染节点, {
 
 -   类型: `string`
 -   默认值：`zh-cn`
--   详细：语言配置，暂时支持 `zh-cn`、`en`。可使用 `engine.language` 添加
+-   详细：语言配置，暂时支持 `zh-cn`、`en`。可使用 `view.language` 添加
 
 ```ts
-const engine = new Engine(渲染节点, {
+const view = new View(渲染节点, {
 	lang: 'zh-cn',
 });
-engine.language.add({
+view.language.add({
 	'zh-cn': {
 		test: '测试',
 	},
 });
-console.log(engine.language.get('test'));
+console.log(view.language.get('test'));
 ```
-
-### className
-
--   类型: `string`
--   默认值：`null`
--   详细：添加编辑器渲染节点额外样式
-
-### tabIndex
-
--   类型: `number`
--   默认值：`null`
--   详细：当前编辑器位于第几个 tab 项
 
 ### root
 
 -   类型: `Node`
--   默认值：当前编辑器渲染节点父节点
--   详细：编辑器根节点
+-   默认值：当前阅读器渲染节点父节点
+-   详细：阅读器根节点
 
 ### plugins
 

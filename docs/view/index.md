@@ -1,4 +1,5 @@
 ---
+translateHelp: true
 title: 阅读渲染器
 order: 1
 toc: menu
