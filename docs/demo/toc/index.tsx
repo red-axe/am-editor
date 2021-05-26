@@ -19,10 +19,11 @@ const Toc: React.FC<Props> = ({ editor }) => {
 			setDatas(data);
 		};
 		editor.on('change', onChange);
-		setTimeout(() => {
-			onChange();
-		}, 50);
-		return () => editor.off('change', onChange);
+		editor.on('afterSetValue', onChange);
+		return () => {
+			editor.off('change', onChange);
+			editor.off('afterSetValue', onChange);
+		};
 	}, [editor]);
 
 	const getTocData = useCallback(() => {
