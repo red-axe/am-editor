@@ -38,8 +38,8 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 		],
 		'/plugin': [
 			{
-				title: 'Development',
-				'title_zh-CN': '开发',
+				title: 'Plug-in development',
+				'title_zh-CN': '插件开发',
 				children: [
 					{
 						title: opts.lang === 'zh-CN' ? '基础' : 'Basis',
