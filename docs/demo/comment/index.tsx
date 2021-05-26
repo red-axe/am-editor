@@ -212,8 +212,7 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 	 */
 	useEffect(() => {
 		if (loading) return;
-		if (containerRef.current)
-			containerRef.current.style.minHeight = `${editor.container.height()}px`;
+		updateHeight();
 		normalize();
 	}, [loading, list]);
 
@@ -226,6 +225,11 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 		updateStatus,
 		reload: load,
 	}));
+
+	const updateHeight = () => {
+		if (containerRef.current)
+			containerRef.current.style.minHeight = `${editor.root.height()}px`;
+	};
 	/**
 	 * 获取编辑器中评论所在位置的 top
 	 * @param selectors css 选择器
@@ -322,6 +326,7 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 	 * @param status 状态，true 显示、flase 隐藏
 	 */
 	const updateStatus = (ids: Array<string>, status: boolean) => {
+		updateHeight();
 		if (ids.length === 0) return;
 
 		request.current
@@ -654,6 +659,7 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 	const renderList = () => {
 		return (
 			<div className="doc-comment-layer" ref={containerRef}>
+				<div className="doc-comment-title">评论</div>
 				{list.map(item => renderItem(item))}
 			</div>
 		);

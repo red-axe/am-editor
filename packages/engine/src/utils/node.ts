@@ -1,6 +1,4 @@
-import { ANCHOR, FOCUS, CURSOR } from '../constants/selection';
 import { NodeInterface, isNodeEntry } from '../types/node';
-import { DATA_ELEMENT } from '../constants/root';
 
 export const getDocument = (node?: Node): Document => {
 	if (
@@ -38,36 +36,30 @@ export const combinTextNode = (node: NodeInterface | Node) => {
 };
 
 /**
- * 转换为Map格式
- * @param value 数组或者字符串
- * @param delimiter 字符串时候的分隔符
- * @param callback 回调函数
+ * 获取一个 dom 元素内所有的 textnode 类型的元素
+ * @param  {Node} node - dom节点
+ * @param  {Function} filter - 过滤器
+ * @return {Array} 获取的文本节点
  */
-export const toMap = <V = boolean>(
-	value: Array<string> | string,
-	delimiter: string = ',',
-	callback: (key: string) => boolean = function() {
-		return true;
-	},
-): { [k: string]: V | boolean } => {
-	const map: { [k: string]: V | boolean } = {};
+export const getTextNodes = (
+	node: Node,
+	filter?: (node: Node) => boolean,
+): Array<Node> => {
+	let textNodes: Array<Node> = [];
+	if (filter && !filter(node)) {
+		return textNodes;
+	}
 
-	const arr: Array<string> = Array.isArray(value)
-		? value
-		: value.split(delimiter);
-	let match;
-	arr.forEach(char => {
-		if ((match = /^(\d+)\.\.(\d+)$/.exec(char))) {
-			for (
-				let i = parseInt(match[1], 10);
-				i <= parseInt(match[2], 10);
-				i++
-			) {
-				map[i.toString()] = callback(i.toString());
-			}
-		} else {
-			map[char] = true;
+	const nodes = node.childNodes;
+
+	for (let i = 0; i < nodes.length; i++) {
+		const node = nodes[i];
+		const nodeType = node.nodeType;
+		if (nodeType === 3) {
+			textNodes.push(node);
+		} else if (nodeType === 1 || nodeType === 9 || nodeType === 11) {
+			textNodes = textNodes.concat(getTextNodes(node, filter));
 		}
-	});
-	return map;
+	}
+	return textNodes;
 };

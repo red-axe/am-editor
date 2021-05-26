@@ -53,12 +53,19 @@ span[data-comment-preview], span[data-comment-id] {
 
 .doc-comment-layer {
     position: absolute;
-    top: 62px;
-    right: 0;
-    border: solid #dee0e3;
-    border-width: 0 0 0 1px;
-    width: 324px;
-    padding: 12px;
+    top: 20px;
+    width: calc(50% - 454px);
+    left: calc(50% + 428px);
+    padding-left: 24px;
+}
+
+.doc-comment-title {
+    position: relative;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 2px 8px;
+    border-bottom: 1px solid #e8e8e8;
 }
 
 .doc-comment-item {
@@ -66,7 +73,7 @@ span[data-comment-preview], span[data-comment-id] {
     background-color: #fff;
     border: 1px solid #dee0e3;
     border-radius: 4px;
-    width: 300px;
+    width: calc(100% - 24px);
 }
 
 .doc-comment-item-active::before {
@@ -74,7 +81,7 @@ span[data-comment-preview], span[data-comment-id] {
     border-top-right-radius: 4px;
     content: "";
     position: absolute;
-    width: 300px;
+    width: calc(100% + 2px);
     height: 6px;
     background: #ffc60a;
     margin-top: -1px;

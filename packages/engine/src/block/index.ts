@@ -2,7 +2,6 @@ import md5 from 'blueimp-md5';
 import {
 	CARD_KEY,
 	CARD_SELECTOR,
-	CARD_TYPE_KEY,
 	CURSOR,
 	CURSOR_SELECTOR,
 	DATA_ELEMENT,

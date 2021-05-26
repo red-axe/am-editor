@@ -147,7 +147,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	}
 
 	refreshModel() {
-		if (!this.tableRoot) return;
+		if (!this.tableRoot || this.tableRoot.length === 0) return;
 		this.tableModel = this.table.helper.getTableModel(this.tableRoot);
 	}
 

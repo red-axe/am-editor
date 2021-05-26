@@ -156,15 +156,16 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	}
 
 	didRender() {
-		this.selection.init();
-		this.conltrollBar.init();
-		this.command.init();
-
 		this.viewport = this.wrapper?.find(
 			isEngine(this.editor)
 				? Template.VIEWPORT
 				: Template.VIEWPORT_READER,
 		);
+
+		this.selection.init();
+		this.conltrollBar.init();
+		this.command.init();
+
 		if (this.viewport) {
 			this.scrollbar = new Scrollbar(
 				this.editor,
@@ -232,6 +233,9 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 					),
 			  )
 			: $(this.template.htmlView(value));
+		if (!isEngine(this.editor)) {
+			this.wrapper.find('table').addClass('data-table');
+		}
 		return this.wrapper;
 	}
 }

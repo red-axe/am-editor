@@ -9,6 +9,7 @@ import {
 	BlockPlugin,
 	PluginEntry,
 } from '@aomao/engine';
+import Outline, { OutlineData } from './outline';
 import './index.css';
 
 export type Options = {
@@ -548,3 +549,5 @@ export default class extends BlockPlugin<Options> {
 			});
 	}
 }
+
+export { Outline, OutlineData };

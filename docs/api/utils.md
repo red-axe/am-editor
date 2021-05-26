@@ -147,3 +147,43 @@ translateHelp: true
 是否是引擎
 
 接受对象：`EditorInterface`
+
+### `getWindow`
+
+从节点中获取 window 对象
+
+如果 window 是 undefined 会尝试从 global['__amWindow'] 中获取 window 对象
+
+```ts
+(node?: Node): Window & typeof globalThis
+```
+
+### `getDocument`
+
+从节点中获取 document 对象
+
+```ts
+getDocument(node?: Node): Document
+```
+
+### `combinTextNode`
+
+移除空的文本节点，并连接相邻的文本节点
+
+```ts
+combinTextNode(node: NodeInterface | Node): void
+```
+
+### `getTextNodes`
+
+获取一个 dom 元素内所有的 textnode 类型的元素
+
+```ts
+/**
+ * 获取一个 dom 元素内所有的 textnode 类型的元素
+ * @param  {Node} node - dom节点
+ * @param  {Function} filter - 过滤器
+ * @return {Array} 获取的文本节点
+ */
+getTextNodes(node: Node, filter?:(node: Node) => boolean): Array<Node>
+```

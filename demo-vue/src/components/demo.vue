@@ -230,7 +230,7 @@ export default defineComponent({
 .editor-wrapper {
 	background: #fafafa;
 	padding: 62px 0;
-	height: calc(100% - 20px);
+	height: calc(100vh - 20px);
 	overflow: auto;
 }
 

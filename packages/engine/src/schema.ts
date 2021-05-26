@@ -1,4 +1,3 @@
-import md5 from 'blueimp-md5';
 import { cloneDeep, merge, omit } from 'lodash-es';
 import {
 	isSchemaRule,

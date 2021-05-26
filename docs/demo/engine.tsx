@@ -19,6 +19,7 @@ import OTClient, { Member } from './ot-client';
 //Demo相关
 import Loading from './loading';
 import CommentLayer from './comment';
+import Toc from './toc';
 import {
 	IS_DEV,
 	DOMAIN,
@@ -304,16 +305,19 @@ const EngineDemo = () => {
 			)}
 			<div className="editor-wrapper">
 				<div className="editor-container">
-					<div ref={ref} />
+					<div className="editor-content">
+						<div ref={ref} />
+					</div>
+					{!editorLoading && (
+						<CommentLayer
+							editor={engineRef.current!}
+							member={member!}
+							update={onCommentRequestUpdate}
+							ref={comment}
+						/>
+					)}
 				</div>
-				{!editorLoading && (
-					<CommentLayer
-						editor={engineRef.current}
-						member={member}
-						update={onCommentRequestUpdate}
-						ref={comment}
-					/>
-				)}
+				{!editorLoading && <Toc editor={engineRef.current!} />}
 			</div>
 		</>
 	);

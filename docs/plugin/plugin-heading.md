@@ -98,3 +98,123 @@ engine.command.execute(
 //使用 command 执行查询当前状态，返回 string | undefined，返回 "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p"
 engine.command.queryState('heading');
 ```
+
+## 大纲
+
+生成标题的大纲数据
+
+需要从 `@aomao/plugin-heading` 导入 `Outline` 类
+
+```ts
+import { Outline } from '@aomao/plugin-heading';
+```
+
+### `normalize`
+
+将标题节点数据归一化为带深度层级的结构
+
+```ts
+/**
+ * 将 heading 数据归一化为带深度层级的结构
+ * 归一化后，每个元素的结构为:
+ * {
+ *   id: string,       // id
+ *   title: string,    // 标题
+ *   level: number ,   // 标题层级
+ *   domNode: Node,    // dom 节点
+ *   depth: number     // 展示深度
+ * }
+ * depth 的算法和 Google Docs 的一致
+ * - 效果：h1 -> h4 分配固定的 depth，保证相同 level 的标题最终的层级深度是一样的
+ * - 算法：找出文档存在的标题层级；按层级由大到小依次分别分配缩进深度；
+ * @param {Element[]}headings heading 的标准 DOM 节点数组
+ *
+ * @return {Array} 标题节点数组
+ */
+normalize(headings: Array<Element>): OutlineData[];
+```
+
+### `extractFromDom`
+
+从 DOM 节点提取大纲
+
+```ts
+/**
+ * 从 DOM 节点提取大纲
+ * @param {Element} rootNode 根节点
+ * @return {Array}
+ */
+extractFromDom(rootNode: Element): OutlineData[];
+```
+
+### 例子
+
+```ts
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { EditorInterface } from '@aomao/engine';
+import { Outline, OutlineData } from '@aomao/plugin-heading';
+
+type Props = {
+	editor: EditorInterface;
+};
+
+const outline = new Outline();
+
+const Toc: React.FC<Props> = ({ editor }) => {
+	const rootRef = useRef<HTMLDivElement | null>(null);
+	const [datas, setDatas] = useState<Array<OutlineData>>([]);
+
+	useEffect(() => {
+		const onChange = () => {
+			//获取大纲数据
+			const data = getTocData();
+			setDatas(data);
+		};
+		//绑定编辑器值改变事件
+		editor.on('change', onChange);
+		setTimeout(() => {
+			onChange();
+		}, 50);
+		return () => editor.off('change', onChange);
+	}, [editor]);
+
+	const getTocData = useCallback(() => {
+		// 从编辑区域提取符合结构要求的标题 Dom 节点
+		let nodes: Array<Element> = [];
+		const { $, card } = editor;
+		editor.container.find('h1,h2,h3,h4,h5,h6').each(child => {
+			const node = $(child);
+			// Card 里的标题，不纳入大纲
+			if (card.closest(node)) {
+				return;
+			}
+			// 非一级深度标题，不纳入大纲
+			if (!node.parent()?.isRoot()) {
+				return;
+			}
+			nodes.push(node.get<Element>()!);
+		});
+		return outline.normalize(nodes);
+	}, []);
+
+	return (
+		<div className="data-toc-wrapper">
+			<div className="data-toc-title">大纲</div>
+			<div className="data-toc" ref={rootRef}>
+				{datas.map((data, index) => {
+					return (
+						<a
+							key={index}
+							href={'#' + data.id}
+							className={`data-toc-item data-toc-item-${data.depth}`}
+						>
+							{data.text}
+						</a>
+					);
+				})}
+			</div>
+		</div>
+	);
+};
+export default Toc;
+```
