@@ -69,14 +69,26 @@ class Enter {
 			const cardLeft = range.startNode.closest(CARD_LEFT_SELECTOR);
 			if (cardLeft.length > 0) {
 				event.preventDefault();
-				this.insertNewline(range, card, true);
+				const prev = card.root.prev();
+				if (!prev || prev.isCard()) {
+					card.focusPrevBlock(range, true);
+					change.select(range);
+				} else {
+					this.insertNewline(range, card, true);
+				}
 				return false;
 			}
 			// 右侧光标
 			const cardRight = range.startNode.closest(CARD_RIGHT_SELECTOR);
 			if (cardRight.length > 0) {
 				event.preventDefault();
-				this.insertNewline(range, card, false);
+				const next = card.root.next();
+				if (!next || next.isCard()) {
+					card.focusNextBlock(range, true);
+					change.select(range);
+				} else {
+					this.insertNewline(range, card, false);
+				}
 				return false;
 			}
 		}

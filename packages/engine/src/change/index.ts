@@ -1283,7 +1283,6 @@ class ChangeModel implements ChangeInterface {
 			const card = this.engine.card.find(prevBlock);
 			if (card) {
 				this.engine.card.focus(card);
-				this.select(range);
 				return;
 			}
 		}
