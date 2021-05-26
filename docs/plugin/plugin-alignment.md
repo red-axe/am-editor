@@ -1,64 +1,64 @@
 # @aomao/plugin-alignment
 
-对齐方式：左对齐、居中对齐、右对齐、两端对齐
+Alignment: left, center, right, justified
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-alignment
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Alignment from '@aomao/plugin-alignment';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Alignment from'@aomao/plugin-alignment';
 
 new Engine(...,{ plugins:[Alignment] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键为
+The default shortcut key is
 
-左对齐: `mod+shift+l`
+Left alignment: `mod+shift+l`
 
-居中对齐: `mod+shift+c`
+Center alignment: `mod+shift+c`
 
-右对齐: `mod+shift+r`
+Right alignment: `mod+shift+r`
 
-两端对齐: `mod+shift+j`
+Justification: `mod+shift+j`
 
 ```ts
-//快捷键
+//hot key
 hotkey?: {
-    left?: string;//左对齐，默认 mod+shift+l
-    center?: string;//居中对齐，默认 mod+shift+c
-    right?: string;//右对齐，默认 mod+shift+r
-    justify?: string;//两端对齐，默认 mod+shift+j
+    left?: string;//Left alignment, default mod+shift+l
+    center?: string;//Center alignment, default mod+shift+c
+    right?: string;//Right alignment, default mod+shift+r
+    justify?: string;//Justify at both ends, default mod+shift+j
 };
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "alignment":{
-            //修改 左对齐 快捷键
+            //Modify left-aligned shortcut key
             hotkey:{
-                left:"快捷键"
+                left: "shortcut key"
             }
         }
     }
  })
 ```
 
-## 命令
+## Command
 
-对齐插件可选参数，`left` | `center` | `right` | `justify`，分别表示 左对齐、居中对齐、右对齐、两端对齐
+Optional parameters of the alignment plugin, `left` | `center` | `right` | `justify`, respectively indicate left-justified, center-justified, right-justified, and justified at both ends
 
 ```ts
-//使用 command 执行插件、并传入所需参数
+//Use command to execute the plug-in and pass in the required parameters
 engine.command.execute('alignment', 'left' | 'center' | 'right' | 'justify');
-//使用 command 执行查询当前状态，返回 string | undefined，光标所在处节点对齐样式 "left" | "center" | "right" | "justify"
+//Use command to execute the query current status, return string | undefined, the alignment style of the node where the cursor is located "left" | "center" | "right" | "justify"
 engine.command.queryState('alignment');
 ```

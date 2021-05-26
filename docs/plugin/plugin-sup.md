@@ -1,66 +1,66 @@
 # @aomao/plugin-sup
 
-上标样式插件
+Superscript style plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-sup
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Sup from '@aomao/plugin-sup';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Sup from'@aomao/plugin-sup';
 
 new Engine(...,{ plugins:[Sup] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键为 `mod+.`，以数组形式传入多个快捷键
+The default shortcut key is `mod+.`, multiple shortcut keys are passed in as an array
 
 ```ts
-//快捷键，
+//hot key,
 hotkey?: string | Array<string>;
 
-//使用配置
+//Use configuration
 new Engine(...,{
-    config:{
-        "sup":{
-            //修改快捷键
-            hotkey:"快捷键"
-        }
-    }
- })
+     config:{
+         "sup":{
+             //Modify shortcut keys
+             hotkey: "shortcut key"
+         }
+     }
+  })
 ```
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-Sup 插件 markdown 语法为`^`
+Sup plugin markdown syntax is `^`
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
-    config:{
-        "sup":{
-            //关闭markdown
-            markdown:false
-        }
-    }
- })
+     config:{
+         "sup":{
+             //Close markdown
+             markdown:false
+         }
+     }
+  })
 ```
 
-## 命令
+## Command
 
 ```ts
 engine.command.execute('sup');
-//使用 command 执行查询当前状态，返回 boolean | undefined
+//Use command to execute query current status, return boolean | undefined
 engine.command.queryState('sup');
 ```

@@ -1,138 +1,138 @@
 # @aomao/plugin-image
 
-图片插件
+Image plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-image
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Image , { ImageComponent , ImageUploader } from '@aomao/plugin-image';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Image, {ImageComponent, ImageUploader} from'@aomao/plugin-image';
 
-new Engine(...,{ plugins:[ Image , ImageUploader ] , cards:[ ImageComponent ]})
+new Engine(...,{ plugins:[ Image, ImageUploader], cards:[ ImageComponent ]})
 ```
 
-`ImageUploader` 插件主要功能：选择图片、上传图片、在粘贴或者使用 markdown 时上传第三方图片地址
+The main functions of the `ImageUploader` plugin: select images, upload images, upload third-party image addresses when pasting or using markdown
 
-## `Image` 可选项
+## `Image` optional
 
-无可选项
+No option
 
-## `ImageUploader` 可选项
+## `ImageUploader` optional
 
 ```ts
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         [ImageUploader.pluginName]:{
-            //...相关配置
+            //...Related configuration
         }
     }
  })
 ```
 
-### 文件上传
+### File Upload
 
-`action`: 上传地址，始终使用 `POST` 请求
+`action`: upload address, always use `POST` request
 
-`contentType`: 图片文件上传默认以 `multipart/form-data;` 类型上传
+`contentType`: Image file upload is uploaded in `multipart/form-data;` type by default
 
-`accept`: 限制用户文件选择框选择的文件类型，默认 `svg`,`png`,`bmp`,`jpg`,`jpeg`,`gif`,`tif`,`tiff`,`emf`,`webp`
+`accept`: Restrict the file type selected by the user's file selection box, the default is `svg`, `png`,`bmp`, `jpg`, `jpeg`,`gif`,`tif`,`tiff`,`emf` ,`webp`
 
-`limitSize`: 限制用户选择的文件大小，超过限制将不请求上传。默认：`1024 * 1024 * 5` 5M
+`limitSize`: Limit the file size selected by the user. If the file size exceeds the limit, no upload will be requested. Default: `1024 * 1024 * 5` 5M
 
-`multiple`: `false` 一次只能上传一张图片，`true` 默认一次最多 100 张图。可以指定具体数量，但是文件选择框无法限制，只能上传的时候限制上传最前面的张数
+`multiple`: `false` can only upload one picture at a time, `true` defaults to a maximum of 100 pictures at a time. You can specify the specific number, but the file selection box cannot be limited, only the first number of uploads can be limited when uploading
 
-`data`: 文件上传或第三方图片地址上传时同时将这些数据一起`POST`到服务端
+`data`: When files are uploaded or third-party image addresses are uploaded, these data will be `POST` to the server at the same time
 
 ```ts
 /**
- * 文件上传配置
+ * File upload configuration
  */
 file:{
     /**
-     * 文件上传地址
+     * File upload address
      */
     action:string
     /**
-     * 数据返回类型，默认 json
+     * Data return type, default json
      */
-    type?: '*' | 'json' | 'xml' | 'html' | 'text' | 'js';
+    type?:'*' |'json' |'xml' |'html' |'text' |'js';
     /**
-     * 额外携带数据上传
+     * Additional data upload
      */
     data?: {};
     /**
-     * 请求类型，默认 multipart/form-data;
+     * Request type, default multipart/form-data;
      */
     contentType?:string
     /**
-     * 图片接收的格式，默认 "svg","png","bmp","jpg","jpeg","gif","tif","tiff","emf","webp"
+     * The format of the picture received, the default is "svg","png","bmp","jpg","jpeg","gif","tif","tiff","emf","webp"
      */
     accept?: string | Array<string>;
     /**
-     * 文件选择限制数量
+     * File selection limit
      */
     multiple?: boolean | number;
     /**
-     * 上传大小限制，默认 1024 * 1024 * 5 就是5M
+     * Upload size limit, default 1024 * 1024 * 5 is 5M
      */
     limitSize?: number;
 }
 ```
 
-### 第三方图片上传
+### Third-party image upload
 
-判断图片地址是否属于第三方图片
+Determine whether the image address belongs to a third-party image
 
-第三方图片可能存在防盗链等一些访问限制，或者图片展示有有效期限
+Third-party pictures may have some access restrictions such as anti-hotlinking, or the picture display has an expiration date
 
-如果是第三方图片需要将地址传入服务端下载图片保存，否则将不会执行上传，使用当前地址展现图片
+If it is a third-party picture, you need to pass the address to the server to download the picture and save it, otherwise the upload will not be executed, and the current address will be used to display the picture
 
-请求参数为 `{ url:string }`
+The request parameter is `{ url:string }`
 
 ```ts
 /**
- * 是否是第三方图片地址，如果是，那么地址将上传服务器下载图片保存后，返回新地址
+ * Whether it is a third-party picture address, if it is, then the address will upload the server to download the picture and save it, and then return to the new address
  */
 isRemote?: (src: string) => boolean;
 /**
- * 上传配置
+ * Upload configuration
  */
 remote:{
     /**
-     * 上传地址
+     * Upload address
      */
     action:string
     /**
-     * 数据返回类型，默认 json
+     * Data return type, default json
      */
-    type?: '*' | 'json' | 'xml' | 'html' | 'text' | 'js';
+    type?:'*' |'json' |'xml' |'html' |'text' |'js';
     /**
-     * 额外携带数据上传
+     * Additional data upload
      */
     data?: {};
     /**
-     * 请求类型，默认 application/json
+     * Request type, default application/json
      */
     contentType?:string
 }
 ```
 
-### 解析服务端响应数据
+### Analyze server response data
 
-默认会查找 response.url || response.data && response.data.url || response.src || response.data && response.data.src
+By default, it will find response.url || response.data && response.data.url || response.src || response.data && response.data.src
 
-`result`: true 上传成功，data 为图片地址。false 上传失败，data 为错误消息
+`result`: true upload is successful, data is the image address. false upload failed, data is an error message
 
 ```ts
 /**
- * 解析上传后的Respone，返回 result:是否成功，data:成功：图片地址，失败：错误信息
+ * Parse the uploaded Respone and return result: whether it is successful or not, data: success: image address, failure: error message
  */
 parse?: (
     response: any,
@@ -144,49 +144,49 @@ parse?: (
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-ImageUploader 插件 markdown 语法为`/^!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)$/`
+ImageUploader plug-in markdown syntax is `/^!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)$/`
 
-获取到图片地址后，会使用 `remote` 配置将图片地址 `POST` 到服务端，请求参数为 `url`，服务端使用图片地址下载保存后将新的图片地址返回
+After obtaining the image address, it will use the `remote` configuration to `POST` the image address to the server, the request parameter is `url`, and the server will use the image address to download and save the new image address and return it
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
     config:{
         [ImageUploader.pluginName]:{
-            //关闭markdown
+            //Close markdown
             markdown:false
         }
     }
  })
 ```
 
-## 命令
+## Command
 
-### `Image` 插件命令
+### `Image` plugin command
 
-插入一张图片
+Insert a picture
 
-参数 1：图片状态`uploading` | `done` | `error` 上传中、上传完成、上传错误
+Parameter 1: Image status `uploading` | `done` | `error` uploading, uploading completed, uploading error
 
-参数 2：在状态非 `error` 下，为展示图片，否则展示错误消息
+Parameter 2: When the status is not `error`, it is the display picture, otherwise it displays the error message
 
 ```ts
-//'uploading' | 'done' | 'error'
-engine.command.execute(Image.pluginName, 'done', '图片地址');
+//'uploading' |'done' |'error'
+engine.command.execute(Image.pluginName, 'done', 'Image address');
 ```
 
-### `ImageUploader` 插件命令
+### `ImageUploader` plugin command
 
-弹出文件选择框，并执行上传
+Pop up the file selection box and perform upload
 
-可选参数 1：传入文件列表，将上传这些文件。传入图片地址，插入图片，如果为第三方图片就执行上传。否则弹出文件选择框并，选择文件后执行上传
+Optional parameter 1: Pass in the file list, these files will be uploaded. Pass in the picture address, insert the picture, and upload it if it is a third-party picture. Otherwise, the file selection box will pop up and upload it after selecting the file
 
 ```ts
-//方法签名
+//Method signature
 async execute(files?: Array<File> | string | MouseEvent):void
-//执行命令
+//Excuting an order
 engine.command.execute(ImageUploader.pluginName);
 ```

@@ -1,26 +1,26 @@
 # FAQ
 
-## am-editor 支持 Vue2 吗？
+## Does am-editor support Vue2?
 
-am-editor 部分支持 vue2。引擎库 `@aomao/engine` 本身是 javascript 编写的，不涉及到前端框架。主要在于一些插件我们使用了前端框架渲染
+am-editor partially supports vue2. The engine library `@aomao/engine` itself is written in javascript and does not involve the front-end framework. Mainly because some plugins we use front-end frame rendering
 
-下面这三个插件有区别
+The following three plugins are different
 
--   `@aomao/toolbar-vue` 编辑器工具栏。按钮、图标、下拉框、颜色选择器等都是复杂的 UI
+-   `@aomao/toolbar-vue` editor toolbar. Buttons, icons, drop-down boxes, color pickers, etc. are all complex UIs
 
--   `@aomao/plugin-codeblock-vue` 选择代码语言的下拉框具有搜索功能，使用前端库现有的 UI 是比较好的选择
+-   `@aomao/plugin-codeblock-vue` The drop-down box for selecting the code language has a search function. It is a better choice to use the existing UI of the front-end library
 
--   `@aomao/plugin-link-vue` 链接输入、文本输入，使用前端库现有的 UI 是比较好的选择
+-   `@aomao/plugin-link-vue` link input, text input, using the existing UI of the front-end library is a better choice
 
-这三个插件都有 vue3 的依赖，并且使用的是 antv UI 库。其它插件没有依赖任何前端框架
+These three plugins all have vue3 dependencies and use the antv UI library. Other plugins do not rely on any front-end framework
 
 ## window is not defined, document is not defined, navigator is not defined
 
-SSR 因为会在服务端执行 render 渲染方法，而服务端没有 DOM/BOM 变量和方法
+SSR will execute the render method on the server side, and the server side does not have DOM/BOM variables and methods
 
-在编辑模式下，基本上没有服务端渲染的需求。主要在于视图渲染，如果使用纯 html 呈现将缺少`Card`内容的动态交互。
+In the editing mode, there is basically no need for server-side rendering. Mainly lies in the view rendering. If pure html is used, the dynamic interaction of the content of `Card` will be lacking.
 
-1. 使用 jsdom 内置 window 对象。在引擎或插件内部可以使用 getWindow 对象获取这个 \_\_amWindow 对象。但是无法解决第三方包依赖 window 对象的问题
+1. Use the built-in window object of jsdom. You can use the getWindow object to get this \_\_amWindow object inside the engine or plug-in. But it cannot solve the problem of third-party packages relying on the window object
 
 ```ts
 const { JSDOM } = require('jsdom');
@@ -29,4 +29,4 @@ const { window } = new JSDOM(`<html><body></body></html>`);
 global.__amWindow = window;
 ```
 
-2. 将第三方包动态引入 或者 使用 `isServer` 判定是否有 window 对象。这样能解决运行不会出错的问题，但是在服务端还是无法完整的渲染出内容。可以在服务端输出 html，满足 seo 需求。加载到浏览器后重新渲染 view 阅读器
+2. Introduce third-party packages dynamically or use `isServer` to determine whether there is a window object. This can solve the problem of no errors when running, but the content cannot be completely rendered on the server side. You can output html on the server to meet the needs of seo. Re-render the view reader after loading into the browser

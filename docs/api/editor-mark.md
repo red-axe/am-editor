@@ -1,65 +1,61 @@
----
-translateHelp: true
----
-
 # Mark
 
-编辑样式节点的相关操作
+Related operations for editing style nodes
 
-类型：`MarkModelInterface`
+Type: `MarkModelInterface`
 
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface): MarkModelInterface
 ```
 
-## 方法
+## Method
 
 ### `init`
 
-初始化
+initialization
 
 ```ts
 /**
- * 初始化
+ * Initialization
  */
 init(): void;
 ```
 
 ### `findPlugin`
 
-根据节点查找 mark 插件实例
+Find the mark plugin instance according to the node
 
 ```ts
 /**
- * 根据节点查找mark插件实例
- * @param node 节点
+ * Find the mark plug-in instance according to the node
+ * @param node node
  */
 findPlugin(node: NodeInterface): MarkInterface | undefined;
 ```
 
 ### `closestNotMark`
 
-获取向上第一个非 Mark 节点
+Get the first non-mark node up
 
 ```ts
 /**
- * 获取向上第一个非 Mark 节点
+ * Get the first non-Mark node up
  */
 closestNotMark(node: NodeInterface): NodeInterface;
 ```
 
 ### `compare`
 
-比较两个节点是否相同，包括 attributes、style、class
+Compare whether two nodes are the same, including attributes, style, class
 
 ```ts
 /**
- * 比较两个节点是否相同，包括attributes、style、class
- * @param source 源节点
- * @param target 目标节点
- * @param isCompareValue 是否比较每项属性的值
+ * Compare whether two nodes are the same, including attributes, style, and class
+ * @param source source node
+ * @param target target node
+ * @param isCompareValue Whether to compare the value of each attribute
  */
 compare(
     source: NodeInterface,
@@ -70,26 +66,26 @@ compare(
 
 ### `contain`
 
-判断源节点是否包含目标节点的所有属性和样式
+Determine whether the source node contains all the attributes and styles of the target node
 
 ```ts
 /**
- * 判断源节点是否包含目标节点的所有属性和样式
- * @param source 源节点
- * @param target 目标节点
+ * Determine whether the source node contains all the attributes and styles of the target node
+ * @param source source node
+ * @param target target node
  */
 contain(source: NodeInterface, target: NodeInterface): boolean;
 ```
 
 ### `split`
 
-分割 mark 标签
+Split mark tags
 
 ```ts
 /**
- * 分割mark标签
- * @param range 光标，默认获取当前光标
- * @param removeMark 需要移除的空mark标签
+ * Split mark tags
+ * @param range cursor, get the current cursor by default
+ * @param removeMark The empty mark tag that needs to be removed
  */
 split(
     range?: RangeInterface,
@@ -99,26 +95,26 @@ split(
 
 ### `wrap`
 
-在当前光标选区包裹 mark 标签
+Wrap the mark label in the current cursor selection
 
 ```ts
 /**
- * 在当前光标选区包裹mark标签
- * @param mark mark标签
- * @param both mark标签两侧节点
+ * Wrap the mark label in the current cursor selection area
+ * @param mark mark tag
+ * @param both mark nodes on both sides of the label
  */
 wrap(mark: NodeInterface | Node | string, range?: RangeInterface): void;
 ```
 
 ### `unwrap`
 
-去掉 mark 包裹
+Remove the mark package
 
 ```ts
 /**
- * 去掉mark包裹
- * @param range 光标
- * @param removeMark 要移除的mark标签
+ * Remove the mark package
+ * @param range cursor
+ * @param removeMark the mark tag to be removed
  */
 unwrap(
     removeMark?: NodeInterface | Node | string | Array<NodeInterface>,
@@ -128,50 +124,50 @@ unwrap(
 
 ### `merge`
 
-合并选区的 mark 节点
+Merge the mark node of the selection
 
 ```ts
 /**
- * 合并选区的mark节点
- * @param range 光标，默认当前选区光标
+ * Merge the mark node of the selection
+ * @param range cursor, the current selection cursor by default
  */
 merge(range?: RangeInterface): void;
 ```
 
 ### `insert`
 
-光标处插入 mark 标签
+Insert the mark tag at the cursor
 
 ```ts
 /**
- * 光标处插入mark标签
- * @param mark mark标签
- * @param range 指定光标，默认为编辑器选中的光标
+ * Insert a mark tag at the cursor
+ * @param mark mark tag
+ * @param range specifies the cursor, the default is the cursor selected by the editor
  */
 insert(mark: NodeInterface | Node | string, range?: RangeInterface): void;
 ```
 
 ### `findMarks`
 
-查找对范围有效果的所有 Mark
+Find all Marks that have an effect on the range
 
 ```ts
 /**
- * 查找对范围有效果的所有 Mark
- * @param range 范围
+ * Find all Marks that have an effect on the range
+ * @param range
  */
 findMarks(range: RangeInterface): Array<NodeInterface>;
 ```
 
 ### `removeEmptyMarks`
 
-从下开始往上遍历删除空 Mark，当遇到空 Block，添加 BR 标签
+Traverse from the bottom up to delete empty Marks, when encountering empty Blocks, add BR tags
 
 ```ts
 /**
- * 从下开始往上遍历删除空 Mark，当遇到空 Block，添加 BR 标签
- * @param node 节点
- * @param addBr 是否添加br
+ * Traverse from bottom to top to delete empty Marks, when encountering empty Blocks, add BR tags
+ * @param node node
+ * @param addBr whether to add br
  */
 removeEmptyMarks(node: NodeInterface, addBr?: boolean): void;
 ```

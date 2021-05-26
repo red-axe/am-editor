@@ -1,10 +1,9 @@
 ---
-translateHelp: true
-title: 阅读渲染器
+title: Reading renderer
 order: 1
 toc: menu
 nav:
-    title: 阅读器
+    title: View
     order: 1
 ---
 

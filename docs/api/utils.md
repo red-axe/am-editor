@@ -1,54 +1,50 @@
----
-translateHelp: true
----
+# Useful methods and constants
 
-# 实用方法和常量
-
-## 常量
+## Constant
 
 ### `isEdge`
 
-否是 Edge 浏览器
+Edge browser
 
 ### `isChrome`
 
-是否是 Chrome 浏览器
+Is it a Chrome browser
 
 ### `isFirefox`
 
-是否是 Firefox 浏览器
+Is it a Firefox browser
 
 ### `isSafari`
 
-是否是 Safari 浏览器
+Is it a Safari browser
 
 ### `isMobile`
 
-是否是 手机浏览器
+Is it a mobile browser
 
 ### `isIos`
 
-是否是 iOS 系统
+Is it an iOS system
 
 ### `isAndroid`
 
-是否是 安卓系统
+Whether it is Android
 
 ### `isMacos`
 
-是否是 Mac OS X 系统
+Is it a Mac OS X system
 
 ### `isWindows`
 
-是否是 Windows 系统
+Is it a Windows system
 
-## 方法
+## Method
 
 ### `isNodeEntry`
 
-是否是 NodeInterface 对象
+Whether it is a NodeInterface object
 
-接受以下类型对象
+Accept the following types of objects
 
 -   `string`
 -   `HTMLElement`
@@ -60,9 +56,9 @@ translateHelp: true
 
 ### `isNodeList`
 
-是否是 NodeList 对象
+Is it a NodeList object
 
-接受以下类型对象
+Accept the following types of objects
 
 -   `string`
 -   `HTMLElement`
@@ -74,9 +70,9 @@ translateHelp: true
 
 ### `isNode`
 
-是否是 Node 对象
+Is it a Node object
 
-接受以下类型对象
+Accept the following types of objects
 
 -   `string`
 -   `HTMLElement`
@@ -88,9 +84,9 @@ translateHelp: true
 
 ### `isSelection`
 
-是否是 window.Selection 对象
+Is it a window.Selection object
 
-接受以下类型对象
+Accept the following types of objects
 
 -   Window
 -   Selection
@@ -98,9 +94,9 @@ translateHelp: true
 
 ### `isRange`
 
-是否是 window.Range
+Is it window.Range
 
-接受以下类型对象
+Accept the following types of objects
 
 -   Window
 -   Selection
@@ -108,51 +104,51 @@ translateHelp: true
 
 ### `isRangeInterface`
 
-是否是从 Range 扩展的 RangeInterface 对象
+Whether it is a RangeInterface object extended from Range
 
-接受以下类型对象
+Accept the following types of objects
 
 -   NodeInterface
 -   RangeInterface
 
 ### `isSchemaRule`
 
-是否是 `SchemaRule` 类型对象
+Is it an object of type `SchemaRule`
 
-接受以下类型对象
+Accept the following types of objects
 
 -   SchemaRule
 -   SchemaGlobal
 
 ### `isMarkPlugin`
 
-是否是 Mark 类型插件
+Is it a Mark type plug-in
 
-接受对象：`PluginInterface`
+Accepted object: `PluginInterface`
 
 ### `isInlinePlugin`
 
-是否是 Inline 类型插件
+Is it an Inline type plug-in
 
-接受对象：`PluginInterface`
+Accepted object: `PluginInterface`
 
 ### `isBlockPlugin`
 
-是否是 Block 类型插件
+Is it a Block type plug-in
 
-接受对象：`PluginInterface`
+Accepted object: `PluginInterface`
 
 ### `isEngine`
 
-是否是引擎
+Is it an engine
 
-接受对象：`EditorInterface`
+Accepted object: `EditorInterface`
 
 ### `getWindow`
 
-从节点中获取 window 对象
+Get the window object from the node
 
-如果 window 是 undefined 会尝试从 global['__amWindow'] 中获取 window 对象
+If window is undefined, it will try to get the window object from global['__amWindow']
 
 ```ts
 (node?: Node): Window & typeof globalThis
@@ -160,7 +156,7 @@ translateHelp: true
 
 ### `getDocument`
 
-从节点中获取 document 对象
+Get the document object from the node
 
 ```ts
 getDocument(node?: Node): Document
@@ -168,7 +164,7 @@ getDocument(node?: Node): Document
 
 ### `combinTextNode`
 
-移除空的文本节点，并连接相邻的文本节点
+Remove empty text nodes and connect adjacent text nodes
 
 ```ts
 combinTextNode(node: NodeInterface | Node): void
@@ -176,14 +172,14 @@ combinTextNode(node: NodeInterface | Node): void
 
 ### `getTextNodes`
 
-获取一个 dom 元素内所有的 textnode 类型的元素
+Get all textnode type elements in a dom element
 
 ```ts
 /**
- * 获取一个 dom 元素内所有的 textnode 类型的元素
- * @param  {Node} node - dom节点
- * @param  {Function} filter - 过滤器
- * @return {Array} 获取的文本节点
+ * Get all textnode type elements in a dom element
+ * @param {Node} node-dom node
+ * @param {Function} filter-filter
+ * @return {Array} the obtained text node
  */
 getTextNodes(node: Node, filter?:(node: Node) => boolean): Array<Node>
 ```

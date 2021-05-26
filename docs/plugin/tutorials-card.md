@@ -1,33 +1,33 @@
-# Card 组件
+# Card component
 
-卡片组件
+Card component
 
-通常用于完全自定义渲染内容
+Usually used for completely custom rendering content
 
-## 继承
+## Inheritance
 
-继承 `Card` 抽象类
+Inherit the `Card` abstract class
 
 ```ts
-import { Card } from '@aomao/engine'
+import {Card} from'@aomao/engine'
 
 export default class extends Card {
-	...
+...
 }
 ```
 
-## 案例
+## Case
 
-### `渲染`
+### `Rendering`
 
-渲染一个卡片需要显示 `render` 方法，这是个抽象方法，必须要实现它
+Rendering a card needs to display the `render` method, which is an abstract method and must be implemented
 
 ```ts
 import { Card } from '@aomao/engine';
 
 export default class extends Card {
 	static get cardName() {
-		return '卡片名称';
+		return 'Card Name';
 	}
 
 	static get cardType() {
@@ -36,17 +36,17 @@ export default class extends Card {
 
 	render() {
 		const { $ } = this.editor;
-		//返回节点，会自动追加到卡片 center 位置
+		//Return the node, it will be automatically appended to the center position of the card
 		return $('<div>Card</div>');
-		//或者主动追加
+		//Or take the initiative to append
 		this.getCenter().append($('<div>Card</div>'));
 	}
 }
 ```
 
-### React 渲染
+### React rendering
 
-React 组件
+React components
 
 ```ts
 import React from 'react';
@@ -54,7 +54,7 @@ import React from 'react';
 export default () => <div>React Commponent</div>;
 ```
 
-卡片组件
+Card component
 
 ```ts
 import { ReactDOM } from 'react';
@@ -64,18 +64,18 @@ export default class extends Card {
 	container?: NodeInterface;
 
 	static get cardName() {
-		return '卡片名称';
+		return 'Card Name';
 	}
 
 	static get cardType() {
 		return CardType.Block;
 	}
 
-	//卡片渲染成功后，节点已在编辑器中加载
+	//After the card is rendered successfully, the node has been loaded in the editor
 	didRender() {
 		if (!this.container) return;
 		const element = this.container.get<HTMLElement>()!;
-		//使用 ReactDOM 渲染组件
+		//Use ReactDOM to render components
 		ReactDOM.render(<ReactCommponent />, element);
 	}
 
@@ -87,16 +87,16 @@ export default class extends Card {
 }
 ```
 
-### Vue 渲染
+### Vue rendering
 
-Vue 组件
+Vue components
 
 ```ts
 <template>
     <div>Vue Component</div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import {defineComponent} from'vue'
 
 export default defineComponent({
     name:"am-vue-component",
@@ -104,7 +104,7 @@ export default defineComponent({
 </script>
 ```
 
-卡片组件
+Card component
 
 ```ts
 import { createApp } from 'vue';
@@ -114,19 +114,19 @@ export default class extends Card {
 	container?: NodeInterface;
 
 	static get cardName() {
-		return '卡片名称';
+		return 'Card Name';
 	}
 
 	static get cardType() {
 		return CardType.Block;
 	}
 
-	//卡片渲染成功后，节点已在编辑器中加载
+	//After the card is rendered successfully, the node has been loaded in the editor
 	didRender() {
 		if (!this.container) return;
 		const element = this.container.get<HTMLElement>()!;
-		//使用 createApp 渲染组件
-		//加个延时，不然可能无法渲染成功
+		//Use createApp to render components
+		//Add a delay, otherwise it may not be rendered successfully
 		setTimeout(() => {
 			const vm = createApp(VueComponent);
 			vm.mount(container);
@@ -141,30 +141,30 @@ export default class extends Card {
 }
 ```
 
-### `工具栏`
+### `Toolbar`
 
-实现卡片工具栏，需要重写 `toolbar` 方法
+To implement the card toolbar, you need to rewrite the `toolbar` method
 
-工具栏已经实现了一些默认按钮和事件，传入名称即可使用
+The toolbar has implemented some default buttons and events, just pass in the name to use
 
--   `separator` 分割线
--   `copy` 复制，可以复制卡片包含根节点的内容到剪切板上
--   `delete` 删除卡片
--   `maximize` 最大化卡片
--   `more` 更多按钮，需要额外配置 `items` 属性
--   `dnd` 位于卡片左侧的可拖动图标按钮
+-   `separator` dividing line
+-   `copy` copy, you can copy the content of the card containing the root node to the clipboard
+-   `delete` delete card
+-   `maximize` to maximize the card
+-   `more` more button, need additional configuration `items` property
+-   `dnd` is the draggable icon button on the left side of the card
 
-另外，还可以自定义按钮属性，或者渲染`React` `Vue` 前端框架组件
+In addition, you can customize button properties or render `React` and `Vue` front-end framework components
 
-可自定义工具栏 UI 类型有：
+Customizable toolbar UI types are:
 
--   `button` 按钮
--   `dropdown` 下拉框
--   `switch` 单选按钮
--   `input` 输入框
--   `node` 一个类型为 `NodeInterface` 的节点
+-   `button` button
+-   `dropdown` drop-down box
+-   `switch` radio button
+-   `input` input box
+-   `node` a node of type `NodeInterface`
 
-每个类型的配置请看它的[类型定义](https://github.com/itellyou-com/am-editor/blob/master/packages/engine/src/types/toolbar.ts)
+For the configuration of each type, please see its [Type Definition](https://github.com/itellyou-com/am-editor/blob/master/packages/engine/src/types/toolbar.ts)
 
 ```ts
 import {
@@ -175,7 +175,7 @@ import {
 
 export default class extends Card {
 	static get cardName() {
-		return '卡片名称';
+		return 'Card Name';
 	}
 
 	static get cardType() {
@@ -199,8 +199,8 @@ export default class extends Card {
 				type: 'node',
 				node: $('<div />'),
 				didMount: node => {
-					//加载完成后，可以使用前端框架渲染组件到 node 节点上
-					console.log(`按钮加载好了，${node}`);
+					//After loading, you can use the front-end framework to render components to the node node
+					console.log(`The button is loaded, ${node}`);
 				},
 			},
 		];
@@ -213,35 +213,35 @@ export default class extends Card {
 }
 ```
 
-### 设置卡片值
+### Set card value
 
 ```ts
-import { Card } from '@aomao/engine'
+import {Card} from'@aomao/engine'
 
 export default class extends Card {
 
     container?: NodeInterface
 
-	static get cardName() {
-		return '卡片名称';
-	}
+    static get cardName() {
+        return'Card Name';
+    }
 
     static get cardType() {
-		return CardType.Block;
-	}
+        return CardType.Block;
+    }
 
     onClick = () => {
-	    const value = this.getValue() || { count: 0}
-        const count = value.count + 1
-		this.setValue({
-			count,
-		});
+        const value = this.getValue() || {count: 0}
+                const count = value.count + 1
+        this.setValue({
+            count,
+        });
         this.container?.html(count)
-	};
+    };
 
     render() {
-        const value = this.getValue() || { count: 0}
-        const { $ } = this.editor
+        const value = this.getValue() || {count: 0}
+        const {$} = this.editor
         this.container = $(`<div>${value.count}</div>`)
         this.container.on("click" => this.)
         return this.container
@@ -249,60 +249,57 @@ export default class extends Card {
 }
 ```
 
-### 与插件结合
+### Combine with plugins
 
 ````ts
-import {
-	Plugin
-} from '@aomao/engine';
-import CardComponent from './component';
+import { Plugin } from'@aomao/engine';
+import CardComponent from'./component';
 
 export default class extends Plugin<Options> {
-	static get pluginName() {
-		return 'card-plugin';
-	}
+    static get pluginName() {
+        return'card-plugin';
+    }
 
-	execute() {
-		if (!isEngine(this.editor)) return;
-		const { card } = this.editor;
-        //插入卡片
-		card.insert(CardComponent.cardName);
-	}
+    execute() {
+        if (!isEngine(this.editor)) return;
+        const {card} = this.editor;
+        //Insert card
+        card.insert(CardComponent.cardName);
+    }
 }
-export { CardComponent };
+export {CardComponent };
+```
 
-``
-
-## 静态属性
+## Static properties
 
 ### `cardName`
 
-卡片名称，只读静态属性，必须
+Card name, read-only static attribute, required
 
-类型：`string`
+Type: `string`
 
-卡片名称是唯一的，不可与传入引擎的所有卡片名称重复
+The card name is unique and cannot be repeated with all the card names passed into the engine
 
 ```ts
 export default class extends Plugin {
-    //定义卡片名称，它是必须的
-	static get cardName() {
-		return '卡片名称';
-	}
+    //Define the card name, it is required
+static get cardName() {
+return'Card Name';
+}
 }
 ````
 
 ### `cardType`
 
-卡片类型，只读静态属性，必须
+Card type, read-only static property, required
 
-类型：`CardType`
+Type: `CardType`
 
-`CardType` 有两种类型，`inline` 和 `block`
+There are two types of `CardType`, `inline` and `block`
 
 ```ts
 export default class extends Plugin {
-	//定义卡片类型，它是必须的
+	//Define the card type, it is required
 	static get cardType() {
 		return CardType.Block;
 	}
@@ -311,90 +308,90 @@ export default class extends Plugin {
 
 ### `autoActivate`
 
-是否能自动激活，默认 false
+Whether it can be activated automatically, the default is false
 
 ### `autoSelected`
 
-是否能自动选中，默认 true
+Whether it can be selected automatically, the default is true
 
 ### `singleSelectable`
 
-是否能单独选中，默认 true
+Whether it can be selected individually, the default is true
 
 ### `collab`
 
-是否能参与协作，在其它作者编辑卡片时，会遮盖一层阴影
+Whether you can participate in collaboration, when other authors edit the card, it will cover a layer of shadow
 
 ### `focus`
 
-是否能聚焦
+Can focus
 
 ### `selectStyleType`
 
-被选中是的样式，默认为边框变化，可选值：
+The style of the selected yes, the default is the border change, optional values:
 
--   `border` 边框变化
--   `background` 背景颜色变化
+-   `border` border changes
+-   `background` background color change
 
 ### `toolbarFollowMouse`
 
-卡片工具栏是否跟随鼠标位置，默认 flase
+Whether the card toolbar follows the mouse position, the default flase
 
-## 属性
+## Attributes
 
 ### `editor`
 
-编辑器实例
+EditEditor example
 
-类型：`EditorInterface`
+Type: `EditorInterface`
 
-在插件实例化的时候，会传入编辑器实例。我们可以通过 `this` 访问它
+When the plug-in is instantiated, the editor instance will be passed in. We can access it through `this`
 
 ```ts
-import { Card, isEngine } from '@aomao/engine'
+import {Card, isEngine} from'@aomao/engine'
 
 export default class extends Card<Options> {
-	...
+...
 
-	init() {
-		console.log(isEngine(this.editor) ? "引擎" : "阅读器")
-	}
+init() {
+console.log(isEngine(this.editor)? "Engine": "Reader")
+}
 }
 ```
 
 ### `id`
 
-只读
+Read only
 
-类型：`string`
+Type: `string`
 
-卡片 id，每个卡片都有一个唯一 ID，我们可以用此 ID 来查找卡片组件实例
+Card id, each card has a unique ID, we can use this ID to find instances of card components
 
 ### `isEditable`
 
-只读
+Read only
 
-类型：`boolean`
+Type: `boolean`
 
-卡片是否可编辑器
+Whether the card is editable
 
 ### `contenteditable`
 
-可编辑节点，可选
+Editable node, optional
 
-可设置一个或多个 CSS 选择器，这些节点将会变为可编辑的
+One or more CSS selectors can be set, and these nodes will become editable
 
-可编辑区域的值需要自定义保存。推荐保存在卡片的 `value` 里面
+The value of the editable area needs to be customized and saved. It is recommended to save it in the `value` of the card
 
 ```ts
-import { Card, isEngine } from '@aomao/engine'
+import {Card, isEngine} from'@aomao/engine'
 
 export default class extends Card<Options> {
-	...
+...
 
     contenteditable = ["div.card-editor-container"]
 
-	render(){
+render(){
         return "<div><div>Thi is Card</div><div class=\"card-editor-container\"></div></div>"
     }
 }
@@ -402,71 +399,71 @@ export default class extends Card<Options> {
 
 ### `readonly`
 
-是否是只读
+Is it read-only
 
-类型：`boolean`
+Type: `boolean`
 
 ### `root`
 
-卡片根节点
+Card root node
 
-类型：`NodeInterface`
+Type: `NodeInterface`
 
 ### `activated`
 
-是否激活
+Activate now
 
-类型：`boolean`
+Type: `boolean`
 
 ### `selected`
 
-是否选中
+Whether selected
 
-类型：`boolean`
+Type: `boolean`
 
 ### `isMaximize`
 
-是否最大化
+Whether to maximize
 
-类型：`boolean`
+Type: `boolean`
 
 ### `activatedByOther`
 
-激活者，协同状态下有效
+Activator, effective in cooperative state
 
-类型：`string | false`
+Type: `string | false`
 
 ### `selectedByOther`
 
-选中者，协同状态下有效
+Selected person, valid in collaboration state
 
-类型：`string | false`
+Type: `string | false`
 
 ### `toolbarModel`
 
-工具栏操作类
+Toolbar operation class
 
-类型：`CardToolbarInterface`
+Type: `CardToolbarInterface`
 
 ### `resizeModel`
 
-大小调整操作类
+Size adjustment operation class
 
-类型：`ResizeInterface`
+Type: `ResizeInterface`
 
 ### `resize`
 
-是否可改变卡片大小，或者传入渲染节点
+Whether the card size can be changed or passed into the rendering node
 
-类型：`boolean | (() => NodeInterface);`
+Type: `boolean | (() => NodeInterface);`
 
-如果有指定，将会实例化 `resizeModel` 属性
+If specified, the `resizeModel` attribute will be instantiated
 
-## 方法
+## Method
 
 ### `init`
 
-初始化，可选
+Initialization, optional
 
 ```ts
 init?(): void;
@@ -474,11 +471,11 @@ init?(): void;
 
 ### `find`
 
-查找 Card 内的 DOM 节点
+Find the DOM node in the Card
 
 ```ts
 /**
- * 查找Card内的 DOM 节点
+ * Find the DOM node in the Card
  * @param selector
  */
 find(selector: string): NodeInterface;
@@ -486,11 +483,11 @@ find(selector: string): NodeInterface;
 
 ### `findByKey`
 
-通过 data-card-element 的值，获取当前 Card 内的 DOM 节点
+Get the DOM node in the current Card through the value of data-card-element
 
 ```ts
 /**
- * 通过 data-card-element 的值，获取当前Card内的 DOM 节点
+ * Get the DOM node in the current Card through the value of data-card-element
  * @param key key
  */
 findByKey(key: string): NodeInterface;
@@ -498,158 +495,158 @@ findByKey(key: string): NodeInterface;
 
 ### `getCenter`
 
-获取卡片的中心节点，也就是卡片自定义内容区域的最外层节点
+Get the central node of the card, which is the outermost node of the custom content area of ​​the card
 
 ```ts
 /**
- * 获取卡片的中心节点
+ * Get the central node of the card
  */
 getCenter(): NodeInterface;
 ```
 
 ### `isCenter`
 
-判断节点是否属于卡片的中心节点
+Determine whether the node belongs to the central node of the card
 
 ```ts
 /**
- * 判断节点是否属于卡片的中心节点
- * @param node 节点
+ * Determine whether the node belongs to the central node of the card
+ * @param node node
  */
 isCenter(node: NodeInterface): boolean;
 ```
 
 ### `isCursor`
 
-判断节点是否在卡片的左右光标处
+Determine whether the node is at the left and right cursors of the card
 
 ```ts
 /**
- * 判断节点是否在卡片的左右光标处
- * @param node 节点
+ * Determine whether the node is at the left and right cursors of the card
+ * @param node node
  */
 isCursor(node: NodeInterface): boolean;
 ```
 
 ### `isLeftCursor`
 
-判断节点是否在卡片的左光标处
+Determine whether the node is at the left cursor of the card
 
 ```ts
 /**
- * 判断节点是否在卡片的左光标处
- * @param node 节点
+ * Determine whether the node is at the left cursor of the card
+ * @param node node
  */
 isLeftCursor(node: NodeInterface): boolean;
 ```
 
 ### `isRightCursor`
 
-判断节点是否在卡片的右光标处
+Determine whether the node is at the right cursor of the card
 
 ```ts
 /**
- * 判断节点是否在卡片的右光标处
- * @param node 节点
+ * Determine whether the node is at the right cursor of the card
+ * @param node node
  */
 isRightCursor(node: NodeInterface): boolean;
 ```
 
 ### `focus`
 
-聚焦卡片
+Focus card
 
 ```ts
 /**
- * 聚焦卡片
- * @param range 光标
- * @param toStart 是否开始位置
+ * Focus card
+ * @param range cursor
+ * @param toStart is the starting position
  */
 focus(range: RangeInterface, toStart?: boolean): void;
 ```
 
 ### `focusPrevBlock`
 
-聚焦卡片所在位置的前一个块级节点
+Focus on the previous block-level node where the card is located
 
 ```ts
 /**
- * 聚焦卡片所在位置的前一个块级节点
- * @param range 光标
- * @param hasModify 没有节点时，是否创建一个空节点并聚焦
+ * Focus on the previous block-level node where the card is located
+ * @param range cursor
+ * @param hasModify When there is no node, whether to create an empty node and focus
  */
 focusPrevBlock(range: RangeInterface, hasModify: boolean): void;
 ```
 
 ### `focusNextBlock`
 
-聚焦卡片所在位置的下一个块级节点
+Focus on the next block-level node where the card is located
 
 ```ts
 /**
- * 聚焦卡片所在位置的下一个块级节点
- * @param range 光标
- * @param hasModify 没有节点时，是否创建一个空节点并聚焦
+ * Focus on the next block-level node where the card is located
+ * @param range cursor
+ * @param hasModify When there is no node, whether to create an empty node and focus
  */
 focusNextBlock(range: RangeInterface, hasModify: boolean): void;
 ```
 
 ### `onFocus`
 
-当卡片聚焦时触发
+Triggered when the card is focused
 
 ```ts
 /**
- * 当卡片聚焦时触发
+ * Triggered when the card is focused
  */
 onFocus?(): void;
 ```
 
 ### `activate`
 
-激活 Card
+Activate Card
 
 ```ts
 /**
- * 激活Card
- * @param activated 是否激活
+ * Activate Card
+ * @param activated Whether to activate
  */
 activate(activated: boolean): void;
 ```
 
 ### `select`
 
-选择 Card
+Choose Card
 
 ```ts
 /**
- * 选择Card
- * @param selected 是否选中
+ * Choose Card
+ * @param selected is it selected
  */
 select(selected: boolean): void;
 ```
 
 ### `onSelect`
 
-选中状态变化时触发
+Triggered when the selected state changes
 
 ```ts
 /**
- * 选中状态变化时触发
- * @param selected 是否选中
+ * Trigger when the selected state changes
+ * @param selected is it selected
  */
 onSelect(selected: boolean): void;
 ```
 
 ### `onSelectByOther`
 
-协同状态下，选中状态变化时触发
+In the cooperative state, trigger when the selected state changes
 
 ```ts
 /**
- * 协同状态下，选中状态变化时触发
- * @param selected 是否选中
- * @param value { color:协同者颜色 , rgb:颜色rgb格式 }
+ * In the cooperative state, trigger when the selected state changes
+ * @param selected is it selected
+ * @param value {color: collaborator color, rgb: color rgb format}
  */
 onSelectByOther(
     selected: boolean,
@@ -662,25 +659,25 @@ onSelectByOther(
 
 ### `onActivate`
 
-激活状态变化时触发
+Triggered when the activation state changes
 
 ```ts
 /**
- * 激活状态变化时触发
- * @param activated 是否激活
+ * Triggered when the activation status changes
+ * @param activated Whether to activate
  */
 onActivate(activated: boolean): void;
 ```
 
 ### `onActivateByOther`
 
-协同状态下，激活状态变化时触发
+In the cooperative state, trigger when the activation state changes
 
 ```ts
 /**
- * 协同状态下，激活状态变化时触发
- * @param activated 是否激活
- * @param value { color:协同者颜色 , rgb:颜色rgb格式 }
+ * In the cooperative state, trigger when the activation state changes
+ * @param activated Whether to activate
+ * @param value {color: collaborator color, rgb: color rgb format}
  */
 onActivateByOther(
     activated: boolean,
@@ -693,152 +690,152 @@ onActivateByOther(
 
 ### `onChange`
 
-可编辑器区域值改变时触发
+Trigger when the editable area value changes
 
 ```ts
 /**
- * 可编辑器区域值改变时触发
- * @param node 可编辑器区域节点
+ * Trigger when the editor area value changes
+ * @param node editable area node
  */
 onChange?(node: NodeInterface): void;
 ```
 
 ### `setValue`
 
-设置卡片值
+Set card value
 
 ```ts
 /**
- * 设置卡片值
- * @param value 值
+ * Set card value
+ * @param value
  */
 setValue(value: CardValue): void;
 ```
 
 ### `getValue`
 
-获取卡片值
+Get card value
 
 ```ts
 /**
- * 获取卡片值
+ * Get card value
  */
-getValue(): (CardValue & { id: string }) | undefined;
+getValue(): (CardValue & {id: string }) | undefined;
 ```
 
 ### `toolbar`
 
-工具栏配置项
+Toolbar configuration items
 
 ```ts
 /**
- * 工具栏配置项
+ * Toolbar configuration items
  */
 toolbar?(): Array<CardToolbarItemOptions | ToolbarItemOptions>;
 ```
 
 ### `maximize`
 
-最大化卡片
+Maximize card
 
 ```ts
 /**
- * 最大化
+ * Maximize
  */
 maximize(): void;
 ```
 
 ### `minimize`
 
-最小化卡片
+Minimize the card
 
 ```ts
 /**
- * 最小化
+ * minimize
  */
 minimize(): void;
 ```
 
 ### `render`
 
-渲染卡片
+Render the card
 
 ```ts
 /**
- * 渲染卡片
+ * Render the card
  */
 render(): NodeInterface | string | void;
 ```
 
 ### `destroy`
 
-销毁
+destroy
 
 ```ts
 /**
- * 销毁
+ * Destroy
  */
 destroy?(): void;
 ```
 
 ### `didInsert`
 
-插入卡片到编辑器后触发
+Triggered after inserting a card into the editor
 
 ```ts
 /**
- * 插入后触发
+ * Trigger after insertion
  */
 didInsert?(): void;
 ```
 
 ### `didUpdate`
 
-更新卡片后触发
+Triggered after updating the card
 
 ```ts
 /**
- * 更新后触发
+ * Triggered after update
  */
 didUpdate?(): void;
 ```
 
 ### `didRender`
 
-卡片渲染成功后触发
+Triggered after the card is successfully rendered
 
 ```ts
 /**
- * 渲染后触发
+ * Triggered after rendering
  */
 didRender(): void;
 ```
 
 ### `updateBackgroundSelection`
 
-更新可编辑器卡片协同选择区域
+Update the editable card collaborative selection area
 
 ```ts
 /**
- * 更新可编辑器卡片协同选择区域
- * @param range 光标
+ * Update the editable card collaborative selection area
+ * @param range cursor
  */
 updateBackgroundSelection?(range: RangeInterface): void;
 ```
 
 ### `drawBackground`
 
-渲染可编辑器卡片协同选择区域
+Render the editable card collaborative selection area
 
 ```ts
 /**
- * 渲染可编辑器卡片协同选择区域
- * @param node 背景画布
- * @param range 渲染光标
- */
+  * Rendering the collaborative selection area of the editor card
+  * @param node background canvas
+  * @param range render cursor
+  */
 drawBackground?(
-    node: NodeInterface,
-    range: RangeInterface,
-    targetCanvas: TinyCanvasInterface,
+     node: NodeInterface,
+     range: RangeInterface,
+     targetCanvas: TinyCanvasInterface,
 ): DOMRect | RangeInterface[] | void | false;
 ```

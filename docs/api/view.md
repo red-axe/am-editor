@@ -1,35 +1,31 @@
----
-translateHelp: true
----
+# View
 
-# 阅读器
+Type: `ViewInterface`
 
-类型：`ViewInterface`
-
-## 方法
+## Method
 
 ### `render`
 
-渲染内容
+Render content
 
 ```ts
 /**
- * 渲染内容
- * @param content 渲染的内容
- * @param trigger 是否触发渲染完成事件，用来展示插件的特俗效果。例如在heading插件中，展示锚点显示功能。默认为 true
- */
+  * Render content
+  * @param content rendered content
+  * @param trigger Whether to trigger the rendering completion event, used to show the special effects of the plug-in. For example, in the heading plug-in, the anchor point display function is displayed. The default is true
+  */
 render(content: string, trigger?: boolean): void;
 ```
 
 ### `trigger`
 
-触发事件，可以主动触发 `render` 事件 `trigger("render","需要渲染的节点")`
+Trigger events, you can actively trigger `render` events `trigger("render","nodes to be rendered")`
 
 ```ts
 /**
- * 触发事件
- * @param eventType 事件名称
- * @param args 参数
- */
+  * trigger event
+  * @param eventType event name
+  * @param args parameters
+  */
 trigger(eventType: string, ...args: any): any;
 ```

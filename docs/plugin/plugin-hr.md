@@ -1,64 +1,64 @@
 # @aomao/plugin-hr
 
-代码块插件
+Code block plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-hr
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Hr , { HrComponent } from '@aomao/plugin-hr';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Hr, {HrComponent} from'@aomao/plugin-hr';
 
-new Engine(...,{ plugins:[Hr] , cards:[HrComponent]})
+new Engine(...,{ plugins:[Hr], cards:[HrComponent]})
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键 `mod+shift+e`
+Default shortcut key `mod+shift+e`
 
 ```ts
-hotkey?:string;//默认mod+shift+e
+hotkey?:string;//default mod+shift+e
 
-//使用配置
+//Use configuration
 new Engine(...,{
-    config:{
-        "hr":{
-            //修改快捷键
-            hotkey:"快捷键"
-        }
-    }
- })
+     config:{
+         "hr":{
+             //Modify shortcut keys
+             hotkey: "shortcut key"
+         }
+     }
+  })
 ```
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-Hr 插件 markdown 语法为`---`
+Hr plugin markdown syntax is `---`
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
-    config:{
-        "hr":{
-            //关闭markdown
-            markdown:false
-        }
-    }
- })
+     config:{
+         "hr":{
+             //Close markdown
+             markdown:false
+         }
+     }
+  })
 ```
 
-## 命令
+## Command
 
 ```ts
-//可携带两个参数，语言类型，默认文本，都是可选的
+//Can carry two parameters, language type, default text, all are optional
 engine.command.execute('hr');
 ```

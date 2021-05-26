@@ -1,49 +1,49 @@
 # @aomao/plugin-table
 
-表格插件
+Form plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-table
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Table, { TableComponent } from '@aomao/plugin-table';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Table, {TableComponent} from'@aomao/plugin-table';
 
-new Engine(...,{ plugins:[Table] , cards:[TableComponent]})
+new Engine(...,{ plugins:[Table], cards:[TableComponent]})
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认无快捷键
+No shortcut keys by default
 
 ```ts
-//快捷键，key 组合键，args，执行参数，[rows?: string, cols?: string] 行数：默认3行，列数：默认3列
-hotkey?:string | {key:string,args:Array<string>};//默认无
+//Shortcut keys, key combination keys, args, execution parameters, [rows?: string, cols?: string] Number of rows: default 3 rows, number of columns: default 3 columns
+hotkey?:string | {key:string,args:Array<string>};//default none
 
-//使用配置
+//Use configuration
 new Engine(...,{
-    config:{
-        "table":{
-            //修改快捷键
-            hotkey:{
-                key:"mod+t",
-                args:[5,5]
-            }
-        }
-    }
- })
+     config:{
+         "table":{
+             //Modify shortcut keys
+             hotkey:{
+                 key:"mod+t",
+                 args:[5,5]
+             }
+         }
+     }
+  })
 ```
 
-## 命令
+## Command
 
 ```ts
-//可携带两个参数，行数，列数，都是可选的
+//Can carry two parameters, the number of rows and the number of columns, all are optional
 engine.command.execute('table', 5, 5);
 ```

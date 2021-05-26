@@ -1,44 +1,40 @@
----
-translateHelp: true
----
+# Schema
 
-# 结构
+For a complex DOM tree, we need to use a set of rules to constrain the DOM tree structure, including node nesting, node attributes, and some specific behaviors.
 
-对于复杂的 DOM 树，我们需要使用一套规则来约束 DOM 树结构，包括节点嵌套、节点属性、以及一些特定的行为。
+We can make rules for a single node, of course, we can also make global rules for the three node types `mark` `inline` `block`. `card` belongs to a special type of us, in essence, they can also be classified as `inline` and `block` types
 
-我们可以对单个节点制定规则，当然也可以针对三种节点类型`mark` `inline` `block`制定全局规则。`card` 属于我们一种特殊类型，本质上他们也可以归纳为 `inline` 和 `block` 类型
+If a node is not in the constraint rule, it will be filtered out, including attributes and styles. If you need this attribute, then it must appear in the rule, otherwise it will not be retained
 
-如果一个节点不在约束规则中，那么它将会被过滤掉，包括属性、样式，如果你需要这个属性，那么它一定要出现在规则中，否则都不会被保留
+## Settings
 
-## 设置
+Single rule type: `SchemaRule` Global rule type: `SchemaGlobal`
 
-单个规则类型：`SchemaRule` 全局规则类型：`SchemaGlobal`
+A rule contains the following attributes:
 
-一个规则的包含以下属性：
+-   `name` DOM node name, optional value
+-   `type` type, `mark` `inline` `block`. In the case of no node name, global rules will be set according to type. Must value
+-   The `attributes` attribute, which sets the node attribute rules, is an object. Optional value
+-   Whether `isVoid` is an empty node, like br, img and other tags, it is impossible to set child nodes, including text. Optional value
 
--   `name` DOM 节点名称，可选值
--   `type` 类型，`mark` `inline` `block`。在不制定节点名称情况下，将根据 type 设置全局规则。必须值
--   `attributes` 属性，设置节点属性规则，是一个对象。可选值
--   `isVoid` 是否是空节点，类似 br、img 等标签，是无法设置子节点的，包括文本。可选值
-
-例子：
+example:
 
 ```ts
-//单个节点规则
+//Single node rule
 {
-    name: 'p',
-    type: 'block',
+    name:'p',
+    type:'block',
 },
 {
-    name: 'span',
-    type: 'mark',
+    name:'span',
+    type:'mark',
     attributes: {
         style: {
             color: "@color"
         }
     }
 }
-//按类型全局规则
+//Global rules by type
 {
     type: "block",
     attributes: {
@@ -47,26 +43,26 @@ translateHelp: true
 }
 ```
 
-## 块级节点额外规则
+## Additional rules for block-level nodes
 
-在通用规则之外，我们还为块级节点额外定制了两个属性
+In addition to the general rules, we have also customized two additional attributes for block-level nodes
 
 ```ts
 {
     ...
     allowIn?: Array<string>;
-	canMerge?: boolean;
+canMerge?: boolean;
 }
 ```
 
--   `allowIn` 允许节点可以放入的块级节点名称，默认他们的值为 `$root`(编辑器根节点)。这通常在嵌套节点中使用，例如：ul li 无序列表下有 li 子节点，它也是独占一行的属于块级节点。如果一个块级节点没有指定可放入的块级节点，那么它将会被过滤掉
--   `canMerge` 相邻的两个块级节点是否可以合并。例如：引用插件 blockquote ，在两个 blockquote 节点处于相邻状态时，它们的子节点会被合并到一个 blockquote 节点下，因为它们相邻单独存在是没有意义的，反而还会增加文档的复杂性
+-   `allowIn` allows the name of the block-level node that the node can be put into, by default their value is `$root` (editor root node). This is usually used in nested nodes, for example: ul li unordered list has a li child node, which is also a block-level node on its own line. If a block-level node does not specify a block-level node that can be placed, it will be filtered out
+-   `canMerge` Whether two adjacent block-level nodes can be merged. For example: quoting the plug-in blockquote, when two blockquote nodes are adjacent, their child nodes will be merged into one blockquote node, because it is meaningless for them to exist separately next to each other, but it will increase the complexity of the document.
 
-类型：`SchemaBlock`
+Type: `SchemaBlock`
 
-## attributes 值
+## attributes value
 
-属性值类型 `SchemaValue`，它由 `SchemaValueObject` 和 `SchemaValueBase` 组成
+The attribute value type `SchemaValue`, which consists of `SchemaValueObject` and `SchemaValueBase`
 
 ```ts
 export type SchemaValueBase =
@@ -86,21 +82,21 @@ export type SchemaValueObject = {
 };
 ```
 
-我们可以看到属性值是可以很灵活配置的，支持：
+We can see that the attribute value can be configured very flexibly and supports:
 
--   正则表达式
--   数组
--   单个字符
--   函数自定义验证
--   `@number` 数量，数字
--   `@length` 长度，包括像素带单位的像素值，例如：10px
--   `@color` 可以判断该属性值是否是一个“颜色”。例如：#ffffff rgb(0,0,0,0)
--   `@ulr` 判断该属性值是否是一个链接
--   `*` 任意值，包括 undefined、null 等空值都可以通过效验
+-   Regular expression
+-   Array
+-   Single character
+-   Function custom verification
+-   `@number` number, number
+-   `@length` length, including the pixel value of the pixel band unit, for example: 10px
+-   `@color` can determine whether the attribute value is a "color". For example: #ffffff rgb(0,0,0,0)
+-   `@ulr` determines whether the attribute value is a link
+-   Any value of `*`, including undefined, null and other empty values ​​can pass the validation
 
-除了值的判定外，默认情况下，这些属性设置后都是可选属性，我们还可能需要为节点制定必要的属性，以区分相通名称节点之间的差别和所属插件类型判别，例如：
+In addition to the value determination, by default, these attributes are optional after they are set. We may also need to formulate necessary attributes for nodes to distinguish the difference between the nodes with the same name and the type of plugin they belong to, for example:
 
-表示前景色的样式节点
+A style node representing the foreground color
 
 ```html
 <span style="color:#ffffff">Hello</span>
@@ -118,7 +114,7 @@ export type SchemaValueObject = {
 }
 ```
 
-表示前景色和背景色的样式节点
+Style nodes representing foreground and background colors
 
 ```html
 <span style="color:#ffffff;background-color:#000000">Hello</span>
@@ -137,9 +133,9 @@ export type SchemaValueObject = {
 }
 ```
 
-这两个样式节点名称都是 span 而且都包含 color 样式，因为默认属性都是可选属性，所以我们在判定一个节点时会忽略这些可选属性，剩下的名称也是一样的，这样就会造成逻辑错误，出现很多意外情况。
+The names of these two style nodes are span and both contain color styles. Because the default attributes are optional attributes, we will ignore these optional attributes when determining a node. The rest of the names are also the same, which will cause Logic errors, many unexpected situations occurred.
 
-所以这里我们需要使用 `SchemaValueObject` 类型的值，来表明这两个节点的唯一性，这些标明的属性也是节点最主要的特征点
+So here we need to use the value of the `SchemaValueObject` type to show the uniqueness of these two nodes. These marked attributes are also the most important feature points of the node.
 
 ```ts
 {
@@ -173,9 +169,9 @@ export type SchemaValueObject = {
 }
 ```
 
-## 默认规则
+## Default rules
 
-引擎按照功能和特性对节点进行了划分 `mark` `inline` `block` `card`，为了满足这些划分后的节点正常工作以及引擎需要，我们制定了一些默认规则，这些规则会和我们自定义规则合并后一起使用，所以不建议自定义规则去覆盖它们
+The engine divides the nodes according to functions and characteristics `mark` `inline` `block` `card`, in order to meet the normal operation of these divided nodes and the needs of the engine, we have formulated some default rules, which will be customized with us The rules are combined and used together, so it is not recommended to customize the rules to overwrite them
 
 ```ts
 import { SchemaGlobal, SchemaRule } from '../types';

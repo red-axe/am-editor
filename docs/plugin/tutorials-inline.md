@@ -1,12 +1,12 @@
-# Inline 插件
+# Inline plugin
 
-行内节点插件
+In-line node plugin
 
-通常用于文本单独样式、不可嵌套的场景下
+Usually used in scenarios where the text is individually styled and cannot be nested
 
-此类插件我们需要继承 `InlinePlugin` 抽象类，`InlinePlugin` 抽象类在继承 `ElementPlugin` 抽象类的基础上扩展了一些属性和方法。所以继承 `InlinePlugin` 的插件也同样拥有`ElementPlugin`抽象类的所有属性和方法
+For this type of plug-in, we need to inherit the `InlinePlugin` abstract class. The `InlinePlugin` abstract class extends some properties and methods on the basis of inheriting the `ElementPlugin` abstract class. So the plugin that inherits `InlinePlugin` also has all the attributes and methods of the `ElementPlugin` abstract class
 
-因为`InlinePlugin` 已经实现了`markdown`语法处理，`execute`，`queryState` 命令，所以我们很容易就能配置好一个 Inline 插件
+Because `InlinePlugin` has implemented `markdown` syntax processing, `execute`, `queryState` commands, so we can easily configure an Inline plugin
 
 ```ts
 import { InlinePlugin } from '@aomao/engine';
@@ -24,52 +24,52 @@ export default class extends InlinePlugin {
 }
 ```
 
-执行 `editor.command.execute("inline-plugin")` 后，光标位置的文本就会被一个边框颜色为黑色的 code 标签包裹了
+After executing `editor.command.execute("inline-plugin")`, the text at the cursor position will be wrapped by a code label with a black border color
 
-## 继承
+## Inheritance
 
-继承 `InlinePlugin` 抽象类
+Inherit the `InlinePlugin` abstract class
 
 ```ts
-import { InlinePlugin } from '@aomao/engine'
+import {InlinePlugin} from'@aomao/engine'
 
 export default class extends InlinePlugin {
-	...
+...
 }
 ```
 
-## 属性
+## Attributes
 
 ### `tagName`
 
-标签名称，必须
+Label name, must
 
-此处的标签名称与父类`ElementPlugin`中的标签名称作用是一致的，只不过标签名称是 `InlinePlugin` 插件必要的属性之一
+The label name here is the same as the label name in the parent class `ElementPlugin`, except that the label name is one of the necessary attributes of the `InlinePlugin` plugin
 
 ### `markdown`
 
-Markdown 语法，可选
+Markdown syntax, optional
 
-类型：`string`
+Type: `string`
 
-因为 `InlinePlugin` 插件中已经实现了对 markdown 的语法解析，所以我们只需要传入插件的 markdown 语法即可，例如：
+Because the grammar parsing of markdown has been implemented in the `InlinePlugin` plugin, we only need to pass in the markdown grammar of the plugin, for example:
 
 ```ts
-//行内代码语法
+//Inline code syntax
 readonly markdown = "`"
 ```
 
-## 方法
+## Method
 
 ### `init`
 
-初始化，可选
+Initialization, optional
 
-`InlinePlugin` 插件已经实现了`init`方法，如果需要使用，需要手动再次调用。否则会出现意料外的情况
+The `InlinePlugin` plugin has implemented the `init` method, if you need to use it, you need to manually call it again. Otherwise there will be unexpected situations
 
 ```ts
 export default class extends InlinePlugin {
-	...
+...
     init(){
         super.init()
     }
@@ -78,67 +78,67 @@ export default class extends InlinePlugin {
 
 ### `execute`
 
-执行插件命令，可选
+Execute plug-in commands, optional
 
-`InlinePlugin` 插件已经实现了`execute`方法，如果需要使用，可以重写此方法
+The `InlinePlugin` plugin has implemented the `execute` method, if you need to use it, you can override this method
 
 ### `queryState`
 
-查询插件状态命令，可选
+Query plug-in status command, optional
 
-`InlinePlugin` 插件已经实现了`queryState`方法，如果需要使用，可以重写此方法
+The `InlinePlugin` plugin has implemented the `queryState` method, if you need to use it, you can override this method
 
 ### `schema`
 
-设置此 inline 插件的`schema`规则，可选
+Set the `schema` rule of this inline plugin, optional
 
-`ElementPlugin` 插件已经实现了`schema`方法，会自动根据 `tagName` `style` `attributes` 设置规则。
+The `ElementPlugin` plugin has implemented the `schema` method, which will automatically set the rules according to the `tagName` `style` `attributes`.
 
-如果需要使用，可以重写此方法或者使用 super.schema()再次调用此方法
+If you need to use it, you can override this method or use super.schema() to call this method again
 
 ### `isTrigger`
 
-是否触发执行增加当前 inline 包裹，否则将移除当前 inline 标签的包裹，可选
+Whether to trigger the execution to add the current inline package, otherwise the package with the current inline label will be removed, optional
 
-默认情况下，`InlinePlugin` 插件会调用 `editor.command.queryState` 查询当前插件状态（当前光标范围内选中的节点符合当前 inline 插件设置的节点）与当前设置的`tagName` `style` `attributes`比较，一致的情况下会执行移除当前 inline 插件节点的效果，否则会加上当前 inline 插件节点的效果。
+By default, the `InlinePlugin` plugin will call `editor.command.queryState` to query the current plugin state (the node selected within the current cursor matches the node set by the current inline plugin) and the currently set `tagName` `style` `attributes` In comparison, if they are consistent, the effect of removing the current inline plug-in node will be executed, otherwise the effect of the current inline plug-in node will be added.
 
-如果有实现 `isTrigger` 方法就需要自己判定当前是取消还是加上当前 inline 插件节点的效果
+If you implement the isTrigger method, you need to determine whether to cancel or add the effect of the current inline plug-in node.
 
 ```ts
 /**
- * 是否触发执行增加当前inline标签包裹，否则将移除当前inline标签的包裹
- * @param args 在调用 command.execute 执行插件传入时的参数
+ * Whether to trigger the execution to increase the current inline label package, otherwise it will remove the current inline label package
+ * @param args is the parameter passed in when calling command.execute to execute the plugin
  */
 isTrigger?(...args: any): boolean;
 ```
 
 ### `triggerMarkdown`
 
-解析`markdown`语法，可选
+Parse `markdown` grammar, optional
 
-在 `InlinePlugin` 默认解析后无法满足需求时，我们可以重写此方法
+We can override this method when `InlinePlugin` fails to meet the requirements after the default parsing
 
 ```ts
 /**
- * 解析markdown
- * @param event 事件
- * @param text markdown文本
- * @param node 触发节点
+ * Parse markdown
+ * @param event event
+ * @param text markdown text
+ * @param node trigger node
  */
 triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface): void
 ```
 
 ### `pasteMarkdown`
 
-粘贴时批量解析`markdown`语法
+Batch parsing of `markdown` syntax when pasting
 
-在 `InlinePlugin` 默认解析后无法满足需求时，我们可以重写此方法
+We can override this method when `InlinePlugin` fails to meet the requirements after the default parsing
 
-在粘贴时如果有检测到是`markdown`语法，会转换为纯文本后传入，需要把当前符合当前插件的`markdown`语法文本全部替换为 inline 标签
+If a `markdown` syntax is detected during pasting, it will be converted into plain text and then passed in. You need to replace all the `markdown` syntax texts currently in line with the current plug-in with inline tags
 
 ```ts
 /**
- * @param node 含有markdown语法的文本节点
+ * @param node contains a text node with markdown syntax
  * */
 pasteMarkdown(node: NodeInterface): void
 ```

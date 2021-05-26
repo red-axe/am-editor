@@ -1,81 +1,77 @@
----
-translateHelp: true
----
-
 # Card
 
-编辑卡片的相关操作
+Edit card related operations
 
-类型：`CardModelInterface`
+Type: `CardModelInterface`
 
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface): CardModelInterface
 ```
 
-## 属性
+## Attributes
 
 ### `classes`
 
-已实例化的卡片集合对象
+Instantiated card collection object
 
 ### `active`
 
-当前已激活的卡片
+Currently activated card
 
 ### `length`
 
-已实例化的卡片集合对象长度
+The length of the instantiated card collection object
 
-## 方法
+## Method
 
 ### `init`
 
-实例化
+Instantiate
 
 ```ts
 /**
- * 实例化卡片
- * @param cards 卡片集合
+ * Instantiate cards
+ * @param cards card collection
  */
 init(cards: Array<CardEntry>): void;
 ```
 
 ### `add`
 
-增加卡片
+Add card
 
 ```ts
 /**
- * 增加卡片
- * @param name 名称
- * @param clazz 类
+ * Add cards
+ * @param name name
+ * @param clazz class
  */
 add(clazz: CardEntry): void;
 ```
 
 ### `each`
 
-遍历所有已创建的卡片
+Traverse all created cards
 
 ```ts
 /**
- * 遍历所有已创建的卡片
- * @param callback 回调函数
+ * Traverse all created cards
+ * @param callback callback function
  */
 each(callback: (card: CardInterface) => boolean | void): void;
 ```
 
 ### `closest`
 
-查询父节点距离最近的卡片节点
+Query the card node closest to the parent node
 
 ```ts
 /**
- * 查询父节点距离最近的卡片节点
- * @param selector 查询器
- * @param ignoreEditable 是否忽略可编辑节点
+ * Query the card node closest to the parent node
+ * @param selector querier
+ * @param ignoreEditable Whether to ignore editable nodes
  */
 closest(
     selector: Node | NodeInterface,
@@ -85,13 +81,13 @@ closest(
 
 ### `find`
 
-根据选择器查找 Card
+Find Card according to the selector
 
 ```ts
 /**
- * 根据选择器查找Card
- * @param selector 卡片ID，或者子节点
- * @param ignoreEditable 是否忽略可编辑节点
+ * Find Card according to the selector
+ * @param selector card ID, or child node
+ * @param ignoreEditable Whether to ignore editable nodes
  */
 find(
     selector: NodeInterface | Node | string,
@@ -101,75 +97,75 @@ find(
 
 ### `findBlock`
 
-根据选择器查找 Block 类型 Card
+Find Block Type Card according to the selector
 
 ```ts
 /**
- * 根据选择器查找Block 类型 Card
- * @param selector 卡片ID，或者子节点
+ * Find the Block type Card according to the selector
+ * @param selector card ID, or child node
  */
 findBlock(selector: Node | NodeInterface): CardInterface | undefined;
 ```
 
 ### `getSingleCard`
 
-获取光标选区中的单个卡片
+Get a single card in the cursor selection
 
 ```ts
 /**
- * 获取单个卡片
- * @param range 光标范围
+ * Get a single card
+ * @param range cursor range
  */
 getSingleCard(range: RangeInterface): CardInterface | undefined;
 ```
 
 ### `getSingleSelectedCard`
 
-获取选区选中一个节点时候的卡片
+Get the card when a node is selected in the selection
 
 ```ts
 /**
- * 获取选区选中一个节点时候的卡片
- * @param rang 选区
+ * Get the card when a node is selected in the selection
+ * @param rang selection
  */
 getSingleSelectedCard(rang: RangeInterface): CardInterface | undefined;
 ```
 
 ### `insertNode`
 
-插入卡片
+Insert card
 
 ```ts
 /**
- * 插入卡片
- * @param range 选区
- * @param card 卡片
+ * Insert card
+ * @param range selection
+ * @param card card
  */
 insertNode(range: RangeInterface, card: CardInterface): CardInterface;
 ```
 
 ### `removeNode`
 
-移除卡片节点
+Remove card node
 
 ```ts
 /**
- * 移除卡片节点
- * @param card 卡片
+ * Remove card node
+ * @param card card
  */
 removeNode(card: CardInterface): void;
 ```
 
 ### `replaceNode`
 
-将指定节点替换成等待创建的 Card DOM 节点
+Replace the specified node with the Card DOM node waiting to be created
 
 ```ts
 /**
- * 将指定节点替换成等待创建的Card DOM 节点
- * @param node 节点
- * @param name 卡片名称
- * @param value 卡片值
+ * Replace the specified node with the Card DOM node waiting to be created
+ * @param node node
+ * @param name card name
+ * @param value card value
  */
 replaceNode(
     node: NodeInterface,
@@ -180,27 +176,27 @@ replaceNode(
 
 ### `updateNode`
 
-更新卡片重新渲染
+Update the card to re-render
 
 ```ts
 /**
- * 更新卡片重新渲染
- * @param card 卡片
- * @param value 值
+ * Update the card to re-render
+ * @param card card
+ * @param value
  */
 updateNode(card: CardInterface, value: CardValue): void;
 ```
 
 ### `activate`
 
-激活卡片节点所在的卡片
+Activate the card where the card node is located
 
 ```ts
 /**
- * 激活卡片节点所在的卡片
- * @param node 节点
- * @param trigger 激活方式
- * @param event 事件
+ * Activate the card where the card node is located
+ * @param node node
+ * @param trigger activation method
+ * @param event event
  */
 activate(
     node: NodeInterface,
@@ -211,76 +207,76 @@ activate(
 
 ### `select`
 
-选中卡片
+Selected card
 
 ```ts
 /**
- * 选中卡片
- * @param card 卡片
+ * Select the card
+ * @param card card
  */
 select(card: CardInterface): void;
 ```
 
 ### `focus`
 
-聚焦卡片
+Focus card
 
 ```ts
 /**
- * 聚焦卡片
- * @param card 卡片
- * @param toStart 是否聚焦到开始位置
+ * Focus card
+ * @param card card
+ * @param toStart Whether to focus to the start position
  */
 focus(card: CardInterface, toStart?: boolean): void;
 ```
 
 ### `insert`
 
-插入卡片
+Insert card
 
 ```ts
 /**
- * 插入卡片
- * @param name 卡片名称
- * @param value 卡片值
+ * Insert card
+ * @param name card name
+ * @param value card value
  */
 insert(name: string, value?: CardValue): CardInterface;
 ```
 
 ### `update`
 
-更新卡片
+Update card
 
 ```ts
 /**
- * 更新卡片
- * @param selector 卡片选择器
- * @param value 要更新的卡片值
+ * Update card
+ * @param selector card selector
+ * @param value The card value to be updated
  */
 update(selector: NodeInterface | Node | string, value: CardValue): void;
 ```
 
 ### `remove`
 
-移除卡片
+Remove card
 
 ```ts
 /**
- * 移除卡片
- * @param selector 卡片选择器
+ * Remove card
+ * @param selector card selector
  */
 remove(selector: NodeInterface | Node | string): void;
 ```
 
 ### `create`
 
-创建卡片
+Create a card
 
 ```ts
 /**
- * 创建卡片
- * @param name 插件名称
- * @param options 选项
+ * Create a card
+ * @param name plugin name
+ * @param options option
  */
 create(
     name: string,
@@ -293,23 +289,23 @@ create(
 
 ### `render`
 
-渲染卡片
+Render the card
 
 ```ts
 /**
- * 渲染卡片
- * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
+ * Render the card
+ * @param container needs to re-render the node containing the card, if not passed, then render all the card nodes to be created
  */
 render(container?: NodeInterface): void;
 ```
 
 ### `gc`
 
-释放卡片
+Release card
 
 ```ts
 /**
- * 释放卡片
+ * Release card
  */
 gc(): void;
 ```

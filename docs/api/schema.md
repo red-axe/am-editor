@@ -1,37 +1,33 @@
----
-translateHelp: true
----
+# Schema
 
-# 结构
+Type: `SchemaInterface`
 
-类型：`SchemaInterface`
-
-## 属性
+## Attributes
 
 ### `data`
 
-所有规则约束集合
+Set of all rule constraints
 
 ```ts
 data: {
-    blocks: Array<SchemaRule>;//块级节点
-    inlines: Array<SchemaRule>;//行内节点
-    marks: Array<SchemaRule>;//样式节点
-    globals: { [key: string]: SchemaAttributes | SchemaStyle };//全局规则
+    blocks: Array<SchemaRule>;//Block-level nodes
+    inlines: Array<SchemaRule>;//Inline node
+    marks: Array<SchemaRule>;//Style node
+    globals: {[key: string]: SchemaAttributes | SchemaStyle };//Global rules
 };
 ```
 
-## 方法
+## Method
 
 ### `add`
 
-增加规则约束
+Increase rule constraints
 
 ```ts
 /**
-* 增加规则，不允许设置div标签，div将用作card使用
-* 只有 type 和 attributes 时，将作为此类型全局属性，与其它所有同类型标签属性将合并
-* @param rules 规则
+* Added rules, div tags are not allowed, div will be used as card
+* When only type and attributes are used, they will be regarded as global attributes of this type, and will be merged with all other label attributes of the same type
+* @param rules
 */
 add(
     rules: SchemaRule | SchemaGlobal | Array<SchemaRule | SchemaGlobal>,
@@ -40,37 +36,37 @@ add(
 
 ### `find`
 
-查找规则
+Find rules
 
 ```ts
 /**
- * 查找规则
- * @param callback 查找条件
+ * Find rules
+ * @param callback search condition
  */
 find(callback: (rule: SchemaRule) => boolean): Array<SchemaRule>;
 ```
 
 ### `getType`
 
-获取节点类型
+Get node type
 
 ```ts
 /**
- * 获取节点类型
- * @param node 节点
+ * Get the node type
+ * @param node node
  */
-getType(node: NodeInterface): 'block' | 'mark' | 'inline' | undefined;
+getType(node: NodeInterface):'block' |'mark' |'inline' | undefined;
 ```
 
 ### `checkNode`
 
-检测节点是否符合某一属性规则
+Check whether the node conforms to a certain attribute rule
 
 ```ts
 /**
- * 检测节点是否符合某一属性规则
- * @param node 节点
- * @param attributes 属性规则
+ * Check whether the node conforms to a certain attribute rule
+ * @param node node
+ * @param attributes attribute rules
  */
 checkNode(
     node: NodeInterface,
@@ -80,28 +76,28 @@ checkNode(
 
 ### `checkStyle`
 
-检测样式值是否符合节点样式规则
+Check whether the style value meets the node style rules
 
 ```ts
 /**
- * 检测样式值是否符合节点样式规则
- * @param name 节点名称
- * @param styleName 样式名称
- * @param styleValue 样式值
+ * Check whether the style value meets the node style rules
+ * @param name node name
+ * @param styleName style name
+ * @param styleValue style value
  */
 checkStyle(name: string, styleName: string, styleValue: string): boolean;
 ```
 
 ### `checkAttributes`
 
-检测值是否符合节点属性的规则
+Check whether the value meets the rules of node attributes
 
 ```ts
 /**
- * 检测值是否符合节点属性的规则
- * @param name 节点名称
- * @param attributesName 属性名称
- * @param attributesValue 属性值
+ * Check whether the value meets the rules of node attributes
+ * @param name node name
+ * @param attributesName attribute name
+ * @param attributesValue attribute value
  */
 checkAttributes(
     name: string,
@@ -112,14 +108,14 @@ checkAttributes(
 
 ### `checkValue`
 
-检测值是否符合规则
+Check whether the value meets the rules
 
 ```ts
 /**
- * 检测值是否符合规则
- * @param rule 规则
- * @param attributesName 属性名称
- * @param attributesValue 属性值
+ * Whether the detection value meets the rules
+ * @param rule
+ * @param attributesName attribute name
+ * @param attributesValue attribute value
  */
 checkValue(
     rule: SchemaAttributes | SchemaStyle,
@@ -130,137 +126,137 @@ checkValue(
 
 ### `checkStyle`
 
-检测样式值是否符合节点样式规则
+Check whether the style value meets the node style rules
 
 ```ts
 /**
- * 检测样式值是否符合节点样式规则
- * @param name 节点名称
- * @param styleName 样式名称
- * @param styleValue 样式值
- * @param type 指定类型
+ * Check whether the style value meets the node style rules
+ * @param name node name
+ * @param styleName style name
+ * @param styleValue style value
+ * @param type specifies the type
  */
 checkStyle(
     name: string,
     styleName: string,
     styleValue: string,
-    type?: 'block' | 'mark' | 'inline',
+    type?:'block' |'mark' |'inline',
 ): void;
 ```
 
 ### `checkAttributes`
 
-检测值是否符合节点属性的规则
+Check whether the value meets the rules of node attributes
 
 ```ts
 /**
- * 检测值是否符合节点属性的规则
- * @param name 节点名称
- * @param attributesName 属性名称
- * @param attributesValue 属性值
- * @param type 指定类型
+ * Check whether the value meets the rules of node attributes
+ * @param name node name
+ * @param attributesName attribute name
+ * @param attributesValue attribute value
+ * @param type specifies the type
  */
 checkAttributes(
     name: string,
     attributesName: string,
     attributesValue: string,
-    type?: 'block' | 'mark' | 'inline',
+    type?:'block' |'mark' |'inline',
 ): void;
 ```
 
 ### `filterStyles`
 
-过滤节点样式
+Filter node style
 
 ```ts
 /**
- * 过滤节点样式
- * @param name 节点名称
- * @param styles 样式
- * @param type 指定类型
+ * Filter node style
+ * @param name node name
+ * @param styles style
+ * @param type specifies the type
  */
 filterStyles(
     name: string,
-    styles: { [k: string]: string },
-    type?: 'block' | 'mark' | 'inline',
+    styles: {[k: string]: string },
+    type?:'block' |'mark' |'inline',
 ): void;
 ```
 
 ### `filterAttributes`
 
-过滤节点属性
+Filter node attributes
 
 ```ts
 /**
- * 过滤节点属性
- * @param name 节点名称
- * @param attributes 属性
- * @param type 指定类型
+ * Filter node attributes
+ * @param name node name
+ * @param attributes
+ * @param type specifies the type
  */
 filterAttributes(
     name: string,
-    attributes: { [k: string]: string },
-    type?: 'block' | 'mark' | 'inline',
+    attributes: {[k: string]: string },
+    type?:'block' |'mark' |'inline',
 ): void;
 ```
 
 ### `clone`
 
-克隆当前 schema 对象
+Clone the current schema object
 
 ```ts
 /**
- * 克隆当前schema对象
+ * Clone the current schema object
  */
 clone(): SchemaInterface;
 ```
 
 ### `toAttributesMap`
 
-将相同标签的属性和 gloals 属性合并转换为 map 格式
+Combine attributes of the same label and gloals attributes into map format
 
 ```ts
 /**
- * 将相同标签的属性和gloals属性合并转换为map格式
- * @param type 指定转换的类别 "block" | "mark" | "inline"
+ * Combine and convert the attributes of the same tag and the attributes of gloals into map format
+ * @param type specifies the type of conversion "block" | "mark" | "inline"
  */
-toAttributesMap(type?: 'block' | 'mark' | 'inline'): SchemaMap;
+toAttributesMap(type?:'block' |'mark' |'inline'): SchemaMap;
 ```
 
 ### `getMapCache`
 
-获取合并后的 Map 格式
+Get the merged Map format
 
 ```ts
 /**
- * 获取合并后的Map格式
- * @param 类型，默认为所有
+ * Get the merged Map format
+ * @param type, default is all
  */
-getMapCache(type?: 'block' | 'mark' | 'inline'): SchemaMap;
+getMapCache(type?:'block' |'mark' |'inline'): SchemaMap;
 ```
 
 ### `closest`
 
-查找节点符合规则的最顶层的节点名称
+Find the name of the topmost node where the node matches the rule
 
 ```ts
 /**
- * 查找节点符合规则的最顶层的节点名称
- * @param name 节点名称
- * @returns 最顶级的block节点名称
+ * Find the name of the top-level node where the node meets the rule
+ * @param name node name
+ * @returns The name of the top block node
  */
 closest(name: string): string;
 ```
 
 ### `isAllowIn`
 
-判断子节点名称是否允许放入指定的父节点中
+Determine whether the child node name is allowed to be placed in the specified parent node
 
 ```ts
 /**
- * 判断子节点名称是否允许放入指定的父节点中
- * @param source 父节点名称
- * @param target 子节点名称
+ * Determine whether the child node name is allowed to be placed in the specified parent node
+ * @param source parent node name
+ * @param target child node name
  * @returns true | false
  */
 isAllowIn(source: string, target: string): boolean;
@@ -268,11 +264,11 @@ isAllowIn(source: string, target: string): boolean;
 
 ### `getAllowInTags`
 
-获取允许有子 block 节点的标签集合
+Get the label collection that allows sub-block nodes
 
 ```ts
 /**
- * 获取允许有子block节点的标签集合
+ * Get the label collection that allows child block nodes
  * @returns
  */
 getAllowInTags(): Array<string>;
@@ -280,11 +276,11 @@ getAllowInTags(): Array<string>;
 
 ### `getCanMergeTags`
 
-获取能够合并的 block 节点的标签集合
+Get the label collection of block nodes that can be merged
 
 ```ts
 /**
- * 获取能够合并的block节点的标签集合
+ * Get the label collection of block nodes that can be merged
  * @returns
  */
 getCanMergeTags(): Array<string>;

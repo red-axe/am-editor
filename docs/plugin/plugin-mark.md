@@ -1,38 +1,38 @@
 # @aomao/plugin-mark
 
-标记样式插件
+Markup style plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-mark
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Mark from '@aomao/plugin-mark';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Mark from'@aomao/plugin-mark';
 
 new Engine(...,{ plugins:[Mark] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键无，以数组形式传入多个快捷键
+The default shortcut key is none, and multiple shortcut keys are passed in as an array
 
 ```ts
-//快捷键，
+//hot key,
 hotkey?: string | Array<string>;
 
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "mark":{
-            //修改快捷键
-            hotkey:"快捷键"
+            //Modify shortcut keys
+            hotkey: "shortcut key"
         }
     }
  })
@@ -40,27 +40,27 @@ new Engine(...,{
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-Mark 插件 markdown 语法为`==`
+The markdown syntax of the Mark plug-in is `==`
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
     config:{
         "mark":{
-            //关闭markdown
+            //Close markdown
             markdown:false
         }
     }
  })
 ```
 
-## 命令
+## Command
 
 ```ts
 engine.command.execute('mark');
-//使用 command 执行查询当前状态，返回 boolean | undefined
+//Use command to execute query current status, return boolean | undefined
 engine.command.queryState('orderedlist');
 ```

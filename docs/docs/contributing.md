@@ -1,18 +1,14 @@
----
-translateHelp: true
----
+# Contribution
 
-# 贡献
+## Contributing plugins
 
-## 贡献插件
+Refer to the plugin tutorial document
 
-参考插件教程文档
+## Contribute Engine Code
 
-## 贡献 Engine 代码
+Clone the am-editor repository on GitHub
 
-在 GitHub 上 clone am-editor 仓库
-
-### 安装依赖
+### Installation dependencies
 
 ```bash
 $ yarn
@@ -22,39 +18,39 @@ $ yarn
 $ npm install
 ```
 
-### 启动项目
+### Startup project
 
 ```bash
-//普通启动
+//Ordinary start
 $ yarn start
 
 //or
-//服务端渲染模式启动，将调用 site-ssr 。要完全使用ssr模式，启动后需要主动访问 7001 端口
+//The server-side rendering mode is started and site-ssr will be called. To fully use ssr mode, you need to actively access port 7001 after startup
 $ yarn ssr
 ```
 
-### 启动协同服务
+### Start collaborative service
 
 ```bash
 $ cd ot-server
 $ yarn start
 ```
 
-### 编译
+### Compile
 
-因为我们有多个 package，使用的是 lerna 管理模式
+Because we have multiple packages, we use lerna management mode
 
-在编译配置上，我们使用了 [father-build](https://github.com/umijs/father)
+In the compilation configuration, we used [father-build](https://github.com/umijs/father)
 
-一个命令就可以编译所有的包
+One command can compile all packages
 
 ```bash
 $ yarn build
 ```
 
-需要注意的是，[father-build](https://github.com/umijs/father) 对 vue 很不友好，我们需要改动 node_modules/father/lib/getRollupConfig.ts 文件中的 getPlugins 方法。 [我的分支上已修改，可以参考一下](https://github.com/itellyou-com/father/blob/master/packages/father-build/src/getRollupConfig.ts)
+It should be noted that [father-build](https://github.com/umijs/father) is very unfriendly to vue, we need to change the getPlugins method in the node_modules/father/lib/getRollupConfig.ts file. [My branch has been modified, you can refer to it](https://github.com/itellyou-com/father/blob/master/packages/father-build/src/getRollupConfig.ts)
 
-在 vue 项目中还需要添加.fatherrc.ts 配置文件
+You also need to add the .fatherrc.ts configuration file in the vue project
 
 ```ts
 import vue from 'rollup-plugin-vue';
@@ -69,18 +65,18 @@ export default {
 };
 ```
 
-这样在使用 father-build 编译 vue 项目时不会出错
+This way there will be no error when using father-build to compile the vue project
 
-站点打包
+Site packaging
 
 ```bash
 $ yarn docs:build
 ```
 
-## 贡献文档
+## Contributing documents
 
-am-editor 使用 [dumi](https://d.umijs.org/) 作为文档站点工具，
+am-editor uses [dumi](https://d.umijs.org/) as a document site tool,
 
-1. 每篇文档左下方有 “在 GitHub 上编辑这篇文档”，你可以通过这里进行文档修改
-2. 打开 Github 上的 docs 目录，用文件编辑器新建、修改、预览文件，然后提 PR
-3. 你还可以 clone am-editor 仓库，修改 docs 目录下的文件，本地文档调试完成后统一提 PR
+1. There is "Edit this document on GitHub" at the bottom left of each document, you can modify the document here
+2. Open the docs directory on Github, use the file editor to create, modify, and preview files, and then submit a PR
+3. You can also clone the am-editor warehouse and modify the files in the docs directory. After the local documentation is debugged, the PR will be unified.

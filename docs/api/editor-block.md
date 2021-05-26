@@ -1,133 +1,129 @@
----
-translateHelp: true
----
-
 # Block
 
-编辑块级节点的相关操作
+Edit related operations of block-level nodes
 
-类型：`BlockModelInterface`
+Type: `BlockModelInterface`
 
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface): BlockModelInterface
 ```
 
-## 方法
+## Method
 
 ### `init`
 
-初始化
+initialization
 
 ```ts
 /**
- * 初始化
+ * Initialization
  */
 init(): void;
 ```
 
 ### `findPlugin`
 
-根据节点查找 block 插件实例
+Find the block plugin instance according to the node
 
 ```ts
 /**
- * 根据节点查找block插件实例
- * @param node 节点
+ * Find the block plugin instance according to the node
+ * @param node node
  */
 findPlugin(node: NodeInterface): Array<BlockInterface>;
 ```
 
 ### `findTop`
 
-查找 Block 节点的一级节点。如 div -> H2 返回 H2 节点
+Find the first-level node of the Block node. For example, div -> H2 returns H2 node
 
 ```ts
 /**
- * 查找Block节点的一级节点。如 div -> H2 返回 H2节点
- * @param parentNode 父节点
- * @param childNode 子节点
+ * Find the first level node of the Block node. For example, div -> H2 returns H2 node
+ * @param parentNode parent node
+ * @param childNode child node
  */
 findTop(parentNode: NodeInterface, childNode: NodeInterface): NodeInterface;
 ```
 
 ### `closest`
 
-获取最近的 block 节点，找不到返回 node
+Get the nearest block node, can not find the return node
 
 ```ts
 /**
- * 获取最近的block节点，找不到返回 node
- * @param node 节点
+ * Get the nearest block node, the return node cannot be found
+ * @param node node
  */
 closest(node: NodeInterface): NodeInterface;
 ```
 
 ### `wrap`
 
-在光标位置包裹一个 block 节点
+Wrap a block node at the cursor position
 
 ```ts
 /**
- * 在光标位置包裹一个block节点
- * @param block 节点
- * @param range 光标
+ * Wrap a block node at the cursor position
+ * @param block node
+ * @param range cursor
  */
 wrap(block: NodeInterface | Node | string, range?: RangeInterface): void;
 ```
 
 ### `unwrap`
 
-移除光标所在 block 节点包裹
+Remove the package of the block node where the cursor is located
 
 ```ts
 /**
- * 移除光标所在block节点包裹
- * @param block 节点
- * @param range 光标
+ * Remove the package of the block node where the cursor is located
+ * @param block node
+ * @param range cursor
  */
 unwrap(block: NodeInterface | Node | string, range?: RangeInterface): void;
 ```
 
 ### `getSiblings`
 
-获取节点相对于光标开始位置、结束位置下的兄弟节点集合
+Get the node's sibling node set relative to the cursor start position and end position
 
 ```ts
 /**
- * 获取节点相对于光标开始位置、结束位置下的兄弟节点集合
- * @param range 光标
- * @param block 节点
+ * Get the node's sibling node set relative to the cursor start position and end position
+ * @param range cursor
+ * @param block node
  */
 getSiblings(
     range: RangeInterface,
     block: NodeInterface,
-): Array<{ node: NodeInterface; position: 'left' | 'center' | 'right' }>;
+): Array<{ node: NodeInterface; position:'left' |'center' |'right' }>;
 ```
 
 ### `split`
 
-分割当前光标选中的 block 节点
+Split the block node selected by the current cursor
 
 ```ts
 /**
- * 分割当前光标选中的block节点
- * @param range 光标
+ * Split the block node selected by the current cursor
+ * @param range cursor
  */
 split(range?: RangeInterface): void;
 ```
 
 ### `insert`
 
-在当前光标位置插入 block 节点
+Insert a block node at the current cursor position
 
 ```ts
 /**
- * 在当前光标位置插入block节点
- * @param block 节点
- * @param remove 是否移除当前位置上的block
- * @param range 光标
+ * Insert a block node at the current cursor position
+ * @param block node
+ * @param remove whether to remove the block at the current position
+ * @param range cursor
  */
 insert(
     block: NodeInterface | Node | string,
@@ -138,116 +134,116 @@ insert(
 
 ### `setBlocks`
 
-设置当前光标所在的所有 block 节点为新的节点或设置新属性
+Set all block nodes where the current cursor is located as new nodes or set new attributes
 
 ```ts
 /**
- * 设置当前光标所在的所有block节点为新的节点或设置新属性
- * @param block 需要设置的节点或者节点属性
- * @param range 光标
+ * Set all block nodes where the current cursor is located as new nodes or set new attributes
+ * @param block The node or node attribute that needs to be set
+ * @param range cursor
  */
 setBlocks(
-    block: string | { [k: string]: any },
+    block: string | {[k: string]: any },
     range?: RangeInterface,
 ): void;
 ```
 
 ### `merge`
 
-合并当前光标位置相邻的 block
+Merge blocks adjacent to the current cursor position
 
 ```ts
 /**
- * 合并当前光标位置相邻的block
- * @param range 光标
+ * Combine blocks adjacent to the current cursor position
+ * @param range cursor
  */
 merge(range?: RangeInterface): void;
 ```
 
 ### `findBlocks`
 
-查找对范围有效果的所有 Block
+Find all blocks that have an effect on the range
 
 ```ts
 /**
- * 查找对范围有效果的所有 Block
- * @param range 范围
+ * Find all blocks that have an effect on the range
+ * @param range
  */
 findBlocks(range: RangeInterface): Array<NodeInterface>;
 ```
 
 ### `isFirstOffset`
 
-判断范围的 {Edge}Offset 是否在 Block 的开始位置
+Determine whether the {Edge}Offset of the range is at the beginning of the Block
 
 ```ts
 /**
- * 判断范围的 {Edge}Offset 是否在 Block 的开始位置
- * @param range 光标
+ * Determine whether the {Edge}Offset of the range is at the beginning of the Block
+ * @param range cursor
  * @param edge start ｜ end
  */
-isFirstOffset(range: RangeInterface, edge: 'start' | 'end'): boolean;
+isFirstOffset(range: RangeInterface, edge:'start' |'end'): boolean;
 ```
 
 ### `isLastOffset`
 
-判断范围的 {Edge}Offset 是否在 Block 的最后位置
+Determine whether the {Edge}Offset of the range is at the last position of the Block
 
 ```ts
 /**
- * 判断范围的 {Edge}Offset 是否在 Block 的最后位置
- * @param range 光标
+ * Determine whether the {Edge}Offset of the range is at the last position of the Block
+ * @param range cursor
  * @param edge start ｜ end
  */
-isLastOffset(range: RangeInterface, edge: 'start' | 'end'): boolean;
+isLastOffset(range: RangeInterface, edge:'start' |'end'): boolean;
 ```
 
 ### `getBlocks`
 
-获取范围内的所有 Block
+Get all blocks in the range
 
 ```ts
 /**
- * 获取范围内的所有 Block
- * @param range  光标s
+ * Get all blocks in the range
+ * @param range cursors
  */
 getBlocks(range: RangeInterface): Array<NodeInterface>;
 ```
 
 ### `getLeftText`
 
-获取 Block 左侧文本
+Get the left text of Block
 
 ```ts
 /**
- * 获取 Block 左侧文本
- * @param block 节点
+ * Get the left text of Block
+ * @param block node
  */
 getLeftText(block: NodeInterface | Node): string;
 ```
 
 ### `removeLeftText`
 
-删除 Block 左侧文本
+Delete the left text of Block
 
 ```ts
 /**
- * 删除 Block 左侧文本
- * @param block 节点
+ * Delete the text on the left side of Block
+ * @param block node
  */
 removeLeftText(block: NodeInterface | Node): void;
 ```
 
 ### `createSide`
 
-生成 cursor 左侧或右侧的节点，放在一个和父节点一样的容器里
+Generate the node on the left or right side of the cursor and place it in the same container as the parent node
 
 ```ts
 /**
- * 生成 cursor 左侧或右侧的节点，放在一个和父节点一样的容器里
- * isLeft = true：左侧
- * isLeft = false：右侧
- * @param {block,range,isLeft,clone,keepID} 节点，光标，左侧或右侧, 是否复制，是否保持id
+ * Generate the node on the left or right side of the cursor and place it in the same container as the parent node
+ * isLeft = true: left
+ * isLeft = false: the right side
+ * @param {block,range,isLeft,clone,keepID} node, cursor, left or right, whether to copy, whether to keep id
  *
  */
 createSide({
@@ -267,38 +263,38 @@ createSide({
 
 ### `flatten`
 
-整理块级节点为符合标准的编辑器值
+Sort block-level nodes into standard editor values
 
 ```ts
 /**
- * 整理块级节点
- * @param domNode 节点
- * @param root 根节点
+ * Sorting block-level nodes
+ * @param domNode node
+ * @param root root node
  */
 flatten(domNode: NodeInterface, root: NodeInterface): void;
 ```
 
 ### `brToBlock`
 
-br 换行改成段落
+br change line to paragraph
 
 ```ts
 /**
- * br 换行改成段落
- * @param block 节点
+ * br change lines to paragraphs
+ * @param block node
  */
 brToBlock(block: NodeInterface): void;
 ```
 
 ### `insertEmptyBlock`
 
-插入一个空的 block 节点
+Insert an empty block node
 
 ```ts
 /**
- * 插入一个空的block节点
- * @param range 光标所在位置
- * @param block 节点
+ * Insert an empty block node
+ * @param range cursor position
+ * @param block node
  * @returns
  */
 insertEmptyBlock(range: RangeInterface, block: NodeInterface): void;
@@ -306,13 +302,13 @@ insertEmptyBlock(range: RangeInterface, block: NodeInterface): void;
 
 ### `insertOrSplit`
 
-在光标位置插入或分割节点
+Insert or split node at cursor position
 
 ```ts
 /**
- * 在光标位置插入或分割节点
- * @param range 光标所在位置
- * @param block 节点
+ * Insert or split a node at the cursor position
+ * @param range cursor position
+ * @param block node
  */
 insertOrSplit(range: RangeInterface, block: NodeInterface): void;
 ```

@@ -1,24 +1,20 @@
----
-translateHelp: true
----
+# Hotkey
 
-# 热键
+Editor hotkeys/shortcut keys
 
-编辑器热键/快捷键
+Type: `HotkeyInterface`
 
-类型：`HotkeyInterface`
-
-## 构造函数
+## Constructor
 
 ```ts
 new (engine: EngineInterface): HotkeyInterface
 ```
 
-## 方法
+## Method
 
 ### `trigger`
 
-触发一个键盘事件
+Trigger a keyboard event
 
 ```ts
 trigger(e: KeyboardEvent): void;
@@ -26,7 +22,7 @@ trigger(e: KeyboardEvent): void;
 
 ### `enable`
 
-启用快捷键
+Enable shortcut keys
 
 ```ts
 enable(): void;
@@ -34,7 +30,7 @@ enable(): void;
 
 ### `disable`
 
-禁用快捷键
+Disable shortcut keys
 
 ```ts
 disable(): void;
@@ -42,7 +38,7 @@ disable(): void;
 
 ### `destroy`
 
-销毁
+destroy
 
 ```ts
 destroy(): void;

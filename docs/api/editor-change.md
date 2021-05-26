@@ -1,24 +1,20 @@
----
-translateHelp: true
----
-
 # Change
 
-编辑器变更的相关操作
+Operations related to editor changes
 
-类型：`ChangeInterface`
+Type: `ChangeInterface`
 
-## 构造函数
+## Constructor
 
 ```ts
 new (container: NodeInterface, options: ChangeOptions): ChangeInterface;
 ```
 
-## 属性
+## Attributes
 
 ### `rangePathBeforeCommand`
 
-命令执行前的光标转换后的路径
+Path after cursor conversion before command execution
 
 ```ts
 rangePathBeforeCommand: Path[] | null;
@@ -26,7 +22,7 @@ rangePathBeforeCommand: Path[] | null;
 
 ### `event`
 
-事件
+event
 
 ```ts
 event: ChangeEventInterface;
@@ -34,7 +30,7 @@ event: ChangeEventInterface;
 
 ### `marks`
 
-当前光标选区中的所有样式节点
+All style nodes in the current cursor selection
 
 ```ts
 marks: Array<NodeInterface>;
@@ -42,7 +38,7 @@ marks: Array<NodeInterface>;
 
 ### `blocks`
 
-当前光标选区中的所有块级节点
+All block-level nodes in the current cursor selection
 
 ```ts
 blocks: Array<NodeInterface>;
@@ -50,87 +46,87 @@ blocks: Array<NodeInterface>;
 
 ### `inlines`
 
-当前光标选区中的所有行内节点
+All inline nodes in the current cursor selection
 
 ```ts
 inlines: Array<NodeInterface>;
 ```
 
-## 方法
+## Method
 
 ### `getRange`
 
-获取当前选区的范围
+Get the range of the current selection
 
 ```ts
 /**
- * 获取当前选区的范围
+ * Get the range of the current selection
  */
 getRange(): RangeInterface;
 ```
 
 ### `getSafeRange`
 
-获取安全可控的光标对象
+Obtain a safe and controllable cursor object
 
 ```ts
 /**
- * 获取安全可控的光标对象
- * @param range 默认当前光标
+ * Obtain a safe and controllable cursor object
+ * @param range default current cursor
  */
 getSafeRange(range?: RangeInterface): RangeInterface;
 ```
 
 ### `select`
 
-选中指定的范围
+Select the specified range
 
 ```ts
 /**
- * 选中指定的范围
- * @param range 光标
+ * Select the specified range
+ * @param range cursor
  */
 select(range: RangeInterface): ChangeInterface;
 ```
 
 ### `focus`
 
-聚焦编辑器
+Focus editor
 
 ```ts
 /**
- * 聚焦编辑器
- * @param toStart true:开始位置,false:结束位置，默认为之前操作位置
+ * Focus editor
+ * @param toStart true: start position, false: end position, the default is the previous operation position
  */
 focus(toStart?: boolean): ChangeInterface;
 ```
 
 ### `blur`
 
-取消焦点
+Cancel focus
 
 ```ts
-	/**
- * 取消焦点
+/**
+ * Cancel focus
  */
 blur(): ChangeInterface;
 ```
 
 ### `apply`
 
-应用一个具有改变 dom 结构的操作
+Apply an operation that changes the dom structure
 
 ```ts
 /**
- * 应用一个具有改变dom结构的操作
- * @param range 光标
+ * Apply an operation that changes the dom structure
+ * @param range cursor
  */
 apply(range?: RangeInterface): void;
 ```
 
 ### `combinTextNode`
 
-把当前编辑中间断的字符组合成一段不间断的字符
+Combine the interrupted characters in the current editing into an uninterrupted character
 
 ```ts
 combinTextNode(): void;
@@ -138,7 +134,7 @@ combinTextNode(): void;
 
 ### `isComposing`
 
-是否在组合输入中
+Is it in the combined input
 
 ```ts
 isComposing(): boolean;
@@ -146,7 +142,7 @@ isComposing(): boolean;
 
 ### `isSelecting`
 
-是否正在选择中
+Is it being selected
 
 ```ts
 isSelecting(): boolean;
@@ -154,19 +150,19 @@ isSelecting(): boolean;
 
 ### `setValue`
 
-设置编辑器值
+Set editor value
 
 ```ts
 /**
- * @param value 值
- * @param onParse 在转换为符合标准的编辑器值前使用根节点解析过滤
+ * @param value
+ * @param onParse uses root node parsing and filtering before converting to standard editor values
  * */
 setValue(value: string, onParse?: (node: Node) => void): void;
 ```
 
 ### `getOriginValue`
 
-获取编辑器原始值
+Get the original value of the editor
 
 ```ts
 getOriginValue(): string;
@@ -174,18 +170,18 @@ getOriginValue(): string;
 
 ### `getValue`
 
-获取编辑器值
+Get editor value
 
 ```ts
 /**
- * @param ignoreCursor 是否忽悠光标所在的记录节点
+ * @param ignoreCursor Whether to fool the record node where the cursor is located
  * */
-getValue(options: { ignoreCursor?: boolean }): string;
+getValue(options: {ignoreCursor?: boolean }): string;
 ```
 
 ### `cacheRangeBeforeCommand`
 
-在执行命令前缓存光标对象
+Cache the cursor object before executing the command
 
 ```ts
 cacheRangeBeforeCommand(): void;
@@ -193,7 +189,7 @@ cacheRangeBeforeCommand(): void;
 
 ### `getRangePathBeforeCommand`
 
-获取命令执行前的光标转换后的路径
+Get the path after the cursor conversion before the command is executed
 
 ```ts
 getRangePathBeforeCommand(): Path[] | null;
@@ -201,7 +197,7 @@ getRangePathBeforeCommand(): Path[] | null;
 
 ### `isEmpty`
 
-当前编辑器是否是空值
+Whether the current editor is empty
 
 ```ts
 isEmpty(): boolean;
@@ -209,7 +205,7 @@ isEmpty(): boolean;
 
 ### `destroy`
 
-销毁
+destroy
 
 ```ts
 destroy(): void;
@@ -217,75 +213,75 @@ destroy(): void;
 
 ### `insertFragment`
 
-插入片段
+Insert
 
 ```ts
 /**
- * 插入片段
- * @param fragment 片段
- * @param callback 插入后的回调函数
+ * Insert fragment
+ * @param fragment fragment
+ * @param callback callback function after insertion
  */
 insertFragment(fragment: DocumentFragment, callback?: () => void): void;
 ```
 
 ### `deleteContent`
 
-删除内容
+Delete content
 
 ```ts
 /**
- * 删除内容
- * @param range 光标，默认获取当前光标
- * @param isDeepMerge 删除后执行合并操作
+ * Delete content
+ * @param range cursor, get the current cursor by default
+ * @param isDeepMerge Perform merge operation after deletion
  */
 deleteContent(range?: RangeInterface, isDeepMerge?: boolean): void;
 ```
 
 ### `addBrAfterDelete`
 
-删除节点，删除后如果是空段落，自动添加 BR
+Delete the node, if it is an empty paragraph after deletion, automatically add BR
 
 ```ts
 /**
- * 删除节点，删除后如果是空段落，自动添加 BR
- * @param node 要删除的节点
+ * Delete node, if it is an empty paragraph after deletion, BR will be added automatically
+ * @param node The node to be deleted
  */
 addBrAfterDelete(node: NodeInterface): void;
 ```
 
 ### `unwrapNode`
 
-去除当前光标最接近的 block 节点或传入的节点外层包裹
+Remove the block node closest to the current cursor or the outer package of the incoming node
 
 ```ts
 /**
- * 去除当前光标最接近的block节点或传入的节点外层包裹
- * @param node 节点
+ * Remove the block node closest to the current cursor or the outer package of the incoming node
+ * @param node node
  */
 unwrapNode(node?: NodeInterface): void;
 ```
 
 ### `mergeAfterDeletePrevNode`
 
-删除当前光标最接近的 block 节点或传入的节点的前面一个节点后合并
+Delete the block node closest to the current cursor or the previous node of the incoming node and merge it
 
 ```ts
 /**
- * 删除当前光标最接近的block节点或传入的节点的前面一个节点后合并
- * @param node 节点
+ * Delete the block node closest to the current cursor or the previous node of the incoming node and merge it
+ * @param node node
  */
 mergeAfterDeletePrevNode(node?: NodeInterface): void;
 ```
 
 ### `focusPrevBlock`
 
-焦点移动到当前光标最接近的 block 节点或传入的节点前一个 Block
+The focus moves to the block node closest to the current cursor or the block before the incoming node
 
 ```ts
 /**
- * 焦点移动到当前光标最接近的block节点或传入的节点前一个 Block
- * @param block 节点
- * @param isRemoveEmptyBlock 如果前一个block为空是否删除，默认为否
+ * The focus moves to the block node closest to the current cursor or the block before the incoming node
+ * @param block node
+ * @param isRemoveEmptyBlock If the previous block is empty, whether to delete, the default is no
  */
 focusPrevBlock(block?: NodeInterface, isRemoveEmptyBlock?: boolean): void;
 ```

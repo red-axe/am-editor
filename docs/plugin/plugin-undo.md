@@ -1,47 +1,47 @@
 # @aomao/plugin-undo
 
-撤销历史插件
+Undo history plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-undo
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Undo from '@aomao/plugin-undo';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Undo from'@aomao/plugin-undo';
 
 new Engine(...,{ plugins:[Undo] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键为 `mod+z` `shift+mod+z`
+The default shortcut key is `mod+z` `shift+mod+z`
 
 ```ts
-//快捷键
+//hot key
 hotkey?: string | Array<string>;
-//使用配置
+//Use configuration
 new Engine(...,{
-    config:{
-        "undo":{
-            //修改快捷键
-            hotkey:"快捷键"
-        }
-    }
- })
+     config:{
+         "undo":{
+             //Modify shortcut keys
+             hotkey: "shortcut key"
+         }
+     }
+  })
 ```
 
-## 命令
+## Command
 
 ```ts
-//使用 command 执行插件、并传入所需参数
+//Use command to execute the plug-in and pass in the required parameters
 engine.command.execute('undo');
-//使用 command 执行查询当前状态，返回 boolean | undefined
+//Use command to execute query current status, return boolean | undefined
 engine.command.queryState('undo');
 ```

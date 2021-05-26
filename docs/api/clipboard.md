@@ -1,72 +1,68 @@
----
-translateHelp: true
----
+# Clipboard
 
-# 剪贴板
+Clipboard related operations
 
-剪贴板相关操作
+Type: `ClipboardInterface`
 
-类型：`ClipboardInterface`
-
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface): CommandInterface
 ```
 
-## 方法
+## Method
 
 ### `getData`
 
-获取剪贴板数据
+Get clipboard data
 
 ```ts
 /**
- * 获取剪贴板数据
- * @param event 事件
+ * Get clipboard data
+ * @param event event
  */
 getData(event: DragEvent | ClipboardEvent): ClipboardData;
 ```
 
 ### `write`
 
-写入剪贴板
+Write to clipboard
 
 ```ts
 /**
- * 写入剪贴板
- * @param event 事件
- * @param range 光标，默认获取当前光标位置
- * @param callback 回调
+ * Write to clipboard
+ * @param event event
+ * @param range cursor, get the current cursor position by default
+ * @param callback callback
  */
 write(
     event: ClipboardEvent,
     range?: RangeInterface | null,
-    callback?: (data: { html: string; text: string }) => void,
+    callback?: (data: {html: string; text: string }) => void,
 ): void;
 ```
 
 ### `cut`
 
-在当前光标位置执行剪贴操作
+Perform cut and paste operations at the current cursor position
 
 ```ts
 /**
- * 在当前光标位置执行剪贴操作
+ * Perform cut and paste operations at the current cursor position
  */
 cut(): void;
 ```
 
 ### `copy`
 
-复制
+copy
 
 ```ts
 /**
- * 复制
- * @param data 要复制的数据，可以是节点或者字符串
- * @param trigger 是否触发剪贴事件，通知插件处理转换
- * @returns 返回是否复制成功
+ * Copy
+ * @param data The data to be copied, which can be a node or a string
+ * @param trigger Whether to trigger the clipping event and notify the plug-in to process the conversion
+ * @returns returns whether the copy is successful
  */
 copy(data: Node | string, trigger?: boolean): boolean;
 ```

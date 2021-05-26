@@ -1,4 +1,4 @@
-import { isEngine, isSafari, Plugin } from '@aomao/engine';
+import { EditorInterface, isEngine, isSafari, Plugin } from '@aomao/engine';
 import { CollapseItemProps } from '../types';
 import ToolbarComponent from './component';
 
@@ -10,12 +10,18 @@ export type Options = {
 	config: Config;
 };
 
-const defaultConfig: Config = [
-	{
-		title: '常用',
-		items: ['image-uploader', 'codeblock', 'table'],
-	},
-];
+const defaultConfig = (editor: EditorInterface): Config => {
+	return [
+		{
+			title: editor.language.get<string>(
+				'toolbar',
+				'commonlyUsed',
+				'title',
+			),
+			items: ['image-uploader', 'codeblock', 'table'],
+		},
+	];
+};
 
 class ToolbarPlugin extends Plugin<Options> {
 	static get pluginName() {
@@ -46,7 +52,7 @@ class ToolbarPlugin extends Plugin<Options> {
 			if (range.collapsed) {
 				event.preventDefault();
 				history.startCache();
-				const data = this.options.config || defaultConfig;
+				const data = this.options.config || defaultConfig(this.editor);
 				const card = this.editor.card.insert(
 					ToolbarComponent.cardName,
 					{

@@ -34,6 +34,12 @@ export const DOMAIN = IS_DEV
 	? 'http://localhost:7001'
 	: 'https://editor.aomao.com';
 
+export const lang = (typeof window !== 'undefined'
+	? window.location.href.indexOf('zh-CN') > 0
+	: false)
+	? 'zh-cn'
+	: 'en';
+
 export const plugins = [
 	Redo,
 	Undo,

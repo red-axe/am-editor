@@ -1,43 +1,43 @@
 # @aomao/plugin-link
 
-链接插件
+Link plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-link
 ```
 
-`Vue` 使用
+`Vue` use
 
 ```bash
 $ yarn add @aomao/plugin-link-vue
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Link from '@aomao/plugin-link';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Link from'@aomao/plugin-link';
 
 new Engine(...,{ plugins:[Link] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键为 `mod+k`，默认参数为 ["_blank"]
+The default shortcut key is `mod+k`, and the default parameter is ["_blank"]
 
 ```ts
-//快捷键，key 组合键，args，执行参数，[target?:string,href?:string,text?:string] 打开模式：可选，默认链接：可选，默认文本：可选
+//Shortcut keys, key combination keys, args, execution parameters, [target?:string,href?:string,text?:string] Open mode: optional, default link: optional, default text: optional
 hotkey?:string | {key:string,args:Array<string>};
 
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "link":{
-            //修改快捷键
+            //Modify shortcut keys
             hotkey:{
                 key:"mod+k",
                 args:["_balnk_","https://www.aomao.com","ITELLYOU"]
@@ -49,30 +49,30 @@ new Engine(...,{
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-Link 插件 markdown 语法为`[文本](链接地址)` 回车后触发
+Link plug-in markdown syntax is `[text](link address)` and it is triggered after pressing enter
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
     config:{
         "link":{
-            //关闭markdown
+            //Close markdown
             markdown:false
         }
     }
  })
 ```
 
-## 命令
+## Command
 
-可传入三个参数[target?:string,href?:string,text?:string] 打开模式：可选，默认链接：可选，默认文本：可选
+Three parameters can be passed in [target?:string,href?:string,text?:string] Open mode: optional, default link: optional, default text: optional
 
 ```ts
-//target:'_blank', '_parent', '_top', '_self'，href:链接，text:文字
+//target:'_blank','_parent','_top','_self', href: link, text: text
 engine.command.execute('link', '_blank', 'https://www.aomao.com', 'ITELLYOU');
-//使用 command 执行查询当前状态，返回 boolean | undefined
+//Use command to execute query current status, return boolean | undefined
 engine.command.queryState('link');
 ```

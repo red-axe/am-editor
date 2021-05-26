@@ -1,37 +1,37 @@
 # @aomao/plugin-quote
 
-引用样式插件
+Quote style plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-quote
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Quote from '@aomao/plugin-quote';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Quote from'@aomao/plugin-quote';
 
 new Engine(...,{ plugins:[Quote] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键为 `mod+shift+u`
+The default shortcut key is `mod+shift+u`
 
 ```ts
-//快捷键
+//hot key
 hotkey?: string | Array<string>;
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "quote":{
-            //修改快捷键
-            hotkey:"快捷键"
+            //Modify shortcut keys
+            hotkey: "shortcut key"
         }
     }
  })
@@ -39,28 +39,28 @@ new Engine(...,{
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-Quote 插件 markdown 语法为`>`回车后触发
+The markdown syntax of the Quote plug-in is `>` and it is triggered after the carriage return.
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
     config:{
         "quote":{
-            //关闭markdown
+            //Close markdown
             markdown:false
         }
     }
  })
 ```
 
-## 命令
+## Command
 
 ```ts
-//使用 command 执行插件、并传入所需参数
+//Use command to execute the plug-in and pass in the required parameters
 engine.command.execute('quote');
-//使用 command 执行查询当前状态，返回 boolean | undefined
+//Use command to execute query current status, return boolean | undefined
 engine.command.queryState('quote');
 ```

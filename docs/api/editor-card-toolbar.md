@@ -1,85 +1,81 @@
----
-translateHelp: true
----
+# toolbar
 
-# 工具栏
+Card toolbar
 
-卡片工具栏
+Type: `CardToolbarInterface`
 
-类型：`CardToolbarInterface`
-
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface, card: CardInterface): CardToolbarInterface
 ```
 
-## 方法
+## Method
 
 ### `create`
 
-创建卡片的 toolbar
+Create card toolbar
 
 ```ts
 /**
- * 创建卡片的toolbar
+ * Toolbar for creating cards
  */
 create(): void;
 ```
 
 ### `hide`
 
-隐藏 toolbar，包含 dnd
+Hide toolbar, including dnd
 
 ```ts
 /**
-* 隐藏toolbar，包含dnd
+* Hide toolbar, including dnd
 */
 hide(): void;
 ```
 
 ### `show`
 
-展示 toolbar，包含 dnd
+Show toolbar, including dnd
 
 ```ts
 /**
- * 展示toolbar，包含dnd
- * @param event 鼠标事件，用于定位
+ * Display toolbar, including dnd
+ * @param event mouse event, used for positioning
  */
 show(event?: MouseEvent): void;
 ```
 
 ### `hideCardToolbar`
 
-只隐藏卡片的 toolbar，不包含 dnd
+Only hide the toolbar of the card, not including dnd
 
 ```ts
 /**
- * 只隐藏卡片的toolbar，不包含dnd
+ * Only hide the toolbar of the card, not including dnd
  */
 hideCardToolbar(): void;
 ```
 
 ### `showCardToolbar`
 
-只显示卡片的 toolbar，不包含 dnd
+Only show the toolbar of the card, not including dnd
 
 ```ts
 /**
- * 只显示卡片的toolbar，不包含dnd
- * @param event 鼠标事件，用于定位
+ * Only display the toolbar of the card, not including dnd
+ * @param event mouse event, used for positioning
  */
 showCardToolbar(event?: MouseEvent): void;
 ```
 
 ### `getContainer`
 
-获取工具栏容器
+Get toolbar container
 
 ```ts
 /**
- * 获取工具栏容器
+ * Get the toolbar container
  */
 getContainer(): NodeInterface | undefined;
 ```

@@ -1,77 +1,77 @@
-# Block 插件
+# Block plugin
 
-块级节点插件
+Block node plugin
 
-通常用于独占一行的块级节点，类似于标题、引用
+Usually used for block-level nodes on a single line, similar to titles, quotes
 
-此类插件我们需要继承 `BlockPlugin` 抽象类，`BlockPlugin` 抽象类在继承 `ElementPlugin` 抽象类的基础上扩展了一些属性和方法。所以继承 `BlockPlugin` 的插件也同样拥有`ElementPlugin`抽象类的所有属性和方法
+For this type of plug-in, we need to inherit the `BlockPlugin` abstract class. The `BlockPlugin` abstract class extends some properties and methods on the basis of inheriting the `ElementPlugin` abstract class. So the plug-in that inherits `BlockPlugin` also has all the attributes and methods of the `ElementPlugin` abstract class
 
-## 继承
+## Inheritance
 
-继承 `BlockPlugin` 抽象类
+Inherit the `BlockPlugin` abstract class
 
 ```ts
-import { BlockPlugin } from '@aomao/engine'
+import {BlockPlugin} from'@aomao/engine'
 
 export default class extends BlockPlugin {
-	...
+...
 }
 ```
 
-## 属性
+## Attributes
 
 ### `tagName`
 
-标签名称，必须
+Label name, must
 
-类型：`string | Array<string>`
+Type: `string | Array<string>`
 
-此处的标签名称与父类`ElementPlugin`中的标签名称作用是一致的，只不过标签名称是 `BlockPlugin` 插件必要的属性之一
+The tag name here is the same as the tag name in the parent class `ElementPlugin`, except that the tag name is one of the necessary attributes of the `BlockPlugin` plugin
 
-`BlockPlugin` 标签名称可以是数组。例如标题，h1 h2 h3 h4 h5 h6 多种标签名称，设置为数组后，会把这些名称单独和 `style` `attributes`组合成 `schema` 规则
+The `BlockPlugin` tag name can be an array. For example, title, h1, h2, h3, h4, h5, h6. When set as an array, these names will be combined with `style` and `attributes` into a `schema` rule.
 
 ```ts
-readonly tagName = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+readonly tagName = ['h1','h2','h3','h4','h5','h6'];
 ```
 
 ### `allowIn`
 
-该节点允许可以放入的 block 节点，默认为 `$root`编辑器根节点
+This node allows block nodes that can be placed, the default is `$root` editor root node
 
-类型：`Array<string>`
+Type: `Array<string>`
 
 ```ts
-readonly allowIn = ['blockquote', '$root']
+readonly allowIn = ['blockquote','$root']
 ```
 
 ### `disableMark`
 
-禁用的 mark 插件样式，该 block 节点下不可以出现的 mark 插件节点的样式
+Disabled mark plug-in style, the mark plug-in node style that cannot appear under the block node
 
-类型：`Array<string>`
+Type: `Array<string>`
 
 ```ts
-//传入 mark插件 名称
+//Pass in the mark plugin name
 disableMark = ['fontsize', 'bold'];
 ```
 
 ### `canMerge`
 
-相同的 block 节点能否合并，默认 false，可选
+Can the same block nodes be merged, the default is false, optional
 
-类型：`boolean`
+Type: `boolean`
 
-## 方法
+## Method
 
 ### `init`
 
-初始化，可选
+Initialization, optional
 
-`BlockPlugin` 插件已经实现了`init`方法，如果需要使用，需要手动再次调用。否则会出现意料外的情况
+The `BlockPlugin` plugin has implemented the `init` method, if you need to use it, you need to manually call it again. Otherwise there will be unexpected situations
 
 ```ts
 export default class extends BlockPlugin {
-	...
+...
     init(){
         super.init()
     }
@@ -80,49 +80,49 @@ export default class extends BlockPlugin {
 
 ### `queryState`
 
-查询插件状态命令，可选
+Query plug-in status command, optional
 
 ```ts
 queryState() {
-    //不是引擎
+    //Not an engine
     if (!isEngine(this.editor)) return;
-    const { change } = this.editor
-    //获取当前光标选择区域内的所有块级标签
+    const {change} = this.editor
+    //Get all block-level labels in the current cursor selection area
     const blocks = change.blocks;
     if (blocks.length === 0) {
-        return '';
+        return'';
     }
-    //查看是否有包含当前插件设置的标签名称，如果有设置属性样式，还需要比较属性和样式
-    return this.tagName.indexOf(blocks[0].name) >= 0 ? blocks[0].name : '';
+    //Check if there is a label name that contains the current plug-in settings. If there is an attribute style set, you also need to compare the attributes and styles
+    return this.tagName.indexOf(blocks[0].name) >= 0? blocks[0].name:'';
 }
 ```
 
 ### `execute`
 
-执行插件命令，需要实现
+Execute plug-in commands, need to be implemented
 
-添加一个 block 标签的例子：
+Example of adding a block tag:
 
 ```ts
 execute(...args) {
-    //不是引擎
+    //Not an engine
     if (!isEngine(this.editor)) return;
-    const { change, block, node } = this.editor;
+    const {change, block, node} = this.editor;
     if (!this.queryState()) {
-        //包裹块级节点
+        //Package block node
         block.wrap(`<${this.tagName} />`);
     } else {
-        //获取光标对象
+        //Get the cursor object
         const range = change.getRange();
-        //获取当前光标区域内的第一个块级节点并且向上查找与当前插件设置的块级节点名称相同的节点
+        //Get the first block-level node in the current cursor area and look up the node with the same name as the block-level node set by the current plugin
         const blockquote = change.blocks[0].closest(this.tagName);
-        //标记移除包裹前光标位置
+        //Mark the cursor position before removing the package
         const selection = range.createSelection();
-        //移除包裹
+        //Remove package
         node.unwrap(blockquote);
-        //还原移除包裹后的光标所处位置
+        //Restore the cursor position after removing the package
         selection.move()
-        //重新设置编辑器所处光标
+        //Reset the cursor of the editor
         change.select(range);
     }
 }
@@ -130,25 +130,25 @@ execute(...args) {
 
 ### `schema`
 
-设置此 block 插件的`schema`规则，可选
+Set the `schema` rule of this block plugin, optional
 
-`BlockPlugin` 插件已经实现了`schema`方法，会自动根据 `tagName` `style` `attributes` 设置规则。
+The `BlockPlugin` plugin has implemented the `schema` method and will automatically set the rules according to the `tagName` `style` `attributes`.
 
-如果需要使用，可以重写此方法或者使用 super.schema()再次调用此方法
+If you need to use it, you can override this method or use super.schema() to call this method again
 
 ### `markdown`
 
-解析`markdown`语法，可选
+Parse `markdown` grammar, optional
 
-默认在按下空格后，引擎会获取到空格前面的文本字符，然后调用此方法，我们可以在方法中查找文本的`markdown`语法
+By default, after pressing the space, the engine will get the text characters in front of the space, and then call this method, we can find the `markdown` syntax of the text in the method
 
 ```ts
 /**
- * Markdown 处理
- * @param event 事件
- * @param text 文本
- * @param block 块级节点
- * @param node 触发节点
+ * Markdown processing
+ * @param event event
+ * @param text text
+ * @param block block-level node
+ * @param node trigger node
  */
 markdown?(event: KeyboardEvent, text: string, block: NodeInterface, node: NodeInterface): boolean | void;
 ```

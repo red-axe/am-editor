@@ -1,67 +1,67 @@
 # @aomao/plugin-indent
 
-缩进插件
+Indentation plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-indent
 ```
 
-添加到引擎
+Add to engine
 
-此插件建议放在第一个增加，以免其它插件拦截了事件，使其无法生效
+This plug-in is recommended to be added first to prevent other plug-ins from intercepting the event and making it unable to take effect
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Indent from '@aomao/plugin-indent';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Indent from'@aomao/plugin-indent';
 
 new Engine(...,{ plugins:[Indent] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认缩进快捷键 `mod+]`
+Default indentation shortcut `mod+]`
 
-默认删除缩进快捷键 `mod+[`
+Delete indentation shortcut key `mod+[` by default
 
 ```ts
-//快捷键，
+//hot key,
 hotkey?: {
-    in?:string //缩进快捷键，默认 mod+]
-    out?:string //删除缩进快捷键，默认 mod+[
+    in?:string //Indentation shortcut key, default mod+]
+    out?:string //Delete indentation shortcut key, default mod+[
 };
 
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "indent":{
-            //修改快捷键
+            //Modify shortcut keys
             hotkey:{
-                "in":"快捷键",
-                "out":"快捷键"
+                "in":"shortcut key",
+                "out": "shortcut key"
             }
         }
     }
  })
 ```
 
-### 最大 padding
+### Maximum padding
 
-最大 padding，每次缩进为 2
+Maximum padding, each indentation is 2
 
 ```ts
 maxPadding?:number
 ```
 
-## 命令
+## Command
 
-有一个参数 默认为 `in` ,可选值为 `in` 增加缩进，`out` 减少缩进
+One parameter defaults to `in`, optional value is `in` to increase indentation, and `out` to decrease indentation
 
 ```ts
 engine.command.execute('indent');
-//使用 command 执行查询当前状态，返回 numbber，当前缩进值
+//Use command to execute query current status, return numbber, current indentation value
 engine.command.queryState('indent');
 ```

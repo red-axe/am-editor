@@ -1,110 +1,106 @@
----
-translateHelp: true
----
+# adjust size
 
-# 调整大小
+A tool that can adjust the size of the card content area
 
-可以调整卡片内容区域大小的工具
+Type: `ResizeInterface`
 
-类型：`ResizeInterface`
-
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface, card: CardInterface): ResizeInterface
 ```
 
-## 方法
+## Method
 
 ### `create`
 
-创建并绑定事件
+Create and bind events
 
 ```ts
 /**
- * 创建并绑定事件
- * @param options 可选项
+ * Create and bind events
+ * @param options optional
  */
 create(options: ResizeCreateOptions): void;
 ```
 
 ### `render`
 
-渲染工具
+Rendering tools
 
 ```ts
 /**
- * 渲染
- * @param container 渲染到的目标节点，默认为当前卡片根节点
- * @param minHeight 最小高度，默认80px
+ * Render
+ * The target node rendered by @param container, the default is the root node of the current card
+ * @param minHeight minimum height, default 80px
  */
 render(container?: NodeInterface, minHeight?: number): void;
 ```
 
 ### `dragStart`
 
-拉动开始
+Pull start
 
 ```ts
 /**
- * 拉动开始
- * @param event 事件
+ * Pull to start
+ * @param event event
  */
 dragStart(event: MouseEvent): void;
 ```
 
 ### `dragMove`
 
-拉动移动中
+Pulling moving
 
 ```ts
 /**
- * 拉动移动中
- * @param event 事件
+ * Pulling and moving
+ * @param event event
  */
 dragMove(event: MouseEvent): void;
 ```
 
 ### `dragEnd`
 
-拉动结束
+Pull over
 
 ```ts
 /**
- * 拉动结束
+ * Pull end
  */
 dragEnd(event: MouseEvent): void;
 ```
 
 ### `show`
 
-展示
+Show off
 
 ```ts
 /**
- * 展示
+ * Show
  */
 show(): void;
 ```
 
 ### `hide`
 
-隐藏
+hide
 
 ```ts
 /**
- * 隐藏
+ * Hide
  */
 hide(): void;
 ```
 
 ### `destroy`
 
-注销
+Logout
 
 ```ts
 /**
- * 注销
+ * Logout
  */
 destroy(): void;
 ```

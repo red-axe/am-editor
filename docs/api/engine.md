@@ -1,146 +1,142 @@
----
-translateHelp: true
----
+# Engine
 
-# 引擎
+Type: `EngineInterface`
 
-类型：`EngineInterface`
-
-## 属性
+## Attributes
 
 ### `options`
 
-选项
+Options
 
-类型：`EngineOptions`
+Type: `EngineOptions`
 
 ### `readonly`
 
-是否只读
+Read-only
 
-类型：`boolean`
+Type: `boolean`
 
 ### `change`
 
-编辑时状态
+Edit state
 
-类型：`ChangeInterface`
+Type: `ChangeInterface`
 
 ### `typing`
 
-按键处理
+Key processing
 
-类型：`TypingInterface`
+Type: `TypingInterface`
 
 ### `ot`
 
-协同编辑相关
+Co-editing related
 
-类型：`OTInterface`
+Type: `OTInterface`
 
 ### `history`
 
-历史记录
+history record
 
-类型：`HistoryInterface`
+Type: `HistoryInterface`
 
 ### `request`
 
-网络请求
+Network request
 
-类型：`RequestInterface`
+Type: `RequestInterface`
 
-## 方法
+## Method
 
 ### `focus`
 
-聚焦到编辑器
+Focus on the editor
 
 ```ts
 /**
- * 聚焦到编辑器
+ * Focus on the editor
  */
 focus(): void;
 ```
 
 ### `isSub`
 
-是否是子编辑器
+Is it a sub-editor
 
 ```ts
 /**
- * 是否是子编辑器
+ * Is it a sub-editor
  */
 isSub(): boolean;
 ```
 
 ### `isFocus`
 
-当前光标是否已聚焦到编辑器
+Whether the current cursor is focused on the editor
 
 ```ts
 /**
- * 当前光标是否已聚焦到编辑器
+ * Whether the current cursor has been focused on the editor
  */
 isFocus(): boolean;
 ```
 
 ### `getValue`
 
-获取编辑器值
+Get editor value
 
 ```ts
 /**
- * 获取编辑器值
- * @param ignoreCursor 是否包含光标位置信息
+ * Get editor value
+ * @param ignoreCursor whether to include cursor position information
  */
 getValue(ignoreCursor?: boolean): string;
 ```
 
 ### `getValueAsync`
 
-异步获取编辑器值，将等候插件处理完成后再获取值
+Get the editor value asynchronously, and will wait for the plug-in processing to complete before getting the value
 
 ```ts
 /**
- * 异步获取编辑器值，将等候插件处理完成后再获取值
- * 比如插件上传等待中，将等待上传完成后再获取值
- * @param ignoreCursor 是否包含光标位置信息
+ * Obtain the editor value asynchronously, and wait for the plug-in processing to complete before obtaining the value
+ * For example, plug-in upload is waiting, and the value will be obtained after the upload is completed.
+ * @param ignoreCursor whether to include cursor position information
  */
 getValueAsync(ignoreCursor?: boolean): Promise<string>;
 ```
 
 ### `getHtml`
 
-获取编辑器的 html
+Get the html of the editor
 
 ```ts
 /**
- * 获取编辑器的html
+ * Get the html of the editor
  */
 getHtml(): string;
 ```
 
 ### `setValue`
 
-设置编辑器值
+Set editor value
 
 ```ts
 /**
- * 设置编辑器值
- * @param value 值
+ * Set editor value
+ * @param value
  */
 setValue(value: string): EngineInterface;
 ```
 
 ### `setJsonValue`
 
-设置 json 格式值，主要用于与协同服务端的值同步
+Set the json format value, which is mainly used to synchronize with the value of the collaborative server
 
 ```ts
 /**
- * 设置json格式值，主要用于协同
- * @param value 值
+ * Set the json format value, mainly used for collaboration
+ * @param value
  */
 setJsonValue(value: Array<any>): EngineInterface;
 ```

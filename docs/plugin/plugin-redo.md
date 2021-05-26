@@ -1,47 +1,47 @@
 # @aomao/plugin-redo
 
-重做历史插件
+Redo history plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-redo
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Redo from '@aomao/plugin-redo';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Redo from'@aomao/plugin-redo';
 
 new Engine(...,{ plugins:[Redo] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键为 `mod+y` `shift+mod+y`
+The default shortcut key is `mod+y` `shift+mod+y`
 
 ```ts
-//快捷键
+//hot key
 hotkey?: string | Array<string>;
-//使用配置
+//Use configuration
 new Engine(...,{
-    config:{
-        "redo":{
-            //修改快捷键
-            hotkey:"快捷键"
-        }
-    }
- })
+     config:{
+         "redo":{
+             //Modify shortcut keys
+             hotkey: "shortcut key"
+         }
+     }
+  })
 ```
 
-## 命令
+## Command
 
 ```ts
-//使用 command 执行插件、并传入所需参数
+//Use command to execute the plug-in and pass in the required parameters
 engine.command.execute('redo');
-//使用 command 执行查询当前状态，返回 boolean | undefined
+//Use command to execute query current status, return boolean | undefined
 engine.command.queryState('redo');
 ```

@@ -1,7 +1,3 @@
----
-translateHelp: true
----
-
 # 范围标记
 
 通过 `Selection` 可以很轻松的根据`RangeInterface`的选区在 DOM 树中创建标记，然后获取标记中间或者两侧的节点

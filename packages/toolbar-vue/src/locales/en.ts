@@ -165,5 +165,17 @@ export default {
 		component: {
 			placeholder: 'Card name',
 		},
+		image: {
+			title: 'Image',
+		},
+		codeblock: {
+			title: 'Codeblock',
+		},
+		table: {
+			title: 'Table',
+		},
+		commonlyUsed: {
+			title: 'Commonly used',
+		},
 	},
 };

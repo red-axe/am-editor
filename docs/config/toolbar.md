@@ -1,48 +1,47 @@
 ---
-translateHelp: true
 toc: menu
 ---
 
-# 工具栏配置
+# Toolbar configuration
 
-引入工具栏
+Introducing the toolbar
 
 ```ts
-//vue 请使用 @aomao/toolbar-vue
+//vue please use @aomao/toolbar-vue
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 ```
 
--   Toolbar 工具栏组件
--   ToolbarPlugin 提供给引擎的插件
--   ToolbarComponent 提供给引擎的卡片组件
+-   Toolbar Toolbar component
+-   ToolbarPlugin provides plugins to the engine
+-   ToolbarComponent provides the card component to the engine
 
-除了 `Toolbar` 组件，后两者都是实现在编辑器按下 `/` 出现工具栏卡片插件选项的快捷方式
+Except for the `Toolbar` component, the latter two are shortcuts to realize the toolbar card plug-in option when you press `/` in the editor
 
-## 类型
+## Types of
 
-工具栏现在有四种展现方式
+There are now four ways to display the toolbar
 
--   `button` 按钮
--   `downdrop` 下拉框
--   `color` 颜色板
--   `collapse` 下拉面板，工具栏的第一个按钮出现的下拉框，卡片形式的组件基本上都放在这里
+-   `button` button
+-   `downdrop` drop-down box
+-   `color` color palette
+-   `collapse` drop-down panel, the drop-down box that appears on the first button of the toolbar, and card-form components are basically placed here
 
 ## Props
 
-Toolbar 组件需要传入的属性：
+The attributes that the Toolbar component needs to pass in:
 
--   `editor` 编辑器实例，可以用于自动调用插件执行
--   `items` 插件展示配置列表
+-   An instance of the `editor` editor, which can be used to automatically invoke the plug-in execution
+-   `items` plugin display configuration list
 
 ## Items
 
-items 是一个二维数组，我们可以把相同概念的插件放在一个组里面，便于寻找。渲染出来后，每个组都会有分割线分开
+items is a two-dimensional array. We can put plugins of the same concept in a group for easy searching. After rendering, each group will be separated by a dividing line
 
 ```ts
 items: [['collapse'], ['bold', 'italic']];
 ```
 
-在 Toolbar 组件里面已经配置好了现有插件的所有展现形式，我们可以直接传入插件名称使用这些配置。当然，我们也可以传入一个对象覆盖部分配置
+All the display forms of the existing plug-ins have been configured in the Toolbar component, and we can directly pass in the plug-in name to use these configurations. Of course, we can also pass in an object to cover part of the configuration
 
 ```ts
 items: [
@@ -50,16 +49,16 @@ items: [
 	[
 		{
 			name: 'bold',
-			icon: '图标',
-			title: '提示文字',
+			icon: 'icon',
+			title: 'Prompt text',
 		},
 		'italic',
 	],
 ];
 ```
 
-如果通过 `name` 属性找到了默认配置，那么 `type` 属性是不会被覆盖的。如果配置的`name`不属于默认配置的一部分，也是可以展现出来，相当于在 toolbar 上加了一个自定义按钮，也可以为其添加事件自定义处理
+If the default configuration is found through the `name` attribute, the `type` attribute will not be overwritten. If the configured `name` is not part of the default configuration, it can also be displayed, which is equivalent to adding a custom button to the toolbar, and you can also add event custom processing for it
 
-## 默认配置
+## default allocation
 
-[https://github.com/itellyou-com/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx](https://github.com/itellyou-com/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx)
+[https://github.com/itellyou-com/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx](https://github.com/itellyou-com/am- editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx)

@@ -1,30 +1,26 @@
----
-translateHelp: true
----
-
 # Node/NodeInterface
 
-编辑节点的相关操作
+Edit node related operations
 
-类型：`NodeModelInterface`
+Type: `NodeModelInterface`
 
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface)
 ```
 
-## 方法
+## Method
 
 ### `isVoid`
 
-是否是空节点
+Whether it is an empty node
 
 ```ts
 /**
- * 是否是空节点
- * @param node 节点或节点名称
- * @param schema 默认从 this.editor 中取 schema
+ * Is it an empty node
+ * @param node node or node name
+ * @param schema takes the schema from this.editor by default
  */
 isVoid(
     node: NodeInterface | Node | string,
@@ -34,59 +30,59 @@ isVoid(
 
 ### `isMark`
 
-是否是 mark 样式标签
+Whether it is a mark style label
 
 ```ts
 /**
- * 是否是mark标签
- * @param node 节点
+ * Is it a mark tag
+ * @param node node
  */
 isMark(node: NodeInterface | Node, schema?: SchemaInterface): boolean;
 ```
 
 ### `isInline`
 
-是否是 inline 标签
+Is it an inline tag
 
 ```ts
 /**
- * 是否是inline标签
- * @param node 节点
+ * Is it an inline tag
+ * @param node node
  */
 isInline(node: NodeInterface | Node, schema?: SchemaInterface): boolean;
 ```
 
 ### `isBlock`
 
-是否是 block 节点
+Is it a block node
 
 ```ts
 /**
- * 是否是block节点
- * @param node 节点
+ * Is it a block node
+ * @param node node
  */
 isBlock(node: NodeInterface | Node, schema?: SchemaInterface): boolean;
 ```
 
 ### `isSimpleBlock`
 
-判断节点是否为 block 类型的简单节点（子节点不包含 blcok 标签）
+Determine whether the node is a simple node of block type (child nodes do not contain blcok tags)
 
 ```ts
 /**
- * 判断节点是否为block类型的简单节点（子节点不包含blcok标签）
+ * Determine whether the node is a simple node of block type (child nodes do not contain blcok tags)
  */
 isSimpleBlock(node: NodeInterface): boolean;
 ```
 
 ### `isRootBlock`
 
-判断节点是否是顶级根节点，父级为编辑器根节点，且，子级节点没有 block 节点
+Determine whether the node is the top-level root node, the parent is the editor root node, and the child node does not have a block node
 
 ```ts
 /**
- * 判断节点是否是顶级根节点，父级为编辑器根节点，且，子级节点没有block节点
- * @param node 节点
+ * Determine whether the node is the top-level root node, the parent is the editor root node, and the child node has no block node
+ * @param node node
  * @returns
  */
 isRootBlock(node: NodeInterface, schema?: SchemaInterface): boolean;
@@ -94,87 +90,87 @@ isRootBlock(node: NodeInterface, schema?: SchemaInterface): boolean;
 
 ### `isEmpty`
 
-判断节点下的文本是否为空
+Determine whether the text under the node is empty
 
 ```ts
 /**
- * 判断节点下的文本是否为空
- * @param node 节点
- * @param withTrim 是否 trim
+ * Determine whether the text under the node is empty
+ * @param node node
+ * @param withTrim is trim
  */
 isEmpty(node: NodeInterface, withTrim?: boolean): boolean;
 ```
 
 ### `isEmptyWithTrim`
 
-判断一个节点下的文本是否为空，或者只有空白字符
+Determine whether the text under a node is empty or only white space characters
 
 ```ts
 /**
- * 判断一个节点下的文本是否为空，或者只有空白字符
- * @param node 节点
+ * Determine whether the text under a node is empty, or there are only blank characters
+ * @param node node
  */
 isEmptyWithTrim(node: NodeInterface): boolean;
 ```
 
 ### `isLikeEmpty`
 
-判断一个节点是否为空，有卡片不算作空节点
+Judge whether a node is empty, a card is not counted as an empty node
 
 ```ts
 /**
- * 判断一个节点是否为空
- * @param node 节点
+ * Determine whether a node is empty
+ * @param node node
  */
 isLikeEmpty(node: NodeInterface): boolean;
 ```
 
 ### `isList`
 
-判断节点是否为列表节点
+Determine whether the node is a list node
 
 ```ts
 /**
- * 判断节点是否为列表节点
- * @param node 节点或者节点名称
+ * Determine whether the node is a list node
+ * @param node node or node name
  */
 isList(node: NodeInterface | string | Node): boolean;
 ```
 
 ### `isCustomize`
 
-判断节点是否是自定义列表
+Determine whether the node is a custom list
 
 ```ts
 /**
- * 判断节点是否是自定义列表
- * @param node 节点
+ * Determine whether the node is a custom list
+ * @param node node
  */
 isCustomize(node: NodeInterface): boolean;
 ```
 
 ### `unwrap`
 
-去除节点的外层包裹
+Remove the outer wrapper of the node
 
 ```ts
 /**
- * 去除包裹
- * @param node 需要去除包裹的节点
+ * Remove package
+ * @param node The node that needs to remove the package
  */
 unwrap(node: NodeInterface): void;
 ```
 
 ### `wrap`
 
-给节点外面包裹一层节点
+Wrap a layer of nodes outside the node
 
 ```ts
 /**
- * 包裹节点
- * @param source 需要包裹的节点
- * @param outer 包裹的外部节点
- * @param mergeSame 合并相同名称的节点样式和属性在同一个节点上
+ * Package node
+ * @param source The node that needs to be wrapped
+ * @param outer packaged external node
+ * @param mergeSame merges the node styles and attributes of the same name on the same node
  */
 wrap(
     source: NodeInterface | Node,
@@ -185,40 +181,40 @@ wrap(
 
 ### `merge`
 
-合并节点
+Merge node
 
 ```ts
 /**
- * 合并节点
- * @param source 合并的节点
- * @param target 需要合并的节点
- * @param remove 合并后是否移除
+ * Merge nodes
+ * @param source merged node
+ * @param target The node that needs to be merged
+ * @param remove Whether to remove after merging
  */
 merge(source: NodeInterface, target: NodeInterface, remove?: boolean): void;
 ```
 
 ### `replace`
 
-将源节点的子节点追加到目标节点，并替换源节点
+Append the child nodes of the source node to the target node and replace the source node
 
 ```ts
 /**
- * 将源节点的子节点追加到目标节点，并替换源节点
- * @param source 旧节点
- * @param target 新节点
+ * Append the child nodes of the source node to the target node and replace the source node
+ * @param source old node
+ * @param target new node
  */
 replace(source: NodeInterface, target: NodeInterface): NodeInterface;
 ```
 
 ### `insert`
 
-在光标位置插入一个节点
+Insert a node at the cursor position
 
 ```ts
 /**
- * 在光标位置插入一个节点
- * @param node 节点
- * @param range 光标
+ * Insert a node at the cursor position
+ * @param node node
+ * @param range cursor
  */
 insert(
     node: Node | NodeInterface,
@@ -228,13 +224,13 @@ insert(
 
 ### `insertText`
 
-光标位置插入文本
+Insert text at cursor position
 
 ```ts
 /**
- * 光标位置插入文本
- * @param text 文本
- * @param range 光标
+ * Insert text at the cursor position
+ * @param text text
+ * @param range cursor
  */
 insertText(
     text: string,
@@ -244,89 +240,89 @@ insertText(
 
 ### `setAttributes`
 
-设置节点属性
+Set node properties
 
 ```ts
 /**
- * 设置节点属性
- * @param node 节点
- * @param props 属性
+ * Set node attributes
+ * @param node node
+ * @param props property
  */
 setAttributes(node: NodeInterface, attributes: any): NodeInterface;
 ```
 
 ### `removeMinusStyle`
 
-移除值为负的样式
+Remove styles with negative values
 
 ```ts
 /**
- * 移除值为负的样式
- * @param node 节点
- * @param style 样式名称
+ * Remove styles with negative values
+ * @param node node
+ * @param style style name
  */
 removeMinusStyle(node: NodeInterface, style: string): void;
 ```
 
 ### `mergeAdjacent`
 
-合并节点下的子节点，两个相同的相邻节点的子节点，通常是 blockquote、ul、ol 标签
+The child nodes under the merged node, the child nodes of two identical adjacent nodes, usually blockquote, ul, ol tags
 
 ```ts
 /**
- * 合并节点下的子节点，两个相同的相邻节点的子节点，通常是 blockquote、ul、ol 标签
- * @param node 当前节点
+ * The child nodes under the merged node, the child nodes of two identical adjacent nodes, usually blockquote, ul, ol tags
+ * @param node current node
  */
 mergeAdjacent(node: NodeInterface): void;
 ```
 
 ### `removeSide`
 
-删除节点两边标签
+Remove the labels on both sides of the node
 
 ```ts
 /**
- * 删除节点两边标签
- * @param node 节点
- * @param tagName 标签名称，默认为br标签
+ * Delete the labels on both sides of the node
+ * @param node node
+ * @param tagName tag name, the default is br tag
  */
 removeSide(node: NodeInterface, tagName?: string): void;
 ```
 
 ### `flatten`
 
-整理节点，把节点修复到符合编辑器值的状态
+Organize the nodes and restore the nodes to the state that meets the editor value
 
 ```ts
 /**
- * 整理节点
- * @param node 节点
- * @param root 根节点，默认为node节点
+ * Organize nodes
+ * @param node node
+ * @param root root node, the default is node node
  */
 flatten(node: NodeInterface, root?: NodeInterface): void;
 ```
 
 ### `normalize`
 
-标准化节点
+Standardized node
 
 ```ts
 /**
- * 标准化节点
- * @param node 节点
+ * Standardized node
+ * @param node node
  */
 normalize(node: NodeInterface): void;
 ```
 
 ### `html`
 
-获取或设置元素节点 html 文本
+Get or set the html text of the element node
 
 ```ts
 /**
- * 获取或设置元素节点html文本
- * @param {string|undefined} val html文本
- * @return {NodeEntry|string} 当前实例或html文本
+ * Get or set the html text of the element node
+ * @param {string|undefined} val html text
+ * @return {NodeEntry|string} current instance or html text
  */
 html(node: NodeInterface): string;
 html(node: NodeInterface, val: string): NodeInterface;
@@ -335,26 +331,26 @@ html(node: NodeInterface, val?: string): NodeInterface | string;
 
 ### `clone`
 
-复制元素节点
+Copy element node
 
 ```ts
 /**
- * 复制元素节点
- * @param {boolean} deep 是否深度复制
- * @return 复制后的元素节点
+ * Copy element node
+ * @param {boolean} deep whether deep copy
+ * @return copied element node
  */
 clone(node: NodeInterface, deep?: boolean): NodeInterface;
 ```
 
 ### `getBatchAppendHTML`
 
-获取批量追加子节点后的 outerHTML
+Get outerHTML after batch appending child nodes
 
 ```ts
 /**
- * 获取批量追加子节点后的outerHTML
- * @param nodes 节点集合
- * @param appendExp 追加的节点
+ * Get outerHTML after batch appending child nodes
+ * @param nodes node collection
+ * @param appendExp appended node
  */
 getBatchAppendHTML(nodes: Array<NodeInterface>, appendExp: string): string;
 ```

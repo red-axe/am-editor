@@ -1,37 +1,37 @@
 # @aomao/plugin-unorderedlist
 
-无序列表插件
+Unordered list plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-unorderedlist
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Unorderedlist from '@aomao/plugin-unorderedlist';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Unorderedlist from'@aomao/plugin-unorderedlist';
 
 new Engine(...,{ plugins:[Unorderedlist] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键`mod+shift+8`
+Default shortcut key `mod+shift+8`
 
 ```ts
-//快捷键
-hotkey?: string | Array<string>;//默认mod+shift+8
-//使用配置
+//hot key
+hotkey?: string | Array<string>;//default mod+shift+8
+//Use configuration
 new Engine(...,{
     config:{
         "unorderedlist":{
-            //修改快捷键
-            hotkey:"快捷键"
+            //Modify shortcut keys
+            hotkey: "shortcut key"
         }
     }
  })
@@ -39,28 +39,28 @@ new Engine(...,{
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-Unorderedlist 插件 markdown 语法为`*`, `-`, `+`
+Unorderedlist plugin markdown syntax is `*`, `-`, `+`
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
     config:{
         "unorderedlist":{
-            //关闭markdown
+            //Close markdown
             markdown:false
         }
     }
  })
 ```
 
-## 命令
+## Command
 
 ```ts
-//使用 command 执行插件、并传入所需参数
+//Use command to execute the plug-in and pass in the required parameters
 engine.command.execute('unorderedlist');
-//使用 command 执行查询当前状态，返回 false 或者当前列表插件名称 unorderedlist tasklist unorderedlist
+//Use command to execute query current status, return false or current list plug-in name unorderedlist tasklist unorderedlist
 engine.command.queryState('unorderedlist');
 ```

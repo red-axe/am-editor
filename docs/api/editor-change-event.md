@@ -1,34 +1,30 @@
----
-translateHelp: true
----
+# Change events
 
-# 变更中的事件
+Related events in editor changes
 
-编辑器变更中的相关事件
+Type: `ChangeEventInterface`
 
-类型：`ChangeEventInterface`
-
-## 构造函数
+## Constructor
 
 ```ts
 new (engine: EngineInterface, options: ChangeEventOptions = {}): ChangeEventInterface;
 ```
 
-## 属性
+## Attributes
 
 ### `isComposing`
 
-是否组合输入中
+Whether to combine input
 
 ### `isSelecting`
 
-是否正在选择中
+Is it being selected
 
-## 方法
+## Method
 
 ### `isCardInput`
 
-是否是在卡片输入
+Is it entered in the card
 
 ```ts
 isCardInput(e: Event): boolean;
@@ -36,7 +32,7 @@ isCardInput(e: Event): boolean;
 
 ### `onInput`
 
-输入事件
+Input event
 
 ```ts
 onInput(callback: (event?: Event) => void): void;
@@ -44,7 +40,7 @@ onInput(callback: (event?: Event) => void): void;
 
 ### `onSelect`
 
-光标选择事件
+Cursor selection event
 
 ```ts
 onSelect(callback: (event?: Event) => void): void;
@@ -52,17 +48,17 @@ onSelect(callback: (event?: Event) => void): void;
 
 ### `onPaste`
 
-粘贴事件
+Paste event
 
 ```ts
 onPaste(
-    callback: (data: ClipboardData & { isPasteText: boolean }) => void,
+    callback: (data: ClipboardData & {isPasteText: boolean }) => void,
 ): void;
 ```
 
 ### `onDrop`
 
-拖动事件
+Drag event
 
 ```ts
 onDrop(
@@ -77,7 +73,7 @@ onDrop(
 
 ### `onDocument`
 
-绑定 document 事件
+Bind the document event
 
 ```ts
 onDocument(
@@ -89,7 +85,7 @@ onDocument(
 
 ### `onWindow`
 
-绑定 window 事件
+Bind window events
 
 ```ts
 onWindow(
@@ -101,7 +97,7 @@ onWindow(
 
 ### `onContainer`
 
-绑定编辑器根节点事件
+Binding editor root node event
 
 ```ts
 onContainer(eventType: string, listener: EventListener): void;
@@ -109,7 +105,7 @@ onContainer(eventType: string, listener: EventListener): void;
 
 ### `destroy`
 
-销毁
+destroy
 
 ```ts
 destroy(): void;

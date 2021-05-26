@@ -1,101 +1,97 @@
----
-translateHelp: true
----
+# Extend Node
 
-# 扩展 Node
+Expand on the `Node` node of the DOM
 
-在 DOM 的 `Node` 节点上进行扩展
+Type: `NodeInterface`
 
-类型：`NodeInterface`
+## Create `NodeInterface` object
 
-## 创建 `NodeInterface` 对象
-
-使用引擎内提供的 `$` 节点选择器来实例化 `NodeInterface` 对象
+Use the `$` node selector provided in the engine to instantiate the `NodeInterface` object
 
 ```ts
 const { $ } = engine;
-//使用CSS选择器查找节点
+//Use CSS selector to find nodes
 const content = $('.content');
-//创建节点
+//Create node
 const div = $('<div></div>');
-//转换
+//Conversion
 const p = $(document.querySelector('p'));
 const target = $(event.target);
 ```
 
-## 属性
+## Attributes
 
 ### `length`
 
-Node 节点集合长度
+Node node collection length
 
-类型：`number`
+Type: `number`
 
 ### `events`
 
-当前对象中所有 Node 节点的事件对象集合
+The collection of event objects of all Node nodes in the current object
 
-类型：`EventInterface[]`
+Type: `EventInterface[]`
 
 ### `document`
 
-当前 Node 节点所在的 Document 对象。在使用 iframe 中，不同框架中的 document 并是不一致的，还有一些其它环境中也是如此，所以我们需要跟随这个对象。
+The Document object where the current Node node is located. In the use of iframe, the document in different frames is not consistent, and there are other environments as well, so we need to follow this object.
 
-类型：`Document | null`
+Type: `Document | null`
 
 ### `window`
 
-当前 Node 节点所在的 Window 对象。在使用 iframe 中，不同框架中的 window 并是不一致的，还有一些其它环境中也是如此，所以我们需要跟随这个对象。
+The Window object where the current Node node is located. In the use of iframes, the windows in different frames are not consistent, and the same is true in some other environments, so we need to follow this object.
 
-类型：`Window | null`
+Type: `Window | null`
 
 ### `context`
 
-上下文节点
+Context node
 
-类型：`Context | undefined`
+Type: `Context | undefined`
 
 ### `name`
 
-节点名称
+Node name
 
-类型：`string`
+Type: `string`
 
 ### `type`
 
-节点类型，与 `Node.nodeType` 一致 [API](https://developer.mozilla.org/zh-CN/docs/Web/API/Node/nodeType)
+Node type, consistent with `Node.nodeType` [API](https://developer.mozilla.org/zh-CN/docs/Web/API/Node/nodeType)
 
-类型：`number | undefined`
+Type: `number | undefined`
 
 ### `display`
 
-节点显示状态
+Node display status
 
-类型：`string | undefined`
+Type: `string | undefined`
 
 ### `isFragment`
 
-当前对象中的 Node 节点集合是否是框架片段
+Whether the Node node collection in the current object is a frame fragment
 
-类型：`boolean`
+Type: `boolean`
 
 ### `[n: number]`
 
-Node 节点集合，可以通过下标索引访问
+Node node collection, which can be accessed by subscript index
 
-返回类型：Node
+Return type: Node
 
-## 方法
+## Method
 
 ### `each`
 
-遍历当前对象内的所有 Node 节点
+Traverse all Node nodes in the current object
 
 ```ts
 /**
-* 遍历
-* @param {Function} callback 回调函数
-* @return {NodeInterface} 返回当前实例
+* Traverse
+* @param {Function} callback callback function
+* @return {NodeInterface} returns the current instance
 */
 each(
     callback: (node: Node, index: number) => boolean | void,
@@ -104,7 +100,7 @@ each(
 
 ### `toArray`
 
-把当前对象内的所有 Node 节点转换为数组
+Convert all Node nodes in the current object to an array
 
 ```ts
 toArray(): Array<NodeInterface>;
@@ -112,7 +108,7 @@ toArray(): Array<NodeInterface>;
 
 ### `isElement`
 
-当前节点是否为 Node.ELEMENT_NODE 节点类型
+Whether the current node is Node.ELEMENT_NODE node type
 
 ```ts
 isElement(): boolean;
@@ -120,7 +116,7 @@ isElement(): boolean;
 
 ### `isText`
 
-当前节点是否为 Node.TEXT_NODE 节点类型
+Whether the current node is Node.TEXT_NODE node type
 
 ```ts
 isText(): boolean;
@@ -128,7 +124,7 @@ isText(): boolean;
 
 ### `isCard`
 
-当前节点是否为 Card 组件
+Whether the current node is a Card component
 
 ```ts
 isCard(): boolean;
@@ -136,7 +132,7 @@ isCard(): boolean;
 
 ### `isBlockCard`
 
-当前节点是否为 block 类型的 Card 组件
+Whether the current node is a Card component of block type
 
 ```ts
 isBlockCard(): boolean;
@@ -144,7 +140,7 @@ isBlockCard(): boolean;
 
 ### `isInlineCard`
 
-当前节点是否为 inline 类型的 Card 组件
+Whether the current node is a Card component of inline type
 
 ```ts
 isInlineCard(): boolean;
@@ -152,7 +148,7 @@ isInlineCard(): boolean;
 
 ### `isEditableCard`
 
-是否是可编辑的卡片
+Is it an editable card
 
 ```ts
 isEditableCard(): boolean;
@@ -160,7 +156,7 @@ isEditableCard(): boolean;
 
 ### `isPseudoBlockCard`
 
-具有 display:block css 属性的 inline card
+Inline card with display:block css attribute
 
 ```ts
 isPseudoBlockCard(): boolean;
@@ -168,7 +164,7 @@ isPseudoBlockCard(): boolean;
 
 ### `isRoot`
 
-是否为根节点
+Whether it is the root node
 
 ```ts
 isRoot(): boolean;
@@ -176,7 +172,7 @@ isRoot(): boolean;
 
 ### `isEditable`
 
-是否为可编辑节点
+Whether it is an editable node
 
 ```ts
 isEditable(): boolean;
@@ -184,7 +180,7 @@ isEditable(): boolean;
 
 ### `inEditor`
 
-是否在根节点内
+Is it in the root node
 
 ```ts
 inEditor(): boolean;
@@ -192,7 +188,7 @@ inEditor(): boolean;
 
 ### `isCursor`
 
-是否是光标标记节点
+Whether it is a cursor marked node
 
 ```ts
 isCursor(): boolean
@@ -200,7 +196,7 @@ isCursor(): boolean
 
 ### `get`
 
-获取当前 Node 节点
+Get the current Node node
 
 ```ts
 get<E extends Node>(): E | null;
@@ -208,174 +204,174 @@ get<E extends Node>(): E | null;
 
 ### `eq`
 
-获取当前第 index 个节点
+Get the current index node
 
 ```ts
 /**
- * 获取当前第 index 节点
+ * Get the current index node
  * @param {number} index
- * @return {NodeInterface|undefined} NodeInterface 类，或 undefined
+ * @return {NodeInterface|undefined} NodeInterface class, or undefined
  */
 eq(index: number): NodeInterface | undefined;
 ```
 
 ### `index`
 
-获取当前节点所在父节点中的索引，仅计算节点类型为 ELEMENT_NODE 的节点
+Get the index of the parent node where the current node is located, and only count the nodes whose node type is ELEMENT_NODE
 
 ```ts
 /**
- * 获取当前节点所在父节点中的索引，仅计算节点类型为ELEMENT_NODE的节点
- * @return {number} 返回索引
+ * Get the index of the parent node where the current node is located, and only calculate the node whose node type is ELEMENT_NODE
+ * @return {number} return index
  */
 index(): number;
 ```
 
 ### `parent`
 
-获取当前节点父节点
+Get the parent node of the current node
 
 ```ts
 /**
- * 获取当前节点父节点
- * @return {NodeInterface} 父节点
+ * Get the parent node of the current node
+ * @return {NodeInterface} parent node
  */
 parent(): NodeInterface | undefined;
 ```
 
 ### `children`
 
-查询当前节点的所有子节点
+Query all child nodes of the current node
 
 ```ts
 /**
  *
- * @param {Node | string} selector 查询器
- * @return {NodeInterface} 符合条件的子节点
+ * @param {Node | string} selector finder
+ * @return {NodeInterface} Eligible child nodes
  */
 children(selector?: string): NodeInterface;
 ```
 
 ### `first`
 
-获取当前节点第一个子节点
+Get the first child node of the current node
 
 ```ts
 /**
- * 获取当前节点第一个子节点
- * @return {NodeInterface} NodeInterface 子节点
+ * Get the first child node of the current node
+ * @return {NodeInterface} NodeInterface child node
  */
 first(): NodeInterface | null;
 ```
 
 ### `last`
 
-获取当前节点最后一个子节点
+Get the last child node of the current node
 
 ```ts
 /**
- * 获取当前节点最后一个子节点
- * @return {NodeInterface} NodeInterface 子节点
+ * Get the last child node of the current node
+ * @return {NodeInterface} NodeInterface child node
  */
 last(): NodeInterface | null;
 ```
 
 ### `prev`
 
-返回节点之前的兄弟节点（包括文本节点、注释节点）
+Return the sibling nodes before the node (including text nodes and comment nodes)
 
 ```ts
 /**
- * 返回节点之前的兄弟节点（包括文本节点、注释节点）
- * @return {NodeInterface} NodeInterface 节点
+ * Return the sibling nodes before the node (including text nodes and comment nodes)
+ * @return {NodeInterface} NodeInterface node
  */
 prev(): NodeInterface | null;
 ```
 
 ### `next`
 
-返回节点之后的兄弟节点（包括文本节点、注释节点）
+Return the sibling nodes after the node (including text nodes and comment nodes)
 
 ```ts
 /**
- * 返回节点之后的兄弟节点（包括文本节点、注释节点）
- * @return {NodeInterface} NodeInterface 节点
+ * Return the sibling nodes after the node (including text nodes and comment nodes)
+ * @return {NodeInterface} NodeInterface node
  */
 next(): NodeInterface | null;
 ```
 
 ### `prevElement`
 
-返回节点之前的兄弟节点（不包括文本节点、注释节点）
+Return the sibling nodes before the node (not including text nodes and comment nodes)
 
 ```ts
 /**
- * 返回节点之前的兄弟节点（不包括文本节点、注释节点）
- * @return {NodeInterface} NodeInterface 节点
+ * Return the sibling nodes before the node (not including text nodes and comment nodes)
+ * @return {NodeInterface} NodeInterface node
  */
 prevElement(): NodeInterface | null;
 ```
 
 ### `nextElement`
 
-返回节点之后的兄弟节点（不包括文本节点、注释节点）
+Return the sibling nodes after the node (not including text nodes and comment nodes)
 
 ```ts
 /**
- * 返回节点之后的兄弟节点（不包括文本节点、注释节点）
- * @return {NodeInterface} NodeInterface 节点
+ * Return the sibling nodes after the node (not including text nodes and comment nodes)
+ * @return {NodeInterface} NodeInterface node
  */
 nextElement(): NodeInterface | null;
 ```
 
 ### `getPath`
 
-返回节点所在根节点路径，默认根节点为 document.body
+Returns the path of the root node where the node is located, the default root node is document.body
 
 ```ts
 /**
- * 返回节点所在根节点路径，默认根节点为 document.body
- * @param {Node} context 根节点，默认为 document.body
- * @return {number} 路径
+ * Return the path of the root node where the node is located, the default root node is document.body
+ * @param {Node} context root node, the default is document.body
+ * @return {number} path
  */
 getPath(context?: Node | NodeInterface): Array<number>;
 ```
 
 ### `contains`
 
-判断节点是否包含要查询的节点
+Determine whether the node contains the node to be queried
 
 ```ts
 /**
- * 判断节点是否包含要查询的节点
- * @param {NodeInterface | Node} node 要查询的节点
- * @return {Boolean} 是否包含
+ * Determine whether the node contains the node to be queried
+ * @param {NodeInterface | Node} node The node to be queried
+ * @return {Boolean} Does it contain
  */
 contains(node: NodeInterface | Node): boolean;
 ```
 
 ### `find`
 
-根据查询器查询当前节点
+Query the current node according to the querier
 
 ```ts
 /**
- * 根据查询器查询当前节点
- * @param {String} selector 查询器
- * @return {NodeInterface} 返回一个 NodeInterface 实例
+ * Query the current node according to the querier
+ * @param {String} selector finder
+ * @return {NodeInterface} returns a NodeInterface instance
  */
 find(selector: string): NodeInterface;
 ```
 
 ### closest
 
-根据查询器查询符合条件的离当前节点最近的父节点
+Query the parent node closest to the current node that meets the criteria according to the querier
 
 ```ts
 /**
- * 根据查询器查询符合条件的离当前节点最近的父节点
- * @param {string} selector 查询器
- * @return {NodeInterface} 返回一个 NodeInterface 实例
+ * Query the parent node closest to the current node that meets the criteria according to the querier
+ * @param {string} selector querier
+ * @return {NodeInterface} returns a NodeInterface instance
  */
 closest(
     selector: string,
@@ -385,47 +381,47 @@ closest(
 
 ### `on`
 
-为当前节点绑定事件
+Bind events to the current node
 
 ```ts
 /**
- * 为当前节点绑定事件
- * @param {String} eventType 事件类型
- * @param {Function} listener 事件函数
- * @return {NodeInterface} 返回当前实例
+ * Bind events to the current node
+ * @param {String} eventType event type
+ * @param {Function} listener event function
+ * @return {NodeInterface} returns the current instance
  */
 on(eventType: string, listener: EventListener): NodeInterface;
 ```
 
 ### `off`
 
-移除当前节点事件
+Remove current node event
 
 ```ts
 /**
- * 移除当前节点事件
- * @param {String} eventType 事件类型
- * @param {Function} listener 事件函数
- * @return {NodeInterface} 返回当前实例
+ * Remove the current node event
+ * @param {String} eventType event type
+ * @param {Function} listener event function
+ * @return {NodeInterface} returns the current instance
  */
 off(eventType: string, listener: EventListener): NodeInterface;
 ```
 
 ### `getBoundingClientRect`
 
-获取当前节点相对于视口的位置
+Get the position of the current node relative to the viewport
 
 ```ts
 /**
- * 获取当前节点相对于视口的位置
- * @param {Object} defaultValue 默认值
+ * Get the position of the current node relative to the viewport
+ * @param {Object} defaultValue default value
  * @return {Object}
  * {
- *  top,
- *  bottom,
- *  left,
- *  right
- * }
+ * top,
+ * bottom,
+ * left,
+ * right
+ *}
  */
 getBoundingClientRect(defaultValue?: {
     top: number;
@@ -433,158 +429,158 @@ getBoundingClientRect(defaultValue?: {
     left: number;
     right: number;
 }):
-    | { top: number; bottom: number; left: number; right: number }
+    | {top: number; bottom: number; left: number; right: number}
     | undefined;
 ```
 
 ### `removeAllEvents`
 
-移除当前节点所有已绑定的事件
+Remove all bound events of the current node
 
 ```ts
 /**
- * 移除当前节点所有已绑定的事件
- * @return {NodeInterface} 当前 NodeInterface 实例
+ * Remove all bound events of the current node
+ * @return {NodeInterface} current NodeInterface instance
  */
 removeAllEvents(): NodeInterface;
 ```
 
 ### `offset`
 
-获取当前节点相对父节点的偏移量
+Get the offset of the current node relative to the parent node
 
 ```ts
 /**
- * 获取当前节点相对父节点的偏移量
+ * Get the offset of the current node relative to the parent node
  */
 offset(): number;
 ```
 
 ### `attributes`
 
-获取或设置节点属性
+Get or set node attributes
 
 ```ts
 /**
- * 获取或设置节点属性
- * @param {string|undefined} key 属性名称，key为空获取所有属性，返回Map
- * @param {string|undefined} val 属性值，val为空获取当前key的属性，返回string|null
- * @return {NodeInterface|{[k:string]:string}} 返回值或当前实例
+ * Get or set node attributes
+ * @param {string|undefined} key attribute name, key is empty to get all attributes, return Map
+ * @param {string|undefined} val attribute value, val is empty to get the attribute of the current key, return string|null
+ * @return {NodeInterface|{[k:string]:string}} return value or current instance
  */
-attributes(): { [k: string]: string };
-attributes(key: { [k: string]: string }): string;
+attributes(): {[k: string]: string };
+attributes(key: {[k: string]: string }): string;
 attributes(key: string, val: string | number): NodeInterface;
 attributes(key: string): string;
 attributes(
-    key?: string | { [k: string]: string },
+    key?: string | {[k: string]: string },
     val?: string | number,
-): NodeInterface | { [k: string]: string } | string;
+): NodeInterface | {[k: string]: string} | string;
 ```
 
 ### `removeAttributes`
 
-移除节点属性
+Remove node attributes
 
 ```ts
 /**
- * 移除节点属性
- * @param {String} key 属性名称
- * @return {NodeInterface} 返当前实例
+ * Remove node attributes
+ * @param {String} key attribute name
+ * @return {NodeInterface} returns the current instance
  */
 removeAttributes(key: string): NodeInterface;
 ```
 
 ### `hasClass`
 
-判断节点是否包含某个 class
+Determine whether the node contains a certain class
 
 ```ts
 /**
- * 判断节点是否包含某个 class
- * @param {String} className 样式名称
- * @return {Boolean} 是否包含
+ * Determine whether the node contains a certain class
+ * @param {String} className style name
+ * @return {Boolean} Does it contain
  */
 hasClass(className: string): boolean;
 ```
 
 ### `addClass`
 
-为节点增加一个 class
+Add a class to the node
 
 ```ts
 /**
  *
  * @param {string} className
- * @return {NodeInterface} 返当前实例
+ * @return {NodeInterface} returns the current instance
  */
 addClass(className: string): NodeInterface;
 ```
 
 ### `removeClass`
 
-移除节点 class
+Remove node class
 
 ```ts
 /**
- * 移除节点 class
+ * Remove node class
  * @param {String} className
- * @return {NodeInterface} 返当前实例
+ * @return {NodeInterface} returns the current instance
  */
 removeClass(className: string): NodeInterface;
 ```
 
 ### `css`
 
-获取或设置节点样式
+Get or set the node style
 
 ```ts
 /**
- * 获取或设置节点样式
- * @param {String|undefined} key 样式名称
- * @param {String|undefined} val 样式值
- * @return {NodeInterface|{[k:string]:string}} 返回值或当前实例
+ * Get or set the node style
+ * @param {String|undefined} key style name
+ * @param {String|undefined} val style value
+ * @return {NodeInterface|{[k:string]:string}} return value or current instance
  */
-css(): { [k: string]: string };
-css(key: { [k: string]: string | number }): NodeInterface;
+css(): {[k: string]: string };
+css(key: {[k: string]: string | number }): NodeInterface;
 css(key: string): string;
 css(key: string, val: string | number): NodeInterface;
 css(
-    key?: string | { [k: string]: string | number },
+    key?: string | {[k: string]: string | number },
     val?: string | number,
-): NodeInterface | { [k: string]: string } | string;
+): NodeInterface | {[k: string]: string} | string;
 ```
 
 ### `width`
 
-获取节点宽度
+Get node width
 
 ```ts
 /**
- * 获取节点宽度
- * @return {number} 宽度
+ * Get node width
+ * @return {number} width
  */
 width(): number;
 ```
 
 ### `height`
 
-获取节点高度
+Get node height
 
 ```ts
 /**
- * 获取节点高度
- * @return {Number} 高度
+ * Get node height
+ * @return {Number} height
  */
 height(): number;
 ```
 
 ### `html`
 
-获取或设置节点 html 文本
+Get or set node html text
 
 ```ts
 /**
- * 获取或设置节点html文本
+ * Get or set node html text
  */
 html(): string;
 html(html: string): NodeInterface;
@@ -595,7 +591,7 @@ html(html?: string): NodeInterface | string;
 
 ```ts
 /**
- * 获取或设置节点文本
+ * Get or set the node text
  */
 text(): string;
 text(text: string): NodeInterface;
@@ -604,163 +600,163 @@ text(text?: string): string | NodeInterface;
 
 ### `show`
 
-设置节点为显示状态
+Set the node to display state
 
 ```ts
 /**
- * 设置节点为显示状态
- * @param {String} display display值
- * @return {NodeInterface} 当前实例
+ * Set the node to display state
+ * @param {String} display display value
+ * @return {NodeInterface} current instance
  */
 show(display?: string): NodeInterface;
 ```
 
 ### `hide`
 
-设置节点为隐藏状态
+Set node to hidden state
 
 ```ts
 /**
- * 设置节点为隐藏状态
- * @return {NodeInterface} 当前实例
+ * Set the node to hidden
+ * @return {NodeInterface} current instance
  */
 hide(): NodeInterface;
 ```
 
 ### `remove`
 
-移除当前实例所有节点
+Remove all nodes of the current instance
 
 ```ts
 /**
- * 移除当前实例所有节点
- * @return {NodeInterface} 当前实例
+ * Remove all nodes of the current instance
+ * @return {NodeInterface} current instance
  */
 remove(): NodeInterface;
 ```
 
 ### `empty`
 
-清空节点下的所有子节点，包括文本
+Clear all child nodes under the node, including text
 
 ```ts
 /**
- * 清空节点下的所有子节点
- * @return {NodeInterface} 当前实例
+ * Clear all child nodes under the node
+ * @return {NodeInterface} current instance
  */
 empty(): NodeInterface;
 ```
 
 ### `equal`
 
-比较两个节点是否相同，包括引用地址
+Compare whether two nodes are the same, including the reference address
 
 ```ts
 /**
-* 比较两个节点是否相同
-* @param {NodeInterface|Node} node 比较的节点
-* @return {Boolean} 是否相同
+* Compare whether two nodes are the same
+* @param {NodeInterface|Node} node The node to compare
+* @return {Boolean} are they the same
 */
 equal(node: NodeInterface | Node): boolean;
 ```
 
 ### `clone`
 
-复制节点
+Copy node
 
 ```ts
 /**
- * 复制节点
- * @param deep 是否深度复制
+ * Copy node
+ * @param deep Whether to deep copy
  */
 clone(deep?: boolean): NodeInterface;
 ```
 
 ### `prepend`
 
-在节点的开头插入指定内容
+Insert the specified content at the beginning of the node
 
 ```ts
 /**
- * 在节点的开头插入指定内容
- * @param {Selector} selector 选择器或节点
- * @return {NodeInterface} 当前实例
+ * Insert the specified content at the beginning of the node
+ * @param {Selector} selector selector or node
+ * @return {NodeInterface} current instance
  */
 prepend(selector: Selector): NodeInterface;
 ```
 
 ### `append`
 
-在节点的结尾插入指定内容
+Insert the specified content at the end of the node
 
 ```ts
 /**
- * 在节点的结尾插入指定内容
- * @param {Selector} selector 选择器或节点
- * @return {NodeInterface} 当前实例
+ * Insert the specified content at the end of the node
+ * @param {Selector} selector selector or node
+ * @return {NodeInterface} current instance
  */
 append(selector: Selector): NodeInterface;
 ```
 
 ### `before`
 
-在节点前插入新的节点
+Insert a new node before the node
 
 ```ts
 /**
- * 在节点前插入新的节点
- * @param {Selector} selector 选择器或节点
- * @return {NodeInterface} 当前实例
+ * Insert a new node before the node
+ * @param {Selector} selector selector or node
+ * @return {NodeInterface} current instance
  */
 before(selector: Selector): NodeInterface;
 ```
 
 ### `after`
 
-在节点后插入内容
+Insert content after the node
 
 ```ts
 /**
- * 在节点后插入内容
- * @param {Selector} selector 选择器或节点
- * @return {NodeInterface} 当前实例
+ * Insert content after the node
+ * @param {Selector} selector selector or node
+ * @return {NodeInterface} current instance
  */
 after(selector: Selector): NodeInterface;
 ```
 
 ### `replaceWith`
 
-将节点替换为新的内容
+Replace node with new content
 
 ```ts
 /**
- * 将节点替换为新的内容
- * @param {Selector} selector 选择器或节点
- * @return {NodeInterface} 当前实例
+ * Replace the node with new content
+ * @param {Selector} selector selector or node
+ * @return {NodeInterface} current instance
  */
 replaceWith(selector: Selector): NodeInterface;
 ```
 
 ### `getRoot`
 
-获取节点所在编辑区域的根节点
+Get the root node of the editing area where the node is located
 
 ```ts
 /**
- * 获取节点所在编辑区域的根节点
+ * Get the root node of the editing area where the node is located
  */
 getRoot(): NodeInterface;
 ```
 
 ### `traverse`
 
-遍历所有子节点
+Traverse all child nodes
 
 ```ts
 /**
- * 遍历所有子节点
- * @param callback 回调函数，false：停止遍历 ，true：停止遍历当前节点及子节点，继续遍历下一个兄弟节点
- * @param order true:顺序 ，false:倒序，默认 true
+ * Traverse all child nodes
+ * @param callback callback function, false: stop traversal, true: stop traversing the current node and child nodes, and continue to traverse the next sibling node
+ * @param order true: order, false: reverse order, default true
  */
 traverse(
     callback: (node: NodeInterface) => boolean | void,
@@ -770,115 +766,9 @@ traverse(
 
 ### `getChildByPath`
 
-根据路径获取子节点
+Get child nodes according to path
 
 ```ts
 /**
- * 根据路径获取子节点
- * @param path 路径
- */
-getChildByPath(path: Path, filter?: (node: Node) => boolean): Node;
-```
-
-### `inside`
-
-检查当前节点是否在目标节点内
-
-```ts
-/**
- * 检查当前节点是否在目标节点内
- * @param node 节点
- */
-inside(node: Node | NodeInterface): boolean;
-```
-
-### `getIndex`
-
-获取当前节点所在父节点中的索引
-
-```ts
-/**
- * 获取当前节点所在父节点中的索引
- */
-getIndex(filter?: (node: Node) => boolean): number;
-```
-
-### `findParent`
-
-在指定容器里获取父节点
-
-```ts
-/**
- * 在指定容器里获取父节点
- * @param container 容器节点，默认为编辑器根节点
- */
-findParent(container?: Node | NodeInterface): NodeInterface | null;
-```
-
-### `allChildren`
-
-获取节点下的所有子节点
-
-```ts
-/**
- * 获取节点下的所有子节点
- */
-allChildren(): Array<Node>;
-```
-
-### `getViewport`
-
-返回当前节点或者传入的节点所在当前节点的顶级 window 对象的视图边界
-
-```ts
-/**
- * 返回当前节点或者传入的节点所在当前节点的顶级window对象的视图边界
- * @param node 节点
- */
-getViewport(
-    node?: NodeInterface,
-): { top: number; left: number; bottom: number; right: number };
-```
-
-### `inViewport`
-
-判断 view 是否在 node 节点根据当前节点的顶级 window 对象计算的视图边界内
-
-```ts
-/**
- * 判断view是否在node节点根据当前节点的顶级window对象计算的视图边界内
- * @param node 节点
- * @param view 是否在视图的节点
- */
-inViewport(node: NodeInterface, view: NodeInterface): boolean;
-```
-
-### `scrollIntoView`
-
-如果 view 节点不可见，将滚动到 align 位置，默认为 nearest
-
-```ts
-/**
- * 如果view节点不可见，将滚动到align位置，默认为nearest
- * @param node 节点
- * @param view 视图节点
- * @param align 位置
- */
-scrollIntoView(
-    node: NodeInterface,
-    view: NodeInterface,
-    align?: 'start' | 'center' | 'end' | 'nearest',
-): void;
-```
-
-### `removeZeroWidthSpace`
-
-移除节点内的所有零宽字符占位符 \u200B
-
-```ts
-/**
-* 移除占位符 \u200B
-* @param root 节点
-*/
-removeZeroWidthSpace(): void;
+ * According to the path to obtain
 ```

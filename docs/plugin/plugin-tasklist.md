@@ -1,37 +1,37 @@
 # @aomao/plugin-tasklist
 
-任务列表插件
+Task list plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-tasklist
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Tasklist , { CheckboxComponent } from '@aomao/plugin-tasklist';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Tasklist, {CheckboxComponent} from'@aomao/plugin-tasklist';
 
-new Engine(...,{ plugins:[Tasklist] , cards:[CheckboxComponent] })
+new Engine(...,{ plugins:[Tasklist], cards:[CheckboxComponent] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键`mod+shift+9`
+Default shortcut key `mod+shift+9`
 
 ```ts
-//快捷键
-hotkey?: string | Array<string>;//默认mod+shift+9
-//使用配置
+//hot key
+hotkey?: string | Array<string>;//default mod+shift+9
+//Use configuration
 new Engine(...,{
     config:{
         "tasklist":{
-            //修改快捷键
-            hotkey:"快捷键"
+            //Modify shortcut keys
+            hotkey: "shortcut key"
         }
     }
  })
@@ -39,30 +39,30 @@ new Engine(...,{
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-Tasklist 插件 markdown 语法为`[]`, `[ ]`, `[x]`
+Tasklist plugin markdown syntax is `[]`, `[ ]`, `[x]`
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
     config:{
         "tasklist":{
-            //关闭markdown
+            //Close markdown
             markdown:false
         }
     }
  })
 ```
 
-## 命令
+## Command
 
-可传入 { checked:true } 表示选中，可选参数
+You can pass in {checked:true} to indicate checked, optional parameters
 
 ```ts
-//使用 command 执行插件、并传入所需参数
+//Use command to execute the plug-in and pass in the required parameters
 engine.command.execute('tasklist', { checked: boolean });
-//使用 command 执行查询当前状态，返回 false 或者当前列表插件名称 tasklist tasklist unorderedlist
+//Use command to execute query current status, return false or current list plug-in name tasklist tasklist unorderedlist
 engine.command.queryState('tasklist');
 ```

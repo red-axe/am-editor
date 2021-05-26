@@ -1,7 +1,3 @@
----
-translateHelp: true
----
-
 # 最大化
 
 调整卡片最大化/最小化

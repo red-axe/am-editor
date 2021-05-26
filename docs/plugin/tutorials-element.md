@@ -1,117 +1,117 @@
-# 节点插件
+# Node plugin
 
-通常用于使用节点包裹文本加以修饰的场景。例如，`<strong>abc</strong>` `<h2>abc</h2>` 使用一组标签包裹文本或者节点
+It is usually used in scenes that use node wrapping text to be modified. For example, `<strong>abc</strong>` `<h2>abc</h2>` uses a set of tags to wrap text or nodes
 
-或者用于设置所有的节点样式。例如缩进，`<p style="padding-left:10px"></p>`，`<h2 style="padding-left:10px"></h2>`，每个块级节点都可以设置缩进样式
+Or used to set all node styles. For example, indentation, `<p style="padding-left:10px"></p>`, `<h2 style="padding-left:10px"></h2>`, each block-level node can be set Indentation style
 
-一个标签由 `标签名称`、`属性`、`样式` 组成，这三要素最终都会加入 `schema` 规则管理里面，`schema` 是 DOM 树的约束条件列表，标签、样式、属性如果不存在 `schema` 规则里面，都会被过滤遗弃
+A tag is composed of `tag name`, `attribute`, and `style`. These three elements will eventually be added to the `schema` rule management. `schema` is a list of constraints of the DOM tree. If the tag, style, and attribute do not exist`In the schema` rules, all will be filtered and discarded
 
-`ElementPlugin` 插件会把我们设置的`标签名称`、`属性`、`样式`自动组成一个节点，并自动加入到`schema`规则里面
+The `ElementPlugin` plugin will automatically compose a node of the `tag name`, `attribute`, and `style` we set, and automatically add it to the `schema` rule
 
-此类插件我们需要继承 `ElementPlugin` 抽象类，`ElementPlugin` 抽象类在继承 `Plugin` 抽象类的基础上扩展了一些属性和方法。所以继承 `ElementPlugin` 的插件也同样拥有`Plugin`抽象类的所有属性和方法
+For this type of plug-in, we need to inherit the `ElementPlugin` abstract class. The `ElementPlugin` abstract class extends some properties and methods on the basis of inheriting the `Plugin` abstract class. So the plugin that inherits `ElementPlugin` also has all the attributes and methods of the `Plugin` abstract class
 
-## 继承
+## Inheritance
 
-继承 `ElementPlugin` 抽象类
+Inherit the `ElementPlugin` abstract class
 
 ```ts
-import { ElementPlugin } from '@aomao/engine'
+import {ElementPlugin} from'@aomao/engine'
 
 export default class extends ElementPlugin {
-	...
+...
 }
 ```
 
-## 属性
+## Attributes
 
-因为 `ElementPlugin` 继承了 `Plugin` 抽象类，所以 `pluginName` 不要忘记了～
+Because `ElementPlugin` inherits the abstract class of `Plugin`, so don't forget `pluginName`~
 
 ### `tagName`
 
-标签名称，可选
+Label name, optional
 
-用于包裹文本或节点的标签名称
+The label name used to wrap the text or node
 
-如果有设置，会自动加入 `schema` 规则管理
+If there is a setting, it will be automatically added to the `schema` rule management
 
 ```ts
 export default class extends ElementPlugin {
-	...
+...
     readonly tagName = "span"
 }
 ```
 
 ### `style`
 
-标签的样式，可选
+Label style, optional
 
-用于设置当前标签的样式，如果此插件没有设置标签名称，样式将作为全局标签的样式，拥有此样式的标签`schema`会判定为合法的，会把样式保留。
+It is used to set the style of the current label. If the plug-in does not set the label name, the style will be used as the style of the global label. The label `schema` with this style will be judged to be legal and the style will be retained.
 
-如果有设置，会自动加入 `schema` 规则管理
+If there is a setting, it will be automatically added to the `schema` rule management
 
-示例：
+Example:
 
 ```ts
 export default class extends ElementPlugin {
-	...
+...
     readonly style = {
         "font-weight": "bold"
     }
 }
 ```
 
-某些情况下我们需要一个动态值，例如字体大小，`<span style="font-size:14px"></span>` 14px 是一个固定的值，如果希望每次执行插件都能替换成`editor.command.execute`传进来的动态值，那么就要使用变量表示
+In some cases we need a dynamic value, such as font size, `<span style="font-size:14px"></span>` 14px is a fixed value, if you want to replace it with `every time you execute the plug-in The dynamic value passed in by editor.command.execute`, then it is necessary to use the variable representation
 
-这个变量来源于`editor.command.execute`命令的参数，变量名称由 `@var` + 参数所在位置索引决定。`editor.command.execute("插件名称","参数0","参数1","参数2",...)` 对应的变量名为 `@var0` `@var1` `@var2` ...
+This variable is derived from the parameters of the `editor.command.execute` command, and the variable name is determined by `@var` + the index of the location of the parameter. `editor.command.execute("plugin name","parameter 0","parameter 1","parameter 2",...)` The corresponding variable name is `@var0` `@var1` `@var2`. ..
 
 ```ts
 export default class extends ElementPlugin {
-	...
+...
     readonly style = {
         "font-size": "@var0"
     }
 }
 ```
 
-除了动态设置值以外，我们还可以对节点获取到的值进行格式化。例如，在粘贴某些复制过来的文本时，字体大小单位是 pt，我们需要转换成我们熟悉的 px。这样在执行`editor.command.queryState`时，我们能轻松的获取到预期内的值
+In addition to dynamically setting the value, we can also format the value obtained by the node. For example, when pasting some copied text, the font size unit is pt, and we need to convert it to the familiar px. In this way, when executing `editor.command.queryState`, we can easily get the expected value
 
 ```ts
 export default class extends ElementPlugin {
-	...
+...
     readonly style = {
         'font-size': {
-			value: '@var0',
-			format: (value: string) => {
-				value = this.convertToPX(value);
-				return value;
-			},
-		},
+value:'@var0',
+format: (value: string) => {
+value = this.convertToPX(value);
+return value;
+},
+},
     }
 }
 ```
 
 ### `attributes`
 
-标签的属性，可选
+The attributes of the label, optional
 
-设置和使用方式与 `style` 一样
+The setting and usage are the same as `style`
 
 ```ts
 export default class extends ElementPlugin {
-	...
+...
     readonly attributes = {
         "data-attr": "@var0"
     }
 }
 ```
 
-严格意义上`style`也属性标签上的属性，不过`style`属性比较常用，并且它是以键值对形式出现的，单独罗列出来比较好理解和管理。最终在加入 `schema` 时 `style` 属性会被合并到 `attributes` 字段中。
+Strictly speaking, `style` is also an attribute on the attribute tag, but the `style` attribute is more commonly used, and it appears in the form of key-value pairs. It is easier to understand and manage if listed separately. Eventually, when adding the `schema`, the `style` attribute will be merged into the `attributes` field.
 
 ### `variable`
 
-变量规则，可选
+Variable rules, optional
 
-如果 `style` 或 `attributes` 的值有使用动态变量，那么必须要对变量进行规则说明。否则，`@var0`，`@var1` 在 `schema` 中会被当作固定值处理，不符合就会被过滤遗弃
+If dynamic variables are used in the values ​​of `style` or `attributes`, then the variables must be stated in rules. Otherwise, `@var0`, `@var1` will be treated as fixed values ​​in the `schema`, and non-conformities will be filtered out
 
 ```ts
 variable = {
@@ -122,24 +122,24 @@ variable = {
 };
 ```
 
-对于`@var0`我们使用了以下规则表明
+For `@var0` we used the following rules to indicate
 
--   `required` 必需要有的值
--   `value` 正则表达式，可以用`pt` 或 `px`做单位的数值
+-   `required` required value
+-   `value` regular expression, you can use `pt` or `px` as the unit value
 
-更多关于 `schema` 规则的设置请在 `文档` -> `基础` -> `结构`阅读
+For more information about the setting of `schema` rules, please read in `Document` -> `Basic` -> `Structure`
 
-## 方法
+## Method
 
 ### `init`
 
-初始化，可选
+Initialization, optional
 
-`ElementPlugin` 插件已经实现了`init`方法，如果需要使用，需要手动再次调用。否则会出现意料外的情况
+The `ElementPlugin` plugin has implemented the `init` method, if you need to use it, you need to manually call it again. Otherwise there will be unexpected situations
 
 ```ts
 export default class extends ElementPlugin {
-	...
+...
     init(){
         super.init()
     }
@@ -148,64 +148,64 @@ export default class extends ElementPlugin {
 
 ### `setStyle`
 
-将当前插件 `style` 属性应用到一个节点
+Apply the current plug-in `style` attribute to a node
 
 ```ts
 /**
- * 将当前插件style属性应用到节点
- * @param node 需要设置的节点
- * @param args 如果有 `style` 中有动态值，在这里以参数的形式传入，需要注意参数顺序
+ * Apply the current plug-in style attribute to the node
+ * @param node The node that needs to be set
+ * @param args If there is a dynamic value in `style`, pass it here as a parameter, and you need to pay attention to the order of the parameters
  */
 setStyle(node: NodeInterface | Node, ...args: Array<any>): void
 ```
 
 ### `setAttributes`
 
-将当前插件 `attributes` 属性应用到一个节点
+Apply the current plugin `attributes` attribute to a node
 
 ```ts
 /**
- * 将当前插件attributes属性应用到节点
- * @param node 节点
- * @param args 如果有 `attributes` 中有动态值，在这里以参数的形式传入，需要注意参数顺序
+ * Apply the attributes of the current plugin to the node
+ * @param node node
+ * @param args If there is a dynamic value in `attributes`, pass it in as a parameter here, and you need to pay attention to the order of the parameters
  */
 setAttributes(node: NodeInterface | Node, ...args: Array<any>): void;
 ```
 
 ### `getStyle`
 
-获取一个节点符合当前插件规则的样式
+Get the style of a node that meets the current plug-in rules
 
 ```ts
 /**
- * 获取节点符合当前插件规则的样式
- * @param node 节点
- * @returns 样式名称和样式值键值对
+ * Get the style of the node that meets the current plug-in rules
+ * @param node node
+ * @returns key-value pairs of style name and style value
  */
-getStyle(node: NodeInterface | Node): { [key: string]: string };
+getStyle(node: NodeInterface | Node): {[key: string]: string };
 ```
 
 ### `getAttributes`
 
-获取节点符合当前插件规则的属性
+Get the attributes of the node that comply with the current plug-in rules
 
 ```ts
 /**
- * 获取节点符合当前插件规则的属性
- * @param node 节点
- * @returns 属性名称和属性值键值对
+ * Get the attributes of the node that comply with the current plugin rules
+ * @param node node
+ * @returns attribute name and attribute value key-value pair
  */
-getAttributes(node: NodeInterface | Node): { [key: string]: string };
+getAttributes(node: NodeInterface | Node): {[key: string]: string };
 ```
 
 ### `isSelf`
 
-检测当前节点是否符合当前插件设置的规则
+Check whether the current node meets the rules set by the current plug-in
 
 ```ts
 /**
- * 检测当前节点是否符合当前插件设置的规则
- * @param node 节点
+ * Check whether the current node meets the rules set by the current plug-in
+ * @param node node
  * @returns true | false
  */
 isSelf(node: NodeInterface | Node): boolean;
@@ -213,52 +213,52 @@ isSelf(node: NodeInterface | Node): boolean;
 
 ### `queryState`
 
-查询插件状态命令，可选
+Query plug-in status command, optional
 
 ```ts
 queryState() {
-    //不是引擎
+    //Not an engine
     if (!isEngine(this.editor)) return;
-    const { change } = this.editor;
-    //如果没有属性和样式限制，直接查询是否包含当前标签名称
+    const {change} = this.editor;
+    //If there are no attributes and style restrictions, directly query whether the current label name is included
     if (!this.style && !this.attributes)
-        return change.marks.some(node => node.name === this.tagName);
-    //获取属性和样式限制内的值集合
+        return change.marks.some(node ​​=> node.name === this.tagName);
+    //Get the value collection within the attribute and style limit
     const values: Array<string> = [];
-    change.marks.forEach(node => {
+    change.marks.forEach(node ​​=> {
         values.push(...Object.values(this.getStyle(node)));
         values.push(...Object.values(this.getAttributes(node)));
     });
-    return values.length === 0 ? undefined : values;
+    return values.length === 0? undefined: values;
 }
 ```
 
 ### `execute`
 
-执行插件命令，需要实现
+Execute plug-in commands, need to be implemented
 
-添加一个 mark 标签的例子：
+Example of adding a mark tag:
 
 ```ts
 execute(...args) {
-    //不是引擎
+    //Not an engine
     if (!isEngine(this.editor)) return;
-    const { $, change } = this.editor;
-    //实例化一个当前插件设定的标签名称节点
+    const {$, change} = this.editor;
+    //Instantiate a label name node set by the current plugin
     const markNode = $(`<${this.tagName} />`);
-    //给节点设置当前插件设定的样式，如果有动态值，自动组合动态参数
+    //Set the style set by the current plugin for the node. If there is a dynamic value, the dynamic parameter will be automatically combined
     this.setStyle(markNode, ...args);
-    //给节点设置当前插件设定的属性，如果有动态值，自动组合动态参数
+    //Set the attributes set by the current plug-in to the node, if there are dynamic values, automatically combine dynamic parameters
     this.setAttributes(markNode, ...args);
 
-    const { mark } = this.editor;
-    //查询当前光标位置是否符合当前插件的设置
+    const {mark} = this.editor;
+    //Query whether the current cursor position meets the settings of the current plug-in
     const trigger = !this.queryState()
     if (trigger) {
-        //在光标处包裹当前插件设置的mark样式标签节点
+        //Wrap the mark style label node set by the current plug-in at the cursor
         mark.wrap(markNode);
     } else {
-        //在光标处移除当前插件设置的mark样式标签节点
+        //Remove the mark style label node set by the current plug-in at the cursor
         mark.unwrap(markNode);
     }
 }
@@ -266,11 +266,11 @@ execute(...args) {
 
 ### `schema`
 
-获取插件设置的属性和样式所生成的规则，这些规则将添加到 `schema` 对象中
+Get the rules generated by the attributes and styles set by the plugin. These rules will be added to the `schema` object
 
 ```ts
 /**
- * 获取插件设置的属性和样式所生成的规则
- */
+  * Get the rules generated by the attributes and styles set by the plugin
+  */
 schema(): SchemaRule | SchemaGlobal | Array<SchemaRule>;
 ```

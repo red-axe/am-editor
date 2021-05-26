@@ -1,56 +1,52 @@
----
-translateHelp: true
----
+# Range
 
-# 光标
+In the editor, in addition to dealing with the DOM tree, the second thing is to control our range. After we click the left mouse button in the editing area, the range will flicker, and there is the editing position, including the selection of a range by sliding the mouse after pressing the left button. The range information will indicate the position of the DOM node that the current user wants to operate.
 
-在编辑器中，除了需要和 DOM 树打交道外，其次就是控制好我们的光标。在我们鼠标左键在编辑区域单击后，会有光标闪烁，那里就是我们编辑的位置，包括左键按下后滑动鼠标选取一段范围。这些光标信息都会表明当前用户要操作的 DOM 节点位置。
+After knowing the position of the DOM to be manipulated, any other user operations may need to change the DOM tree structure, such as inputting characters or pressing the delete key. What we need to do is to correctly apply the user feedback to the DOM tree. After up, let the range range fall on the correct position, the user does not want to see the range jump randomly.
 
-在知道要操作的 DOM 位置后，用户的其它任何操作都可能需要去改变 DOM 树结构，例如输入字符、或者按下删除键，我们需要做的是就是把用户的这些反馈正确的应用到 DOM 树上后让光标范围落在正确的位置上，用户并不想看到光标乱跳。
+The browser has provided us with a rich API [Range](https://developer.mozilla.org/zh-CN/docs/Web/API/Range/Range). Different browser vendors may have some subtle differences in implementation, including differences in the location of selected nodes. But these have been handled well in our engine.
 
-浏览器已经为我们提供了丰富的 API [Range](https://developer.mozilla.org/zh-CN/docs/Web/API/Range/Range)。不同的浏览器厂商可能在实现上会有些细微的差别，包括所选节点的位置也有差别。不过这些在我们的引擎中已经很好的处理过了。
+## Meet Range
 
-## 认识 Range
+There are five important attributes in the `Range` object. If you need to understand other detailed attributes and methods, please visit the browser API [Range](https://developer.mozilla.org/zh-CN/docs/Web/API/Range /Range)
 
-`Range` 对象中主要有五个重要属性，需要了解其它详细属性和方法，请访问浏览器 API[Range](https://developer.mozilla.org/zh-CN/docs/Web/API/Range/Range)
+-   `startContainer` range start position node
+-   `startOffset` the offset under the node where the range starts
+-   `endContainer` node at the end of the range
+-   `endOffset` the offset under the node where the range ends
+-   `collapsed` indicates whether the start position and end position of the range are at the same position
 
--   `startContainer` 光标开始位置节点
--   `startOffset` 光标开始位置节点下的偏移量
--   `endContainer` 光标结束位置节点
--   `endOffset` 光标结束位置节点下的偏移量
--   `collapsed` 表示光标开始位置和结束位置是否处于同一个位置
+Example 1:
 
-例子 1：
-
-这里我们使用 anchor 表示开始位置，focus 表示结束位置。
+Here we use anchor to indicate the start position, and focus to indicate the end position.
 
 ```html
 <p>a<anchor />bc<focus />d</p>
 ```
 
-p 节点下面是一段 `abcd` 文本，在 DOM 树中类型是 `Text` ，是一个文本节点。startContainer 和 endContainer 都指向 `Text`, offset 就是字符长度 startOffset=1, endOffset=3 ，虽然指向节点都是 Text，但是 offset 不一致，collapsed 为 false
+Below the p node is a paragraph of `abcd` text, the type is `Text` in the DOM tree, which is a text node. Both startContainer and endContainer point to `Text`, offset is the character length startOffset=1, endOffset=3, although the pointing nodes are all Text, the offset is inconsistent, collapsed is false
 
-例子 2:
+Example 2:
 
-这里我们使用 cursor 表示光标开始位置和结束位置处于重合状态
+Here we use range to indicate that the start position and end position of the range are in a coincident state
 
 ```html
 <p>
-	<span><cursor />abcd</span>
+	<span><range />abcd</span>
 </p>
 ```
 
-p 节点下是一个 span 节点，span 节点下是 `Text` 文本节点。此处表示 `Range` 对象有两种方式
+Below the p node is a span node, and below the span node is the text node `Text`. Here, there are two ways of `Range` object
 
--   startContainer 和 endContainer 都指向 `Text`，startOffset 和 endOffset 都为 0
--   startContainer 和 endContainer 都指向 span 节点，startOffset 和 endOffset 都为 0
+-   startContainer and endContainer both point to `Text`, startOffset and endOffset are both 0
+-   startContainer and endContainer both point to the span node, startOffset and endOffset are both 0
 
-在所指节点非 `Text` 文本节点时，offset 表示子节点相对于父节点的索引值
+When the pointed node is not a `Text` text node, offset represents the index value of the child node relative to the parent node
 
-此处这两种方式表达的意思都是一样的，而且在更复杂的 DOM 结构中，还会有更多复杂的表述，在这种情况下我们借助 Range 对象来判定节点位置执行操作会有很多的不确定性。所以我们在 Range 基础上扩展了`RangeInterface`类型来帮助我们更好的把控`Range`对象。更多的信息请查看 API
+The meanings of these two methods are the same here, and in more complex DOM structures, there will be more complex expressions. In this case, we use the Range object to determine the position of the node and perform many operations. Uncertainty. So we extend the `RangeInterface` type on the basis of Range to help us better control the `Range` object. For more information, please see API
 
-## 零宽字符
+## Zero-width characters
 
-零宽字符是一种在浏览器中不打印的字符，它也没有宽度。
+A zero-width character is a character that is not printed in the browser, and it has no width.
 
-在无法设置光标位置，或者有修复默认浏览器默认光标位置时，会使用到`零宽字符`，让光标选择到零宽字符旁边。例如：<span></span>，我们想让光标聚焦到 span 节点内，但是 span 节点内没有任何节点，这时我们可以给 span 节点内添加一个零宽字符 <span>&#8204;</span>，并让光标选择在零宽字符前或后，我们就可以在 span 节点内输入内容了。
+When the range position cannot be set, or there is a repair to the default browser default range position, the `zero-width character` will be used to select the range next to the zero-width character. For example: <span></span>, we want the range to focus on the span node, but there is no node in the span node, then we can add a zero-width character to the span node <span>&#8204;</ span>, and let the range select before or after the zero-width character, we can enter content in the span node.

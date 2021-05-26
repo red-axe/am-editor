@@ -1,221 +1,217 @@
----
-translateHelp: true
----
-
 # List
 
-编辑列表节点的相关操作
+Related operations for editing list nodes
 
-类型：`ListModelInterface`
+Type: `ListModelInterface`
 
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface): ListModelInterface
 ```
 
-## 属性
+## Attributes
 
 ### `CUSTOMZIE_UL_CLASS`
 
-只读
+Read only
 
-自定义列表样式标记
+Custom list style markup
 
 ### `CUSTOMZIE_LI_CLASS`
 
-只读
+Read only
 
-自定义列表项样式标记
+Custom list item style mark
 
 ### `INDENT_KEY`
 
-只读
+Read only
 
-列表缩进 key 标记，用于获取列表缩进值
+List indentation key tag, used to get the list indentation value
 
-## 方法
+## Method
 
 ### `init`
 
-初始化
+initialization
 
 ```ts
 /**
- * 初始化
+ * Initialization
  */
 init(): void;
 ```
 
 ### `isEmptyItem`
 
-判断列表项节点是否为空
+Determine whether the list item node is empty
 
 ```ts
 /**
- * 判断列表项节点是否为空
- * @param node 节点
+ * Determine whether the list item node is empty
+ * @param node node
  */
 isEmptyItem(node: NodeInterface): boolean;
 ```
 
 ### `isSame`
 
-判断两个节点是否是一样的 List 节点
+Determine whether two nodes are the same List node
 
 ```ts
 /**
- * 判断两个节点是否是一样的List节点
- * @param sourceNode 源节点
- * @param targetNode 目标节点
+ * Determine whether two nodes are the same List node
+ * @param sourceNode source node
+ * @param targetNode target node
  */
 isSame(sourceNode: NodeInterface, targetNode: NodeInterface): boolean;
 ```
 
 ### `isSpecifiedType`
 
-判断节点集合是否是指定类型的 List 列表
+Determine whether the node set is a List list of the specified type
 
 ```ts
 /**
- * 判断节点集合是否是指定类型的List列表
- * @param blocks 节点集合
- * @param name 节点标签类型
- * @param card 是否是指定的自定义列表项的卡片名称
+ * Determine whether the node collection is a List list of the specified type
+ * @param blocks node collection
+ * @param name node label type
+ * @param card is the card name of the specified custom list item
  */
 isSpecifiedType(
     blocks: Array<NodeInterface>,
-    name?: 'ul' | 'ol',
+    name?:'ul' |'ol',
     card?: string,
 ): boolean;
 ```
 
 ### `getPlugins`
 
-获取所有 List 插件
+Get all List plugins
 
 ```ts
 /**
- * 获取所有List插件
+ * Get all List plugins
  */
 getPlugins(): Array<ListInterface>;
 ```
 
 ### `getPluginNameByNode`
 
-根据列表节点获取列表插件名称
+Get the name of the list plugin according to the list node
 
 ```ts
 /**
- * 根据列表节点获取列表插件名称
- * @param block 节点
+ * Get the name of the list plug-in according to the list node
+ * @param block node
  */
 getPluginNameByNode(block: NodeInterface): string;
 ```
 
 ### `getPluginNameByNodes`
 
-获取一个列表节点集合所属列表插件名称
+Get the name of the list plugin that a list node collection belongs
 
 ```ts
 /**
- * 获取一个列表节点集合所属列表插件名称
- * @param blocks 节点集合
+ * Get the name of the list plugin to which a list node collection belongs
+ * @param blocks node collection
  */
 getPluginNameByNodes(blocks: Array<NodeInterface>): string;
 ```
 
 ### `unwrapCustomize`
 
-清除自定义列表节点相关属性
+Clear the related attributes of the custom list node
 
 ```ts
 /**
- * 清除自定义列表节点相关属性
- * @param node 节点
+ * Clear the related attributes of the custom list node
+ * @param node node
  */
 unwrapCustomize(node: NodeInterface): NodeInterface;
 ```
 
 ### `unwrap`
 
-取消节点的列表
+Cancel the list of nodes
 
 ```ts
 /**
- * 取消节点的列表
- * @param blocks 节点集合
+ * Cancel the list of nodes
+ * @param blocks node collection
  */
 unwrap(blocks: Array<NodeInterface>): void;
 ```
 
 ### `normalize`
 
-获取当前选区的修复列表后的节点集合
+Get the node collection after the repair list of the current selection
 
 ```ts
 /**
- * 获取当前选区的修复列表后的节点集合
+ * Get the node collection after the repair list of the current selection
  */
 normalize(): Array<NodeInterface>;
 ```
 
 ### `split`
 
-将选中列表项列表分割出来单独作为一个列表
+Split the list of selected items into a single list
 
 ```ts
 /**
- * 将选中列表项列表分割出来单独作为一个列表
+ * Split the list of selected items into a single list
  */
 split(): void;
 ```
 
 ### `merge`
 
-合并列表
+Merge list
 
 ```ts
 /**
- * 合并列表
- * @param blocks 节点集合，默认为当前选区的blocks
+ * Consolidated list
+ * @param blocks node collection, the default is the blocks of the current selection
  */
 merge(blocks?: Array<NodeInterface>, range?: RangeInterface): void;
 ```
 
 ### `addStart`
 
-给列表添加 start 序号
+Add the start number to the list
 
 ```ts
 /**
- * 给列表添加start序号
- * @param block 列表节点
+ * Add the start number to the list
+ * @param block list node
  */
 addStart(block?: NodeInterface): void;
 ```
 
 ### `addIndent`
 
-给列表节点增加缩进
+Add indentation to list nodes
 
 ```ts
 /**
- * 给列表节点增加缩进
- * @param block 列表节点
- * @param value 缩进值
+ * Add indentation to list nodes
+ * @param block list node
+ * @param value indentation value
  */
 addIndent(block: NodeInterface, value: number, maxValue?: number): void;
 ```
 
 ### `getIndent`
 
-获取列表节点 indent 值
+Get the indent value of the list node
 
 ```ts
 /**
- * 获取列表节点 indent 值
- * @param block 列表节点
+ * Get the indent value of the list node
+ * @param block list node
  * @returns
  */
 getIndent(block: NodeInterface): number;
@@ -223,14 +219,14 @@ getIndent(block: NodeInterface): number;
 
 ### `addCardToCustomize`
 
-为自定义列表项添加卡片节点
+Add card nodes to custom list items
 
 ```ts
 /**
- * 为自定义列表项添加卡片节点
- * @param node 列表节点项
- * @param cardName 卡片名称，必须是支持inline卡片类型
- * @param value 卡片值
+ * Add card nodes for custom list items
+ * @param node list node item
+ * @param cardName card name, must support inline card type
+ * @param value card value
  */
 addCardToCustomize(
     node: NodeInterface | Node,
@@ -241,14 +237,14 @@ addCardToCustomize(
 
 ### `addReadyCardToCustomize`
 
-为自定义列表项添加待渲染卡片节点
+Add a card node to be rendered for the custom list item
 
 ```ts
 /**
- * 为自定义列表项添加待渲染卡片节点
- * @param node 列表节点项
- * @param cardName 卡片名称，必须是支持inline卡片类型
- * @param value 卡片值
+ * Add a card node to be rendered for the custom list item
+ * @param node list node item
+ * @param cardName card name, must support inline card type
+ * @param value card value
  */
 addReadyCardToCustomize(
     node: NodeInterface | Node,
@@ -259,26 +255,26 @@ addReadyCardToCustomize(
 
 ### `addBr`
 
-给列表添加 BR 标签
+Add the BR tag to the list
 
 ```ts
 /**
- * 给列表添加BR标签
- * @param node 列表节点项
+ * Add the BR tag to the list
+ * @param node list node item
  */
 addBr(node: NodeInterface): void;
 ```
 
 ### `toCustomize`
 
-将节点转换为自定义节点
+Convert node to custom node
 
 ```ts
 /**
- * 将节点转换为自定义节点
- * @param blocks 节点
- * @param cardName 卡片名称
- * @param value 卡片值
+ * Convert nodes to custom nodes
+ * @param blocks node
+ * @param cardName card name
+ * @param value card value
  */
 toCustomize(
     blocks: Array<NodeInterface> | NodeInterface,
@@ -289,41 +285,41 @@ toCustomize(
 
 ### `toNormal`
 
-将节点转换为列表节点
+Convert node to list node
 
 ```ts
 /**
- * 将节点转换为列表节点
- * @param blocks 节点
- * @param tagName 列表节点名称，ul 或者 ol，默认为ul
- * @param start 有序列表开始序号
+ * Convert a node to a list node
+ * @param blocks node
+ * @param tagName list node name, ul or ol, the default is ul
+ * @param start the start number of the ordered list
  */
 toNormal(
     blocks: Array<NodeInterface> | NodeInterface,
-    tagName?: 'ul' | 'ol',
+    tagName?:'ul' |'ol',
     start?: number,
 ): Array<NodeInterface> | NodeInterface;
 ```
 
 ### `isFirst`
 
-判断选中的区域是否在列表的开始
+Determine whether the selected area is at the beginning of the list
 
 ```ts
 /**
- * 判断选中的区域是否在列表的开始
- * 选中的区域
+ * Determine whether the selected area is at the beginning of the list
+ * Selected area
  */
 isFirst(range: RangeInterface): boolean;
 ```
 
 ### `isLast`
 
-判断选中的区域是否在列表的末尾
+Determine whether the selected area is at the end of the list
 
 ```ts
 /**
- * 判断选中的区域是否在列表的末尾
+ * Determine whether the selected area is at the end of the list
  */
 isLast(range: RangeInterface): boolean;
 ```

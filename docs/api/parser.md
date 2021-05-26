@@ -1,36 +1,32 @@
----
-translateHelp: true
----
+# Parser
 
-# 解析器
+Type: `ParserInterface`
 
-类型：`ParserInterface`
-
-## 构造函数
+## Constructor
 
 ```ts
 /**
- * @param source 值或者节点最终为解析为DOM树
- * @param editor 编辑器实例
- * @param paserBefore 解析前回调
+ * @param source value or node is finally parsed as a DOM tree
+ * @param editor editor example
+ * @param paserBefore callback before parsing
  * */
 new (source: string | Node | NodeInterface, editor: EditorInterface, paserBefore?: (node: NodeInterface) => void): ParserInterface
 ```
 
-## 方法
+## Method
 
 ### `walkTree`
 
-遍历节点
+Traverse nodes
 
 ```ts
 /**
- * 遍历节点
- * @param node 根节点
- * @param conversionRules 标签名称转换器
- * @param callbacks 回调
- * @param isCardNode 是否是卡片
- * @param includeCard 是否包含卡片
+ * Traverse nodes
+ * @param node root node
+ * @param conversionRules tag name converter
+ * @param callbacks callbacks
+ * @param isCardNode is it a card
+ * @param includeCard whether to include the card
  */
 walkTree(
     node: NodeInterface,
@@ -43,15 +39,15 @@ walkTree(
 
 ### `toValue`
 
-遍历 DOM 树，生成符合标准的编辑器值
+Traverse the DOM tree to generate standard editor values
 
 ```ts
 /**
- * 遍历 DOM 树，生成符合标准的编辑器值
- * @param schemaRules 标签保留规则
- * @param conversionRules 标签转换规则
- * @param replaceSpaces 是否替换空格
- * @param customTags 是否将光标、卡片节点转换为标准代码
+ * Traverse the DOM tree to generate standard editor values
+ * @param schemaRules tag retention rules
+ * @param conversionRules tag conversion rules
+ * @param replaceSpaces whether to replace spaces
+ * @param customTags Whether to convert the cursor and card nodes into standard codes
  */
 toValue(
     schema?: SchemaInterface | null,
@@ -63,37 +59,37 @@ toValue(
 
 ### `toHTML`
 
-转换为 HTML 代码
+Convert to HTML code
 
 ```ts
 /**
- * 转换为HTML代码
- * @param inner 内包裹节点
- * @param outter 外包裹节点
+ * Convert to HTML code
+ * @param inner inner package node
+ * @param outter outer package node
  */
-toHTML(inner?: Node, outter?: Node): { html: string, text: string}
+toHTML(inner?: Node, outter?: Node): {html: string, text: string}
 ```
 
 ### `toDOM`
 
-返回 DOM 树
+Return to the DOM tree
 
 ```ts
 /**
- * 返回DOM树
+ * Return to the DOM tree
  */
 toDOM(schema?: SchemaInterface | null, conversionRules?: any): DocumentFragment
 ```
 
 ### `toText`
 
-转换为文本
+Convert to text
 
 ```ts
 /**
- * 转换为文本
- * @param conversionRules 标签转换规则
- * @param includeCard 是否包含卡片
+ * Convert to text
+ * @param conversionRules tag conversion rules
+ * @param includeCard whether to include the card
  */
 toText(
     schema?: SchemaInterface | null,

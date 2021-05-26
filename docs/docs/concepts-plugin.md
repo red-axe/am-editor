@@ -1,46 +1,42 @@
----
-translateHelp: true
----
+# Plugin
 
-# 插件
+It is relatively simple to develop a plug-in on the engine. The engine provides the following abstract classes:
 
-在引擎上开发一个插件是相对比较简单的。引擎提供了以下几个抽象类：
+-   `Plugin` The most basic abstract plug-in class
+-   `ElementPlugin` node plugin, inherited from the `Plugin` abstract class
+-   `BlockPlugin` block-level node plug-in, inherited from the abstract class of `ElementPlugin`
+-   `MarkPlugin` style node plugin, inherited from `ElementPlugin` abstract class
+-   `InlinePlugin` inline node plugin, inherited from `ElementPlugin` abstract class
+-   `ListPlugin` list plugin, inherited from `BlockPlugin` abstract class
 
--   `Plugin` 最基础的插件抽象类
--   `ElementPlugin` 节点插件，继承自`Plugin`抽象类
--   `BlockPlugin` 块级节点插件，继承自`ElementPlugin`抽象类
--   `MarkPlugin` 样式节点插件，继承自`ElementPlugin`抽象类
--   `InlinePlugin` 行内节点插件，继承自`ElementPlugin`抽象类
--   `ListPlugin` 列表插件，继承自`BlockPlugin`抽象类
+In more complex plug-ins, we need to manipulate the DOM tree and cursor, so just inheritance is not enough. We also need to cooperate with the node API to make a more complete plug-in.
 
-在比较复杂的插件里面，我们需要操作 DOM 树还有光标，所以仅仅继承还是不够的，我们还需要配合节点 API 来制作一个比较完善的插件。
+Here we only need to understand the basic knowledge about plug-ins. If you need to develop a complete tutorial for plug-ins, please view it in the "Plugins" menu.
 
-在这里我们只需要了解有关插件的基本知识，如果需要开发插件的完整教程请在"插件"菜单里面查看。
+## Use
 
-## 使用
-
-插件在编辑器实例化时，就会初始化插件。所以我们得在一开始就需要把插件传入引擎
+The plugin is initialized when the editor is instantiated. So we need to pass the plugin to the engine at the beginning
 
 ```ts
-const engine = new Engine(渲染节点, {
-	plugins: [...插件列表],
+const engine = new Engine(render node, {
+plugins: [...plugin list],
 });
 ```
 
-## 命令
+## Command
 
-插件都继承自`Plugin`抽象类，必须实现 `execute` 方法。引擎会把他们加入到可执行命令列表里，并且在执行插件命令时，引擎会帮助处理好光标位置、历史记录等等
+All plug-ins inherit from the abstract class `Plugin` and must implement the `execute` method. The engine will add them to the list of executable commands, and when executing plug-in commands, the engine will help deal with the cursor position, history, etc.
 
 ```ts
 /**
- * 执行插件
- * @param args 插件需要的参数
+ * Execute plugin
+ * @param args parameters required by the plug-in
  */
 abstract execute(...args: any): void;
 ```
 
-我们可以通过 `engine.command.execute("插件名称", ...插件参数)` 这种形式来执行一个插件命令
+We can execute a plugin command in the form of `engine.command.execute("plugin name", ...plugin parameter)`
 
-## 卡片
+## Card
 
-除了前面的无 UI 渲染的命令式和固定操作节点类型的插件外，我们还可以结合 `Card` 来完成自定义内容渲染的插件。同样的， `Card` 也是一个抽象类，我们需要继承它，它也有一个必须实现的方法 `render`（卡片渲染方法），如何渲染卡片内的节点节点完全取决于你。
+In addition to the previous imperative and fixed operation node type plug-ins without UI rendering, we can also combine `Card` to complete custom content rendering plug-ins. Similarly, `Card` is also an abstract class, and we need to inherit it. It also has a method `render` (card rendering method) that must be implemented. How to render the nodes in the card is entirely up to you.

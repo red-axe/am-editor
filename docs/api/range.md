@@ -1,52 +1,48 @@
----
-translateHelp: true
----
+# Range
 
-# 光标
+Inherited from `Range`, has all the methods and attributes of `Range`, if you need to know the detailed attributes and methods, please visit the browser API [Range](https://developer.mozilla.org/zh-CN/docs/Web/ API/Range/Range)
 
-继承自 `Range`，拥有`Range`所有的方法和属性，需要了解详细属性和方法，请访问浏览器 API[Range](https://developer.mozilla.org/zh-CN/docs/Web/API/Range/Range)
+Type: `RangeInterface`
 
-类型：`RangeInterface`
+## Attributes
 
-## 属性
-
-以下只列出从`Range`对象扩展出来的属性和方法
+The following only lists the properties and methods extended from the `Range` object
 
 ### `base`
 
-`Range` 对象
+`Range` object
 
-只读
+Read only
 
 ### `startNode`
 
-光标开始位置节点，只读
+The node where the range starts, read-only
 
-类型：`NodeInterface`
+Type: `NodeInterface`
 
 ### `endNode`
 
-光标结束位置节点，只读
+Node at the end of the range, read-only
 
-类型：`NodeInterface`
+Type: `NodeInterface`
 
 ### `commonAncestorNode`
 
-开始节点和结束节点所共有最近的父节点
+The nearest parent node shared by the start node and the end node
 
-类型：`NodeInterface`
+Type: `NodeInterface`
 
-## 静态方法
+## Static method
 
 ### `create`
 
-从一个 Point 位置创建 RangeInterface 对象
+Create a RangeInterface object from a Point position
 
-Point 可以理解为鼠标指针位置的 x,y 坐标点
+Point can be understood as the x,y coordinate point of the mouse pointer position
 
 ```ts
 /**
- * 从一个 Point 位置创建 RangeInterface 对象
+ * Create a RangeInterface object from a Point position
  */
 create: (
 	editor: EditorInterface,
@@ -57,11 +53,11 @@ create: (
 
 ### `from`
 
-从 Window 、Selection、Range 中创建 RangeInterface 对象
+Create RangeInterface objects from Window, Selection, Range
 
 ```ts
 /**
- * 从 Window 、Selection、Range 中创建 RangeInterface 对象
+ * Create RangeInterface objects from Window, Selection, Range
  */
 from: (
 	editor: EditorInterface,
@@ -71,101 +67,101 @@ from: (
 
 ### `fromPath`
 
-把路径还原为 RangeInterface 对象
+Restore the path to a RangeInterface object
 
 ```ts
 /**
- * 从路径转换为光标
+ * Convert from path to range
  * @param path
- * @param 上下文，默认编辑器节点
+ * @param context, the default editor node
  */
 fromPath(path: Path[], context?: NodeInterface): RangeInterface;
 ```
 
-## 方法
+## Method
 
 ### `select`
 
-让光标选中一个节点
+Let the range select a node
 
 ```ts
 /**
- * 选中一个节点
- * @param node 节点
- * @param contents 是否只选中内容
+ * Select a node
+ * @param node node
+ * @param contents whether only selected contents
  */
 select(node: NodeInterface | Node, contents?: boolean): RangeInterface;
 ```
 
 ### `getText`
 
-获取光标选中的所有节点的文本
+Get the text of all nodes selected by the range
 
 ```ts
 /**
- * 获取光标选中的文本
+ * Get the text selected by the range
  */
 getText(): string | null;
 ```
 
 ### `getClientRect`
 
-获取光标所占的区域
+Get the area occupied by the range
 
 ```ts
 /**
- * 获取光标所占的区域
+ * Get the area occupied by the range
  */
 getClientRect(): DOMRect;
 ```
 
 ### `enlargeFromTextNode`
 
-将选择标记从 TextNode 扩大到最近非 TextNode 节点
+Extend the selection marker from the TextNode to the nearest non-TextNode node
 
 ```ts
 /**
- * 将选择标记从 TextNode 扩大到最近非TextNode节点
- * range 实质所选择的内容不变
+ * Expand the selection mark from TextNode to the nearest non-TextNode node
+ * The selected content of the range remains unchanged
  */
 enlargeFromTextNode(): RangeInterface;
 ```
 
 ### `shrinkToTextNode`
 
-将选择标记从非 TextNode 缩小到 TextNode 节点上，与 enlargeFromTextNode 相反
+Reduce the selection marker from a non-TextNode to a TextNode node, as opposed to enlargeFromTextNode
 
 ```ts
 /**
- * 将选择标记从非 TextNode 缩小到TextNode节点上，与 enlargeFromTextNode 相反
- * range 实质所选择的内容不变
+ * Reduce the selection marker from a non-TextNode to a TextNode node, as opposed to enlargeFromTextNode
+ * The selected content of the range remains unchanged
  */
 shrinkToTextNode(): RangeInterface;
 ```
 
 ### `enlargeToElementNode`
 
-扩大光标选区边界
+Extend the range selection boundary
 
 ```ts
 /**
- * 扩大边界
+ * Expand the border
  * <p><strong><span>[123</span>abc]</strong>def</p>
  * to
  * <p>[<strong><span>123</span>abc</strong>]def</p>
- * @param range 选区
- * @param toBlock 是否扩大到块级节点
+ * @param range selection
+ * @param toBlock whether to expand to block-level nodes
  */
 enlargeToElementNode(toBlock?: boolean): RangeInterface;
 ```
 
 ### `shrinkToElementNode`
 
-缩小光标选区边界
+Shrink the range selection boundary
 
 ```ts
 /**
- * 缩小边界
+ * Reduce the border
  * <body>[<p><strong>123</strong></p>]</body>
  * to
  * <body><p><strong>[123]</strong></p></body>
@@ -175,38 +171,38 @@ shrinkToElementNode(): RangeInterface;
 
 ### `createSelection`
 
-创建 selectionElement，通过插入自定义 span 节点标记光标 anchor、focus 或 cursor 的位置。通过这些标记我们可以很轻松的获取到选区内的节点
+Create selectionElement and mark the position of the range, focus or range by inserting a custom span node. Through these marks, we can easily get the nodes in the selection area
 
-更多属性和方法请查看 `SelectionInterface` API
+For more properties and methods, please see the `SelectionInterface` API
 
 ```ts
 /**
- * 创建 selectionElement，通过插入 span 节点标记位置
+ * Create selectionElement, mark the position by inserting a span node
  */
 createSelection(): SelectionInterface;
 ```
 
 ### `getSubRanges`
 
-将光标选区按照文本节点和卡片节点分割为多个子选区
+Split the range selection into multiple sub-selections according to text nodes and card nodes
 
 ```ts
 /**
- * 获取子选区集合
- * @param includeCard 是否包含卡片
+ * Get a collection of sub-selections
+ * @param includeCard whether to include the card
  */
 getSubRanges(includeCard?: boolean): Array<RangeInterface>;
 ```
 
 ### `setOffset`
 
-让光标选择一个节点，并设置它的开始位置偏移量和结束位置偏移量
+Let the range select a node and set its start position offset and end position offset
 
 ```ts
 /**
- * @param node 要设置的节点
- * @param start 开始位置的偏移量
- * @param end 结束位置的偏移量
+ * @param node The node to be set
+ * @param start the offset of the starting position
+ * @param end The offset of the end position
  * */
 setOffset(
     node: Node | NodeInterface,
@@ -217,7 +213,7 @@ setOffset(
 
 ### `findElementsInSimpleRange`
 
-在光标区域中查找元素节点集合，不包括 Text 文本节点
+Find a collection of element nodes in the range area, excluding Text text nodes
 
 ```ts
 findElementsInSimpleRange(): Array<Node>;
@@ -225,7 +221,7 @@ findElementsInSimpleRange(): Array<Node>;
 
 ### `inCard`
 
-查询光标是否在卡片内
+Query whether the range is in the card
 
 ```ts
 inCard(): boolean;
@@ -233,7 +229,7 @@ inCard(): boolean;
 
 ### `getStartOffsetNode`
 
-获取相对于光标开始位置节点的偏移量处的节点
+Get the node at the offset relative to the node at the beginning of the range
 
 ```ts
 getStartOffsetNode(): Node;
@@ -241,7 +237,7 @@ getStartOffsetNode(): Node;
 
 ### `getEndOffsetNode`
 
-获取相对于光标结束位置节点的偏移量处的节点
+Get the node at the offset relative to the node at the end of the range
 
 ```ts
 getEndOffsetNode(): Node;
@@ -249,30 +245,30 @@ getEndOffsetNode(): Node;
 
 ### `containsCard`
 
-光标区域是否包含卡片
+Whether the range area contains a card
 
 ```ts
 /**
- * 是否包含卡片
+ * Whether to include a card
  */
 containsCard(): boolean;
 ```
 
 ### `addOrRemoveBr`
 
-在光标位置修复 Br 节点
+Repair the Br node at the range position
 
 ```ts
 /**
- * 输入内容时，删除浏览器生成的 BR 标签，对空 block 添加 BR
- * 删除场景
+ * When entering content, delete the BR tag generated by the browser, and add BR to the empty block
+ * Delete scene
  * <p><br />foo</p>
  * <p>foo<br /></p>
- * 保留场景
+ * Keep the scene
  * <p><br /><br />foo</p>
  * <p>foo<br /><br /></p>
  * <p>foo<br />bar</p>
- * 添加场景
+ * Add scene
  * <p></p>
  * @param isLeft
  */
@@ -281,11 +277,11 @@ addOrRemoveBr(isLeft?: boolean): RangeInterface;
 
 ### `getPrevNode`
 
-获取光标开始位置前的节点
+Get the node before the range start position
 
 ```ts
 /**
- * 获取开始位置前的节点
+ * Get the node before the start position
  * <strong>foo</strong>|bar
  */
 getPrevNode(): NodeInterface | undefined;
@@ -293,11 +289,11 @@ getPrevNode(): NodeInterface | undefined;
 
 ### `getNextNode`
 
-获取结束位置后的节点
+Get the node after the end position
 
 ```ts
 /**
- * 获取结束位置后的节点
+ * Get the node after the end position
  * foo|<strong>bar</strong>
  */
 getNextNode(): NodeInterface | undefined;
@@ -305,45 +301,45 @@ getNextNode(): NodeInterface | undefined;
 
 ### `deepCut`
 
-剪切光标选择区域的内容。数据会在剪贴板上
+Cut the contents of the area selected by the range. Data will be on the clipboard
 
 ```ts
 /**
- * 深度剪切
+ * Deep cut
  */
 deepCut(): void;
 ```
 
 ### `equal`
 
-对比两个光标对象范围是否相等
+Compare whether the range of two range objects are equal
 
 ```ts
 /**
- * 对比两个范围是否相等
- *范围
+ * Compare whether the two ranges are equal
+ *range
     */
 equal(range: RangeInterface | globalThis.Range): boolean;
 ```
 
 ### `getRootBlock`
 
-获取当前选区最近的根节点
+Get the nearest root node of the current selection
 
 ```ts
 /**
- * 获取当前选区最近的根节点
+ * Get the nearest root node of the current selection
  */
 getRootBlock(): NodeInterface | undefined;
 ```
 
 ### `toPath`
 
-将光标选区转换为路径
+Convert range selection to path
 
 ```ts
 /**
- * 获取光标路径
+ * Get the range path
  */
 toPath(): Path[];
 ```

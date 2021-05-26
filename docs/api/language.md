@@ -1,26 +1,22 @@
----
-translateHelp: true
----
+# Language
 
-# 语言
+Add multi-language configuration to the editor
 
-给编辑器增加多语言配置
+Type: `LanguageInterface`
 
-类型：`LanguageInterface`
-
-## 构造函数
+## Constructor
 
 ```ts
 new (lange: string, data: {} = {}): LanguageInterface
 ```
 
-## 方法
+## Method
 
 ### `add`
 
-增加语言配置
+Increase language configuration
 
-方法签名
+Method signature
 
 ```ts
 add(data: {}): void;
@@ -28,11 +24,11 @@ add(data: {}): void;
 
 ### `get`
 
-获取语言配置项的值
+Get the value of the language configuration item
 
 ```ts
 /**
- * @param keys 多个配置项的key
- * */
+  * @param keys The keys of multiple configuration items
+  * */
 get<T extends string | {}>(...keys: Array<string>): T;
 ```

@@ -1,9 +1,5 @@
----
-translateHelp: true
----
+# History
 
-# 历史
+In the engine, the observe method of [`MutationObserver`](https://dom.spec.whatwg.org/#mutationobserver) is used to monitor the changes of the DOM tree. The observe method is not triggered immediately after every change, but in Triggered when there is no subsequent editing behavior. This interval is very short, so short that we can think of it as changing from time to time. This interval depends on the implementation of `MutationObserver` and we cannot control it.
 
-在引擎中会使用[`MutationObserver`](https://dom.spec.whatwg.org/#mutationobserver)的 observe 方法监听 DOM 树的变更，并不是每次变更后都会立马触发 observe 方法，而是在没有后续编辑行为时触发，这个间隔非常短，短到能让我们认为是时时变更的。这个间隔时间取决于`MutationObserver`的实现，我们无法控制。
-
-每次的变更，我们会将`MutationObserver`提供给我们的 DOM 节点数据（类似增删改的操作）包括属性的变更，转换为`Ops`相当于是一个描述操作的集合，其次我们还有记录变更前的光标位置。这些数据我们都把它当作一种快照按堆栈形式存在内存中。在执行撤销、重做命令时，我们会从这个堆栈中按索引查找并还原。同时这些`Ops`还会传输到我们的协同服务端上，以此来通知各个客户端 DOM 树的变更
+For each change, we will provide the DOM node data (similar to addition, deletion and modification operations) provided to us by `MutationObserver`, including attribute changes. Converting to `Ops` is equivalent to a set of description operations, and secondly, we also record before the change The cursor position. We treat these data as a kind of snapshot in the memory in the form of a stack. When executing undo and redo commands, we will search and restore by index from this stack. At the same time, these `ops` will also be transmitted to our collaborative server to notify each client of the changes in the DOM tree

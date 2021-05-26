@@ -1,56 +1,56 @@
 # @aomao/plugin-fontsize
 
-字体大小插件
+Font size plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-fontsize
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Fontsize from '@aomao/plugin-fontsize';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Fontsize from'@aomao/plugin-fontsize';
 
 new Engine(...,{ plugins:[Fontsize] })
 ```
 
-## 可选项
+## Optional
 
-### 字体大小列表
+### Font size list
 
-支持自定义字体大小列表，传入列表，或键值对
+Support custom font size list, incoming list, or key-value pair
 
 ```ts
 /**
- * 可以指定字体大小列表 ["12px","14px","15px"]
- * 或者为字体小大设置别名 { "9pt":"12px","10pt":"13px"}
- * 在粘贴的时候过滤，不满足列表条件，将移除字体大小样式。
+ * You can specify the font size list ["12px","14px","15px"]
+ * Or set an alias for the font size {"9pt":"12px","10pt":"13px"}
+ * Filter when pasting. If the list conditions are not met, the font size style will be removed.
  * */
 data?:Array<string> | {[key:string]:string}
 ```
 
-### 默认字体大小
+### Default font size
 
 ```ts
-defaultSize?:string //默认为14px
+defaultSize?:string //The default is 14px
 ```
 
-### 快捷键
+### hot key
 
-默认无快捷键
+No shortcut keys by default
 
 ```ts
-//快捷键，key 组合键，args，执行参数，[size,defaultSize?] ， size 必须，defaultSize 可选
-hotkey?:{key:string,args:Array<string>};//默认无
+//Shortcut keys, key combination keys, args, execution parameters, [size,defaultSize?], size is required, defaultSize is optional
+hotkey?:{key:string,args:Array<string>};//default none
 
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "fontsize":{
-            //修改快捷键
+            //Modify shortcut keys
             hotkey:{
                 key:"mod+b",
                 args:["12px","14px"]
@@ -60,11 +60,11 @@ new Engine(...,{
  })
 ```
 
-## 命令
+## Command
 
 ```ts
-//size：更改的字体大小，defaultSize：保持的默认字体大小，在没有传入 defaultSize 或者 size 与 defaultSize 值不同时执行前景色修改
+//size: the font size to be changed, defaultSize: the default font size to be maintained, the foreground color modification is performed when the defaultSize is not passed in or the size is different from the defaultSize value
 engine.command.execute('fontsize', size, defaultSize);
-//使用 command 执行查询当前状态，返回 Array<string> | undefined，当前光标所在处字体大小值集合
+//Use command to query the current state, return Array<string> | undefined, the font size value collection where the cursor is currently located
 engine.command.queryState('fontsize');
 ```

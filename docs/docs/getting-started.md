@@ -1,27 +1,26 @@
 ---
-title: 快速上手
-translateHelp: true
+title: Quick start
 ---
 
-## 快速上手
+## Get started quickly
 
-除引擎库纯`javascript`编写外，我们所提供的插件中，小部分插件 UI 比较复杂，使用前端库来渲染 UI 是一项比较轻松的工作。
+In addition to the pure `javascript` writing of the engine library, a small part of the plug-ins we provide have more complex UI, and it is a relatively easy task to use the front-end library to render the UI.
 
-下面这三个插件有区别
+The following three plugins are different
 
--   `@aomao/toolbar` 编辑器工具栏。按钮、图标、下拉框、颜色选择器等都是复杂的 UI
+-   `@aomao/toolbar` editor toolbar. Buttons, icons, drop-down boxes, color pickers, etc. are all complex UIs
 
--   `@aomao/plugin-codeblock` 选择代码语言的下拉框具有搜索功能，使用前端库现有的 UI 是比较好的选择
+-   `@aomao/plugin-codeblock` The drop-down box for selecting the code language has a search function. It is a better choice to use the existing UI of the front-end library
 
--   `@aomao/plugin-link` 链接输入、文本输入，使用前端库现有的 UI 是比较好的选择
+-   `@aomao/plugin-link` link input, text input, using the existing UI of the front-end library is a better choice
 
-[React 案例](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
+[React case](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
 
-[Vue 案例](https://github.com/itellyou-com/am-editor/tree/master/demo-vue)
+[Vue case](https://github.com/itellyou-com/am-editor/tree/master/demo-vue)
 
-### 安装
+### Installation
 
-使用 npm 或者 yarn 安装编辑引擎
+Use npm or yarn to install the editing engine
 
 ```bash
 $ npm install @aomao/engine
@@ -29,9 +28,9 @@ $ npm install @aomao/engine
 $ yarn add @aomao/engine
 ```
 
-### 使用
+### Use
 
-我们按从输出一个`Hello word!`入手。现在你可以在下方编辑了。
+Let's start by outputting a `Hello word!`. Now you can edit it below.
 
 ```tsx
 /**
@@ -41,27 +40,27 @@ import React, { useEffect, useRef, useState } from 'react';
 import Engine, { EngineInterface } from '@aomao/engine';
 
 const EngineDemo = () => {
-	//编辑器容器
+	//Editor container
 	const ref = useRef<HTMLDivElement | null>(null);
-	//引擎实例
+	//Engine instance
 	const [engine, setEngine] = useState<EngineInterface>();
-	//编辑器内容
+	//Editor content
 	const [content, setContent] = useState<string>('Hello word!');
 
 	useEffect(() => {
 		if (!ref.current) return;
-		//实例化引擎
+		//Instantiate the engine
 		const engine = new Engine(ref.current);
-		//初始化本地协作，用作记录历史
+		//Initialize local collaboration to record history
 		engine.ot.initLockMode();
-		//设置编辑器值
+		//Set the editor value
 		engine.setValue(content);
-		//监听编辑器值改变事件
+		//Listen to the editor value change event
 		engine.on('change', value => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
-		//设置引擎实例
+		//Set the engine instance
 		setEngine(engine);
 	}, []);
 
@@ -70,24 +69,24 @@ const EngineDemo = () => {
 export default EngineDemo;
 ```
 
-### 插件
+### Plugins
 
-现在我们在上诉代码基础上，引入`@aomao/plugin-bold`加粗插件
+Now, on the basis of the appeal code, we introduce the `@aomao/plugin-bold` bold plug-in
 
 ```tsx | pure
 import Bold from '@aomao/plugin-bold';
 ```
 
-然后将`Bold`插件加入引擎
+Then add the `Bold` plugin to the engine
 
 ```tsx | pure
-//实例化引擎
+//Instantiate the engine
 const engine = new Engine(ref.current, {
 	plugins: [Bold],
 });
 ```
 
-`Bold`插件的默认快捷键为 windows `ctrl+b` 或 mac `⌘+b`，现在试试加粗效果吧
+The default shortcut of the `Bold` plugin is windows `ctrl+b` or mac `⌘+b`, now try the bold effect
 
 ```tsx
 import React, { useEffect, useRef, useState } from 'react';
@@ -95,31 +94,31 @@ import Engine, { EngineInterface } from '@aomao/engine';
 import Bold from '@aomao/plugin-bold';
 
 const EngineDemo = () => {
-	//编辑器容器
+	//Editor container
 	const ref = useRef<HTMLDivElement | null>(null);
-	//引擎实例
+	//Engine instance
 	const [engine, setEngine] = useState<EngineInterface>();
-	//编辑器内容
+	//Editor content
 	const [content, setContent] = useState<string>(
 		'Hello <strong>word</strong>!',
 	);
 
 	useEffect(() => {
 		if (!ref.current) return;
-		//实例化引擎
+		//Instantiate the engine
 		const engine = new Engine(ref.current, {
 			plugins: [Bold],
 		});
-		//初始化本地协作，用作记录历史
+		//Initialize local collaboration to record history
 		engine.ot.initLockMode();
-		//设置编辑器值
+		//Set the editor value
 		engine.setValue(content);
-		//监听编辑器值改变事件
+		//Listen to the editor value change event
 		engine.on('change', value => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
-		//设置引擎实例
+		//Set the engine instance
 		setEngine(engine);
 	}, []);
 
@@ -128,27 +127,27 @@ const EngineDemo = () => {
 export default EngineDemo;
 ```
 
-### 卡片
+### Card
 
-卡片是编辑器中单独划分的一个区域，该区域的 UI 可以使用 React、Vue 等前端框架自定义渲染内容，最后再挂载到编辑器上。
+A card is a separate area in the editor. The UI of this area can be customized to render content using front-end frameworks such as React and Vue, and finally mounted on the editor.
 
-引入`@aomao/plugin-codeblock`代码块插件，这个插件部分 UI 使用前端框架渲染，所以有区分。 `vue`开发者使用 `@aomao/plugin-codeblock-vue`
+Introduce the `@aomao/plugin-codeblock` code block plug-in. Part of the plug-in UI is rendered by the front-end framework, so there is a distinction. `vue` developers use `@aomao/plugin-codeblock-vue`
 
 ```tsx | pure
 import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
 ```
 
-将`CodeBlock`插件和`CodeBlockComponent`卡片组件加入引擎
+Add `CodeBlock` plugin and `CodeBlockComponent` card component to the engine
 
 ```tsx | pure
-//实例化引擎
+//Instantiate the engine
 const engine = new Engine(ref.current, {
 	plugins: [CodeBlock],
 	cards: [CodeBlockComponent],
 });
 ```
 
-`CodeBlock`插件默认支持`markdown`，在编辑器一行开头位置输入代码块语法` ```javascript `回车后，看看效果吧
+The `CodeBlock` plugin supports `markdown` by default. Enter the code block syntax ```javascript` at the beginning of a line in the editor, and then see the effect.
 
 ```tsx
 import React, { useEffect, useRef, useState } from 'react';
@@ -156,32 +155,32 @@ import Engine, { EngineInterface } from '@aomao/engine';
 import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
 
 const EngineDemo = () => {
-	//编辑器容器
+	//Editor container
 	const ref = useRef<HTMLDivElement | null>(null);
-	//引擎实例
+	//Engine instance
 	const [engine, setEngine] = useState<EngineInterface>();
-	//编辑器内容
+	//Editor content
 	const [content, setContent] = useState<string>(
 		'Hello <strong>word</strong>!',
 	);
 
 	useEffect(() => {
 		if (!ref.current) return;
-		//实例化引擎
+		//Instantiate the engine
 		const engine = new Engine(ref.current, {
 			plugins: [CodeBlock],
 			cards: [CodeBlockComponent],
 		});
-		//初始化本地协作，用作记录历史
+		//Initialize local collaboration to record history
 		engine.ot.initLockMode();
-		//设置编辑器值
+		//Set the editor value
 		engine.setValue(content);
-		//监听编辑器值改变事件
+		//Listen to the editor value change event
 		engine.on('change', value => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
-		//设置引擎实例
+		//Set the engine instance
 		setEngine(engine);
 	}, []);
 
@@ -190,27 +189,27 @@ const EngineDemo = () => {
 export default EngineDemo;
 ```
 
-### 工具栏
+### toolbar
 
-引入`@aomao/toolbar`工具栏，工具栏 UI 比较复杂，都是借助使用前端框架渲染，`vue`开发者使用 `@aomao/toolbar-vue`
+Introduce the `@aomao/toolbar` toolbar, the toolbar UI is more complicated, all of which are rendered by using the front-end framework, `vue` developers use `@aomao/toolbar-vue`
 
-`vue` 请使用 vue3.0 @vue/cli-service @vue/cli-plugin-babel 相关脚手架 vite 无法使用此插件
+`vue` Please use vue3.0 @vue/cli-service @vue/cli-plugin-babel related scaffolding vite cannot use this plugin
 
 ```tsx | pure
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 ```
 
-将`ToolbarPlugin`插件和`ToolbarComponent`卡片组件加入引擎，它将让我们在编辑器中可以使用快捷键`/`唤醒出工具栏
+Add the `ToolbarPlugin` plugin and the `ToolbarComponent` card component to the engine, it will allow us to use the shortcut key `/` to wake up the toolbar in the editor
 
 ```tsx | pure
-//实例化引擎
+//Instantiate the engine
 const engine = new Engine(ref.current, {
 	plugins: [ToolbarPlugin],
 	cards: [ToolbarComponent],
 });
 ```
 
-渲染工具栏，工具栏已配置好所有插件，这里我们只需要传入插件名称即可
+Rendering toolbar, the toolbar has been configured with all plug-ins, here we only need to pass in the plug-in name
 
 ```tsx | pure
 return (
@@ -240,32 +239,32 @@ import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 
 const EngineDemo = () => {
-	//编辑器容器
+	//Editor container
 	const ref = useRef<HTMLDivElement | null>(null);
-	//引擎实例
+	//Engine instance
 	const [engine, setEngine] = useState<EngineInterface>();
-	//编辑器内容
+	//Editor content
 	const [content, setContent] = useState<string>(
 		'Hello <strong>word</strong>!',
 	);
 
 	useEffect(() => {
 		if (!ref.current) return;
-		//实例化引擎
+		//Instantiate the engine
 		const engine = new Engine(ref.current, {
 			plugins: [CodeBlock, Bold, ToolbarPlugin],
 			cards: [CodeBlockComponent, ToolbarComponent],
 		});
-		//初始化本地协作，用作记录历史
+		//Initialize local collaboration to record history
 		engine.ot.initLockMode();
-		//设置编辑器值
+		//Set the editor value
 		engine.setValue(content);
-		//监听编辑器值改变事件
+		//Listen to the editor value change event
 		engine.on('change', value => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
-		//设置引擎实例
+		//Set the engine instance
 		setEngine(engine);
 	}, []);
 
@@ -281,16 +280,16 @@ const EngineDemo = () => {
 export default EngineDemo;
 ```
 
-### 协同编辑
+### Collaborative editing
 
-协同编辑基于[ShareDB](https://github.com/share/sharedb)实现。每位编辑者作为[客户端](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/ot-client.ts)通过`WebSocket`与[服务端](https://github.com/itellyou-com/am-editor/tree/master/ot-server)通信交换数据。编辑器处理数据、渲染数据。
+Collaborative editing is based on [ShareDB](https://github.com/share/sharedb). Each editor acts as [client](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/ot-client.ts) through `WebSocket` and [server](https://github.com/itellyou-com/am-editor/tree/master/ot-server) to exchange data. The editor processes and renders data.
 
-我们需要把服务端搭建好，然后配置客户端。[查看完整示例](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
+We need to set up the server and then configure the client. [View full example](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
 
 ```tsx | pure
-//实例化协作编辑客户端，传入当前编辑器引擎实例
+//Instantiate the collaborative editing client and pass in the current editor engine instance
 const otClient = new OTClient(engine);
-//连接到协作服务端，uid这里做一个简单的身份验证演示，正常业务中应该需要token等身份验证信息。`demo` 是文档的唯一编号
+//Connect to the collaboration server, uid will do a simple authentication demonstration here, and authentication information such as token should be required in normal business. `demo` is the unique number of the document
 otClient.connect(
 	`ws://127.0.0.1:8080${currentMember ? '?uid=' + currentMember.id : ''}`,
 	'demo',

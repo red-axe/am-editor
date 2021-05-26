@@ -27,6 +27,7 @@ import {
 	plugins,
 	ImageUploader,
 	MarkRange,
+	lang,
 } from './config';
 import 'antd/lib/avatar/style';
 import 'antd/lib/message/style';
@@ -115,6 +116,7 @@ const EngineDemo = () => {
 		if (!ref.current || loading) return;
 		//实例化引擎
 		const engine = new Engine(ref.current, {
+			lang,
 			plugins: plugins.concat(ToolbarPlugin),
 			cards: cards.concat(ToolbarComponent),
 			config: {
@@ -267,7 +269,15 @@ const EngineDemo = () => {
 			<div className="editor-ot-users">
 				<Space className="editor-ot-users-content" size="small">
 					<span style={{ color: '#888888' }}>
-						当前在线<strong>{members.length}</strong>人
+						{lang === 'zh-cn' ? (
+							<>
+								当前在线<strong>{members.length}</strong>人
+							</>
+						) : (
+							<>
+								<strong>{members.length}</strong> person online
+							</>
+						)}
 					</span>
 					{members.map(member => {
 						return (

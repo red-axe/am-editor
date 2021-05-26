@@ -1,52 +1,52 @@
-# List 插件
+# List plugin
 
-列表节点插件
+List node plugin
 
-通常用于有序列表、无序列表、自定义列表。例如，任务列表就属于自定义列表，里面的`checkbox`是 `inline` 类型的 `card` 实现
+Usually used for ordered lists, unordered lists, and custom lists. For example, the task list is a custom list, and the `checkbox` inside is an implementation of `card` of type `inline`
 
-此类插件我们需要继承 `ListPlugin` 抽象类，`ListPlugin` 抽象类在继承 `BlockPlugin` 抽象类的基础上扩展了一些属性和方法。所以继承 `ListPlugin` 的插件也同样拥有`BlockPlugin`抽象类的所有属性和方法
+For this type of plug-in, we need to inherit the `ListPlugin` abstract class. The `ListPlugin` abstract class extends some properties and methods on the basis of inheriting the `BlockPlugin` abstract class. So the plug-in that inherits `ListPlugin` also has all the attributes and methods of the `BlockPlugin` abstract class
 
-## 继承
+## Inheritance
 
-继承 `ListPlugin` 抽象类
+Inherit the `ListPlugin` abstract class
 
 ```ts
-import { ListPlugin } from '@aomao/engine'
+import {ListPlugin} from'@aomao/engine'
 
 export default class extends ListPlugin {
-	...
+...
 }
 ```
 
-## 属性
+## Attributes
 
-`ListPlugin` 拥有继承的 `BlockPlugin` `ElementPlugin` `Plugin` 所有的属性和方法
+`ListPlugin` has all the attributes and methods of `BlockPlugin` `ElementPlugin` `Plugin` inherited
 
 ### `cardName`
 
-卡片名称，可选。
+Card name, optional.
 
-在我们自定义列表时，`cardName` 是必须的
+When we customize the list, `cardName` is necessary
 
-卡片名称所对应的 `card` 组件必须是 `inline` 类型的，不能是 `block` 类型
+The `card` component corresponding to the card name must be of type `inline`, not of type `block`
 
-类型：`string`
+Type: `string`
 
 ```ts
 cardName = 'checkbox';
 ```
 
-## 方法
+## Method
 
 ### `init`
 
-初始化，可选
+Initialization, optional
 
-`ListPlugin` 插件已经实现了`init`方法，如果需要使用，需要手动再次调用。否则会出现意料外的情况
+The `ListPlugin` plugin has implemented the `init` method, if you need to use it, you need to manually call it again. Otherwise there will be unexpected situations
 
 ```ts
 export default class extends ListPlugin {
-	...
+...
     init(){
         super.init()
     }
@@ -55,26 +55,26 @@ export default class extends ListPlugin {
 
 ### `isCurrent`
 
-判断节点是否是当前列表所需要的节点，必须实现它
+To determine whether the node is the node required by the current list, it must be implemented
 
-我们需要通过此方法，判定一个列表节点属性哪个插件
+We need to use this method to determine which plug-in a list node attribute
 
 ```ts
 isCurrent(node: NodeInterface) {
-    //li 节点，必须包含 `CUSTOMZIE_LI_CLASS` 自定义列表的样式，并且li下的第一个子节点，应是一个卡片，卡片名称与我们设置的 cardName 对应
-    if (node.name === 'li')
+    //li node, must include the style of the `CUSTOMZIE_LI_CLASS` custom list, and the first child node under li should be a card, the card name corresponds to the cardName we set
+    if (node.name ==='li')
         return (
             node.hasClass(this.editor.list.CUSTOMZIE_LI_CLASS) &&
             node.first()?.attributes(CARD_KEY) === this.cardName
         );
-    //ul 节点应该必须包含 `CUSTOMZIE_UI_CLASS` 自定义列表的样式。并且还有我们自定义的样式
+    //ul node should contain `CUSTOMZIE_UI_CLASS` custom list style. And there are also our custom styles
     return node.hasClass(this.editor.list.CUSTOMZIE_UI_CLASS) && node.hasClass('data-list-task');
 }
 ```
 
 ### `queryState`
 
-`ListPlugin` 插件已经实现了`queryState`方法，如果需要使用，可以重写此方法
+The `ListPlugin` plugin has implemented the `queryState` method, if you need to use it, you can override this method
 
 ```ts
 queryState() {
@@ -88,45 +88,45 @@ queryState() {
 
 ### `execute`
 
-需用通过 API 调用方法，来实现对列表节点的包裹，与移除
+Need to use API call method to realize the package of the list node, and remove
 
 ```ts
-//非引擎
+//Non-engine
 if (!isEngine(this.editor)) return;
 const { change, list, block } = this.editor;
-//先要切割列表，<ul><li /><anchor /><li /><focus /><li /></ul> -> <ul><li /></ul><anchor /><ul><li /><focus /></ul><ul><li /></ul>
+//First cut the list, <ul><li /><anchor /><li /><focus /><li /></ul> -> <ul><li /></ul><anchor / ><ul><li /><focus /></ul><ul><li /></ul>
 list.split();
-//获取当前光标
+//Get the current cursor
 const range = change.getRange();
-//获取当前所有季后的block节点
+//Get all current block nodes after the season
 const activeBlocks = block.findBlocks(range);
 if (activeBlocks) {
-	//在光标处创建标记节点
+	//Create a marker node at the cursor
 	const selection = range.createSelection();
-	//判定是否属于当前插件类型的自定义列表节点
+	//Determine whether it belongs to the custom list node of the current plug-in type
 	if (list.isSpecifiedType(activeBlocks, 'ul', 'checkbox')) {
-		//移除包裹
+		//Remove package
 		list.unwrap(activeBlocks);
 	} else {
-		//把当前的所有激活的block节点转换为自定义列表
+		//Convert all currently activated block nodes into a custom list
 		const listBlocks = list.toCustomize(
 			activeBlocks,
 			'checkbox',
-			//checkbox 卡片的值，由checkbox定义时的值决定。例如 checked 是否有选中
+			//The value of the checkbox card is determined by the value when the checkbox is defined. For example, whether checked is checked
 			{
 				checked: boolean,
 			},
 		) as Array<NodeInterface>;
-		//转换完成后，循环添加我们自定义的样式
+		//After the conversion is completed, add our custom styles in a loop
 		listBlocks.forEach(list => {
 			if (this.editor.node.isList(list)) list.addClass('data-list-task');
 		});
 	}
-	//移除标记，并把光标复原
+	//Remove the mark and restore the cursor
 	selection.move();
-	//重新选中新的光标位置
+	//Reselect the new cursor position
 	change.select(range);
-	//合并相邻并且相同的列表节点，如果有
+	//Merge adjacent and identical list nodes, if any
 	list.merge();
 }
 ```

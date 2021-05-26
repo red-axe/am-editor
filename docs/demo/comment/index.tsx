@@ -20,7 +20,7 @@ import {
 	random,
 	NodeInterface,
 } from '@aomao/engine';
-import { DOMAIN } from '../config';
+import { DOMAIN, lang } from '../config';
 import Loading from '../loading';
 import CommentButton from './button';
 import { Member } from '../ot-client';
@@ -543,7 +543,7 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 							select();
 						}}
 					>
-						取消
+						{lang === 'zh-cn' ? '取消' : 'Ok'}
 					</Button>
 					<Button
 						size="small"
@@ -551,7 +551,7 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 						onClick={(event: React.MouseEvent) => post(event)}
 						loading={editing}
 					>
-						确定
+						{lang === 'zh-cn' ? '确定' : 'Cancel'}
 					</Button>
 				</div>
 			</div>
@@ -659,7 +659,9 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 	const renderList = () => {
 		return (
 			<div className="doc-comment-layer" ref={containerRef}>
-				<div className="doc-comment-title">评论</div>
+				<div className="doc-comment-title">
+					{lang === 'zh-cn' ? '评论' : 'Comment'}
+				</div>
 				{list.map(item => renderItem(item))}
 			</div>
 		);

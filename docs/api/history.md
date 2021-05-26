@@ -1,24 +1,20 @@
----
-translateHelp: true
----
+# History
 
-# 历史
+Editor's edit history
 
-编辑器的编辑历史记录
+Type: `HistoryInterface`
 
-类型：`HistoryInterface`
-
-## 构造函数
+## Constructor
 
 ```ts
 new (engine: EngineInterface): HistoryInterface
 ```
 
-## 方法
+## Method
 
 ### `reset`
 
-重置历史记录，会清空所有的历史记录
+Reset history, it will clear all history
 
 ```ts
 reset(): void;
@@ -26,7 +22,7 @@ reset(): void;
 
 ### `hasUndo`
 
-是否有撤销操作
+Is there an undo operation
 
 ```ts
 hasUndo(): boolean;
@@ -34,7 +30,7 @@ hasUndo(): boolean;
 
 ### `hasRedo`
 
-是否有重做操作
+Is there a redo operation
 
 ```ts
 hasRedo(): boolean;
@@ -42,7 +38,7 @@ hasRedo(): boolean;
 
 ### `undo`
 
-执行撤销操作
+Perform undo operation
 
 ```ts
 undo(): void;
@@ -50,7 +46,7 @@ undo(): void;
 
 ### `redo`
 
-执行重做操作
+Perform redo operation
 
 ```ts
 redo(): void;
@@ -58,53 +54,53 @@ redo(): void;
 
 ### `hold`
 
-在接下来的多少毫秒内的动作保持为一个历史片段
+The action in the next milliseconds remains as a historical segment
 
 ```ts
 /**
- * 多少毫秒内的动作保持为一个历史片段
- * @param time 毫秒
+ * How many milliseconds the action remains as a historical segment
+ * @param time milliseconds
  */
 hold(time?: number): void;
 ```
 
 ### `releaseHold`
 
-重置 hold
+Reset hold
 
 ```ts
 /**
- * 重置 hold
+ * Reset hold
  */
 releaseHold(): void;
 ```
 
 ### `lock`
 
-在接下来的多少毫秒内的动作将不作为历史记录
+Actions in the next few milliseconds will not be recorded as history
 
 ```ts
 /**
- * 多少毫秒内的动作将不作为历史记录
- * @param time 默认10毫秒
+ * How many milliseconds actions will not be recorded as history
+ * @param time defaults to 10 milliseconds
  */
 lock(time?: number): void;
 ```
 
 ### `releaseLock`
 
-重置 lock
+Reset lock
 
 ```ts
 /**
- * 重置 lock
+ * Reset lock
  */
 releaseLock(): void;
 ```
 
 ### `clear`
 
-延时清除全部的历史记录
+Delay to clear all history records
 
 ```ts
 clear(): void;
@@ -112,40 +108,40 @@ clear(): void;
 
 ### `startCache`
 
-将后续操作暂时缓存，不会同步到协同服务端，不写入历史记录
+Cache subsequent operations temporarily, will not be synchronized to the collaborative server, and will not be written to history
 
 ```ts
 /**
- * 将后续操作暂时缓存，不会同步到协同服务端，不写入历史记录
+ * The subsequent operations are temporarily cached, and will not be synchronized to the collaborative server, and history will not be written
  */
 startCache(): void;
 ```
 
 ### `submitCache`
 
-将暂时缓存的操作提交，同步到协同服务端，写入历史记录
+Submit temporarily cached operations, synchronize them to the collaborative server, and write historical records
 
 ```ts
 /**
- * 将暂时缓存的操作提交，同步到协同服务端，写入历史记录
+ * Submit temporarily cached operations, synchronize them to the collaborative server, and write historical records
  */
 submitCache(): void;
 ```
 
 ### `destroyCache`
 
-将暂时缓存的操作遗弃
+Abandon temporarily cached operations
 
 ```ts
 /**
- * 将暂时缓存的操作遗弃
+ * Abandon temporarily cached operations
  */
 destroyCache(): void;
 ```
 
 ### `saveOp`
 
-把当前还未保持的操作保存到堆栈里
+Save the currently unmaintained operations to the stack
 
 ```ts
 saveOp(): void;
@@ -153,29 +149,29 @@ saveOp(): void;
 
 ### `collectSelfOps`
 
-收集本地编辑的操作
+Collect local editing operations
 
 ```ts
 /**
- * @param ops 操作集合
+ * @param ops operation set
  * */
 collectSelfOps(ops: Op[]): void;
 ```
 
 ### `collectRemoteOps`
 
-收集远程的操作（来自其它协同者的操作）
+Collect remote operations (operations from other coordinators)
 
 ```ts
 /**
- * @param ops 操作集合
+ * @param ops operation set
  * */
 collectRemoteOps(ops: Op[]): void;
 ```
 
 ### `getUndoOp`
 
-获取当前最前位置的撤销操作
+Get the undo operation of the current top position
 
 ```ts
 getUndoOp(): Operation | undefined;
@@ -183,7 +179,7 @@ getUndoOp(): Operation | undefined;
 
 ### `getRedoOp`
 
-获取当前最前位置的重做操作
+Get the redo operation of the current top position
 
 ```ts
 getRedoOp(): Operation | undefined;
@@ -191,7 +187,7 @@ getRedoOp(): Operation | undefined;
 
 ### `getCurrentRangePath`
 
-获取当前光标转换后的路径
+Get the converted path of the current cursor
 
 ```ts
 getCurrentRangePath(): Path[];
@@ -199,7 +195,7 @@ getCurrentRangePath(): Path[];
 
 ### `getRangePathBeforeCommand`
 
-获取执行命令前记录的光标转换后的路径
+Get the converted path of the cursor recorded before executing the command
 
 ```ts
 getRangePathBeforeCommand(): Path[];

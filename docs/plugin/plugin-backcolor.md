@@ -1,37 +1,37 @@
 # @aomao/plugin-backcolor
 
-背景颜色插件
+Background color plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-backcolor
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Backcolor from '@aomao/plugin-backcolor';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Backcolor from'@aomao/plugin-backcolor';
 
 new Engine(...,{ plugins:[Backcolor] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认无快捷键
+No shortcut keys by default
 
 ```ts
-//快捷键，key 组合键，args，执行参数，[color,defaultColor?] ， color 必须，defaultColor 可选
-hotkey?:{key:string,args:Array<string>};//默认无
+//Shortcut keys, key combination keys, args, execution parameters, [color,defaultColor?], color is required, defaultColor is optional
+hotkey?:{key:string,args:Array<string>};//default none
 
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "backcolor":{
-            //修改快捷键
+            //Modify shortcut keys
             hotkey:{
                 key:"mod+b",
                 args:["#000000","#ffffff"]
@@ -41,11 +41,11 @@ new Engine(...,{
  })
 ```
 
-## 命令
+## Command
 
 ```ts
-//color：更改的背景颜色，defaultColor：保持的默认背景色，在没有传入 defaultColor 或者 color 与 defaultColor 值不同时执行背景色修改
+//color: the changed background color, defaultColor: the default background color to keep, modify the background color when the defaultColor is not passed in or the color is different from the defaultColor value
 engine.command.execute('backcolor', color, defaultColor);
-//使用 command 执行查询当前状态，返回 Array<string> | undefined，当前光标所在处背景色值集合
+//Use command to query the current state, return Array<string> | undefined, the background color value set where the cursor is currently located
 engine.command.queryState('backcolor');
 ```

@@ -165,5 +165,17 @@ export default {
 		component: {
 			placeholder: '卡片名称',
 		},
+		image: {
+			title: '图标',
+		},
+		codeblock: {
+			title: '代码块',
+		},
+		table: {
+			title: '表格',
+		},
+		commonlyUsed: {
+			title: '常用',
+		},
 	},
 };

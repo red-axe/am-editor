@@ -1,57 +1,57 @@
 # @aomao/plugin-heading
 
-标题样式插件
+Heading style plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-heading
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Heading from '@aomao/plugin-heading';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Heading from'@aomao/plugin-heading';
 
 new Engine(...,{ plugins:[Heading] })
 ```
 
-## 可选项
+## Optional
 
-### 锚点
+### Anchor
 
-开启后在标题左边出现可复制锚点按钮
+A copyable anchor button appears on the left side of the title after it is turned on
 
 ```ts
 showAnchor?: boolean;
 ```
 
-当点击复制锚点的时候触发，传入当前标题的 id 值，返回的内容将写入到用户的粘贴板上，默认将返回当前 url+id
+Triggered when the copy anchor is clicked, the id value of the current title is passed in, the returned content will be written to the user's pasteboard, and the current url+id will be returned by default
 
 ```ts
 anchorCopy?:(id:string) => string
 ```
 
-### 快捷键
+### hot key
 
 ```ts
-//快捷键
+//hot key
 hotkey?: {
-    h1?: string;//标题1，默认 mod+opt+1
-    h2?: string;//标题2，默认 mod+opt+2
-    h3?: string;//标题3，默认 mod+opt+3
-    h4?: string;//标题4，默认 mod+opt+4
-    h5?: string;//标题5，默认 mod+opt+5
-    h6?: string;//标题6，默认 mod+opt+6
+    h1?: string;//Title 1, default mod+opt+1
+    h2?: string;//Title 2, default mod+opt+2
+    h3?: string;//Title 3, default mod+opt+3
+    h4?: string;//Title 4, default mod+opt+4
+    h5?: string;//Title 5, default mod+opt+5
+    h6?: string;//Title 6, default mod+opt+6
 };
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "heading":{
-            //修改快捷键
+            //Modify shortcut keys
             hotkey:{
-                h1:"快捷键"
+                h1: "shortcut key"
             }
         }
     }
@@ -60,50 +60,50 @@ new Engine(...,{
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-Heading 插件 markdown 语法为`#` `##` `###` `####` `#####` `######`
+The heading plugin markdown syntax is `#` `##` `###` `####` `#####` `######`
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
     config:{
         "heading":{
-            //关闭markdown
+            //Close markdown
             markdown:false
         }
     }
  })
 ```
 
-### 禁用 mark 插件样式效果
+### Disable mark plugin style effect
 
-可以在标题下禁用 mark 插件效果，默认禁用 ['fontsize', 'bold'] ，在分割、粘贴等情况下过滤掉这些插件样式
+You can disable the mark plug-in effect under the title, ['fontsize','bold'] is disabled by default, and filter out these plug-in styles in the case of splitting, pasting, etc.
 
 ```ts
-disableMark?: Array<string> //mark插件名称集合
+disableMark?: Array<string> //mark plugin name collection
 ```
 
-## 命令
+## Command
 
-传入 `p` 或当前标题样式与当前传入值一致 时将取消标题
+When `p` is passed in or the current heading style is consistent with the current passed value, the heading will be canceled
 
 ```ts
-//使用 command 执行插件、并传入所需参数
+//Use command to execute the plug-in and pass in the required parameters
 engine.command.execute(
 	'heading',
 	'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p',
 );
-//使用 command 执行查询当前状态，返回 string | undefined，返回 "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p"
+//Use command to execute query current status, return string | undefined, return "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p"
 engine.command.queryState('heading');
 ```
 
-## 大纲
+## Outline
 
-生成标题的大纲数据
+Generate headline outline data
 
-需要从 `@aomao/plugin-heading` 导入 `Outline` 类
+Need to import the `Outline` class from `@aomao/plugin-heading`
 
 ```ts
 import { Outline } from '@aomao/plugin-heading';
@@ -111,41 +111,43 @@ import { Outline } from '@aomao/plugin-heading';
 
 ### `normalize`
 
-将标题节点数据归一化为带深度层级的结构
+Normalize the title node data into a structure with depth levels
 
 ```ts
 /**
- * 将 heading 数据归一化为带深度层级的结构
- * 归一化后，每个元素的结构为:
+ * Normalize heading data into a structure with depth levels
+ * After normalization, the structure of each element is:
  * {
- *   id: string,       // id
- *   title: string,    // 标题
- *   level: number ,   // 标题层级
- *   domNode: Node,    // dom 节点
- *   depth: number     // 展示深度
- * }
- * depth 的算法和 Google Docs 的一致
- * - 效果：h1 -> h4 分配固定的 depth，保证相同 level 的标题最终的层级深度是一样的
- * - 算法：找出文档存在的标题层级；按层级由大到小依次分别分配缩进深度；
- * @param {Element[]}headings heading 的标准 DOM 节点数组
+ * id: string, // id
+ * title: string, // title
+ * level: number, // Title level
+ * domNode: Node, // dom node
+ * depth: number // display depth
+ *}
+ * The depth algorithm is consistent with that of Google Docs
+ *-Effect: h1 -> h4 assign a fixed depth to ensure that the final level depth of the title of the same level is the same
+ *-Algorithm: Find out the title level of the document; assign the indentation depth in descending order of level;
+ * @param {Element[]}headings heading standard DOM node array
  *
- * @return {Array} 标题节点数组
+ * @return {Array} title node array
  */
 normalize(headings: Array<Element>): OutlineData[];
 ```
 
 ### `extractFromDom`
 
-从 DOM 节点提取大纲
+Extract outline from DOM node
 
 ```ts
 /**
- * 从 DOM 节点提取大纲
- * @param {Element} rootNode 根节点
+ * Extract outline from DOM node
+ * @param {Element} rootNode root node
  * @return {Array}
  */
 extractFromDom(rootNode: Element): OutlineData[];
 ```
+
+### Examples
 
 ### 例子
 
@@ -166,11 +168,11 @@ const Toc: React.FC<Props> = ({ editor }) => {
 
 	useEffect(() => {
 		const onChange = () => {
-			//获取大纲数据
+			//Get outline data
 			const data = getTocData();
 			setDatas(data);
 		};
-		//绑定编辑器值改变事件
+		//Binding editor value change event
 		editor.on('change', onChange);
 		setTimeout(() => {
 			onChange();
@@ -179,16 +181,16 @@ const Toc: React.FC<Props> = ({ editor }) => {
 	}, [editor]);
 
 	const getTocData = useCallback(() => {
-		// 从编辑区域提取符合结构要求的标题 Dom 节点
+		// Extract the title Dom node that meets the structural requirements
 		let nodes: Array<Element> = [];
 		const { $, card } = editor;
 		editor.container.find('h1,h2,h3,h4,h5,h6').each(child => {
 			const node = $(child);
-			// Card 里的标题，不纳入大纲
+			// The title in the Card is not included in the outline
 			if (card.closest(node)) {
 				return;
 			}
-			// 非一级深度标题，不纳入大纲
+			// Non-first-level in-depth titles, not included in the outline
 			if (!node.parent()?.isRoot()) {
 				return;
 			}

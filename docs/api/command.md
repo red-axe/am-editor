@@ -1,24 +1,20 @@
----
-translateHelp: true
----
+# Command
 
-# 命令
+Execute plugin commands
 
-执行插件命令
+Type: `CommandInterface`
 
-类型：`CommandInterface`
-
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface): CommandInterface
 ```
 
-## 方法
+## Method
 
 ### `queryEnabled`
 
-查询是否有启用指定插件命令
+Query whether there is a command to enable the specified plug-in
 
 ```ts
 queryEnabled(name: string): boolean;
@@ -26,7 +22,7 @@ queryEnabled(name: string): boolean;
 
 ### `queryState`
 
-查询插件状态
+Check plug-in status
 
 ```ts
 queryState(name: string, ...args: any): any;
@@ -34,7 +30,7 @@ queryState(name: string, ...args: any): any;
 
 ### `execute`
 
-执行插件命令
+Execute plugin commands
 
 ```ts
 execute(name: string, ...args: any): any;

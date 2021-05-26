@@ -1,44 +1,40 @@
----
-translateHelp: true
----
+# Node
 
-# 节点
+The DOM node is the most important object in the editor, and the editor data structure is a DOM tree. According to functions and characteristics, we can be divided into
 
-DOM 节点在编辑器中是最重要的对象，编辑器数据结构就是一个 DOM 树。按照功能和特性我们可以划分为
+-   `mark` style node, we can add color, bold, font size and other effects to the text, and can nest effects in each other
+-   `inline` Inline nodes, for example, links. Add special attributes or style effects to a paragraph of text, not nested.
+-   `block` block-level node, can occupy a line alone, and can have multiple `mark` `inline` style nodes as child nodes
+-   `card` is a single area, which can be in-line nodes or block-level nodes. In this area, unless there is a specific area that can be edited, it will be handed over to the developer to customize
 
--   `mark` 样式节点，我们可以给文本加上颜色、加粗、字体大小等效果，并且可以互相嵌套效果
--   `inline` 行内节点，例如，链接。给一段文字添加特殊属性或者样式效果，不可嵌套。
--   `block` 块级节点，可以独占一行，并且可以有多个 `mark` `inline` 样式节点作为子节点
--   `card` 一个单独区域，可以是行内节点也可以是块级节点。在这个区域内，除非有指定特定区域可编辑，否则都将交由开发者自定义
-
-这是一个简单的纯文本值：
+This is a simple plain text value:
 
 ```html
-<p>这是一个<strong>段落</strong></p>
+<p>This is a <strong>paragraph</strong></p>
 ```
 
-节点通常由 html 标签和一些样式属性组成。为了有利于区分，每个样式节点的组成都应唯一。
+Nodes usually consist of html tags and some style attributes. In order to facilitate the distinction, the composition of each style node should be unique.
 
-例如，拥有一个独特的标签名称：
+For example, to have a unique label name:
 
 ```html
-<strong>加粗</strong> <em>斜体</em>
+<strong>Bold</strong> <em>Italic</em>
 ```
 
-或者通过属性以及样式来修饰：
+Or modified by attributes and styles:
 
 ```html
-<span style="font-weight:bold">加粗</span>
-<span style="font-style:italic">斜体</span>
+<span style="font-weight:bold">Bold</span>
+<span style="font-style:italic">Italic</span>
 ```
 
-他们都有一样的效果，但引擎在判定上，他们都属于不同插件。
+They all have the same effect, but the engine judges that they all belong to different plug-ins.
 
-## 样式节点
+## Style node
 
-样式节点通常用来描述文本的文字大小、粗体、斜体、颜色等样式。
+The style node is usually used to describe the text size, bold, italic, color and other styles of the text.
 
-样式节点的子节点只能是文本节点或者样式节点，样式节点必须有父节点（行内节点或块级节点），不能单独存在于编辑器中。
+The child nodes of a style node can only be a text node or a style node. The style node must have a parent node (inline node or block-level node) and cannot exist in the editor alone.
 
 ```html
 <p>
@@ -46,9 +42,9 @@ DOM 节点在编辑器中是最重要的对象，编辑器数据结构就是一�
 </p>
 ```
 
-## 行内节点
+## In-line node
 
-行内节点拥有样式节点的所有的特质，但是行内节点不可以嵌套，行内节点的子节点只能是样式节点或者文本节点。同样，行内节点必须有父节点（只能是块级节点），不能单独存在于编辑器中。
+Inline nodes have all the characteristics of style nodes, but inline nodes cannot be nested, and the child nodes of inline nodes can only be style nodes or text nodes. Similarly, inline nodes must have a parent node (only block-level nodes), and cannot exist alone in the editor.
 
 ```html
 <p>
@@ -56,20 +52,20 @@ DOM 节点在编辑器中是最重要的对象，编辑器数据结构就是一�
 </p>
 ```
 
-## 块级节点
+## Block node
 
-块级节点在编辑器中独占一行，除了使用 `schema` 明确指定嵌套关系外，默认只能在 `$root` (编辑器根节点)下。子节点可以是其它任意节点，除非已指定不能包含某些样式节点类的插件。例如，标题中不能使用加粗、调整字体大小。
+The block-level node occupies a line in the editor. Except for explicitly specifying the nesting relationship with `schema`, it can only be under `$root` (editor root node) by default. The child node can be any other node, unless it has been specified that the plug-in cannot contain certain style node classes. For example, bolding and adjusting the font size cannot be used in the title.
 
 ```html
-<!-- strong 标签将会被过滤掉 -->
+<!-- strong tags will be filtered out -->
 <h2>This is a <strong>title</strong></h2>
 ```
 
-p 标签在引擎中属于默认所需的块级节点，用于表明一个段落。在自定义节点中，不建议再使用 p 标签。
+The p tag belongs to the block-level node required by default in the engine and is used to indicate a paragraph. In custom nodes, it is not recommended to use the p tag.
 
-## 卡片
+## Card
 
-我们可以在编辑器中划分一个单独区域，用于展示一个复杂的编辑模块。该区域就像一张白纸，你可以在上面挥洒自如。他的结构看起来像这样：
+We can divide a separate area in the editor to display a complex editing module. This area is like a piece of white paper, you can sway freely on it. His structure looks like this:
 
 ```html
 <div
@@ -80,46 +76,46 @@ p 标签在引擎中属于默认所需的块级节点，用于表明一个段落
 	<div data-card-element="body">
 		<span data-card-element="left" data-transient-element="true">​</span>
 		<div data-card-element="center" contenteditable="false" class="card-hr">
-			<!-- 卡片内容节点 -->
+			<!-- Card content node -->
 		</div>
 		<span data-card-element="right" data-transient-element="true">​</span>
 	</div>
 </div>
 ```
 
-### 属性
+### Attributes
 
-`data-card-type` 表示卡片类型，卡片有两种类型：
+`data-card-type` indicates the card type, there are two types of cards:
 
--   `inline` 行内，可以嵌入一个块级标签中作为子节点，可以和文本、样式节点、其它行内节点同级别展示
--   `block` 作为一个块级节点独占一行
+-   Inline `inline` can be embedded in a block-level label as a child node, which can be displayed at the same level as text, style nodes, and other inline nodes
+-   `block` as a block-level node on its own line
 
-`data-card-value` 卡片自定义值，在渲染时可以借助值动态渲染
+`data-card-value` card custom value, which can be dynamically rendered with the help of the value during rendering
 
-`data-card-key` 卡片唯一标识
+`data-card-key` unique identification of the card
 
-### 子节点
+### Child node
 
-`data-card-element` 卡片子固定节点标识属性
+`data-card-element` card sub-fixed node identification attribute
 
--   `body` 卡片主体节点，包含卡片所有的内容
--   `left` `right` 用户控制卡片两侧光标，也是固定的节点，不能存任何内容
--   `center` 卡片内容节点，也是自定义渲染节点。你的所有节点要放在这里。
+-   `body` The main node of the card, which contains all the content of the card
+-   `left` `right` The user controls the cursor on both sides of the card, which is also a fixed node and cannot store any content
+-   The `center` card content node is also a custom rendering node. All your nodes should be placed here.
 
-## 节点选择器
+## Node selector
 
-要操作复杂的 DOM 树，使用浏览器自带的 document.createElement 相关函数看起来比较麻烦。如果有像`JQuery`的 javascript 库则会很方便，因此我们封装了一个"简易版的 jquery 库"。
+To manipulate the complex DOM tree, it seems more troublesome to use the document.createElement related function that comes with the browser. It would be very convenient if there is a javascript library like `JQuery`, so we encapsulated a "simple version of the jquery library".
 
 ```ts
-import Engine from '@aomao/engine'
+import Engine from'@aomao/engine'
 
 const engine = new Engine(...)
 
-const { $ } = engine
-//选择节点
-const node = $("CSS选择器")
-//创建节点
+const {$} = engine
+//Select node
+const node = $("CSS selector")
+//Create node
 const divNode = $("<div></div>")
 ```
 
-使用 \$ 创建或选择节点后会返回一个 `NodeInterface` 类型对象，能更好的帮助你管理 DOM `Node` 节点。具体属性和方法请查看 API
+Using \$ to create or select a node will return a `NodeInterface` type object, which can better help you manage DOM `Node` nodes. Please check the API for specific properties and methods

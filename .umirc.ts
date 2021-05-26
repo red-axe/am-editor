@@ -1,56 +1,16 @@
 import { defineConfig } from 'dumi';
 
-export default defineConfig({
-	title: 'am-editor 多人协同编辑器',
-	favicon: 'https://cdn-object.aomao.com/icon/shortcut.png',
-	logo: 'https://cdn-object.aomao.com/icon/icon.svg',
-	outputPath: 'docs-dist',
-	mode: 'site',
-	ssr: {
-		devServerRender: false,
-	},
-	navs: [
-		{
-			title: '编辑',
-			path: '/',
-		},
-		{
-			title: '阅读',
-			path: '/view',
-		},
-		{
-			title: '文档',
-			path: '/docs',
-		},
-		{
-			title: '配置',
-			path: '/config',
-		},
-		{
-			title: '插件',
-			path: '/plugin',
-		},
-		{
-			title: 'API',
-			path: '/api',
-		},
-		{
-			title: 'AoMao',
-			path: 'https://www.aomao.com',
-		},
-		{
-			title: 'Github',
-			path: 'https://github.com/itellyou-com/am-editor',
-		},
-	],
-	menus: {
+function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
+	const menus = {
 		'/docs': [
 			{
-				title: '介绍',
+				title: 'Introduction',
+				'title_zh-CN': '介绍',
 				children: ['/docs/README', '/docs/getting-started'],
 			},
 			{
-				title: '基础',
+				title: 'Basis',
+				'title_zh-CN': '基础',
 				children: [
 					'/docs/concepts-node',
 					'/docs/concepts-schema',
@@ -62,11 +22,13 @@ export default defineConfig({
 				],
 			},
 			{
-				title: '资源文件',
+				title: 'Resource',
+				'title_zh-CN': '资源文件',
 				children: ['/docs/resources-icon'],
 			},
 			{
-				title: '贡献',
+				title: 'Contribution',
+				'title_zh-CN': '贡献',
 				path: '/docs/contributing',
 			},
 			{
@@ -76,11 +38,14 @@ export default defineConfig({
 		],
 		'/plugin': [
 			{
-				title: '教程',
+				title: 'Development',
+				'title_zh-CN': '开发',
 				children: [
 					{
-						title: '基础',
-						path: '/plugin/tutorials',
+						title: opts.lang === 'zh-CN' ? '基础' : 'Basis',
+						path: `${
+							opts.lang === 'zh-CN' ? '/zh-CN' : ''
+						}/plugin/tutorials`,
 						exact: true,
 					},
 					'plugin/tutorials-element',
@@ -92,7 +57,8 @@ export default defineConfig({
 				],
 			},
 			{
-				title: '插件列表',
+				title: 'List of plugins',
+				'title_zh-CN': '插件列表',
 				children: [
 					'/plugin/plugin-alignment',
 					'/plugin/plugin-backcolor',
@@ -132,7 +98,8 @@ export default defineConfig({
 		],
 		'/api': [
 			{
-				title: '节点',
+				title: 'Node',
+				'title_zh-CN': 'DOM节点',
 				children: [
 					'/api/node',
 					'/api/editor-node',
@@ -143,11 +110,14 @@ export default defineConfig({
 				],
 			},
 			{
-				title: '卡片',
+				title: 'Card',
+				'title_zh-CN': '卡片',
 				children: [
 					{
 						title: 'Card',
-						path: '/api/editor-card',
+						path: `${
+							opts.lang === 'zh-CN' ? '/zh-CN' : ''
+						}/api/editor-card`,
 						exact: true,
 					},
 					'/api/editor-card-toolbar',
@@ -156,69 +126,195 @@ export default defineConfig({
 				],
 			},
 			{
-				title: '结构',
+				title: 'Schema',
+				'title_zh-CN': '架构',
 				path: '/api/schema',
 			},
 			{
-				title: '光标',
+				title: 'Range',
+				'title_zh-CN': '光标范围',
 				children: ['/api/range', '/api/selection'],
 			},
 			{
-				title: '历史',
+				title: 'History',
+				'title_zh-CN': '历史记录',
 				path: '/api/history',
 			},
 			{
-				title: '编辑器',
+				title: 'Editor',
+				'title_zh-CN': '编辑器',
 				children: [
 					{
 						title: 'Change',
-						path: '/api/editor-change',
-						children: ['/api/editor-change-event'],
+						path: `${
+							opts.lang === 'zh-CN' ? '/zh-CN' : ''
+						}/api/editor-change`,
+						children: [
+							`${
+								opts.lang === 'zh-CN' ? '/zh-CN' : ''
+							}/api/editor-change-event`,
+						],
 					},
 					{
-						title: '共有属性和方法',
-						path: '/api/editor',
+						title:
+							opts.lang === 'zh-CN'
+								? '共有属性和方法'
+								: 'Common attributes and methods',
+						path: `${
+							opts.lang === 'zh-CN' ? '/zh-CN' : ''
+						}/api/editor`,
 						exact: true,
 					},
 					{
-						title: '引擎',
-						path: '/api/engine',
+						title: opts.lang === 'zh-CN' ? '引擎' : 'Engine',
+						path: `${
+							opts.lang === 'zh-CN' ? '/zh-CN' : ''
+						}/api/engine`,
 					},
 					{
-						title: '阅读器',
-						path: '/api/view',
+						title: opts.lang === 'zh-CN' ? '阅读器' : 'View',
+						path: `${
+							opts.lang === 'zh-CN' ? '/zh-CN' : ''
+						}/api/view`,
 					},
 				],
 			},
 			{
-				title: '语言',
+				title: 'Language',
+				'title_zh-CN': '语言',
 				path: '/api/language',
 			},
 			{
-				title: '命令',
+				title: 'Command',
+				'title_zh-CN': '命令',
 				path: '/api/command',
 			},
 			{
-				title: '常量',
+				title: 'Constants',
+				'title_zh-CN': '常量',
 				path: '/api/constants',
 			},
 			{
-				title: '热键',
+				title: 'Hotkey',
+				'title_zh-CN': '热键',
 				path: '/api/hotkey',
 			},
 			{
-				title: '剪贴板',
+				title: 'Clipboard',
+				'title_zh-CN': '剪贴板',
 				path: '/api/clipboard',
 			},
 			{
-				title: '解析器',
+				title: 'Parser',
+				'title_zh-CN': '解析器',
 				path: '/api/parser',
 			},
 			{
-				title: '实用方法/常量',
+				title: 'Utility method/constant',
+				'title_zh-CN': '实用方法/常量',
 				path: '/api/utils',
 			},
 		],
+	};
+	return (menus[opts.base] as []).map((menu: any) => {
+		if (!opts.lang) return menu;
+		return {
+			...menu,
+			title: menu[`title_${opts.lang}`] || menu.title,
+		};
+	});
+}
+
+export default defineConfig({
+	title: 'AoMao Editor',
+	favicon: 'https://cdn-object.aomao.com/icon/shortcut.png',
+	logo: 'https://cdn-object.aomao.com/icon/icon.svg',
+	outputPath: 'docs-dist',
+	mode: 'site',
+	locales: [
+		['en-US', 'English'],
+		['zh-CN', '中文'],
+	],
+	ssr: {
+		devServerRender: false,
+	},
+	navs: {
+		'en-US': [
+			{
+				title: 'Edit',
+				path: '/',
+			},
+			{
+				title: 'View',
+				path: '/view',
+			},
+			{
+				title: 'Docs',
+				path: '/docs',
+			},
+			{
+				title: 'Config',
+				path: '/config',
+			},
+			{
+				title: 'Plug-in',
+				path: '/plugin',
+			},
+			{
+				title: 'API',
+				path: '/api',
+			},
+			{
+				title: 'AoMao',
+				path: 'https://www.aomao.com',
+			},
+			{
+				title: 'Github',
+				path: 'https://github.com/itellyou-com/am-editor',
+			},
+		],
+		'zh-CN': [
+			{
+				title: '编辑',
+				path: '/zh-CN',
+			},
+			{
+				title: '阅读',
+				path: '/zh-CN/view',
+			},
+			{
+				title: '文档',
+				path: '/zh-CN/docs',
+			},
+			{
+				title: '配置',
+				path: '/zh-CN/config',
+			},
+			{
+				title: '插件',
+				path: '/zh-CN/plugin',
+			},
+			{
+				title: 'API',
+				path: '/zh-CN/api',
+			},
+			{
+				title: 'AoMao',
+				path: 'https://www.aomao.com',
+			},
+			{
+				title: 'Github',
+				path: 'https://github.com/itellyou-com/am-editor',
+			},
+		],
+	},
+	menus: {
+		'/zh-CN/docs': getMenus({ lang: 'zh-CN', base: '/docs' }),
+		'/docs': getMenus({ base: '/docs' }),
+		'/zh-CN/plugin': getMenus({ lang: 'zh-CN', base: '/plugin' }),
+		'/plugin': getMenus({ base: '/plugin' }),
+		'/zh-CN/api': getMenus({ lang: 'zh-CN', base: '/api' }),
+		'/api': getMenus({ base: '/api' }),
 	},
 	manifest: {
 		fileName: 'manifest.json',

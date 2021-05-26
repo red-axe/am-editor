@@ -1,43 +1,43 @@
 # @aomao/plugin-codeblock
 
-代码块插件
+Code block plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-codeblock
 ```
 
-`Vue` 使用
+`Vue` use
 
 ```bash
 $ yarn add @aomao/plugin-codeblock-vue
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import CodeBlock , { CodeBlockComponent } from '@aomao/plugin-codeblock';
+import Engine, {EngineInterface} from'@aomao/engine';
+import CodeBlock, {CodeBlockComponent} from'@aomao/plugin-codeblock';
 
-new Engine(...,{ plugins:[CodeBlock] , cards:[CodeBlockComponent]})
+new Engine(...,{ plugins:[CodeBlock], cards:[CodeBlockComponent]})
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认无快捷键
+No shortcut keys by default
 
 ```ts
-//快捷键，key 组合键，args，执行参数，[mode?: string, value?: string] 语言模式：可选，代码文本：可选
-hotkey?:string | {key:string,args:Array<string>};//默认无
+//Shortcut keys, key combination keys, args, execution parameters, [mode?: string, value?: string] Language mode: optional, code text: optional
+hotkey?:string | {key:string,args:Array<string>};//default none
 
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "codeblock":{
-            //修改快捷键
+            //Modify shortcut keys
             hotkey:{
                 key:"mod+b",
                 args:["javascript","const test = 123;"]
@@ -49,26 +49,26 @@ new Engine(...,{
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-CodeBlock 插件 markdown 语法为` ``` `
+CodeBlock plugin markdown syntax is ```
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
     config:{
         "codeblock":{
-            //关闭markdown
+            //Close markdown
             markdown:false
         }
     }
  })
 ```
 
-## 命令
+## Command
 
 ```ts
-//可携带两个参数，语言类型，默认文本，都是可选的
+//Can carry two parameters, language type, default text, all are optional
 engine.command.execute('codeblock', 'javascript', 'const test = 123;');
 ```

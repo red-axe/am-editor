@@ -1,49 +1,49 @@
 # @aomao/plugin-removeformat
 
-移除样式插件
+Remove style plugin
 
-移除所有 mark 标签插件
+Remove all mark tag plugins
 
-移除所有 block 样式
+Remove all block styles
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-removeformat
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Removeformat from '@aomao/plugin-removeformat';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Removeformat from'@aomao/plugin-removeformat';
 
 new Engine(...,{ plugins:[Removeformat] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键为 `mod+\`
+The default shortcut key is `mod+\`
 
 ```ts
-//快捷键
+//hot key
 hotkey?: string | Array<string>;
-//使用配置
+//Use configuration
 new Engine(...,{
-    config:{
-        "redo":{
-            //修改快捷键
-            hotkey:"快捷键"
-        }
-    }
- })
+     config:{
+         "redo":{
+             //Modify shortcut keys
+             hotkey: "shortcut key"
+         }
+     }
+  })
 ```
 
-## 命令
+## Command
 
 ```ts
-//使用 command 执行插件
+//Use command to execute the plugin
 engine.command.execute('removeformat');
 ```

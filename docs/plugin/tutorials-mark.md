@@ -1,12 +1,12 @@
-# Mark 插件
+# Mark plugin
 
-样式节点插件
+Style node plugin
 
-通常用于文本修饰，例如，加粗、斜体、下划线、背景色等等
+Usually used for text modification, for example, bold, italic, underline, background color, etc.
 
-此类插件我们需要继承 `MarkPlugin` 抽象类，`MarkPlugin` 抽象类在继承 `ElementPlugin` 抽象类的基础上扩展了一些属性和方法。所以继承 `MarkPlugin` 的插件也同样拥有`ElementPlugin`抽象类的所有属性和方法
+For this type of plug-in, we need to inherit the `MarkPlugin` abstract class. The `MarkPlugin` abstract class extends some properties and methods on the basis of inheriting the `ElementPlugin` abstract class. So the plugin that inherits `MarkPlugin` also has all the attributes and methods of the `ElementPlugin` abstract class
 
-因为`MarkPlugin` 已经实现了`markdown`语法处理，`execute`，`queryState` 命令，所以我们很容易就能配置好一个 Mark 插件
+Because `MarkPlugin` has implemented `markdown` syntax processing, `execute`, `queryState` commands, so we can easily configure a Mark plugin
 
 ```ts
 import { MarkPlugin } from '@aomao/engine';
@@ -25,85 +25,85 @@ export default class extends MarkPlugin {
 }
 ```
 
-执行 `editor.command.execute("mark-plugin")` 后，光标位置的文本就会被一个 字体大小为 18px 字体颜色为 red 的 span 标签包裹了
+After executing `editor.command.execute("mark-plugin")`, the text at the cursor position will be wrapped by a span tag with a font size of 18px and a font color of red
 
-## 继承
+## Inheritance
 
-继承 `MarkPlugin` 抽象类
+Inherit the `MarkPlugin` abstract class
 
 ```ts
-import { MarkPlugin } from '@aomao/engine'
+import {MarkPlugin} from'@aomao/engine'
 
 export default class extends MarkPlugin {
-	...
+...
 }
 ```
 
-## 属性
+## Attributes
 
 ### `tagName`
 
-标签名称，必须
+Label name, must
 
-此处的标签名称与父类`ElementPlugin`中的标签名称作用是一致的，只不过标签名称是 `MarkPlugin` 插件必要的属性之一
+The tag name here is the same as the tag name in the parent class `ElementPlugin`, except that the tag name is one of the necessary attributes of the `MarkPlugin` plugin
 
 ### `markdown`
 
-Markdown 语法，可选
+Markdown syntax, optional
 
-类型：`string`
+Type: `string`
 
-因为 `MarkPlugin` 插件中已经实现了对 markdown 的语法解析，所以我们只需要传入插件的 markdown 语法即可，例如：
+Because the markdown syntax analysis has been implemented in the `MarkPlugin` plugin, we only need to pass in the markdown syntax of the plugin, for example:
 
 ```ts
-//加粗语法
+//Bold grammar
 readonly markdown = "**"
 ```
 
 ### `copyOnEnter`
 
-回车后是否复制 mark 效果，默认为 true，允许
+Whether to copy the mark effect after carriage return, the default is true, allowing
 
-类型：`string`
+Type: `string`
 
-例如：
-`<p><strong>abc<cursor /></strong></p>` cursor 标签代表当前光标位置，按下回车键后会出现新行：
+E.g:
+`<p><strong>abc<cursor /></strong></p>` The cursor tag represents the current cursor position, and a new line will appear after pressing the Enter key:
 
-如果允许复制：`<p><strong><cursor /></strong></p>`，否则 `<p><cursor /></p>`
+If copying is allowed: `<p><strong><cursor /></strong></p>`, otherwise `<p><cursor /></p>`
 
 ### `followStyle`
 
-是否跟随样式，默认为 true，可选
+Whether to follow the style, the default is true, optional
 
-设置为不跟随后，在此标签后输入将不在有此 mark 插件效果，光标重合状态下也无非执行此 mark 插件取消命令。例如：
+After setting to not follow, input after this label will no longer have the mark plug-in effect, and the mark plug-in cancel command will be executed when the cursor is overlapped. E.g:
 
-`<strong>abc<cursor /></strong>` 或者 `<strong><cursor />abc</strong>` cursor 标签代表当前光标位置
+`<strong>abc<cursor /></strong>` or `<strong><cursor />abc</strong>` The cursor tag represents the current cursor position
 
-在此处输入，会在 strong 节点后输入 或者 strong 节点前输入
+Enter here, it will be entered after the strong node or before the strong node
 
-`<strong>ab<cursor />c</strong>` 如果光标在样式标签中间，还是会继续跟随样式效果
+`<strong>ab<cursor />c</strong>` If the cursor is in the middle of the style tag, it will continue to follow the style effect
 
-`<strong>abc<cursor /></strong><em><strong>123</strong></em>` 如果样式标签后方紧接着还有 strong 节点样式效果，那么还是会继续跟随样式，在 strong abc 后面完成输入
+`<strong>abc<cursor /></strong><em><strong>123</strong></em>` If there is a strong node style effect immediately after the style tag, then it will continue to follow the style. Complete the input after strong abc
 
 ### `combineValueByWrap`
 
-在包裹`schema`判定为相同 mark 插件节点，并且属性名称一致，值不一致的的时候，是合并前者的值到新的节点还是移除前者 mark 节点，默认 false 移除，可选
+When the package `schema` is judged to be the same mark plugin node, and the attribute names are the same, and the values ​​are inconsistent, whether to merge the former value to the new node or remove the former mark node, the default is false to remove, optional
 
-mark 节点样式(style)的值将始终覆盖掉
+The value of mark node style (style) will always be overwritten
 
-`<span a="1">abc</span>` 在使用 `<span a="2"></span>` 包裹 a=1 的 mark 节点时。如果合并值，就是 `<span a="1,2">abc</span>` 否则就是 `<span a="2">abc</span>`
+`<span a="1">abc</span>` When using `<span a="2"></span>` to wrap the mark node of a=1. If the combined value is `<span a="1,2">abc</span>` otherwise it is `<span a="2">abc</span>`
 
-## 方法
+## Method
 
 ### `init`
 
-初始化，可选
+Initialization, optional
 
-`MarkPlugin` 插件已经实现了`init`方法，如果需要使用，需要手动再次调用。否则会出现意料外的情况
+The `MarkPlugin` plugin has implemented the `init` method, if you need to use it, you need to manually call it again. Otherwise there will be unexpected situations
 
 ```ts
 export default class extends MarkPlugin {
-	...
+...
     init(){
         super.init()
     }
@@ -112,67 +112,67 @@ export default class extends MarkPlugin {
 
 ### `execute`
 
-执行插件命令，可选
+Execute plug-in commands, optional
 
-`MarkPlugin` 插件已经实现了`execute`方法，如果需要使用，可以重写此方法
+The `MarkPlugin` plugin has implemented the `execute` method, if you need to use it, you can override this method
 
 ### `queryState`
 
-查询插件状态命令，可选
+Query plug-in status command, optional
 
-`MarkPlugin` 插件已经实现了`queryState`方法，如果需要使用，可以重写此方法
+The `MarkPlugin` plugin has implemented the `queryState` method, if you need to use it, you can override this method
 
 ### `schema`
 
-设置此 mark 插件的`schema`规则，可选
+Set the `schema` rule of this mark plugin, optional
 
-`ElementPlugin` 插件已经实现了`schema`方法，会自动根据 `tagName` `style` `attributes` 设置规则。
+The `ElementPlugin` plugin has implemented the `schema` method, which will automatically set the rules according to the `tagName` `style` `attributes`.
 
-如果需要使用，可以重写此方法或者使用 super.schema()再次调用此方法
+If you need to use it, you can override this method or use super.schema() to call this method again
 
 ### `isTrigger`
 
-是否触发执行增加当前 mark 标签包裹，否则将移除当前 mark 标签的包裹，可选
+Whether to trigger the execution to add the current mark label package, otherwise it will remove the current mark label package, optional
 
-默认情况下，`MarkPlugin` 插件会调用 `editor.command.queryState` 查询当前插件状态（当前光标范围内选中的节点符合当前 mark 插件设置的节点）与当前设置的`tagName` `style` `attributes`比较，一致的情况下会执行移除当前 mark 插件节点的效果，否则会加上当前 mark 插件节点的效果。
+By default, the `MarkPlugin` plugin will call `editor.command.queryState` to query the current plugin state (the node selected within the current cursor area matches the node set by the current mark plugin) and the currently set `tagName` `style` `attributes` In comparison, if they are consistent, the effect of removing the current mark plug-in node will be executed, otherwise the effect of the current mark plug-in node will be added.
 
-如果有实现 `isTrigger` 方法就需要自己判定当前是取消还是加上当前 mark 插件节点的效果
+If you implement the isTrigger method, you need to determine whether to cancel or add the effect of the current mark plug-in node.
 
 ```ts
 /**
- * 是否触发执行增加当前mark标签包裹，否则将移除当前mark标签的包裹
- * @param args 在调用 command.execute 执行插件传入时的参数
+ * Whether to trigger the execution to increase the current mark label package, otherwise it will remove the current mark label package
+ * @param args is the parameter passed in when calling command.execute to execute the plugin
  */
 isTrigger?(...args: any): boolean;
 ```
 
 ### `triggerMarkdown`
 
-解析`markdown`语法，可选
+Parse `markdown` grammar, optional
 
-在 `MarkPlugin` 默认解析后无法满足需求时，我们可以重写此方法
+We can override this method when the requirement cannot be met after the default parsing of `MarkPlugin`
 
 ```ts
 /**
- * 解析markdown
- * @param event 事件
- * @param text markdown文本
- * @param node 触发节点
+ * Parse markdown
+ * @param event event
+ * @param text markdown text
+ * @param node trigger node
  */
 triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface): void
 ```
 
 ### `pasteMarkdown`
 
-粘贴时批量解析`markdown`语法
+Batch parsing of `markdown` syntax when pasting
 
-在 `MarkPlugin` 默认解析后无法满足需求时，我们可以重写此方法
+We can override this method when the requirement cannot be met after the default parsing of `MarkPlugin`
 
-在粘贴时如果有检测到是`markdown`语法，会转换为纯文本后传入，需要把当前符合当前插件的`markdown`语法文本全部替换为 mark 标签
+If the `markdown` syntax is detected during pasting, it will be converted into plain text and then passed in. You need to replace all the `markdown` syntax texts currently in line with the current plug-in with the mark tag
 
 ```ts
 /**
- * @param node 含有markdown语法的文本节点
+ * @param node contains a text node with markdown syntax
  * */
 pasteMarkdown(node: NodeInterface): void
 ```

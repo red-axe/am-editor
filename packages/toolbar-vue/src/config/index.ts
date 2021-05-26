@@ -54,7 +54,7 @@ export const getToolbarDefaultConfig = (
 										</g>
 									</svg>
 								</span>`,
-							title: '图片',
+							title: language['image']['title'],
 							search: '图片,tupian,image,img',
 						},
 						{
@@ -96,7 +96,7 @@ export const getToolbarDefaultConfig = (
 										</g>
 									</svg>
 								</span>`,
-							title: '代码块',
+							title: language['codeblock']['title'],
 							search: '代码块,daimakuai,code',
 						},
 						{
@@ -216,7 +216,7 @@ export const getToolbarDefaultConfig = (
 										</g>
 									</g>
 								</svg></span>`,
-							title: '表格',
+							title: language['table']['title'],
 							search: 'biaoge,table',
 						},
 					],

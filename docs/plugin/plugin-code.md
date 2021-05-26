@@ -1,38 +1,38 @@
 # @aomao/plugin-code
 
-行内代码样式插件
+Inline code style plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-code
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Code from '@aomao/plugin-code';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Code from'@aomao/plugin-code';
 
 new Engine(...,{ plugins:[Code] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键为 `mod+e`，以数组形式传入多个快捷键
+The default shortcut key is `mod+e`, and multiple shortcut keys are passed in as an array
 
 ```ts
-//快捷键，
+//hot key,
 hotkey?: string | Array<string>;
 
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "code":{
-            //修改快捷键
-            hotkey:"快捷键"
+            //Modify shortcut keys
+            hotkey: "shortcut key"
         }
     }
  })
@@ -40,27 +40,27 @@ new Engine(...,{
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-Code 插件 markdown 语法为`` `
+Code plugin markdown syntax is `` `
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
     config:{
         "code":{
-            //关闭markdown
+            //Close markdown
             markdown:false
         }
     }
  })
 ```
 
-## 命令
+## Command
 
 ```ts
 engine.command.execute('code');
-//使用 command 执行查询当前状态，返回 boolean | undefined
+//Use command to execute query current status, return boolean | undefined
 engine.command.queryState('code');
 ```

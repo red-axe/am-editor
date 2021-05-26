@@ -1,20 +1,19 @@
 ---
-title: 介绍
-translateHelp: true
+title: Introduction
 ---
 
-## 是什么？
+## What is it?
 
-am-editor，一个 Web 多人实时协同富文本编辑器。使用浏览器提供的`contenteditable`属性让一个 DOM 节点具有可编辑能力，众所周知`contenteditable`属性，在不同的浏览器厂商中实现会有不同的差异，并且其默认行为具有不可预测性，因此我们封装了一个具有一定可控性的编辑能力引擎库`@aomao/engine`，在默认行为和期望行为之间进行平衡取舍。
+am-editor, a web multi-person real-time collaborative rich text editor. Use the `contenteditable` attribute provided by the browser to make a DOM node editable. As we all know, the `contenteditable` attribute has different implementations in different browser vendors, and its default behavior is unpredictable, so we encapsulate A certain controllable editing capability engine library `@aomao/engine` is created, which balances the default behavior and the desired behavior.
 
-引擎库使用`javascript`编写，我们对 DOM 节点插入、删除、替换等一系列操作、包括光标、事件进行了封装并派生接口。因此，在引擎中我们的所有操作都将直接编辑复杂的 DOM 树，在数据结构中我们也将以 DOM 树结构呈现。不过在实际应用中，我们非常有必要对复杂的 DOM 树结构进行约束，以免出现不可预期的行为，并且在当前流行使用`React` `Vue`等前端框架来渲染 UI 的情况下，让我们再使用`javascript`定制 UI 是一件非常痛苦的事情。所以我们把 DOM 节点按功能和特性分为以下几类：`mark` `inline` `block` `card` 并且通过 `schema` 来约束他们特定的行为和一些特质属性，在 `card` 组件中我们还可以结合前端框架来完成复杂的 UI 渲染和编辑嵌套。
+The engine library is written in `javascript`. We encapsulate and derive interfaces for a series of operations such as DOM node insertion, deletion, and replacement, including cursors and events. Therefore, all our operations in the engine will directly edit the complex DOM tree, and in the data structure we will also present it in the DOM tree structure. However, in practical applications, it is very necessary for us to constrain the complex DOM tree structure to avoid unexpected behavior, and in the current popular use of front-end frameworks such as `React` and `Vue` to render the UI, let us re Using `javascript` to customize the UI is a very painful thing. So we divide the DOM nodes into the following categories according to their functions and characteristics: `mark` `inline` `block` `card` and use the `schema` to constrain their specific behaviors and some idiosyncratic attributes. In the `card` component we It can also be combined with the front-end framework to complete complex UI rendering and editing nesting.
 
-在现代化企业中，协同办公已是高效的代名词。在即时通讯、视频会议之后让文档也协同起来，已是大势所趋。在引擎库中，我们基于[ShareDB](https://github.com/share/sharedb)提供协同编辑能力，把复杂的 DOM 结构转换为[JSON0](https://github.com/ottypes/json0)协议的数据结构后，提交给`sharedb`处理协同编辑的交互。
+In modern enterprises, collaborative office is synonymous with high efficiency. Collaborating documents after instant messaging and video conferencing is a general trend. In the engine library, we provide collaborative editing capabilities based on [ShareDB](https://github.com/share/sharedb) and convert the complex DOM structure to [JSON0](https://github.com/ottypes/json0) After the data structure of the protocol, submit it to `sharedb` to handle the interaction of collaborative editing.
 
-## 特性
+## Features
 
--   📦 开箱即用，提供几十种丰富的插件来满足大部分需求
--   🏷 高扩展性，除了`mark` `inline` `block`基础插件外，我们还提供`card`组件结合`React` `Vue`等前端框架渲染插件 UI
--   📋 丰富的多媒体支持，不仅支持图片和音视频，更支持插入嵌入式多媒体内容
--   🐠 不依赖前端框架，复杂架构轻松应对
--   📡 内置协同编辑方案，轻量配置即可使用
+-   📦 Out of the box, it provides dozens of rich plug-ins to meet most needs
+-   🏷 High scalability, in addition to the `mark` `inline` `block` basic plug-in, we also provide `card` component combined with `React` `Vue` and other front-end framework rendering plug-in UI
+-   📋 Rich multimedia support, not only supports pictures, audio and video, but also supports inserting embedded multimedia content
+-   🐠 Do not rely on front-end framework, easy to deal with complex architecture
+-   📡 Built-in collaborative editing program, ready to use with lightweight configuration

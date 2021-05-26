@@ -1,115 +1,111 @@
----
-translateHelp: true
----
+# Constant
 
-# 常量
-
-## 节点
+## Node
 
 ### `DATA_ELEMENT`
 
-标记节点类型
+Mark node type
 
 ### `ROOT`
 
-标记为根节点
+Mark as root node
 
 ### `ROOT_SELECTOR`
 
-根节点选择器
+Root node selector
 
 ### `UI`
 
-标记为 UI 节点
+Mark as UI node
 
 ### `UI_SELECTOR`
 
-UI 节点 CSS 选择器
+UI node CSS selector
 
 ### `EDITABLE`
 
-标记为可编辑器节点
+Mark as editable node
 
 ### `EDITABLE_SELECTOR`
 
-可编辑节点 CSS 选择器
+Editable node CSS selector
 
 ### `DATA_TRANSIENT_ATTRIBUTES`
 
-标记不参与协同的节点属性
+Mark node attributes that do not participate in collaboration
 
 ### `DATA_TRANSIENT_ELEMENT`
 
-标记不参与协同的节点
+Mark nodes that do not participate in collaboration
 
-## 选区范围
+## Selection area
 
 ### `ANCHOR`
 
-开始节点标记
+Start node marker
 
 ### `FOCUS`
 
-结束节点标记
+End node marker
 
 ### `CURSOR`
 
-开始位置和结束位置重合处标记
+Mark where the start position and end position coincide
 
 ### `ANCHOR_SELECTOR`
 
-开始节点标记 CSS 查询器
+Start Node Marker CSS Queryer
 
 ### `FOCUS_SELECTOR`
 
-结束节点标记 CSS 查询器
+End node marker CSS finder
 
 ### `CURSOR_SELECTOR`
 
-开始位置和结束位置重合处标记 CSS 查询器
+Mark the CSS finder where the start position and end position coincide
 
-## 卡片
+## Card
 
 ### `CARD_TAG`
 
-卡片节点标签名称
+Card node label name
 
 ### `CARD_KEY`
 
-卡片名称
+Card name
 
 ### `READY_CARD_KEY`
 
-待渲染卡片名称
+Name of the card to be rendered
 
 ### `CARD_TYPE_KEY`
 
-卡片类型
+Card type
 
 ### `CARD_VALUE_KEY`
 
-卡片值
+Card value
 
 ### `CARD_ELEMENT_KEY`
 
-卡片节点
+Card node
 
 ### `CARD_SELECTOR`
 
-卡片 CSS 选择器
+Card CSS selector
 
 ### `READY_CARD_SELECTOR`
 
-待渲染卡片 CSS 选择器
+CSS selector for the card to be rendered
 
 ### `CARD_LEFT_SELECTOR`
 
-卡片左侧 CSS 选择器
+CSS selector on the left side of the card
 
 ### `CARD_CENTER_SELECTOR`
 
-卡片中心节点 CSS 选择器
+CSS selector for card center node
 
 ### `CARD_RIGHT_SELECTOR`
 
-卡片右侧 CSS 选择器
+CSS selector on the right side of the card

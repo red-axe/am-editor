@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { EditorInterface } from '@aomao/engine';
 import { Outline, OutlineData } from '@aomao/plugin-heading';
+import { lang } from '../config';
 import './index.css';
 
 type Props = {
@@ -47,7 +48,9 @@ const Toc: React.FC<Props> = ({ editor }) => {
 
 	return (
 		<div className="data-toc-wrapper">
-			<div className="data-toc-title">大纲</div>
+			<div className="data-toc-title">
+				{lang === 'zh-cn' ? '大纲' : 'Outline'}
+			</div>
 			<div className="data-toc" ref={rootRef}>
 				{datas.map((data, index) => {
 					return (

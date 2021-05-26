@@ -1,175 +1,175 @@
 # @aomao/plugin-mark-range
 
-光标区域标记插件
+Cursor area marking plugin
 
-可用来配合开发类似于批注、划线评论
+Can be used to cooperate with development similar to comments, crossed comments
 
-[批注/评论案例](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/comment/index.tsx)
+[Annotation/Comment Case](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/comment/index.tsx)
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-mark-range
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import MarkRange from '@aomao/plugin-mark-range';
+import Engine, {EngineInterface} from'@aomao/engine';
+import MarkRange from'@aomao/plugin-mark-range';
 
 new Engine(...,{ plugins:[MarkRange] })
 ```
 
-## 可选项
+## Optional
 
 ```ts
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "mark-range":{
-            //修改快捷键
+            //Modify shortcut keys
             hotkey:...,
-            //其它可选项
+            //Other options
             ...
         }
     }
  })
 ```
 
-### 标记类型集合
+### Mark Type Collection
 
-必须为标记插件指定至少一个类型。如果有多种标记可指定多个类型
+At least one type must be specified for the tag plugin. If there are multiple tags, multiple types can be specified
 
 ```ts
 keys: Array<string>
 
-//例如评论 keys = ["comment"]
+//For example, comments keys = ["comment"]
 ```
 
-### 标记节点改变回调
+### Mark node change callback
 
-在协同编辑时，其它作者添加标记后,或者在编辑、删除一些节点中包含标记节点时都会触发此回调
+In collaborative editing, this callback will be triggered after other authors add tags, or edit or delete some nodes that contain tagged nodes
 
-在使用 撤销、重做 相关操作时，也会触发此回调
+This callback will also be triggered when using undo and redo related operations
 
-addIds: 新增的标记节点编号集合
+addIds: Newly added mark node number collection
 
-removeIds: 删除的标记节点编号集合
+removeIds: a collection of deleted marker node numbers
 
-ids: 所有有效的标记节点编号集合
+ids: a collection of all valid marked node numbers
 
 ```ts
-onChange?: (addIds: { [key: string]: Array<string>},removeIds: { [key: string]: Array<string>},ids: { [key:string] : Array<string> }) => void
+onChange?: (addIds: {[key: string]: Array<string>},removeIds: {[key: string]: Array<string>},ids: {[key:string]: Array<string> }) = > void
 ```
 
-### 选中标记节时点回调
+### Callback when the marked section is selected
 
-在光标改变时触发，selectInfo 有值的情况下将携带光标所在最近，如果是嵌套关系，那么就返回最里层的标记编号
+Triggered when the cursor changes. If selectInfo has a value, it will carry the nearest cursor position. If it is a nested relationship, then it will return the innermost mark number
 
 ```ts
-onSelect? : (range: RangeInterface, selectInfo?: { key: string, id: string}) => void
+onSelect?: (range: RangeInterface, selectInfo?: {key: string, id: string}) => void
 ```
 
-### 快捷键
+### hot key
 
-默认无快捷键
+No shortcut keys by default
 
 ```ts
-//快捷键，key 组合键，args，执行参数，[mode?: string, value?: string] 语言模式：可选，代码文本：可选
-hotkey?:string | {key:string,args:Array<string>};//默认无
+//Shortcut keys, key combination keys, args, execution parameters, [mode?: string, value?: string] Language mode: optional, code text: optional
+hotkey?:string | {key:string,args:Array<string>};//default none
 ```
 
-## 命令
+## Command
 
-所有命令都需要指定在可选项中 `keys` 中传入的指定 key
+All commands need to specify the specified key passed in in the options `keys`
 
 ```ts
-engine.command.execute('mark-range', '标记key');
+engine.command.execute('mark-range', 'mark key');
 ```
 
-### 预览
+### Preview
 
-对一个标记或当前做在光标位置进行效果预览
+Preview the effect of a mark or the current cursor position
 
-如果不传入编辑 id 参数，那么就对当前光标所选进行效果预览
+If you do not pass in the edit id parameter, then preview the effect of the current cursor selection
 
-此操作不会参与协同同步
+This operation will not participate in collaborative synchronization
 
-此操作不会产生历史记录，无法做 撤销 和 重做 操作
+This operation will not generate historical records, and cannot undo and redo operations
 
-光标改变时，将自动取消当前预览效果
+When the cursor changes, the current preview effect will be cancelled automatically
 
-如果是对光标进行效果预览，命令将返回光标选中区域的所有文本拼接。卡片将使用 [card:卡片名称,卡片编号] 这种格式拼接，需要转换则要自行处理
+If it is to preview the effect of the cursor, the command will return all the text splicing in the area selected by the cursor. The cards will be spliced ​​in the format of [card:card name, card number]. If you need to convert it, you have to deal with it yourself
 
 ```ts
-engine.command.execute('mark-range', key: string, 'preview', id?:string): string | undefined;
+engine.command.execute('mark-range', key: string,'preview', id?:string): string | undefined;
 ```
 
-### 将预览效果应用到编辑器
+### Apply the preview effect to the editor
 
-将预览效果应用到编辑器，并同步到协同服务器
+Apply the preview effect to the editor and synchronize to the collaboration server
 
-此操作不会产生历史记录，无法做 撤销 和 重做 操作
+This operation will not generate historical records, and cannot undo and redo operations
 
-必须传入一个标记编号，可以是字符串。编号相对于 key 应是唯一的
+A tag number must be passed in, which can be a string. The number should be unique relative to the key
 
 ```ts
-engine.command.execute('mark-range', key: string, 'apply', id:string);
+engine.command.execute('mark-range', key: string,'apply', id:string);
 ```
 
-### 取消预览效果
+### Cancel the preview effect
 
-如果不传入标记编号，则取消所有的当前正在进行的预览项
+If you do not pass in the mark number, cancel all currently ongoing preview items
 
 ```ts
-engine.command.execute('mark-range', key: string, 'revoke', id?:string);
+engine.command.execute('mark-range', key: string,'revoke', id?:string);
 ```
 
-### 查找节点
+### Find Node
 
-根据标记编号找出其在编辑器中所有相对应的 dom 节点对象
+Find out all the corresponding dom node objects in the editor according to the tag number
 
 ```ts
-engine.command.execute('mark-range', key: string, 'find', id: string): Array<NodeInterface>;
+engine.command.execute('mark-range', key: string,'find', id: string): Array<NodeInterface>;
 ```
 
-### 移除标记效果
+### Remove mark effect
 
-移除指定标记编号的标记效果
+Remove the mark effect of the specified mark number
 
-此操作不会产生历史记录，无法做 撤销 和 重做 操作
+This operation will not generate historical records, and cannot undo and redo operations
 
 ```ts
-engine.command.execute('mark-range', key: string, 'remove', id: string)
+engine.command.execute('mark-range', key: string,'remove', id: string)
 ```
 
-### 过滤标记
+### Filter tags
 
-对编辑器值中的所有标记过滤，并返回过滤后的值和所有标记的编号和对应路径
+Filter all tags in the editor value, and return the filtered value and the number and corresponding path of all tags
 
-value 默认获取当前编辑器根节点中的 html 作为值
+value Gets the html in the root node of the current editor as the value by default
 
-在我们需要将标记和编辑器值分开存储或有条件展现标记时很有用
+It is useful when we need to store the mark and the editor value separately or conditionally display the mark
 
 ```ts
-engine.command.execute('mark-range', key: string, 'filter', value?: string): { value: string, paths: Array<{ id: Array<string>, path: Array<Path>}>}
+engine.command.execute('mark-range', key: string,'filter', value?: string): {value: string, paths: Array<{ id: Array<string>, path: Array<Path>} >}
 ```
 
-### 还原标记
+### Restore mark
 
-使用标记路径和过滤后的编辑器值进行标记还原
+Use the tag path and the filtered editor value for tag restoration
 
-value 默认获取当前编辑器根节点中的 html 作为值
+value Gets the html in the root node of the current editor as the value by default
 
 ```ts
-engine.command.execute('mark-range', key: string, 'wrap', paths: Array<{ id: Array<string>, path: Array<Path>}>, value?: string): string
+engine.command.execute('mark-range', key: string,'wrap', paths: Array<{ id: Array<string>, path: Array<Path>}>, value?: string): string
 ```
 
-## 样式定义
+## Style definition
 
 ```css
-/** 编辑器中标记样式 -comment- 中的 comment 都是代指标记中配置的 key ---- 开始 **/
+/** The comment in the mark style -comment- in the editor refers to the key configured in the mark ---- start **/
 [data-comment-preview],
 [data-comment-id] {
 	position: relative;
@@ -199,5 +199,5 @@ span[data-comment-id] {
 [data-card-key][data-comment-preview]::before {
 	bottom: -2px;
 }
-/** 编辑器中标记样式 ---- 结束 **/
+/** Mark style in the editor ---- end **/
 ```

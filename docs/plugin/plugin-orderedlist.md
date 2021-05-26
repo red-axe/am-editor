@@ -1,37 +1,37 @@
 # @aomao/plugin-orderedlist
 
-有序列表插件
+Ordered list plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-orderedlist
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Orderedlist from '@aomao/plugin-orderedlist';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Orderedlist from'@aomao/plugin-orderedlist';
 
 new Engine(...,{ plugins:[Orderedlist] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认快捷键`mod+shift+7`
+Default shortcut key `mod+shift+7`
 
 ```ts
-//快捷键
-hotkey?: string | Array<string>;//默认mod+shift+7
-//使用配置
+//hot key
+hotkey?: string | Array<string>;//default mod+shift+7
+//Use configuration
 new Engine(...,{
     config:{
         "orderedlist":{
-            //修改快捷键
-            hotkey:"快捷键"
+            //Modify shortcut keys
+            hotkey: "shortcut key"
         }
     }
  })
@@ -39,30 +39,30 @@ new Engine(...,{
 
 ### Markdown
 
-默认支持 markdown，传入`false`关闭
+Support markdown by default, pass in `false` to close
 
-Orderedlist 插件 markdown 语法为`1.` 序号+点
+The orderedlist plugin markdown syntax is `1.` serial number + dot
 
 ```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
+markdown?: boolean;//enabled by default, false off
+//Use configuration
 new Engine(...,{
     config:{
         "orderedlist":{
-            //关闭markdown
+            //Close markdown
             markdown:false
         }
     }
  })
 ```
 
-## 命令
+## Command
 
-有一个参数 `start:number` 默认为 1，表示列表开始序号
+There is a parameter `start:number` which defaults to 1, which indicates the starting number of the list
 
 ```ts
-//使用 command 执行插件、并传入所需参数
+//Use command to execute the plug-in and pass in the required parameters
 engine.command.execute('orderedlist', 1);
-//使用 command 执行查询当前状态，返回 false 或者当前列表插件名称 orderedlist tasklist unorderedlist
+//Use command to execute query current status, return false or current list plug-in name orderedlist tasklist unorderedlist
 engine.command.queryState('orderedlist');
 ```

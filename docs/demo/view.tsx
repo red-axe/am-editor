@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { isBrowser } from 'umi';
 import Message from 'antd/lib/message';
 import { View, ViewInterface, Request } from '@aomao/engine';
-import { DOMAIN, cards, plugins } from './config';
+import { DOMAIN, cards, plugins, lang } from './config';
 import Loading from '../demo/loading';
 import 'antd/lib/message/style';
 
@@ -44,6 +44,7 @@ const ViewRender = () => {
 		if (viewRef.current && !loading) {
 			//初始化
 			view.current = new View(viewRef.current, {
+				lang,
 				plugins: viewPlugins,
 				cards,
 			});
@@ -61,6 +62,7 @@ const ViewRender = () => {
 	//服务端渲染
 	const renderServer = () => {
 		const view = new View('<div></div>', {
+			lang,
 			plugins: viewPlugins,
 			cards,
 		});
