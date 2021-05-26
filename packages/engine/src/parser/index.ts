@@ -408,7 +408,6 @@ class Parser implements ParserInterface {
 		includeCard?: boolean,
 	) {
 		const result: Array<string> = [];
-
 		this.walkTree(
 			this.root,
 			conversionRules,
@@ -457,8 +456,11 @@ class Parser implements ParserInterface {
 					text = text.replace(/\u00a0/g, ' ');
 					result.push(text);
 				},
-				onClose: node => {
-					if (this.editor.node.isBlock(node, schema || undefined)) {
+				onClose: (node, name) => {
+					if (
+						name === 'p' ||
+						this.editor.node.isBlock(node, schema || undefined)
+					) {
 						result.push('\n');
 					}
 				},
