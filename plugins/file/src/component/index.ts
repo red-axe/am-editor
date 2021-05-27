@@ -4,6 +4,8 @@ import {
 	NodeInterface,
 	escape,
 	sanitizeUrl,
+	CardToolbarItemOptions,
+	ToolbarItemOptions,
 } from '@aomao/engine';
 import { getFileSize } from '../utils';
 import './index.css';
@@ -97,7 +99,7 @@ export default class FileCard extends Card<FileValue> {
 	};
 
 	toolbar() {
-		const items = [];
+		const items: Array<CardToolbarItemOptions | ToolbarItemOptions> = [];
 		const value = this.getValue();
 		if (!value) return items;
 		const { status, preview, download } = value;

@@ -319,8 +319,14 @@ export default defineConfig({
 		'/zh-CN/api': getMenus({ lang: 'zh-CN', base: '/api' }),
 		'/api': getMenus({ base: '/api' }),
 	},
+	analytics: {
+		baidu: 'c456d9579fec82a2ce1175db47c46efe',
+	},
 	manifest: {
 		fileName: 'manifest.json',
 	},
+	headScripts: [
+		`<script data-ad-client="ca-pub-3706417744839656" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>`,
+	],
 	// more config: https://d.umijs.org/config
 });

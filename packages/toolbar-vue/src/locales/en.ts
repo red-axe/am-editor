@@ -174,6 +174,9 @@ export default {
 		table: {
 			title: 'Table',
 		},
+		file: {
+			title: 'File',
+		},
 		commonlyUsed: {
 			title: 'Commonly used',
 		},

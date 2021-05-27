@@ -18,7 +18,7 @@ const defaultConfig = (editor: EditorInterface): Config => {
 				'commonlyUsed',
 				'title',
 			),
-			items: ['image-uploader', 'codeblock', 'table'],
+			items: ['image-uploader', 'codeblock', 'table', 'file'],
 		},
 	];
 };
