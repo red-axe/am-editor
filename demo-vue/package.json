@@ -35,7 +35,7 @@
     "@aomao/plugin-tasklist": "^2.1.1",
     "@aomao/plugin-table": "^2.1.1",
     "@aomao/plugin-image": "^2.1.2",
-    "@aomao/plugin-file": "^2.0.0",
+    "@aomao/plugin-file": "^2.0.1",
     "@aomao/plugin-underline": "^2.1.1",
     "@aomao/plugin-undo": "^2.1.1",
     "@aomao/plugin-unorderedlist": "^2.1.1",
