@@ -1,35 +1,35 @@
-# 最大化
+# Maximize
 
-调整卡片最大化/最小化
+Adjust the card to maximize/minimize
 
-类型：`MaximizeInterface`
+Type: `MaximizeInterface`
 
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface, card: CardInterface): MaximizeInterface
 ```
 
-## 方法
+## Method
 
 ### `restore`
 
-恢复
+restore
 
 ```ts
 /**
- * 恢复
- */
+  * Restore
+  */
 restore(): void;
 ```
 
 ### `maximize`
 
-最大化
+maximize
 
 ```ts
 /**
- * 最大化
- */
+  * Maximize
+  */
 maximize(): void;
 ```

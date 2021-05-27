@@ -1,0 +1,63 @@
+.data-file {
+    display: flex;
+    height: 24px;
+    line-height: 24px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .data-file .data-file-icon {
+    flex: auto;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    text-align: center;
+  }
+  .data-file .data-file-title {
+    flex: auto;
+    font-size: 14px;
+    margin-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .data-file .data-file-size {
+    flex: auto;
+    font-size: 12px;
+  }
+  .data-file-done {
+    color: #096DD9;
+  }
+  .data-file-uploading,
+  .data-file-error {
+    color: #595959;
+  }
+  .data-file-uploading .data-file-size,
+  .data-file-error .data-file-size {
+    color: #8C8C8C;
+  }
+  .data-file-error {
+    padding: 2px 4px;
+    background: #f5f5f5;
+    display: inline-flex;
+    border-radius: 4px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    align-items: center;
+    user-select: none;
+}
+
+.data-file-error .data-icon {
+    font-size: 12px;
+}
+
+.data-file-error .data-icon-error {
+    color: red;
+    margin-right: 8px;
+}
+
+.data-file-error .data-icon-copy {
+    margin-left: 8px;
+    cursor: pointer;
+}

@@ -6,6 +6,7 @@
 module.exports = app => {
 	const { router, controller } = app;
 	router.post('/upload/image', controller.upload.image);
+	router.post('/upload/file', controller.upload.file);
 	router.post('/doc/content', controller.doc.content);
 	router.post('/comment/add', controller.comment.add);
 	router.post('/comment/remove', controller.comment.remove);

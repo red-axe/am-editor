@@ -28,6 +28,7 @@ import Codeblock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
 import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
 import Table, { TableComponent } from '@aomao/plugin-table';
 import MarkRange from '@aomao/plugin-mark-range';
+import File, { FileComponent, FileUploader } from '@aomao/plugin-file';
 
 export const IS_DEV = process.env.NODE_ENV !== 'production';
 export const DOMAIN = IS_DEV
@@ -71,6 +72,8 @@ export const plugins = [
 	ImageUploader,
 	Table,
 	MarkRange,
+	File,
+	FileUploader,
 ];
 
 export const cards = [
@@ -79,6 +82,7 @@ export const cards = [
 	CodeBlockComponent,
 	ImageComponent,
 	TableComponent,
+	FileComponent,
 ];
 
 export {
@@ -117,4 +121,7 @@ export {
 	CodeBlockComponent,
 	ImageComponent,
 	TableComponent,
+	File,
+	FileComponent,
+	FileUploader,
 };

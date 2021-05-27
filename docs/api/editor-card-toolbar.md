@@ -1,4 +1,4 @@
-# toolbar
+# Toolbar
 
 Card toolbar
 

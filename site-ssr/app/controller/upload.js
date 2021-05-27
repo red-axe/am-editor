@@ -23,7 +23,9 @@ class UploadController extends Controller {
 		}
 
 		//图片名称
-		const fileName = new Date().getTime() + '-' + stream.filename; // stream对象也包含了文件名，大小等基本信息
+		const sourceName = stream.filename;
+		const ext = sourceName.substr(sourceName.lastIndexOf('.'));
+		const fileName = new Date().getTime() + '-image' + ext; // stream对象也包含了文件名，大小等基本信息
 
 		// 创建文件写入路径
 		const filePath = path.join(
@@ -47,12 +49,61 @@ class UploadController extends Controller {
 				console.log(err);
 				reject(err);
 			});
-
+			const url = `${this.config.domain}/public/upload/${fileName}`;
 			// 监听写入完成事件
 			remoteFileStrem.on('finish', () => {
 				if (errFlag) return;
 				resolve({
-					url: `${this.config.domain}/public/upload/${fileName}`,
+					url,
+				});
+			});
+		});
+
+		ctx.body = { code: 200, message: '', data: result };
+	}
+
+	async file() {
+		const { ctx, app } = this;
+		//获取文件流
+		const stream = await ctx.getFileStream();
+		//文件名称
+		const sourceName = stream.filename;
+		const ext = sourceName.substr(sourceName.lastIndexOf('.'));
+		const fileName = new Date().getTime() + '-file' + ext; // stream对象也包含了文件名，大小等基本信息
+		// 创建文件写入路径
+		const filePath = path.join(
+			app.baseDir,
+			`/app/public/upload/${fileName}`,
+		);
+
+		const result = await new Promise((resolve, reject) => {
+			// 创建文件写入流
+			const remoteFileStrem = fs.createWriteStream(filePath);
+			// 以管道方式写入流
+			stream.pipe(remoteFileStrem);
+
+			let errFlag;
+			// 监听error事件
+			remoteFileStrem.on('error', err => {
+				errFlag = true;
+				// 停止写入
+				sendToWormhole(stream);
+				remoteFileStrem.destroy();
+				console.log(err);
+				reject(err);
+			});
+			const url = `${this.config.domain}/public/upload/${fileName}`;
+			// 监听写入完成事件
+			remoteFileStrem.on('finish', () => {
+				if (errFlag) return;
+				resolve({
+					url,
+					preview:
+						['.jpg', '.png', '.gif', '.pdf', '.txt'].indexOf(ext) >=
+						0
+							? url
+							: '',
+					download: url,
 				});
 			});
 		});

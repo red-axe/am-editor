@@ -1,4 +1,4 @@
-# adjust size
+# Resize
 
 A tool that can adjust the size of the card content area
 

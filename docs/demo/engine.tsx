@@ -26,6 +26,7 @@ import {
 	cards,
 	plugins,
 	ImageUploader,
+	FileUploader,
 	MarkRange,
 	lang,
 } from './config';
@@ -128,6 +129,9 @@ const EngineDemo = () => {
 						action: `${DOMAIN}/upload/image`,
 					},
 					isRemote: (src: string) => src.indexOf(DOMAIN) < 0,
+				},
+				[FileUploader.pluginName]: {
+					action: `${DOMAIN}/upload/file`,
 				},
 				[MarkRange.pluginName]: {
 					//标记类型集合

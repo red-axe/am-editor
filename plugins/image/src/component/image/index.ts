@@ -3,7 +3,7 @@ import {
 	EditorInterface,
 	getWindow,
 	isEngine,
-	isMobile,
+	escape,
 	NodeInterface,
 	sanitizeUrl,
 	Tooltip,

@@ -70,15 +70,21 @@ const ViewRender = () => {
 		view.render(content);
 		const { container } = view;
 		return (
-			<div
-				className={container.attributes('class')}
-				dangerouslySetInnerHTML={{ __html: container.html() }}
-			></div>
+			<div className="editor-wrapper" style={{ position: 'relative' }}>
+				<div
+					className={container.attributes('class')}
+					dangerouslySetInnerHTML={{ __html: container.html() }}
+				></div>
+			</div>
 		);
 	};
 	//普通渲染
 	const render = () => {
-		return <div className="am-engine-view" ref={viewRef} />;
+		return (
+			<div className="editor-wrapper" style={{ position: 'relative' }}>
+				<div className="am-engine-view" ref={viewRef} />
+			</div>
+		);
 	};
 	return (
 		<Loading loading={loading}>

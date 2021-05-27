@@ -33,8 +33,8 @@ class DocController extends Controller {
 		const doc = getDoc();
 		if (!content.paths) content.paths = [];
 		content.paths = content.paths.map(paths => {
-			const path = paths.path.map(path => {
-				return path.map(p => parseInt(p, 10));
+			const path = (paths.path || []).map(path => {
+				return (path || []).map(p => parseInt(p, 10));
 			});
 			return { ...paths, path };
 		});

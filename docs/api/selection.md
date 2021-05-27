@@ -1,46 +1,46 @@
-# 范围标记
+# Selection
 
-通过 `Selection` 可以很轻松的根据`RangeInterface`的选区在 DOM 树中创建标记，然后获取标记中间或者两侧的节点
+With `Selection`, you can easily create a mark in the DOM tree based on the selection of `RangeInterface`, and then get the nodes in the middle or on both sides of the mark
 
-## 构造函数
+## Constructor
 
 ```ts
 new (editor: EditorInterface, range: RangeInterface): SelectionInterface
 ```
 
-## 属性
+## Attributes
 
 ### `anchor`
 
-选区开始位置标记节点
+Mark the node at the beginning of the selection
 
-类型：`NodeInterface | null`
+Type: `NodeInterface | null`
 
 ### `focus`
 
-选区结束位置标记节点。如果 `Range` 的 collapsed 为 true，那么 focus 节点与 anchor 节点是一致的
+Mark the node at the end of the selection. If the collapsed of `Range` is true, then the focus node and the anchor node are consistent
 
-类型：`NodeInterface | null`
+Type: `NodeInterface | null`
 
-## 静态方法
+## Static method
 
 ### `removeTags`
 
-移除光标位置占位标签
+Remove cursor position placeholder label
 
 ```ts
 /**
- * 移除光标位置占位标签
- * @param value 需要移除的字符串
+ * Remove the placeholder label at the cursor position
+ * @param value The string to be removed
  */
 static removeTags = (value: string) => void
 ```
 
-## 方法
+## Method
 
 ### `has`
 
-是否有创建好的标记
+Is there a created mark?
 
 ```ts
 has(): boolean;
@@ -48,39 +48,39 @@ has(): boolean;
 
 ### `create`
 
-创建标记
+Create a mark
 
 ```ts
 /**
- * 创建标记
+ * Create mark
  */
 create(): void;
 ```
 
 ### `move`
 
-设置 Range 恢复到标记位置，并删除标记
+Set Range to return to the marked position and delete the mark
 
 ```ts
 /**
- * 让Range选择标记位置，并删除标记
+ * Let Range select the mark position and delete the mark
  */
 move(): void;
 ```
 
 ### `getNode`
 
-获取节点相对于标记位置的节点，获取后会移除标记
+Get the node relative to the marked position of the node, and the mark will be removed after acquisition
 
 ```ts
 /**
- * 获取节点相对于标记位置的节点，获取后会移除标记
- * @param node 节点
- * @param position 位置
+ * Get the node of the node relative to the marked position, and the mark will be removed after acquisition
+ * @param node node
+ * @param position
  */
 getNode(
     node: NodeInterface,
-    position?: 'left' | 'center' | 'right',
+    position?:'left' |'center' |'right',
     isClone?: boolean,
 ): NodeInterface;
 ```

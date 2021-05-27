@@ -54,6 +54,7 @@ am-editor，一个 Web 多人实时协同富文本编辑器。使用浏览器提
 -   [x] `@aomao/plugin-unorderedlist` 无序列表
 -   [x] `@aomao/plugin-image` 图片
 -   [x] `@aomao/plugin-table` 表格
+-   [x] `@aomao/plugin-file` 附件
 -   [x] `@aomao/plugin-mark-range` 光标范围标记
 -   [ ] `@aomao/plugin-video` 视频
 

@@ -174,6 +174,9 @@ export default {
 		table: {
 			title: '表格',
 		},
+		file: {
+			title: '附件',
+		},
 		commonlyUsed: {
 			title: '常用',
 		},

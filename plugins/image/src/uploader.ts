@@ -318,6 +318,7 @@ export default class extends Plugin<Options> {
 	dropFiles(files: Array<File>) {
 		if (!isEngine(this.editor)) return;
 		this.editor.command.execute('image-uploader', files);
+		return false;
 	}
 
 	pasteSchema(schema: SchemaInterface) {
@@ -349,6 +350,7 @@ export default class extends Plugin<Options> {
 			'image-uploader',
 			files.filter(file => this.isImage(file)),
 		);
+		return false;
 	}
 
 	pasteEach(node: NodeInterface) {

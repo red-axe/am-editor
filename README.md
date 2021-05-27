@@ -58,6 +58,7 @@ In modern enterprises, collaborative office is synonymous with high efficiency. 
 -   [x] `@aomao/plugin-unorderedlist` unordered list
 -   [x] `@aomao/plugin-image` image
 -   [x] `@aomao/plugin-table` table
+-   [x] `@aomao/plugin-file` file
 -   [x] `@aomao/plugin-mark-range` cursor range mark
 -   [] `@aomao/plugin-video` video
 

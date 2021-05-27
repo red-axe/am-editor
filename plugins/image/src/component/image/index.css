@@ -91,7 +91,7 @@
 }
 
 .data-image-error {
-    padding: 6px 8px;
+    padding: 2px 4px;
     background: #f5f5f5;
     display: inline-flex;
     border-radius: 4px;
@@ -102,6 +102,10 @@
     font-size: 12px;
     align-items: center;
     user-select: none;
+}
+
+.data-image-error .data-icon {
+    font-size: 12px;
 }
 
 .data-image-error .data-icon-error {

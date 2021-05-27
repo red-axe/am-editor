@@ -65,6 +65,7 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 					'/plugin/plugin-bold',
 					'/plugin/plugin-code',
 					'/plugin/plugin-codelock',
+					'/plugin/plugin-file',
 					'/plugin/plugin-fontcolor',
 					'/plugin/plugin-fontsize',
 					'/plugin/plugin-heading',
@@ -230,6 +231,7 @@ export default defineConfig({
 	favicon: 'https://cdn-object.aomao.com/icon/shortcut.png',
 	logo: 'https://cdn-object.aomao.com/icon/icon.svg',
 	outputPath: 'docs-dist',
+	hash: true,
 	mode: 'site',
 	locales: [
 		['en-US', 'English'],
