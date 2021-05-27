@@ -99,8 +99,15 @@ class UploadController extends Controller {
 				resolve({
 					url,
 					preview:
-						['.jpg', '.png', '.gif', '.pdf', '.txt'].indexOf(ext) >=
-						0
+						[
+							'.jpg',
+							'.png',
+							'.gif',
+							'.pdf',
+							'.txt',
+							'.html',
+							'.htm',
+						].indexOf(ext) >= 0
 							? url
 							: '',
 					download: url,

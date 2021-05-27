@@ -30,7 +30,15 @@ module.exports = (appInfo, appConfig = {}) => {
 			},
 		},
 	};
-
+	config.static = {
+		prefix: '/',
+		dir: path.join(appInfo.baseDir, 'app/public'),
+		// support lazy load
+		dynamic: true,
+		preload: false,
+		buffer: false,
+		maxFiles: 1000,
+	};
 	config.view = {
 		mapping: {
 			'.html': 'nunjucks',
