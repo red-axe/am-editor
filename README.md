@@ -1,10 +1,10 @@
 # am-editor
 
-![DEMO screenshot](https://user-images.githubusercontent.com/55792257/119612837-f6018580-be2e-11eb-8bde-60f55f1ffecc.png)
-
-> Thanks to Google Translate
+<img width="1676" alt="Demo" src="https://user-images.githubusercontent.com/55792257/119711922-a359b500-be92-11eb-9f77-459b6d468be9.png">
 
 [中文简体](https://github.com/itellyou-com/am-editor/blob/master/README.zh-CN.md)
+
+> Thanks to Google Translate
 
 am-editor, a web multi-person collaborative rich text editor based on [ShareDB](https://github.com/share/sharedb), suitable for `React` and `Vue` frameworks, compatible with mainstream modern browsers .
 
