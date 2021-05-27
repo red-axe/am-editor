@@ -29,7 +29,7 @@ class HomeController extends Controller {
 
 		// 先走 eggjs 的view 渲染
 		const htmlTemplate = await ctx.view.render(
-			isDev ? 'index.html' : 'main.html',
+			isDev ? 'dev.html' : 'index.html',
 		);
 
 		// 将 html 模板传到服务端渲染函数中

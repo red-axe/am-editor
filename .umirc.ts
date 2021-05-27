@@ -326,7 +326,11 @@ export default defineConfig({
 		fileName: 'manifest.json',
 	},
 	headScripts: [
-		`<script data-ad-client="ca-pub-3706417744839656" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>`,
+		{
+			src:
+				'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+			'data-ad-client': 'ca-pub-3706417744839656',
+		},
 	],
 	// more config: https://d.umijs.org/config
 });
