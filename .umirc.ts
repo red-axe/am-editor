@@ -237,6 +237,7 @@ export default defineConfig({
 	],
 	ssr: {
 		devServerRender: false,
+		removeWindowInitialProps: true,
 	},
 	navs: {
 		'en-US': [

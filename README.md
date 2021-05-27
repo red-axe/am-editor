@@ -196,4 +196,20 @@ return (
 
 ### Collaborative editing
 
-Collaborative editing is based on [ShareDB](https://github.com/share/sharedb). Each editor acts as [client](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/ot-cli)
+Collaborative editing is based on [ShareDB](https://github.com/share/sharedb). Each editor acts as [client](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/ot-client.ts) through `WebSocket` and [server](https://github.com/itellyou-com/am-editor/tree/master/ot-server) to exchange data. The editor processes and renders data.
+
+After we set up the client and server, we start collaborative editing. [View full example](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
+
+```tsx | pure
+//Instantiate the collaborative editing client and pass in the current editor engine instance
+const otClient = new OTClient(engine);
+//Connect to the collaboration server, `demo` is the same as the server document ID
+otClient.connect(
+	`ws://127.0.0.1:8080${currentMember ? '?uid=' + currentMember.id : ''}`,
+	'demo',
+);
+```
+
+### Project icon
+
+[Iconfont](https://at.alicdn.com/t/project/1456030/ada29c50-2c37-4701-b836-b9d622b8f0b3.html?spm=a313x.7781069.1998910419.35)
