@@ -49,7 +49,7 @@ class UploadController extends Controller {
 				console.log(err);
 				reject(err);
 			});
-			const url = `${this.config.domain}/public/upload/${fileName}`;
+			const url = `${this.config.domain}/upload/${fileName}`;
 			// 监听写入完成事件
 			remoteFileStrem.on('finish', () => {
 				if (errFlag) return;
@@ -92,7 +92,7 @@ class UploadController extends Controller {
 				console.log(err);
 				reject(err);
 			});
-			const url = `${this.config.domain}/public/upload/${fileName}`;
+			const url = `${this.config.domain}/upload/${fileName}`;
 			// 监听写入完成事件
 			remoteFileStrem.on('finish', () => {
 				if (errFlag) return;
