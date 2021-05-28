@@ -317,6 +317,8 @@ export default class extends Plugin<Options> {
 
 	dropFiles(files: Array<File>) {
 		if (!isEngine(this.editor)) return;
+		files = files.filter(file => this.isImage(file));
+		if (files.length === 0) return;
 		this.editor.command.execute('image-uploader', files);
 		return false;
 	}
