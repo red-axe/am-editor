@@ -231,9 +231,12 @@ export default class extends Plugin<Options> {
 
 	pasteFiles(files: Array<File>) {
 		if (!isEngine(this.editor)) return;
+		files = files.filter(file => this.isFile(file));
+		if (files.length === 0) return;
 		this.editor.command.execute(
 			'file-uploader',
 			files.filter(file => this.isFile(file)),
+			files,
 		);
 		return false;
 	}

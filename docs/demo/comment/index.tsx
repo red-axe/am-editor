@@ -156,6 +156,10 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 	useEffect(() => {
 		buttonRef.current = new CommentButton(editor);
 		load();
+		editor.on('afterSetValue', load);
+		return () => {
+			editor.off('afterSetValue', load);
+		};
 	}, []);
 
 	/**
@@ -543,7 +547,7 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 							select();
 						}}
 					>
-						{lang === 'zh-cn' ? '取消' : 'Ok'}
+						{lang === 'zh-cn' ? '取消' : 'Cancel'}
 					</Button>
 					<Button
 						size="small"
@@ -551,7 +555,7 @@ const Comment: React.FC<Props> = ({ editor, member, ...props }, ref) => {
 						onClick={(event: React.MouseEvent) => post(event)}
 						loading={editing}
 					>
-						{lang === 'zh-cn' ? '确定' : 'Cancel'}
+						{lang === 'zh-cn' ? '确定' : 'Ok'}
 					</Button>
 				</div>
 			</div>
