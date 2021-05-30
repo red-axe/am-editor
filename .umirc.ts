@@ -320,7 +320,7 @@ export default defineConfig({
 		'/api': getMenus({ base: '/api' }),
 	},
 	analytics: {
-		baidu: 'c456d9579fec82a2ce1175db47c46efe',
+		baidu: '91a0c5558015c5af2d5259d2bf4aa6eb',
 	},
 	manifest: {
 		fileName: 'manifest.json',

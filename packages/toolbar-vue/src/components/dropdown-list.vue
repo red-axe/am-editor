@@ -23,10 +23,11 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import ATooltip from "ant-design-vue/lib/tooltip"
+import ATooltip from "ant-design-vue/es/tooltip"
 import { formatHotkey } from '@aomao/engine'
 import { dropdownListProps , DropdownListItem } from '../types'
 import { autoGetHotkey } from "../utils"
+import 'ant-design-vue/es/tooltip/style/css'
 
 export default defineComponent({
     name:"am-dropdown-list",

@@ -35,11 +35,11 @@
 <script lang="ts">
 import { defineComponent, onMounted, PropType, ref } from 'vue'
 import { LanguageInterface } from '@aomao/engine'
-import AConfigProvider from 'ant-design-vue/lib/config-provider';
-import AInput from 'ant-design-vue/lib/input'
-import AButton from 'ant-design-vue/lib/button'
-import 'ant-design-vue/lib/input/style/css';
-import 'ant-design-vue/lib/button/style/css';
+import AConfigProvider from 'ant-design-vue/es/config-provider';
+import AInput from 'ant-design-vue/es/input'
+import AButton from 'ant-design-vue/es/button'
+import 'ant-design-vue/es/input/style/css';
+import 'ant-design-vue/es/button/style/css';
 
 export default defineComponent({
     name:"am-link-editor",

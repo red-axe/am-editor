@@ -20,8 +20,8 @@
 <script lang="ts">
 import { defineComponent, onMounted, PropType } from 'vue'
 import { LanguageInterface } from '@aomao/engine'
-import ATooltip from 'ant-design-vue/lib/tooltip'
-import 'ant-design-vue/lib/tooltip/style/css';
+import ATooltip from 'ant-design-vue/es/tooltip'
+import 'ant-design-vue/es/tooltip/style/css';
 
 export default defineComponent({
     name:"am-link-preview",

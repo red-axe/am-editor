@@ -17,11 +17,11 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref} from "vue"
-import ATooltip from "ant-design-vue/lib/tooltip"
+import ATooltip from "ant-design-vue/es/tooltip"
 import { formatHotkey } from '@aomao/engine'
 import { autoGetHotkey } from "../utils"
 import { buttonProps } from "../types"
-import 'ant-design-vue/lib/tooltip/style/css'
+import 'ant-design-vue/es/tooltip/style/css'
 
 export default defineComponent({
     name:"am-button",

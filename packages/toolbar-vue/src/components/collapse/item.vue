@@ -28,9 +28,9 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import APopover from 'ant-design-vue/lib/popover'
+import APopover from 'ant-design-vue/es/popover'
 import { collapseItemProps } from '../../types'
-import 'ant-design-vue/lib/popover/style/css'
+import 'ant-design-vue/es/popover/style/css'
 
 export default defineComponent({
     name:"am-collapse-item",

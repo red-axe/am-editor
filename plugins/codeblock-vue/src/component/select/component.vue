@@ -21,9 +21,9 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import ASelect from 'ant-design-vue/lib/select'
+import ASelect from 'ant-design-vue/es/select'
 import modeData from '../mode';
-import 'ant-design-vue/lib/select/style/css'
+import 'ant-design-vue/es/select/style/css'
 const ASelectOption = ASelect.Option
 
 export default defineComponent({
