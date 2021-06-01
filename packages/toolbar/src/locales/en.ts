@@ -177,6 +177,9 @@ export default {
 		file: {
 			title: 'File',
 		},
+		video: {
+			title: 'Video',
+		},
 		commonlyUsed: {
 			title: 'Commonly used',
 		},

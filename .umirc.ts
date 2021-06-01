@@ -94,6 +94,7 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 					'/plugin/plugin-underline',
 					'/plugin/plugin-undo',
 					'/plugin/plugin-unorderedlist',
+					'/plugin/plugin-video',
 				],
 			},
 		],

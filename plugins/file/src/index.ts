@@ -18,15 +18,15 @@ export default class extends Plugin {
 	execute(
 		status: 'uploading' | 'done' | 'error',
 		url: string,
-		name: string,
-		size: number,
-		preview: string,
-		download: string,
+		name?: string,
+		size?: number,
+		preview?: string,
+		download?: string,
 	): void {
 		const value: FileValue = {
 			status,
 			url,
-			name,
+			name: name || url,
 			size,
 			preview,
 			download,
@@ -75,7 +75,7 @@ export default class extends Plugin {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as FileComponent;
 			const value = card?.getValue();
-			if (value?.url) {
+			if (value?.url && value.status === 'done') {
 				const html = `<a href="${value.url}" style="word-wrap: break-word;color: #096DD9;touch-action: manipulation;background-color: rgba(0,0,0,0);text-decoration: none;outline: none;cursor: pointer;transition: color .3s;">
                 <span style="font-size: 14px;">\ud83d\udcce</span>${value.name}</a>`;
 				node.empty();

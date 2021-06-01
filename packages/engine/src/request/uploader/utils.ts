@@ -1,3 +1,5 @@
+import filesize from 'filesize';
+import { isWindows } from '../../utils';
 import mime from './mime';
 
 /**
@@ -15,4 +17,30 @@ export const getExtensionName = (file: File | string | Blob) => {
 		ext = file['name'].split('.').pop();
 	}
 	return ext;
+};
+
+/**
+ * 获取文件大小
+ * @param size
+ * @param base
+ * @returns
+ */
+export const getFileSize = (
+	size: number,
+	base: number = isWindows ? 2 : 10,
+) => {
+	//1M以下
+	if (size < 1048576) {
+		return filesize(size, {
+			base,
+			exponent: 1,
+			round: 0,
+		});
+	}
+
+	return filesize(size, {
+		base,
+		exponent: 2,
+		round: 1,
+	});
 };

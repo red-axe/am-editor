@@ -1,38 +1,43 @@
 import { isServer } from '@aomao/engine';
 
+const plugins = [
+	'shell',
+	'clike',
+	'css',
+	'dart',
+	'diff',
+	'dockerfile',
+	'erlang',
+	'go',
+	'groovy',
+	'htmlmixed',
+	'http',
+	'javascript',
+	'jsx',
+	'cmake',
+	'markdown',
+	'octave',
+	'nginx',
+	'pascal',
+	'perl',
+	'php',
+	'powershell',
+	'protobuf',
+	'python',
+	'r',
+	'ruby',
+	'rust',
+	'sql',
+	'swift',
+	'vb',
+	'velocity',
+	'xml',
+	'yaml',
+];
 if (!isServer) {
-	require('codemirror/mode/shell/shell');
-	require('codemirror/mode/clike/clike');
-	require('codemirror/mode/css/css');
-	require('codemirror/mode/dart/dart');
-	require('codemirror/mode/diff/diff');
-	require('codemirror/mode/dockerfile/dockerfile');
-	require('codemirror/mode/erlang/erlang');
-	require('codemirror/mode/go/go');
-	require('codemirror/mode/groovy/groovy');
-	require('codemirror/mode/htmlmixed/htmlmixed');
-	require('codemirror/mode/http/http');
-	require('codemirror/mode/javascript/javascript');
-	require('codemirror/mode/jsx/jsx');
-	require('codemirror/mode/cmake/cmake');
-	require('codemirror/mode/markdown/markdown');
-	require('codemirror/mode/octave/octave');
-	require('codemirror/mode/nginx/nginx');
-	require('codemirror/mode/pascal/pascal');
-	require('codemirror/mode/perl/perl');
-	require('codemirror/mode/php/php');
-	require('codemirror/mode/powershell/powershell');
-	require('codemirror/mode/protobuf/protobuf');
-	require('codemirror/mode/python/python');
-	require('codemirror/mode/r/r');
-	require('codemirror/mode/ruby/ruby');
-	require('codemirror/mode/rust/rust');
-	require('codemirror/mode/sql/sql');
-	require('codemirror/mode/swift/swift');
-	require('codemirror/mode/vb/vb');
-	require('codemirror/mode/velocity/velocity');
-	require('codemirror/mode/xml/xml');
-	require('codemirror/mode/yaml/yaml');
+	plugins.forEach(pluginName => {
+		import(`codemirror/mode/${pluginName}/${pluginName}`);
+	});
 }
 
 const datas = [

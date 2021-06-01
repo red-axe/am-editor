@@ -6,7 +6,9 @@ am-editor，一个基于[ShareDB](https://github.com/share/sharedb) 的 Web 多�
 
 [查看在线文档及演示](https://editor.aomao.com)
 
-技术交流 QQ 群：907664876 [科学上网](https://xiyou4you.us/r/?s=18517120)
+技术交流 QQ 群：907664876
+
+[科学上网，方便、快捷的上网冲浪](https://xiyou4you.us/r/?s=18517120)
 
 am-editor，一个 Web 多人实时协同富文本编辑器。使用浏览器提供的`contenteditable`属性让一个 DOM 节点具有可编辑能力。
 
@@ -56,7 +58,7 @@ am-editor，一个 Web 多人实时协同富文本编辑器。使用浏览器提
 -   [x] `@aomao/plugin-table` 表格
 -   [x] `@aomao/plugin-file` 附件
 -   [x] `@aomao/plugin-mark-range` 光标范围标记
--   [ ] `@aomao/plugin-video` 视频
+-   [x] `@aomao/plugin-video` 视频
 
 ## 快速上手
 

@@ -36,7 +36,7 @@
     "vue": "^3.0.11"
   },
   "devDependencies": {
-    "@types/codemirror": "^0.0.108",
+    "@types/codemirror": "^5.60.0",
     "@types/lodash-es": "^4.17.4",
     "@vue/compiler-sfc": "^3.0.11",
     "rollup-plugin-vue": "^6.0.0-beta.10"

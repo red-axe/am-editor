@@ -15,7 +15,12 @@ import Toolbar, { Tooltip } from './toolbar';
 import Range from './range';
 import Selection from './selection';
 import Parser from './parser';
-import Request, { Ajax, Uploader, getExtensionName } from './request';
+import Request, {
+	Ajax,
+	Uploader,
+	getExtensionName,
+	getFileSize,
+} from './request';
 import Scrollbar from './scrollbar';
 
 export * from './types';
@@ -43,6 +48,7 @@ export {
 	Uploader,
 	Ajax,
 	getExtensionName,
+	getFileSize,
 	Scrollbar,
 	Path,
 };

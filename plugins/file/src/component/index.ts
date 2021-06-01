@@ -6,8 +6,8 @@ import {
 	sanitizeUrl,
 	CardToolbarItemOptions,
 	ToolbarItemOptions,
+	getFileSize,
 } from '@aomao/engine';
-import { getFileSize } from '../utils';
 import './index.css';
 
 export type FileValue = {

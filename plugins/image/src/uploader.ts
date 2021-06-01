@@ -359,7 +359,7 @@ export default class extends Plugin<Options> {
 		//是卡片，并且还没渲染
 		if (node.isCard() && node.attributes(READY_CARD_KEY)) {
 			const card = this.editor.card.find(node) as ImageComponent;
-			if (!card) return;
+			if (!card || node.attributes(READY_CARD_KEY) !== 'image') return;
 			const value = card.getValue();
 			if (!value || !value.src) {
 				node.remove();

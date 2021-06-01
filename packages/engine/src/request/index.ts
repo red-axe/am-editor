@@ -5,7 +5,7 @@ import {
 	OpenDialogOptions,
 } from '../types';
 import Ajax from './ajax';
-import Uploader, { getExtensionName } from './uploader';
+import Uploader, { getExtensionName, getFileSize } from './uploader';
 
 class Request implements RequestInterface {
 	ajax(options: AjaxOptions | string) {
@@ -67,5 +67,5 @@ class Request implements RequestInterface {
 		});
 	}
 }
-export { getExtensionName, Ajax, Uploader };
+export { getExtensionName, Ajax, Uploader, getFileSize };
 export default Request;

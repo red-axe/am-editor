@@ -83,6 +83,10 @@ export interface EditorInterface {
 	 */
 	command: CommandInterface;
 	/**
+	 * 请求
+	 */
+	request: RequestInterface;
+	/**
 	 * 卡片
 	 */
 	card: CardModelInterface;
@@ -461,11 +465,6 @@ export interface EngineInterface extends EditorInterface {
 	 * 历史记录
 	 */
 	history: HistoryInterface;
-	/**
-	 * 请求
-	 */
-	request: RequestInterface;
-
 	/**
 	 * 聚焦到编辑器
 	 */

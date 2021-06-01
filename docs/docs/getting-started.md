@@ -193,8 +193,6 @@ export default EngineDemo;
 
 Introduce the `@aomao/toolbar` toolbar, the toolbar UI is more complicated, all of which are rendered by using the front-end framework, `vue` developers use `@aomao/toolbar-vue`
 
-`vue` Please use vue3.0 @vue/cli-service @vue/cli-plugin-babel related scaffolding vite cannot use this plugin
-
 ```tsx | pure
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 ```

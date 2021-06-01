@@ -29,6 +29,7 @@ import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
 import Table, { TableComponent } from '@aomao/plugin-table';
 import MarkRange from '@aomao/plugin-mark-range';
 import File, { FileComponent, FileUploader } from '@aomao/plugin-file';
+import Video, { VideoComponent, VideoUploader } from '@aomao/plugin-video';
 
 export const IS_DEV = process.env.NODE_ENV !== 'production';
 export const DOMAIN = IS_DEV
@@ -74,6 +75,8 @@ export const plugins = [
 	MarkRange,
 	File,
 	FileUploader,
+	Video,
+	VideoUploader,
 ];
 
 export const cards = [
@@ -83,6 +86,7 @@ export const cards = [
 	ImageComponent,
 	TableComponent,
 	FileComponent,
+	VideoComponent,
 ];
 
 export {
@@ -124,4 +128,7 @@ export {
 	File,
 	FileComponent,
 	FileUploader,
+	Video,
+	VideoComponent,
+	VideoUploader,
 };

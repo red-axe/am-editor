@@ -27,6 +27,7 @@ import {
 	plugins,
 	ImageUploader,
 	FileUploader,
+	VideoUploader,
 	MarkRange,
 	lang,
 } from './config';
@@ -132,6 +133,12 @@ const EngineDemo = () => {
 				},
 				[FileUploader.pluginName]: {
 					action: `${DOMAIN}/upload/file`,
+				},
+				[VideoUploader.pluginName]: {
+					action: `${DOMAIN}/upload/video`,
+					query: {
+						action: `${DOMAIN}/upload/video-query`,
+					},
 				},
 				[MarkRange.pluginName]: {
 					//标记类型集合
@@ -298,7 +305,7 @@ const EngineDemo = () => {
 			</div>
 			{!editorLoading && (
 				<Toolbar
-					engine={engineRef.current}
+					engine={engineRef.current!}
 					items={[
 						['collapse'],
 						['undo', 'redo', 'paintformat', 'removeformat'],

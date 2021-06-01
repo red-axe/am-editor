@@ -8,11 +8,11 @@ import {
 	getExtensionName,
 } from '@aomao/engine';
 
-import FileComponent from './component';
+import VideoComponent from './component';
 
 export type Options = {
 	/**
-	 * 文件上传地址
+	 * 视频上传地址
 	 */
 	action: string;
 	/**
@@ -40,24 +40,52 @@ export type Options = {
 	 */
 	limitSize?: number;
 	/**
-	 * 解析上传后的Respone，返回 result:是否成功，data:成功：文件地址，失败：错误信息
+	 * 解析上传后的Respone，返回 result:是否成功，data:成功：{id:视频唯一标识,url:视频地址,cover?:视频封面}，失败：错误信息
 	 */
 	parse?: (
 		response: any,
 	) => {
 		result: boolean;
-		data: string;
+		data:
+			| {
+					url: string;
+					id?: string;
+					cover?: string;
+					status?: string;
+			  }
+			| string;
+	};
+	/**
+	 * 查询地址
+	 */
+	query?: {
+		/**
+		 * 查询地址
+		 */
+		action: string;
+		/**
+		 * 数据返回类型，默认 json
+		 */
+		type?: '*' | 'json' | 'xml' | 'html' | 'text' | 'js';
+		/**
+		 * 额外携带数据上传
+		 */
+		data?: {};
+		/**
+		 * 请求类型，默认 multipart/form-data;
+		 */
+		contentType?: string;
 	};
 };
 
 export default class extends Plugin<Options> {
-	private cardComponents: { [key: string]: FileComponent } = {};
+	private cardComponents: { [key: string]: VideoComponent } = {};
 
 	static get pluginName() {
-		return 'file-uploader';
+		return 'video-uploader';
 	}
 
-	private extensionNames = ['*'];
+	private extensionNames = ['mp4'];
 
 	init() {
 		if (isEngine(this.editor)) {
@@ -102,16 +130,20 @@ export default class extends Plugin<Options> {
 			  });
 	}
 
-	isFile(file: File) {
+	isVideo(file: File) {
 		const name = getExtensionName(file);
-		return (
-			this.extensionNames.indexOf('*') >= 0 ||
-			this.extensionNames.indexOf(name) >= 0
-		);
+		return this.extensionNames.indexOf(name) >= 0;
 	}
 
-	async execute(files?: Array<File> | MouseEvent) {
+	async execute(files?: Array<File> | MouseEvent | string, ...args: any) {
 		if (!isEngine(this.editor)) return;
+		if (typeof files === 'string') {
+			switch (files) {
+				case 'query':
+					return this.query(args[0], args[1], args[2]);
+			}
+			return;
+		}
 		const { request, card, language } = this.editor;
 		const { action, data, type, contentType, multiple } = this.options;
 		const { parse } = this.options;
@@ -119,12 +151,11 @@ export default class extends Plugin<Options> {
 		if (!Array.isArray(files)) {
 			files = await request.getFiles({
 				event: files,
-				accept:
-					isAndroid || this.extensionNames.indexOf('*') > -1
-						? '*'
-						: this.extensionNames.length > 0
-						? '.' + this.extensionNames.join(',.')
-						: '',
+				accept: isAndroid
+					? 'video/*'
+					: this.extensionNames.length > 0
+					? '.' + this.extensionNames.join(',.')
+					: '',
 				multiple,
 			});
 		}
@@ -139,7 +170,7 @@ export default class extends Plugin<Options> {
 					if (file.size > limitSize) {
 						this.editor.messageError(
 							language
-								.get('file', 'uploadLimitError')
+								.get('video', 'uploadLimitError')
 								.toString()
 								.replace(
 									'$size',
@@ -156,11 +187,11 @@ export default class extends Plugin<Options> {
 						!!this.cardComponents[fileInfo.uid]
 					)
 						return;
-					const component = card.insert('file', {
+					const component = card.insert('video', {
 						status: 'uploading',
 						name: fileInfo.name,
 						size: fileInfo.size,
-					}) as FileComponent;
+					}) as VideoComponent;
 					this.cardComponents[fileInfo.uid] = component;
 				},
 				onUploading: (file, { percent }) => {
@@ -171,34 +202,51 @@ export default class extends Plugin<Options> {
 				onSuccess: (response, file) => {
 					const component = this.cardComponents[file.uid || ''];
 					if (!component) return;
-					const url =
+					const id: string =
+						response.id || (response.data && response.data.id);
+					let url: string =
 						response.url || (response.data && response.data.url);
-					const preview =
-						response.preview ||
-						(response.data && response.data.preview);
-					const download =
+					const cover: string =
+						response.cover ||
+						(response.data && response.data.cover);
+					const download: string =
 						response.download ||
 						(response.data && response.data.download);
+					let status: string =
+						response.status ||
+						(response.data && response.data.status);
+					status = status === 'transcoding' ? 'transcoding' : 'done';
 					const result = parse
 						? parse(response)
 						: !!url
-						? { result: true, data: url }
+						? {
+								result: true,
+								data: {
+									video_id: id,
+									url,
+									cover,
+									download,
+									status,
+								},
+						  }
 						: { result: false, data: response.data };
+					//失败
 					if (!result.result) {
 						card.update(component.id, {
 							status: 'error',
 							message:
 								result.data ||
-								this.editor.language.get('file', 'uploadError'),
+								this.editor.language.get(
+									'video',
+									'uploadError',
+								),
 						});
-					} else {
-						const value: any = {
-							status: 'done',
-							url: result.data,
-							preview,
-							download,
-						};
-						this.editor.card.update(component.id, value);
+					}
+					//成功
+					else {
+						this.editor.card.update(component.id, {
+							...result.data,
+						});
 					}
 					delete this.cardComponents[file.uid || ''];
 				},
@@ -209,7 +257,7 @@ export default class extends Plugin<Options> {
 						status: 'error',
 						message:
 							error.message ||
-							this.editor.language.get('file', 'uploadError'),
+							this.editor.language.get('video', 'uploadError'),
 					});
 					delete this.cardComponents[file.uid || ''];
 				},
@@ -219,21 +267,78 @@ export default class extends Plugin<Options> {
 		return;
 	}
 
+	query(
+		video_id: string,
+		success: (data?: {
+			url: string;
+			name?: string;
+			cover?: string;
+			download?: string;
+			status?: string;
+		}) => void,
+		failed: (message: string) => void = () => {},
+	) {
+		const { request } = this.editor;
+
+		const { query, parse } = this.options;
+		if (!query || !video_id) return success();
+
+		const { action, type, contentType, data } = query;
+
+		request.ajax({
+			url: action,
+			dataType: type || 'json',
+			contentType,
+			data: {
+				...data,
+				id: video_id,
+			},
+			success: (response: any) => {
+				const { result, data } = response;
+				if (!result) {
+					failed(data);
+				} else {
+					const result = parse ? parse(response) : response;
+					if (result.result === false) {
+						failed(
+							result.data ||
+								this.editor.language.get('video', 'loadError'),
+						);
+					} else
+						success({
+							...result.data,
+							status:
+								result.data.status !== 'transcoding'
+									? 'done'
+									: 'transcoding',
+						});
+				}
+			},
+			error: error => {
+				failed(
+					error.message ||
+						this.editor.language.get('video', 'loadError'),
+				);
+			},
+			method: 'GET',
+		});
+	}
+
 	dropFiles(files: Array<File>) {
 		if (!isEngine(this.editor)) return;
-		files = files.filter(file => this.isFile(file));
+		files = files.filter(file => this.isVideo(file));
 		if (files.length === 0) return;
-		this.editor.command.execute('file-uploader', files);
+		this.editor.command.execute('video-uploader', files);
 		return false;
 	}
 
 	pasteFiles(files: Array<File>) {
 		if (!isEngine(this.editor)) return;
-		files = files.filter(file => this.isFile(file));
+		files = files.filter(file => this.isVideo(file));
 		if (files.length === 0) return;
 		this.editor.command.execute(
-			'file-uploader',
-			files.filter(file => this.isFile(file)),
+			'video-uploader',
+			files.filter(file => this.isVideo(file)),
 			files,
 		);
 		return false;
@@ -242,8 +347,8 @@ export default class extends Plugin<Options> {
 	pasteEach(node: NodeInterface) {
 		//是卡片，并且还没渲染
 		if (node.isCard() && node.attributes(READY_CARD_KEY)) {
-			const card = this.editor.card.find(node) as FileComponent;
-			if (!card || node.attributes(READY_CARD_KEY) !== 'file') return;
+			const card = this.editor.card.find(node) as VideoComponent;
+			if (!card || node.attributes(READY_CARD_KEY) !== 'video') return;
 			const value = card.getValue();
 			if (!value || !value.url) {
 				node.remove();

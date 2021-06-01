@@ -548,6 +548,17 @@
     display: inline-block;
 }
 
+@-webkit-keyframes loadingCircle {
+    100% {
+      transform: rotate(360deg);
+    }
+}
+@keyframes loadingCircle {
+    100% {
+      transform: rotate(360deg);
+    }
+}
+
 .data-anticon .data-anticon-spin {
     display: inline-block;
     -webkit-animation: loadingCircle 1s infinite linear;

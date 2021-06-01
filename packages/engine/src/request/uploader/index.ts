@@ -4,7 +4,7 @@ import {
 	UploaderOptions,
 	File,
 } from '../../types/request';
-import { getExtensionName } from './utils';
+import { getExtensionName, getFileSize } from './utils';
 import Ajax from '../ajax';
 
 class Uploader implements UploaderInterface {
@@ -130,4 +130,4 @@ class Uploader implements UploaderInterface {
 
 export default Uploader;
 
-export { getExtensionName };
+export { getExtensionName, getFileSize };

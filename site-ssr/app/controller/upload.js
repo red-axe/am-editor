@@ -117,6 +117,65 @@ class UploadController extends Controller {
 
 		ctx.body = { code: 200, message: '', data: result };
 	}
+
+	async video() {
+		const { ctx, app } = this;
+		//获取文件流
+		const stream = await ctx.getFileStream();
+		//文件名称
+		const sourceName = stream.filename;
+		const ext = sourceName.substr(sourceName.lastIndexOf('.'));
+		const fileName = new Date().getTime() + '-video' + ext; // stream对象也包含了文件名，大小等基本信息
+		// 创建文件写入路径
+		const filePath = path.join(
+			app.baseDir,
+			`/app/public/upload/${fileName}`,
+		);
+
+		const result = await new Promise((resolve, reject) => {
+			// 创建文件写入流
+			const remoteFileStrem = fs.createWriteStream(filePath);
+			// 以管道方式写入流
+			stream.pipe(remoteFileStrem);
+
+			let errFlag;
+			// 监听error事件
+			remoteFileStrem.on('error', err => {
+				errFlag = true;
+				// 停止写入
+				sendToWormhole(stream);
+				remoteFileStrem.destroy();
+				console.log(err);
+				reject(err);
+			});
+			const url = `${this.config.domain}/upload/${fileName}`;
+			// 监听写入完成事件
+			remoteFileStrem.on('finish', () => {
+				if (errFlag) return;
+				resolve({
+					url,
+					download: url,
+				});
+			});
+		});
+
+		ctx.body = { code: 200, message: '', data: result };
+	}
+
+	async videoQuery() {
+		const { ctx, app } = this;
+
+		const { id } = ctx.request.body;
+		const result = await new Promise((resolve, reject) => {
+			setTimeout(() => {
+				resolve({
+					id,
+					//url
+				});
+			}, 5000);
+		});
+		ctx.body = { code: 200, message: '', data: result };
+	}
 }
 
 module.exports = UploadController;

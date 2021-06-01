@@ -50,8 +50,10 @@ export default defineComponent({
         })
 
         const show = () => {
-            document.addEventListener('click', hide);
             visible.value = true
+            setTimeout(() => {
+                document.addEventListener('click', hide);
+            }, 10);
         };
 
         const hide = (event?: MouseEvent) => {

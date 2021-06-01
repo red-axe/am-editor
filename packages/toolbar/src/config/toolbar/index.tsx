@@ -264,6 +264,70 @@ export const getToolbarDefaultConfig = (
 							title: language['file']['title'],
 							search: '附件,文件,fujian,wenjian,file',
 						},
+						{
+							name: 'video-uploader',
+							icon: (
+								<span>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24px"
+										height="24px"
+										viewBox="0 0 24 24"
+										version="1.1"
+									>
+										<g
+											stroke="none"
+											strokeWidth="1"
+											fill="none"
+											fillRule="evenodd"
+										>
+											<g transform="translate(-16.000000, -641.000000)">
+												<g>
+													<g transform="translate(16.000000, 641.000000)">
+														<g>
+															<rect
+																stroke="#E8E8E8"
+																fill="#FFFFFF"
+																x="0.5"
+																y="0.5"
+																width="23"
+																height="23"
+																rx="2"
+															/>
+															<g
+																transform="translate(6.000000, 6.000000)"
+																fillRule="nonzero"
+															>
+																<rect
+																	fill="#000000"
+																	opacity="0"
+																	x="0"
+																	y="0"
+																	width="12"
+																	height="12"
+																/>
+																<path
+																	d="M6,0.75 C3.10078125,0.75 0.75,3.10078125 0.75,6 C0.75,8.89921875 3.10078125,11.25 6,11.25 C8.89921875,11.25 11.25,8.89921875 11.25,6 C11.25,3.10078125 8.89921875,0.75 6,0.75 Z M6,10.359375 C3.59296875,10.359375 1.640625,8.40703125 1.640625,6 C1.640625,3.59296875 3.59296875,1.640625 6,1.640625 C8.40703125,1.640625 10.359375,3.59296875 10.359375,6 C10.359375,8.40703125 8.40703125,10.359375 6,10.359375 Z"
+																	id="Shape"
+																	fill="#595959"
+																/>
+																<path
+																	d="M7.93963415,5.8884912 L5.23140244,4.02687575 C5.13445122,3.96020395 5,4.02514402 5,4.13857268 L5,7.86180356 C5,7.97523223 5.13536585,8.03930643 5.23140244,7.97350049 L7.93963415,6.11188505 C8.02012195,6.05646952 8.02012195,5.94390673 7.93963415,5.8884912 Z"
+																	id="Shape"
+																	fill="#71D19A"
+																/>
+															</g>
+														</g>
+													</g>
+												</g>
+											</g>
+										</g>
+									</svg>
+								</span>
+							),
+							title: language['video']['title'],
+							search: '视频,MP4,shipin,video',
+						},
 					],
 				},
 			],

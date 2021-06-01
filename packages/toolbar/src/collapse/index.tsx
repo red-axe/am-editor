@@ -34,8 +34,10 @@ const Collapse: React.FC<CollapseProps> = ({
 	}, [isCustomize]);
 
 	const show = () => {
-		document.addEventListener('click', hide);
 		setVisible(true);
+		setTimeout(() => {
+			document.addEventListener('click', hide);
+		}, 10);
 	};
 
 	const hide = (event?: MouseEvent) => {

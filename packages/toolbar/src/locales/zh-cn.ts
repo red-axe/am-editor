@@ -177,6 +177,9 @@ export default {
 		file: {
 			title: '附件',
 		},
+		video: {
+			title: '视频',
+		},
 		commonlyUsed: {
 			title: '常用',
 		},

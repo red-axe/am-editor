@@ -28,7 +28,8 @@
     "is-hotkey": "^0.2.0",
     "lodash-es": "^4.17.21",
     "ot-json0": "^1.1.0",
-    "tinycolor2": "^1.4.2"
+    "tinycolor2": "^1.4.2",
+    "filesize": "^6.3.0"
   },
   "devDependencies": {
     "@types/blueimp-md5": "^2.7.0",

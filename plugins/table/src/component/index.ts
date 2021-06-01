@@ -61,6 +61,9 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 				type: 'dnd',
 			},
 			{
+				type: 'maximize',
+			},
+			{
 				type: 'copy',
 			},
 			{

@@ -25,7 +25,11 @@ import Clipboard from './clipboard';
 import { LanguageInterface } from './types/language';
 import Language from './language';
 import Parser from './parser';
-import { CommandInterface, MarkModelInterface } from './types';
+import {
+	CommandInterface,
+	MarkModelInterface,
+	RequestInterface,
+} from './types';
 import { BlockModelInterface } from './types/block';
 import { InlineModelInterface } from './types/inline';
 import { ListModelInterface } from './types/list';
@@ -34,6 +38,7 @@ import Mark from './mark';
 import Inline from './inline';
 import Block from './block';
 import Command from './command';
+import Request from './request';
 
 class View implements ViewInterface {
 	private options: ContentViewOptions = {
@@ -57,6 +62,7 @@ class View implements ViewInterface {
 	schema: SchemaInterface;
 	conversion: ConversionInterface;
 	command: CommandInterface;
+	request: RequestInterface;
 
 	constructor(selector: Selector, options?: ContentViewOptions) {
 		this.options = { ...this.options, ...options };
@@ -75,6 +81,7 @@ class View implements ViewInterface {
 		this.inline = new Inline(this);
 		this.block = new Block(this);
 		this.clipboard = new Clipboard(this);
+		this.request = new Request();
 		this.container = this.$(selector);
 		this.root = this.$(
 			this.options.root || this.container.parent() || document.body,
@@ -126,7 +133,7 @@ class View implements ViewInterface {
 		console.log(`error:${error}`);
 	}
 
-	messageConfirm(message: string) {
+	messageConfirm(message: string): Promise<boolean> {
 		console.log(`confirm:${message}`);
 		return Promise.reject(false);
 	}
