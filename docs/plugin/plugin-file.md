@@ -120,10 +120,10 @@ engine.command.execute(
 	File.pluginName,
 	'done',
 	'File address',
-	'File name',
-	'File size',
-	'Preview address',
-	'Download address',
+	'File name', //optional
+	'File size', //optional
+	'Preview address', //optional
+	'Download address', //optional
 );
 ```
 

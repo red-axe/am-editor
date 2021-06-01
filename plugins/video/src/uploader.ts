@@ -287,8 +287,8 @@ export default class extends Plugin<Options> {
 
 		request.ajax({
 			url: action,
-			dataType: type || 'json',
-			contentType,
+			contentType: contentType || 'application/json',
+			type: type === undefined ? 'json' : type,
 			data: {
 				...data,
 				id: video_id,
