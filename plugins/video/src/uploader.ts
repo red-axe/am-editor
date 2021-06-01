@@ -136,7 +136,6 @@ export default class extends Plugin<Options> {
 	}
 
 	async execute(files?: Array<File> | MouseEvent | string, ...args: any) {
-		if (!isEngine(this.editor)) return;
 		if (typeof files === 'string') {
 			switch (files) {
 				case 'query':
