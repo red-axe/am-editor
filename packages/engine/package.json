@@ -1,6 +1,6 @@
 {
   "name": "@aomao/engine",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -25,11 +25,11 @@
     "copy-to-clipboard": "^3.3.1",
     "diff-match-patch": "^1.0.5",
     "eventemitter2": "^6.4.4",
+    "filesize": "^6.3.0",
     "is-hotkey": "^0.2.0",
     "lodash-es": "^4.17.21",
     "ot-json0": "^1.1.0",
-    "tinycolor2": "^1.4.2",
-    "filesize": "^6.3.0"
+    "tinycolor2": "^1.4.2"
   },
   "devDependencies": {
     "@types/blueimp-md5": "^2.7.0",
