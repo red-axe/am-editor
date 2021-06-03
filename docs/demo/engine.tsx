@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import debounce from 'lodash-es/debounce';
-import Avatar from 'antd/lib/avatar';
-import Message from 'antd/lib/message';
-import Space from 'antd/lib/space';
-import Modal from 'antd/lib/modal';
+import Avatar from 'antd/es/avatar';
+import Message from 'antd/es/message';
+import Space from 'antd/es/space';
+import Modal from 'antd/es/modal';
 //引入编辑器引擎
 import Engine, {
 	EngineInterface,
@@ -29,12 +29,13 @@ import {
 	FileUploader,
 	VideoUploader,
 	MarkRange,
+	Math,
 	lang,
 } from './config';
-import 'antd/lib/avatar/style';
-import 'antd/lib/message/style';
-import 'antd/lib/space/style';
-import 'antd/lib/modal/style';
+import 'antd/es/avatar/style';
+import 'antd/es/message/style';
+import 'antd/es/space/style';
+import 'antd/es/modal/style';
 import './engine.less';
 
 const localMember =
@@ -136,8 +137,12 @@ const EngineDemo = () => {
 				},
 				[VideoUploader.pluginName]: {
 					action: `${DOMAIN}/upload/video`,
-					query: {
-						action: `${DOMAIN}/upload/video-query`,
+				},
+				[Math.pluginName]: {
+					action: `https://g.aomao.com/latex`,
+					parse: (res: any) => {
+						if (res.success) return { result: true, data: res.svg };
+						return { result: false };
 					},
 				},
 				[MarkRange.pluginName]: {
@@ -212,7 +217,6 @@ const EngineDemo = () => {
 			}
 		});
 		//设置编辑器值
-		console.log(content.current);
 		const wrapValue = engine.command.execute(
 			MarkRange.pluginName,
 			'comment',
@@ -229,6 +233,19 @@ const EngineDemo = () => {
 			onSave();
 			console.log('value', editorValue);
 			//console.log('html:', engine.getHtml());
+		});
+		//卡片最大化时设置编辑页面样式
+		engine.on('card:maximize', () => {
+			engine
+				.$('.editor-toolbar')
+				.css('z-index', '9999')
+				.css('top', '56px');
+		});
+		engine.on('card:minimize', () => {
+			engine
+				.$('.editor-toolbar')
+				.css('z-index', '')
+				.css('top', '');
 		});
 		//获取当前保存的用户信息
 		const memberData = localStorage.getItem('member');

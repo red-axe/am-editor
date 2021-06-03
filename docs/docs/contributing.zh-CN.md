@@ -80,3 +80,17 @@ am-editor 使用 [dumi](https://d.umijs.org/) 作为文档站点工具，
 1. 每篇文档左下方有 “在 GitHub 上编辑这篇文档”，你可以通过这里进行文档修改
 2. 打开 Github 上的 docs 目录，用文件编辑器新建、修改、预览文件，然后提 PR
 3. 你还可以 clone am-editor 仓库，修改 docs 目录下的文件，本地文档调试完成后统一提 PR
+
+## 经济支持
+
+### 支付宝
+
+![alipay](https://cdn-object.aomao.com/contribution/alipay.png?x-oss-process=image/resize,w_200)
+
+### 微信支付
+
+![wechat](https://cdn-object.aomao.com/contribution/weichat.png?x-oss-process=image/resize,w_200)
+
+### PayPal
+
+https://paypal.me/aomaocom

@@ -1,9 +1,9 @@
 import React from 'react';
 import classnames from 'classnames-es-ts';
-import Tooltip from 'antd/lib/tooltip';
+import Tooltip from 'antd/es/tooltip';
 import { EngineInterface, formatHotkey } from '@aomao/engine';
 import { autoGetHotkey } from '../utils';
-import 'antd/lib/tooltip/style';
+import 'antd/es/tooltip/style';
 
 export type DropdownListItem = {
 	key: string;

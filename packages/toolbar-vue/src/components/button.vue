@@ -21,7 +21,7 @@ import ATooltip from "ant-design-vue/es/tooltip"
 import { formatHotkey } from '@aomao/engine'
 import { autoGetHotkey } from "../utils"
 import { buttonProps } from "../types"
-import 'ant-design-vue/es/tooltip/style/css'
+import 'ant-design-vue/es/tooltip/style'
 
 export default defineComponent({
     name:"am-button",

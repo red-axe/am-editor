@@ -1,0 +1,30 @@
+{
+  "name": "@aomao/plugin-math",
+  "version": "1.0.0",
+  "description": "Math（数学公式）",
+  "keywords": [
+    "Math"
+  ],
+  "author": "ITELLYOU <me@aomao.com>",
+  "homepage": "https://github.com/itellyou-com/am-editor/tree/main/plugins/plugin-math#readme",
+  "main": "dist/index.ts",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itellyou-com/am-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itellyou-com/am-editor/issues"
+  },
+  "dependencies": {
+    "@aomao/engine": "^2.1.2",
+    "@babel/runtime": "^7.13.10"
+  }
+}

@@ -1,4 +1,5 @@
 import { createApp, App } from 'vue';
+import Keymaster from 'keymaster';
 import { omit } from 'lodash-es';
 import { EngineInterface, isServer, NodeInterface } from '@aomao/engine';
 import Collapse from '../../components/collapse/collapse.vue';

@@ -28,6 +28,7 @@ import {
 import Paste from './paste';
 import { SelectionInterface } from '../types/selection';
 import Selection from '../selection';
+import { escape } from '../utils';
 
 class ChangeModel implements ChangeInterface {
 	private engine: EngineInterface;

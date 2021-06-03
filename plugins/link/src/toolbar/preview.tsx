@@ -1,8 +1,8 @@
 import React from 'react';
 import classnames from 'classnames-es-ts';
 import { LanguageInterface } from '@aomao/engine';
-import Tooltip from 'antd/lib/tooltip';
-import 'antd/lib/tooltip/style';
+import Tooltip from 'antd/es/tooltip';
+import 'antd/es/tooltip/style';
 
 export type LinkPreviewProps = {
 	language: LanguageInterface;

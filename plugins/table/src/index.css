@@ -638,3 +638,7 @@ div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
     border: 1px solid rgb(217, 217, 217);
     cursor: auto;
 }
+
+[data-card-key="table"].data-card-block-max [data-card-element="center"] {
+    padding: 48px;
+}

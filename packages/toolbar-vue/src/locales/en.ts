@@ -180,6 +180,9 @@ export default {
 		video: {
 			title: 'Video',
 		},
+		math: {
+			title: 'Formula',
+		},
 		commonlyUsed: {
 			title: 'Commonly used',
 		},

@@ -38,8 +38,8 @@ import { LanguageInterface } from '@aomao/engine'
 import AConfigProvider from 'ant-design-vue/es/config-provider';
 import AInput from 'ant-design-vue/es/input'
 import AButton from 'ant-design-vue/es/button'
-import 'ant-design-vue/es/input/style/css';
-import 'ant-design-vue/es/button/style/css';
+import 'ant-design-vue/es/input/style';
+import 'ant-design-vue/es/button/style';
 
 export default defineComponent({
     name:"am-link-editor",

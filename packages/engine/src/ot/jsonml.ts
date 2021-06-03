@@ -18,9 +18,11 @@ export const toDOM = (ops: Op[] | Op[][]): Node => {
 			fragment.appendChild(toDOM(ops[i] as Op[]));
 		} else if ('[object Object]' === ops[i].toString()) {
 			if (elementName) {
-				element = document.createElement(elementName);
+				element = document.createElement(
+					elementName,
+				) as HTMLElement | null;
 				for (let attr in ops[i]) {
-					element!.setAttribute(
+					element?.setAttribute(
 						unescapeDots(attr),
 						unescape(ops[i][attr]),
 					);

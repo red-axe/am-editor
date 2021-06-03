@@ -46,6 +46,14 @@
 	color: #8C8C8C;
 }
 
-.data-card-block-max .card-max-edit {
+.data-card-block-max [data-card-element="center"] {
     top: 96px;
+    background: #fafafa;
+    position: fixed!important;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1032;
+    overflow: auto;
+    padding: 20px;
 }

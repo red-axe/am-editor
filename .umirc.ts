@@ -80,6 +80,7 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 						exact: true,
 					},
 					'/plugin/plugin-mark-range',
+					'/plugin/plugin-math',
 					'/plugin/plugin-orderedlist',
 					'/plugin/plugin-paintformat',
 					'/plugin/plugin-quote',

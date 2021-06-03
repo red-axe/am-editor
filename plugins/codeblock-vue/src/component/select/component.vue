@@ -23,7 +23,7 @@
 import { defineComponent } from 'vue'
 import ASelect from 'ant-design-vue/es/select'
 import modeData from '../mode';
-import 'ant-design-vue/es/select/style/css'
+import 'ant-design-vue/es/select/style'
 const ASelectOption = ASelect.Option
 
 export default defineComponent({

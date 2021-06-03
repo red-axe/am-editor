@@ -277,7 +277,7 @@ export interface CardInterface {
 	 * 设置卡片值
 	 * @param value 值
 	 */
-	setValue(value: CardValue): void;
+	setValue(value: Partial<CardValue>): void;
 	/**
 	 * 获取卡片值
 	 */

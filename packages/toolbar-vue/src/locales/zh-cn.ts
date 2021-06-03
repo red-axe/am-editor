@@ -166,7 +166,7 @@ export default {
 			placeholder: '卡片名称',
 		},
 		image: {
-			title: '图标',
+			title: '图片',
 		},
 		codeblock: {
 			title: '代码块',
@@ -179,6 +179,9 @@ export default {
 		},
 		video: {
 			title: '视频',
+		},
+		math: {
+			title: '公式',
 		},
 		commonlyUsed: {
 			title: '常用',

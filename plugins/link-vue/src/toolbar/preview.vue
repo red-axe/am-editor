@@ -21,7 +21,7 @@
 import { defineComponent, onMounted, PropType } from 'vue'
 import { LanguageInterface } from '@aomao/engine'
 import ATooltip from 'ant-design-vue/es/tooltip'
-import 'ant-design-vue/es/tooltip/style/css';
+import 'ant-design-vue/es/tooltip/style';
 
 export default defineComponent({
     name:"am-link-preview",

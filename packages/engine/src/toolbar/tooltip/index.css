@@ -14,6 +14,7 @@
 	visibility: visible;
 	max-width: 250px;
 	white-space: nowrap;
+    top: 0;
 }
 
 .data-tooltip-hidden {

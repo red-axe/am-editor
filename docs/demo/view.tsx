@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { isBrowser } from 'umi';
-import Message from 'antd/lib/message';
+import Message from 'antd/es/message';
 import { View, ViewInterface, Request } from '@aomao/engine';
 import { DOMAIN, cards, plugins, lang } from './config';
 import Loading from '../demo/loading';
-import 'antd/lib/message/style';
+import 'antd/es/message/style';
 
 const viewPlugins = plugins.filter(
 	plugin => ['image-uploader', 'mark-range'].indexOf(plugin.pluginName) < 0,

@@ -1,6 +1,6 @@
 import React from 'react';
-import Spin from 'antd/lib/spin';
-import 'antd/lib/spin/style/css';
+import Spin from 'antd/es/spin';
+import 'antd/es/spin/style';
 import './index.css';
 
 const Loading: React.FC<{ text?: string; loading?: boolean }> = ({

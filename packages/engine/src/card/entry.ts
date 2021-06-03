@@ -116,7 +116,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	}
 
 	// 设置 DOM 属性里的数据
-	setValue(value: T) {
+	setValue(value: Partial<T>) {
 		if (value == null) {
 			return;
 		}

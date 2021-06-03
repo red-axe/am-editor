@@ -696,7 +696,7 @@ class List implements ListModelInterface {
 					blocks = node.wrap(blocks, customizeRoot);
 					return blocks;
 				default:
-					if (node.isRootBlock(blocks)) {
+					if (node.isRootBlock(blocks) && !blocks.isBlockCard()) {
 						blocks = node.replace(blocks, customizeItem);
 						this.addCardToCustomize(blocks, cardName, value);
 						blocks = node.wrap(blocks, customizeRoot);
@@ -762,7 +762,7 @@ class List implements ListModelInterface {
 					blocks = node.wrap(blocks, targetNode);
 					return blocks;
 				default:
-					if (node.isRootBlock(blocks)) {
+					if (node.isRootBlock(blocks) && !blocks.isBlockCard()) {
 						blocks = node.replace(blocks, itemNode);
 						blocks = node.wrap(blocks, targetNode);
 					}

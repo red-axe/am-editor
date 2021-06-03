@@ -30,7 +30,7 @@
 import { defineComponent, ref } from 'vue'
 import APopover from 'ant-design-vue/es/popover'
 import { collapseItemProps } from '../../types'
-import 'ant-design-vue/es/popover/style/css'
+import 'ant-design-vue/es/popover/style'
 
 export default defineComponent({
     name:"am-collapse-item",

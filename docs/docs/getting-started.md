@@ -230,6 +230,9 @@ return (
 ```
 
 ```tsx
+/**
+ * transform: true
+ */
 import React, { useEffect, useRef, useState } from 'react';
 import Engine, { EngineInterface } from '@aomao/engine';
 import Bold from '@aomao/plugin-bold';
@@ -268,9 +271,7 @@ const EngineDemo = () => {
 
 	return (
 		<>
-			{engine && (
-				<Toolbar engine={engine} items={[['collapse'], ['bold']]} />
-			)}
+			{engine && <Toolbar engine={engine} items={[['bold']]} />}
 			<div ref={ref} />
 		</>
 	);

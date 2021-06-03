@@ -27,7 +27,7 @@ import ATooltip from "ant-design-vue/es/tooltip"
 import { formatHotkey } from '@aomao/engine'
 import { dropdownListProps , DropdownListItem } from '../types'
 import { autoGetHotkey } from "../utils"
-import 'ant-design-vue/es/tooltip/style/css'
+import 'ant-design-vue/es/tooltip/style'
 
 export default defineComponent({
     name:"am-dropdown-list",

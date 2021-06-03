@@ -7,10 +7,10 @@ import React, {
 	forwardRef,
 } from 'react';
 import moment from 'moment';
-import Message from 'antd/lib/message';
-import Input from 'antd/lib/input';
-import Button from 'antd/lib/button';
-import Space from 'antd/lib/space';
+import Message from 'antd/es/message';
+import Input from 'antd/es/input';
+import Button from 'antd/es/button';
+import Space from 'antd/es/space';
 import {
 	Request,
 	EditorInterface,
@@ -24,10 +24,10 @@ import { DOMAIN, lang } from '../config';
 import Loading from '../loading';
 import CommentButton from './button';
 import { Member } from '../ot-client';
-import 'antd/lib/message/style/css';
-import 'antd/lib/input/style/css';
-import 'antd/lib/button/style/css';
-import 'antd/lib/space/style/css';
+import 'antd/es/message/style';
+import 'antd/es/input/style';
+import 'antd/es/button/style';
+import 'antd/es/space/style';
 import './index.css';
 
 export type Props = {

@@ -20,7 +20,6 @@ class Maximize implements MaximizeInterface {
 			this.node = undefined;
 		}
 		if (!this.card.readonly && isEngine(this.editor)) {
-			this.card.findByKey('center').removeClass('card-max-edit');
 			this.editor.trigger('card:minimize', this.card);
 			this.editor.history.reset();
 		}
@@ -53,7 +52,6 @@ class Maximize implements MaximizeInterface {
 		body.prepend(node);
 
 		if (!this.card.readonly && isEngine(this.editor)) {
-			this.card.findByKey('center').addClass('card-max-edit');
 			this.editor.trigger('card:maximize', this.card);
 			this.editor.history.reset();
 		}
