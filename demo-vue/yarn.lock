@@ -34,187 +34,276 @@
     "@types/lodash" "^4.14.165"
     lodash "^4.17.15"
 
-"@aomao/engine@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/engine/-/engine-1.2.2.tgz#e97c2776b02a35a37f76d9200f144fc0be6eb9bc"
-  integrity sha512-6LKkrwjZTqLD31hpYSFY5jfAF/R1u3e+sB1t2OFpUwNVeegZPsQ9AQnC/GE3rotlbIdspuWKtUKhDbMxo4YLLw==
+"@aomao/engine@^2.1.1", "@aomao/engine@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/engine/download/@aomao/engine-2.1.2.tgz#316f6300ac4410d0e1ec4393ffc0be1a6bb60c98"
+  integrity sha1-MW9jAKxEENDh7EOT/8C+Gmu2DJg=
   dependencies:
+    "@babel/runtime" "^7.13.10"
     blueimp-md5 "^2.18.0"
     copy-to-clipboard "^3.3.1"
     diff-match-patch "^1.0.5"
     eventemitter2 "^6.4.4"
+    filesize "^6.3.0"
     is-hotkey "^0.2.0"
     lodash-es "^4.17.21"
     ot-json0 "^1.1.0"
     tinycolor2 "^1.4.2"
 
-"@aomao/plugin-alignment@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-alignment/-/plugin-alignment-1.2.2.tgz#8b5c2ee91ee94412e2a32474ba29040550ee3b30"
-  integrity sha512-nAJ+g3WVr3EwNf5jMfnwsj98JFKBHtimA4tc7bzxX0Bcm7qkn+Pc3pU8ul4G3axAuYHZCYvsieXlLEsaVVPUdQ==
+"@aomao/plugin-alignment@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-alignment/download/@aomao/plugin-alignment-2.1.2.tgz#2f4d85fe46158dd9c66b2d9b3e18d98bb59077cf"
+  integrity sha1-L02F/kYVjdnGay2bPhjZi7WQd88=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-backcolor@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-backcolor/-/plugin-backcolor-1.2.2.tgz#b4547f1ca13cc230fc11f2a148d382248852ba44"
-  integrity sha512-i6+FZGN8PgUOQoEtJ/79R6jK40rqNWAJhtrr7t3RmoQves/r5xerMyjjCBf7sKhroPgWw5m4OUbUXK/7Y+wGdA==
+"@aomao/plugin-backcolor@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-backcolor/download/@aomao/plugin-backcolor-2.1.2.tgz#2294a1897a1698b8e3e4f986d554acdd17cec5d9"
+  integrity sha1-IpShiXoWmLjj5PmG1VSs3RfOxdk=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-bold@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-bold/-/plugin-bold-1.2.2.tgz#ee7f3302cd4da02a1b78c56e4261bf060201048a"
-  integrity sha512-GMjRrnv6SV9c5txYo+RRYRqeci51vmISWr2mg7l+wr120Cp3e7DiIxmleSiacH1s5+p+Hb7RTcwdd44lecfMnA==
+"@aomao/plugin-bold@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-bold/download/@aomao/plugin-bold-2.1.2.tgz#a003d4f3b702717b9e24b8160665b298b84495d8"
+  integrity sha1-oAPU87cCcXueJLgWBmWymLhEldg=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-code@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-code/-/plugin-code-1.2.2.tgz#e5d93c369200d720c32ac8c1d70c6079b2947964"
-  integrity sha512-ZURdhkDcztt7Z14C6myGt0rQ1Mx3GQW5BYZ7WoOp8zuA/l75xm7S0l1Y2erRSDkKR2lXITJbe185Smm7wP0v1g==
+"@aomao/plugin-code@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-code/download/@aomao/plugin-code-2.1.2.tgz#1db5bffe88bcbbb0bb05ac4953f995839ff2af6c"
+  integrity sha1-HbW//oi8u7C7BaxJU/mVg5/yr2w=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-fontcolor@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-fontcolor/-/plugin-fontcolor-1.2.2.tgz#4d96749dff9dea92a5966fad51d5863843ea27d3"
-  integrity sha512-/oOxgNPI88LkZxVoM/+1+yCSRszn9s05poQER1mWO1jaPjzPu4XmsIi47twMG9Kaw+OGDiWjZZ+T2LbeXgavWQ==
+"@aomao/plugin-codeblock-vue@^2.1.2":
+  version "2.1.4"
+  resolved "https://registry.nlark.com/@aomao/plugin-codeblock-vue/download/@aomao/plugin-codeblock-vue-2.1.4.tgz#fada7a57dfb51259ec7d0a19723c1f563f3371cb"
+  integrity sha1-+tp6V9+1ElnsfQoZcjwfVj8zccs=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+    ant-design-vue "^2.1.2"
+    codemirror "^5.60.0"
+    lodash-es "^4.17.21"
+    vue "^3.0.11"
 
-"@aomao/plugin-fontsize@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-fontsize/-/plugin-fontsize-1.2.2.tgz#d6ea1c2a57701099850306872fd688d78b15e106"
-  integrity sha512-vArx52sEjnucnfJMj/EM37XGV+taVnpjH3QkRmNQJ8ZrQiXkbu1TTz2cH8lmMUWY2+x8yFSYNsPYEp9E0A858Q==
+"@aomao/plugin-file@^2.0.1":
+  version "2.0.3"
+  resolved "https://registry.nlark.com/@aomao/plugin-file/download/@aomao/plugin-file-2.0.3.tgz#35b2689f81d4b8f0051121f8b1e1fe96a7f3dac5"
+  integrity sha1-NbJon4HUuPAFESH4seH+lqfz2sU=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-heading@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-heading/-/plugin-heading-1.2.2.tgz#4f3a38fd6e1d5504d134d214b6e756d7267e7db3"
-  integrity sha512-+g38ok2+VlCZRr/LRqg4Cmffd+j+9wvv6M5TaMq26bXkdql0ztNw58KqyC3JGdrAg3E3dNkWaZRLSxC71kja1w==
+"@aomao/plugin-fontcolor@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-fontcolor/download/@aomao/plugin-fontcolor-2.1.2.tgz#0bde77162f9a0c1beaf1d48415551822ae9a253f"
+  integrity sha1-C953Fi+aDBvq8dSEFVUYIq6aJT8=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-hr@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-hr/-/plugin-hr-1.2.2.tgz#5a2ef114f207a9946abe2c75656f9160ad6babd3"
-  integrity sha512-MGW66nx9NWrGvbdVetOvB6BYMEmYiXQsR5j2wy7m4L8s6XUE1olVYnaKwB2eWxS08mwahRu9MEj2D0ofoMoB4Q==
+"@aomao/plugin-fontsize@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-fontsize/download/@aomao/plugin-fontsize-2.1.2.tgz#7dc8a50568a3c0eafc5d1631f7e02e9228abfdf0"
+  integrity sha1-fcilBWijwOr8XRYx9+Aukiir/fA=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-indent@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-indent/-/plugin-indent-1.2.2.tgz#38ba98ab62e0f4d25169dd74f3a8c736e3df8bcc"
-  integrity sha512-MqLmVSIah/aPTkibxDCo4AcDoK+KTtQGB/ZKz3jxq+4RyCcsvimumZrn1Z4MlXAlS4mXLHAFaawwhcgFYcPC2g==
+"@aomao/plugin-heading@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-heading/download/@aomao/plugin-heading-2.1.2.tgz#4780bb1798895232d81fc2cf1f1bd6332992fa97"
+  integrity sha1-R4C7F5iJUjLYH8LPHxvWMymS+pc=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+    blueimp-md5 "^2.18.0"
 
-"@aomao/plugin-italic@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-italic/-/plugin-italic-1.2.2.tgz#fb4a05936294aadd5eef3d9e2a3f81ef8a815d59"
-  integrity sha512-7Qr/qt9JgGs+xns5gwGDv/qItCDtBuZ0BzSBY1Gj9qsoqF4yVhP0Bi3oPislNyC1ty08C6p5zLlCBr01hTZCSA==
+"@aomao/plugin-hr@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-hr/download/@aomao/plugin-hr-2.1.2.tgz#39d807c404767c64de4ee3984ae81d49a908bf72"
+  integrity sha1-OdgHxAR2fGTeTuOYSugdSakIv3I=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-mark@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-mark/-/plugin-mark-1.2.2.tgz#b8c9492a2b67e53eb491444b1cf477b45885c832"
-  integrity sha512-lb8JqcfYMKBN8hUxIQTTQdsNZ8S4QU/xjgBIn99thS22aYBpQ6jEdzrwsPFidR+8Skv6CfXg4kcVb2e0tunyXQ==
+"@aomao/plugin-image@^2.1.2":
+  version "2.1.4"
+  resolved "https://registry.nlark.com/@aomao/plugin-image/download/@aomao/plugin-image-2.1.4.tgz#e01ee70eacd4c8608d687265da112745e9b2d68a"
+  integrity sha1-4B7nDqzUyGCNaHJl2hEnRemy1oo=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+    eventemitter2 "^6.4.4"
+    photoswipe "^4.1.3"
 
-"@aomao/plugin-orderedlist@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-orderedlist/-/plugin-orderedlist-1.2.2.tgz#8f614bfa64b4a9bcdc57fce88c04fedd3585a4af"
-  integrity sha512-N/G6Tvsm5tsFiCl4EJlzCOdzGGq9xwW8pcgf+HnweB6HArcU0TiqnH8jflEALAbFgrFhxG90viI0loWL/6fvMA==
+"@aomao/plugin-indent@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-indent/download/@aomao/plugin-indent-2.1.2.tgz#2345ddc80d40897eda7b9efcd8e3bb33aa39edf8"
+  integrity sha1-I0XdyA1AiX7ae5782OO7M6o57fg=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-paintformat@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-paintformat/-/plugin-paintformat-1.2.2.tgz#8b082abca3acf2950cdb70483c6c720712cc300c"
-  integrity sha512-6/Gjpun0fYasoiWQ1maK8I3l9mYm5KoKhV9Xlo/kF4aPCfgxDQdNs4Y6Y9cGezSY18sVBpSK+nfuskgNnKaElg==
+"@aomao/plugin-italic@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-italic/download/@aomao/plugin-italic-2.1.2.tgz#eb7de1c77fed0d2e637e207efc89cfb23e5bf551"
+  integrity sha1-633hx3/tDS5jfiB+/InPsj5b9VE=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-quote@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-quote/-/plugin-quote-1.2.2.tgz#5eb82413cf615e8b705f9d2a0e10e9388d04be80"
-  integrity sha512-FwcnwgpDDNHssv9CI7ykT4zNHErv1NIitUjGFnxKhpzHUv13TfGmdfV62YgqQRqimpXC4nHUuvz4/nyrQceGcA==
+"@aomao/plugin-link-vue@^2.1.2":
+  version "2.1.3"
+  resolved "https://registry.nlark.com/@aomao/plugin-link-vue/download/@aomao/plugin-link-vue-2.1.3.tgz#eb3a0fbd6ceff49991ddea881ec13d9b6ab62ae2"
+  integrity sha1-6zoPvWzv9JmR3eqIHsE9m2q2KuI=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+    ant-design-vue "^2.1.2"
+    vue "^3.0.11"
 
-"@aomao/plugin-redo@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-redo/-/plugin-redo-1.2.2.tgz#ed189fbc90b8871559b30b41b4bbba2eb64d23c0"
-  integrity sha512-Uf7k5Nj0fZl/NhMEi1wjJehSYiu0IsjNwnTGDhWNkKshTXnkSB/zOZrW5L2JAhgBZWIs2gFodFpBXcv7IL1JLQ==
+"@aomao/plugin-mark@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-mark/download/@aomao/plugin-mark-2.1.2.tgz#9975124bf00b785da77210c5830fca3978e853f4"
+  integrity sha1-mXUSS/ALeF2nchDFgw/KOXjoU/Q=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-removeformat@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-removeformat/-/plugin-removeformat-1.2.2.tgz#a827992fa4eb76533f28a3202f034fe0daff2c24"
-  integrity sha512-JQvPpH3NAEZgQY3qQbmFoDeFJz0y1WuBaeiYsEyjrbmzNIci0MZYiXxSFZy9WOc0mru+gWCYyQiNzpuYWm4wdw==
+"@aomao/plugin-orderedlist@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-orderedlist/download/@aomao/plugin-orderedlist-2.1.2.tgz#8a6d9ca2f84d91d6876c947eeacb50b5a49cc9b7"
+  integrity sha1-im2covhNkdaHbJR+6stQtaScybc=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-selectall@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-selectall/-/plugin-selectall-1.2.2.tgz#aeb784a994dd44bc17fcff86afcabac850e22c70"
-  integrity sha512-O6siow2ok2j4RE6049WnqXaX2lgI3lOpLaQLn93GQtQ+tK6yzF5Pzg5rXaSgWVkAEkZU6z6Qyn68dVspwf9GmA==
+"@aomao/plugin-paintformat@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-paintformat/download/@aomao/plugin-paintformat-2.1.2.tgz#7025efb995390328c8ba436b62fde5334ef7d8d5"
+  integrity sha1-cCXvuZU5AyjIukNrYv3lM0732NU=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-strikethrough@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-strikethrough/-/plugin-strikethrough-1.2.2.tgz#71de40ba397416da54a3cdfbad6fbda0217e3099"
-  integrity sha512-KxoiCkdYjxOsnTNCgygs8aCZu/9UDxf5gXEPXUUkyku6Y66E3vDh9NbIP/1oeYaSUhLFAf5Lrcix/r+LjVfeag==
+"@aomao/plugin-quote@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-quote/download/@aomao/plugin-quote-2.1.2.tgz#63572f1046cb73ae0108c0563249adc76849b5be"
+  integrity sha1-Y1cvEEbLc64BCMBWMkmtx2hJtb4=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-sub@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-sub/-/plugin-sub-1.2.2.tgz#21d830c260b647fe9e9fa548655738421304bc5a"
-  integrity sha512-fZKkG7Jesa8yrPHDXaxFvSJl9A/ZMA5fnSIAKxCjnw+P2aKGcjpqOzY8FJJze6vVPBlVOV69jcEsiMn2d6bnBg==
+"@aomao/plugin-redo@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-redo/download/@aomao/plugin-redo-2.1.2.tgz#1dfe8ded50d9eae88cadc002f882caed7cba1a0a"
+  integrity sha1-Hf6N7VDZ6uiMrcAC+ILK7Xy6Ggo=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-sup@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-sup/-/plugin-sup-1.2.2.tgz#4b4ce7302757ee39d4c51fdf8331b0fb8da0074b"
-  integrity sha512-XkNWB0QIcIRI/v5+Li+hPqdJtsIHpr7YPYztkpbil1cwbQN7qD7WSsdcUDQmBhU2QpkBhU7nID2wItZ2a3eY6Q==
+"@aomao/plugin-removeformat@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-removeformat/download/@aomao/plugin-removeformat-2.1.2.tgz#339388d25ad4f9572b443f022318bbbd36d7de52"
+  integrity sha1-M5OI0lrU+VcrRD8CIxi7vTbX3lI=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-tasklist@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-tasklist/-/plugin-tasklist-1.2.2.tgz#5efe37eaced4c36b38d6817ce309be3a9ee35c60"
-  integrity sha512-ked0jyz10mgvk1fjtCta+ycuGxAM/IWWal9yKcLPYe3amsCyMreduSNEnFVYLBkHnn3DcLA3AOmnH1tUFOjTVg==
+"@aomao/plugin-selectall@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-selectall/download/@aomao/plugin-selectall-2.1.2.tgz#72eb53b3516b12fa6c198f48181f6e06dd2d46bc"
+  integrity sha1-cutTs1FrEvpsGY9IGB9uBt0tRrw=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-underline@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-underline/-/plugin-underline-1.2.2.tgz#44627f248572fa914fee688bcfa563179dd9f6df"
-  integrity sha512-DTfz9xhZvUSZGeROXtBAQf5b/zkgP7GY66BZ++D9AIf8gMsPDm0LPgDJROP9cD3pG8uG+KL5V9s5667AzWiJOg==
+"@aomao/plugin-strikethrough@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-strikethrough/download/@aomao/plugin-strikethrough-2.1.2.tgz#452701d332d43dd231681e1b58c790b7073258ad"
+  integrity sha1-RScB0zLUPdIxaB4bWMeQtwcyWK0=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-undo@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-undo/-/plugin-undo-1.2.2.tgz#3f9e24276f642bda6c1402a4d19c6d42821eb033"
-  integrity sha512-4BL++UysI6fE5gWf3kruNXKLUg7nHNcthNDJbmnY033PGYkpNfkOXASq3Fu3ayjX+l9nU7wzCpH4yd55ki7MTA==
+"@aomao/plugin-sub@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-sub/download/@aomao/plugin-sub-2.1.2.tgz#b4d42a2dc33c761b2561f633db9abb1ff6662d7a"
+  integrity sha1-tNQqLcM8dhslYfYz25q7H/ZmLXo=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-unorderedlist@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@aomao/plugin-unorderedlist/-/plugin-unorderedlist-1.2.2.tgz#d6d69fdd612ff41327217a927afd6f990c6e055b"
-  integrity sha512-Nl82qCsTtAu973SGa/9hrIMqDu2gXqrv1tAwdvoWfHmOAuxiK8tM2YFPXhC5dAUAWMOCP4197z7rtERK4qLE6w==
+"@aomao/plugin-sup@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-sup/download/@aomao/plugin-sup-2.1.2.tgz#90f03ea76e3467b20a17d5feffaa194d6d0b8339"
+  integrity sha1-kPA+p240Z7IKF9X+/6oZTW0Lgzk=
   dependencies:
-    "@aomao/engine" "^1.2.2"
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+
+"@aomao/plugin-table@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-table/download/@aomao/plugin-table-2.1.2.tgz#04caa25e8f42449bf984be3d5ece11a38fd650f1"
+  integrity sha1-BMqiXo9CRJv5hL49Xs4Ro4/WUPE=
+  dependencies:
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+    eventemitter2 "^6.4.4"
+
+"@aomao/plugin-tasklist@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-tasklist/download/@aomao/plugin-tasklist-2.1.2.tgz#9fa812fbc1d793600c429bb8f6071fa9aced7084"
+  integrity sha1-n6gS+8HXk2AMQpu49gcfqaztcIQ=
+  dependencies:
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+
+"@aomao/plugin-underline@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-underline/download/@aomao/plugin-underline-2.1.2.tgz#f1caa190e8031aa392649a815561fafe6b15665f"
+  integrity sha1-8cqhkOgDGqOSZJqBVWH6/msVZl8=
+  dependencies:
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+
+"@aomao/plugin-undo@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-undo/download/@aomao/plugin-undo-2.1.2.tgz#9ef0d97af3709852591342b8d331f10ebe816b38"
+  integrity sha1-nvDZevNwmFJZE0K40zHxDr6Bazg=
+  dependencies:
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+
+"@aomao/plugin-unorderedlist@^2.1.1":
+  version "2.1.2"
+  resolved "https://registry.nlark.com/@aomao/plugin-unorderedlist/download/@aomao/plugin-unorderedlist-2.1.2.tgz#c59d21ea9e8bd5e6d15cea4945abf84f8bd0a59a"
+  integrity sha1-xZ0h6p6L1ebRXOpJRav4T4vQpZo=
+  dependencies:
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+
+"@aomao/toolbar-vue@^2.1.3":
+  version "2.1.4"
+  resolved "https://registry.nlark.com/@aomao/toolbar-vue/download/@aomao/toolbar-vue-2.1.4.tgz#3b7c998d30e6d2d4a30f827f4b85a1b0a9fb7924"
+  integrity sha1-O3yZjTDm0tSjD4J/S4WhsKn7eSQ=
+  dependencies:
+    "@aomao/engine" "^2.1.2"
+    "@babel/runtime" "^7.13.10"
+    ant-design-vue "^2.1.2"
+    keymaster "^1.6.2"
+    lodash-es "^4.17.21"
+    tinycolor2 "^1.4.2"
+    vue "^3.0.11"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.8.3":
   version "7.12.13"
@@ -1048,6 +1137,13 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@^7.13.10":
+  version "7.14.0"
+  resolved "https://registry.nlark.com/@babel/runtime/download/@babel/runtime-7.14.0.tgz?cache=0&sync_timestamp=1619727389508&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.14.0.tgz#46794bc20b612c5f75e62dd071e24dfd95f1cbe6"
+  integrity sha1-RnlLwgthLF915i3QceJN/ZXxy+Y=
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/template@^7.0.0", "@babel/template@^7.12.13":
   version "7.12.13"
   resolved "https://registry.npm.taobao.org/@babel/template/download/@babel/template-7.12.13.tgz?cache=0&sync_timestamp=1612314730561&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Ftemplate%2Fdownload%2F%40babel%2Ftemplate-7.12.13.tgz#530265be8a2589dbb37523844c5bcb55947fb327"
@@ -1189,11 +1285,6 @@
   integrity sha1-FwpAIjptZmAG2TyhKK8r6x2bGQE=
   dependencies:
     "@types/node" "*"
-
-"@types/events@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.npmjs.org/@types/events/-/events-3.0.0.tgz#2862f3f58a9a7f7c3e78d79f130dd4d71c25c2a7"
-  integrity sha512-EaObqwIvayI5a8dCzhFrjKzVwKLxjoG9T6Ppd5CEo07LRKfQ8Yokw54r5+Wq7FaBQ+yXRvQAYPrHwya1/UFt9g==
 
 "@types/express-serve-static-core@*", "@types/express-serve-static-core@^4.17.18":
   version "4.17.19"
@@ -2840,7 +2931,7 @@ clone@^1.0.2:
   resolved "https://registry.npm.taobao.org/clone/download/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
   integrity sha1-2jCcwmPfFZlMaIypAheco8fNfH4=
 
-clone@^2.1.1:
+clone@^2.1.2:
   version "2.1.2"
   resolved "https://registry.npm.taobao.org/clone/download/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
   integrity sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=
@@ -2853,6 +2944,11 @@ coa@^2.0.2:
     "@types/q" "^1.5.1"
     chalk "^2.4.1"
     q "^1.1.2"
+
+codemirror@^5.60.0:
+  version "5.61.1"
+  resolved "https://registry.nlark.com/codemirror/download/codemirror-5.61.1.tgz#ccfc8a43b8fcfb8b12e8e75b5ffde48d541406e0"
+  integrity sha1-zPyKQ7j8+4sS6OdbX/3kjVQUBuA=
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -4075,6 +4171,11 @@ filesize@^3.6.1:
   version "3.6.1"
   resolved "https://registry.npm.taobao.org/filesize/download/filesize-3.6.1.tgz#090bb3ee01b6f801a8a8be99d31710b3422bb317"
   integrity sha1-CQuz7gG2+AGoqL6Z0xcQs0Irsxc=
+
+filesize@^6.3.0:
+  version "6.3.0"
+  resolved "https://registry.nlark.com/filesize/download/filesize-6.3.0.tgz#dff53cfb3f104c9e422f346d53be8dbcc971bf11"
+  integrity sha1-3/U8+z8QTJ5CLzRtU76NvMlxvxE=
 
 fill-range@^4.0.0:
   version "4.0.0"
@@ -5392,6 +5493,11 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+keymaster@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.npm.taobao.org/keymaster/download/keymaster-1.6.2.tgz#e1ae54d0ea9488f9f60b66b668f02e9a1946c6eb"
+  integrity sha1-4a5U0OqUiPn2C2a2aPAumhlGxus=
+
 killable@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npm.taobao.org/killable/download/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"
@@ -5436,16 +5542,17 @@ launch-editor@^2.2.1:
     chalk "^2.3.0"
     shell-quote "^1.6.1"
 
-less-loader@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.npm.taobao.org/less-loader/download/less-loader-5.0.0.tgz?cache=0&sync_timestamp=1617983468127&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fless-loader%2Fdownload%2Fless-loader-5.0.0.tgz#498dde3a6c6c4f887458ee9ed3f086a12ad1b466"
-  integrity sha1-SY3eOmxsT4h0WO6e0/CGoSrRtGY=
+less-loader@6.0.0:
+  version "6.0.0"
+  resolved "https://registry.nlark.com/less-loader/download/less-loader-6.0.0.tgz#f7833177c2fc3de5014de072d5c26eca0954c1cb"
+  integrity sha1-94Mxd8L8PeUBTeBy1cJuyglUwcs=
   dependencies:
-    clone "^2.1.1"
-    loader-utils "^1.1.0"
-    pify "^4.0.1"
+    clone "^2.1.2"
+    less "^3.11.1"
+    loader-utils "^2.0.0"
+    schema-utils "^2.6.6"
 
-less@^3.0.4:
+less@^3.0.4, less@^3.11.1:
   version "3.13.1"
   resolved "https://registry.npm.taobao.org/less/download/less-3.13.1.tgz#0ebc91d2a0e9c0c6735b83d496b0ab0583077909"
   integrity sha1-DryR0qDpwMZzW4PUlrCrBYMHeQk=
@@ -6507,6 +6614,11 @@ performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npm.taobao.org/performance-now/download/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
+
+photoswipe@^4.1.3:
+  version "4.1.3"
+  resolved "https://registry.npm.taobao.org/photoswipe/download/photoswipe-4.1.3.tgz#59f49494eeb9ddab5888d03392926a19bc197550"
+  integrity sha1-WfSUlO653atYiNAzkpJqGbwZdVA=
 
 picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.2.3:
   version "2.2.3"

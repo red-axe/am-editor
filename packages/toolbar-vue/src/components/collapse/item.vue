@@ -2,7 +2,7 @@
     <a-popover
     :placement="placement || 'right'"
     :content="typeof prompt === 'function' ? prompt() : prompt"
-    :overlayStyle="prompt ? {} : {display:'none'}"
+    :overlayClassName="prompt ? '' : 'prompt-popover-hide'"
     >
         <div
         :class="['toolbar-collapse-item', { 'toolbar-collapse-item-active': active }, className]"
@@ -81,3 +81,8 @@ export default defineComponent({
     }
 })
 </script>
+<style>
+.prompt-popover-hide {
+    display: none;
+}
+</style>

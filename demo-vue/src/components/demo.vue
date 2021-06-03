@@ -102,7 +102,7 @@ const isDev = process.env.NODE_ENV !== 'production';
 const domain = isDev ? 'http://localhost:7001' : 'https://editor.aomao.com';
 
 export default defineComponent({
-    name:"engine-deom",
+    name:"engine-demo",
     components:{
         Avatar,
         AmToolbar

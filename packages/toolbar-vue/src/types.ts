@@ -32,7 +32,7 @@ export const buttonProps = {
 	content: [String, Function] as PropType<string | (() => string) | VNode>,
 	title: String,
 	placement: String as PropType<Placement>,
-	hotkey: [String, Boolean] as PropType<boolean | string>,
+	hotkey: [String, Object] as PropType<boolean | string | undefined>,
 	command: Object as PropType<Command>,
 	autoExecute: Object as PropType<boolean | undefined>,
 	className: String,
