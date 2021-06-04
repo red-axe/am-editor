@@ -688,7 +688,10 @@ class ChangeModel implements ChangeInterface {
 								isSelect = true;
 							}
 						}
-						card.select(isSelect);
+						const {
+							singleSelectable,
+						} = card.constructor as CardEntry;
+						if (singleSelectable !== false) card.select(isSelect);
 					}
 				});
 				const cardComponent = card.getSingleSelectedCard(range);
@@ -971,7 +974,7 @@ class ChangeModel implements ChangeInterface {
 				node = next;
 			}
 			range.insertNode(fragment);
-			range.shrinkToElementNode().collapse(false);
+			//range.shrinkToElementNode().collapse(false);
 			const component = card.find(range.startNode);
 			if (component) component.focus(range, false);
 		}
@@ -1042,7 +1045,11 @@ class ChangeModel implements ChangeInterface {
 		if (startNode) {
 			const _firstNode = getFirstChild($(startNode.nextSibling || []))!;
 			const _lastNode = getLastChild($(startNode))!;
-			if (isSameListChild(_lastNode, _firstNode)) {
+			if (
+				_lastNode.name === 'p' &&
+				_firstNode.name !== _lastNode.name &&
+				isSameListChild(_lastNode, _firstNode)
+			) {
 				clearList(_lastNode, _firstNode);
 				nodeApi.merge(_lastNode, _firstNode, false);
 				removeEmptyNode(_firstNode);
@@ -1054,15 +1061,18 @@ class ChangeModel implements ChangeInterface {
 		}
 
 		if (endNode) {
-			const prevNode = getLastChild($(endNode.previousSibling || []))!;
+			const prevNode = getLastChild($(endNode.previousSibling || []));
 			const nextNode = getFirstChild($(endNode))!;
-			range
+			/**range
 				.select(prevNode, true)
 				.shrinkToElementNode()
-				.collapse(false);
+				.collapse(false);**/
+			if (prevNode && nodeApi.isEmpty(prevNode)) {
+				removeEmptyNode(prevNode);
+			}
 			if (nextNode && nodeApi.isEmpty(nextNode)) {
 				removeEmptyNode(nextNode);
-			} else if (isSameListChild(prevNode, nextNode)) {
+			} else if (prevNode && isSameListChild(prevNode, nextNode)) {
 				nodeApi.merge(prevNode, nextNode, false);
 				removeEmptyNode(nextNode);
 			}

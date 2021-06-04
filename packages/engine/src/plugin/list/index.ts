@@ -17,7 +17,7 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 				this.pasteBefore(fragment),
 			);
 			this.editor.on('paste:insert', () => this.pasteInsert());
-			this.editor.on('paste:before', () => this.pasteAfter());
+			this.editor.on('paste:after', () => this.pasteAfter());
 		}
 	}
 
@@ -46,15 +46,14 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 				domChild.name === 'li' &&
 				domChild.hasClass(list.CUSTOMZIE_LI_CLASS)
 			) {
-				domChild.closest('ul').addClass(list.CUSTOMZIE_UL_CLASS);
-				if (
-					domChild.find(`[${READY_CARD_KEY}=${this.cardName}]`)
-						.length === 0
-				)
-					this.editor?.list.addReadyCardToCustomize(
-						domChild,
-						this.cardName!,
-					);
+				//自定义列表，没有卡片节点，就作为普通列表
+				if (!domChild.first()?.isCard()) {
+					domChild.removeClass(list.CUSTOMZIE_LI_CLASS);
+					domChild.closest('ul').removeClass(list.CUSTOMZIE_UL_CLASS);
+					return;
+				} else {
+					domChild.closest('ul').addClass(list.CUSTOMZIE_UL_CLASS);
+				}
 			}
 		});
 		this.isPasteList = children.some(
@@ -64,14 +63,14 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 
 	pasteInsert() {
 		if (!this.cardName || !isEngine(this.editor)) return;
-		const { change, list } = this.editor;
+		const { change, list, $ } = this.editor;
 		const range = change.getRange();
 		const rootBlock = range.getRootBlock();
 		const nextBlock = rootBlock?.next();
 		const customizeItems = nextBlock?.find(`li.${list.CUSTOMZIE_LI_CLASS}`);
 		if (customizeItems && customizeItems.length > 0) {
 			customizeItems.each(node => {
-				const domNode = this.editor.$(node);
+				const domNode = $(node);
 				if (
 					0 ===
 					domNode.find(

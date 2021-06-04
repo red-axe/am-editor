@@ -74,13 +74,16 @@ Get the node relative to the marked position of the node, and the mark will be r
 
 ```ts
 /**
- * Get the node of the node relative to the marked position, and the mark will be removed after acquisition
- * @param node node
- * @param position
- */
+* Get the node of the node relative to the marked position, and the mark will be removed after acquisition
+* @param node node
+* @param position
+* @param isClone whether to make a copy
+* @param callback Call back when deleting a node, return a boolean to indicate whether the current node is deleted
+*/
 getNode(
-    node: NodeInterface,
-    position?:'left' |'center' |'right',
-    isClone?: boolean,
+node: NodeInterface,
+position?:'left' |'center' |'right',
+isClone?: boolean,
+         callback?: (node: NodeInterface) => boolean
 ): NodeInterface;
 ```

@@ -118,11 +118,9 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 			const blockPlugin = this.editor.block.findPlugin(node);
 			const pluginName = (this.constructor as PluginEntryType).pluginName;
 			if (
-				blockPlugin.some(
-					plugin =>
-						plugin.disableMark &&
-						plugin.disableMark.indexOf(pluginName) > -1,
-				)
+				blockPlugin &&
+				blockPlugin.disableMark &&
+				blockPlugin.disableMark.indexOf(pluginName) > -1
 			)
 				return;
 			const { change } = this.editor;
@@ -163,7 +161,10 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 		let text = node.text();
 		if (!text) return;
 		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
-		const reg = new RegExp(`(${key}([^${key}\r\n]+)${key})`);
+		const reg =
+			key === '_'
+				? new RegExp(`\\s+(${key}([^${key}\\r\\n]+)${key})\\s+`)
+				: new RegExp(`(${key}([^${key}\\r\\n]+)${key})`);
 		let match = reg.exec(text);
 		if (!match) return;
 		let newText = '';

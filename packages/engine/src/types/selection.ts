@@ -25,10 +25,13 @@ export interface SelectionInterface {
 	 * 获取节点相对于标记位置的节点，获取后会移除标记
 	 * @param node 节点
 	 * @param position 位置
+	 * @param isClone 是否复制一个副本
+	 * @param callback 删除节点时回调，返回一个 boolean 来表示当前节点是否删除
 	 */
 	getNode(
 		node: NodeInterface,
 		position?: 'left' | 'center' | 'right',
 		isClone?: boolean,
+		callback?: (node: NodeInterface) => boolean,
 	): NodeInterface;
 }

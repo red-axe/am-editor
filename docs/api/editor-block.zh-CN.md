@@ -32,7 +32,7 @@ init(): void;
  * 根据节点查找block插件实例
  * @param node 节点
  */
-findPlugin(node: NodeInterface): Array<BlockInterface>;
+findPlugin(node: NodeInterface): BlockInterface | undefined;
 ```
 
 ### `findTop`
@@ -122,13 +122,13 @@ split(range?: RangeInterface): void;
 /**
  * 在当前光标位置插入block节点
  * @param block 节点
- * @param remove 是否移除当前位置上的block
  * @param range 光标
+ * @param splitNode 分割节点，默认为光标开始位置的block节点
  */
 insert(
     block: NodeInterface | Node | string,
-    remove?: boolean,
     range?: RangeInterface,
+    splitNode?: (node: NodeInterface) => NodeInterface,
 ): void;
 ```
 

@@ -5,6 +5,7 @@ import {
 	SchemaBlock,
 	isEngine,
 	PluginEntry,
+	READY_CARD_KEY,
 } from '@aomao/engine';
 import CheckboxComponent from './checkbox';
 import './index.css';
@@ -43,6 +44,17 @@ export default class extends ListPlugin<Options> {
 			this.editor.on('paste:markdown', child =>
 				this.pasteMarkdown(child),
 			);
+			this.editor.on('paste:each-after', child => {
+				if (
+					child.name === 'li' &&
+					child.hasClass(this.editor.list.CUSTOMZIE_LI_CLASS) &&
+					(child.first()?.attributes(CARD_KEY) === 'checkbox' ||
+						child.first()?.attributes(READY_CARD_KEY) ===
+							'checkbox')
+				) {
+					child.parent()?.addClass('data-list-task');
+				}
+			});
 		}
 	}
 
@@ -120,12 +132,11 @@ export default class extends ListPlugin<Options> {
 		root.find(`[${CARD_KEY}=checkbox`).each(checkboxNode => {
 			const node = $(checkboxNode);
 			const checkbox = $(
-				'<span>'.concat(
+				`<span>${
 					'checked' === node.find('input').attributes('checked')
 						? '✅'
-						: '🔲',
-					'<span/>',
-				),
+						: '🔲'
+				}</span>`,
 			);
 			checkbox.css({
 				margin: '3px 0.5ex',
@@ -145,28 +156,26 @@ export default class extends ListPlugin<Options> {
 	//设置markdown
 	markdown(event: KeyboardEvent, text: string, block: NodeInterface) {
 		if (!isEngine(this.editor) || this.options.markdown === false) return;
-
-		const plugins = this.editor.block.findPlugin(block);
+		const { node, command } = this.editor;
+		const blockApi = this.editor.block;
+		const plugin = blockApi.findPlugin(block);
 		// fix: 列表、引用等 markdown 快捷方式不应该在标题内生效
 		if (
 			block.name !== 'p' ||
-			plugins.find(
-				plugin =>
-					(plugin.constructor as PluginEntry).pluginName ===
-					'heading',
-			)
+			(plugin &&
+				(plugin.constructor as PluginEntry).pluginName === 'heading')
 		) {
 			return;
 		}
 
 		if (['[]', '[ ]', '[x]'].indexOf(text) < 0) return;
 		event.preventDefault();
-		this.editor.block.removeLeftText(block);
-		if (this.editor.node.isEmpty(block)) {
+		blockApi.removeLeftText(block);
+		if (node.isEmpty(block)) {
 			block.empty();
 			block.append('<br />');
 		}
-		this.editor.command.execute(
+		command.execute(
 			(this.constructor as PluginEntry).pluginName,
 			text === '[x]' ? { checked: true } : undefined,
 		);

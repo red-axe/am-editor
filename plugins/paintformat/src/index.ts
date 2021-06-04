@@ -133,7 +133,8 @@ export default class extends Plugin<Options> {
 
 	paintBlocks(currentBlock: NodeInterface, activeBlocks: NodeInterface[]) {
 		if (!isEngine(this.editor)) return;
-		const { command } = this.editor!;
+		const { command, node } = this.editor!;
+		const blockApi = this.editor.block;
 		activeBlocks.forEach(block => {
 			if (this.options.paintBlock) {
 				const paintResult = this.options.paintBlock(
@@ -145,9 +146,9 @@ export default class extends Plugin<Options> {
 			if (block.name !== currentBlock.name) {
 				if (block.name === 'p') {
 					command.execute('heading', block.name);
-				} else if (this.editor.node.isRootBlock(block)) {
-					const plugins = this.editor.block.findPlugin(block);
-					plugins.forEach(plugin => plugin.execute(block.name));
+				} else if (node.isRootBlock(block)) {
+					const plugin = blockApi.findPlugin(block);
+					if (plugin) plugin.execute(block.name);
 				}
 				if (block.name === 'ol') {
 					command.execute('orderlist');
@@ -158,7 +159,7 @@ export default class extends Plugin<Options> {
 			}
 			const css = block.css();
 			if (Object.keys(css).length > 0) {
-				this.editor.block.setBlocks({
+				blockApi.setBlocks({
 					style: css,
 				});
 			}

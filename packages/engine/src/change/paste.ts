@@ -121,7 +121,10 @@ export default class Paste {
 				nodeApi.unwrap(node);
 				return;
 			}
-
+			//\n换成 br
+			if (node.isText() && /^\n+$/g.test(node.text())) {
+				nodeApi.replace(node, $('<br />'));
+			}
 			// br 换行改成正常段落
 			if (nodeApi.isBlock(node, this.schema)) {
 				this.engine.block.brToBlock(node);

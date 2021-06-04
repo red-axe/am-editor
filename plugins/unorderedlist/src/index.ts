@@ -86,29 +86,25 @@ export default class extends ListPlugin<Options> {
 	//设置markdown
 	markdown(event: KeyboardEvent, text: string, block: NodeInterface) {
 		if (!isEngine(this.editor) || this.options.markdown === false) return;
-
-		const plugins = this.editor.block.findPlugin(block);
+		const { node, command } = this.editor;
+		const blockApi = this.editor.block;
+		const plugin = blockApi.findPlugin(block);
 		// fix: 列表、引用等 markdown 快捷方式不应该在标题内生效
 		if (
 			block.name !== 'p' ||
-			plugins.find(
-				plugin =>
-					(plugin.constructor as PluginEntry).pluginName ===
-					'heading',
-			)
+			(plugin &&
+				(plugin.constructor as PluginEntry).pluginName === 'heading')
 		) {
 			return;
 		}
 		if (['*', '-', '+'].indexOf(text) < 0) return;
 		event.preventDefault();
-		this.editor.block.removeLeftText(block);
-		if (this.editor.node.isEmpty(block)) {
+		blockApi.removeLeftText(block);
+		if (node.isEmpty(block)) {
 			block.empty();
 			block.append('<br />');
 		}
-		this.editor.command.execute(
-			(this.constructor as PluginEntry).pluginName,
-		);
+		command.execute((this.constructor as PluginEntry).pluginName);
 		return false;
 	}
 

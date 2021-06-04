@@ -22,7 +22,7 @@ import {
 } from '../types/card';
 import { NodeInterface, isNode, isNodeEntry } from '../types/node';
 import { RangeInterface } from '../types/range';
-import { EditorInterface, EngineInterface, isEngine } from '../types/engine';
+import { EditorInterface, isEngine } from '../types/engine';
 import {
 	decodeCardValue,
 	encodeCardValue,
@@ -197,17 +197,29 @@ class CardModel implements CardModelInterface {
 	insertNode(range: RangeInterface, card: CardInterface) {
 		const { $ } = this.editor;
 		const isInline = (card.constructor as CardEntry).cardType === 'inline';
-		const editor = this.editor as EngineInterface;
+		const editor = this.editor;
 		// 范围为折叠状态时先删除内容
-		if (!range.collapsed) {
+		if (!range.collapsed && isEngine(editor)) {
 			editor.change.deleteContent(range);
 		}
 		this.gc();
+		const { inline, block, node } = editor;
 		// 插入新 Card
 		if (isInline) {
-			editor.inline.insert(card.root, range);
+			inline.insert(card.root, range);
 		} else {
-			editor.block.insert(card.root, true, range);
+			block.insert(card.root, range, container => {
+				//获取最外层的block嵌套节点
+				let blockParent = container.parent();
+				while (blockParent && !blockParent.isEditable()) {
+					container = blockParent;
+					const parent = blockParent.parent();
+					if (parent && node.isBlock(parent)) {
+						blockParent = parent;
+					} else break;
+				}
+				return container;
+			});
 		}
 		this.components.push(card);
 		card.focus(range);
@@ -217,9 +229,9 @@ class CardModel implements CardModelInterface {
 			!isInline &&
 			rootParent &&
 			rootParent.inEditor() &&
-			this.editor.node.isBlock(rootParent)
+			node.isBlock(rootParent)
 		) {
-			editor.block.unwrap(rootParent, range);
+			block.unwrap(rootParent, range);
 		}
 		const result = card.render();
 		const center = card.getCenter();
@@ -246,9 +258,11 @@ class CardModel implements CardModelInterface {
 	// 移除Card
 	removeNode(card: CardInterface) {
 		if (card.destroy) card.destroy();
-		const editor = this.editor as EngineInterface;
-		if ((card.constructor as CardEntry).cardType === CardType.BLOCK) {
-			editor.readonly = false;
+		if (
+			isEngine(this.editor) &&
+			(card.constructor as CardEntry).cardType === CardType.BLOCK
+		) {
+			this.editor.readonly = false;
 		}
 		this.removeComponent(card);
 		card.root.remove();

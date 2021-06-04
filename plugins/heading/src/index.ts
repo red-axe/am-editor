@@ -190,7 +190,7 @@ export default class extends BlockPlugin<Options> {
 
 	showAnchor() {
 		if (!isEngine(this.editor)) return;
-		const { change, root, clipboard, $, language } = this.editor;
+		const { change, root, clipboard, $, language, card } = this.editor;
 		const range = change.getRange();
 		let button = root.find('.data-anchor-button');
 		const block = range.startNode.closest(this.tagName.join(','));
@@ -203,7 +203,7 @@ export default class extends BlockPlugin<Options> {
 			button.remove();
 		}
 
-		if (block.length === 0) {
+		if (block.length === 0 || card.closest(block, true)) {
 			return;
 		}
 
@@ -301,45 +301,6 @@ export default class extends BlockPlugin<Options> {
 		selection.move();
 	}
 
-	// 前置处理
-	beforeProcess() {
-		if (!isEngine(this.editor)) return;
-		this.replaceParagraph();
-		const { change, block } = this.editor;
-		const range = change.getRange();
-		const blocks = block.getBlocks(range);
-		const selection = range.createSelection();
-
-		if (!selection.has()) {
-			return;
-		}
-		let start;
-		blocks.forEach(block => {
-			const parent = block.parent();
-			let first = block.first();
-			//如果是光标相关节点取下一个兄弟节点
-			if (
-				[CURSOR, ANCHOR].includes(first?.attributes(DATA_ELEMENT) || '')
-			) {
-				first = first!.next();
-			}
-			//如果是有序列表，转换序号
-			if (
-				block.name === 'li' &&
-				parent &&
-				parent.name === 'ol' &&
-				first &&
-				first.isText()
-			) {
-				start = parseInt(parent.attributes('start'), 10) || 1;
-				first[0].nodeValue = `${start}.` + first[0].nodeValue;
-			}
-			this.editor.block.brToBlock(block);
-		});
-		selection.move();
-		return start;
-	}
-
 	// 后续处理
 	afterProcess(start?: number) {
 		if (!isEngine(this.editor)) return;
@@ -391,7 +352,6 @@ export default class extends BlockPlugin<Options> {
 	execute(type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p') {
 		if (!isEngine(this.editor)) return;
 		if (type === this.queryState()) type = 'p';
-		this.beforeProcess();
 		const { list, block } = this.editor;
 		list.split();
 		block.setBlocks(`<${type} />`);
@@ -405,7 +365,10 @@ export default class extends BlockPlugin<Options> {
 		if (blocks.length === 0) {
 			return '';
 		}
-		return this.tagName.indexOf(blocks[0].name) >= 0 ? blocks[0].name : '';
+		const name = this.tagName.find(name =>
+			blocks.some(block => block.name === name),
+		);
+		return name || '';
 	}
 
 	hotkey() {
@@ -495,18 +458,19 @@ export default class extends BlockPlugin<Options> {
 
 	onBackspace(event: KeyboardEvent) {
 		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const { change, node } = this.editor;
 		const range = change.getRange();
-		if (!this.editor.block.isFirstOffset(range, 'start')) return;
-		const block = this.editor.block.closest(range.startNode);
+		const blockApi = this.editor.block;
+		if (!blockApi.isFirstOffset(range, 'start')) return;
+		const block = blockApi.closest(range.startNode);
 
 		if (
 			this.tagName.indexOf(block.name) > -1 &&
-			this.editor.node.isEmptyWithTrim(block) &&
+			node.isEmptyWithTrim(block) &&
 			block.parent()?.isEditable()
 		) {
 			event.preventDefault();
-			this.editor.block.setBlocks('<p />');
+			blockApi.setBlocks('<p />');
 			return false;
 		}
 		if (this.tagName.indexOf(block.name) > -1) {

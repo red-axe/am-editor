@@ -55,7 +55,7 @@ export default class extends Plugin<Options> {
 			return list.getIndent(block.closest('ul,ol'));
 		}
 
-		if (node.isRootBlock(block)) {
+		if (node.isRootBlock(block) || node.isSimpleBlock(block)) {
 			const padding = removeUnit(block.css('padding-left'));
 			const textIndent = removeUnit(
 				block.get<HTMLElement>()?.style.textIndent || '',
@@ -71,16 +71,17 @@ export default class extends Plugin<Options> {
 		isTab: boolean,
 		maxPadding: number,
 	) {
-		const { list } = this.editor;
-		if (this.editor.node.isList(block)) {
+		const { list, node } = this.editor;
+		if (block.name === 'li') return;
+		if (node.isList(block)) {
 			list.addIndent(block, padding, maxPadding);
-		} else if (this.editor.node.isRootBlock(block)) {
+		} else if (node.isRootBlock(block) || node.isSimpleBlock(block)) {
 			if (padding > 0) {
 				if (removeUnit(block.css('text-indent')) || isTab !== true) {
 					const currentValue = block.css('padding-left');
 					let newValue = removeUnit(currentValue) + padding;
 					newValue = Math.min(newValue, maxPadding);
-					this.editor.node.setAttributes(block, {
+					node.setAttributes(block, {
 						style: {
 							'padding-left': addUnit(
 								newValue > 0 ? newValue : 0,
@@ -89,14 +90,14 @@ export default class extends Plugin<Options> {
 						},
 					});
 				} else {
-					this.editor.node.setAttributes(block, {
+					node.setAttributes(block, {
 						style: {
 							'text-indent': '2em',
 						},
 					});
 				}
 			} else if (removeUnit(block.css('text-indent'))) {
-				this.editor.node.setAttributes(block, {
+				node.setAttributes(block, {
 					style: {
 						'text-indent': '',
 					},
@@ -104,7 +105,7 @@ export default class extends Plugin<Options> {
 			} else {
 				const currentValue = block.css('padding-left');
 				const newValue = removeUnit(currentValue) + padding;
-				this.editor.node.setAttributes(block, {
+				node.setAttributes(block, {
 					style: {
 						'padding-left': addUnit(
 							newValue > 0 ? newValue : 0,

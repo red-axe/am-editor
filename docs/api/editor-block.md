@@ -32,7 +32,7 @@ Find the block plugin instance according to the node
  * Find the block plugin instance according to the node
  * @param node node
  */
-findPlugin(node: NodeInterface): Array<BlockInterface>;
+findPlugin(node: NodeInterface): BlockInterface | undefined;
 ```
 
 ### `findTop`
@@ -120,15 +120,15 @@ Insert a block node at the current cursor position
 
 ```ts
 /**
- * Insert a block node at the current cursor position
- * @param block node
- * @param remove whether to remove the block at the current position
- * @param range cursor
- */
+  * Insert a block node at the current cursor position
+  * @param block node
+  * @param range cursor
+  * @param splitNode split node, the default is the block node at the beginning of the cursor
+  */
 insert(
-    block: NodeInterface | Node | string,
-    remove?: boolean,
-    range?: RangeInterface,
+     block: NodeInterface | Node | string,
+     range?: RangeInterface,
+     splitNode?: (node: NodeInterface) => NodeInterface,
 ): void;
 ```
 

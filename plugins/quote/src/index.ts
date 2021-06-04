@@ -67,28 +67,25 @@ export default class extends BlockPlugin<Options> {
 	//设置markdown
 	markdown(event: KeyboardEvent, text: string, block: NodeInterface) {
 		if (this.options.markdown === false || !isEngine(this.editor)) return;
-		const plugins = this.editor.block.findPlugin(block);
+		const { node, command } = this.editor;
+		const blockApi = this.editor.block;
+		const plugin = blockApi.findPlugin(block);
 		// fix: 列表、引用等 markdown 快捷方式不应该在标题内生效
 		if (
 			block.name !== 'p' ||
-			plugins.find(
-				plugin =>
-					(plugin.constructor as PluginEntry).pluginName ===
-					'heading',
-			)
+			(plugin &&
+				(plugin.constructor as PluginEntry).pluginName === 'heading')
 		) {
 			return;
 		}
 		if (['>'].indexOf(text) < 0) return;
 		event.preventDefault();
-		this.editor.block.removeLeftText(block);
-		if (this.editor.node.isEmpty(block)) {
+		blockApi.removeLeftText(block);
+		if (node.isEmpty(block)) {
 			block.empty();
 			block.append('<br />');
 		}
-		this.editor.command.execute(
-			(this.constructor as PluginEntry).pluginName,
-		);
+		command.execute((this.constructor as PluginEntry).pluginName);
 		return false;
 	}
 
@@ -149,22 +146,23 @@ export default class extends BlockPlugin<Options> {
 
 	onBackspace(event: KeyboardEvent) {
 		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const { change, node } = this.editor;
 		const range = change.getRange();
-		if (!this.editor.block.isFirstOffset(range, 'start')) return;
-		const block = this.editor.block.closest(range.startNode);
+		const blockApi = this.editor.block;
+		if (!blockApi.isFirstOffset(range, 'start')) return;
+		const block = blockApi.closest(range.startNode);
 		const parentBlock = block.parent();
 
 		if (
 			parentBlock &&
 			parentBlock.name === 'blockquote' &&
-			this.editor.node.isRootBlock(block)
+			node.isRootBlock(block)
 		) {
 			event.preventDefault();
 			if (block.prevElement()) {
 				change.mergeAfterDeletePrevNode(block);
 			} else {
-				this.editor.block.unwrap('<blockquote />');
+				blockApi.unwrap('<blockquote />');
 			}
 			return false;
 		}
@@ -174,9 +172,10 @@ export default class extends BlockPlugin<Options> {
 	onEnter(event: KeyboardEvent) {
 		if (!isEngine(this.editor)) return;
 		const { change } = this.editor;
+		const blockApi = this.editor.block;
 		const range = change.getRange();
 		// 选区选中最后的节点
-		const block = this.editor.block.closest(range.endNode);
+		const block = blockApi.closest(range.endNode);
 
 		const parent = block.parent();
 		if (
@@ -185,7 +184,7 @@ export default class extends BlockPlugin<Options> {
 			block.nextElement()
 		) {
 			event.preventDefault();
-			this.editor.block.insertOrSplit(range, block);
+			blockApi.insertOrSplit(range, block);
 			return false;
 		}
 		return;

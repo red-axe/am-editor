@@ -7,10 +7,11 @@ class Enter {
 	}
 
 	trigger(event: KeyboardEvent) {
-		const { change, node, $ } = this.engine;
+		const { change, node, $, list } = this.engine;
 		const range = change.getRange();
 		// 选区选中最后的节点
-		let block = this.engine.block.closest(range.endNode);
+		const blockApi = this.engine.block;
+		let block = blockApi.closest(range.endNode);
 		// 嵌套 block
 		const parent = block.parent();
 		if (parent && parent.inEditor() && node.isBlock(parent)) {
@@ -24,58 +25,57 @@ class Enter {
 				const selection = range.createSelection();
 				change.unwrapNode(block);
 				selection.move();
-				block = this.engine.block.closest(range.endNode);
+				block = blockApi.closest(range.endNode);
 			}
 			if (
 				range.collapsed &&
 				((range.startContainer.childNodes.length === 1 &&
 					'BR' === range.startContainer.firstChild?.nodeName) ||
-					(this.engine.block.isLastOffset(range, 'end') &&
-						this.engine.block.isFirstOffset(range, 'end')))
+					(blockApi.isLastOffset(range, 'end') &&
+						blockApi.isFirstOffset(range, 'end')))
 			) {
 				event.preventDefault();
 				if (['li'].indexOf(parent.name) >= 0) {
-					this.engine.block.unwrap('<'.concat(parent.name!, ' />'));
-					this.engine.block.setBlocks(
-						'<'.concat(parent.name!, ' />'),
-					);
+					blockApi.unwrap('<'.concat(parent.name!, ' />'));
+					blockApi.setBlocks('<'.concat(parent.name!, ' />'));
 				} else {
-					this.engine.block.unwrap('<'.concat(parent.name!, ' />'));
-					this.engine.block.setBlocks('<p />');
+					blockApi.unwrap('<'.concat(parent.name!, ' />'));
+					blockApi.setBlocks('<p />');
 				}
 				return false;
 			}
 		}
-		if (this.engine.node.isRootBlock(block) && !block.isCard()) {
+		if (
+			node.isBlock(block) &&
+			(!parent || !node.isList(parent)) &&
+			!block.isCard()
+		) {
 			event.preventDefault();
-			this.engine.block.insertOrSplit(range, block);
+			blockApi.insertOrSplit(range, block);
 			return false;
 		}
 		// 列表
 		if (block.name === 'li') {
-			if (this.engine.node.isCustomize(block)) {
+			if (node.isCustomize(block)) {
 				return;
 			}
 			event.preventDefault();
 			// <li>foo<cursor /><li>
-			if (this.engine.block.isLastOffset(range, 'end')) {
+			if (blockApi.isLastOffset(range, 'end')) {
 				// <li><cursor /><li>
-				if (
-					range.collapsed &&
-					this.engine.block.isFirstOffset(range, 'end')
-				) {
+				if (range.collapsed && blockApi.isFirstOffset(range, 'end')) {
 					const listRoot = block.closest('ul,ol');
-					this.engine.block.unwrap('<'.concat(listRoot.name!, ' />'));
-					this.engine.block.setBlocks('<p />');
+					blockApi.unwrap('<'.concat(listRoot.name!, ' />'));
+					blockApi.setBlocks('<p />');
 				} else {
 					const li = $('<li><br /></li>');
 					li.attributes(block.attributes());
-					this.engine.block.insertEmptyBlock(range, li);
+					blockApi.insertEmptyBlock(range, li);
 				}
 			} else {
-				this.engine.block.split();
+				blockApi.split();
 			}
-			this.engine.list.merge();
+			list.merge();
 			range.scrollIntoView();
 			return false;
 		}

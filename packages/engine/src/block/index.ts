@@ -81,34 +81,34 @@ class Block implements BlockModelInterface {
 	 * 根据节点查找block插件实例
 	 * @param node 节点
 	 */
-	findPlugin(block: NodeInterface) {
+	findPlugin(block: NodeInterface): BlockInterface | undefined {
 		const { node, schema } = this.editor;
-		if (!node.isBlock(block)) return [];
-		const plugins: Array<BlockInterface> = [];
+		if (!node.isBlock(block)) return;
+		let result: BlockInterface | undefined = undefined;
 		Object.keys(this.editor.plugin.components).some(pluginName => {
-			const plugin = this.editor.plugin.components[pluginName];
-			if (isBlockPlugin(plugin)) {
+			const blockPlugin = this.editor.plugin.components[pluginName];
+			if (
+				isBlockPlugin(blockPlugin) &&
+				(!blockPlugin.tagName || typeof blockPlugin.tagName === 'string'
+					? block.name === blockPlugin.tagName
+					: blockPlugin.tagName.indexOf(block.name) > -1)
+			) {
+				const schemaRule = blockPlugin.schema();
 				if (
-					plugin.tagName &&
-					(typeof plugin.tagName === 'string'
-						? plugin.tagName === block.name
-						: plugin.tagName.indexOf(block.name) > -1)
-				) {
-					const schemaRule = plugin.schema();
-					if (
-						!(Array.isArray(schemaRule)
-							? schemaRule.find(rule =>
-									schema.checkNode(block, rule.attributes),
-							  )
-							: schema.checkNode(block, schemaRule.attributes))
-					)
-						return;
-					plugins.push(plugin);
-				}
+					(blockPlugin.attributes || blockPlugin.style) &&
+					!(Array.isArray(schemaRule)
+						? schemaRule.find(rule =>
+								schema.checkNode(block, rule.attributes),
+						  )
+						: schema.checkNode(block, schemaRule.attributes))
+				)
+					return;
+				result = blockPlugin;
+				return true;
 			}
 			return;
 		});
-		return plugins;
+		return result;
 	}
 	/**
 	 * 查找Block节点的一级节点。如 div -> H2 返回 H2节点
@@ -163,7 +163,7 @@ class Block implements BlockModelInterface {
 	 */
 	wrap(block: NodeInterface | Node | string, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { change, node } = this.editor;
+		const { change, node, schema, list } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof block === 'string' || isNode(block)) {
@@ -173,29 +173,43 @@ class Block implements BlockModelInterface {
 		if (!node.isBlock(block)) return;
 
 		let blocks: Array<NodeInterface | null> = this.getBlocks(safeRange);
-
-		// li 节点改成 ul 或 ol
-		const listBlocks: Array<NodeInterface> = [];
+		//一样的block插件不嵌套
 		blocks = blocks
-			.map(node => {
-				const parent = node?.parent();
-				if (
-					node?.name === 'li' &&
-					parent &&
-					this.editor.node.isList(parent)
-				) {
-					if (!listBlocks.find(block => block.equal(parent))) {
-						listBlocks.push(parent);
-						return parent;
+			.map(blockNode => {
+				if (!blockNode || blockNode.isCard()) return null;
+				const wrapBlock = block as NodeInterface;
+				let blockParent = blockNode?.parent();
+				while (blockParent && !blockParent.isEditable()) {
+					blockNode = blockParent;
+					const parent = blockParent.parent();
+					if (parent && node.isBlock(parent)) {
+						blockParent = parent;
+					} else break;
+				}
+				//|| blockParent && !blockParent.equal(blockNode) && !blockParent.isRoot() && node.isBlock(blockParent) && !schema.isAllowIn(wrapBlock.name, blockParent.name)
+				if (!schema.isAllowIn(wrapBlock.name, blockNode.name)) {
+					//一样的插件，返回子级
+					if (
+						this.findPlugin(blockNode) ===
+						this.findPlugin(wrapBlock)
+					) {
+						return blockNode.children();
 					}
 					return null;
 				}
-				return node;
+				return blockNode;
 			})
-			.filter(node => node !== null);
+			.filter(block => block !== null);
+
 		// 不在段落内
 		if (blocks.length === 0) {
 			const root = this.closest(safeRange.startNode);
+			if (
+				root.isCard() ||
+				root.isEditable() ||
+				!schema.isAllowIn(block.name, root.name)
+			)
+				return;
 			const selection = safeRange.createSelection();
 			root.children().each(node => {
 				(block as NodeInterface).append(node);
@@ -211,6 +225,8 @@ class Block implements BlockModelInterface {
 			if (node) (block as NodeInterface).append(node);
 		});
 		selection.move();
+		this.merge(safeRange);
+		list.merge(undefined, safeRange);
 		if (!range) change.apply(safeRange);
 	}
 	/**
@@ -462,13 +478,13 @@ class Block implements BlockModelInterface {
 	/**
 	 * 在当前光标位置插入block节点
 	 * @param block 节点
-	 * @param removeEmpty 是否移除当前位置上的block
 	 * @param range 光标
+	 * @param splitNode 分割节点，默认为光标开始位置的block节点
 	 */
 	insert(
 		block: NodeInterface | Node | string,
-		removeEmpty: boolean = false,
 		range?: RangeInterface,
+		splitNode?: (node: NodeInterface) => NodeInterface,
 	) {
 		if (!isEngine(this.editor)) return;
 		const { $, change, node, list } = this.editor;
@@ -486,7 +502,7 @@ class Block implements BlockModelInterface {
 		}
 
 		// 获取上面第一个 Block
-		const container = this.closest(safeRange.startNode);
+		let container = this.closest(safeRange.startNode);
 		// 超出编辑范围
 		if (!container.isEditable() && !container.inEditor()) {
 			if (!range) change.apply(safeRange);
@@ -514,48 +530,65 @@ class Block implements BlockModelInterface {
 			if (!range) change.apply(safeRange);
 			return;
 		}
-
-		const containerClone = node.clone(container, false);
+		container = splitNode ? splitNode(container) : container;
 		// 切割 Block
-		let child = container.first();
-		let isLeft = true;
-
-		while (child) {
-			const next = child.next();
-			if (child.equal(selection.anchor!)) {
-				isLeft = false;
-				child = next;
-				continue;
+		const leftNodes = selection.getNode(container, 'left');
+		leftNodes.allChildren().forEach(child => {
+			const leftNode = $(child);
+			if (
+				node.isBlock(leftNode) &&
+				(node.isEmpty(leftNode) || list.isEmptyItem(leftNode))
+			) {
+				leftNode.remove();
 			}
+		});
+		const rightNodes = selection.getNode(
+			container,
+			'right',
+			true,
+			child => {
+				if (child.isCard()) {
+					const parent = child.parent();
+					if (parent && node.isCustomize(parent)) return false;
+				}
+				return true;
+			},
+		);
 
-			if (!isLeft) {
-				containerClone.append(child);
+		rightNodes.allChildren().forEach(child => {
+			const rightNode = $(child);
+			if (
+				node.isBlock(rightNode) &&
+				(node.isEmpty(rightNode) || list.isEmptyItem(rightNode))
+			) {
+				rightNode.remove();
+			} else if (node.isList(rightNode)) {
+				list.addBr(rightNode);
 			}
-			child = next;
-		}
-
-		if (!node.isEmpty(containerClone)) {
-			container.after(containerClone);
-		}
-		// 如果是列表，增加br标签
-		const containerParent = container.parent();
-		if (containerParent && node.isList(containerParent)) {
-			const cardNode = container.first();
-			if (cardNode?.isCard()) {
-				const cardName = cardNode.attributes(CARD_KEY);
-				list.addCardToCustomize(containerClone, cardName);
-			}
-
-			if (node.isCustomize(container)) {
-				list.addBr(container);
-			}
-		}
-		// 移除范围的开始和结束标记
-		selection.move();
+		});
+		if (
+			rightNodes.length > 0 &&
+			!node.isEmpty(rightNodes) &&
+			!list.isEmptyItem(rightNodes)
+		)
+			container.after(rightNodes);
+		if (
+			leftNodes.length > 0 &&
+			!node.isEmpty(leftNodes) &&
+			!list.isEmptyItem(leftNodes)
+		)
+			container.after(leftNodes);
+		if (!node.isEmpty(container) && !list.isEmptyItem(container))
+			container.remove();
 		// 移除原 Block
-		safeRange.setStartAfter(container);
-		safeRange.collapse(true);
-		if (node.isEmpty(container) && !removeEmpty) container.remove();
+		const last =
+			node.isEmpty(leftNodes) || list.isEmptyItem(leftNodes)
+				? container
+				: leftNodes.eq(leftNodes.length - 1);
+		if (last) {
+			safeRange.setStartAfter(last);
+			safeRange.collapse(true);
+		}
 		// 插入新 Block
 		node.insert(block, safeRange);
 		if (!range) change.apply(safeRange);
@@ -567,7 +600,7 @@ class Block implements BlockModelInterface {
 	 */
 	setBlocks(block: string | { [k: string]: any }, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { $, node } = this.editor;
+		const { $, node, schema } = this.editor;
 		const { change } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
@@ -585,7 +618,10 @@ class Block implements BlockModelInterface {
 		// 编辑器根节点，无段落
 		const { startNode } = safeRange;
 		if (startNode.isEditable() && blocks.length === 0) {
+			if (startNode.isCard() || startNode.isEditable()) return;
 			const newBlock = targetNode || $('<p></p>');
+			if (!schema.isAllowIn(newBlock.name, startNode.name)) return;
+
 			node.setAttributes(newBlock, attributes);
 
 			const selection = safeRange.createSelection();
@@ -607,8 +643,19 @@ class Block implements BlockModelInterface {
 				return;
 			}
 			// 相同标签，或者只传入样式属性
-			if (!targetNode || child.name === targetNode.name) {
+			if (
+				!targetNode ||
+				(this.findPlugin(child) === this.findPlugin(targetNode) &&
+					child.name === targetNode.name)
+			) {
 				node.setAttributes(child, attributes);
+				return;
+			}
+			//如果要包裹的节点可以放入到当前节点中，就不操作
+			if (
+				targetNode.name !== 'p' &&
+				schema.isAllowIn(child.name, targetNode.name)
+			) {
 				return;
 			}
 			node.replace(child, targetNode);
@@ -633,7 +680,7 @@ class Block implements BlockModelInterface {
 		if (block.length > 0) {
 			const selection = safeRange.createSelection();
 			let nextNode = block.next();
-			while (nextNode) {
+			while (nextNode && tags.indexOf(nextNode.name) > 0) {
 				const prevNode = nextNode.prev();
 				const nextAttributes = nextNode.attributes();
 				const prevAttributes = prevNode?.attributes();
@@ -751,7 +798,7 @@ class Block implements BlockModelInterface {
 		if (!fragment.firstChild) {
 			return true;
 		}
-		const { $ } = this.editor;
+		const { $, node } = this.editor;
 		if (
 			fragment.childNodes.length === 1 &&
 			$(fragment.firstChild).name === 'br'
@@ -759,9 +806,9 @@ class Block implements BlockModelInterface {
 			return true;
 		}
 
-		const node = $('<div />');
-		node.append(fragment);
-		return this.editor.node.isEmpty(node);
+		const emptyNode = $('<div />');
+		emptyNode.append(fragment);
+		return node.isEmpty(emptyNode);
 	}
 
 	/**
@@ -782,11 +829,11 @@ class Block implements BlockModelInterface {
 		if (!fragment.firstChild) {
 			return true;
 		}
-		const { $ } = this.editor;
-		const node = $('<div />');
-		node.append(fragment);
+		const { $, node } = this.editor;
+		const emptyNode = $('<div />');
+		emptyNode.append(fragment);
 
-		return 0 >= node.find('br').length && this.editor.node.isEmpty(node);
+		return 0 >= emptyNode.find('br').length && node.isEmpty(emptyNode);
 	}
 
 	/**
@@ -797,12 +844,22 @@ class Block implements BlockModelInterface {
 		range = range.cloneRange();
 		range.shrinkToElementNode();
 		range.shrinkToTextNode();
-		const startBlock = this.closest(range.startNode);
-		const endBlock = this.closest(range.endNode);
+
+		const { $, node } = this.editor;
+
+		let startBlock = this.closest(range.startNode);
+		if (range.startNode.isRoot()) {
+			startBlock = $(range.getStartOffsetNode());
+		}
+		let endBlock = this.closest(range.endNode);
+		if (range.endNode.isRoot()) {
+			endBlock = $(range.getEndOffsetNode());
+		}
+
 		const closest = this.closest(range.commonAncestorNode);
 		const blocks: Array<NodeInterface> = [];
 		let started = false;
-		const { $ } = this.editor;
+
 		closest.traverse(node => {
 			const child = $(node);
 			if (child.equal(startBlock)) {
@@ -824,7 +881,11 @@ class Block implements BlockModelInterface {
 		});
 		// 未选中文本时忽略该 Block
 		// 示例：<h3><anchor />word</h3><p><focus />another</p>
-		if (blocks.length > 1 && this.isFirstOffset(range, 'end')) {
+		if (
+			blocks.length > 1 &&
+			this.isFirstOffset(range, 'end') &&
+			!node.isEmpty(endBlock)
+		) {
 			blocks.pop();
 		}
 		return blocks;
@@ -1155,7 +1216,7 @@ class Block implements BlockModelInterface {
 		const { change, $ } = this.editor;
 		const { blocks, marks } = change;
 		const nodeApi = this.editor.node;
-		this.insert(block, true);
+		this.insert(block);
 		if (blocks[0]) {
 			const styles = blocks[0].css();
 			block.css(styles);

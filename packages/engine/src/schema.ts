@@ -151,15 +151,11 @@ class Schema implements SchemaInterface {
 	}
 
 	getType(node: NodeInterface) {
-		for (let i = 0; i < this._all.length; i++) {
-			const rule = this._all[i];
-			if (
+		return this._all.find(
+			rule =>
 				rule.name === node.name &&
-				this.checkNode(node, rule.attributes)
-			)
-				return rule.type;
-		}
-		return;
+				this.checkNode(node, rule.attributes),
+		)?.type;
 	}
 
 	/**
@@ -250,9 +246,8 @@ class Schema implements SchemaInterface {
 		if (!schema[attributesName]) return false;
 		let rule = schema[attributesName];
 		if (isSchemaValueObject(rule)) {
-			//不是强制的，并且没有值，不用验证
-			if (attributesValue === undefined && rule.required === false)
-				return true;
+			//如果没有值，强制状态就返回 false，非强制就返回 true
+			if (attributesValue === undefined) return !rule.required;
 			rule = rule.value;
 		}
 		//默认都不为强制的

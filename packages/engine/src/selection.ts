@@ -193,6 +193,7 @@ class Selection implements SelectionInterface {
 		source: NodeInterface,
 		position: 'left' | 'center' | 'right' = 'center',
 		isClone: boolean = true,
+		callback: (node: NodeInterface) => boolean = () => true,
 	) {
 		const node = isClone ? source.clone(true) : source;
 		if (!this.focus || !this.anchor) {
@@ -214,7 +215,7 @@ class Selection implements SelectionInterface {
 					isRemove = true;
 					return;
 				}
-				if (isRemove) node.remove();
+				if (isRemove && callback(node)) node.remove();
 			}, true);
 		}
 		// 删除左侧
@@ -232,7 +233,7 @@ class Selection implements SelectionInterface {
 					isRemove = true;
 					return;
 				}
-				if (isRemove) node.remove();
+				if (isRemove && callback(node)) node.remove();
 			}, false);
 		}
 		return node;

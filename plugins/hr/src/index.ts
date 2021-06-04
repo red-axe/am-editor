@@ -41,26 +41,24 @@ export default class extends Plugin<Options> {
 
 	markdown(event: KeyboardEvent) {
 		if (!isEngine(this.editor) || this.options.markdown === false) return;
-		const { change } = this.editor;
+		const { change, command, node } = this.editor;
 		const range = change.getRange();
 
 		if (!range.collapsed || change.isComposing() || !this.markdown) return;
+		const blockApi = this.editor.block;
+		const block = blockApi.closest(range.startNode);
 
-		const block = this.editor.block.closest(range.startNode);
-
-		if (!this.editor.node.isRootBlock(block)) {
+		if (!node.isRootBlock(block)) {
 			return;
 		}
 
-		const chars = this.editor.block.getLeftText(block);
+		const chars = blockApi.getLeftText(block);
 		const match = /^[-]{3,}$/.exec(chars);
 
 		if (match) {
 			event.preventDefault();
-			this.editor.block.removeLeftText(block);
-			this.editor.command.execute(
-				(this.constructor as PluginEntry).pluginName,
-			);
+			blockApi.removeLeftText(block);
+			command.execute((this.constructor as PluginEntry).pluginName);
 			return false;
 		}
 		return;

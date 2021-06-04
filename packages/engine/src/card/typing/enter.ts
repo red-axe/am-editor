@@ -24,17 +24,17 @@ class Enter {
 		card: CardInterface,
 		isStart: boolean,
 	) {
-		const { change } = this.engine;
+		const { change, block } = this.engine;
 		range.select(card.root);
 		range.collapse(isStart);
 		change.select(range);
-		const block = this.engine.$('<p><br /></p>');
-		this.engine.block.insert(block, true);
+		const emptyBlock = this.engine.$('<p><br /></p>');
+		block.insert(emptyBlock);
 
 		if (isStart) {
 			card.focus(range, true);
 		} else {
-			range.select(block, true);
+			range.select(emptyBlock, true);
 			range.collapse(false);
 		}
 		change.select(range);

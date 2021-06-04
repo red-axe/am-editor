@@ -88,6 +88,7 @@ class NodeModel implements NodeModelInterface {
 	 * @returns
 	 */
 	isRootBlock(node: NodeInterface, schema?: SchemaInterface) {
+		//父级不是根节点
 		if (!node.parent()?.isEditable()) return false;
 		if (!this.isSimpleBlock(node)) return false;
 		//并且规则上不可以设置子节点
@@ -317,22 +318,21 @@ class NodeModel implements NodeModelInterface {
 		//被合并的节点最后一个子节点为br，则移除
 		const toNodeLast = source.last();
 		let child = target.first();
-		const plugins = block.findPlugin(source);
+		const plugin = block.findPlugin(source);
 		//循环追加
 		while (child) {
 			const next = child.next();
-			plugins.forEach(plugin => {
-				const markPlugin = mark.findPlugin(child!);
-				if (
-					markPlugin &&
-					plugin.disableMark &&
-					plugin.disableMark!.indexOf(
-						(markPlugin.constructor as PluginEntry).pluginName,
-					) > -1
-				) {
-					node.unwrap(child!);
-				}
-			});
+			const markPlugin = mark.findPlugin(child!);
+			if (
+				plugin &&
+				markPlugin &&
+				plugin.disableMark &&
+				plugin.disableMark!.indexOf(
+					(markPlugin.constructor as PluginEntry).pluginName,
+				) > -1
+			) {
+				node.unwrap(child!);
+			}
 			//追加到要合并的列表中
 			source.append(child);
 			child = next;
@@ -363,7 +363,10 @@ class NodeModel implements NodeModelInterface {
 	 */
 	replace(source: NodeInterface, target: NodeInterface) {
 		const clone = this.editor.node.clone(target, false);
-		let childNode = source.first();
+		let childNode =
+			this.isCustomize(source) && source.name === 'li'
+				? source.first()?.next()
+				: source.first();
 
 		while (childNode) {
 			const nextNode = childNode.next();
