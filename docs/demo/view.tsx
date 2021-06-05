@@ -77,7 +77,10 @@ const ViewRender = () => {
 		view.render(content);
 		const { container } = view;
 		return (
-			<div className="editor-wrapper" style={{ position: 'relative' }}>
+			<div
+				className="editor-wrapper editor-wrapper-view"
+				style={{ position: 'relative' }}
+			>
 				<div
 					className={container.attributes('class')}
 					dangerouslySetInnerHTML={{ __html: container.html() }}
@@ -88,7 +91,10 @@ const ViewRender = () => {
 	//普通渲染
 	const render = () => {
 		return (
-			<div className="editor-wrapper" style={{ position: 'relative' }}>
+			<div
+				className="editor-wrapper editor-wrapper-view"
+				style={{ position: 'relative' }}
+			>
 				<div className="am-engine-view" ref={viewRef} />
 			</div>
 		);
