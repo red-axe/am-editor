@@ -8,9 +8,7 @@ class Hotkey implements HotkeyInterface {
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
 		//绑定事件
-		this.engine.typing
-			.getHandleListener('default', 'keydown')
-			?.on(event => this.trigger(event));
+		this.engine.container.on('keydown', event => this.trigger(event));
 	}
 
 	/**

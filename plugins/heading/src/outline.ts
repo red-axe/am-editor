@@ -1,5 +1,4 @@
-import { getTextNodes, CARD_KEY } from '@aomao/engine';
-import HeadingId from './heading-id';
+import { getTextNodes, CARD_KEY, getHashId } from '@aomao/engine';
 
 export type OutlineData = {
 	id: string;
@@ -115,14 +114,13 @@ class Outline {
 		headings = headings || [];
 		if (headings.length === 0) return [];
 		let data: Array<OutlineData> = [];
-		const calculater = new HeadingId();
 		headings.forEach(node => {
 			const text = (this.getText(node) || '').trim();
 			// id 或文本为空，不纳入大纲
 			if (!text) return;
 			let id = node['id'];
 			if (!id) {
-				id = calculater.id(text);
+				id = node['data-id'] || getHashId(node);
 			}
 			data.push({
 				id,

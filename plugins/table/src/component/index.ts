@@ -159,6 +159,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	}
 
 	didRender() {
+		super.didRender();
 		this.viewport = this.wrapper?.find(
 			isEngine(this.editor)
 				? Template.VIEWPORT

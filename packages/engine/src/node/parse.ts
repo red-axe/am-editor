@@ -47,7 +47,7 @@ function domParser(
 			//创建一个空节点，用来包裹需要生成的节点
 			const container = getDocument().createElement('div');
 			container.innerHTML = selector;
-			editor.block.generateRandomIDForDescendant(container);
+			//editor.block.generateRandomIDForDescendant(container);
 
 			if (isTr) {
 				const tbody = container.querySelector('tbody');

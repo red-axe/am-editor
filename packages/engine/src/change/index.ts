@@ -232,36 +232,43 @@ class ChangeModel implements ChangeInterface {
 
 	setValue(value: string, onParse?: (node: Node) => void) {
 		const range = this.getRange();
+		const {
+			schema,
+			conversion,
+			container,
+			history,
+			mark,
+			node,
+			inline,
+			block,
+			card,
+		} = this.engine;
 		if (value === '') {
-			range.setStart(this.engine.container[0], 0);
+			range.setStart(container[0], 0);
 			range.collapse(true);
 			this.select(range);
 		} else {
-			const { schema, conversion } = this.engine;
-			const parser = new Parser(value, this.engine, node => {
-				node.allChildren().forEach(child => {
-					this.engine.mark.removeEmptyMarks(node);
-					if (this.engine.node.isInline(child)) {
-						this.engine.inline.repairCursor(child);
+			const parser = new Parser(value, this.engine, root => {
+				mark.removeEmptyMarks(root);
+				root.allChildren().forEach(child => {
+					if (node.isInline(child)) {
+						inline.repairCursor(child);
 					}
 					if (onParse) {
 						onParse(child);
 					}
 				});
 			});
-			const { container, history } = this.engine;
 			container.html(
 				parser.toValue(schema, conversion.getValue(), false, true),
 			);
 			container.allChildren().forEach(child => {
-				if (this.engine.node.isInline(child)) {
-					this.engine.inline.repairCursor(child);
+				if (node.isInline(child)) {
+					inline.repairCursor(child);
 				}
 			});
-			this.engine.block.generateDataIDForDescendant(
-				container.get<Element>()!,
-			);
-			this.engine.card.render();
+			block.generateDataIDForDescendant(container.get<Element>()!);
+			card.render();
 			const cursor = container.find(CURSOR_SELECTOR);
 			const selection: SelectionInterface = new Selection(
 				this.engine,
@@ -294,10 +301,8 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	getOriginValue() {
-		return new Parser(
-			this.engine.container.clone(true),
-			this.engine,
-		).toValue(this.engine.schema);
+		const { container, schema } = this.engine;
+		return new Parser(container.clone(true), this.engine).toValue(schema);
 	}
 
 	getValue(
@@ -907,6 +912,9 @@ class ChangeModel implements ChangeInterface {
 		this.combinTextNode();
 		if (range) this.select(range);
 		this.change();
+		this.engine.block.generateRandomIDForDescendant(
+			this.engine.container.get<Element>()!,
+		);
 	}
 
 	/**

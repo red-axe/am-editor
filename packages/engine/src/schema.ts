@@ -12,7 +12,7 @@ import {
 	SchemaValue,
 	SchemaValueObject,
 } from './types';
-import { validUrl } from './utils';
+import { getHashId, getWindow, validUrl } from './utils';
 
 /**
  * 标签规则
@@ -20,6 +20,9 @@ import { validUrl } from './utils';
 class Schema implements SchemaInterface {
 	private _map: { [key: string]: SchemaMap } = {};
 	private _all: Array<SchemaRule> = [];
+	private _typeMap: {
+		[key: string]: 'block' | 'mark' | 'inline' | undefined;
+	} = {};
 
 	data: {
 		blocks: Array<SchemaRule>;
@@ -151,11 +154,17 @@ class Schema implements SchemaInterface {
 	}
 
 	getType(node: NodeInterface) {
-		return this._all.find(
+		if (node.type !== getWindow().Node.ELEMENT_NODE) return undefined;
+		let id = node.attributes('data-id');
+		if (!id) id = getHashId(node, false);
+		else id = id.split('-')[0];
+		if (this._typeMap.hasOwnProperty(id)) return this._typeMap[id];
+		this._typeMap[id] = this._all.find(
 			rule =>
 				rule.name === node.name &&
 				this.checkNode(node, rule.attributes),
 		)?.type;
+		return this._typeMap[id];
 	}
 
 	/**

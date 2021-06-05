@@ -1,4 +1,3 @@
-import md5 from 'blueimp-md5';
 import {
 	CARD_KEY,
 	CARD_SELECTOR,
@@ -7,6 +6,7 @@ import {
 	DATA_ELEMENT,
 	READY_CARD_KEY,
 	ROOT_SELECTOR,
+	UI,
 } from '../constants';
 import Range from '../range';
 import {
@@ -15,13 +15,14 @@ import {
 	NodeInterface,
 	RangeInterface,
 	isNode,
+	PluginEntry,
 } from '../types';
 import {
 	BlockInterface,
 	BlockModelInterface,
 	isBlockPlugin,
 } from '../types/block';
-import { getDocument, getWindow } from '../utils';
+import { getDocument, getHashId, getWindow } from '../utils';
 import { Backspace, Enter } from './typing';
 
 class Block implements BlockModelInterface {
@@ -163,7 +164,7 @@ class Block implements BlockModelInterface {
 	 */
 	wrap(block: NodeInterface | Node | string, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { change, node, schema, list } = this.editor;
+		const { change, node, schema, list, $, mark } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof block === 'string' || isNode(block)) {
@@ -173,6 +174,7 @@ class Block implements BlockModelInterface {
 		if (!node.isBlock(block)) return;
 
 		let blocks: Array<NodeInterface | null> = this.getBlocks(safeRange);
+		const targetPlugin = this.findPlugin(block);
 		//一样的block插件不嵌套
 		blocks = blocks
 			.map(blockNode => {
@@ -189,10 +191,7 @@ class Block implements BlockModelInterface {
 				//|| blockParent && !blockParent.equal(blockNode) && !blockParent.isRoot() && node.isBlock(blockParent) && !schema.isAllowIn(wrapBlock.name, blockParent.name)
 				if (!schema.isAllowIn(wrapBlock.name, blockNode.name)) {
 					//一样的插件，返回子级
-					if (
-						this.findPlugin(blockNode) ===
-						this.findPlugin(wrapBlock)
-					) {
+					if (this.findPlugin(blockNode) === targetPlugin) {
 						return blockNode.children();
 					}
 					return null;
@@ -221,8 +220,28 @@ class Block implements BlockModelInterface {
 
 		const selection = safeRange.createSelection();
 		blocks[0]?.before(block);
-		blocks.forEach(node => {
-			if (node) (block as NodeInterface).append(node);
+		blocks.forEach(child => {
+			if (child) {
+				//先移除不能放入块级节点的mark标签
+				if (targetPlugin) {
+					child.allChildren().forEach(child => {
+						const markNode = $(child);
+						if (node.isMark(markNode)) {
+							const markPlugin = mark.findPlugin(markNode);
+							if (!markPlugin) return;
+							if (
+								targetPlugin.disableMark?.indexOf(
+									(markPlugin.constructor as PluginEntry)
+										.pluginName,
+								)
+							) {
+								node.unwrap(markNode);
+							}
+						}
+					});
+				}
+				(block as NodeInterface).append(child);
+			}
 		});
 		selection.move();
 		this.merge(safeRange);
@@ -600,7 +619,7 @@ class Block implements BlockModelInterface {
 	 */
 	setBlocks(block: string | { [k: string]: any }, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { $, node, schema } = this.editor;
+		const { $, node, schema, mark } = this.editor;
 		const { change } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
@@ -635,7 +654,9 @@ class Block implements BlockModelInterface {
 			if (!range) change.apply(safeRange);
 			return;
 		}
-
+		const targetPlugin = targetNode
+			? this.findPlugin(targetNode)
+			: undefined;
 		const selection = safeRange.createSelection();
 		blocks.forEach(child => {
 			// Card 不做处理
@@ -645,7 +666,7 @@ class Block implements BlockModelInterface {
 			// 相同标签，或者只传入样式属性
 			if (
 				!targetNode ||
-				(this.findPlugin(child) === this.findPlugin(targetNode) &&
+				(this.findPlugin(child) === targetPlugin &&
 					child.name === targetNode.name)
 			) {
 				node.setAttributes(child, attributes);
@@ -658,7 +679,33 @@ class Block implements BlockModelInterface {
 			) {
 				return;
 			}
-			node.replace(child, targetNode);
+			//先移除不能放入块级节点的mark标签
+			if (targetPlugin) {
+				child.allChildren().forEach(child => {
+					const markNode = $(child);
+					if (node.isMark(markNode)) {
+						const markPlugin = mark.findPlugin(markNode);
+						if (!markPlugin) return;
+						if (
+							targetPlugin.disableMark?.indexOf(
+								(markPlugin.constructor as PluginEntry)
+									.pluginName,
+							)
+						) {
+							node.unwrap(markNode);
+						}
+					}
+				});
+			}
+			const newNode = node.replace(child, targetNode);
+			const parent = newNode.parent();
+			if (
+				parent &&
+				!parent.isEditable() &&
+				!schema.isAllowIn(parent.name, newNode.name)
+			) {
+				node.unwrap(parent);
+			}
 		});
 		selection.move();
 		if (!range) change.apply(safeRange);
@@ -1048,24 +1095,12 @@ class Block implements BlockModelInterface {
 	/**
 	 * 给节点创建data-id
 	 * @param node 节点
-	 * @param index 索引
 	 * @returns
 	 */
-	createDataID(node: Node | NodeInterface, index: number) {
+	createDataID(node: Node | NodeInterface) {
 		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
-		const { name } = node;
-		const id =
-			md5(
-				''
-					.concat(name, '_')
-					.concat(index.toString(), '_')
-					.concat(node.get<HTMLElement>()?.innerText || ''),
-			) +
-			'_' +
-			name +
-			'_' +
-			index.toString();
+		const id = getHashId(node);
 		node.attributes('data-id', id);
 		return id;
 	}
@@ -1081,7 +1116,7 @@ class Block implements BlockModelInterface {
 		if (id) return id;
 		const nodes = root.querySelectorAll(nodeName);
 		for (let i = 0; i < nodes.length; i++) {
-			if (nodes[i] === node) return this.createDataID(node, i);
+			if (nodes[i] === node) return this.createDataID(node);
 		}
 		return null;
 	}
@@ -1090,13 +1125,16 @@ class Block implements BlockModelInterface {
 	 * @param root 根节点
 	 */
 	generateDataIDForDescendant(root: Element) {
-		this.getMarkIdTags().forEach(nodeName => {
-			const nodes = root.querySelectorAll(nodeName);
-			for (let i = 0; i < nodes.length; i++) {
-				const node = this.editor.$(nodes[i]);
-				if (!node.attributes('data-id') && !node.isCard())
-					this.createDataID(node, i);
-			}
+		const tags = this.getMarkIdTags().join(',');
+		const nodes = root.querySelectorAll(tags);
+		nodes.forEach(child => {
+			const node = this.editor.$(child);
+			if (
+				!node.attributes('data-id') &&
+				!node.isCard() &&
+				node.attributes(DATA_ELEMENT) !== UI
+			)
+				this.createDataID(node);
 		});
 	}
 	/**
@@ -1108,16 +1146,12 @@ class Block implements BlockModelInterface {
 	generateRandomID(node: Node | NodeInterface, isCreate: boolean = false) {
 		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
-		if (node.isCard()) return '';
+		if (node.isCard() || node.attributes(DATA_ELEMENT) === UI) return '';
 		if (!isCreate) {
 			const id = node.attributes('data-id');
 			if (id) return id;
 		}
-		const id = md5(
-			''
-				.concat(Math.random().toString(), '_')
-				.concat(Date.now().toString()),
-		);
+		const id = getHashId(node);
 		node.attributes('data-id', id);
 		return id;
 	}
@@ -1137,7 +1171,8 @@ class Block implements BlockModelInterface {
 					| DocumentFragment).querySelectorAll(nodeName);
 				for (let i = 0; i < nodes.length; i++) {
 					const node = this.editor.$(nodes[i]);
-					if (node.isCard()) continue;
+					if (node.isCard() || node.attributes(DATA_ELEMENT) === UI)
+						continue;
 					this.generateRandomID(node, isCreate);
 				}
 			});

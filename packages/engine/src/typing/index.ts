@@ -27,12 +27,9 @@ class Typing implements TypingInterface {
 				handle.triggerName,
 			);
 		});
-		this.engine.container.on('keydown', (e: KeyboardEvent) =>
-			this.bindKeydown(e),
-		);
-		this.engine.container.on('keyup', (e: KeyboardEvent) =>
-			this.bindKeyup(e),
-		);
+		const { container } = engine;
+		container.on('keydown', (e: KeyboardEvent) => this.bindKeydown(e));
+		container.on('keyup', (e: KeyboardEvent) => this.bindKeyup(e));
 	}
 
 	addHandleListener(
@@ -74,24 +71,24 @@ class Typing implements TypingInterface {
 	}
 
 	bindKeydown(event: KeyboardEvent) {
+		const { readonly, card, $ } = this.engine;
 		//只读状态
-		if (this.engine.readonly) {
+		if (readonly) {
 			//全选禁止默认事件触发
 			if (isHotkey('mod+a', event)) event.preventDefault();
 			return;
 		}
 		//跳过卡片
-		if (event.target && this.engine.card.find(this.engine.$(event.target)))
-			return;
+		if (event.target && card.find($(event.target))) return;
 		this.trigger('keydown', event);
 	}
 
 	bindKeyup(event: KeyboardEvent) {
+		const { readonly, card, $ } = this.engine;
 		//只读状态
-		if (this.engine.readonly) return;
+		if (readonly) return;
 		//跳过卡片
-		if (event.target && this.engine.card.find(this.engine.$(event.target)))
-			return;
+		if (event.target && card.find($(event.target))) return;
 		this.trigger('keyup', event);
 	}
 

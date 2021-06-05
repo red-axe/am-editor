@@ -1,3 +1,4 @@
+import md5 from 'blueimp-md5';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import {
 	CARD_TYPE_KEY,
@@ -7,6 +8,7 @@ import {
 import { DATA_ELEMENT } from '../constants/root';
 import { getWindow } from './node';
 import { isMacos } from './user-agent';
+import { isNodeEntry, NodeInterface } from '../types';
 
 /**
  * 随机字符串
@@ -21,6 +23,37 @@ export const random = (length: number = 5) => {
 		word += str.charAt(Math.floor(Math.random() * str.length));
 	}
 	return word;
+};
+
+const _counters: { [key: string]: number } = {};
+
+export const getHashId = (
+	value: string | NodeInterface,
+	unique: boolean = true,
+) => {
+	let prefix = '';
+	if (isNodeEntry(value)) {
+		const attributes = value.attributes();
+		const styles = attributes['style'];
+		delete attributes['style'];
+		prefix = value.name.substring(0, 1);
+		value = `${value.name}_${Object.keys(attributes || {}).join(
+			',',
+		)}_${Object.values(attributes || {}).join(',')}_${Object.keys(
+			styles || {},
+		).join(',')}_${Object.values(styles || {}).join(',')}`;
+	}
+
+	let hash = prefix + md5(value).substr(0, 8);
+	if (unique) {
+		const counter = _counters[hash] || 0;
+		_counters[hash] = counter + 1;
+		if (counter > 0) {
+			hash = `${hash}-${counter}`;
+		}
+	}
+
+	return hash;
 };
 
 /**

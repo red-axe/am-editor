@@ -142,10 +142,9 @@ export interface BlockModelInterface {
 	/**
 	 * 给节点创建data-id
 	 * @param node 节点
-	 * @param index 索引
 	 * @returns
 	 */
-	createDataID(node: Node | NodeInterface, index: number): string;
+	createDataID(node: Node | NodeInterface): string;
 	/**
 	 * 获取或产生节点的data-id
 	 * @param root 根节点

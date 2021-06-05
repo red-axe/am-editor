@@ -364,7 +364,9 @@ class NodeModel implements NodeModelInterface {
 	replace(source: NodeInterface, target: NodeInterface) {
 		const clone = this.editor.node.clone(target, false);
 		let childNode =
-			this.isCustomize(source) && source.name === 'li'
+			this.isCustomize(source) &&
+			source.name === 'li' &&
+			source.first()?.isCard()
 				? source.first()?.next()
 				: source.first();
 

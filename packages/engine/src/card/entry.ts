@@ -379,6 +379,11 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 			this.resizeModel = new Resize(this.editor, this);
 			this.resizeModel.render(container);
 		}
+		if (this.contenteditable.length > 0) {
+			this.editor.block.generateDataIDForDescendant(
+				this.getCenter().get<Element>()!,
+			);
+		}
 	}
 	abstract render(): NodeInterface | string | void;
 

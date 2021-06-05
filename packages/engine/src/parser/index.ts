@@ -84,7 +84,7 @@ class Parser implements ParserInterface {
 		paserBefore?: (node: NodeInterface) => void,
 	) {
 		this.editor = editor;
-		const { $ } = this.editor;
+		const { $, node } = this.editor;
 		if (typeof source === 'string') {
 			source = source.replace(/<a\s{0,1000}\/>/gi, '<a></a>');
 			source = source.replace(/<a(\s[^>]+?)\/>/gi, (_, t) => {
@@ -103,6 +103,10 @@ class Parser implements ParserInterface {
 				'text/html',
 			);
 			this.root = $(doc.body);
+			const p = $('<p></p>');
+			this.root.find('paragraph').each(child => {
+				node.replace($(child), p.clone());
+			});
 		} else if (isNodeEntry(source)) {
 			this.root = source;
 		} else {

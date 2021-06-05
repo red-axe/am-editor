@@ -1,10 +1,7 @@
 import {
-	ANCHOR,
-	CURSOR,
-	DATA_ELEMENT,
 	isEngine,
 	NodeInterface,
-	random,
+	getHashId,
 	Tooltip,
 	BlockPlugin,
 	PluginEntry,
@@ -128,7 +125,6 @@ export default class extends BlockPlugin<Options> {
 	}
 
 	updateId() {
-		const ids = {};
 		const { $ } = this.editor;
 		this.editor.container.find(this.tagName.join(',')).each(titleNode => {
 			const node = $(titleNode);
@@ -140,16 +136,9 @@ export default class extends BlockPlugin<Options> {
 
 			let id = node.attributes('id');
 			if (!id) {
-				id = random();
+				id = node.attributes('data-id') || getHashId(node);
 				node.attributes('id', id);
 			}
-			if (ids[id]) {
-				while (ids[id]) {
-					id = random();
-				}
-				node.attributes('id', id);
-			}
-			ids[id] = true;
 		});
 	}
 
@@ -273,89 +262,12 @@ export default class extends BlockPlugin<Options> {
 		});
 	}
 
-	/**
-	 * 将p标签下的节点放到标题节点下，并且移除p标签
-	 */
-	private replaceParagraph() {
-		if (!isEngine(this.editor)) return;
-		const { change, block } = this.editor;
-		const range = change.getRange();
-		const blocks = block.getBlocks(range);
-		const selection = range.createSelection();
-		blocks.forEach(block => {
-			if (block.name === 'p') {
-				const parent = block.parent();
-				if (parent && this.tagName.indexOf(parent.name) > -1) {
-					const childNodes = block[0].childNodes;
-					for (
-						let index = childNodes.length - 1;
-						index >= 0;
-						index--
-					) {
-						parent[0].insertBefore(childNodes[index], block[0]);
-					}
-					block.remove();
-				}
-			}
-		});
-		selection.move();
-	}
-
-	// 后续处理
-	afterProcess(start?: number) {
-		if (!isEngine(this.editor)) return;
-		const { change, block, mark, $ } = this.editor;
-		const range = change.getRange();
-		const blocks = block.getBlocks(range);
-		const selection = range.createSelection();
-		if (!selection.has()) {
-			return;
-		}
-
-		blocks.forEach(block => {
-			block.allChildren().forEach(child => {
-				const node = $(child);
-				const plugin = mark.findPlugin(node);
-				this.disableMark.forEach(pluginName => {
-					if (
-						plugin &&
-						(plugin.constructor as PluginEntry).pluginName ===
-							pluginName
-					) {
-						this.editor.node.unwrap(node);
-					}
-				});
-			});
-			//有序列表序号
-			const parent = block.parent();
-			if (start) {
-				const parentNext = parent?.next();
-				if (
-					parentNext &&
-					parentNext.name === 'ol' &&
-					parentNext.attributes('start')
-				) {
-					parentNext.attributes('start', start + 1);
-				}
-			}
-			//列表
-			if (parent && this.editor.node.isList(parent)) {
-				if (this.editor.node.isCustomize(parent)) {
-					block.first()?.remove();
-				}
-				this.editor.node.unwrap(parent);
-			}
-		});
-		selection.move();
-	}
-
 	execute(type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p') {
 		if (!isEngine(this.editor)) return;
 		if (type === this.queryState()) type = 'p';
 		const { list, block } = this.editor;
 		list.split();
 		block.setBlocks(`<${type} />`);
-		this.afterProcess();
 	}
 
 	queryState() {
