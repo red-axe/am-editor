@@ -1,4 +1,5 @@
 import { EngineInterface } from '../../types';
+import { $ } from '../../node';
 
 class Enter {
 	private engine: EngineInterface;
@@ -7,7 +8,7 @@ class Enter {
 	}
 
 	trigger(event: KeyboardEvent) {
-		const { change, node, $, list } = this.engine;
+		const { change, node, list } = this.engine;
 		const range = change.getRange();
 		// 选区选中最后的节点
 		const blockApi = this.engine.block;

@@ -1,6 +1,7 @@
 import { EditorConfiguration, Editor } from 'codemirror';
 import { debounce } from 'lodash-es';
 import {
+	$,
 	EditorInterface,
 	isEngine,
 	isServer,
@@ -47,7 +48,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 	constructor(editor: EditorInterface, options: Options) {
 		this.editor = editor;
 		this.options = options;
-		this.container = options.container || editor.$(this.renderTemplate());
+		this.container = options.container || $(this.renderTemplate());
 	}
 
 	renderTemplate() {
@@ -139,7 +140,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 	render(mode: string, value: string) {
 		const root = this.container.find('.data-codeblock-content');
 		mode = this.getSyntax(mode);
-		const stage = this.editor.$(
+		const stage = $(
 			'<div class="CodeMirror"><pre class="cm-s-default" /></div>',
 		);
 		root.append(stage);

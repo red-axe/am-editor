@@ -3,6 +3,7 @@ import { NodeInterface, SchemaInterface } from '../types';
 import { READY_CARD_KEY, READY_CARD_SELECTOR } from '../constants/card';
 import Parser from '../parser';
 import { EngineInterface } from '../types/engine';
+import { $ } from '../node';
 
 export default class Paste {
 	protected source: string;
@@ -72,7 +73,7 @@ export default class Paste {
 
 	commonNormalize(fragment: DocumentFragment) {
 		const defaultStyle = this.getDefaultStyle();
-		const { $, inline } = this.engine;
+		const { inline } = this.engine;
 		const nodeApi = this.engine.node;
 		// 第一轮预处理，主要处理 span 节点
 		let nodes = $(fragment).allChildren();
@@ -260,7 +261,6 @@ export default class Paste {
 	}
 
 	normalize() {
-		const { $ } = this.engine;
 		const nodeApi = this.engine.node;
 		const fragment = this.parser();
 		this.commonNormalize(fragment);
@@ -316,7 +316,6 @@ export default class Paste {
 	}
 
 	removeElementNodes(fragment: NodeInterface) {
-		const { $ } = this.engine;
 		const nodes = fragment.allChildren();
 		nodes.forEach(child => {
 			const node = $(child);

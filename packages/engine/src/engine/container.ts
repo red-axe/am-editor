@@ -1,5 +1,6 @@
 import { DATA_ELEMENT, ROOT } from '../constants';
 import { EngineInterface, NodeInterface, Selector } from '../types';
+import { $ } from '../node';
 
 export type Options = {
 	engine: EngineInterface;
@@ -13,7 +14,7 @@ class Container {
 	private node: NodeInterface;
 	private _focused: boolean = false;
 	constructor(selector: Selector, options: Options) {
-		this.node = options.engine.$(selector);
+		this.node = $(selector);
 		this.options = options;
 		this._init();
 		this._focused =
@@ -53,7 +54,6 @@ class Container {
 
 	init() {
 		const { engine } = this.options;
-		const { $ } = engine;
 		this.node.on('input', e => {
 			if (engine.readonly) {
 				return;

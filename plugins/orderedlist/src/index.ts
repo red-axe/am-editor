@@ -1,4 +1,5 @@
 import {
+	$,
 	NodeInterface,
 	ListPlugin,
 	isEngine,
@@ -115,7 +116,7 @@ export default class extends ListPlugin<Options> {
 		let match = reg.exec(text);
 		if (!match) return;
 
-		const { $, list } = this.editor;
+		const { list } = this.editor;
 
 		const createList = (nodes: Array<string>, start?: number) => {
 			const listNode = $(

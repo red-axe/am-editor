@@ -1,6 +1,6 @@
-import { EditorInterface } from '../../types';
 import { NodeInterface } from '../../types/node';
 import { DropdownButtonOptions } from '../../types/toolbar';
+import { $ } from '../../node';
 
 const template = (options: DropdownButtonOptions) => {
 	return `
@@ -14,17 +14,14 @@ const template = (options: DropdownButtonOptions) => {
 };
 
 export default class {
-	private editor: EditorInterface;
 	private options: DropdownButtonOptions;
 	private root: NodeInterface | undefined;
 
-	constructor(editor: EditorInterface, options: DropdownButtonOptions) {
-		this.editor = editor;
+	constructor(options: DropdownButtonOptions) {
 		this.options = options;
 	}
 
 	renderTo(container: NodeInterface) {
-		const { $ } = this.editor;
 		this.root = $(template(this.options));
 		container.append(this.root);
 		const { onClick } = this.options;

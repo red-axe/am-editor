@@ -11,7 +11,7 @@ import {
 	EDITABLE_SELECTOR,
 } from '../constants';
 import DOMEvent from './event';
-import domParse from './parse';
+import $ from './parse';
 import {
 	toCamelCase,
 	getStyleMap,
@@ -41,7 +41,6 @@ import {
  * @param context 节点上下文，或根节点
  */
 class NodeEntry implements NodeInterface {
-	private editor: EditorInterface;
 	length: number = 0;
 	events: EventInterface[] = [];
 	document: Document | null = null;
@@ -53,12 +52,7 @@ class NodeEntry implements NodeInterface {
 	isFragment: boolean = false;
 	[n: number]: Node;
 
-	constructor(
-		editor: EditorInterface,
-		nodes: Node | NodeList | Array<Node>,
-		context?: Context,
-	) {
-		this.editor = editor;
+	constructor(nodes: Node | NodeList | Array<Node>, context?: Context) {
 		if (isNode(nodes)) {
 			if (nodes.nodeType === getWindow().Node.DOCUMENT_FRAGMENT_NODE)
 				this.isFragment = true;
@@ -91,7 +85,7 @@ class NodeEntry implements NodeInterface {
 			return false;
 		}
 		const defaultMatches = (element: Element, selector: string) => {
-			const domNode = new NodeEntry(this.editor, element);
+			const domNode = new NodeEntry(element);
 			let matches = domNode.document?.querySelectorAll(selector),
 				i = matches ? matches.length : 0;
 			while (--i >= 0 && matches?.item(i) !== domNode.get()) {}
@@ -132,7 +126,7 @@ class NodeEntry implements NodeInterface {
 	toArray(): Array<NodeInterface> {
 		const nodeArray: Array<NodeInterface> = [];
 		this.each(node => {
-			nodeArray.push(new NodeEntry(this.editor, node));
+			nodeArray.push(new NodeEntry(node));
 		});
 		return nodeArray;
 	}
@@ -231,7 +225,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	eq(index: number): NodeInterface | undefined {
 		return index > -1 && index < this.length
-			? new NodeEntry(this.editor, this[index])
+			? new NodeEntry(this[index])
 			: undefined;
 	}
 
@@ -256,7 +250,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	parent(): NodeInterface | undefined {
 		const node = this.get()?.parentNode;
-		return node ? new NodeEntry(this.editor, node) : undefined;
+		return node ? new NodeEntry(node) : undefined;
 	}
 
 	/**
@@ -265,7 +259,7 @@ class NodeEntry implements NodeInterface {
 	 * @return 符合条件的子节点
 	 */
 	children(selector?: string): NodeInterface {
-		if (0 === this.length) return new NodeEntry(this.editor, []);
+		if (0 === this.length) return new NodeEntry([]);
 		const childNodes = this.get()!.childNodes;
 		if (selector) {
 			let nodes = [];
@@ -275,9 +269,9 @@ class NodeEntry implements NodeInterface {
 					nodes.push(node);
 				}
 			}
-			return new NodeEntry(this.editor, nodes);
+			return new NodeEntry(nodes);
 		}
-		return new NodeEntry(this.editor, childNodes);
+		return new NodeEntry(childNodes);
 	}
 
 	/**
@@ -287,7 +281,7 @@ class NodeEntry implements NodeInterface {
 	first(): NodeInterface | null {
 		if (this.isFragment) return this.eq(0) || null;
 		const node = this.length === 0 ? null : this.get()?.firstChild;
-		return node ? new NodeEntry(this.editor, node) : null;
+		return node ? new NodeEntry(node) : null;
 	}
 
 	/**
@@ -297,7 +291,7 @@ class NodeEntry implements NodeInterface {
 	last(): NodeInterface | null {
 		if (this.isFragment) return this.eq(this.length - 1) || null;
 		const node = this.length === 0 ? null : this.get()?.lastChild;
-		return node ? new NodeEntry(this.editor, node) : null;
+		return node ? new NodeEntry(node) : null;
 	}
 
 	/**
@@ -306,7 +300,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	prev(): NodeInterface | null {
 		const node = this.length === 0 ? null : this.get()?.previousSibling;
-		return node ? new NodeEntry(this.editor, node) : null;
+		return node ? new NodeEntry(node) : null;
 	}
 
 	/**
@@ -315,7 +309,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	next(): NodeInterface | null {
 		const node = this.length === 0 ? null : this.get()?.nextSibling;
-		return node ? new NodeEntry(this.editor, node) : null;
+		return node ? new NodeEntry(node) : null;
 	}
 
 	/**
@@ -327,7 +321,7 @@ class NodeEntry implements NodeInterface {
 			this.length === 0 || !this.isElement()
 				? null
 				: this.get<Element>()!.previousElementSibling;
-		return node ? new NodeEntry(this.editor, node) : null;
+		return node ? new NodeEntry(node) : null;
 	}
 
 	/**
@@ -339,7 +333,7 @@ class NodeEntry implements NodeInterface {
 			this.length === 0 || !this.isElement()
 				? null
 				: this.get<Element>()!.nextElementSibling;
-		return node ? new NodeEntry(this.editor, node) : null;
+		return node ? new NodeEntry(node) : null;
 	}
 
 	/**
@@ -394,9 +388,9 @@ class NodeEntry implements NodeInterface {
 	find(selector: string): NodeInterface {
 		if (this.length > 0 && this.isElement()) {
 			const nodeList = this.get<Element>()?.querySelectorAll(selector);
-			return new NodeEntry(this.editor, nodeList || []);
+			return new NodeEntry(nodeList || []);
 		}
-		return new NodeEntry(this.editor, []);
+		return new NodeEntry([]);
 	}
 
 	/**
@@ -415,11 +409,11 @@ class NodeEntry implements NodeInterface {
 		while (node) {
 			if (this.isMatchesSelector(<ElementInterface>node, selector)) {
 				nodeList.push(node);
-				return new NodeEntry(this.editor, nodeList);
+				return new NodeEntry(nodeList);
 			}
 			node = callback(node);
 		}
-		return new NodeEntry(this.editor, nodeList);
+		return new NodeEntry(nodeList);
 	}
 
 	/**
@@ -811,7 +805,7 @@ class NodeEntry implements NodeInterface {
 		this.each(node => {
 			nodes.push(node.cloneNode(deep));
 		});
-		return new NodeEntry(this.editor, nodes);
+		return new NodeEntry(nodes);
 	}
 	/**
 	 * 在元素节点的开头插入指定内容
@@ -820,7 +814,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	prepend(selector: Selector): NodeInterface {
 		this.each(node => {
-			const nodes = domParse(this.editor, selector, this.context);
+			const nodes = $(selector, this.context);
 			if (node.firstChild) {
 				node.insertBefore(nodes[0], node.firstChild);
 			} else {
@@ -837,7 +831,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	append(selector: Selector): NodeInterface {
 		this.each(node => {
-			const nodes = domParse(this.editor, selector, this.context);
+			const nodes = $(selector, this.context);
 			for (let i = 0; i < nodes.length; i++) {
 				const child = nodes[i];
 				if (typeof selector === 'string') {
@@ -857,7 +851,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	before(selector: Selector): NodeInterface {
 		this.each(node => {
-			const nodes = domParse(this.editor, selector, this.context);
+			const nodes = $(selector, this.context);
 			node.parentNode?.insertBefore(nodes[0], node);
 		});
 		return this;
@@ -870,7 +864,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	after(selector: Selector): NodeInterface {
 		this.each(node => {
-			const nodes = domParse(this.editor, selector, this.context);
+			const nodes = $(selector, this.context);
 			if (node.nextSibling) {
 				node.parentNode?.insertBefore(nodes[0], node.nextSibling);
 			} else {
@@ -888,12 +882,12 @@ class NodeEntry implements NodeInterface {
 	replaceWith(selector: Selector): NodeInterface {
 		const newNodes: Array<Node> = [];
 		this.each(node => {
-			const nodes = domParse(this.editor, selector, this.context);
+			const nodes = $(selector, this.context);
 			const newNode = nodes[0];
 			node.parentNode?.replaceChild(newNode, node);
 			newNodes.push(newNode);
 		});
-		return new NodeEntry(this.editor, newNodes);
+		return new NodeEntry(newNodes);
 	}
 
 	getRoot(): NodeInterface {
@@ -966,8 +960,7 @@ class NodeEntry implements NodeInterface {
 	findParent(
 		container: Node | NodeInterface = this.closest(ROOT_SELECTOR),
 	): NodeInterface | null {
-		if (isNode(container))
-			container = new NodeEntry(this.editor, container);
+		if (isNode(container)) container = new NodeEntry(container);
 		if (this.length === 0 || !this.parent()) return null;
 		let node: NodeInterface = this;
 		while (!node.parent()?.equal(container)) {
@@ -1025,7 +1018,7 @@ class NodeEntry implements NodeInterface {
 			} else {
 				view[0].parentNode?.appendChild(viewNode);
 			}
-			view = new NodeEntry(this.editor, viewNode);
+			view = new NodeEntry(viewNode);
 		}
 		const viewElement = view[0] as Element;
 		const {
@@ -1058,7 +1051,7 @@ class NodeEntry implements NodeInterface {
 				viewElement = view.document.createElement('span');
 				viewElement.innerHTML = '&nbsp;';
 				view[0].parentNode?.insertBefore(viewElement, view[0]);
-				view = new NodeEntry(this.editor, viewElement);
+				view = new NodeEntry(viewElement);
 			}
 			if (!this.inViewport(node, view)) {
 				view.get<Element>()?.scrollIntoView({
@@ -1068,56 +1061,6 @@ class NodeEntry implements NodeInterface {
 			}
 			if (viewElement) viewElement.parentNode?.removeChild(viewElement);
 		}
-	}
-
-	removeZeroWidthSpace() {
-		const nodeApi = this.editor.node;
-		this.traverse(child => {
-			const node = child[0];
-			if (node.nodeType !== getWindow().Node.TEXT_NODE) {
-				return;
-			}
-			const text = node.nodeValue;
-			if (text?.length !== 2) {
-				return;
-			}
-			const next = node.nextSibling;
-			const prev = node.previousSibling;
-			if (
-				text.charCodeAt(1) === 0x200b &&
-				next &&
-				next.nodeType === getWindow().Node.ELEMENT_NODE &&
-				[ANCHOR, FOCUS, CURSOR].indexOf(
-					(<Element>next).getAttribute(DATA_ELEMENT) || '',
-				) >= 0
-			) {
-				return;
-			}
-
-			const parent = child.parent();
-
-			if (
-				text.charCodeAt(1) === 0x200b &&
-				((!next && parent && nodeApi.isInline(parent)) ||
-					(next && nodeApi.isInline(next)))
-			) {
-				return;
-			}
-
-			if (
-				text.charCodeAt(0) === 0x200b &&
-				((!prev && parent && nodeApi.isInline(parent)) ||
-					(prev && nodeApi.isInline(prev)))
-			) {
-				return;
-			}
-
-			if (text.charCodeAt(0) === 0x200b) {
-				const newNode = (<Text>node).splitText(1);
-				if (newNode.previousSibling)
-					newNode.parentNode?.removeChild(newNode.previousSibling);
-			}
-		});
 	}
 }
 export default NodeEntry;

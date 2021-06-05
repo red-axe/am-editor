@@ -15,6 +15,7 @@ import {
 import { isMarkPlugin, MarkInterface, MarkModelInterface } from '../types/mark';
 import { getDocument, getWindow } from '../utils';
 import { Backspace } from './typing';
+import { $ } from '../node';
 
 class Mark implements MarkModelInterface {
 	private editor: EditorInterface;
@@ -24,16 +25,15 @@ class Mark implements MarkModelInterface {
 	}
 
 	init() {
-		if (isEngine(this.editor)) {
+		const editor = this.editor;
+		if (isEngine(editor)) {
 			//删除事件
-			const backspace = new Backspace(this.editor);
-			this.editor.typing
+			const backspace = new Backspace(editor);
+			editor.typing
 				.getHandleListener('backspace', 'keydown')
 				?.on(event => backspace.trigger(event));
 
-			this.editor.on('keydown:space', event =>
-				this.triggerMarkdown(event),
-			);
+			editor.on('keydown:space', event => this.triggerMarkdown(event));
 		}
 	}
 
@@ -42,8 +42,9 @@ class Mark implements MarkModelInterface {
 	 * @param event 事件
 	 */
 	triggerMarkdown(event: KeyboardEvent) {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		let range = change.getRange();
 		if (!range.collapsed || change.isComposing()) return;
 		const { startNode, startOffset } = range;
@@ -57,8 +58,8 @@ class Mark implements MarkModelInterface {
 			node.type === Node.TEXT_NODE
 				? node.text().substr(0, startOffset)
 				: node.text();
-		return !Object.keys(this.editor.plugin.components).some(pluginName => {
-			const plugin = this.editor.plugin.components[pluginName];
+		return !Object.keys(editor.plugin.components).some(pluginName => {
+			const plugin = editor.plugin.components[pluginName];
 			if (isMarkPlugin(plugin) && !!plugin.markdown) {
 				const reuslt = plugin.triggerMarkdown(event, text, node);
 				if (reuslt === false) return true;
@@ -239,7 +240,7 @@ class Mark implements MarkModelInterface {
 		root: NodeInterface,
 		callback?: (node: NodeInterface) => boolean,
 	) {
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 		const children = root.allChildren();
 		children.forEach(childNode => {
 			const child = $(childNode);
@@ -273,7 +274,7 @@ class Mark implements MarkModelInterface {
 		const card = startNode.isCard()
 			? startNode
 			: startNode.closest(CARD_SELECTOR);
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 		if (
 			(card.length === 0 ||
 				card.attributes(CARD_TYPE_KEY) !== 'inline') &&
@@ -286,7 +287,6 @@ class Mark implements MarkModelInterface {
 			const selection = range.createSelection();
 			// 获取标记左侧节点
 			const left = selection.getNode(parent, 'left');
-			const { $ } = this.editor;
 			// 获取标记右侧节点
 			let right: NodeInterface | undefined = undefined;
 			let keelpRoot: NodeInterface | undefined = undefined;
@@ -402,7 +402,7 @@ class Mark implements MarkModelInterface {
 			//替换多个零宽字符为一个零宽字符
 			let textWithEmpty = false;
 			parent.children().each(child => {
-				const childNode = this.editor.$(child);
+				const childNode = $(child);
 				if (childNode.isText()) {
 					const { textContent } = child;
 					let text = textContent?.replace(/\u200b+/g, '\u200b') || '';
@@ -657,7 +657,7 @@ class Mark implements MarkModelInterface {
 		removeMark?: NodeInterface | Node | string | Array<NodeInterface>,
 	) {
 		if (!isEngine(this.editor)) return;
-		const { change, $ } = this.editor;
+		const { change } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (
@@ -682,7 +682,7 @@ class Mark implements MarkModelInterface {
 	wrap(mark: NodeInterface | Node | string, range?: RangeInterface) {
 		const change = isEngine(this.editor) ? this.editor.change : undefined;
 		if (!range && !change) return;
-		const { node, $ } = this.editor;
+		const { node } = this.editor;
 		const safeRange = range || change!.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof mark === 'string' || isNode(mark)) {
@@ -749,7 +749,7 @@ class Mark implements MarkModelInterface {
 									targetNode = targetChild;
 								} else break;
 							}
-							targetNode.removeZeroWidthSpace();
+							nodeApi.removeZeroWidthSpace(targetNode);
 							const parent = targetNode.parent();
 							//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
 							if (
@@ -784,7 +784,7 @@ class Mark implements MarkModelInterface {
 					}
 
 					if (child.isText() && !nodeApi.isEmpty(child)) {
-						child.removeZeroWidthSpace();
+						nodeApi.removeZeroWidthSpace(child);
 						const parent = child.parent();
 						//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
 						if (parent && nodeApi.isMark(parent)) {
@@ -826,7 +826,7 @@ class Mark implements MarkModelInterface {
 	 */
 	merge(range?: RangeInterface): void {
 		if (!isEngine(this.editor)) return;
-		const { change, $, node } = this.editor;
+		const { change, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const marks = this.findMarks(safeRange);
 		if (marks.length === 0) {
@@ -883,7 +883,7 @@ class Mark implements MarkModelInterface {
 		range?: RangeInterface,
 	) {
 		if (!isEngine(this.editor)) return;
-		const { change, $, node } = this.editor;
+		const { change, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer) || document;
 
@@ -991,7 +991,7 @@ class Mark implements MarkModelInterface {
 	 */
 	insert(mark: NodeInterface | Node | string, range?: RangeInterface): void {
 		if (!isEngine(this.editor)) return;
-		const { change, node, $ } = this.editor;
+		const { change, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		if (typeof mark === 'string' || isNode(mark)) {
 			const doc = getDocument(safeRange.startContainer);
@@ -1015,7 +1015,7 @@ class Mark implements MarkModelInterface {
 	 */
 	findMarks(range: RangeInterface) {
 		const cloneRange = range.cloneRange();
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 		const handleRange = (
 			allowBlock: boolean,
 			range: RangeInterface,

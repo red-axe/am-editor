@@ -2,6 +2,7 @@ import { EventEmitter2 } from 'eventemitter2';
 import PhotoSwipe from 'photoswipe';
 import PhotoSwipeUI from 'photoswipe/dist/photoswipe-ui-default';
 import {
+	$,
 	EditorInterface,
 	isHotkey,
 	isMobile,
@@ -52,7 +53,7 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 		this.root = this.renderTemplate();
 		this.barUI = this.root.find('.data-pswp-custom-top-bar');
 		this.closeUI = this.root.find('.data-pswp-button-close');
-		this.editor.$(document.body).append(this.root);
+		$(document.body).append(this.root);
 		this.zoomUI = new Zoom(this.editor, this);
 		this.zoomUI.render();
 		if (!isMobile) {
@@ -63,7 +64,7 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 	}
 
 	renderTemplate() {
-		const root = this.editor.$(`
+		const root = $(`
         <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="pswp__bg"></div>
             <div class="pswp__scroll-wrap">
@@ -122,7 +123,7 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 
 	bindClickEvent() {
 		this.root.on('click', ({ target }: MouseEvent) => {
-			const node = this.editor.$(target || []);
+			const node = $(target || []);
 			if (node.hasClass('pswp__img')) {
 				setTimeout(() => {
 					this.zoom = undefined;

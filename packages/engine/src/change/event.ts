@@ -9,6 +9,7 @@ import Range from '../range';
 import { CARD_ELEMENT_KEY } from '../constants/card';
 import { ClipboardData } from '../types/clipboard';
 import { DATA_ELEMENT, UI } from '../constants';
+import { $ } from '../node';
 
 class ChangeEvent implements ChangeEventInterface {
 	private events: Array<{
@@ -38,7 +39,7 @@ class ChangeEvent implements ChangeEventInterface {
 	// return true：焦点在Card里的其它输入框
 	// return false：焦点在编辑区域，触发 change、select 事件
 	isCardInput(e: Event) {
-		let node = e.target ? this.engine.$(e.target as Node) : null;
+		let node = e.target ? $(e.target as Node) : null;
 		while (node) {
 			if (node.isEditable()) {
 				return false;
@@ -212,7 +213,6 @@ class ChangeEvent implements ChangeEventInterface {
 	) {
 		const { bindDrop } = this.options;
 		if (bindDrop && !bindDrop()) return;
-		const { $ } = this.engine;
 		let cardComponet: CardInterface | undefined;
 		let dragImage: NodeInterface | undefined;
 		let dropRange: RangeInterface | undefined;

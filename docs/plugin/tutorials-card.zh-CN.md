@@ -23,7 +23,7 @@ export default class extends Card {
 渲染一个卡片需要显示 `render` 方法，这是个抽象方法，必须要实现它
 
 ```ts
-import { Card } from '@aomao/engine';
+import { $, Card } from '@aomao/engine';
 
 export default class extends Card {
 	static get cardName() {
@@ -35,7 +35,6 @@ export default class extends Card {
 	}
 
 	render() {
-		const { $ } = this.editor;
 		//返回节点，会自动追加到卡片 center 位置
 		return $('<div>Card</div>');
 		//或者主动追加
@@ -58,7 +57,7 @@ export default () => <div>React Commponent</div>;
 
 ```ts
 import { ReactDOM } from 'react';
-import { Card } from '@aomao/engine';
+import { $, Card } from '@aomao/engine';
 
 export default class extends Card {
 	container?: NodeInterface;
@@ -80,7 +79,6 @@ export default class extends Card {
 	}
 
 	render() {
-		const { $ } = this.editor;
 		this.container = $('<div></div>');
 		return this.container;
 	}
@@ -108,7 +106,7 @@ export default defineComponent({
 
 ```ts
 import { createApp } from 'vue';
-import { Card } from '@aomao/engine';
+import { $, Card } from '@aomao/engine';
 
 export default class extends Card {
 	container?: NodeInterface;
@@ -134,7 +132,6 @@ export default class extends Card {
 	}
 
 	render() {
-		const { $ } = this.editor;
 		this.container = $('<div></div>');
 		return this.container;
 	}
@@ -168,6 +165,7 @@ export default class extends Card {
 
 ```ts
 import {
+	$,
 	Card,
 	CardToolbarItemOptions,
 	ToolbarItemOptions,
@@ -183,8 +181,6 @@ export default class extends Card {
 	}
 
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
-		const { $ } = this.editor;
-
 		return [
 			{
 				type: 'dnd',
@@ -207,7 +203,6 @@ export default class extends Card {
 	}
 
 	render() {
-		const { $ } = this.editor;
 		return $('<div>Card</div>');
 	}
 }
@@ -216,7 +211,7 @@ export default class extends Card {
 ### 设置卡片值
 
 ```ts
-import { Card } from '@aomao/engine'
+import { $, Card } from '@aomao/engine'
 
 export default class extends Card {
 
@@ -241,7 +236,6 @@ export default class extends Card {
 
     render() {
         const value = this.getValue() || { count: 0}
-        const { $ } = this.editor
         this.container = $(`<div>${value.count}</div>`)
         this.container.on("click" => this.)
         return this.container

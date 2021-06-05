@@ -7,6 +7,7 @@ import {
 } from '../types';
 import keydownDefaultHandles from './keydown';
 import keyupDefaultHandles from './keyup';
+import { $ } from '../node';
 
 class Typing implements TypingInterface {
 	private engine: EngineInterface;
@@ -71,7 +72,7 @@ class Typing implements TypingInterface {
 	}
 
 	bindKeydown(event: KeyboardEvent) {
-		const { readonly, card, $ } = this.engine;
+		const { readonly, card } = this.engine;
 		//只读状态
 		if (readonly) {
 			//全选禁止默认事件触发
@@ -84,7 +85,7 @@ class Typing implements TypingInterface {
 	}
 
 	bindKeyup(event: KeyboardEvent) {
-		const { readonly, card, $ } = this.engine;
+		const { readonly, card } = this.engine;
 		//只读状态
 		if (readonly) return;
 		//跳过卡片

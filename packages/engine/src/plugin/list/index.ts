@@ -3,6 +3,7 @@ import { CARD_KEY, READY_CARD_KEY } from '../../constants';
 import { ListInterface } from '../../types/list';
 import { PluginEntry as PluginEntryType } from '../../types/plugin';
 import BlockEntry from '../block';
+import { $ } from '../../node';
 import './index.css';
 
 abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
@@ -12,19 +13,19 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 
 	init() {
 		super.init();
-		if (isEngine(this.editor)) {
-			this.editor.on('paste:before', fragment =>
-				this.pasteBefore(fragment),
-			);
-			this.editor.on('paste:insert', () => this.pasteInsert());
-			this.editor.on('paste:after', () => this.pasteAfter());
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.on('paste:before', fragment => this.pasteBefore(fragment));
+			editor.on('paste:insert', () => this.pasteInsert());
+			editor.on('paste:after', () => this.pasteAfter());
 		}
 	}
 
 	queryState() {
-		if (!isEngine(this.editor)) return false;
+		const editor = this.editor;
+		if (!isEngine(editor)) return false;
 		return (
-			this.editor.list.getPluginNameByNodes(this.editor.change.blocks) ===
+			editor.list.getPluginNameByNodes(editor.change.blocks) ===
 			(this.constructor as PluginEntryType).pluginName
 		);
 	}
@@ -37,7 +38,7 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 
 	pasteBefore(documentFragment: DocumentFragment) {
 		if (!this.cardName || !this.editor) return;
-		const { list, $ } = this.editor;
+		const { list } = this.editor;
 		const node = $(documentFragment);
 		const children = node.allChildren();
 		children.forEach(child => {
@@ -63,7 +64,7 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 
 	pasteInsert() {
 		if (!this.cardName || !isEngine(this.editor)) return;
-		const { change, list, $ } = this.editor;
+		const { change, list } = this.editor;
 		const range = change.getRange();
 		const rootBlock = range.getRootBlock();
 		const nextBlock = rootBlock?.next();

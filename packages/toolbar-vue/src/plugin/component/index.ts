@@ -1,4 +1,5 @@
 import {
+	$,
 	Card,
 	isEngine,
 	NodeInterface,
@@ -182,9 +183,9 @@ class ToolbarComponent extends Card {
 	}
 
 	render(): string | void | NodeInterface {
-		if (!isEngine(this.editor) || isServer) return;
-		const { $ } = this.editor;
-		const language = this.editor.language.get<{ placeholder: string }>(
+		const editor = this.editor;
+		if (!isEngine(editor) || isServer) return;
+		const language = editor.language.get<{ placeholder: string }>(
 			'toolbar',
 			'component',
 		);
@@ -226,7 +227,7 @@ class ToolbarComponent extends Card {
 			}, 10);
 		});
 		// 显示下拉列表
-		this.component?.render(this.editor.root, this.root, this.data);
+		this.component?.render(editor.root, this.root, this.data);
 	}
 }
 

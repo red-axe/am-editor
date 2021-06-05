@@ -23,6 +23,7 @@ import {
 	READY_CARD_SELECTOR,
 } from '../constants';
 import { getDocument, getStyleMap, getWindow } from '../utils';
+import $ from './query';
 
 class NodeModel implements NodeModelInterface {
 	private editor: EditorInterface;
@@ -42,7 +43,6 @@ class NodeModel implements NodeModelInterface {
 
 	isMark(node: NodeInterface | Node, schema?: SchemaInterface) {
 		schema = schema || this.editor.schema;
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		return schema.getType(node) === 'mark';
 	}
@@ -53,7 +53,6 @@ class NodeModel implements NodeModelInterface {
 	 */
 	isInline(node: NodeInterface | Node, schema?: SchemaInterface) {
 		schema = schema || this.editor.schema;
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		return schema.getType(node) === 'inline';
 	}
@@ -64,7 +63,6 @@ class NodeModel implements NodeModelInterface {
 	 */
 	isBlock(node: NodeInterface | Node, schema?: SchemaInterface) {
 		schema = schema || this.editor.schema;
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		return schema.getType(node) === 'block';
 	}
@@ -159,7 +157,7 @@ class NodeModel implements NodeModelInterface {
 				if (child['data'].replace(/\u200b/g, '') !== '') return false;
 			} else if (child.nodeType === getWindow().Node.ELEMENT_NODE) {
 				if ((child as Element).hasAttribute(CARD_KEY)) return false;
-				if (!this.isLikeEmpty(this.editor.$(child))) {
+				if (!this.isLikeEmpty($(child))) {
 					return false;
 				}
 			}
@@ -182,12 +180,13 @@ class NodeModel implements NodeModelInterface {
 	 * @param node 节点
 	 */
 	isCustomize(node: NodeInterface) {
+		const { list } = this.editor;
 		switch (node.name) {
 			case 'li':
-				return node.hasClass(this.editor.list.CUSTOMZIE_LI_CLASS);
+				return node.hasClass(list.CUSTOMZIE_LI_CLASS);
 
 			case 'ul':
-				return node.hasClass(this.editor.list.CUSTOMZIE_UL_CLASS);
+				return node.hasClass(list.CUSTOMZIE_UL_CLASS);
 
 			default:
 				return false;
@@ -217,7 +216,7 @@ class NodeModel implements NodeModelInterface {
 		outer: NodeInterface,
 		mergeSame: boolean = false,
 	) {
-		const { $, node, mark } = this.editor;
+		const { node, mark } = this.editor;
 		if (isNode(source)) source = $(source);
 		outer = node.clone(outer, false);
 		// 文本节点
@@ -289,7 +288,7 @@ class NodeModel implements NodeModelInterface {
 			source.append(target);
 			return;
 		}
-		const { $, node, block, mark } = this.editor;
+		const { node, block, mark } = this.editor;
 		let mergedNode = target;
 		const toIsList = ['ul', 'ol'].includes(source.name);
 		const fromIsList = ['ul', 'ol'].includes(target.name);
@@ -410,10 +409,11 @@ class NodeModel implements NodeModelInterface {
 			if (node.length === 0) throw 'Not found node';
 			node = node[0];
 		}
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		range = range || change.getRange();
-		const nodeApi = this.editor.node;
+		const nodeApi = editor.node;
 		const {
 			startNode,
 			startOffset,
@@ -558,7 +558,7 @@ class NodeModel implements NodeModelInterface {
 	 * @param root 根节点
 	 */
 	flatten(node: NodeInterface, root: NodeInterface = node) {
-		const { $, block } = this.editor;
+		const { block } = this.editor;
 		const nodeApi = this.editor.node;
 		//第一个子节点
 		let childNode = node.first();
@@ -642,7 +642,7 @@ class NodeModel implements NodeModelInterface {
 	 * @return 复制后的元素节点
 	 */
 	clone(node: NodeInterface, deep?: boolean): NodeInterface {
-		const { $, block } = this.editor;
+		const { block } = this.editor;
 		const nodes: Array<Node> = [];
 		node.each(node => {
 			const cloneNode = node.cloneNode(deep);
@@ -662,7 +662,7 @@ class NodeModel implements NodeModelInterface {
 	 */
 	getBatchAppendHTML(nodes: Array<NodeInterface>, appendExp: string) {
 		if (nodes.length === 0) return appendExp;
-		let appendNode = this.editor.$(appendExp);
+		let appendNode = $(appendExp);
 		nodes.forEach(node => {
 			node = node.clone(false);
 			node.append(appendNode);
@@ -670,8 +670,58 @@ class NodeModel implements NodeModelInterface {
 		});
 		return appendNode.get<Element>()?.outerHTML || '';
 	}
+
+	removeZeroWidthSpace(node: NodeInterface) {
+		const nodeApi = this.editor.node;
+		node.traverse(child => {
+			const node = child[0];
+			if (node.nodeType !== getWindow().Node.TEXT_NODE) {
+				return;
+			}
+			const text = node.nodeValue;
+			if (text?.length !== 2) {
+				return;
+			}
+			const next = node.nextSibling;
+			const prev = node.previousSibling;
+			if (
+				text.charCodeAt(1) === 0x200b &&
+				next &&
+				next.nodeType === getWindow().Node.ELEMENT_NODE &&
+				[ANCHOR, FOCUS, CURSOR].indexOf(
+					(<Element>next).getAttribute(DATA_ELEMENT) || '',
+				) >= 0
+			) {
+				return;
+			}
+
+			const parent = child.parent();
+
+			if (
+				text.charCodeAt(1) === 0x200b &&
+				((!next && parent && nodeApi.isInline(parent)) ||
+					(next && nodeApi.isInline(next)))
+			) {
+				return;
+			}
+
+			if (
+				text.charCodeAt(0) === 0x200b &&
+				((!prev && parent && nodeApi.isInline(parent)) ||
+					(prev && nodeApi.isInline(prev)))
+			) {
+				return;
+			}
+
+			if (text.charCodeAt(0) === 0x200b) {
+				const newNode = (<Text>node).splitText(1);
+				if (newNode.previousSibling)
+					newNode.parentNode?.removeChild(newNode.previousSibling);
+			}
+		});
+	}
 }
 
 export default NodeModel;
 
-export { Entry as NodeEntry, Event };
+export { Entry as NodeEntry, Event, $ };

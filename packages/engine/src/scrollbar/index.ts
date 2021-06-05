@@ -1,7 +1,8 @@
 import { EventEmitter2 } from 'eventemitter2';
 import { DATA_ELEMENT, UI } from '../constants';
-import { EditorInterface, isNode, NodeInterface } from '../types';
+import { isNode, NodeInterface } from '../types';
 import { isFirefox, isMobile } from '../utils';
+import { $ } from '../node';
 import './index.css';
 
 export type ScrollbarDragging = {
@@ -10,7 +11,6 @@ export type ScrollbarDragging = {
 };
 
 class Scrollbar extends EventEmitter2 {
-	private editor: EditorInterface;
 	private container: NodeInterface;
 	private x: boolean;
 	private y: boolean;
@@ -38,15 +38,13 @@ class Scrollbar extends EventEmitter2 {
 	 * @param {boolean} needShadow 是否显示阴影
 	 */
 	constructor(
-		editor: EditorInterface,
 		container: NodeInterface | Node,
 		x: boolean = true,
 		y: boolean = false,
 		shadow: boolean = true,
 	) {
 		super();
-		this.editor = editor;
-		this.container = isNode(container) ? editor.$(container) : container;
+		this.container = isNode(container) ? $(container) : container;
 		this.x = x;
 		this.y = y;
 		this.shadow = shadow;
@@ -54,7 +52,6 @@ class Scrollbar extends EventEmitter2 {
 	}
 
 	init() {
-		const { $ } = this.editor;
 		if (!isFirefox && !isMobile) {
 			const children = this.container.children();
 			let hasScrollbar = false;

@@ -31,8 +31,6 @@ trigger(eventType: string, ...args: any): any;
 In javascript, we usually use document.addEventListener document.removeEventListener to bind DOM element events. In the engine, we abstract an `EventInterface` type interface, and elements of the `NodeInterface` type are bound to an attribute event of the `EventInterface` type. So as long as the element of type `NodeInterface` can be bound, removed, and triggered by on off trigger. Not only can bind DOM native events, but also custom events
 
 ```ts
-const { $ } = engine;
-
 const node = $('<div></div>');
 //Native event
 node.on('click', () => alert('click'));

@@ -1,6 +1,6 @@
 import { DATA_ELEMENT } from '../../constants/root';
-import { EditorInterface } from '../../types';
 import { NodeInterface } from '../../types/node';
+import { $ } from '../../node';
 import './index.css';
 
 type Placement =
@@ -24,17 +24,12 @@ const template = (options: { placement: Placement }) => {
 };
 
 class Tooltip {
-	private editor: EditorInterface;
-	constructor(editor: EditorInterface) {
-		this.editor = editor;
-	}
-	show(
+	static show(
 		node: NodeInterface,
 		title: string | NodeInterface,
 		options: { placement: Placement } = { placement: 'top' },
 	) {
-		this.hide();
-		const { $ } = this.editor;
+		Tooltip.hide();
 		const root = $(template(options));
 		// 设置提示文字
 		if (typeof title === 'string')
@@ -59,8 +54,7 @@ class Tooltip {
 		});
 		root.addClass('data-tooltip-active');
 	}
-	hide() {
-		const { $ } = this.editor;
+	static hide() {
 		$(`div[${DATA_ELEMENT}=tooltip]`).remove();
 	}
 }

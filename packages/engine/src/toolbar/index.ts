@@ -11,8 +11,8 @@ import Button from './button';
 import Dropdown from './dropdown';
 import Input from './input';
 import Tooltip from './tooltip';
-import { EditorInterface } from '../types';
 import { DATA_ELEMENT } from '../constants';
+import { $ } from '../node';
 import './index.css';
 
 const template = () => {
@@ -20,31 +20,29 @@ const template = () => {
 };
 
 class Toolbar implements ToolbarInterface {
-	private editor: EditorInterface;
 	private options: ToolbarOptions;
 	root: NodeInterface;
 	private items: Array<NodeInterface | Button | Input | Dropdown> = [];
 
-	constructor(editor: EditorInterface, options: ToolbarOptions) {
-		this.editor = editor;
+	constructor(options: ToolbarOptions) {
 		this.options = { ...options };
-		this.root = this.editor.$(template());
+		this.root = $(template());
 	}
 
 	addItems(node: NodeInterface) {
 		this.options.items.forEach(options => {
 			let item;
 			if (options.type === 'button') {
-				item = new Button(this.editor, options as ButtonOptions);
+				item = new Button(options as ButtonOptions);
 				item.render(node);
 			}
 			if (options.type === 'input') {
 				const inputOptions = options as InputOptions;
-				item = new Input(this.editor, inputOptions);
+				item = new Input(inputOptions);
 				item.render(node);
 			}
 			if (options.type === 'dropdown') {
-				item = new Dropdown(this.editor, options as DropdownOptions);
+				item = new Dropdown(options as DropdownOptions);
 				item.render(node);
 			}
 			if (options.type === 'node') {
@@ -53,18 +51,17 @@ class Toolbar implements ToolbarInterface {
 				nodeItem.addClass('data-toolbar-item');
 				const { title } = nodeOptions;
 				if (title) {
-					const tooltip = new Tooltip(this.editor);
 					nodeItem.on('mouseenter', () => {
-						tooltip.show(
+						Tooltip.show(
 							nodeItem,
 							typeof title === 'function' ? title() : title,
 						);
 					});
 					nodeItem.on('mouseleave', () => {
-						tooltip.hide();
+						Tooltip.hide();
 					});
 					nodeItem.on('mousedown', () => {
-						tooltip.hide();
+						Tooltip.hide();
 					});
 				}
 				node.append(nodeItem);
@@ -92,7 +89,7 @@ class Toolbar implements ToolbarInterface {
 	}
 
 	render(container?: NodeInterface) {
-		const group = this.editor.$('<div class="data-toolbar-group"></div>');
+		const group = $('<div class="data-toolbar-group"></div>');
 		this.root.append(group);
 		this.addItems(group);
 		if (container) {

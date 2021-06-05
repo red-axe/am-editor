@@ -106,20 +106,6 @@ Type: `ClipboardInterface`
 
 ## Method
 
-### `$`
-
-Node finder
-
-```ts
-/**
- * Node Finder
- * @param selector CSS selector, or node string
- * @param context Context root node, the default is document
- * @param clazz node analysis class
- */
-$(selector: Selector, context?: Context | null | false, clazz?: NodeEntry): NodeInterface;
-```
-
 ### `on`
 
 Event binding

@@ -6,6 +6,7 @@ import {
 	NodeInterface,
 	PluginEntry as PluginEntryType,
 } from '../types';
+import { $ } from '../node';
 
 abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	implements InlineInterface {
@@ -21,19 +22,19 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 
 	init() {
 		super.init();
-		if (isEngine(this.editor) && this.markdown) {
-			this.editor.on('paste:markdown', child =>
-				this.pasteMarkdown(child),
-			);
+		const editor = this.editor;
+		if (isEngine(editor) && this.markdown) {
+			editor.on('paste:markdown', child => this.pasteMarkdown(child));
 		}
 	}
 
 	execute(...args: any) {
-		if (!isEngine(this.editor)) return;
-		const inlineNode = this.editor.$(`<${this.tagName} />`);
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const inlineNode = $(`<${this.tagName} />`);
 		this.setStyle(inlineNode, ...args);
 		this.setAttributes(inlineNode, ...args);
-		const { inline } = this.editor;
+		const { inline } = editor;
 		const trigger = this.isTrigger
 			? this.isTrigger(...args)
 			: !this.queryState();
@@ -45,8 +46,9 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	}
 
 	queryState() {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		//如果没有属性和样式限制，直接查询是否包含当前标签名称
 		if (!this.style && !this.attributes)
 			return change.inlines.some(node => node.name === this.tagName);
@@ -71,11 +73,12 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	 * @param node 触发节点
 	 */
 	triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface) {
-		if (!isEngine(this.editor) || !this.markdown) return;
+		const editor = this.editor;
+		if (!isEngine(editor) || !this.markdown) return;
+		const { change, command } = editor;
 		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
 		const match = new RegExp(`^(.*)${key}(.+?)${key}$`).exec(text);
 		if (match) {
-			const { change } = this.editor;
 			let range = change.getRange();
 			const visibleChar = match[1] && /\S$/.test(match[1]);
 			const codeChar = match[2];
@@ -94,12 +97,10 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 			range.setStart(node[0], leftText.length);
 			range.setEnd(node[0], (leftText + codeChar).length);
 			change.select(range);
-			this.editor.command.execute(
-				(this.constructor as PluginEntryType).pluginName,
-			);
+			command.execute((this.constructor as PluginEntryType).pluginName);
 			range = change.getRange();
 			range.collapse(false);
-			const inline = this.editor.inline.closest(range.startNode);
+			const inline = editor.inline.closest(range.startNode);
 			const inlineNext = inline.next();
 			if (
 				inline &&
@@ -111,7 +112,7 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 				range.setEnd(inlineNext, 1);
 			}
 			change.select(range);
-			this.editor.node.insertText('\xa0');
+			editor.node.insertText('\xa0');
 			return false;
 		}
 		return;
@@ -121,7 +122,6 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 		if (!isEngine(this.editor) || !this.markdown) return;
 		if (!node.isText()) return;
 
-		const { $, inline } = this.editor;
 		let text = node.text();
 		if (!text) return;
 

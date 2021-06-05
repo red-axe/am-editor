@@ -8,6 +8,7 @@ import {
 } from '../types';
 import { EventEmitter2 } from 'eventemitter2';
 import {
+	$,
 	ActiveTrigger,
 	EditorInterface,
 	isEngine,
@@ -119,7 +120,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		let allColWidth = 0;
 		let colIndex = 0;
 		cols.each((col, i) => {
-			const colWidth = this.editor.$(col).attributes('width');
+			const colWidth = $(col).attributes('width');
 			if (colWidth) {
 				colWidthArray[i] = colWidth;
 				allColWidth += parseInt(colWidth);
@@ -212,7 +213,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		//列头部 padding 区域单击让其选中表格卡片上方的blcok
 		this.viewport?.on('mousedown', (event: MouseEvent) => {
 			if (!event.target) return;
-			const targetNode = this.editor.$(event.target);
+			const targetNode = $(event.target);
 			if (
 				!isEngine(this.editor) ||
 				!event.target ||
@@ -313,7 +314,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 */
 	onTableMouseDown(event: MouseEvent) {
 		if (!event.target) return;
-		const { $ } = this.editor;
 		const td = $(event.target).closest('td');
 		if (td.length > 0 && event.button === 2) {
 			this.showContextMenu(event);
@@ -329,7 +329,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	onMouseMoveColsHeader(event: MouseEvent) {
 		if (!event.target || !this.colAddButton || !this.colAddButtonSplit)
 			return;
-		const { $ } = this.editor;
 		const targetNode = $(event.target);
 		const itemNode = targetNode.closest(Template.COLS_HEADER_ITEM_CLASS);
 		if (itemNode.length === 0) return;
@@ -368,7 +367,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	onMouseMoveRowsHeader(event: MouseEvent) {
 		if (!event.target || !this.rowAddButton || !this.rowAddButtonSplit)
 			return;
-		const { $ } = this.editor;
 		const targetNode = $(event.target);
 		const itemNode = targetNode.closest(Template.ROWS_HEADER_ITEM_CLASS);
 		if (itemNode.length === 0) return;
@@ -399,7 +397,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @returns
 	 */
 	onMouseDownColsHeader(event: MouseEvent) {
-		const { $ } = this.editor;
 		const trigger = $(event.target || []).closest(
 			Template.COLS_HEADER_TRIGGER_CLASS,
 		);
@@ -420,7 +417,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @returns
 	 */
 	onMouseDownRowsHeader(event: MouseEvent) {
-		const { $ } = this.editor;
 		const trigger = $(event.target || []).closest(
 			Template.ROWS_HEADER_TRIGGER_CLASS,
 		);
@@ -441,7 +437,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 */
 	onClickColsHeader(event: MouseEvent) {
 		const { selection } = this.table;
-		const { $ } = this.editor;
 		const trigger = $(event.target || []).closest(
 			Template.COLS_HEADER_TRIGGER_CLASS,
 		);
@@ -463,7 +458,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 */
 	onClickRowsHeader(event: MouseEvent) {
 		const { selection } = this.table;
-		const { $ } = this.editor;
 		const trigger = $(event.target || []).closest(
 			Template.ROWS_HEADER_TRIGGER_CLASS,
 		);
@@ -798,7 +792,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const { selection } = this.table;
 		const selectArea = selection.getSelectArea();
 		if (!event.target || !selectArea.allRow) return;
-		const { $ } = this.editor;
 		const colBar = $(event.target).closest(Template.COLS_HEADER_ITEM_CLASS);
 		if (colBar.length === 0) return;
 		const index = this.colsHeader
@@ -833,7 +826,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const { selection } = this.table;
 		const selectArea = selection.getSelectArea();
 		if (!event.target || !selectArea.allCol) return;
-		const { $ } = this.editor;
 		const rowBar = $(event.target).closest(Template.ROWS_HEADER_ITEM_CLASS);
 		if (rowBar.length === 0) return;
 		const index = this.rowsHeader
@@ -985,7 +977,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		}
 		// dragover会不断的触发事件，这里做一个截流，鼠标在3像素以内不去计算
 		if (Math.abs(this.dragging.x - event.offsetX) < 3) return;
-		const { $ } = this.editor;
 		this.dragging.x = event.offsetX;
 		this.draggingHeader.element.removeClass('dragging');
 		const td = $(event.target).closest('td');
@@ -1083,8 +1074,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.dragging.y = event.offsetY;
 		this.draggingHeader.element.removeClass('dragging');
 
-		const { $ } = this.editor;
-
 		const td = $(event.target).closest('td');
 		const rowBar = $(event.target).closest(Template.ROWS_HEADER_ITEM_CLASS);
 		if (td.length === 0 && rowBar.length === 0) return;
@@ -1180,7 +1169,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 
 	showContextMenu(event: MouseEvent) {
 		if (!this.menuBar || !event.target) return;
-		const { $ } = this.editor;
 		const { selection } = this.table;
 		const menuItems = this.menuBar.find(Template.MENUBAR_ITEM_CLASS);
 		menuItems.removeClass('disabled');
@@ -1275,7 +1263,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		if (!this.contextVisible) {
 			return;
 		}
-		const { $ } = this.editor;
 		const menuItems = this.menuBar?.find(Template.MENUBAR_ITEM_CLASS);
 		menuItems?.removeClass('disabled');
 		menuItems?.each(menu => {
@@ -1317,7 +1304,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 
 	handleClickMenu(event: MouseEvent) {
 		if (!event.target) return;
-		const { $ } = this.editor;
 		const targetNode = $(event.target);
 		const menu = targetNode.closest('.table-menubar-item');
 		if (menu.length === 0 || targetNode.name === 'input') return;
@@ -1345,7 +1331,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 
 	handleHoverMenu(event: MouseEvent) {
 		if (!event.target) return;
-		const { $ } = this.editor;
 		const menu = $(event.target).closest('.table-menubar-item');
 		if (menu.length === 0) return;
 		event.stopPropagation();

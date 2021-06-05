@@ -43,7 +43,6 @@ export type Context = Element | Document;
 export interface NodeEntry {
 	prototype: NodeInterface;
 	new (
-		editor: EditorInterface,
 		nodes: Node | NodeList | Array<Node>,
 		context?: Context,
 	): NodeInterface;
@@ -529,12 +528,6 @@ export interface NodeInterface {
 		view: NodeInterface,
 		align?: 'start' | 'center' | 'end' | 'nearest',
 	): void;
-
-	/**
-	 * 移除占位符 \u200B
-	 * @param root 节点
-	 */
-	removeZeroWidthSpace(): void;
 }
 
 export interface NodeModelInterface {
@@ -698,6 +691,12 @@ export interface NodeModelInterface {
 	 * @param appendExp 追加的节点
 	 */
 	getBatchAppendHTML(nodes: Array<NodeInterface>, appendExp: string): string;
+
+	/**
+	 * 移除占位符 \u200B
+	 * @param node 节点
+	 */
+	removeZeroWidthSpace(node: NodeInterface): void;
 }
 
 export interface ElementInterface extends Element {

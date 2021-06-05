@@ -10,6 +10,7 @@ import { NodeInterface, isNode } from '../types/node';
 import { isRangeInterface, RangeInterface } from '../types/range';
 import { getDocument, getWindow } from '../utils';
 import { Backspace, Left, Right } from './typing';
+import { $ } from '../node';
 
 class Inline implements InlineModelInterface {
 	private editor: EditorInterface;
@@ -19,32 +20,26 @@ class Inline implements InlineModelInterface {
 	}
 
 	init() {
-		if (isEngine(this.editor)) {
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			const { typing, event } = editor;
 			//删除事件
-			const backspace = new Backspace(this.editor);
-			this.editor.typing
+			const backspace = new Backspace(editor);
+			typing
 				.getHandleListener('backspace', 'keydown')
 				?.on(event => backspace.trigger(event));
 			//左方向键
-			const left = new Left(this.editor);
-			this.editor.typing
+			const left = new Left(editor);
+			typing
 				.getHandleListener('left', 'keydown')
 				?.on(event => left.trigger(event));
 			//右方向键
-			const right = new Right(this.editor);
-			this.editor.typing
+			const right = new Right(editor);
+			typing
 				.getHandleListener('right', 'keydown')
 				?.on(event => right.trigger(event));
 			//markdown
-			this.editor.event.on('keydown:space', event =>
-				this.triggerMarkdown(event),
-			);
-			/**this.editor.on('beforeCommandExecute', () => {
-				if (!isEngine(this.editor)) return;
-				const range = this.repairRange();
-				const { change } = this.editor;
-				change.rangePathBeforeCommand = getRangePath(range);
-			});**/
+			event.on('keydown:space', event => this.triggerMarkdown(event));
 		}
 	}
 
@@ -111,8 +106,9 @@ class Inline implements InlineModelInterface {
 	 * @param event 事件
 	 */
 	triggerMarkdown(event: KeyboardEvent) {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		let range = change.getRange();
 		if (!range.collapsed || change.isComposing()) return;
 		const { startNode, startOffset } = range;
@@ -126,8 +122,8 @@ class Inline implements InlineModelInterface {
 			node.type === Node.TEXT_NODE
 				? node.text().substr(0, startOffset)
 				: node.text();
-		return !Object.keys(this.editor.plugin.components).some(pluginName => {
-			const plugin = this.editor.plugin.components[pluginName];
+		return !Object.keys(editor.plugin.components).some(pluginName => {
+			const plugin = editor.plugin.components[pluginName];
 			if (isInlinePlugin(plugin) && !!plugin.markdown) {
 				const reuslt = plugin.triggerMarkdown(event, text, node);
 				if (reuslt === false) return true;
@@ -174,7 +170,7 @@ class Inline implements InlineModelInterface {
 	 */
 	wrap(inline: NodeInterface | Node | string, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { change, mark, node, $ } = this.editor;
+		const { change, mark, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof inline === 'string' || isNode(inline)) {
@@ -284,8 +280,9 @@ class Inline implements InlineModelInterface {
 	 * @param range 光标，默认当前编辑器光标,或者需要移除的inline节点
 	 */
 	unwrap(range?: RangeInterface | NodeInterface) {
-		if (!isEngine(this.editor)) return;
-		const { change, mark } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, mark } = editor;
 		const safeRange =
 			!range || !isRangeInterface(range) ? change.getSafeRange() : range;
 		this.repairRange(safeRange);
@@ -333,7 +330,7 @@ class Inline implements InlineModelInterface {
 						.splitText(lastText.length - 1)
 						.remove();
 			}
-			this.editor.node.unwrap(node);
+			editor.node.unwrap(node);
 		});
 
 		selection.move();
@@ -348,7 +345,7 @@ class Inline implements InlineModelInterface {
 	 */
 	insert(inline: NodeInterface | Node | string, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { change, node, $, mark } = this.editor;
+		const { change, node, mark } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof inline === 'string' || isNode(inline)) {
@@ -400,7 +397,7 @@ class Inline implements InlineModelInterface {
 		const { node } = this.editor;
 		const children = root.allChildren();
 		children.forEach(childNode => {
-			const child = this.editor.$(childNode);
+			const child = $(childNode);
 			if (
 				node.isEmpty(child) &&
 				node.isInline(child) &&
@@ -423,7 +420,7 @@ class Inline implements InlineModelInterface {
 		const { startNode } = range;
 		const startParent = startNode.parent();
 		//获取卡片
-		const { node, $ } = this.editor;
+		const { node } = this.editor;
 		const card = startNode.isCard()
 			? startNode
 			: startNode.closest(CARD_SELECTOR);
@@ -654,7 +651,6 @@ class Inline implements InlineModelInterface {
 	 */
 	findInlines(range: RangeInterface) {
 		const cloneRange = range.cloneRange();
-		const { $ } = this.editor;
 		const nodeApi = this.editor.node;
 		const handleRange = (
 			allowBlock: boolean,
@@ -835,7 +831,6 @@ class Inline implements InlineModelInterface {
 	 * @param node inlne 节点
 	 */
 	repairCursor(node: NodeInterface | Node) {
-		const { $ } = this.editor;
 		const nodeApi = this.editor.node;
 		if (isNode(node)) node = $(node);
 		if (!nodeApi.isInline(node) || nodeApi.isVoid(node) || node.isCard())
@@ -873,7 +868,6 @@ class Inline implements InlineModelInterface {
 	 * @param node 节点
 	 */
 	repairBoth(node: NodeInterface | Node) {
-		const { $ } = this.editor;
 		const nodeApi = this.editor.node;
 		if (isNode(node)) node = $(node);
 		if (node.parent() && !nodeApi.isVoid(node)) {

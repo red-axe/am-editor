@@ -1,7 +1,7 @@
 import { createApp, App } from 'vue';
 import Keymaster from 'keymaster';
 import { omit } from 'lodash-es';
-import { EngineInterface, isServer, NodeInterface } from '@aomao/engine';
+import { $, EngineInterface, isServer, NodeInterface } from '@aomao/engine';
 import Collapse from '../../components/collapse/collapse.vue';
 import { CollapseGroupProps } from '../../types';
 
@@ -165,9 +165,7 @@ class CollapseComponent implements CollapseComponentInterface {
 	) {
 		this.unbindEvents();
 		this.remove();
-		this.root = this.engine.$(
-			'<div class="data-toolbar-component-list" />',
-		);
+		this.root = $('<div class="data-toolbar-component-list" />');
 		container.append(this.root);
 
 		const rootElement = this.root.get<HTMLElement>()!;

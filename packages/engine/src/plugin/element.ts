@@ -12,6 +12,7 @@ import {
 	SchemaValue,
 } from '../types/schema';
 import { toHex } from '../utils';
+import { $ } from '../node';
 import PluginEntry from './base';
 
 abstract class ElementPluginEntry<T extends PluginOptions = {}>
@@ -62,7 +63,6 @@ abstract class ElementPluginEntry<T extends PluginOptions = {}>
 	 * @param args style 对应 variable 中的变量参数
 	 */
 	setStyle(node: NodeInterface | Node, ...args: Array<any>) {
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		if (this.style) {
 			Object.keys(this.style).forEach(styleName => {
@@ -87,7 +87,6 @@ abstract class ElementPluginEntry<T extends PluginOptions = {}>
 	 * @param args attributes 对应 variable 中的变量参数
 	 */
 	setAttributes(node: NodeInterface | Node, ...args: Array<any>) {
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		if (this.attributes) {
 			Object.keys(this.attributes).forEach(attributesName => {
@@ -115,7 +114,6 @@ abstract class ElementPluginEntry<T extends PluginOptions = {}>
 	 * @returns 样式名称和样式值键值对
 	 */
 	getStyle(node: NodeInterface | Node) {
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		const values: { [k: string]: string } = {};
 		if (this.style && this.isSelf(node)) {
@@ -140,7 +138,6 @@ abstract class ElementPluginEntry<T extends PluginOptions = {}>
 	 * @returns 属性名称和属性值键值对
 	 */
 	getAttributes(node: NodeInterface | Node) {
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		const values: { [k: string]: string } = {};
 		if (this.attributes && this.isSelf(node)) {
@@ -161,7 +158,6 @@ abstract class ElementPluginEntry<T extends PluginOptions = {}>
 	 * @returns true | false
 	 */
 	isSelf(node: NodeInterface | Node) {
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		let schema:
 			| SchemaRule

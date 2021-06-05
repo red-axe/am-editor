@@ -1,5 +1,5 @@
 import debounce from 'lodash-es/debounce';
-import { ActiveTrigger, Card, CardType, NodeInterface } from '@aomao/engine';
+import { $, ActiveTrigger, Card, CardType, NodeInterface } from '@aomao/engine';
 import { getLocales } from '../utils';
 import MathEditor from './editor';
 import './index.css';
@@ -33,7 +33,7 @@ export default class MathCard extends Card<MathValue> {
 	init() {
 		const tips = getLocales<{ text: string; href: string }>(this.editor)
 			.tips;
-		const { $, card } = this.editor;
+		const { card } = this.editor;
 		this.mathEditor = new MathEditor(this.editor, {
 			tips: `<a class="tips-text" href="${tips.href}" target="_blank"><span class="data-icon data-icon-question-circle-o"></span>${tips.text}</a>`,
 			onFocus: () => {
@@ -114,7 +114,6 @@ export default class MathCard extends Card<MathValue> {
 	}
 
 	renderMath(code: string) {
-		const { $ } = this.editor;
 		this.isSaving = true;
 		this.query(
 			code,
@@ -164,7 +163,6 @@ export default class MathCard extends Card<MathValue> {
 		const value = this.getValue();
 		const locales = getLocales(this.editor);
 		const { url, code, width, height } = value || { url: '', code: '' };
-		const { $ } = this.editor;
 
 		this.container = $('<span class="data-math-container"></span>');
 		this.getCenter().append(this.container);
@@ -202,7 +200,6 @@ export default class MathCard extends Card<MathValue> {
 
 	renderEditor() {
 		if (!this.mathEditor) return;
-		const { $ } = this.editor;
 		const value = this.getValue();
 		this.editorContainer = this.mathEditor.render(value?.code);
 		$(document.body).append(this.editorContainer);

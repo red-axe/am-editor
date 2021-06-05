@@ -13,6 +13,7 @@ import {
 import { EditorInterface, NodeInterface, RangeInterface } from './types';
 import { isEdge, isSafari } from './utils';
 import { SelectionInterface } from './types/selection';
+import { $ } from './node';
 
 class Selection implements SelectionInterface {
 	private range: RangeInterface;
@@ -83,7 +84,6 @@ class Selection implements SelectionInterface {
 				}
 			}
 		}
-		const { $ } = this.editor;
 		// cursor
 		if (this.range.collapsed) {
 			const cursor = $(document.createElement('span'));
@@ -119,7 +119,7 @@ class Selection implements SelectionInterface {
 			const cursor = this.anchor;
 			const _parent = cursor.parent();
 			if (!_parent) return;
-			_parent.removeZeroWidthSpace();
+			node.removeZeroWidthSpace(_parent);
 			_parent[0].normalize();
 
 			let isCardCursor = false;
@@ -168,7 +168,7 @@ class Selection implements SelectionInterface {
 		// range start
 		let parent = this.anchor.parent();
 		if (parent) {
-			parent.removeZeroWidthSpace();
+			node.removeZeroWidthSpace(parent);
 			this.range.setStartBefore(this.anchor);
 			this.anchor.remove();
 			parent[0].normalize();
@@ -177,7 +177,7 @@ class Selection implements SelectionInterface {
 		// range end
 		parent = this.focus.parent();
 		if (parent) {
-			parent.removeZeroWidthSpace();
+			node.removeZeroWidthSpace(parent);
 			this.range.setEndBefore(this.focus);
 			this.focus.remove();
 			parent[0].normalize();
@@ -199,7 +199,6 @@ class Selection implements SelectionInterface {
 		if (!this.focus || !this.anchor) {
 			return node;
 		}
-		const { $ } = this.editor;
 		// 删除右侧
 		if (position === 'left' || position === 'center') {
 			const selectionNode =

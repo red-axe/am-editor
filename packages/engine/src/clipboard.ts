@@ -4,6 +4,7 @@ import { ClipboardInterface } from './types/clipboard';
 import { EditorInterface, EngineInterface } from './types/engine';
 import { RangeInterface } from './types/range';
 import { getWindow, isSafari } from './utils';
+import { $ } from './node';
 import Range from './range';
 
 export const isDragEvent = (
@@ -86,7 +87,6 @@ export default class Clipboard implements ClipboardInterface {
 		if (!range) range = Range.from(this.editor);
 		if (!range) throw 'Range is null';
 		range = range.cloneRange();
-		const { $ } = this.editor;
 		let card = range.startNode.closest('[data-card-key]', node => {
 			return $(node).isEditable()
 				? undefined
@@ -193,11 +193,11 @@ export default class Clipboard implements ClipboardInterface {
 		if (typeof data === 'string') {
 			return copyTo(data);
 		}
-		const { $ } = this.editor;
+		const editor = this.editor;
 		const selection = window.getSelection();
 		const range = selection
-			? Range.from(this.editor, selection) || Range.create(this.editor)
-			: Range.create(this.editor);
+			? Range.from(editor, selection) || Range.create(editor)
+			: Range.create(editor);
 		const cloneRange = range.cloneRange();
 		const block = $('<div class="am-engine-view">&#8203;</div>');
 		block.css({
@@ -209,10 +209,10 @@ export default class Clipboard implements ClipboardInterface {
 			this.write(e);
 		});
 		$(document.body).append(block);
-		block.append(this.editor.node.clone($(data), true));
+		block.append(editor.node.clone($(data), true));
 		if (trigger) {
 			block.allChildren().forEach(child => {
-				this.editor.trigger('copy', $(child));
+				editor.trigger('copy', $(child));
 			});
 		}
 		block.append($('&#8203;', null));
@@ -243,7 +243,6 @@ export default class Clipboard implements ClipboardInterface {
 		(this.editor as EngineInterface).change.deleteContent(range);
 		const listElements =
 			-1 !== ['ul', 'ol'].indexOf(root.name) ? root : root.find('ul,ol');
-		const { $ } = this.editor;
 		for (let i = 0; i < listElements.length; i++) {
 			const list = $(listElements[i]);
 			const childs = list.find('li');

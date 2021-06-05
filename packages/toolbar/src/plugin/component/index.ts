@@ -1,4 +1,5 @@
 import {
+	$,
 	Card,
 	isEngine,
 	NodeInterface,
@@ -180,9 +181,9 @@ class ToolbarComponent extends Card {
 	}
 
 	render(): string | void | NodeInterface {
-		if (!isEngine(this.editor) || isServer) return;
-		const { $ } = this.editor;
-		const language = this.editor.language.get('toolbar', 'component');
+		const editor = this.editor;
+		if (!isEngine(editor) || isServer) return;
+		const language = editor.language.get('toolbar', 'component');
 		this.root.attributes('data-transient', 'true');
 		this.root.attributes('contenteditable', 'false');
 		// 编辑模式

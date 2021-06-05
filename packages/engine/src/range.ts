@@ -8,6 +8,7 @@ import Selection from './selection';
 import { SelectionInterface } from './types/selection';
 import { EditorInterface } from './types/engine';
 import { Path } from 'sharedb';
+import { $ } from './node';
 import { CardEntry } from './types/card';
 
 class Range implements RangeInterface {
@@ -123,15 +124,15 @@ class Range implements RangeInterface {
 	}
 
 	get startNode() {
-		return this.editor.$(this.base.startContainer);
+		return $(this.base.startContainer);
 	}
 
 	get endNode() {
-		return this.editor.$(this.base.endContainer);
+		return $(this.base.endContainer);
 	}
 
 	get commonAncestorNode() {
-		return this.editor.$(this.base.commonAncestorContainer);
+		return $(this.base.commonAncestorContainer);
 	}
 
 	toRange = (): globalThis.Range => {
@@ -280,7 +281,7 @@ class Range implements RangeInterface {
 			offset: number,
 			isStart: boolean,
 		) => {
-			let domNode = this.editor.$(node);
+			let domNode = $(node);
 			if (
 				domNode.type === getWindow().Node.TEXT_NODE ||
 				(!toBlock && nodeApi.isBlock(domNode)) ||
@@ -336,7 +337,7 @@ class Range implements RangeInterface {
 	 * @param range 选区
 	 */
 	shrinkToElementNode = () => {
-		const { node, $ } = this.editor;
+		const { node } = this.editor;
 		let child;
 		let childDom;
 		while (
@@ -557,7 +558,6 @@ class Range implements RangeInterface {
 	};
 
 	scrollIntoViewIfNeeded = (node: NodeInterface, view: NodeInterface) => {
-		const { $ } = this.editor;
 		if (this.collapsed) {
 			node.scrollIntoView(view, $(this.getEndOffsetNode()));
 		} else {
@@ -594,7 +594,6 @@ class Range implements RangeInterface {
 	 * @param isLeft
 	 */
 	addOrRemoveBr = (isLeft?: boolean) => {
-		const { $ } = this.editor;
 		const block = this.editor.block.closest(this.commonAncestorNode);
 		block.find('br').each(br => {
 			const domBr = $(br);

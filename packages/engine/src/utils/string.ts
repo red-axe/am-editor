@@ -6,9 +6,10 @@ import {
 	READY_CARD_KEY,
 } from '../constants/card';
 import { DATA_ELEMENT } from '../constants/root';
+import { $ } from '../node';
 import { getWindow } from './node';
 import { isMacos } from './user-agent';
-import { isNodeEntry, NodeInterface } from '../types';
+import { isNode, isNodeEntry, NodeInterface } from '../types';
 
 /**
  * 随机字符串
@@ -28,10 +29,11 @@ export const random = (length: number = 5) => {
 const _counters: { [key: string]: number } = {};
 
 export const getHashId = (
-	value: string | NodeInterface,
+	value: string | NodeInterface | Node,
 	unique: boolean = true,
 ) => {
 	let prefix = '';
+	if (isNode(value)) value = $(value);
 	if (isNodeEntry(value)) {
 		const attributes = value.attributes();
 		const styles = attributes['style'];

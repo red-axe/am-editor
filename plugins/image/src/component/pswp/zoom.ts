@@ -1,5 +1,5 @@
 import { PswpInterface } from '@/types';
-import { EditorInterface, Tooltip } from '@aomao/engine';
+import { $, EditorInterface, Tooltip } from '@aomao/engine';
 
 class Zoom {
 	private pswp: PswpInterface;
@@ -35,7 +35,7 @@ class Zoom {
 	}
 
 	renderTemplate() {
-		const root = this.editor.$(`
+		const root = $(`
         <div class="data-pswp-tool-bar">
             <div class="pswp-toolbar-content"></div>
         </div>
@@ -135,19 +135,18 @@ class Zoom {
 		status: string,
 		onClick: () => void,
 	) {
-		const btn = this.editor.$(
+		const btn = $(
 			`<span class="data-pswp-${zoomClass} btn ${status}"></span>`,
 		);
-		const tooltip = new Tooltip(this.editor);
 		btn.on('mouseenter', () => {
-			tooltip.show(btn, title);
+			Tooltip.show(btn, title);
 		});
 		btn.on('mouseleave', () => {
-			tooltip.hide();
+			Tooltip.hide();
 		});
 		btn.on('mousedown', e => {
 			e.stopPropagation();
-			tooltip.hide();
+			Tooltip.hide();
 		});
 		btn.on('click', onClick);
 		return btn;

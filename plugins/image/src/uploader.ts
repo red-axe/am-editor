@@ -1,4 +1,5 @@
 import {
+	$,
 	File,
 	isAndroid,
 	isEngine,
@@ -576,7 +577,7 @@ export default class extends Plugin<Options> {
 
 		let newText = '';
 		let textNode = node.clone(true).get<Text>()!;
-		const { $, card } = this.editor;
+		const { card } = this.editor;
 		while (
 			textNode.textContent &&
 			(match = reg.exec(textNode.textContent))

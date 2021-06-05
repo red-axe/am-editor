@@ -1,4 +1,5 @@
 import {
+	$,
 	DATA_ELEMENT,
 	DATA_TRANSIENT_ATTRIBUTES,
 	EDITABLE,
@@ -68,11 +69,9 @@ class Template implements TemplateInterface {
 	static readonly TABLE_TD_BG_CLASS = `.${TABLE_TD_BG_CLASS_NAME}`;
 	static readonly EmptyCell = `<div class="${TABLE_TD_CONTENT_CLASS_NAME}" contenteditable="true" ${DATA_ELEMENT}="${EDITABLE}"><p><br /></p></div><div class="${TABLE_TD_BG_CLASS_NAME}"><div class="table-main-border-top"></div><div class="table-main-border-right"></div><div class="table-main-border-bottom"></div><div class="table-main-border-left"></div></div>`;
 
-	private editor: EditorInterface;
 	private table: TableInterface;
 
-	constructor(editor: EditorInterface, table: TableInterface) {
-		this.editor = editor;
+	constructor(table: TableInterface) {
 		this.table = table;
 	}
 
@@ -159,9 +158,8 @@ class Template implements TemplateInterface {
 				});
 			}
 
-			html = this.table.helper
-				.normalize(this.editor.$(html))
-				.get<HTMLElement>()!.outerHTML;
+			html = this.table.helper.normalize($(html)).get<HTMLElement>()!
+				.outerHTML;
 		}
 
 		const table =

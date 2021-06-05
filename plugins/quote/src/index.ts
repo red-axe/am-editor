@@ -1,4 +1,5 @@
 import {
+	$,
 	isEngine,
 	NodeInterface,
 	BlockPlugin,
@@ -98,8 +99,6 @@ export default class extends BlockPlugin<Options> {
 		const reg = /(^|\r\n|\n)([>]{1,})/;
 		let match = reg.exec(text);
 		if (!match) return;
-
-		const { $ } = this.editor;
 
 		let newText = '';
 		const rows = text.split(/\n|\r\n/);

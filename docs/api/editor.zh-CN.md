@@ -106,20 +106,6 @@ readonly kind: 'engine' | 'view';
 
 ## 方法
 
-### `$`
-
-节点查询器
-
-```ts
-/**
- * 节点查询器
- * @param selector CSS 选择器，或者节点字符串
- * @param context 上下文根节点，默认为document
- * @param clazz 节点解析类
- */
-$(selector: Selector, context?: Context | null | false, clazz?: NodeEntry): NodeInterface;
-```
-
 ### `on`
 
 事件绑定

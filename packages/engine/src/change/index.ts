@@ -29,6 +29,7 @@ import Paste from './paste';
 import { SelectionInterface } from '../types/selection';
 import Selection from '../selection';
 import { escape } from '../utils';
+import { $ } from '../node';
 
 class ChangeModel implements ChangeInterface {
 	private engine: EngineInterface;
@@ -604,7 +605,7 @@ class ChangeModel implements ChangeInterface {
 			rangeClone = range.cloneRange();
 			rangeClone.enlargeFromTextNode();
 
-			const startNode = this.engine.$(rangeClone.startContainer);
+			const startNode = $(rangeClone.startContainer);
 			const startOffset = rangeClone.startOffset;
 
 			if (this.engine.node.isInline(startNode) && startOffset === 0) {
@@ -654,7 +655,7 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	private initNativeEvents() {
-		const { container, $, card, clipboard } = this.engine;
+		const { container, card, clipboard } = this.engine;
 
 		this.event.onInput((event: InputEvent) => {
 			const range = this.getRange();
@@ -926,7 +927,7 @@ class ChangeModel implements ChangeInterface {
 		fragment: DocumentFragment,
 		callback: (range: RangeInterface) => void = () => {},
 	) {
-		const { block, list, card, $, schema } = this.engine;
+		const { block, list, card, schema } = this.engine;
 		const nodeApi = this.engine.node;
 		const range = this.getSafeRange();
 		const firstBlock = block.closest(range.startNode);
@@ -1101,7 +1102,7 @@ class ChangeModel implements ChangeInterface {
 		if (safeRange.collapsed) {
 			return;
 		}
-		const { mark, node, $ } = this.engine;
+		const { mark, node } = this.engine;
 		let cloneRange = safeRange.cloneRange();
 		cloneRange.collapse(true);
 		const activeMarks = mark.findMarks(cloneRange);
@@ -1275,7 +1276,7 @@ class ChangeModel implements ChangeInterface {
 	 * @param node 节点
 	 */
 	mergeAfterDeletePrevNode(node?: NodeInterface) {
-		const { block, $ } = this.engine;
+		const { block } = this.engine;
 		const range = this.getRange();
 		node = node || block.closest(range.startNode);
 		// <p><br />foo</p>，先删除 BR

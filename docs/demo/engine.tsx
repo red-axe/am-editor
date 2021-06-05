@@ -6,6 +6,7 @@ import Space from 'antd/es/space';
 import Modal from 'antd/es/modal';
 //引入编辑器引擎
 import Engine, {
+	$,
 	EngineInterface,
 	isHotkey,
 	RangeInterface,
@@ -236,14 +237,12 @@ const EngineDemo = () => {
 		});
 		//卡片最大化时设置编辑页面样式
 		engine.on('card:maximize', () => {
-			engine
-				.$('.editor-toolbar')
+			$('.editor-toolbar')
 				.css('z-index', '9999')
 				.css('top', '56px');
 		});
 		engine.on('card:minimize', () => {
-			engine
-				.$('.editor-toolbar')
+			$('.editor-toolbar')
 				.css('z-index', '')
 				.css('top', '');
 		});

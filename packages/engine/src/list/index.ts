@@ -2,7 +2,6 @@ import { CARD_KEY, CARD_SELECTOR } from '../constants';
 import Range from '../range';
 import {
 	EditorInterface,
-	EngineInterface,
 	isEngine,
 	NodeInterface,
 	PluginEntry,
@@ -12,6 +11,7 @@ import {
 import { ListInterface, ListModelInterface } from '../types/list';
 import { getWindow, removeUnit } from '../utils';
 import { Enter, Backspace } from './typing';
+import { $ } from '../node';
 
 class List implements ListModelInterface {
 	private editor: EditorInterface;
@@ -240,7 +240,7 @@ class List implements ListModelInterface {
 	 */
 	unwrap(blocks: Array<NodeInterface>) {
 		let indent = 0;
-		const { node, $ } = this.editor;
+		const { node } = this.editor;
 		const normalBlock = $('<p />');
 		blocks.forEach(block => {
 			this.unwrapCustomize(block);
@@ -264,7 +264,7 @@ class List implements ListModelInterface {
 	 */
 	normalize() {
 		if (!isEngine(this.editor)) return [];
-		const { $, change, block, node } = this.editor;
+		const { change, block, node } = this.editor;
 		const range = change.getRange();
 		const blocks = block.getBlocks(range);
 		const listNodes: Array<NodeInterface> = [];
@@ -556,7 +556,7 @@ class List implements ListModelInterface {
 		cardName: string,
 		value?: any,
 	) {
-		if (isNode(node)) node = this.editor.$(node);
+		if (isNode(node)) node = $(node);
 		//必须是li标签
 		if (node.name !== 'li') return;
 		//第一个子节点必须不是卡片
@@ -585,7 +585,6 @@ class List implements ListModelInterface {
 		cardName: string,
 		value?: any,
 	) {
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		//必须是li标签
 		if (node.name !== 'li') return;
@@ -602,7 +601,6 @@ class List implements ListModelInterface {
 	 * @param node 列表节点项
 	 */
 	addBr(node: NodeInterface) {
-		const { $ } = this.editor;
 		const nodeApi = this.editor.node;
 		if (nodeApi.isList(node)) {
 			node.find('li').each(node => {
@@ -655,7 +653,7 @@ class List implements ListModelInterface {
 		cardName: string,
 		value?: any,
 	) {
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 		if (Array.isArray(blocks)) {
 			let nodes: Array<NodeInterface> = [];
 			blocks.forEach(block => {
@@ -716,7 +714,7 @@ class List implements ListModelInterface {
 		tagName: 'ul' | 'ol' = 'ul',
 		start?: number,
 	) {
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 		if (Array.isArray(blocks)) {
 			let nodes: Array<NodeInterface> = [];
 			blocks.forEach(block => {
@@ -775,7 +773,6 @@ class List implements ListModelInterface {
 	 * 判断选中的区域是否在List列表的开始
 	 */
 	isFirst(range: RangeInterface) {
-		const { $ } = this.editor;
 		//获取选区开始节点和位置偏移值
 		const { startNode, startOffset } = range;
 		//复制选区
@@ -825,7 +822,6 @@ class List implements ListModelInterface {
 	 * 判断选中的区域是否在List列表的末尾
 	 */
 	isLast(range: RangeInterface) {
-		const { $ } = this.editor;
 		//获取选区范围结束节点和结束位置偏移值
 		const { endNode, endOffset } = range;
 		//复制选区

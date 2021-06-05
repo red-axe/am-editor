@@ -23,7 +23,7 @@ export default class extends Card {
 Rendering a card needs to display the `render` method, which is an abstract method and must be implemented
 
 ```ts
-import { Card } from '@aomao/engine';
+import { $, Card } from '@aomao/engine';
 
 export default class extends Card {
 	static get cardName() {
@@ -35,7 +35,6 @@ export default class extends Card {
 	}
 
 	render() {
-		const { $ } = this.editor;
 		//Return the node, it will be automatically appended to the center position of the card
 		return $('<div>Card</div>');
 		//Or take the initiative to append
@@ -58,7 +57,7 @@ Card component
 
 ```ts
 import { ReactDOM } from 'react';
-import { Card } from '@aomao/engine';
+import { $, Card } from '@aomao/engine';
 
 export default class extends Card {
 	container?: NodeInterface;
@@ -80,7 +79,6 @@ export default class extends Card {
 	}
 
 	render() {
-		const { $ } = this.editor;
 		this.container = $('<div></div>');
 		return this.container;
 	}
@@ -108,7 +106,7 @@ Card component
 
 ```ts
 import { createApp } from 'vue';
-import { Card } from '@aomao/engine';
+import { $, Card } from '@aomao/engine';
 
 export default class extends Card {
 	container?: NodeInterface;
@@ -134,7 +132,6 @@ export default class extends Card {
 	}
 
 	render() {
-		const { $ } = this.editor;
 		this.container = $('<div></div>');
 		return this.container;
 	}
@@ -168,6 +165,7 @@ For the configuration of each type, please see its [Type Definition](https://git
 
 ```ts
 import {
+	$,
 	Card,
 	CardToolbarItemOptions,
 	ToolbarItemOptions,
@@ -183,8 +181,6 @@ export default class extends Card {
 	}
 
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
-		const { $ } = this.editor;
-
 		return [
 			{
 				type: 'dnd',
@@ -207,7 +203,6 @@ export default class extends Card {
 	}
 
 	render() {
-		const { $ } = this.editor;
 		return $('<div>Card</div>');
 	}
 }
@@ -216,7 +211,7 @@ export default class extends Card {
 ### Set card value
 
 ```ts
-import {Card} from'@aomao/engine'
+import { $, Card } from'@aomao/engine'
 
 export default class extends Card {
 
@@ -241,7 +236,6 @@ export default class extends Card {
 
     render() {
         const value = this.getValue() || {count: 0}
-        const {$} = this.editor
         this.container = $(`<div>${value.count}</div>`)
         this.container.on("click" => this.)
         return this.container

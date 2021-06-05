@@ -1,4 +1,5 @@
 import {
+	$,
 	EditorInterface,
 	NodeInterface,
 	RangeInterface,
@@ -17,7 +18,7 @@ class Button {
 	}
 
 	init() {
-		const { $, root } = this.editor;
+		const { root } = this.editor;
 		const container = $(
 			`<div class="data-comment-button-container" ${DATA_ELEMENT}="${UI}"><span class="data-icon data-icon-comment"></span></div>`,
 		);

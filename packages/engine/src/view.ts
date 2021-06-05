@@ -1,14 +1,11 @@
-import NodeModel, { Event } from './node';
-import domQuery from './node/query';
+import NodeModel, { Event, $ } from './node';
 import language from './locales';
 import {
 	EventInterface,
 	NodeInterface,
 	Selector,
 	EventListener,
-	NodeEntry as NodeEntryType,
 	NodeModelInterface,
-	Context,
 } from './types/node';
 import schemaDefaultData from './constants/schema';
 import Schema from './schema';
@@ -82,8 +79,8 @@ class View implements ViewInterface {
 		this.block = new Block(this);
 		this.clipboard = new Clipboard(this);
 		this.request = new Request();
-		this.container = this.$(selector);
-		this.root = this.$(
+		this.container = $(selector);
+		this.root = $(
 			this.options.root || this.container.parent() || document.body,
 		);
 		this.container.addClass('am-engine-view');
@@ -94,14 +91,6 @@ class View implements ViewInterface {
 		this.card.init(this.options.cards || []);
 		this.plugin.init(this.options.plugins || [], this.options.config || {});
 	}
-
-	$ = (
-		selector: Selector,
-		context?: Context | null | false,
-		clazz?: NodeEntryType,
-	): NodeInterface => {
-		return domQuery(this, selector, context, clazz);
-	};
 
 	on(eventType: string, listener: EventListener, rewrite?: boolean) {
 		this.event.on(eventType, listener, rewrite);

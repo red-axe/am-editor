@@ -7,6 +7,7 @@ import {
 import { getWindow } from '../../utils';
 import { CARD_KEY } from '../../constants';
 import Range from '../../range';
+import { $ } from '../../node';
 
 class Delete implements TypingHandleInterface {
 	private engine: EngineInterface;
@@ -32,7 +33,7 @@ class Delete implements TypingHandleInterface {
 	}
 
 	getNext(node: Node): Node | null {
-		return this.engine.$(node).isEditable()
+		return $(node).isEditable()
 			? null
 			: node.nextSibling
 			? node.nextSibling
@@ -42,7 +43,6 @@ class Delete implements TypingHandleInterface {
 	}
 
 	getRange(node: Node, hasNext: boolean = false): RangeInterface | null {
-		const { $ } = this.engine;
 		if ($(node).isEditable()) return null;
 		if (!hasNext) {
 			const next = this.getNext(node);

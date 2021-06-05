@@ -153,7 +153,7 @@ extractFromDom(rootNode: Element): OutlineData[];
 
 ```ts
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { EditorInterface } from '@aomao/engine';
+import { $, EditorInterface } from '@aomao/engine';
 import { Outline, OutlineData } from '@aomao/plugin-heading';
 
 type Props = {
@@ -183,7 +183,7 @@ const Toc: React.FC<Props> = ({ editor }) => {
 	const getTocData = useCallback(() => {
 		// Extract the title Dom node that meets the structural requirements
 		let nodes: Array<Element> = [];
-		const { $, card } = editor;
+		const { card } = editor;
 		editor.container.find('h1,h2,h3,h4,h5,h6').each(child => {
 			const node = $(child);
 			// The title in the Card is not included in the outline

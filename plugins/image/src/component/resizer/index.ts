@@ -1,4 +1,4 @@
-import { EditorInterface, NodeInterface, EventListener } from '@aomao/engine';
+import { $, NodeInterface, EventListener } from '@aomao/engine';
 import './index.css';
 
 export type Options = {
@@ -27,7 +27,6 @@ export type Size = {
 };
 
 class Resizer {
-	private editor: EditorInterface;
 	private options: Options;
 	private root: NodeInterface;
 	private image: NodeInterface;
@@ -41,10 +40,9 @@ class Resizer {
 	 */
 	private resizing: boolean = false;
 
-	constructor(editor: EditorInterface, options: Options) {
-		this.editor = editor;
+	constructor(options: Options) {
 		this.options = options;
-		this.root = this.editor.$(this.renderTemplate(options.src));
+		this.root = $(this.renderTemplate(options.src));
 		this.image = this.root.find('img');
 		this.resizerNumber = this.root.find('.data-image-resizer-number');
 		const { width, height } = this.options;

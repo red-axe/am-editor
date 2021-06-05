@@ -1,4 +1,4 @@
-import { CARD_KEY, NodeInterface, Plugin } from '@aomao/engine';
+import { $, CARD_KEY, NodeInterface, Plugin } from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 import ImageUploader from './uploader';
 import locales from './locales';
@@ -64,7 +64,6 @@ export default class extends Plugin {
 	}
 
 	parseHtml(root: NodeInterface) {
-		const { $ } = this.editor;
 		root.find(`[${CARD_KEY}=${ImageComponent.cardName}`).each(cardNode => {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as ImageComponent;

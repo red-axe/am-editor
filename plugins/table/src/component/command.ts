@@ -1,4 +1,5 @@
 import {
+	$,
 	ClipboardData,
 	EditorInterface,
 	isEngine,
@@ -67,7 +68,6 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		} else if (typeof widths === 'number') {
 			totalWidth = count * widths;
 		}
-		const { $ } = this.editor;
 
 		head.css(
 			'width',
@@ -238,7 +238,6 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const { wrapper, selection, helper } = this.table;
 		const { tableModel } = selection;
 		if (!wrapper || !tableModel) return;
-		const { $ } = this.editor;
 
 		isUp = index === 0 || isUp;
 		const insertMethod = isUp ? 'after' : 'before';
@@ -436,7 +435,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const { selection, helper } = this.table;
 		const areaHtml = selection.getSelectionHtml();
 		if (!areaHtml) return;
-		this.editor.clipboard.copy(this.editor.$(areaHtml)[0]);
+		this.editor.clipboard.copy($(areaHtml)[0]);
 		helper.copyHTML(areaHtml);
 	}
 
@@ -451,7 +450,6 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const { selection, helper } = this.table;
 		const areaHtml = selection.getSelectionHtml();
 		if (!areaHtml) return;
-		const { $ } = this.editor;
 		event.clipboardData?.clearData();
 		event.clipboardData?.setData('text/plain', $(areaHtml).html());
 		event.clipboardData?.setData('text/html', areaHtml);
@@ -540,7 +538,6 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const { selection, helper } = this.table;
 		const { tableModel } = selection;
 		if (!tableModel) return;
-		const { $ } = this.editor;
 		const selectArea = selection.getSelectArea();
 		const { begin, end } = selectArea;
 		const isSingleTd = begin.row === end.row && begin.col === end.col;
@@ -663,8 +660,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 				// 空单元格里面也有 html，只有在有实际内容时才会在合并的时候将内容合并
 				if (tdModel.element.innerText.trim() !== '') {
 					content.unshift(
-						this.editor
-							.$(tdModel.element)
+						$(tdModel.element)
 							.find(Template.TABLE_TD_CONTENT_CLASS)
 							.html(),
 					);
@@ -674,7 +670,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			}
 		});
 		if (mergeTd) {
-			const tdNode = this.editor.$(mergeTd);
+			const tdNode = $(mergeTd);
 			const contentNode = tdNode.find(Template.TABLE_TD_CONTENT_CLASS);
 			contentNode.html(contentNode.html() + content.join(''));
 			this.emit('actioned', 'mergeCell', ...args);

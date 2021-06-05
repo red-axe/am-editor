@@ -1,4 +1,5 @@
 import {
+	$,
 	DATA_ELEMENT,
 	EditorInterface,
 	NodeInterface,
@@ -20,11 +21,9 @@ class MathEditor {
 	private editor: EditorInterface;
 	private options: Options;
 	private container?: NodeInterface;
-	private tooltip: Tooltip;
 
 	constructor(editor: EditorInterface, options: Options) {
 		this.editor = editor;
-		this.tooltip = new Tooltip(this.editor);
 		this.options = options;
 	}
 
@@ -38,7 +37,6 @@ class MathEditor {
 	render(defaultValue?: string) {
 		this.destroy();
 
-		const { $ } = this.editor;
 		this.container = $(
 			`<div class="data-card-math-editor" ${DATA_ELEMENT}="${UI}"></div>`,
 		);
@@ -74,13 +72,13 @@ class MathEditor {
 		);
 		const button = buttonContainer.find('a');
 		button.on('mouseenter', () => {
-			this.tooltip.show(button, locales.buttonTips);
+			Tooltip.show(button, locales.buttonTips);
 		});
 		button.on('mouseleave', () => {
-			this.tooltip.hide();
+			Tooltip.hide();
 		});
 		button.on('mousedown', () => {
-			this.tooltip.hide();
+			Tooltip.hide();
 		});
 		if (onOk) button.on('click', onOk);
 		toolbar.append(buttonContainer);

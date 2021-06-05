@@ -1,5 +1,4 @@
-import NodeModel, { Event } from '../node';
-import domQuery from '../node/query';
+import NodeModel, { Event, $ } from '../node';
 import language from '../locales';
 import Change from '../change';
 import { DATA_ELEMENT } from '../constants/root';
@@ -12,8 +11,6 @@ import {
 	EventInterface,
 	EventListener,
 	NodeModelInterface,
-	Context,
-	NodeEntry as NodeEntryType,
 } from '../types/node';
 import { ChangeInterface } from '../types/change';
 import {
@@ -138,7 +135,7 @@ class Engine implements EngineInterface {
 			className: this.options.className,
 			tabIndex: this.options.tabIndex,
 		});
-		this.root = this.$(
+		this.root = $(
 			this.options.root || this.container.parent() || getDocument().body,
 		);
 		this._container.init();
@@ -155,20 +152,12 @@ class Engine implements EngineInterface {
 
 		this.hotkey = new Hotkey(this);
 		this.scrollNode = this.options.scrollNode
-			? this.$(this.options.scrollNode)
+			? $(this.options.scrollNode)
 			: null;
 		this.card.init(this.options.cards || []);
 		this.plugin.init(this.options.plugins || [], this.options.config || {});
 		this.ot = new OT(this);
 	}
-
-	$ = (
-		selector: Selector,
-		context?: Context | null | false,
-		clazz?: NodeEntryType,
-	): NodeInterface => {
-		return domQuery(this, selector, context, clazz);
-	};
 
 	isSub() {
 		return this.container.closest(CARD_SELECTOR).length > 0;
@@ -212,7 +201,7 @@ class Engine implements EngineInterface {
 	}
 
 	getHtml(): string {
-		const node = this.$(this.container[0].cloneNode(true));
+		const node = $(this.container[0].cloneNode(true));
 		node.removeAttributes('contenteditable');
 		node.removeAttributes('tabindex');
 		node.removeAttributes('autocorrect');
@@ -232,7 +221,7 @@ class Engine implements EngineInterface {
 	}
 
 	setJsonValue(value: Array<any>) {
-		const dom = this.$(toDOM(value));
+		const dom = $(toDOM(value));
 		const attributes = dom.get<Element>()?.attributes;
 		for (let i = 0; attributes && i < attributes.length; i++) {
 			const { nodeName, nodeValue } = attributes.item(i) || {};
@@ -263,7 +252,7 @@ class Engine implements EngineInterface {
 	}
 
 	private normalizeTree() {
-		let block = this.$('<p />');
+		let block = $('<p />');
 		const range = this.change.getRange();
 		const selection = range.createSelection();
 		let anchorNext, focusPrev, anchorParent, focusParent;
@@ -277,12 +266,12 @@ class Engine implements EngineInterface {
 		if (focusPrev) selection.focus?.remove();
 		// 保证所有行内元素都在段落内
 		this.container.children().each(child => {
-			const node = this.$(child);
+			const node = $(child);
 			if (this.node.isBlock(node)) {
 				if (block.children().length > 0) {
 					node.before(block);
 				}
-				block = this.$('<p />');
+				block = $('<p />');
 			} else {
 				block.append(node);
 			}
@@ -306,7 +295,7 @@ class Engine implements EngineInterface {
 		}
 		// 处理空段落
 		this.container.children().each(child => {
-			const node = this.$(child);
+			const node = $(child);
 			this.node.removeMinusStyle(node, 'text-indent');
 			if (this.node.isRootBlock(node)) {
 				const childrenLength = node.children().length;
@@ -321,7 +310,7 @@ class Engine implements EngineInterface {
 							child.attributes(DATA_ELEMENT),
 						) >= 0
 					) {
-						node.prepend(this.$('<br />'));
+						node.prepend($('<br />'));
 					}
 				}
 			}

@@ -12,6 +12,7 @@ import {
 import { EditorInterface } from '../../types/engine';
 import './index.css';
 import { DATA_ELEMENT, UI } from '../../constants';
+import { $ } from '../../node';
 
 export const isCardToolbarItemOptions = (
 	item: ToolbarItemOptions | CardToolbarItemOptions,
@@ -36,7 +37,8 @@ class CardToolbar implements CardToolbarInterface {
 	getDefaultItem(
 		item: CardToolbarItemOptions,
 	): ToolbarItemOptions | undefined {
-		const { $, language } = this.editor;
+		const editor = this.editor;
+		const { language, clipboard, card } = editor;
 		switch (item.type) {
 			case 'separator':
 				return {
@@ -54,16 +56,13 @@ class CardToolbar implements CardToolbarInterface {
 					title:
 						item.title || language.get('copy', 'title').toString(),
 					onClick: () => {
-						const result = this.editor.clipboard.copy(
-							this.card.root[0],
-							true,
-						);
+						const result = clipboard.copy(this.card.root[0], true);
 						if (result)
-							this.editor.messageSuccess(
+							editor.messageSuccess(
 								language.get('copy', 'success').toString(),
 							);
 						else
-							this.editor.messageError(
+							editor.messageError(
 								language.get('copy', 'error').toString(),
 							);
 					},
@@ -78,7 +77,6 @@ class CardToolbar implements CardToolbarInterface {
 						item.title ||
 						language.get('delete', 'title').toString(),
 					onClick: () => {
-						const { card } = this.editor;
 						card.remove(this.card.root);
 					},
 				};
@@ -114,7 +112,7 @@ class CardToolbar implements CardToolbarInterface {
 			//获取客户端配置
 			const config = this.card.toolbar();
 			//获取渲染节点
-			const { root } = this.editor;
+			const { root, language } = this.editor;
 			this.hide();
 			const items: Array<ToolbarItemOptions> = [];
 			config.forEach(item => {
@@ -126,9 +124,7 @@ class CardToolbar implements CardToolbarInterface {
 								item.content ||
 									'<span class="data-icon data-icon-drag"></span>',
 								item.title ||
-									this.editor.language
-										.get('dnd', 'title')
-										.toString(),
+									language.get('dnd', 'title').toString(),
 							);
 							root.append(dndNode);
 							break;
@@ -142,7 +138,7 @@ class CardToolbar implements CardToolbarInterface {
 			});
 
 			if (items.length > 0) {
-				const toolbar = new Toolbar(this.editor, {
+				const toolbar = new Toolbar({
 					items,
 				});
 				toolbar.root.addClass('data-card-toolbar');
@@ -230,7 +226,6 @@ class CardToolbar implements CardToolbarInterface {
 	}
 
 	private createDnd(content: string, title: string) {
-		const { $ } = this.editor;
 		const dndNode = $(
 			`<div ${DATA_ELEMENT}="${UI}" class="data-card-dnd" draggable="true" dnd-trigger-key="${
 				(this.card.constructor as CardEntry).cardName
@@ -240,16 +235,15 @@ class CardToolbar implements CardToolbarInterface {
                 </div>
             </div>`,
 		);
-		const tooltip = new Tooltip(this.editor);
 		dndNode.on('mouseenter', () => {
-			tooltip.show(dndNode, title);
+			Tooltip.show(dndNode, title);
 		});
 		dndNode.on('mouseleave', () => {
-			tooltip.hide();
+			Tooltip.hide();
 		});
 		dndNode.on('mousedown', e => {
 			e.stopPropagation();
-			tooltip.hide();
+			Tooltip.hide();
 			this.hideCardToolbar();
 		});
 

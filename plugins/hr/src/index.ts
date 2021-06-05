@@ -1,4 +1,5 @@
 import {
+	$,
 	Plugin,
 	NodeInterface,
 	CARD_KEY,
@@ -74,7 +75,7 @@ export default class extends Plugin<Options> {
 
 		let newText = '';
 		let textNode = node.clone(true).get<Text>()!;
-		const { $, card } = this.editor;
+		const { card } = this.editor;
 		while (
 			textNode.textContent &&
 			(match = reg.exec(textNode.textContent))
@@ -112,7 +113,6 @@ export default class extends Plugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		const { $ } = this.editor;
 		root.find(`[${CARD_KEY}=${HrComponent.cardName}`).each(hrNode => {
 			const node = $(hrNode);
 			const hr = node.find('hr');

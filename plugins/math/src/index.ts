@@ -1,10 +1,4 @@
-import {
-	CARD_KEY,
-	NodeInterface,
-	Plugin,
-	Card,
-	CardEntry,
-} from '@aomao/engine';
+import { $, CARD_KEY, NodeInterface, Plugin, CardEntry } from '@aomao/engine';
 import MathComponent from './component';
 import locales from './locales';
 
@@ -174,7 +168,6 @@ export default class Math extends Plugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		const { $ } = this.editor;
 		root.find(`[${CARD_KEY}=${MathComponent.cardName}`).each(cardNode => {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as MathComponent;

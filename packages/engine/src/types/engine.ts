@@ -56,17 +56,6 @@ export interface EditorInterface {
 	 */
 	readonly kind: 'engine' | 'view';
 	/**
-	 * 节点查询器
-	 * @param selector 表达式
-	 * @param context 上下文根节点，默认为document
-	 * @param clazz 节点解析类
-	 */
-	$(
-		selector: Selector,
-		context?: Context | null | false,
-		clazz?: NodeEntry,
-	): NodeInterface;
-	/**
 	 * 语言
 	 */
 	language: LanguageInterface;

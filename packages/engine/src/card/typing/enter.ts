@@ -6,6 +6,7 @@ import {
 	EngineInterface,
 	RangeInterface,
 } from '../../types';
+import { $ } from '../../node';
 
 class Enter {
 	private engine: EngineInterface;
@@ -28,7 +29,7 @@ class Enter {
 		range.select(card.root);
 		range.collapse(isStart);
 		change.select(range);
-		const emptyBlock = this.engine.$('<p><br /></p>');
+		const emptyBlock = $('<p><br /></p>');
 		block.insert(emptyBlock);
 
 		if (isStart) {

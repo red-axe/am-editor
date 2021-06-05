@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { EditorInterface } from '@aomao/engine';
+import { $, EditorInterface } from '@aomao/engine';
 import { Outline, OutlineData } from '@aomao/plugin-heading';
 import { lang } from '../config';
 import './index.css';
@@ -30,7 +30,7 @@ const Toc: React.FC<Props> = ({ editor }) => {
 	const getTocData = useCallback(() => {
 		// 从编辑区域提取符合结构要求的标题 Dom 节点
 		let nodes: Array<Element> = [];
-		const { $, card } = editor;
+		const { card } = editor;
 		editor.container.find('h1,h2,h3,h4,h5,h6').each(child => {
 			const node = $(child);
 			// Card 里的标题，不纳入大纲

@@ -31,8 +31,6 @@ trigger(eventType: string, ...args: any): any;
 在 javascript 中我们通常使用 document.addEventListener document.removeEventListener 绑定 DOM 元素事件。在引擎中，我们抽象了一个 `EventInterface` 类型接口，并且 `NodeInterface` 类型的元素绑定了`EventInterface`类型的属性 event。所以只要是 `NodeInterface` 类型的元素都可以通过 on off trigger，绑定、移除、触发事件。不仅可以绑定 DOM 原生事件，还可以绑定自定义事件
 
 ```ts
-const { $ } = engine;
-
 const node = $('<div></div>');
 //原生事件
 node.on('click', () => alert('click'));

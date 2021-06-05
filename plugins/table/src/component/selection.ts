@@ -9,6 +9,7 @@ import {
 } from '../types';
 import { EventEmitter2 } from 'eventemitter2';
 import {
+	$,
 	EditorInterface,
 	NodeInterface,
 	isHotkey,
@@ -241,8 +242,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		let cell = table[curPoint[0]][curPoint[1]];
 		if (this.table.helper.isEmptyModelCol(cell)) {
 			cell = table[cell.parent.row][cell.parent.col] as TableModelCol;
-			if (cell.element)
-				curPoint = this.getCellPoint(this.editor.$(cell.element));
+			if (cell.element) curPoint = this.getCellPoint($(cell.element));
 		}
 		return {
 			begin: { row: curPoint[0], col: curPoint[1] },
@@ -386,9 +386,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 					const col = this.tableModel.table[r][c];
 					if (!this.table.helper.isEmptyModelCol(col)) {
 						if (!isSame && col.element) {
-							this.editor
-								.$(col.element)
-								.attributes('table-cell-selection', 'true');
+							$(col.element).attributes(
+								'table-cell-selection',
+								'true',
+							);
 						}
 						count++;
 					}
@@ -423,7 +424,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 
 	focusCell(cell: NodeInterface | Node) {
 		if (!isEngine(this.editor)) return;
-		const { change, $ } = this.editor;
+		const { change } = this.editor;
 		if (isNode(cell)) cell = $(cell);
 		const range = change.getRange();
 		const editableElement = cell.find(EDITABLE_SELECTOR);
@@ -441,7 +442,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 
 	selectCellRange(cell: NodeInterface | Node) {
 		if (!isEngine(this.editor)) return;
-		const { change, $ } = this.editor;
+		const { change } = this.editor;
 		if (isNode(cell)) cell = $(cell);
 		const range = change.getRange();
 		const editableElement = cell.find(EDITABLE_SELECTOR);
@@ -464,7 +465,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	onTdMouseDown = (event: MouseEvent) => {
 		this.selectRange = undefined;
 		if (!event.target || !isEngine(this.editor)) return;
-		const { $, change } = this.editor;
+		const { change } = this.editor;
 		const target = $(event.target);
 		const td = target.closest('td');
 		if (td.length === 0) return;
@@ -546,7 +547,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 
 	onDragMove = (event: MouseEvent) => {
 		if (!this.dragging || !event.target) return;
-		const dragoverTd = this.editor.$(event.target).closest('td');
+		const dragoverTd = $(event.target).closest('td');
 		if (
 			dragoverTd.length === 0 ||
 			(this.prevOverTd && dragoverTd.equal(this.prevOverTd))
@@ -572,7 +573,6 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	onKeydown = (event: KeyboardEvent) => {
 		if (!event.target || !this.tableModel || !isEngine(this.editor)) return;
 		//获取单元格节点
-		const { $ } = this.editor;
 		const td = $(event.target).closest('td');
 		if (td.length === 0) {
 			return;

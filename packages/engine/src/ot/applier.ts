@@ -8,6 +8,7 @@ import { ApplierInterface, RemoteAttr, RemotePath } from '../types/ot';
 import { isNodeEntry, NodeInterface } from '../types/node';
 import { getWindow } from '../utils';
 import { isTransientElement } from './utils';
+import { $ } from '../node';
 
 class Applier implements ApplierInterface {
 	private engine: EngineInterface;
@@ -25,7 +26,7 @@ class Applier implements ApplierInterface {
 			return [node, undefined, node, index];
 		const offset = index - JSONML.ELEMENT_LIST_OFFSET;
 		const childNode = Array.from(node.childNodes).filter(node => {
-			const childNode = this.engine.$(node);
+			const childNode = $(node);
 			return !isTransientElement(childNode);
 		})[offset];
 		const pathOffset = path[1];
@@ -42,7 +43,6 @@ class Applier implements ApplierInterface {
 
 	fromRemoteAttr(attr: RemoteAttr) {
 		if (!attr) return;
-		const { $ } = this.engine;
 		const { id, leftText, rightText } = attr;
 		const idNode = $(`[data-id="${id}"]`);
 		if (idNode.length === 0) return;
@@ -136,7 +136,7 @@ class Applier implements ApplierInterface {
 
 	setAttribute(path: Path, attr: string, value: string) {
 		const { engine } = this;
-		const { $, card } = this.engine;
+		const { card } = this.engine;
 		const [node] = this.elementAtPath(engine.container[0], path);
 		const domNode = $(node);
 		if (
@@ -155,7 +155,6 @@ class Applier implements ApplierInterface {
 
 	removeAttribute(path: Path, attr: string) {
 		const { engine } = this;
-		const { $ } = this.engine;
 		const [node] = this.elementAtPath(engine.container[0], path);
 		const domNode = $(node);
 		if (
@@ -168,7 +167,6 @@ class Applier implements ApplierInterface {
 
 	insertNode(path: Path, value: string | Op[] | Op[][]) {
 		const { engine } = this;
-		const { $ } = this.engine;
 		const [begine, beginOffset, end] = this.elementAtPath(
 			engine.container[0],
 			path,
@@ -192,7 +190,6 @@ class Applier implements ApplierInterface {
 	deleteNode(path: Path) {
 		const { engine } = this;
 		const [begine] = this.elementAtPath(engine.container[0], path);
-		const { $ } = this.engine;
 		const domBegine = $(begine);
 		if (domBegine.length > 0 && !domBegine.isRoot()) {
 			if (domBegine.isCard()) {
@@ -220,7 +217,7 @@ class Applier implements ApplierInterface {
 			case JSONML.ATTRIBUTE_INDEX:
 				throw Error('Unsupported indexType JSONML.ATTRIBUTE_INDEX (1)');
 			default:
-				if (begine && !this.engine.$(begine).isText()) return;
+				if (begine && !$(begine).isText()) return;
 				const nodeValue =
 					begine && begine.nodeValue ? begine.nodeValue : '';
 				const value =
@@ -249,7 +246,7 @@ class Applier implements ApplierInterface {
 				throw Error('Unsupported indexType JSONML.ATTRIBUTE_INDEX (1)');
 			default:
 				end = begine;
-				if (!engine.$(end).isText()) return;
+				if (!$(end).isText()) return;
 				const nodeValue = end && end.nodeValue ? end.nodeValue : '';
 				const value =
 					nodeValue.substring(0, offset) +
@@ -381,7 +378,6 @@ class Applier implements ApplierInterface {
 
 	setRangeByPath(path: Path[]) {
 		if (path) {
-			const { $ } = this.engine;
 			let [start, end] = path;
 			if (start && end) {
 				const beginOffset = start[start.length - 1] as number;

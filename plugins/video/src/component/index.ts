@@ -1,4 +1,5 @@
 import {
+	$,
 	Card,
 	CardToolbarItemOptions,
 	CardType,
@@ -265,7 +266,7 @@ class VideoComponent extends Card<VideoValue> {
 		const center = this.getCenter();
 		//先清空卡片内容容器
 		center.empty();
-		const { $, command } = this.editor;
+		const { command } = this.editor;
 		const { video_id, status } = value;
 		const locales = this.getLocales();
 		//阅读模式

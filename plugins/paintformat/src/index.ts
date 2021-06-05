@@ -1,4 +1,5 @@
 import {
+	$,
 	isEngine,
 	isNode,
 	NodeInterface,
@@ -62,7 +63,6 @@ export default class extends Plugin<Options> {
 	}
 
 	removeActiveNodes(node: NodeInterface | Node) {
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		this.editor!.container.removeClass(PAINTFORMAT_CLASS);
 		this.activeMarks = undefined;
@@ -86,7 +86,6 @@ export default class extends Plugin<Options> {
 			}
 		};
 		if (ownerDocument) {
-			const { $ } = this.editor;
 			$(ownerDocument).on('keydown', keyEvent);
 			this.event = keyEvent;
 		}
@@ -94,7 +93,7 @@ export default class extends Plugin<Options> {
 
 	paintFormat(activeMarks: NodeInterface[], activeBlocks?: NodeInterface[]) {
 		if (!isEngine(this.editor)) return;
-		const { change, command, block, $ } = this.editor;
+		const { change, command, block } = this.editor;
 		const range = change.getRange();
 		const removeCommand = this.options.removeCommand || 'removeformat';
 		// 选择范围为折叠状态，应用在整个段落，包括段落自己的样式

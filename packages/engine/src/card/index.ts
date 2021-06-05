@@ -29,6 +29,7 @@ import {
 	transformCustomTags,
 } from '../utils';
 import { Backspace, Enter, Left, Right, Up, Down, Default } from './typing';
+import { $ } from '../node';
 import './index.css';
 
 class CardModel implements CardModelInterface {
@@ -53,40 +54,42 @@ class CardModel implements CardModelInterface {
 	}
 
 	init(cards: Array<CardEntry>) {
-		if (isEngine(this.editor)) {
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			const { typing } = editor;
 			//绑定回车事件
-			const enter = new Enter(this.editor);
-			this.editor.typing
+			const enter = new Enter(editor);
+			typing
 				.getHandleListener('enter', 'keydown')
 				?.on(event => enter.trigger(event));
 			//删除事件
-			const backspace = new Backspace(this.editor);
-			this.editor.typing
+			const backspace = new Backspace(editor);
+			typing
 				.getHandleListener('backspace', 'keydown')
 				?.on(event => backspace.trigger(event));
 			//方向键事件
-			const left = new Left(this.editor);
-			this.editor.typing
+			const left = new Left(editor);
+			typing
 				.getHandleListener('left', 'keydown')
 				?.on(event => left.trigger(event));
 
-			const right = new Right(this.editor);
-			this.editor.typing
+			const right = new Right(editor);
+			typing
 				.getHandleListener('right', 'keydown')
 				?.on(event => right.trigger(event));
 
-			const up = new Up(this.editor);
-			this.editor.typing
+			const up = new Up(editor);
+			typing
 				.getHandleListener('up', 'keydown')
 				?.on(event => up.trigger(event));
 
-			const down = new Down(this.editor);
-			this.editor.typing
+			const down = new Down(editor);
+			typing
 				.getHandleListener('down', 'keydown')
 				?.on(event => down.trigger(event));
 
-			const _default = new Default(this.editor);
-			this.editor.typing
+			const _default = new Default(editor);
+			typing
 				.getHandleListener('default', 'keydown')
 				?.on(event => _default.trigger(event));
 		}
@@ -113,7 +116,6 @@ class CardModel implements CardModelInterface {
 		selector: Node | NodeInterface,
 		ignoreEditable?: boolean,
 	): NodeInterface | undefined {
-		const { $ } = this.editor;
 		if (isNode(selector)) selector = $(selector);
 		if (isNodeEntry(selector) && !selector.isCard()) {
 			const card = selector.closest(CARD_SELECTOR, (node: Node) => {
@@ -145,7 +147,7 @@ class CardModel implements CardModelInterface {
 		const getValue = (
 			node: Node | NodeInterface,
 		): CardValue & { id: string } => {
-			if (isNode(node)) node = this.editor.$(node);
+			if (isNode(node)) node = $(node);
 			const value = node.attributes(CARD_VALUE_KEY);
 			return value ? decodeCardValue(value) : {};
 		};
@@ -162,7 +164,6 @@ class CardModel implements CardModelInterface {
 	}
 
 	findBlock(selector: Node | NodeInterface): CardInterface | undefined {
-		const { $ } = this.editor;
 		if (isNode(selector)) selector = $(selector);
 		if (!selector.get()) return;
 		const parent = selector.parent();
@@ -181,7 +182,6 @@ class CardModel implements CardModelInterface {
 	}
 
 	getSingleSelectedCard(range: RangeInterface) {
-		const { $ } = this.editor;
 		const elements = range.findElementsInSimpleRange();
 		let node = elements[0];
 		if (elements.length === 1 && node) {
@@ -195,7 +195,6 @@ class CardModel implements CardModelInterface {
 
 	// 插入Card
 	insertNode(range: RangeInterface, card: CardInterface) {
-		const { $ } = this.editor;
 		const isInline = (card.constructor as CardEntry).cardType === 'inline';
 		const editor = this.editor;
 		// 范围为折叠状态时先删除内容
@@ -270,7 +269,6 @@ class CardModel implements CardModelInterface {
 
 	// 更新Card
 	updateNode(card: CardInterface, value: CardValue) {
-		const { $ } = this.editor;
 		if (card.destroy) card.destroy();
 		const container = card.findByKey('center');
 		container.empty();
@@ -289,7 +287,6 @@ class CardModel implements CardModelInterface {
 	replaceNode(node: NodeInterface, name: string, value?: CardValue) {
 		const clazz = this.classes[name];
 		if (!clazz) throw ''.concat(name, ': This card does not exist');
-		const { $ } = this.editor;
 		value = encodeCardValue(value);
 		const cardNode = transformCustomTags(
 			`<card type="${clazz.cardType}" name="${name}" value="${value}"></card>`,
@@ -305,11 +302,12 @@ class CardModel implements CardModelInterface {
 		trigger: ActiveTrigger = ActiveTrigger.MANUAL,
 		event?: MouseEvent,
 	) {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		//获取当前卡片所在编辑器的根节点
 		const container = node.getRoot();
 		//如果当前编辑器根节点和引擎的根节点不匹配就不执行，主要是子父编辑器的情况
-		if (!container.get() || this.editor.container.equal(container)) {
+		if (!container.get() || editor.container.equal(container)) {
 			let card = this.find(node);
 			const editableElement = node.closest(EDITABLE_SELECTOR);
 			if (!card && editableElement.length > 0) {
@@ -331,7 +329,7 @@ class CardModel implements CardModelInterface {
 				const type = (this.active.constructor as CardEntry).cardType;
 				this.active.activate(false);
 				if (type === CardType.BLOCK) {
-					this.editor.readonly = false;
+					editor.readonly = false;
 				}
 			}
 			if (card) {
@@ -354,29 +352,29 @@ class CardModel implements CardModelInterface {
 				) {
 					card.select(false);
 					//不在可编辑器区域内，设置为只读
-					if (editableElement.length === 0)
-						this.editor.readonly = true;
-					else this.editor.readonly = false;
+					if (editableElement.length === 0) editor.readonly = true;
+					else editor.readonly = false;
 				}
 				if (
 					!isCurrentActiveCard &&
 					trigger === ActiveTrigger.MOUSE_DOWN
 				) {
-					this.editor.trigger('focus');
+					editor.trigger('focus');
 				}
-				this.editor.change.onSelect();
+				editor.change.onSelect();
 			}
 		}
 	}
 
 	select(card: CardInterface) {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (
 			(card.constructor as CardEntry).singleSelectable !== false &&
 			((card.constructor as CardEntry).cardType !== CardType.BLOCK ||
 				!card.activated)
 		) {
-			const range = this.editor.change.getRange();
+			const range = editor.change.getRange();
 			const root = card.root;
 			const parentNode = root.parent()!;
 			const index = parentNode
@@ -385,23 +383,21 @@ class CardModel implements CardModelInterface {
 				.findIndex(child => child.equal(root));
 			range.setStart(parentNode, index);
 			range.setEnd(parentNode, index + 1);
-			this.editor.change.select(range);
+			editor.change.select(range);
 		}
 	}
 
 	focus(card: CardInterface, toStart: boolean = false) {
-		if (!isEngine(this.editor)) return;
-		const range = this.editor.change.getRange();
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, container, scrollNode } = editor;
+		const range = change.getRange();
 		card.focus(range, toStart);
-		this.editor.change.select(range);
-		this.editor.readonly = false;
+		change.select(range);
+		editor.readonly = false;
 		this.activate(range.startNode, ActiveTrigger.MOUSE_DOWN);
-		this.editor.change.onSelect();
-		if (this.editor.scrollNode)
-			range.scrollIntoViewIfNeeded(
-				this.editor.container,
-				this.editor.scrollNode,
-			);
+		change.onSelect();
+		if (scrollNode) range.scrollIntoViewIfNeeded(container, scrollNode);
 	}
 
 	insert(name: string, value?: CardValue) {
@@ -456,12 +452,12 @@ class CardModel implements CardModelInterface {
 		list.addBr(range.startNode);
 		if (parent && node.isEmpty(parent)) {
 			if (parent.isEditable()) {
-				this.editor.node.html(parent, '<p><br /></p>');
+				node.html(parent, '<p><br /></p>');
 				range.select(parent, true);
 				range.shrinkToElementNode();
 				range.collapse(false);
 			} else {
-				this.editor.node.html(parent, '<br />');
+				node.html(parent, '<br />');
 				range.select(parent, true);
 				range.collapse(false);
 			}
@@ -480,7 +476,6 @@ class CardModel implements CardModelInterface {
 	): CardInterface {
 		const clazz = this.classes[name];
 		if (!clazz) throw ''.concat(name, ': This card does not exist');
-		const { $ } = this.editor;
 		if (['inline', 'block'].indexOf(clazz.cardType) < 0) {
 			throw ''.concat(
 				name,
@@ -544,7 +539,6 @@ class CardModel implements CardModelInterface {
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
 	 */
 	render(container?: NodeInterface) {
-		const { $ } = this.editor;
 		const cards = container
 			? container.isCard()
 				? container

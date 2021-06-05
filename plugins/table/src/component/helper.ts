@@ -6,6 +6,7 @@ import {
 } from '../types';
 import isInteger from 'lodash-es/isInteger';
 import {
+	$,
 	EDITABLE_SELECTOR,
 	DATA_TRANSIENT_ATTRIBUTES,
 	EditorInterface,
@@ -16,15 +17,10 @@ import {
 import Template from './template';
 
 class Helper implements HelperInterface {
-	private editor: EditorInterface;
 	private clipboard?: {
 		html: string;
 		text: string;
 	};
-
-	constructor(editor: EditorInterface) {
-		this.editor = editor;
-	}
 
 	isEmptyModelCol(
 		model: TableModelCol | TableModelEmptyCol,
@@ -171,7 +167,6 @@ class Helper implements HelperInterface {
 		}
 		// 表格 table 标签不允许有背景色，无法设置
 		table.css('background-color', '');
-		const { $ } = this.editor;
 		//补充可编辑器区域
 		table.find('td').each(tdElement => {
 			const tdNode = $(tdElement);
@@ -400,7 +395,6 @@ class Helper implements HelperInterface {
 	 * @param to 目标节点
 	 */
 	copyCss(from: NodeInterface | Node, to: NodeInterface | Node) {
-		const { $ } = this.editor;
 		if (isNode(from)) from = $(from);
 		if (isNode(to)) to = $(to);
 		to.css('text-align', from.css('text-align'));
@@ -418,7 +412,6 @@ class Helper implements HelperInterface {
 	 * @param to 目标节点
 	 */
 	copyTo(from: NodeInterface | Node, to: NodeInterface | Node) {
-		const { $ } = this.editor;
 		if (isNode(from)) from = $(from);
 		if (isNode(to)) to = $(to);
 		to.html(transformCustomTags(from.html()));
@@ -432,7 +425,7 @@ class Helper implements HelperInterface {
 	copyHTML(html: string) {
 		this.clipboard = {
 			html: html,
-			text: this.editor.$(html).get<HTMLElement>()?.innerText || '',
+			text: $(html).get<HTMLElement>()?.innerText || '',
 		};
 	}
 	/**
@@ -471,7 +464,7 @@ class Helper implements HelperInterface {
 		}
 
 		if (nodelist.length) {
-			return this.editor.$(nodelist);
+			return $(nodelist);
 		}
 		return node;
 	}
@@ -499,7 +492,6 @@ class Helper implements HelperInterface {
 
 		table.css('background-color', '');
 		const model = this.getTableModel(table);
-		const { $ } = this.editor;
 		// 修正列的 span 场景
 		let cols = table.find('col');
 		if (cols.length !== 0) {

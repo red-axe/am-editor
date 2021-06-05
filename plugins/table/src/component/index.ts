@@ -1,4 +1,5 @@
 import {
+	$,
 	Card,
 	CardToolbarItemOptions,
 	CardType,
@@ -44,8 +45,8 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	}
 
 	wrapper?: NodeInterface;
-	helper: HelperInterface = new Helper(this.editor);
-	template: TemplateInterface = new Template(this.editor, this);
+	helper: HelperInterface = new Helper();
+	template: TemplateInterface = new Template(this);
 	selection: TableSelectionInterface = new TableSelection(this.editor, this);
 	conltrollBar: ControllBarInterface = new ControllBar(this.editor, this, {
 		col_min_width: 40,
@@ -78,7 +79,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		if (!tableRoot) return;
 		const { tableModel } = this.selection;
 		if (!tableModel) return;
-		const { $, schema, conversion } = this.editor;
+		const { schema, conversion } = this.editor;
 		const container = $('<div></div>');
 		container.append(tableRoot.clone(true));
 		const parser = new Parser(container, this.editor, node => {
@@ -171,13 +172,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.command.init();
 
 		if (this.viewport) {
-			this.scrollbar = new Scrollbar(
-				this.editor,
-				this.viewport,
-				true,
-				false,
-				true,
-			);
+			this.scrollbar = new Scrollbar(this.viewport, true, false, true);
 			this.scrollbar.on('display', (display: 'node' | 'block') => {
 				if (display === 'block') {
 					this.wrapper?.addClass('scrollbar-show');
@@ -220,7 +215,6 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	}
 
 	render() {
-		const { $ } = this.editor;
 		const value = this.getValue();
 		if (!value) return 'Error value';
 		if (value.html) {

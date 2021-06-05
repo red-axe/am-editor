@@ -9,7 +9,7 @@
 使用引擎内提供的 `$` 节点选择器来实例化 `NodeInterface` 对象
 
 ```ts
-const { $ } = engine;
+import { $ } from '@aomao/engine';
 //使用CSS选择器查找节点
 const content = $('.content');
 //创建节点

@@ -25,6 +25,7 @@ import {
 	ParserInterface,
 	Callbacks,
 } from '../types';
+import { $ } from '../node';
 
 const style = {
 	'font-size': '14px',
@@ -84,7 +85,7 @@ class Parser implements ParserInterface {
 		paserBefore?: (node: NodeInterface) => void,
 	) {
 		this.editor = editor;
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 		if (typeof source === 'string') {
 			source = source.replace(/<a\s{0,1000}\/>/gi, '<a></a>');
 			source = source.replace(/<a(\s[^>]+?)\/>/gi, (_, t) => {
@@ -264,7 +265,6 @@ class Parser implements ParserInterface {
 		customTags: boolean = false,
 	) {
 		const result: Array<string> = [];
-		const { $ } = this.editor;
 		const nodeApi = this.editor.node;
 		this.editor.trigger('paser:value-before', this.root);
 		this.walkTree(this.root, conversionRules, {
@@ -355,7 +355,7 @@ class Parser implements ParserInterface {
 	 * @param outter 外包裹节点
 	 */
 	toHTML(inner?: Node, outter?: Node) {
-		const { $ } = this.editor;
+		const { trigger } = this.editor;
 		const element = $('<div />');
 		if (inner && outter) {
 			$(inner)
@@ -365,7 +365,7 @@ class Parser implements ParserInterface {
 		} else {
 			element.append(this.root);
 		}
-		this.editor.trigger('paser:html-before', this.root);
+		trigger('paser:html-before', this.root);
 		element.traverse(domNode => {
 			const node = domNode.get<HTMLElement>();
 			if (
@@ -377,9 +377,9 @@ class Parser implements ParserInterface {
 				node.parentNode.removeChild(node);
 			}
 		});
-		this.editor.trigger('paser:html', element);
+		trigger('paser:html', element);
 		element.find('p').css(style);
-		this.editor.trigger('paser:html-after', element);
+		trigger('paser:html-after', element);
 		return {
 			html: element.html(),
 			text: new Parser(element, this.editor).toText(null, true),

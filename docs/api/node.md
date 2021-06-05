@@ -9,7 +9,7 @@ Type: `NodeInterface`
 Use the `$` node selector provided in the engine to instantiate the `NodeInterface` object
 
 ```ts
-const { $ } = engine;
+import { $ } from '@aomao/engine';
 //Use CSS selector to find nodes
 const content = $('.content');
 //Create node

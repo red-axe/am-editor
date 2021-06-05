@@ -3,6 +3,7 @@ import Range from '../../range';
 import { EngineInterface } from '../../types/engine';
 import { CardInterface } from '../../types/card';
 import { DragoverOptions } from '../../types/change';
+import { $ } from '../../node';
 import './index.css';
 
 class DragoverHelper {
@@ -68,7 +69,7 @@ class DragoverHelper {
 
 		this.x = e.clientX;
 		this.y = e.clientY;
-		const target = this.engine.$(e.target || []);
+		const target = $(e.target || []);
 		this.doc = target.document || document;
 		this.targetCard = card.find(target);
 		// 当前鼠标精确击中的Card
@@ -168,7 +169,7 @@ class DragoverHelper {
 
 	getCursor() {
 		const { className } = this.options;
-		return this.engine.$(`body > div.${className}`);
+		return $(`body > div.${className}`);
 	}
 
 	removeCursor() {
@@ -177,7 +178,6 @@ class DragoverHelper {
 
 	setCursor() {
 		this.removeCursor();
-		const { $ } = this.engine;
 		const { className } = this.options;
 		const cursor = $(`<div class="${className}" />`);
 		$(document.body).append(cursor);

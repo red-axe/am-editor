@@ -1,4 +1,5 @@
 import {
+	$,
 	NodeInterface,
 	ListPlugin,
 	CARD_KEY,
@@ -128,7 +129,6 @@ export default class extends ListPlugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		const { $ } = this.editor;
 		root.find(`[${CARD_KEY}=checkbox`).each(checkboxNode => {
 			const node = $(checkboxNode);
 			const checkbox = $(
@@ -192,7 +192,7 @@ export default class extends ListPlugin<Options> {
 		let match = reg.exec(text);
 		if (!match) return;
 
-		const { $, list, card } = this.editor;
+		const { list, card } = this.editor;
 
 		const createList = (nodes: Array<string>) => {
 			const listNode = $(

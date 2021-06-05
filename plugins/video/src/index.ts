@@ -1,4 +1,4 @@
-import { CARD_KEY, NodeInterface, Plugin } from '@aomao/engine';
+import { $, CARD_KEY, NodeInterface, Plugin } from '@aomao/engine';
 import VideoComponent, { VideoValue } from './component';
 import VideoUploader from './uploader';
 import locales from './locales';
@@ -72,7 +72,6 @@ export default class VideoPlugin extends Plugin {
 	}
 
 	parseHtml(root: NodeInterface) {
-		const { $ } = this.editor;
 		root.find(`[${CARD_KEY}=${VideoComponent.cardName}`).each(cardNode => {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as VideoComponent;

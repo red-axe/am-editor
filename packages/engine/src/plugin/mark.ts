@@ -1,5 +1,4 @@
 import ElementPluginEntry from './element';
-import { unescape } from '../utils';
 import {
 	isEngine,
 	MarkInterface,
@@ -7,6 +6,7 @@ import {
 	SchemaMark,
 	PluginEntry as PluginEntryType,
 } from '../types';
+import { $ } from '../node';
 
 abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	implements MarkInterface {
@@ -44,18 +44,19 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 
 	init() {
 		super.init();
-		if (isEngine(this.editor) && this.markdown) {
-			this.editor.on('paste:markdown', node => this.pasteMarkdown(node));
+		const editor = this.editor;
+		if (isEngine(editor) && this.markdown) {
+			editor.on('paste:markdown', node => this.pasteMarkdown(node));
 		}
 	}
 
 	execute(...args: any) {
-		if (!isEngine(this.editor)) return;
-		const { $, change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, mark } = editor;
 		const markNode = $(`<${this.tagName} />`);
 		this.setStyle(markNode, ...args);
 		this.setAttributes(markNode, ...args);
-		const { mark } = this.editor;
 		const trigger = this.isTrigger
 			? this.isTrigger(...args)
 			: !this.queryState();
@@ -109,13 +110,15 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	 * @param node 触发节点
 	 */
 	triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface) {
-		if (!isEngine(this.editor) || !this.markdown) return;
+		const editor = this.editor;
+		if (!isEngine(editor) || !this.markdown) return;
+		const { block, change, command } = editor;
 		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
 		const match = new RegExp(`^(.*)${key}(.+?)${key}$`).exec(text);
 
 		if (match) {
 			//限制block下某些禁用的mark插件
-			const blockPlugin = this.editor.block.findPlugin(node);
+			const blockPlugin = block.findPlugin(node);
 			const pluginName = (this.constructor as PluginEntryType).pluginName;
 			if (
 				blockPlugin &&
@@ -123,7 +126,6 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 				blockPlugin.disableMark.indexOf(pluginName) > -1
 			)
 				return;
-			const { change } = this.editor;
 			let range = change.getRange();
 			const visibleChar = match[1] && /\S$/.test(match[1]);
 			const codeChar = match[2];
@@ -142,13 +144,11 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 			range.setStart(node[0], leftText.length);
 			range.setEnd(node[0], (leftText + codeChar).length);
 			change.select(range);
-			this.editor.command.execute(
-				(this.constructor as PluginEntryType).pluginName,
-			);
+			command.execute((this.constructor as PluginEntryType).pluginName);
 			range = change.getRange();
 			range.collapse(false);
 			change.select(range);
-			this.editor.node.insertText('\xa0');
+			editor.node.insertText('\xa0');
 			return false;
 		}
 		return;
@@ -181,7 +181,7 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 			textNode = regNode.splitText(match[0].length);
 
 			//获取中间字符
-			const markNode = this.editor.$(
+			const markNode = $(
 				`<${this.tagName}>${match[2]}</${this.tagName}>`,
 			);
 			this.setStyle(markNode);

@@ -243,7 +243,7 @@ queryState() {
 execute(...args) {
     //不是引擎
     if (!isEngine(this.editor)) return;
-    const { $, change } = this.editor;
+    const { change } = this.editor;
     //实例化一个当前插件设定的标签名称节点
     const markNode = $(`<${this.tagName} />`);
     //给节点设置当前插件设定的样式，如果有动态值，自动组合动态参数

@@ -107,15 +107,12 @@ p 标签在引擎中属于默认所需的块级节点，用于表明一个段落
 要操作复杂的 DOM 树，使用浏览器自带的 document.createElement 相关函数看起来比较麻烦。如果有像`JQuery`的 javascript 库则会很方便，因此我们封装了一个"简易版的 jquery 库"。
 
 ```ts
-import Engine from '@aomao/engine'
+import { $ } from '@aomao/engine';
 
-const engine = new Engine(...)
-
-const { $ } = engine
 //选择节点
-const node = $("CSS选择器")
+const node = $('CSS选择器');
 //创建节点
-const divNode = $("<div></div>")
+const divNode = $('<div></div>');
 ```
 
 使用 \$ 创建或选择节点后会返回一个 `NodeInterface` 类型对象，能更好的帮助你管理 DOM `Node` 节点。具体属性和方法请查看 API

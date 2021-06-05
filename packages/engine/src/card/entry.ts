@@ -26,6 +26,7 @@ import { decodeCardValue, encodeCardValue, random } from '../utils';
 import Maximize from './maximize';
 import Resize from './resize';
 import Toolbar from './toolbar';
+import { $ } from '../node';
 
 abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	protected readonly editor: EditorInterface;
@@ -89,7 +90,6 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 
 	constructor({ editor, value, root }: CardOptions) {
 		this.editor = editor;
-		const { $ } = this.editor;
 		const type = (this.constructor as CardEntryType).cardType;
 		const tagName = type === 'inline' ? 'span' : 'div';
 		this.root = root ? root : $('<'.concat(tagName, ' />'));
@@ -139,7 +139,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	 * @param selector
 	 */
 	find(selector: string) {
-		const { card, $ } = this.editor;
+		const { card } = this.editor;
 		const nodes = this.root.find(selector);
 		const children: Array<Node> = [];
 		nodes.each(item => {
@@ -239,7 +239,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 
 		if (hasModify) {
 			if (!prevBlock || prevBlock.attributes(CARD_KEY)) {
-				const _block = this.editor.$('<p><br /></p>');
+				const _block = $('<p><br /></p>');
 				this.root.before(_block);
 				range.select(_block, true);
 				range.collapse(false);
@@ -279,7 +279,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 
 		if (hasModify) {
 			if (!nextBlock || nextBlock.attributes(CARD_KEY)) {
-				const _block = this.editor.$('<p><br /></p>');
+				const _block = $('<p><br /></p>');
 				this.root.after(_block);
 				range.select(_block, true);
 				range.collapse(false);

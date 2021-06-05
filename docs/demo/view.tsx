@@ -5,6 +5,7 @@ import { View, ViewInterface, Request } from '@aomao/engine';
 import { DOMAIN, cards, plugins, lang } from './config';
 import Loading from '../demo/loading';
 import 'antd/es/message/style';
+import './view.less';
 
 const viewPlugins = plugins.filter(
 	plugin => ['image-uploader', 'mark-range'].indexOf(plugin.pluginName) < 0,
@@ -48,6 +49,12 @@ const ViewRender = () => {
 				plugins: viewPlugins,
 				cards,
 			});
+			view.current.messageSuccess = (msg: string) => {
+				Message.success(msg);
+			};
+			view.current.messageError = (error: string) => {
+				Message.error(error);
+			};
 			setViewLoading(false);
 		}
 	}, [loading]);

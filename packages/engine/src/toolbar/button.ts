@@ -1,7 +1,7 @@
-import { EditorInterface } from '../types';
 import { NodeInterface } from '../types/node';
 import { ButtonInterface, ButtonOptions } from '../types/toolbar';
 import Tooltip from './tooltip';
+import { $ } from '../node';
 
 const template = (options: ButtonOptions) => {
 	return `
@@ -15,13 +15,11 @@ const template = (options: ButtonOptions) => {
 };
 
 export default class Button implements ButtonInterface {
-	private editor: EditorInterface;
 	private options: ButtonOptions;
 	private root: NodeInterface;
-	constructor(editor: EditorInterface, options: ButtonOptions) {
-		this.editor = editor;
+	constructor(options: ButtonOptions) {
 		this.options = options;
-		this.root = this.editor.$(template(options));
+		this.root = $(template(options));
 		if (options.style) {
 			this.root.attributes('style', options.style);
 		}
@@ -35,18 +33,17 @@ export default class Button implements ButtonInterface {
 		container.append(this.root);
 
 		if (title) {
-			const tooltip = new Tooltip(this.editor);
 			this.root.on('mouseenter', () => {
-				tooltip.show(
+				Tooltip.show(
 					this.root,
 					typeof title === 'function' ? title() : title,
 				);
 			});
 			this.root.on('mouseleave', () => {
-				tooltip.hide();
+				Tooltip.hide();
 			});
 			this.root.on('mousedown', () => {
-				tooltip.hide();
+				Tooltip.hide();
 			});
 		}
 

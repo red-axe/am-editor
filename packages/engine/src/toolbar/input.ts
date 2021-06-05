@@ -1,8 +1,8 @@
 import isHotkey from 'is-hotkey';
-import { EditorInterface } from '../types';
 import { NodeInterface } from '../types/node';
 import { InputInterface, InputOptions } from '../types/toolbar';
 import { escape } from '../utils';
+import { $ } from '../node';
 
 const template = (options: InputOptions) => {
 	return `
@@ -28,17 +28,15 @@ const template = (options: InputOptions) => {
 };
 
 export default class Input implements InputInterface {
-	private editor: EditorInterface;
 	private options: InputOptions;
 	private root: NodeInterface;
 	onEnter: (value: string) => void;
 	onInput: (value: string) => void;
 	onChange: (value: string) => void;
 
-	constructor(editor: EditorInterface, options: InputOptions) {
-		this.editor = editor;
+	constructor(options: InputOptions) {
 		this.options = options;
-		this.root = this.editor.$(template(options));
+		this.root = $(template(options));
 		this.onEnter = options.onEnter || (() => {});
 		this.onInput = options.onInput || (() => {});
 		this.onChange = options.onChange || (() => {});

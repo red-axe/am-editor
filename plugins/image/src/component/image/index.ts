@@ -1,5 +1,6 @@
 import { PswpInterface } from '@/types';
 import {
+	$,
 	EditorInterface,
 	getWindow,
 	isEngine,
@@ -105,7 +106,7 @@ class Image {
 			naturalWidth: 0,
 		};
 		this.status = this.options.status;
-		this.root = editor.$(this.renderTemplate());
+		this.root = $(this.renderTemplate());
 		this.progress = this.root.find('.data-image-progress');
 		this.image = this.root.find('img');
 		this.detail = this.root.find('.data-image-detail');
@@ -168,9 +169,8 @@ class Image {
 
 	bindErrorEvent(node: NodeInterface) {
 		const copyNode = node.find('.data-icon-copy');
-		const tooltip = new Tooltip(this.editor);
 		copyNode.on('mouseenter', () => {
-			tooltip.show(
+			Tooltip.show(
 				copyNode,
 				this.editor.language
 					.get('image', 'errorMessageCopy')
@@ -178,12 +178,12 @@ class Image {
 			);
 		});
 		copyNode.on('mouseleave', () => {
-			tooltip.hide();
+			Tooltip.hide();
 		});
 		copyNode.on('mousedown', (event: MouseEvent) => {
 			event.stopPropagation();
 			event.preventDefault();
-			tooltip.hide();
+			Tooltip.hide();
 			this.editor.clipboard.copy(this.options.message || 'Error message');
 			this.editor.messageSuccess(
 				this.editor.language.get('copy', 'success').toString(),
@@ -415,7 +415,7 @@ class Image {
 		this.maxWidth = this.getMaxWidth();
 		this.rate = clientHeight / clientWidth;
 		// 拖动调整图片大小
-		const resizer = new Resizer(this.editor, {
+		const resizer = new Resizer({
 			src: this.src,
 			width: clientWidth,
 			height: clientHeight,

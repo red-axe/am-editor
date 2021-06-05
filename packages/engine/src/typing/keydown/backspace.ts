@@ -3,6 +3,7 @@ import {
 	EventListener,
 	TypingHandleInterface,
 } from '../../types';
+import { $ } from '../../node';
 
 class Backspace implements TypingHandleInterface {
 	type: 'keydown' | 'keyup' = 'keydown';
@@ -40,7 +41,7 @@ class Backspace implements TypingHandleInterface {
 		const { startNode, startOffset } = range;
 		if (startNode.isEditable()) {
 			const child = startNode[0].childNodes[startOffset - 1];
-			const lastNode = this.engine.$(child);
+			const lastNode = $(child);
 			if (lastNode.name === 'br') {
 				event.preventDefault();
 				lastNode.remove();

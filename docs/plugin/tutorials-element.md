@@ -243,7 +243,7 @@ Example of adding a mark tag:
 execute(...args) {
     //Not an engine
     if (!isEngine(this.editor)) return;
-    const {$, change} = this.editor;
+    const { change} = this.editor;
     //Instantiate a label name node set by the current plugin
     const markNode = $(`<${this.tagName} />`);
     //Set the style set by the current plugin for the node. If there is a dynamic value, the dynamic parameter will be automatically combined

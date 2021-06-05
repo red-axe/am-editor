@@ -1,4 +1,5 @@
 import {
+	$,
 	isEngine,
 	NodeInterface,
 	getHashId,
@@ -43,7 +44,7 @@ export default class extends BlockPlugin<Options> {
 	init() {
 		super.init();
 		this.editor.on('paser:html', node => this.parseHtml(node));
-		const { $, language } = this.editor;
+		const { language } = this.editor;
 		//阅读模式处理
 		if (!isEngine(this.editor) && this.options.showAnchor !== false) {
 			this.editor.on('render', (root: Node) => {
@@ -61,15 +62,14 @@ export default class extends BlockPlugin<Options> {
 								top: (node.height() - 24) / 2 + 'px',
 							});
 						}
-						const tooltip = new Tooltip(this.editor);
 						button.on('mouseenter', () => {
-							tooltip.show(
+							Tooltip.show(
 								button,
 								language.get('copyAnchor', 'title').toString(),
 							);
 						});
 						button.on('mouseleave', () => {
-							tooltip.hide();
+							Tooltip.hide();
 						});
 
 						button.on('click', e => {
@@ -125,7 +125,6 @@ export default class extends BlockPlugin<Options> {
 	}
 
 	updateId() {
-		const { $ } = this.editor;
 		this.editor.container.find(this.tagName.join(',')).each(titleNode => {
 			const node = $(titleNode);
 
@@ -179,7 +178,7 @@ export default class extends BlockPlugin<Options> {
 
 	showAnchor() {
 		if (!isEngine(this.editor)) return;
-		const { change, root, clipboard, $, language, card } = this.editor;
+		const { change, root, clipboard, language, card } = this.editor;
 		const range = change.getRange();
 		let button = root.find('.data-anchor-button');
 		const block = range.startNode.closest(this.tagName.join(','));
@@ -231,15 +230,14 @@ export default class extends BlockPlugin<Options> {
 			left: `${left}px`,
 		});
 		button.addClass('data-anchor-button-active');
-		const tooltip = new Tooltip(this.editor);
 		button.on('mouseenter', () => {
-			tooltip.show(
+			Tooltip.show(
 				button,
 				language.get('copyAnchor', 'title').toString(),
 			);
 		});
 		button.on('mouseleave', () => {
-			tooltip.hide();
+			Tooltip.hide();
 		});
 
 		button.on('click', e => {

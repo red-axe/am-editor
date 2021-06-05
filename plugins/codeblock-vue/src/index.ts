@@ -1,4 +1,5 @@
 import {
+	$,
 	Plugin,
 	isEngine,
 	PluginEntry,
@@ -148,7 +149,7 @@ export default class extends Plugin<Options> {
 		const reg = /```/;
 		let match = reg.exec(text);
 		if (!match) return;
-		const { $, card } = this.editor;
+		const { card } = this.editor;
 
 		let newText = '';
 		const langs = Object.keys(NAME_MAP)
@@ -213,7 +214,6 @@ export default class extends Plugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		const { $ } = this.editor;
 		if (isServer) return;
 
 		root.find(`[${CARD_KEY}=${CodeBlockComponent.cardName}`).each(

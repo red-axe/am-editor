@@ -1,4 +1,5 @@
 import {
+	$,
 	Card,
 	CardToolbarItemOptions,
 	CardType,
@@ -45,7 +46,6 @@ class CodeBlcok extends Card<CodeBlockValue> {
 	}
 
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
-		const { $ } = this.editor;
 		return [
 			{
 				type: 'dnd',

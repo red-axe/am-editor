@@ -24,6 +24,7 @@ import {
 } from '../types/block';
 import { getDocument, getHashId, getWindow } from '../utils';
 import { Backspace, Enter } from './typing';
+import { $ } from '../node';
 
 class Block implements BlockModelInterface {
 	private editor: EditorInterface;
@@ -33,21 +34,21 @@ class Block implements BlockModelInterface {
 	}
 
 	init() {
-		if (isEngine(this.editor)) {
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			const { typing, event } = editor;
 			//绑定回车事件
-			const enter = new Enter(this.editor);
-			this.editor.typing
+			const enter = new Enter(editor);
+			typing
 				.getHandleListener('enter', 'keydown')
 				?.on(event => enter.trigger(event));
 			//删除事件
-			const backspace = new Backspace(this.editor);
-			this.editor.typing
+			const backspace = new Backspace(editor);
+			typing
 				.getHandleListener('backspace', 'keydown')
 				?.on(event => backspace.trigger(event));
 
-			this.editor.event.on('keydown:space', event =>
-				this.triggerMarkdown(event),
-			);
+			event.on('keydown:space', event => this.triggerMarkdown(event));
 		}
 	}
 
@@ -56,8 +57,9 @@ class Block implements BlockModelInterface {
 	 * @param event 事件
 	 */
 	triggerMarkdown(event: KeyboardEvent) {
-		if (!isEngine(this.editor)) return;
-		const { change, block } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, block } = editor;
 		let range = change.getRange();
 		if (!range.collapsed || change.isComposing()) return;
 		const { startNode, startOffset } = range;
@@ -67,10 +69,10 @@ class Block implements BlockModelInterface {
 				: startNode.children().eq(startOffset - 1);
 		if (!node) return;
 		const blockNode = block.closest(node);
-		if (!this.editor.node.isRootBlock(blockNode)) return;
+		if (!editor.node.isRootBlock(blockNode)) return;
 		const text = block.getLeftText(blockNode);
-		return !Object.keys(this.editor.plugin.components).some(pluginName => {
-			const plugin = this.editor.plugin.components[pluginName];
+		return !Object.keys(editor.plugin.components).some(pluginName => {
+			const plugin = editor.plugin.components[pluginName];
 			if (isBlockPlugin(plugin) && !!plugin.markdown) {
 				const reuslt = plugin.markdown(event, text, blockNode, node);
 				if (reuslt === false) return true;
@@ -83,11 +85,11 @@ class Block implements BlockModelInterface {
 	 * @param node 节点
 	 */
 	findPlugin(block: NodeInterface): BlockInterface | undefined {
-		const { node, schema } = this.editor;
+		const { node, schema, plugin } = this.editor;
 		if (!node.isBlock(block)) return;
 		let result: BlockInterface | undefined = undefined;
-		Object.keys(this.editor.plugin.components).some(pluginName => {
-			const blockPlugin = this.editor.plugin.components[pluginName];
+		Object.keys(plugin.components).some(pluginName => {
+			const blockPlugin = plugin.components[pluginName];
 			if (
 				isBlockPlugin(blockPlugin) &&
 				(!blockPlugin.tagName || typeof blockPlugin.tagName === 'string'
@@ -117,7 +119,7 @@ class Block implements BlockModelInterface {
 	 * @param childNode 子节点
 	 */
 	findTop(parentNode: NodeInterface, childNode: NodeInterface) {
-		const { schema } = this.editor;
+		const { schema, node, list } = this.editor;
 		const topParentName = schema.closest(parentNode.name);
 		const topChildName = schema.closest(childNode.name);
 		//如果父节点没有级别或者子节点没有级别就返回子节点
@@ -127,7 +129,6 @@ class Block implements BlockModelInterface {
 		if (schema.isAllowIn(parentNode.name, childNode.name))
 			return parentNode;
 		//如果父节点是 ul、ol 这样的List列表，并且子节点也是这样的列表，设置ident
-		const { node, list } = this.editor;
 		if (node.isList(parentNode) && node.isList(childNode)) {
 			const childIndent =
 				parseInt(childNode.attributes(list.INDENT_KEY), 10) || 0;
@@ -164,11 +165,11 @@ class Block implements BlockModelInterface {
 	 */
 	wrap(block: NodeInterface | Node | string, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { change, node, schema, list, $, mark } = this.editor;
+		const { change, node, schema, list, mark } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof block === 'string' || isNode(block)) {
-			block = this.editor.$(block, doc);
+			block = $(block, doc);
 		} else block = block;
 
 		if (!node.isBlock(block)) return;
@@ -255,7 +256,7 @@ class Block implements BlockModelInterface {
 	 */
 	unwrap(block: NodeInterface | Node | string, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { change, node, $ } = this.editor;
+		const { change, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof block === 'string' || isNode(block)) {
@@ -365,7 +366,7 @@ class Block implements BlockModelInterface {
 		let node = parentBlock?.first();
 
 		while (node) {
-			node = this.editor.$(node);
+			node = $(node);
 			if (!nodeApi.isBlock(node)) return blocks;
 			// 超过编辑区域
 			if (!node.inEditor()) return blocks;
@@ -506,7 +507,7 @@ class Block implements BlockModelInterface {
 		splitNode?: (node: NodeInterface) => NodeInterface,
 	) {
 		if (!isEngine(this.editor)) return;
-		const { $, change, node, list } = this.editor;
+		const { change, node, list } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof block === 'string' || isNode(block)) {
@@ -619,7 +620,7 @@ class Block implements BlockModelInterface {
 	 */
 	setBlocks(block: string | { [k: string]: any }, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { $, node, schema, mark } = this.editor;
+		const { node, schema, mark } = this.editor;
 		const { change } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
@@ -813,7 +814,6 @@ class Block implements BlockModelInterface {
 		};
 
 		const nodes = this.getBlocks(range);
-		const { $ } = this.editor;
 		// rang头部应该往数组头部插入节点
 		findNodes($(startNode)).forEach(node => {
 			return addNode(nodes, node, true);
@@ -845,7 +845,7 @@ class Block implements BlockModelInterface {
 		if (!fragment.firstChild) {
 			return true;
 		}
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 		if (
 			fragment.childNodes.length === 1 &&
 			$(fragment.firstChild).name === 'br'
@@ -876,7 +876,7 @@ class Block implements BlockModelInterface {
 		if (!fragment.firstChild) {
 			return true;
 		}
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 		const emptyNode = $('<div />');
 		emptyNode.append(fragment);
 
@@ -892,7 +892,7 @@ class Block implements BlockModelInterface {
 		range.shrinkToElementNode();
 		range.shrinkToTextNode();
 
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 
 		let startBlock = this.closest(range.startNode);
 		if (range.startNode.isRoot()) {
@@ -957,7 +957,6 @@ class Block implements BlockModelInterface {
 		clone?: boolean;
 		keepID?: boolean;
 	}) {
-		const { $ } = this.editor;
 		if (isNode(block)) block = $(block);
 		const newRange = Range.create(this.editor, block.document!);
 
@@ -1012,7 +1011,6 @@ class Block implements BlockModelInterface {
 	 */
 	removeLeftText(block: NodeInterface | Node, range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { $ } = this.editor;
 		range = range || this.editor.change.getRange();
 		if (isNode(block)) block = $(block);
 		range.createSelection();
@@ -1039,7 +1037,7 @@ class Block implements BlockModelInterface {
 	 */
 	flatten(domNode: NodeInterface, root: NodeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { $, schema, node } = this.editor;
+		const { schema, node } = this.editor;
 		const mergeTags = schema.getCanMergeTags();
 		//获取父级节点
 		let parentNode = domNode[0].parentNode;
@@ -1098,7 +1096,6 @@ class Block implements BlockModelInterface {
 	 * @returns
 	 */
 	createDataID(node: Node | NodeInterface) {
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		const id = getHashId(node);
 		node.attributes('data-id', id);
@@ -1128,7 +1125,7 @@ class Block implements BlockModelInterface {
 		const tags = this.getMarkIdTags().join(',');
 		const nodes = root.querySelectorAll(tags);
 		nodes.forEach(child => {
-			const node = this.editor.$(child);
+			const node = $(child);
 			if (
 				!node.attributes('data-id') &&
 				!node.isCard() &&
@@ -1144,7 +1141,6 @@ class Block implements BlockModelInterface {
 	 * @returns
 	 */
 	generateRandomID(node: Node | NodeInterface, isCreate: boolean = false) {
-		const { $ } = this.editor;
 		if (isNode(node)) node = $(node);
 		if (node.isCard() || node.attributes(DATA_ELEMENT) === UI) return '';
 		if (!isCreate) {
@@ -1170,7 +1166,7 @@ class Block implements BlockModelInterface {
 					| Element
 					| DocumentFragment).querySelectorAll(nodeName);
 				for (let i = 0; i < nodes.length; i++) {
-					const node = this.editor.$(nodes[i]);
+					const node = $(nodes[i]);
 					if (node.isCard() || node.attributes(DATA_ELEMENT) === UI)
 						continue;
 					this.generateRandomID(node, isCreate);
@@ -1213,7 +1209,6 @@ class Block implements BlockModelInterface {
 		let container;
 		let prevContainer;
 		let node = block.first();
-		const { $ } = this.editor;
 		while (node) {
 			const next = node.next();
 			if (!container || node.name === 'br') {
@@ -1247,10 +1242,11 @@ class Block implements BlockModelInterface {
 	 * @returns
 	 */
 	insertEmptyBlock(range: RangeInterface, block: NodeInterface) {
-		if (!isEngine(this.editor)) return;
-		const { change, $ } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		const { blocks, marks } = change;
-		const nodeApi = this.editor.node;
+		const nodeApi = editor.node;
 		this.insert(block);
 		if (blocks[0]) {
 			const styles = blocks[0].css();
@@ -1259,7 +1255,7 @@ class Block implements BlockModelInterface {
 		let node = block.find('br');
 		marks.forEach(mark => {
 			// 回车后，默认是否复制makr样式
-			const plugin = this.editor.mark.findPlugin(mark);
+			const plugin = editor.mark.findPlugin(mark);
 			mark = nodeApi.clone(mark);
 			//插件判断
 			if (
@@ -1290,7 +1286,6 @@ class Block implements BlockModelInterface {
 	insertOrSplit(range: RangeInterface, block: NodeInterface) {
 		const cloneRange = range.cloneRange();
 		cloneRange.enlargeFromTextNode();
-		const { $ } = this.editor;
 		if (
 			this.isLastOffset(range, 'end') ||
 			(cloneRange.endNode.type === getWindow().Node.ELEMENT_NODE &&

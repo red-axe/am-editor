@@ -1,4 +1,5 @@
 import {
+	$,
 	Card,
 	CardType,
 	NodeInterface,
@@ -197,8 +198,6 @@ export default class FileCard extends Card<FileValue> {
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
-
-		const { $ } = this.editor;
 
 		this.container = $(this.renderTemplate(value));
 		if (!this.readonly) {

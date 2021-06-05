@@ -1,4 +1,5 @@
 import {
+	$,
 	NodeInterface,
 	InlinePlugin,
 	isEngine,
@@ -37,11 +38,12 @@ export default class extends InlinePlugin<Options> {
 
 	init() {
 		super.init();
-		if (isEngine(this.editor)) {
-			this.toolbar = new Toolbar(this.editor);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			this.toolbar = new Toolbar(editor);
 		}
-		this.editor.on('paser:html', node => this.parseHtml(node));
-		this.editor.language.add(locales);
+		editor.on('paser:html', node => this.parseHtml(node));
+		editor.language.add(locales);
 	}
 
 	hotkey() {
@@ -50,9 +52,9 @@ export default class extends InlinePlugin<Options> {
 
 	execute() {
 		if (!isEngine(this.editor)) return;
-		const { inline } = this.editor;
+		const { inline, change, history } = this.editor;
 		if (!this.queryState()) {
-			const inlineNode = this.editor.$(`<${this.tagName} />`);
+			const inlineNode = $(`<${this.tagName} />`);
 			this.setStyle(inlineNode, ...arguments);
 			this.setAttributes(inlineNode, ...arguments);
 			const text = arguments.length > 2 ? arguments[2] : '';
@@ -61,10 +63,9 @@ export default class extends InlinePlugin<Options> {
 				inlineNode.text(text);
 				inline.insert(inlineNode);
 			} else {
-				this.editor.history.startCache();
+				history.startCache();
 				inline.wrap(inlineNode);
 			}
-			const { change } = this.editor;
 			const range = change.getRange();
 			if (!range.collapsed && change.inlines.length > 0) {
 				this.toolbar?.show(change.inlines[0]);
@@ -85,10 +86,11 @@ export default class extends InlinePlugin<Options> {
 	}
 
 	triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface) {
-		if (!isEngine(this.editor) || !this.markdown) return;
+		const editor = this.editor;
+		if (!isEngine(editor) || !this.markdown) return;
 		const match = new RegExp(this.markdown).exec(text);
 		if (match) {
-			const { $, command } = this.editor;
+			const { command } = editor;
 			event.preventDefault();
 			const text = match[1];
 			const url = match[2];
@@ -104,7 +106,7 @@ export default class extends InlinePlugin<Options> {
 				url,
 				text,
 			);
-			this.editor.node.insertText('\xA0');
+			editor.node.insertText('\xA0');
 			return false;
 		}
 		return;
@@ -135,7 +137,7 @@ export default class extends InlinePlugin<Options> {
 			const text = match[2];
 			const url = match[3];
 
-			const inlineNode = this.editor.$(`<${this.tagName} />`);
+			const inlineNode = $(`<${this.tagName} />`);
 			this.setAttributes(inlineNode, '_blank', url);
 			inlineNode.text(!!text ? text : url);
 

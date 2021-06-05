@@ -1,4 +1,5 @@
 import {
+	$,
 	CARD_KEY,
 	EDITABLE_SELECTOR,
 	isEngine,
@@ -21,13 +22,12 @@ class Table extends Plugin<Options> {
 	}
 
 	init() {
-		this.editor.language.add(locales);
-		this.editor.schema.add(this.schema());
-		this.editor.on('paser:html', node => this.parseHtml(node));
-		this.editor.on('paste:each-after', child => this.pasteHtml(child));
-		this.editor.on('paste:markdown-after', child =>
-			this.pasteMarkdown(child),
-		);
+		const editor = this.editor;
+		editor.language.add(locales);
+		editor.schema.add(this.schema());
+		editor.on('paser:html', node => this.parseHtml(node));
+		editor.on('paste:each-after', child => this.pasteHtml(child));
+		editor.on('paste:markdown-after', child => this.pasteMarkdown(child));
 	}
 
 	hotkey() {
@@ -127,7 +127,6 @@ class Table extends Plugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		const { $ } = this.editor;
 		root.find(`[${CARD_KEY}=${TableComponent.cardName}`).each(tableNode => {
 			const node = $(tableNode);
 			const table = node.find('table');
@@ -170,8 +169,6 @@ class Table extends Plugin<Options> {
 		const reg = /\|(?:(?:[^\|]+?)\|){2,}/;
 		let match = reg.exec(text);
 		if (!match) return;
-
-		const { $ } = this.editor;
 
 		const createTable = (nodes: Array<string>) => {
 			const tableNode = $(`<table>${nodes.join('')}</table>`);

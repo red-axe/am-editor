@@ -1,4 +1,4 @@
-import { Card, CardType, NodeInterface } from '@aomao/engine';
+import { $, Card, CardType, NodeInterface } from '@aomao/engine';
 import './index.css';
 
 const CHECKBOX_CLASS = 'data-checkbox';
@@ -50,7 +50,6 @@ class Checkbox extends Card<CheckboxValue> {
 	};
 
 	render() {
-		const { $ } = this.editor;
 		const html = `
             <span class="${CHECKBOX_CLASS}">
                 <input type="checkbox" class="${CHECKBOX_INPUT_CLASS}" value="">

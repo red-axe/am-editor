@@ -1,4 +1,4 @@
-import { EngineInterface, NodeInterface } from '@aomao/engine';
+import { $, EngineInterface, NodeInterface } from '@aomao/engine';
 import { createApp, App } from 'vue';
 import AmEditor from './editor.vue';
 import AmPreview from './preview.vue';
@@ -12,7 +12,7 @@ class Toolbar {
 
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
-		const { change, $ } = this.engine;
+		const { change } = this.engine;
 		change.event.onWindow('mousedown', (event: MouseEvent) => {
 			if (!event.target) return;
 			const target = $(event.target);
@@ -24,9 +24,9 @@ class Toolbar {
 
 	private create() {
 		if (!this.target) return;
-		let root = this.engine.$('.data-link-container');
+		let root = $('.data-link-container');
 		if (root.length === 0) {
-			root = this.engine.$('<div class="data-link-container"></div>');
+			root = $('<div class="data-link-container"></div>');
 			document.body.appendChild(root[0]);
 		}
 		this.root = root;
@@ -80,7 +80,7 @@ class Toolbar {
 		text = text.trim() === '' ? link : text;
 		this.target.text(text);
 
-		this.engine.inline.repairCursor(this.target);
+		inline.repairCursor(this.target);
 		range.setStart(this.target.next()!, 1);
 		range.setEnd(this.target.next()!, 1);
 		change.apply(range);
@@ -104,8 +104,9 @@ class Toolbar {
 	}
 
 	preview(href: string, callback?: () => void) {
+		const { change, inline, language } = this.engine;
 		const vm = createApp(AmPreview, {
-			language: this.engine.language,
+			language,
 			href,
 			onLoad: () => {
 				if (callback) callback();
@@ -118,7 +119,6 @@ class Toolbar {
 			},
 			onRemove: () => {
 				if (!this.target) return;
-				const { change, inline } = this.engine;
 				const range = change.getRange();
 				range.select(this.target, true);
 				inline.repairRange(range);

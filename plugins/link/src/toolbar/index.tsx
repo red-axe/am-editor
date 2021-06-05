@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ConfigProvider from 'antd/es/config-provider';
-import { EngineInterface, NodeInterface } from '@aomao/engine';
+import { $, EngineInterface, NodeInterface } from '@aomao/engine';
 import Editor from './editor';
 import Preview from './preview';
 
@@ -13,7 +13,7 @@ class Toolbar {
 
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
-		const { change, $ } = this.engine;
+		const { change } = this.engine;
 		change.event.onWindow('mousedown', (event: MouseEvent) => {
 			if (!event.target) return;
 			const target = $(event.target);
@@ -25,9 +25,9 @@ class Toolbar {
 
 	private create() {
 		if (!this.target) return;
-		let root = this.engine.$('.data-link-container');
+		let root = $('.data-link-container');
 		if (root.length === 0) {
-			root = this.engine.$('<div class="data-link-container"></div>');
+			root = $('<div class="data-link-container"></div>');
 			document.body.appendChild(root[0]);
 		}
 		this.root = root;

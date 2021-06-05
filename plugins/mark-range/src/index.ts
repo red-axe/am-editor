@@ -1,4 +1,5 @@
 import {
+	$,
 	CardEntry,
 	DATA_TRANSIENT_ATTRIBUTES,
 	isEngine,
@@ -212,7 +213,7 @@ export default class extends MarkPlugin<Options> {
 	 * @returns
 	 */
 	findElements(key: string, id: string) {
-		const { $, container } = this.editor;
+		const { container } = this.editor;
 		const elements: Array<NodeInterface> = [];
 		container.find(`[${this.getIdName(key)}]`).each(markNode => {
 			const mark = $(markNode);
@@ -297,7 +298,6 @@ export default class extends MarkPlugin<Options> {
 	 * @param id
 	 */
 	apply(key: string, id: string) {
-		const { $ } = this.editor;
 		//遍历预览节点
 		this.editor.container
 			.find(`[${this.getPreviewName(key)}]`)
@@ -380,7 +380,7 @@ export default class extends MarkPlugin<Options> {
 	 * @param id 编号，不传编号则遗弃所有预览项
 	 */
 	revoke(key: string, id?: string) {
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 		let elements: Array<NodeInterface | Node> = [];
 		if (id) elements = this.findElements(key, id);
 		else
@@ -416,7 +416,7 @@ export default class extends MarkPlugin<Options> {
 	 * @param id 编号
 	 */
 	remove(key: string, id: string) {
-		const { $, node } = this.editor;
+		const { node } = this.editor;
 
 		const elements: Array<NodeInterface | Node> = this.findElements(
 			key,
@@ -502,7 +502,6 @@ export default class extends MarkPlugin<Options> {
 	}
 
 	getIds() {
-		const { $ } = this.editor;
 		const ids: { [key: string]: Array<string> } = {};
 		this.editor.container.find(`[${this.MARK_KEY}]`).each(markNode => {
 			const mark = $(markNode);
@@ -531,7 +530,6 @@ export default class extends MarkPlugin<Options> {
 		const range = Range.from(this.editor, selection);
 		if (!range) return;
 		const { onSelect } = this.options;
-		const { $ } = this.editor;
 
 		if (isEngine(this.editor) && this.isCachePreview) {
 			this.editor.history.destroyCache();
@@ -593,7 +591,7 @@ export default class extends MarkPlugin<Options> {
 		value: string;
 		paths: Array<{ id: Array<string>; path: Array<Path> }>;
 	} {
-		const { $, node, card } = this.editor;
+		const { node, card } = this.editor;
 		const container = this.editor.container.clone(value ? false : true);
 		container.css({
 			position: 'fixed',
@@ -661,7 +659,7 @@ export default class extends MarkPlugin<Options> {
 		paths: Array<{ id: Array<string>; path: Array<Path> }>,
 		value?: string,
 	): string {
-		const { $, card } = this.editor;
+		const { card } = this.editor;
 		const container = this.editor.container.clone(value ? false : true);
 		if (value) value = Selection.removeTags(value);
 		container.css({

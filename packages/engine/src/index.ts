@@ -22,6 +22,7 @@ import Request, {
 	getFileSize,
 } from './request';
 import Scrollbar from './scrollbar';
+import { $ } from './node';
 
 export * from './types';
 export * from './utils';
@@ -30,6 +31,7 @@ export * from './constants';
 export default Engine;
 
 export {
+	$,
 	Selection,
 	Range,
 	View,

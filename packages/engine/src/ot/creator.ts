@@ -20,6 +20,7 @@ import { EngineInterface } from '../types/engine';
 import { Op, Path, StringInsertOp, StringDeleteOp, Doc } from 'sharedb';
 import { NodeInterface } from '../types/node';
 import { DocInterface, RepairOp } from '../types/ot';
+import { $ } from '../node';
 
 class Creator extends EventEmitter2 {
 	private engine: EngineInterface;
@@ -82,13 +83,10 @@ class Creator extends EventEmitter2 {
 	}
 
 	inAddedCache(node: Node) {
-		return this.addedNodes.find(
-			n => this.engine.$(node).inside(n) || n === node,
-		);
+		return this.addedNodes.find(n => $(node).inside(n) || n === node);
 	}
 
 	isTransientMutation(record: MutationRecord) {
-		const { $ } = this.engine;
 		const {
 			addedNodes,
 			removedNodes,
@@ -125,7 +123,6 @@ class Creator extends EventEmitter2 {
 		const mutationsNodes: Array<Node> = [];
 
 		let isDataString = false;
-		const { $ } = this.engine;
 		const setNodeMutations = (root: Node, record: MutationRecord) => {
 			if (!cacheNodes.includes(root)) {
 				if (!mutationsNodes.includes(root)) mutationsNodes.push(root);
@@ -296,7 +293,7 @@ class Creator extends EventEmitter2 {
 	): number {
 		const { target, nextSibling, previousSibling, addedNodes } = record;
 		const childNodes = Array.from(target.childNodes).filter(
-			node => !isTransientElement(this.engine.$(node)),
+			node => !isTransientElement($(node)),
 		);
 		const addedIndex = childNodes.indexOf(addedNodes[0] as ChildNode);
 		const prevIndex = childNodes.indexOf(previousSibling as ChildNode);
