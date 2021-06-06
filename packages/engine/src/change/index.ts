@@ -1102,13 +1102,15 @@ class ChangeModel implements ChangeInterface {
 		if (safeRange.collapsed) {
 			return;
 		}
-		const { mark, node } = this.engine;
+		const { mark, inline, list } = this.engine;
+		const nodeApi = this.engine.node;
+		const blockApi = this.engine.block;
 		let cloneRange = safeRange.cloneRange();
 		cloneRange.collapse(true);
 		const activeMarks = mark.findMarks(cloneRange);
 		safeRange.enlargeToElementNode();
 		// 获取上面第一个 Block
-		const block = this.engine.block.closest(safeRange.startNode);
+		const block = blockApi.closest(safeRange.startNode);
 		// 获取的 block 超出编辑范围
 		if (!block.isEditable() && !block.inEditor()) {
 			if (!range) this.apply(safeRange);
@@ -1133,21 +1135,21 @@ class ChangeModel implements ChangeInterface {
 			if (
 				startNode[0].childNodes.length === 1 &&
 				firstChild.nodeType === getWindow().Node.ELEMENT_NODE &&
-				node.isCustomize(startNode) &&
+				nodeApi.isCustomize(startNode) &&
 				startNode.first()?.isCard()
 			)
 				isEmptyNode = true;
 		}
-		if (isEmptyNode && node.isBlock(startNode)) {
-			let html = node.getBatchAppendHTML(activeMarks, '<br />');
+		if (isEmptyNode && nodeApi.isBlock(startNode)) {
+			let html = nodeApi.getBatchAppendHTML(activeMarks, '<br />');
 			if (startNode.isEditable()) {
 				html = '<p>'.concat(html, '</p>');
 			}
 			startNode.append($(html));
 			const br = startNode.find('br');
 			const parent = br.parent();
-			if (parent && node.isMark(parent)) {
-				node.replace(br, $('\u200b', null));
+			if (parent && nodeApi.isMark(parent)) {
+				nodeApi.replace(br, $('\u200b', null));
 			}
 			safeRange
 				.select(startNode, true)
@@ -1165,22 +1167,22 @@ class ChangeModel implements ChangeInterface {
 			marks: Array<NodeInterface>,
 		) => {
 			if (
-				node.isBlock(prevNode) &&
-				!node.isVoid(prevNode) &&
+				nodeApi.isBlock(prevNode) &&
+				!nodeApi.isVoid(prevNode) &&
 				!prevNode.isCard()
 			) {
 				range.select(prevNode, true);
 				range.collapse(false);
 				const selection = range.createSelection();
-				this.engine.node.merge(prevNode, nextNode);
+				nodeApi.merge(prevNode, nextNode);
 				selection.move();
 				const prev = range.getPrevNode();
 				const next = range.getNextNode();
 				// 合并之后变成空 Block
 				const { startNode } = range;
-				if (!prev && !next && node.isBlock(startNode)) {
+				if (!prev && !next && nodeApi.isBlock(startNode)) {
 					startNode.append(
-						$(this.engine.node.getBatchAppendHTML(marks, '<br />')),
+						$(nodeApi.getBatchAppendHTML(marks, '<br />')),
 					);
 					range.select(startNode.find('br'), true);
 					range.collapse(false);
@@ -1194,8 +1196,8 @@ class ChangeModel implements ChangeInterface {
 		if (
 			prevNode &&
 			nextNode &&
-			node.isBlock(prevNode) &&
-			node.isBlock(nextNode) &&
+			nodeApi.isBlock(prevNode) &&
+			nodeApi.isBlock(nextNode) &&
 			isDeepMerge
 		) {
 			deepMergeNode(safeRange, $(prevNode), $(nextNode), activeMarks);
@@ -1203,16 +1205,20 @@ class ChangeModel implements ChangeInterface {
 		startNode.children().each(node => {
 			const domNode = $(node);
 			if (
-				!this.engine.node.isVoid(domNode) &&
+				!nodeApi.isVoid(domNode) &&
 				domNode.isElement() &&
-				'' === this.engine.node.html(domNode)
+				'' === nodeApi.html(domNode)
 			)
 				domNode.remove();
 			//给inline节点添加零宽字符，用于光标选择
-			if (this.engine.node.isInline(domNode)) {
-				this.engine.inline.repairCursor(domNode);
+			if (nodeApi.isInline(domNode)) {
+				inline.repairCursor(domNode);
 			}
 		});
+		//移除空列表
+		if (nodeApi.isList(startNode) && nodeApi.isEmpty(startNode)) {
+			startNode.remove();
+		}
 		//修复inline节点光标选择在最后的零宽字符上时，将光标位置移到inline节点末尾
 		cloneRange = safeRange.cloneRange().shrinkToTextNode();
 		if (
