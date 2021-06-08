@@ -71,7 +71,7 @@ export default EngineDemo;
 
 ### 插件
 
-现在我们在上诉代码基础上，引入`@aomao/plugin-bold`加粗插件
+现在我们在上述代码基础上，引入`@aomao/plugin-bold`加粗插件
 
 ```tsx | pure
 import Bold from '@aomao/plugin-bold';
