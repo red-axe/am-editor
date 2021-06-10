@@ -1194,6 +1194,11 @@ class Block implements BlockModelInterface {
 		}
 		// 只有一个节点
 		if (block.children().length === 1) {
+			const node = block.first();
+			//\n换成 br
+			if (node && node.isText() && /^\n+$/g.test(node.text())) {
+				this.editor.node.replace(node, $('<br />'));
+			}
 			return;
 		}
 		if ('li' === block.name) return;

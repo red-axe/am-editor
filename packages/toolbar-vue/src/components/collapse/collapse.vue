@@ -1,6 +1,6 @@
 <template>
     <div
-    :class="['toolbar-dropdown toolbar-collapse',className]"
+    :class="['toolbar-dropdown toolbar-collapse', {'toolbar-dropdown-right': isRight},className]"
     ref="collapse"
     >
     <am-button
@@ -30,6 +30,7 @@
 <script lang="ts">
 import { defineComponent, onUnmounted, ref } from 'vue'
 import { collapseProps } from '../../types';
+import { useRight } from '../../hooks';
 import AmButton from '../button.vue';
 import AmCollapseGroup from './group.vue';
 
@@ -44,6 +45,8 @@ export default defineComponent({
         const isCustomize = !!!(props.icon || props.content);
         const visible = ref(isCustomize);
         const collapse = ref<HTMLElement | null>(null);
+
+        const isRight = useRight(collapse)
 
         onUnmounted(() => {
             if(isCustomize) document.removeEventListener('click', hide);
@@ -88,6 +91,7 @@ export default defineComponent({
             isCustomize,
             visible,
             collapse,
+            isRight,
             triggerClick,
             triggerSelect
         }

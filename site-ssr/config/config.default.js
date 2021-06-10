@@ -49,10 +49,19 @@ module.exports = (appInfo, appConfig = {}) => {
 	config.proxy = true;
 
 	config.security = {
-		csrf: false,
+		csrf: {
+			enable: false,
+			ignoreJSON: true,
+		},
+		domainWhiteList: ['*'],
 		xframe: {
 			enable: false,
 		},
+	};
+
+	config.cors = {
+		origin: '*',
+		allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
 	};
 
 	return config;

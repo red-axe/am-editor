@@ -3,6 +3,7 @@ import language from '../locales';
 import Change from '../change';
 import { DATA_ELEMENT } from '../constants/root';
 import schemaDefaultData from '../constants/schema';
+import conversionDefault from '../constants/conversion';
 import Schema from '../schema';
 import OT from '../ot';
 import {
@@ -118,7 +119,10 @@ class Engine implements EngineInterface {
 		this.command = new Command(this);
 		this.schema = new Schema();
 		this.schema.add(schemaDefaultData);
-		this.conversion = new Conversion();
+		this.conversion = new Conversion(this);
+		conversionDefault.forEach(rule =>
+			this.conversion.add(rule.from, rule.to),
+		);
 		this.history = new History(this);
 		this.card = new CardModel(this);
 		this.clipboard = new Clipboard(this);
@@ -326,7 +330,7 @@ class Engine implements EngineInterface {
 		console.log(`error:${error}`);
 	}
 
-	messageConfirm(message: string) {
+	messageConfirm(message: string): Promise<boolean> {
 		console.log(`confirm:${message}`);
 		return Promise.reject(false);
 	}

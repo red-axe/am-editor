@@ -34,10 +34,10 @@
     "@types/lodash" "^4.14.165"
     lodash "^4.17.15"
 
-"@aomao/engine@^2.1.1", "@aomao/engine@^2.1.2":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/engine/download/@aomao/engine-2.1.2.tgz#316f6300ac4410d0e1ec4393ffc0be1a6bb60c98"
-  integrity sha1-MW9jAKxEENDh7EOT/8C+Gmu2DJg=
+"@aomao/engine@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/engine/-/engine-2.2.0.tgz#d7035dc1753a3446471b57167bf20fc0fc762a99"
+  integrity sha512-FIxGtVyXIlQ4Ik2Qka4bf2tGbl5VaDgQxaP9d3SWlgLQeZLCh8zQaajSSNM5xeft5ODNcPNjAWxKNI7U4gTjmA==
   dependencies:
     "@babel/runtime" "^7.13.10"
     blueimp-md5 "^2.18.0"
@@ -50,254 +50,253 @@
     ot-json0 "^1.1.0"
     tinycolor2 "^1.4.2"
 
-"@aomao/plugin-alignment@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-alignment/download/@aomao/plugin-alignment-2.1.2.tgz#2f4d85fe46158dd9c66b2d9b3e18d98bb59077cf"
-  integrity sha1-L02F/kYVjdnGay2bPhjZi7WQd88=
+"@aomao/plugin-alignment@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-alignment/-/plugin-alignment-2.2.0.tgz#6844a3f14be11fe2d7e833b287b568ab7200dea7"
+  integrity sha512-jpSiX48YjhNOmwuFPqP/mBTWs2ct/IwGzsqGI3rKmgOLAC+S/EK4kMfhjEXa/VXILOFSviS0LXiMVRjGfc4QLw==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-backcolor@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-backcolor/download/@aomao/plugin-backcolor-2.1.2.tgz#2294a1897a1698b8e3e4f986d554acdd17cec5d9"
-  integrity sha1-IpShiXoWmLjj5PmG1VSs3RfOxdk=
+"@aomao/plugin-backcolor@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-backcolor/-/plugin-backcolor-2.2.0.tgz#8a2edd9ebeadfbbf251d8a0ea80137df8feda682"
+  integrity sha512-XR8b7j3Iq9YI0EsNz3N8jzBcRi3sh19v068ZQ8RPv5MTgI2LkZHdIeyFJ/kbrz43WerbU+36PWtmnSLKlkMcLg==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-bold@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-bold/download/@aomao/plugin-bold-2.1.2.tgz#a003d4f3b702717b9e24b8160665b298b84495d8"
-  integrity sha1-oAPU87cCcXueJLgWBmWymLhEldg=
+"@aomao/plugin-bold@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-bold/-/plugin-bold-2.2.0.tgz#4bd70c01025ca461a10610f3e10e5b496f532d6a"
+  integrity sha512-2u0qAwtBoAdGgMMBlMM0ue9LpJCY99OXlhXJDBxGg1PAL9Lz/cFa0hmOlKmuV0PihsbrCHnQZmsuUEtLm4KpfQ==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-code@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-code/download/@aomao/plugin-code-2.1.2.tgz#1db5bffe88bcbbb0bb05ac4953f995839ff2af6c"
-  integrity sha1-HbW//oi8u7C7BaxJU/mVg5/yr2w=
+"@aomao/plugin-code@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-code/-/plugin-code-2.2.0.tgz#5fc8ef99cae1c3896135e6efdf9dad70e7564116"
+  integrity sha512-Qhwlpxc4WSSa2IyKz7hT1hG2PgP4h1opK9e0Y+6VfVdR97k21VAfJusmZyoIGdJoW2D9vUHqXX+qTX3URtshAg==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-codeblock-vue@^2.1.2":
-  version "2.1.4"
-  resolved "https://registry.nlark.com/@aomao/plugin-codeblock-vue/download/@aomao/plugin-codeblock-vue-2.1.4.tgz#fada7a57dfb51259ec7d0a19723c1f563f3371cb"
-  integrity sha1-+tp6V9+1ElnsfQoZcjwfVj8zccs=
+"@aomao/plugin-codeblock-vue@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-codeblock-vue/-/plugin-codeblock-vue-2.2.0.tgz#3e45af60c4ffa72fa55bf340876b19d4ec04f5c0"
+  integrity sha512-WyDxcuDpgmn3iSzfZPp51ktNZXwnAxv/cxR6nSmriTLi7T71s/NbEA3Pf5df43X2TJwCh2fK+Wekgmswm6wtIA==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
     ant-design-vue "^2.1.2"
     codemirror "^5.60.0"
     lodash-es "^4.17.21"
     vue "^3.0.11"
 
-"@aomao/plugin-file@^2.0.1":
-  version "2.0.3"
-  resolved "https://registry.nlark.com/@aomao/plugin-file/download/@aomao/plugin-file-2.0.3.tgz#35b2689f81d4b8f0051121f8b1e1fe96a7f3dac5"
-  integrity sha1-NbJon4HUuPAFESH4seH+lqfz2sU=
+"@aomao/plugin-file@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-file/-/plugin-file-2.1.0.tgz#8338ec5013b82f8404fd7f7ede9bca43fb9ba98f"
+  integrity sha512-5+GBdtJcKDGOMaiK9bkkgK4M59qzg3PZRxij2yQTMU0Iqjzt0ggo/SbxceMKje2rff8BaCkScBrQQVaPBCNYmA==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-fontcolor@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-fontcolor/download/@aomao/plugin-fontcolor-2.1.2.tgz#0bde77162f9a0c1beaf1d48415551822ae9a253f"
-  integrity sha1-C953Fi+aDBvq8dSEFVUYIq6aJT8=
+"@aomao/plugin-fontcolor@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-fontcolor/-/plugin-fontcolor-2.2.0.tgz#fa95ad3af950acd64e77425f40883309e8f22817"
+  integrity sha512-+2c1UbJzNvLw1WQFfUxuV4czdcmBK+NegfUOjveOe4TcGK9mM5T+yye2vVICzVDdUrRK6lYrmJ13SLt3UHwpeA==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-fontsize@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-fontsize/download/@aomao/plugin-fontsize-2.1.2.tgz#7dc8a50568a3c0eafc5d1631f7e02e9228abfdf0"
-  integrity sha1-fcilBWijwOr8XRYx9+Aukiir/fA=
+"@aomao/plugin-fontsize@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-fontsize/-/plugin-fontsize-2.2.0.tgz#3c1a912dc2b2387beab3e8a51074126d0a392e1a"
+  integrity sha512-lbRprZ6p/O0ksNKWLuHqcEQDVMARrAtb8xGOr/j0TA9XDnro+hM532YdkRmpo6BR8ZTXXgEGeAK9y1qBr4yp5Q==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-heading@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-heading/download/@aomao/plugin-heading-2.1.2.tgz#4780bb1798895232d81fc2cf1f1bd6332992fa97"
-  integrity sha1-R4C7F5iJUjLYH8LPHxvWMymS+pc=
+"@aomao/plugin-heading@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-heading/-/plugin-heading-2.2.0.tgz#190e68a0f8b1722bb8d5c130f740ccee44a4229c"
+  integrity sha512-rJKqE9/aBtp5W/aF6pycQ1rtgSTfg1lPZPptyzSrR+3TDeUCaNzhY43X1fNm2l6z1IA+k5TF2RsORWgQ/fuhpg==
   dependencies:
-    "@aomao/engine" "^2.1.2"
-    "@babel/runtime" "^7.13.10"
-    blueimp-md5 "^2.18.0"
-
-"@aomao/plugin-hr@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-hr/download/@aomao/plugin-hr-2.1.2.tgz#39d807c404767c64de4ee3984ae81d49a908bf72"
-  integrity sha1-OdgHxAR2fGTeTuOYSugdSakIv3I=
-  dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-image@^2.1.2":
-  version "2.1.4"
-  resolved "https://registry.nlark.com/@aomao/plugin-image/download/@aomao/plugin-image-2.1.4.tgz#e01ee70eacd4c8608d687265da112745e9b2d68a"
-  integrity sha1-4B7nDqzUyGCNaHJl2hEnRemy1oo=
+"@aomao/plugin-hr@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-hr/-/plugin-hr-2.2.0.tgz#2fabf8d9b711254deb7f77ae2dd32e125d78f29f"
+  integrity sha512-9jf77Cfhnx3zK2qbSFKdMGDJSm492qtm/jbzhHqPfa0EZ9TmmRmFOTX5W59EoraWUyy/1LyMbjNFqQe2KTZDng==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
+    "@babel/runtime" "^7.13.10"
+
+"@aomao/plugin-image@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-image/-/plugin-image-2.2.0.tgz#3d488211095d4e2c4655bca91e7bc7410a8e1f93"
+  integrity sha512-2EiXkv8Ixi9VfaIlZSn6CefLoNL3ultZMbJsduShuv1kJxZUlh7xFqZ/BtXRhd4zr+In8Ff3TJTlk1nexGIGPQ==
+  dependencies:
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
     eventemitter2 "^6.4.4"
     photoswipe "^4.1.3"
 
-"@aomao/plugin-indent@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-indent/download/@aomao/plugin-indent-2.1.2.tgz#2345ddc80d40897eda7b9efcd8e3bb33aa39edf8"
-  integrity sha1-I0XdyA1AiX7ae5782OO7M6o57fg=
+"@aomao/plugin-indent@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-indent/-/plugin-indent-2.2.0.tgz#10c6a2ab4093296b66ba55c19dcffc9b5492f0be"
+  integrity sha512-5JGB1hAaNW2+hKkYuguoD5xLM4XGcXXOK+Ytaw2n2nyArY4pqK5Bx8HzZSupuumY4ZQCzOIg4bSip58xg2sAgw==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-italic@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-italic/download/@aomao/plugin-italic-2.1.2.tgz#eb7de1c77fed0d2e637e207efc89cfb23e5bf551"
-  integrity sha1-633hx3/tDS5jfiB+/InPsj5b9VE=
+"@aomao/plugin-italic@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-italic/-/plugin-italic-2.2.0.tgz#827b7801724f5706d12b631874e32517e49caa6a"
+  integrity sha512-4n+GRXSAOj0P+rUR+DwYHY3d3stQBlKDHIKZtkf+fBOzLlGF6GhfYfdSYcyJRA6GO1R7BTqzGc52nEk8oEzLuw==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-link-vue@^2.1.2":
-  version "2.1.3"
-  resolved "https://registry.nlark.com/@aomao/plugin-link-vue/download/@aomao/plugin-link-vue-2.1.3.tgz#eb3a0fbd6ceff49991ddea881ec13d9b6ab62ae2"
-  integrity sha1-6zoPvWzv9JmR3eqIHsE9m2q2KuI=
+"@aomao/plugin-link-vue@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-link-vue/-/plugin-link-vue-2.2.0.tgz#b1a5b59012ca8204423e6d9e7fef63cbf8e290c0"
+  integrity sha512-7EC64eDhjvWxrqwimZJKVGMGGvIOcXRVhfpD462ptXi0n7Wf7jhw431jfCyvxNAg6N3jyB/jq6IgPff6BDcqmA==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
     ant-design-vue "^2.1.2"
     vue "^3.0.11"
 
-"@aomao/plugin-mark@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-mark/download/@aomao/plugin-mark-2.1.2.tgz#9975124bf00b785da77210c5830fca3978e853f4"
-  integrity sha1-mXUSS/ALeF2nchDFgw/KOXjoU/Q=
+"@aomao/plugin-mark@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-mark/-/plugin-mark-2.2.0.tgz#e4befd9cf841bfe4696f23f018b1c6e2d422512d"
+  integrity sha512-ZuZ8Z3Mu5WaefxXrRNq/Pc+CrUXxOHow79JxDYJegg45mjRtGdE+lo5swn496cxkjFSN/svjG1IXWQ/htXEpcw==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-orderedlist@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-orderedlist/download/@aomao/plugin-orderedlist-2.1.2.tgz#8a6d9ca2f84d91d6876c947eeacb50b5a49cc9b7"
-  integrity sha1-im2covhNkdaHbJR+6stQtaScybc=
+"@aomao/plugin-orderedlist@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-orderedlist/-/plugin-orderedlist-2.2.0.tgz#49e4fe0eb17528b6021ed5e0add84f16c812958f"
+  integrity sha512-hVkkTkaudzNaI3iULctu1WWGBG3gok+do68uUlwCUBzv3gYGOKXQ5/I+oansjeqyaWjmXQ9+afeIcaVTPbfyyw==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-paintformat@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-paintformat/download/@aomao/plugin-paintformat-2.1.2.tgz#7025efb995390328c8ba436b62fde5334ef7d8d5"
-  integrity sha1-cCXvuZU5AyjIukNrYv3lM0732NU=
+"@aomao/plugin-paintformat@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-paintformat/-/plugin-paintformat-2.2.0.tgz#06f4eb42e84bd53db9039836f06efa9ae769ffce"
+  integrity sha512-AH1Jy6yhe9FBrYWVI/zL5D7SLvT8FYOGA0NSyIGJsarxxvGV8ouwBNN9tIfyKdWSx1AqQF+ADhTuGNSy6wde0A==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-quote@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-quote/download/@aomao/plugin-quote-2.1.2.tgz#63572f1046cb73ae0108c0563249adc76849b5be"
-  integrity sha1-Y1cvEEbLc64BCMBWMkmtx2hJtb4=
+"@aomao/plugin-quote@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-quote/-/plugin-quote-2.2.0.tgz#81a469a2972ee6205c33b6d94b91fa1d1203a71c"
+  integrity sha512-cy6hCSJ13rvASyMmTFa1hgU/vUyJUMBVRb2mysLRE59WBIWtdTSFYuyrLfBNEALzIpbP+iRqaubk5FbBJsiOcg==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-redo@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-redo/download/@aomao/plugin-redo-2.1.2.tgz#1dfe8ded50d9eae88cadc002f882caed7cba1a0a"
-  integrity sha1-Hf6N7VDZ6uiMrcAC+ILK7Xy6Ggo=
+"@aomao/plugin-redo@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-redo/-/plugin-redo-2.2.0.tgz#93b9f07db9ec9f7d44cf1eb8ec5009743f2efe9d"
+  integrity sha512-ksDwrYMPzx+u82G3e+EMj69ycptY/kKCD2mPsO6cGBLn92zTAjpgy5PXvyvs3/x1V3q2nteaU0B72biguc97GQ==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-removeformat@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-removeformat/download/@aomao/plugin-removeformat-2.1.2.tgz#339388d25ad4f9572b443f022318bbbd36d7de52"
-  integrity sha1-M5OI0lrU+VcrRD8CIxi7vTbX3lI=
+"@aomao/plugin-removeformat@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-removeformat/-/plugin-removeformat-2.2.0.tgz#64140efcd478b23ecfdfdbdef4fab3d7d8a5b167"
+  integrity sha512-hCBhr1x8jDuG7mAMaQ2JpBI6YKsZqc5eQW1HNi9cyFAVNC2+UdI7Pmh9Zzsl2R3+SF7Az3IzDesEJUVJR6OQag==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-selectall@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-selectall/download/@aomao/plugin-selectall-2.1.2.tgz#72eb53b3516b12fa6c198f48181f6e06dd2d46bc"
-  integrity sha1-cutTs1FrEvpsGY9IGB9uBt0tRrw=
+"@aomao/plugin-selectall@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-selectall/-/plugin-selectall-2.2.0.tgz#50cd86705ea050cea0ddf754a76dc6877f6e7fbf"
+  integrity sha512-R2eBEV6imqbY9nTCGCdqM+pg8sVnaQhrmyBc7noavgQg/NK0gbWYELYQxPDtHLFe5dmSPn4iOVJZgyaUDZATuA==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-strikethrough@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-strikethrough/download/@aomao/plugin-strikethrough-2.1.2.tgz#452701d332d43dd231681e1b58c790b7073258ad"
-  integrity sha1-RScB0zLUPdIxaB4bWMeQtwcyWK0=
+"@aomao/plugin-strikethrough@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-strikethrough/-/plugin-strikethrough-2.2.0.tgz#a9266485993b0ccaaf0a6c9a328c840ee91a1489"
+  integrity sha512-gdAku0X36EVYw/E75uBi1N7k65PGC+PzruGq4aK8oyGZvwINSS2nh4L3NnMogFPH0kilVmEwTgSPKzwXtuQ6iw==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-sub@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-sub/download/@aomao/plugin-sub-2.1.2.tgz#b4d42a2dc33c761b2561f633db9abb1ff6662d7a"
-  integrity sha1-tNQqLcM8dhslYfYz25q7H/ZmLXo=
+"@aomao/plugin-sub@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-sub/-/plugin-sub-2.2.0.tgz#3a4e540dda2e40d6756a43d2cc4e169c3f127d49"
+  integrity sha512-zYRBzTWc2XFoCNd/DaArYcKK/1tGOhMsmht9kXWOJ9EWMwjJur+l+z+JZl8pVZI9a0Sv2zTjzF9Ss1F67Fuyrg==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-sup@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-sup/download/@aomao/plugin-sup-2.1.2.tgz#90f03ea76e3467b20a17d5feffaa194d6d0b8339"
-  integrity sha1-kPA+p240Z7IKF9X+/6oZTW0Lgzk=
+"@aomao/plugin-sup@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-sup/-/plugin-sup-2.2.0.tgz#008746b334b3a74264cb47bf54dbe04b5c03d29d"
+  integrity sha512-OH2w5+3ctTWa3qy2UrPWD29aa5KqXKQTWNzopawhIpKjekcq5Vurn4l909oTWl1xpaSfqLc/M6Ej8eY3cNxBkA==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-table@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-table/download/@aomao/plugin-table-2.1.2.tgz#04caa25e8f42449bf984be3d5ece11a38fd650f1"
-  integrity sha1-BMqiXo9CRJv5hL49Xs4Ro4/WUPE=
+"@aomao/plugin-table@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-table/-/plugin-table-2.2.0.tgz#d5e1459f543dd9e7e7c31b2cdf900cdd3f198334"
+  integrity sha512-32Z83yjK0TvwgXpE+05gXsGna40X6AN9ni7dZTNOMoVbY5cYGFQJSy9Lh1wX3zCy30S8w8Ukh7mub5XAnUxG+w==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
     eventemitter2 "^6.4.4"
 
-"@aomao/plugin-tasklist@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-tasklist/download/@aomao/plugin-tasklist-2.1.2.tgz#9fa812fbc1d793600c429bb8f6071fa9aced7084"
-  integrity sha1-n6gS+8HXk2AMQpu49gcfqaztcIQ=
+"@aomao/plugin-tasklist@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-tasklist/-/plugin-tasklist-2.2.0.tgz#3ffec1eff87124b009f3f6698dcf29f6f615b8b5"
+  integrity sha512-Am/nQYLAa1odbRvDbp0wtLoOSs5E+1zuo1d3SycOXz0uFpP7+lyMC1mjZSAdkVzPCGcFAF1Ud3ThRXKl6WqkqQ==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-underline@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-underline/download/@aomao/plugin-underline-2.1.2.tgz#f1caa190e8031aa392649a815561fafe6b15665f"
-  integrity sha1-8cqhkOgDGqOSZJqBVWH6/msVZl8=
+"@aomao/plugin-underline@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-underline/-/plugin-underline-2.2.0.tgz#979be9afbac43e1e465301e34204a30b67cf1a97"
+  integrity sha512-jfPdRzMXVJ8PKl0uqEKAksJdvYXNYCry5thjNn2jip/26hC2jpDi5tw18NeR3kCVeesfSkmcs8+ggvZk2wYU+A==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-undo@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-undo/download/@aomao/plugin-undo-2.1.2.tgz#9ef0d97af3709852591342b8d331f10ebe816b38"
-  integrity sha1-nvDZevNwmFJZE0K40zHxDr6Bazg=
+"@aomao/plugin-undo@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-undo/-/plugin-undo-2.2.0.tgz#39bc66738d0e98fee94ee5914c087b2985053360"
+  integrity sha512-bphhDNH1OoiHIpKLXGYXVRqvFUn/LXygiKaYZAlFlGxal3Gj2M3a/yYJ7h1nKzGRSoNLuEAq3wfFQJhKBv0Uig==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-unorderedlist@^2.1.1":
-  version "2.1.2"
-  resolved "https://registry.nlark.com/@aomao/plugin-unorderedlist/download/@aomao/plugin-unorderedlist-2.1.2.tgz#c59d21ea9e8bd5e6d15cea4945abf84f8bd0a59a"
-  integrity sha1-xZ0h6p6L1ebRXOpJRav4T4vQpZo=
+"@aomao/plugin-unorderedlist@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-unorderedlist/-/plugin-unorderedlist-2.2.0.tgz#84391a84c369ad08f8f28b0cb0446188aa9e2721"
+  integrity sha512-WGbdhbRSDIfncAmrZj5X94nz68k1IiVyPCOMCMMCCds8RDosTIAYXs9hXrawEPCAU90N6XiLg/LgJ8c3FJu/Hw==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/toolbar-vue@^2.1.3":
-  version "2.1.4"
-  resolved "https://registry.nlark.com/@aomao/toolbar-vue/download/@aomao/toolbar-vue-2.1.4.tgz#3b7c998d30e6d2d4a30f827f4b85a1b0a9fb7924"
-  integrity sha1-O3yZjTDm0tSjD4J/S4WhsKn7eSQ=
+"@aomao/toolbar-vue@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aomao/toolbar-vue/-/toolbar-vue-2.2.0.tgz#9348fbcb36777de1e0d8437e40a38a4465ca1924"
+  integrity sha512-IOW35djhlqL1vJHEvurQj1yVdLPdWEVGPln1ubL+B71IEzGUPRcEC0vSPUEX/yCPvfavZJq3PTp4mZE9e+3yJA==
   dependencies:
-    "@aomao/engine" "^2.1.2"
+    "@aomao/engine" "^2.2.0"
     "@babel/runtime" "^7.13.10"
     ant-design-vue "^2.1.2"
     keymaster "^1.6.2"

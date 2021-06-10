@@ -543,7 +543,11 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const isSingleTd = begin.row === end.row && begin.col === end.col;
 		const { html, text } = data;
 		if (!html) return;
-		const pasteHTML = new Parser(html, this.editor).toValue();
+		const { schema, conversion } = this.editor;
+		const pasteHTML = new Parser(html, this.editor).toValue(
+			schema,
+			conversion,
+		);
 		const element = helper.trimBlankSpan($(pasteHTML));
 
 		if (element.name === 'table') {

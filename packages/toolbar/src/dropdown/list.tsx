@@ -1,7 +1,7 @@
 import React from 'react';
 import classnames from 'classnames-es-ts';
 import Tooltip from 'antd/es/tooltip';
-import { EngineInterface, formatHotkey } from '@aomao/engine';
+import { EngineInterface, formatHotkey, isMobile } from '@aomao/engine';
 import { autoGetHotkey } from '../utils';
 import 'antd/es/tooltip/style';
 
@@ -129,7 +129,7 @@ const DropdownList: React.FC<DropdownListProps> = ({
 			);
 		}
 
-		return titleElement ? (
+		return titleElement && !isMobile ? (
 			<Tooltip
 				key={`${key}-tooltip`}
 				title={titleElement}

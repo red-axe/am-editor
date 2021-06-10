@@ -1,5 +1,5 @@
 <template>
-    <a-tooltip :placement="placement || 'bottom'" :visible="!!title || !!hotkeyText ? visible : false">
+    <a-tooltip :placement="placement || 'bottom'" :visible="(!!title || !!hotkeyText) && !isMobile ? visible : false">
         <template #title>
             <div v-if="!!title" class="toolbar-tooltip-title">{{title}}</div>
             <div v-if="!!hotkeyText" class="toolbar-tooltip-hotkey" v-html="hotkeyText"></div>
@@ -18,7 +18,7 @@
 <script lang="ts">
 import { defineComponent, ref} from "vue"
 import ATooltip from "ant-design-vue/es/tooltip"
-import { formatHotkey } from '@aomao/engine'
+import { formatHotkey, isMobile } from '@aomao/engine'
 import { autoGetHotkey } from "../utils"
 import { buttonProps } from "../types"
 import 'ant-design-vue/es/tooltip/style'
@@ -45,6 +45,7 @@ export default defineComponent({
         const visible = ref(false)
 
         return {
+            isMobile,
             visible,
             hotkeyText:hotkey
         }
@@ -114,17 +115,21 @@ export default defineComponent({
     line-height: 32px;
 }
 
-.editor-toolbar .toolbar-button:hover {
+.editor-toolbar:not(.editor-toolbar-mobile) .toolbar-button {
+    padding: 0 4px;
+}
+
+.editor-toolbar:not(.editor-toolbar-mobile) .toolbar-button:hover {
     border: 1px solid transparent;
     background-color: #f5f5f5;
 }
 
-.editor-toolbar .toolbar-button:active,.editor-toolbar .toolbar-button-active,.editor-toolbar .toolbar-button-active:hover {
+.editor-toolbar:not(.editor-toolbar-mobile) .toolbar-button:active,.editor-toolbar .toolbar-button-active,.editor-toolbar:not(.editor-toolbar-mobile) .toolbar-button-active:hover {
     background-color: #e8e8e8;
     border: 1px solid transparent;
 }
 
-.editor-toolbar .toolbar-button-disabled,.editor-toolbar .toolbar-button-disabled:hover {
+.editor-toolbar .toolbar-button-disabled,.editor-toolbar:not(.editor-toolbar-mobile) .toolbar-button-disabled:hover {
     background-color: transparent;
     border: 1px solid transparent;
     box-shadow: none;

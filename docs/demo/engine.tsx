@@ -12,6 +12,7 @@ import Engine, {
 	RangeInterface,
 	Request,
 	Path,
+	isMobile,
 } from '@aomao/engine';
 //工具栏
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
@@ -42,6 +43,10 @@ import './engine.less';
 const localMember =
 	typeof localStorage === 'undefined' ? null : localStorage.getItem('member');
 
+const getMember = () => {
+	return !!localMember ? JSON.parse(localMember) : null;
+};
+
 const EngineDemo = () => {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const request = useRef(new Request());
@@ -50,12 +55,15 @@ const EngineDemo = () => {
 		paths: Array<{ id: Array<string>; path: Array<Path> }>;
 	}>({ value: '', paths: [] });
 	const value = useRef<string>('');
-	const comment = useRef<{
-		reload: () => void;
-		select: (id?: string) => void;
-		showButton: (range: RangeInterface) => void;
-		updateStatus: (ids: Array<string>, status: boolean) => void;
-	}>();
+	const comment = useRef<
+		| (HTMLDivElement & {
+				reload: () => void;
+				select: (id?: string) => void;
+				showButton: (range: RangeInterface) => void;
+				updateStatus: (ids: Array<string>, status: boolean) => void;
+		  })
+		| null
+	>();
 
 	const otClient = useRef<OTClient>();
 	const engineRef = useRef<EngineInterface>();
@@ -63,9 +71,8 @@ const EngineDemo = () => {
 	const [loading, setLoading] = useState(true);
 	const [editorLoading, setEditorLoading] = useState(true);
 	const [members, setMembers] = useState([]);
-	const [member, setMember] = useState<Member | null>(
-		localMember ? JSON.parse(localMember) : null,
-	);
+	const [member, setMember] = useState<Member | null>(getMember());
+
 	/**
 	 * 加载编辑数据
 	 */
@@ -217,16 +224,6 @@ const EngineDemo = () => {
 				userSave();
 			}
 		});
-		//设置编辑器值
-		const wrapValue = engine.command.execute(
-			MarkRange.pluginName,
-			'comment',
-			'wrap',
-			content.current.paths,
-			content.current.value,
-		);
-		console.log(wrapValue);
-		engine.setValue(wrapValue);
 		//监听编辑器值改变事件
 		engine.on('change', editorValue => {
 			value.current = editorValue;
@@ -246,17 +243,14 @@ const EngineDemo = () => {
 				.css('z-index', '')
 				.css('top', '');
 		});
-		//获取当前保存的用户信息
-		const memberData = localStorage.getItem('member');
-		const currentMember = !!memberData ? JSON.parse(memberData) : null;
 		//实例化协作编辑客户端
 		const ot = new OTClient(engine);
 		//连接到协作服务端，demo文档
-		const ws = IS_DEV ? 'ws://127.0.0.1:8080' : 'wss://collab.aomao.com';
-		ot.connect(
-			`${ws}${currentMember ? '?uid=' + currentMember.id : ''}`,
-			'demo',
-		);
+		const ws = IS_DEV
+			? `ws://${window.location.hostname}:8080`
+			: 'wss://collab.aomao.com';
+		const member = getMember();
+		ot.connect(`${ws}${member ? '?uid=' + member.id : ''}`, 'demo');
 		ot.on('ready', member => {
 			//保存当前会员信息
 			if (member) localStorage.setItem('member', JSON.stringify(member));
@@ -272,6 +266,13 @@ const EngineDemo = () => {
 				userSave();
 			}
 		});
+		//错误连接清除当前存储的本地会员信息，以便重新获取新的编号，真实环境下不需要这么做
+		ot.on('error', () => {
+			if (member) {
+				localStorage.setItem('member', '');
+				setMember(null);
+			}
+		});
 		ot.on('message', ({ type }) => {
 			if (type === 'updateCommentList') comment.current?.reload();
 		});
@@ -285,7 +286,21 @@ const EngineDemo = () => {
 		};
 	}, [loading]);
 
+	useEffect(() => {
+		if (editorLoading || !engineRef.current) return;
+		//设置编辑器值
+		const wrapValue = engineRef.current.command.execute(
+			MarkRange.pluginName,
+			'comment',
+			'wrap',
+			content.current.paths,
+			content.current.value,
+		);
+		engineRef.current.setValue(wrapValue);
+	}, [editorLoading]);
+
 	if (loading) return <Loading />;
+
 	//广播通知更新评论列表吧
 	const onCommentRequestUpdate = () => {
 		otClient.current?.broadcast('updateCommentList', {});
@@ -295,22 +310,25 @@ const EngineDemo = () => {
 		<>
 			<div className="editor-ot-users">
 				<Space className="editor-ot-users-content" size="small">
-					<span style={{ color: '#888888' }}>
-						{lang === 'zh-cn' ? (
-							<>
-								当前在线<strong>{members.length}</strong>人
-							</>
-						) : (
-							<>
-								<strong>{members.length}</strong> person online
-							</>
-						)}
-					</span>
+					{!isMobile && (
+						<span style={{ color: '#888888' }}>
+							{lang === 'zh-cn' ? (
+								<>
+									当前在线<strong>{members.length}</strong>人
+								</>
+							) : (
+								<>
+									<strong>{members.length}</strong> person
+									online
+								</>
+							)}
+						</span>
+					)}
 					{members.map(member => {
 						return (
 							<Avatar
 								key={member['id']}
-								size={24}
+								size={isMobile ? 18 : 24}
 								style={{ backgroundColor: member['color'] }}
 							>
 								{member['name']}
@@ -322,22 +340,103 @@ const EngineDemo = () => {
 			{!editorLoading && (
 				<Toolbar
 					engine={engineRef.current!}
-					items={[
-						['collapse'],
-						['undo', 'redo', 'paintformat', 'removeformat'],
-						['heading', 'fontsize'],
-						[
-							'bold',
-							'italic',
-							'strikethrough',
-							'underline',
-							'moremark',
-						],
-						['fontcolor', 'backcolor'],
-						['alignment'],
-						['unorderedlist', 'orderedlist', 'tasklist', 'indent'],
-						['link', 'quote', 'hr'],
-					]}
+					items={
+						isMobile
+							? [
+									['undo', 'redo'],
+									{
+										icon: 'text',
+										items: [
+											'bold',
+											'italic',
+											'strikethrough',
+											'underline',
+											'moremark',
+										],
+									},
+									[
+										{
+											type: 'button',
+											name: 'image-uploader',
+											icon: 'image',
+										},
+										'link',
+										'tasklist',
+										'heading',
+									],
+									{
+										icon: 'more',
+										items: [
+											{
+												type: 'button',
+												name: 'video-uploader',
+												icon: 'video',
+											},
+											{
+												type: 'button',
+												name: 'file-uploader',
+												icon: 'attachment',
+											},
+											{
+												type: 'button',
+												name: 'table',
+												icon: 'table',
+											},
+											{
+												type: 'button',
+												name: 'math',
+												icon: 'math',
+											},
+											{
+												type: 'button',
+												name: 'codeblock',
+												icon: 'codeblock',
+											},
+											{
+												type: 'button',
+												name: 'orderedlist',
+												icon: 'orderedlist',
+											},
+											{
+												type: 'button',
+												name: 'unorderedlist',
+												icon: 'unorderedlist',
+											},
+											{
+												type: 'button',
+												name: 'hr',
+												icon: 'hr',
+											},
+										],
+									},
+							  ]
+							: [
+									['collapse'],
+									[
+										'undo',
+										'redo',
+										'paintformat',
+										'removeformat',
+									],
+									['heading', 'fontsize'],
+									[
+										'bold',
+										'italic',
+										'strikethrough',
+										'underline',
+										'moremark',
+									],
+									['fontcolor', 'backcolor'],
+									['alignment'],
+									[
+										'unorderedlist',
+										'orderedlist',
+										'tasklist',
+										'indent',
+									],
+									['link', 'quote', 'hr'],
+							  ]
+					}
 				/>
 			)}
 			<div className="editor-wrapper">
@@ -345,7 +444,7 @@ const EngineDemo = () => {
 					<div className="editor-content">
 						<div ref={ref} />
 					</div>
-					{!editorLoading && (
+					{!editorLoading && !isMobile && (
 						<CommentLayer
 							editor={engineRef.current!}
 							member={member!}
@@ -354,7 +453,9 @@ const EngineDemo = () => {
 						/>
 					)}
 				</div>
-				{!editorLoading && <Toc editor={engineRef.current!} />}
+				{!editorLoading && !isMobile && (
+					<Toc editor={engineRef.current!} />
+				)}
 			</div>
 		</>
 	);

@@ -4,6 +4,13 @@ const sendToWormhole = require('stream-wormhole');
 const { Controller } = require('egg');
 
 class UploadController extends Controller {
+	constructor(cxt) {
+		super(cxt);
+		this.domain = this.config.domain.replace(
+			'{port}',
+			this.config.cluster.listen.port,
+		);
+	}
 	async image() {
 		const { ctx, app } = this;
 		//获取图片地址
@@ -49,7 +56,7 @@ class UploadController extends Controller {
 				console.log(err);
 				reject(err);
 			});
-			const url = `${this.config.domain}/upload/${fileName}`;
+			const url = `${this.domain}/upload/${fileName}`;
 			// 监听写入完成事件
 			remoteFileStrem.on('finish', () => {
 				if (errFlag) return;
@@ -92,7 +99,7 @@ class UploadController extends Controller {
 				console.log(err);
 				reject(err);
 			});
-			const url = `${this.config.domain}/upload/${fileName}`;
+			const url = `${this.domain}/upload/${fileName}`;
 			// 监听写入完成事件
 			remoteFileStrem.on('finish', () => {
 				if (errFlag) return;
@@ -148,7 +155,7 @@ class UploadController extends Controller {
 				console.log(err);
 				reject(err);
 			});
-			const url = `${this.config.domain}/upload/${fileName}`;
+			const url = `${this.domain}/upload/${fileName}`;
 			// 监听写入完成事件
 			remoteFileStrem.on('finish', () => {
 				if (errFlag) return;

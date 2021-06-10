@@ -26,10 +26,21 @@ class HomeController extends Controller {
 		if (isDev) {
 			delete require.cache[require.resolve(this.config.umiServerPath)];
 		}
-
 		// 先走 eggjs 的view 渲染
 		const htmlTemplate = await ctx.view.render(
 			isDev ? 'dev.html' : 'index.html',
+			isDev
+				? {
+						domain: this.config.domain.replace(
+							'{port}',
+							this.config.cluster.listen.port,
+						),
+						assetsDomain: this.config.domain.replace(
+							'{port}',
+							this.config.assets.devServer.port,
+						),
+				  }
+				: {},
 		);
 
 		// 将 html 模板传到服务端渲染函数中

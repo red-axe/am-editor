@@ -103,7 +103,7 @@ class OTClient extends EventEmitter {
 			maxReconnectionDelay: 30000,
 			minReconnectionDelay: 10000,
 			reconnectionDelayGrowFactor: 10000,
-			maxRetries: 60,
+			maxRetries: 10,
 		});
 		socket.addEventListener('open', () => {
 			console.log('collab server connected');

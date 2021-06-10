@@ -3,7 +3,7 @@
     :class="['toolbar-dropdown-list',`toolbar-dropdown-${direction || 'vertical'}`,{'toolbar-dropdown-dot': hasDot !== false},className]"
     >
         <a-tooltip v-for="{ key , placement , title , hotkey , direction , hasDot , content , className , icon } in items" :key="key" :placement="placement || 'right'" 
-        :overlayStyle="!!title || !!hotkey ? {} : {display:'none'}"
+        :overlayStyle="(!!title || !!hotkey) && !isMobile ? {} : {display:'none'}"
         >
             <template #title>
                 <div v-if="!!title" class="toolbar-tooltip-title">{{title}}</div>
@@ -24,7 +24,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import ATooltip from "ant-design-vue/es/tooltip"
-import { formatHotkey } from '@aomao/engine'
+import { formatHotkey, isMobile } from '@aomao/engine'
 import { dropdownListProps , DropdownListItem } from '../types'
 import { autoGetHotkey } from "../utils"
 import 'ant-design-vue/es/tooltip/style'
@@ -57,6 +57,7 @@ export default defineComponent({
         })
 
         return {
+            isMobile,
             hotkeys
         }
     },

@@ -68,7 +68,7 @@ class View implements ViewInterface {
 		this.command = new Command(this);
 		this.schema = new Schema();
 		this.schema.add(schemaDefaultData);
-		this.conversion = new Conversion();
+		this.conversion = new Conversion(this);
 		this.card = new CardModel(this);
 		this.clipboard = new Clipboard(this);
 		this.plugin = new PluginModel(this);
@@ -108,7 +108,7 @@ class View implements ViewInterface {
 
 	render(content: string, trigger: boolean = true) {
 		const parser = new Parser(content, this);
-		const value = parser.toValue(this.schema, undefined, false, true);
+		const value = parser.toValue(this.schema, this.conversion, false, true);
 		this.container.html(value);
 		this.card.render();
 		if (trigger) this.trigger('render', this.container);

@@ -89,7 +89,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			});
 		});
 		const { rows, cols, height, width } = tableModel;
-		const html = parser.toValue(schema, conversion.getValue(), false, true);
+		const html = parser.toValue(schema, conversion, false, true);
 		return {
 			rows,
 			cols,

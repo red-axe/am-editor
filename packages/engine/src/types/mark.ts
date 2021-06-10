@@ -14,6 +14,10 @@ export interface MarkModelInterface {
 	 */
 	findPlugin(node: NodeInterface): MarkInterface | undefined;
 	/**
+	 * 获取最近的 Mark 节点，找不到返回 node
+	 */
+	closest(node: NodeInterface): NodeInterface;
+	/**
 	 * 获取向上第一个非 Mark 节点
 	 */
 	closestNotMark(node: NodeInterface): NodeInterface;

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import classnames from 'classnames-es-ts';
 import { EngineInterface } from '@aomao/engine';
 import Button from '../button';
 import DropdownList, { DropdownListItem } from './list';
+import { useRight } from '../hooks';
 import './index.css';
 
 export type DropdownProps = {
@@ -41,6 +42,9 @@ const Dropdown: React.FC<DropdownProps> = ({
 	hasDot,
 }) => {
 	const [visible, setVisible] = useState(false);
+
+	const buttonRef = useRef<HTMLDivElement | null>(null);
+	const isRight = useRight(buttonRef);
 
 	const toggle = (event: React.MouseEvent) => {
 		event.preventDefault();
@@ -117,8 +121,13 @@ const Dropdown: React.FC<DropdownProps> = ({
 
 	return (
 		<div
-			className={classnames('toolbar-dropdown', className)}
+			className={classnames(
+				'toolbar-dropdown',
+				{ 'toolbar-dropdown-right': isRight },
+				className,
+			)}
 			onClick={toggle}
+			ref={buttonRef}
 		>
 			<div
 				className={classnames('toolbar-dropdown-trigger', {

@@ -26,3 +26,40 @@
     text-align: center;
     width: 100%;
 }
+
+.editor-toolbar.editor-toolbar-mobile,.editor-toolbar.editor-toolbar-popover {
+    position: absolute;
+    left: 0;
+    box-shadow: none;
+}
+
+.editor-toolbar-mobile .editor-toolbar-content {
+    text-align: left;
+    padding: 0 12px;
+}
+
+.editor-toolbar-mobile .editor-toolbar-group {
+    border: 0 none;
+    padding: 0;
+}
+
+.editor-toolbar-popover .editor-toolbar {
+    position: relative;
+    box-shadow: none;
+    border: 0 none;
+    left: 0;
+    top: 0;
+}
+
+.editor-toolbar-popover {
+    border-radius: 3px;
+    background: transparent;
+}
+
+.editor-toolbar-popover .ant-popover-inner {
+    border-radius: 3px;
+}
+
+.editor-toolbar-popover .ant-popover-inner-content {
+    padding: 2px;
+}

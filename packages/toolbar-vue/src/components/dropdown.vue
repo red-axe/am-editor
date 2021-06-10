@@ -1,6 +1,7 @@
 <template>
     <div
-    :class="['toolbar-dropdown', className]"
+    :class="['toolbar-dropdown', {'toolbar-dropdown-right': isRight}, className]"
+    ref="buttonRef"
     @click="triggerClick"
     >
         <div
@@ -39,6 +40,7 @@
 <script lang="ts">
 import {defineComponent, ref, watch} from 'vue'
 import { dropdownProps , DropdownListItem  } from '../types'
+import { useRight } from '../hooks';
 import AmDropdownList from './dropdown-list.vue'
 import AmButton from './button.vue'
 
@@ -52,6 +54,9 @@ export default defineComponent({
     setup(props,cxt){
         const valuesVar = ref<string | number | string[]>("")
         let buttonContent = ref<DropdownListItem | {icon?:string,content?:string} | undefined>(undefined)
+
+        const buttonRef = ref<HTMLDivElement | null>(null)
+        const isRight = useRight(buttonRef)
 
         const update = (values?:string | number | string[]) => {
             if (props.single !== false)
@@ -87,6 +92,8 @@ export default defineComponent({
         update(props.values)
         watch(() => props.values,update)
         return {
+            buttonRef,
+            isRight,
             buttonContent,
             valuesVar
         }
@@ -159,7 +166,6 @@ export default defineComponent({
 .toolbar-dropdown .toolbar-dropdown-list {
     position: absolute;
     top: 32px;
-    left: 0px;
     font-size: 12px;
     background: #ffffff;
     border: 1px solid #e8e8e8;
@@ -169,6 +175,21 @@ export default defineComponent({
     height: auto;
     transition: all 0.25s cubic-bezier(0.3, 1.2, 0.2, 1);
     z-index: 999;
+}
+
+.toolbar-dropdown.toolbar-dropdown-right:not(.toolbar-dropdown-right) .toolbar-dropdown-list{
+    left: 0px;
+}
+
+.editor-toolbar-mobile .toolbar-dropdown .toolbar-dropdown-list {
+    bottom: 32px;
+    top: auto;
+    max-height: calc(30vh);
+    overflow: auto;
+}
+
+.editor-toolbar-mobile .toolbar-dropdown.toolbar-dropdown-right .toolbar-dropdown-list {
+    right: 0px;
 }
 
 .toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item {

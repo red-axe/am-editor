@@ -7,8 +7,6 @@ import './index.css';
 export type MathValue = {
 	code: string;
 	url: string;
-	width?: number;
-	height?: number;
 };
 
 export default class MathCard extends Card<MathValue> {
@@ -152,29 +150,19 @@ export default class MathCard extends Card<MathValue> {
 		image.css('width', `${width}px`);
 		image.css('height', `${height}px`);
 		image.css('max-width', `${maxWidth}px`);
-		this.setValue({
-			width,
-			height,
-		});
 		this.updateEditorPosition();
 	}
 
 	renderView() {
 		const value = this.getValue();
 		const locales = getLocales(this.editor);
-		const { url, code, width, height } = value || { url: '', code: '' };
+		const { url, code } = value || { url: '', code: '' };
 
 		this.container = $('<span class="data-math-container"></span>');
 		this.getCenter().append(this.container);
 		if (url) {
 			const image = $(`<img src="${url}" />`);
 			this.container.append(image);
-			if (width) {
-				image.css('wdith', `${width}px`);
-			}
-			if (height) {
-				image.css('height', `${height}px`);
-			}
 			image.on('load', () => {
 				this.renderImage(image);
 			});

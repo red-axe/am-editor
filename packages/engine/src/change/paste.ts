@@ -18,42 +18,11 @@ export default class Paste {
 
 	parser() {
 		const conversion = this.engine.conversion.clone();
-		this.schema.add([
-			{
-				name: 'span',
-				type: 'mark',
-				attributes: {
-					'data-type': '*',
-					style: {
-						'font-size': '@length',
-					},
-				},
-			},
-			{
-				name: 'p',
-				type: 'block',
-				attributes: {
-					'data-type': '*',
-				},
-			},
-			{
-				type: 'mark',
-				attributes: {
-					id: '*',
-				},
-			},
-			{
-				type: 'block',
-				attributes: {
-					id: '*',
-				},
-			},
-		]);
 		this.engine.trigger('paste:schema', this.schema);
 		const parser = new Parser(this.source, this.engine, root => {
 			this.engine.trigger('paste:origin', root);
 		});
-		return parser.toDOM(this.schema, conversion.getValue());
+		return parser.toDOM(this.schema, conversion);
 	}
 
 	getDefaultStyle() {
@@ -122,13 +91,23 @@ export default class Paste {
 				nodeApi.unwrap(node);
 				return;
 			}
-			//\n换成 br
-			if (node.isText() && /^\n+$/g.test(node.text())) {
-				nodeApi.replace(node, $('<br />'));
-			}
 			// br 换行改成正常段落
 			if (nodeApi.isBlock(node, this.schema)) {
 				this.engine.block.brToBlock(node);
+			}
+			if (node.isText()) {
+				const text = node.text();
+				if (/(\r|\n)+/.test(text)) {
+					if (/^(\r|\n)+$/.test(text)) {
+						node.text('\n');
+						return;
+					}
+					text.split(/(\r|\n)+/).forEach(text => {
+						if (text === '') return;
+						node.before(document.createTextNode(`${text}`));
+					});
+					node.remove();
+				}
 			}
 		});
 		// 第二轮处理
@@ -302,9 +281,23 @@ export default class Paste {
 				nodeApi.unwrap(node);
 			}
 		});
+
 		nodeApi.normalize($(fragment));
 		fragment.normalize();
+		const fragmentNode = $(fragment);
+		const first = fragmentNode.first();
+		//如果光标在文本节点，并且父级节点不是根节点，移除粘贴数据的第一个节点块级节点，让其内容接在光标所在行
+		const { startNode } = range.cloneRange().shrinkToTextNode();
+		if (
+			startNode.isText() &&
+			!startNode.parent()?.isEditable() &&
+			first &&
+			first.name === 'p'
+		) {
+			nodeApi.unwrap(first);
+		}
 		nodes = $(fragment).allChildren();
+
 		nodes.forEach(child => {
 			const node = $(child);
 			if (['ol', 'ul'].includes(node.name)) {

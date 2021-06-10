@@ -25,10 +25,6 @@ export type SchemaStyle = {
 	style: { [key: string]: SchemaValue };
 };
 
-export type SchemaMap = {
-	[k: string]: SchemaAttributes | SchemaStyle;
-};
-
 export type SchemaGlobal = {
 	type: 'block' | 'mark' | 'inline';
 	attributes: SchemaAttributes | SchemaStyle;
@@ -77,8 +73,22 @@ export interface SchemaInterface {
 	/**
 	 * 获取节点类型
 	 * @param node 节点
+	 * @param filter 过滤
 	 */
-	getType(node: NodeInterface): 'block' | 'mark' | 'inline' | undefined;
+	getType(
+		node: NodeInterface,
+		filter?: (rule: SchemaRule) => boolean,
+	): 'block' | 'mark' | 'inline' | undefined;
+	/**
+	 * 根据节点获取符合的规则
+	 * @param node 节点
+	 * @param filter 过滤
+	 * @returns
+	 */
+	getRule(
+		node: NodeInterface,
+		filter?: (rule: SchemaRule) => boolean,
+	): SchemaRule | undefined;
 	/**
 	 * 检测节点是否符合某一属性规则
 	 * @param node 节点
@@ -87,24 +97,6 @@ export interface SchemaInterface {
 	checkNode(
 		node: NodeInterface,
 		attributes?: SchemaAttributes | SchemaStyle,
-	): boolean;
-	/**
-	 * 检测样式值是否符合节点样式规则
-	 * @param name 节点名称
-	 * @param styleName 样式名称
-	 * @param styleValue 样式值
-	 */
-	checkStyle(name: string, styleName: string, styleValue: string): boolean;
-	/**
-	 * 检测值是否符合节点属性的规则
-	 * @param name 节点名称
-	 * @param attributesName 属性名称
-	 * @param attributesValue 属性值
-	 */
-	checkAttributes(
-		name: string,
-		attributesName: string,
-		attributesValue: string,
 	): boolean;
 	/**
 	 * 检测值是否符合规则
@@ -118,67 +110,36 @@ export interface SchemaInterface {
 		attributesValue: string,
 	): boolean;
 	/**
-	 * 检测样式值是否符合节点样式规则
-	 * @param name 节点名称
-	 * @param styleName 样式名称
-	 * @param styleValue 样式值
-	 * @param type 指定类型
-	 */
-	checkStyle(
-		name: string,
-		styleName: string,
-		styleValue: string,
-		type?: 'block' | 'mark' | 'inline',
-	): void;
-	/**
-	 * 检测值是否符合节点属性的规则
-	 * @param name 节点名称
-	 * @param attributesName 属性名称
-	 * @param attributesValue 属性值
-	 * @param type 指定类型
-	 */
-	checkAttributes(
-		name: string,
-		attributesName: string,
-		attributesValue: string,
-		type?: 'block' | 'mark' | 'inline',
-	): void;
-	/**
 	 * 过滤节点样式
-	 * @param name 节点名称
 	 * @param styles 样式
-	 * @param type 指定类型
+	 * @param rule 规则
 	 */
-	filterStyles(
-		name: string,
-		styles: { [k: string]: string },
-		type?: 'block' | 'mark' | 'inline',
-	): void;
+	filterStyles(styles: { [k: string]: string }, rule: SchemaRule): void;
 	/**
 	 * 过滤节点属性
-	 * @param name 节点名称
 	 * @param attributes 属性
-	 * @param type 指定类型
+	 * @param rule 规则
 	 */
 	filterAttributes(
-		name: string,
 		attributes: { [k: string]: string },
-		type?: 'block' | 'mark' | 'inline',
+		rule: SchemaRule,
+	): void;
+	/**
+	 * 过滤满足node节点规则的属性和样式
+	 * @param node 节点，用于获取规则
+	 * @param attributes 属性
+	 * @param styles 样式
+	 * @returns
+	 */
+	filter(
+		node: NodeInterface,
+		attributes: { [k: string]: string },
+		styles: { [k: string]: string },
 	): void;
 	/**
 	 * 克隆当前schema对象
 	 */
 	clone(): SchemaInterface;
-	/**
-	 * 将相同标签的属性和gloals属性合并转换为map格式
-	 * @param type 指定转换的类别 "block" | "mark" | "inline"
-	 */
-	toAttributesMap(type?: 'block' | 'mark' | 'inline'): SchemaMap;
-	/**
-	 * 获取合并后的Map格式
-	 * @param 类型，默认为所有
-	 */
-	getMapCache(type?: 'block' | 'mark' | 'inline'): SchemaMap;
 	/**
 	 * 查找节点符合规则的最顶层的节点名称
 	 * @param name 节点名称

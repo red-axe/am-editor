@@ -63,7 +63,14 @@ class Doc {
 
 	removeMember(uuid) {
 		const member = this.members.find(member => member.uuid === uuid);
-		if (member && this.sockets[uuid]) this.sockets[uuid].close();
+		try {
+			if (member && this.sockets[uuid]) {
+				this.sockets[uuid].close();
+				delete this.sockets[member.uuid];
+			}
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 	addMember(ws, member) {
@@ -78,7 +85,6 @@ class Doc {
 			if (index > -1) {
 				const leaveMember = this.members[index];
 				this.members.splice(index, 1);
-				delete this.sockets[member.uuid];
 				this.broadcast('leave', leaveMember);
 			}
 			if (Object.keys(this.sockets).length === 0) this.destroy();

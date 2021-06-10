@@ -1,3 +1,4 @@
+import { ConversionData } from './conversion';
 import { EditorInterface } from './engine';
 import { NodeInterface } from './node';
 import { SchemaGlobal, SchemaRule, SchemaValue } from './schema';
@@ -111,6 +112,10 @@ export interface ElementPluginInterface extends PluginInterface {
 	 * 获取插件设置的属性和样式所生成的规则
 	 */
 	schema(): SchemaRule | SchemaGlobal | Array<SchemaRule>;
+	/**
+	 * 在粘贴时的标签转换，例如：b > strong
+	 */
+	conversion?(): ConversionData;
 }
 
 export interface PluginModelInterface {

@@ -16,4 +16,23 @@ export default class extends MarkPlugin<Options> {
 	hotkey() {
 		return this.options.hotkey || 'mod+b';
 	}
+
+	conversion() {
+		return [
+			{
+				from: {
+					span: {
+						style: {
+							'font-weight': ['bold', '700'],
+						},
+					},
+				},
+				to: this.tagName,
+			},
+			{
+				from: 'b',
+				to: this.tagName,
+			},
+		];
+	}
 }

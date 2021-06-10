@@ -4,8 +4,6 @@ import {
 	Selector,
 	EventListener,
 	NodeModelInterface,
-	Context,
-	NodeEntry,
 } from './node';
 import { ChangeInterface } from './change';
 import { OTInterface } from './ot';

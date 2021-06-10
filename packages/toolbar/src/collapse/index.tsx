@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { EngineInterface } from '@aomao/engine';
 import classnames from 'classnames-es-ts';
 import Button from '../button';
+import { useRight } from '../hooks';
 import CollapseGroup, { CollapseGroupProps } from './group';
 import './index.css';
 
@@ -26,7 +27,10 @@ const Collapse: React.FC<CollapseProps> = ({
 }) => {
 	const isCustomize = !!!(icon || content);
 	const [visible, setVisible] = useState(isCustomize);
-	const collapseRef = useRef();
+
+	const collapseRef = useRef<HTMLDivElement | null>(null);
+	const isRight = useRight(collapseRef);
+
 	useEffect(() => {
 		if (!isCustomize)
 			return () => document.removeEventListener('click', hide);
@@ -66,9 +70,10 @@ const Collapse: React.FC<CollapseProps> = ({
 		<div
 			className={classnames(
 				'toolbar-dropdown toolbar-collapse',
+				{ 'toolbar-dropdown-right': isRight },
 				className,
 			)}
-			ref={collapseRef.current}
+			ref={collapseRef}
 		>
 			{!isCustomize && (
 				<Button

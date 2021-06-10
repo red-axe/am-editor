@@ -1,3 +1,4 @@
+import { ConversionInterface } from './conversion';
 import { NodeInterface } from './node';
 import { SchemaInterface } from './schema';
 
@@ -28,9 +29,9 @@ export interface ParserInterface {
 	 */
 	walkTree(
 		node: NodeInterface,
-		conversionRules: any,
+		schema: SchemaInterface | null,
+		conversion: ConversionInterface | null,
 		callbacks: Callbacks,
-		isCardNode?: boolean,
 		includeCard?: boolean,
 	): void;
 
@@ -43,7 +44,7 @@ export interface ParserInterface {
 	 */
 	toValue(
 		schema?: SchemaInterface | null,
-		conversionRules?: any,
+		conversion?: ConversionInterface | null,
 		replaceSpaces?: boolean,
 		customTags?: boolean,
 	): string;
@@ -60,17 +61,12 @@ export interface ParserInterface {
 	 */
 	toDOM(
 		schema?: SchemaInterface | null,
-		conversionRules?: any,
+		conversion?: ConversionInterface | null,
 	): DocumentFragment;
 
 	/**
 	 * 转换为文本
-	 * @param conversionRules 标签转换规则
-	 * @param includeCard 是否包含卡片
+	 * @param includeCard 是否遍历卡片
 	 */
-	toText(
-		schema?: SchemaInterface | null,
-		conversionRules?: any,
-		includeCard?: boolean,
-	): string;
+	toText(schema?: SchemaInterface | null, includeCard?: boolean): string;
 }

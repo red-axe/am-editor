@@ -214,7 +214,7 @@ otClient.connect(
 
 ### Project icon
 
-[Iconfont](https://at.alicdn.com/t/project/1456030/ada29c50-2c37-4701-b836-b9d622b8f0b3.html?spm=a313x.7781069.1998910419.35)
+[Iconfont](https://at.alicdn.com/t/project/1456030/575170a6-50ef-4156-9ad0-2cd0341752a7.html?spm=a313x.7781069.1998910419.35)
 
 ## Contribution
 

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import classNames from 'classnames-es-ts';
 import { EngineInterface } from '@aomao/engine';
+import { useRight } from '../hooks';
 import Button from '../button';
 import ColorPicker, { ColorPickerProps, Palette } from './picker';
 import './index.css';
@@ -48,6 +49,16 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 			  ),
 	);
 	const [currentColor, setCurrentColor] = useState(defaultActiveColor);
+
+	const buttonRef = useRef<HTMLDivElement | null>(null);
+	const isRight = useRight(buttonRef);
+
+	useEffect(() => {
+		return () => {
+			document.removeEventListener('click', hideDropdown);
+		};
+	}, []);
+
 	const toggleDropdown = (event: React.MouseEvent) => {
 		event.preventDefault();
 		event.stopPropagation();
@@ -94,14 +105,13 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 		if (onSelect) onSelect(color, event);
 	};
 
-	useEffect(() => {
-		return () => {
-			document.removeEventListener('click', hideDropdown);
-		};
-	}, []);
-
 	return (
-		<div className="toolbar-dropdown colorpicker-button">
+		<div
+			ref={buttonRef}
+			className={classNames('toolbar-dropdown', 'colorpicker-button', {
+				'toolbar-dropdown-right': isRight,
+			})}
+		>
 			<div
 				className={classNames(
 					'toolbar-dropdown-trigger colorpicker-button-group',

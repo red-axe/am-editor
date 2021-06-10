@@ -3,6 +3,7 @@ import {
 	ElementPluginInterface,
 	isNode,
 	NodeInterface,
+	ConversionData,
 } from '../types';
 import {
 	SchemaAttributes,
@@ -55,7 +56,13 @@ abstract class ElementPluginEntry<T extends PluginOptions = {}>
 	 * 初始化
 	 */
 	init(): void {
-		this.editor.schema.add(this.schema());
+		const { schema, conversion } = this.editor;
+		schema.add(this.schema());
+		if (this.conversion) {
+			this.conversion().forEach(({ from, to }) => {
+				conversion.add(from, to);
+			});
+		}
 	}
 	/**
 	 * 将当前插件style属性应用到节点
@@ -232,6 +239,11 @@ abstract class ElementPluginEntry<T extends PluginOptions = {}>
 
 		return this.sechamCache;
 	}
+
+	/**
+	 * 在粘贴时的标签转换，例如：b > strong
+	 */
+	conversion?(): ConversionData;
 }
 
 export default ElementPluginEntry;

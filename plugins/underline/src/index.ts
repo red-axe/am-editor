@@ -13,4 +13,19 @@ export default class extends MarkPlugin<Options> {
 	hotkey() {
 		return this.options.hotkey || 'mod+u';
 	}
+
+	conversion() {
+		return [
+			{
+				from: {
+					span: {
+						style: {
+							'text-decoration': 'underline',
+						},
+					},
+				},
+				to: this.tagName,
+			},
+		];
+	}
 }

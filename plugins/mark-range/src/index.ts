@@ -609,10 +609,13 @@ export default class extends MarkPlugin<Options> {
 			: Range.create(this.editor);
 
 		const parser = new Parser(container, this.editor);
-
+		const { schema, conversion } = this.editor;
 		if (!range) {
 			container.remove();
-			return { value: value ? value : parser.toValue(), paths: [] };
+			return {
+				value: value ? value : parser.toValue(schema, conversion),
+				paths: [],
+			};
 		}
 		range.select(container, true).collapse(true);
 
@@ -641,7 +644,7 @@ export default class extends MarkPlugin<Options> {
 			}
 		}, false);
 
-		value = parser.toValue();
+		value = parser.toValue(schema, conversion);
 		container.remove();
 		return {
 			value,
@@ -677,10 +680,10 @@ export default class extends MarkPlugin<Options> {
 			: Range.create(this.editor);
 
 		const parser = new Parser(container, this.editor);
-
+		const { schema, conversion } = this.editor;
 		if (!range) {
 			container.remove();
-			return value ? value : parser.toValue();
+			return value ? value : parser.toValue(schema, conversion);
 		}
 
 		range.select(container, true).collapse(true);
@@ -701,7 +704,7 @@ export default class extends MarkPlugin<Options> {
 				pathRange,
 			);
 		});
-		value = parser.toValue();
+		value = parser.toValue(schema, conversion);
 		container.remove();
 		return value;
 	}

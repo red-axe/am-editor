@@ -6,7 +6,6 @@ import {
 	SchemaBlock,
 	SchemaGlobal,
 	SchemaInterface,
-	SchemaMap,
 	SchemaRule,
 	SchemaStyle,
 	SchemaValue,
@@ -18,10 +17,9 @@ import { getHashId, getWindow, validUrl } from './utils';
  * 标签规则
  */
 class Schema implements SchemaInterface {
-	private _map: { [key: string]: SchemaMap } = {};
 	private _all: Array<SchemaRule> = [];
 	private _typeMap: {
-		[key: string]: 'block' | 'mark' | 'inline' | undefined;
+		[key: string]: SchemaRule;
 	} = {};
 
 	data: {
@@ -122,7 +120,6 @@ class Schema implements SchemaInterface {
 				return aSCount === bSCount ? 0 : aSCount > bSCount ? -1 : 1;
 			return 1;
 		});
-		this._map = {};
 	}
 	/**
 	 * 克隆当前schema对象
@@ -153,18 +150,30 @@ class Schema implements SchemaInterface {
 		return schemas;
 	}
 
-	getType(node: NodeInterface) {
+	getType(node: NodeInterface, filter?: (rule: SchemaRule) => boolean) {
 		if (node.type !== getWindow().Node.ELEMENT_NODE) return undefined;
 		let id = node.attributes('data-id');
 		if (!id) id = getHashId(node, false);
 		else id = id.split('-')[0];
-		if (this._typeMap.hasOwnProperty(id)) return this._typeMap[id];
-		this._typeMap[id] = this._all.find(
-			rule =>
-				rule.name === node.name &&
-				this.checkNode(node, rule.attributes),
-		)?.type;
-		return this._typeMap[id];
+		if (!!this._typeMap[id] && (!filter || filter(this._typeMap[id]!)))
+			return this._typeMap[id].type;
+		const reuslt = this.getRule(node, filter);
+		if (reuslt) this._typeMap[id] = reuslt;
+		return reuslt?.type;
+	}
+
+	/**
+	 * 根据节点获取符合的规则
+	 * @param node 节点
+	 * @param filter 过滤
+	 * @returns
+	 */
+	getRule(node: NodeInterface, filter?: (rule: SchemaRule) => boolean) {
+		filter = filter || (rule => rule.name === node.name);
+		if (node.type !== getWindow().Node.ELEMENT_NODE) return undefined;
+		return this._all.find(
+			rule => filter!(rule) && this.checkNode(node, rule.attributes),
+		);
 	}
 
 	/**
@@ -194,52 +203,6 @@ class Schema implements SchemaInterface {
 		return Object.keys(styles || {}).every(styleName => {
 			return this.checkValue(styles, styleName, nodeStyles[styleName]);
 		});
-	}
-	/**
-	 * 检测样式值是否符合节点样式规则
-	 * @param name 节点名称
-	 * @param styleName 样式名称
-	 * @param styleValue 样式值
-	 * @param type 指定类型
-	 */
-	checkStyle(
-		name: string,
-		styleName: string,
-		styleValue: string,
-		type?: 'block' | 'mark' | 'inline',
-	) {
-		//根据节点名称查找属性规则
-		const map = this.getMapCache(type);
-		if (!map[name]) return false;
-		//没有规则返回false
-		let rule = map[name].style as SchemaAttributes;
-		if (!rule) return false;
-		return this.checkValue(rule, styleName, styleValue);
-	}
-	/**
-	 * 检测值是否符合节点属性的规则
-	 * @param name 节点名称
-	 * @param attributesName 属性名称
-	 * @param attributesValue 属性值
-	 * @param type 指定类型
-	 */
-	checkAttributes(
-		name: string,
-		attributesName: string,
-		attributesValue: string,
-		type?: 'block' | 'mark' | 'inline',
-	) {
-		//根据节点名称查找属性规则
-		const map = this.getMapCache(type);
-		//没有规则返回false
-		if (!map[name]) return false;
-		let rule = map[name] as SchemaAttributes;
-		if (!rule) return false;
-		return this.checkValue(
-			{ ...omit(rule, 'style') },
-			attributesName,
-			attributesValue,
-		);
 	}
 	/**
 	 * 检测值是否符合规则
@@ -342,122 +305,69 @@ class Schema implements SchemaInterface {
 	}
 	/**
 	 * 过滤节点样式
-	 * @param name 节点名称
 	 * @param styles 样式
-	 * @param type 指定类型
+	 * @param rule 规则
 	 */
-	filterStyles(
-		name: string,
-		styles: { [k: string]: string },
-		type?: 'block' | 'mark' | 'inline',
-	) {
+	filterStyles(styles: { [k: string]: string }, rule: SchemaRule) {
+		if (!rule.attributes?.style) return;
 		Object.keys(styles).forEach(styleName => {
-			if (!this.checkStyle(name, styleName, styles[styleName], type))
+			if (
+				!this.checkValue(
+					rule?.attributes?.style! as SchemaAttributes,
+					styleName,
+					styles[styleName],
+				)
+			)
 				delete styles[styleName];
 		});
 	}
 	/**
 	 * 过滤节点属性
-	 * @param name 节点名称
 	 * @param attributes 属性
-	 * @param type 指定类型
+	 * @param rule 规则
 	 */
-	filterAttributes(
-		name: string,
-		attributes: { [k: string]: string },
-		type?: 'block' | 'mark' | 'inline',
-	) {
+	filterAttributes(attributes: { [k: string]: string }, rule: SchemaRule) {
+		if (!rule.attributes?.style) return;
 		Object.keys(attributes).forEach(attributesName => {
 			if (
-				!this.checkAttributes(
-					name,
+				!this.checkValue(
+					rule?.attributes! as SchemaAttributes,
 					attributesName,
 					attributes[attributesName],
-					type,
 				)
 			)
 				delete attributes[attributesName];
 		});
 	}
-	/**
-	 * 将相同标签的属性和gloals属性合并转换为map格式
-	 * @param type 指定转换的类别 "block" | "mark" | "inline"
-	 */
-	toAttributesMap(type?: 'block' | 'mark' | 'inline'): SchemaMap {
-		const data: SchemaMap = {};
-
-		Object.keys(this.data.globals).forEach(dataType => {
-			if (type !== undefined && dataType !== type) return;
-			const globalAttributes = this.data.globals[dataType];
-			this.data[dataType + 's'].forEach((rule: SchemaRule) => {
-				data[rule.name] = merge(
-					{ ...rule.attributes },
-					{ ...globalAttributes },
-				);
-			});
-		});
-
-		Object.keys(this.data).forEach(dataType => {
-			if (
-				dataType === 'globals' ||
-				(type !== undefined && dataType !== `${type}s`)
-			)
-				return;
-			const rules = this.data[dataType];
-
-			rules.forEach((rule: SchemaRule) => {
-				let attributes = { ...rule.attributes };
-				if (type === undefined && !!data[rule.name]) {
-					Object.keys(data[rule.name]).forEach(key => {
-						const dataValue = data[rule.name][key];
-						const ruleValue = attributes[key];
-						if (
-							typeof dataValue === 'string' &&
-							typeof ruleValue === 'string' &&
-							dataValue !== ruleValue
-						) {
-							attributes[key] = [dataValue, ruleValue];
-						} else if (
-							Array.isArray(dataValue) &&
-							typeof ruleValue === 'string' &&
-							dataValue.indexOf(ruleValue) < 0
-						) {
-							attributes[key] = dataValue;
-							attributes[key].push(ruleValue);
-						} else if (
-							Array.isArray(ruleValue) &&
-							typeof dataValue === 'string' &&
-							ruleValue.indexOf(dataValue) < 0
-						) {
-							attributes[key].push(dataValue);
-						} else if (
-							Array.isArray(ruleValue) &&
-							Array.isArray(dataValue)
-						) {
-							dataValue.forEach(value => {
-								if (ruleValue.indexOf(value) < 0) {
-									attributes[key].push(value);
-								}
-							});
-						}
-					});
-				}
-				data[rule.name] = merge({ ...data[rule.name] }, attributes);
-			});
-		});
-		return data;
-	}
 
 	/**
-	 * 获取合并后的Map格式
-	 * @param 类型，默认为所有
+	 * 过滤满足node节点规则的属性和样式
+	 * @param node 节点，用于获取规则
+	 * @param attributes 属性
+	 * @param styles 样式
+	 * @returns
 	 */
-	getMapCache(type?: 'block' | 'mark' | 'inline') {
-		const key = type || '*';
-		if (!this._map[key]) this._map[key] = this.toAttributesMap(type);
-
-		return this._map[key];
+	filter(
+		node: NodeInterface,
+		attributes: { [k: string]: string },
+		styles: { [k: string]: string },
+	) {
+		const rule = this.getRule(node);
+		if (!rule) return;
+		let allRule: SchemaRule = { ...rule };
+		const globalRule = Object.keys(this.data.globals).find(
+			dataType => rule.type === dataType,
+		);
+		if (globalRule) {
+			allRule.attributes = {
+				...allRule.attributes,
+				...this.data.globals[globalRule],
+			};
+		}
+		this.filterAttributes(attributes, allRule);
+		this.filterStyles(styles, allRule);
 	}
+
 	/**
 	 * 查找节点符合规则的最顶层的节点名称
 	 * @param name 节点名称

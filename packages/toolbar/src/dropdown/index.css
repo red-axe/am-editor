@@ -31,7 +31,6 @@
 .toolbar-dropdown .toolbar-dropdown-list {
     position: absolute;
     top: 32px;
-    left: 0px;
     font-size: 12px;
     background: #ffffff;
     border: 1px solid #e8e8e8;
@@ -41,6 +40,21 @@
     height: auto;
     transition: all 0.25s cubic-bezier(0.3, 1.2, 0.2, 1);
     z-index: 999;
+}
+
+.toolbar-dropdown.toolbar-dropdown-right:not(.toolbar-dropdown-right) .toolbar-dropdown-list{
+    left: 0px;
+}
+
+.editor-toolbar-mobile .toolbar-dropdown .toolbar-dropdown-list {
+    bottom: 32px;
+    top: auto;
+    max-height: calc(30vh);
+    overflow: auto;
+}
+
+.editor-toolbar-mobile .toolbar-dropdown.toolbar-dropdown-right .toolbar-dropdown-list {
+    right: 0px;
 }
 
 .toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item {

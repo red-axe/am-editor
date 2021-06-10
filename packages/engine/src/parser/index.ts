@@ -1,10 +1,16 @@
+import { NodeInterface } from '../types/node';
+import { DATA_ELEMENT, EDITABLE } from '../constants/root';
+import { EditorInterface } from '../types/engine';
 import {
-	CARD_ELEMENT_KEY,
-	CARD_KEY,
-	READY_CARD_KEY,
-	CARD_VALUE_KEY,
-	CARD_TYPE_KEY,
-} from '../constants';
+	SchemaInterface,
+	isNodeEntry,
+	ParserInterface,
+	Callbacks,
+	ConversionInterface,
+	ConversionRule,
+	SchemaRule,
+} from '../types';
+import { CARD_ELEMENT_KEY } from '../constants';
 import {
 	escape,
 	unescape,
@@ -14,17 +20,7 @@ import {
 	getListStyle,
 	getWindow,
 } from '../utils';
-import transform from './transform';
 import TextParser from './text';
-import { NodeInterface } from '../types/node';
-import { DATA_ELEMENT, EDITABLE } from '../constants/root';
-import { EditorInterface } from '../types/engine';
-import {
-	SchemaInterface,
-	isNodeEntry,
-	ParserInterface,
-	Callbacks,
-} from '../types';
 import { $ } from '../node';
 
 const style = {
@@ -115,6 +111,149 @@ class Parser implements ParserInterface {
 		}
 		if (paserBefore) paserBefore(this.root);
 	}
+	normalize(
+		root: NodeInterface,
+		schema: SchemaInterface,
+		conversion: ConversionInterface | null,
+	) {
+		const nodeApi = this.editor.node;
+		const inlineApi = this.editor.inline;
+		const markApi = this.editor.mark;
+		//转换标签和分割 mark 和 inline 标签
+		root.allChildren().forEach(child => {
+			let node = $(child);
+			if (node.isElement()) {
+				//转换标签
+				if (conversion) {
+					let value = conversion.transform(node);
+					const oldRules: Array<ConversionRule> = [];
+					while (value) {
+						const { rule } = value;
+						oldRules.push(rule);
+						const { name, attributes, style } = value.node;
+						const newNode = $(`<${name} />`);
+						nodeApi.setAttributes(newNode, {
+							...attributes,
+							style,
+						});
+						//把旧节点的子节点追加到新节点下
+						newNode.append(node.children());
+						if (node.isCard()) {
+							node.before(newNode);
+							node.remove();
+							value = undefined;
+							continue;
+						} else {
+							//把包含旧子节点的新节点追加到旧节点下
+							node.append(newNode);
+						}
+						//排除之前的过滤规则后再次过滤
+						value = conversion.transform(
+							node,
+							r => oldRules.indexOf(r) < 0,
+						);
+					}
+				}
+				if (node.isCard()) return;
+				//分割
+				const filter = (node: NodeInterface) => {
+					//获取节点属性样式
+					const attributes = node.attributes();
+					const style = node.css();
+					delete attributes.style;
+					//过滤不符合当前节点规则的属性样式
+					schema.filter(node, attributes, style);
+					//复制一个节点
+					const newNode = node.clone();
+					//移除 data-id，以免在下次判断类型的时候使用缓存
+					newNode.removeAttributes('data-id');
+					//移除符合当前节点的属性样式，剩余的属性样式组成新的节点
+					Object.keys(attributes).forEach(name => {
+						if (attributes[name]) {
+							newNode.removeAttributes(name);
+						}
+					});
+					Object.keys(style).forEach(name => {
+						if (style[name]) {
+							newNode.css(name, '');
+						}
+					});
+					if (newNode.attributes('style').trim() === '')
+						newNode.removeAttributes('style');
+					return newNode;
+				};
+				//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
+				if (nodeApi.isInline(node) && node.name !== 'br') {
+					const parentInline = inlineApi.closest(node);
+					//不允许嵌套
+					if (
+						!parentInline.equal(node) &&
+						nodeApi.isInline(parentInline)
+					) {
+						nodeApi.unwrap(node);
+					}
+					//不允许放入mark
+					else {
+						const parentMark = markApi.closest(node);
+						if (
+							!parentMark.equal(node) &&
+							nodeApi.isMark(parentMark)
+						) {
+							const cloneMark = parentMark.clone();
+							const inlineMark = node.clone();
+							parentMark.each(markChild => {
+								if (node.equal(markChild)) {
+									nodeApi.wrap(
+										nodeApi.replace(node, cloneMark),
+										inlineMark,
+									);
+								} else {
+									nodeApi.wrap(markChild, cloneMark);
+								}
+							});
+							nodeApi.unwrap(parentMark);
+						}
+					}
+				}
+				//当前节点是 mark 节点
+				if (nodeApi.isMark(node)) {
+					//过滤掉当前mark节点属性样式并使用剩下的属性样式组成新的节点
+					const oldRules: Array<SchemaRule> = [];
+					let rule = schema.getRule(node);
+					if (rule) {
+						oldRules.push(rule);
+						let newNode = filter(node);
+						//获取这个新的节点所属类型，并且不能是之前节点一样的规则
+						let type = schema.getType(
+							newNode,
+							rule =>
+								rule.name === newNode.name &&
+								rule.type === 'mark' &&
+								oldRules.indexOf(rule) < 0,
+						);
+						//如果是mark节点，使用新节点包裹旧节点子节点
+						while (type === 'mark') {
+							newNode.append(node.children());
+							node.append(newNode);
+							newNode = filter(newNode);
+							//获取这个新的节点所属类型，并且不能是之前节点一样的规则
+							type = schema.getType(
+								newNode,
+								rule =>
+									rule.name === newNode.name &&
+									rule.type === 'mark' &&
+									oldRules.indexOf(rule) < 0,
+							);
+							if (!type) break;
+							rule = schema.getRule(newNode);
+							if (!rule) break;
+							oldRules.push(rule);
+						}
+					}
+				}
+			}
+		});
+	}
 	/**
 	 * data type:
 	 *
@@ -127,13 +266,14 @@ class Parser implements ParserInterface {
 	 */
 	walkTree(
 		node: NodeInterface,
-		conversionRules: any,
+		schema: SchemaInterface | null = null,
+		conversion: ConversionInterface | null,
 		callbacks: Callbacks,
-		isCardNode?: boolean,
 		includeCard?: boolean,
 	) {
-		let child = node.first();
 		const nodeApi = this.editor.node;
+
+		let child = node.first();
 		while (child) {
 			if (child.isElement()) {
 				let name = child.name;
@@ -141,81 +281,54 @@ class Parser implements ParserInterface {
 				let styles = child.css();
 				//删除属性中的style属性
 				delete attrs.style;
-				// 光标相关节点
-				if (child.isCursor()) {
-					name = attrs[DATA_ELEMENT].toLowerCase();
-					attrs = {};
-					styles = {};
-				}
+
 				// Card Combine 相关节点
 				if (['left', 'right'].indexOf(attrs[CARD_ELEMENT_KEY]) >= 0) {
 					child = child.next();
 					continue;
 				}
-
-				if (attrs[CARD_KEY] || attrs[READY_CARD_KEY]) {
-					name = 'card';
-					const value = attrs[CARD_VALUE_KEY];
-
-					const oldAttrs = { ...attrs };
-					attrs = {
-						type: attrs[CARD_TYPE_KEY],
-						name: (
-							attrs[CARD_KEY] || attrs[READY_CARD_KEY]
-						).toLowerCase(),
-					};
-					//其它 data 属性
-					Object.keys(oldAttrs).forEach(attrName => {
-						if (
-							attrName.indexOf('data-') === 0 &&
-							attrName.indexOf('data-card') !== 0
-						) {
-							attrs[attrName] = oldAttrs[attrName];
-						}
-					});
-
-					if (value !== undefined) {
-						attrs.value = value;
+				let passed = true;
+				let type: 'inline' | 'block' | 'mark' | undefined = undefined;
+				if (schema && attrs[DATA_ELEMENT] !== EDITABLE) {
+					//不符合规则，跳过
+					type = schema.getType(child);
+					if (type === undefined) {
+						passed = false;
+					} else {
+						//过滤不符合规则的属性和样式
+						schema.filter(child, attrs, styles);
 					}
-					styles = {};
 				}
-				name = transform(
-					conversionRules,
-					name,
-					attrs,
-					styles,
-					isCardNode,
-				);
 				// 执行回调函数
-				if (attrs[CARD_ELEMENT_KEY] !== 'center') {
-					if (callbacks.onOpen) {
-						const result = callbacks.onOpen(
-							child,
-							name,
-							attrs,
-							styles,
-						);
-						if (result === false) {
-							child = child.next();
-							continue;
-						}
+				if (
+					attrs[CARD_ELEMENT_KEY] !== 'center' &&
+					callbacks.onOpen &&
+					passed
+				) {
+					const result = callbacks.onOpen(child, name, attrs, styles);
+					//终止遍历当前节点
+					if (result === false) {
+						child = child.next();
+						continue;
 					}
 				}
 				// Card不遍历子节点
 				if (name !== 'card' || includeCard) {
 					this.walkTree(
 						child,
-						conversionRules,
+						schema,
+						conversion,
 						callbacks,
-						isCardNode,
 						includeCard,
 					);
 				}
 				// 执行回调函数
-				if (attrs[CARD_ELEMENT_KEY] !== 'center') {
-					if (callbacks.onClose) {
-						callbacks.onClose(child, name, attrs, styles);
-					}
+				if (
+					attrs[CARD_ELEMENT_KEY] !== 'center' &&
+					callbacks.onClose &&
+					passed
+				) {
+					callbacks.onClose(child, name, attrs, styles);
 				}
 			} else if (child.isText()) {
 				let text = child[0].nodeValue ? escape(child[0].nodeValue) : '';
@@ -253,34 +366,24 @@ class Parser implements ParserInterface {
 	}
 	/**
 	 * 遍历 DOM 树，生成符合标准的 XML 代码
-	 * @param schemaRules 标签保留规则
-	 * @param conversionRules 标签转换规则
+	 * @param schema 标签保留规则
+	 * @param conversion 标签转换规则
 	 * @param replaceSpaces 是否替换空格
 	 * @param customTags 是否将光标、卡片节点转换为标准代码
 	 */
 	toValue(
 		schema: SchemaInterface | null = null,
-		conversionRules: any = null,
+		conversion: ConversionInterface | null = null,
 		replaceSpaces: boolean = false,
 		customTags: boolean = false,
 	) {
 		const result: Array<string> = [];
 		const nodeApi = this.editor.node;
-		this.editor.trigger('paser:value-before', this.root);
-		this.walkTree(this.root, conversionRules, {
+		const root = this.root.clone(true);
+		if (schema) this.normalize(root, schema, conversion);
+		this.editor.trigger('paser:value-before', root);
+		this.walkTree(root, schema, conversion, {
 			onOpen: (child, name, attrs, styles) => {
-				if (schema && attrs[DATA_ELEMENT] !== EDITABLE) {
-					let node = child;
-					if (child.name !== name) {
-						node = $(`<${name} />`);
-						node.attributes(attrs);
-						node.css(styles);
-					}
-					const type = schema.getType(node);
-					if (type === undefined) return;
-					schema.filterAttributes(name, attrs, type);
-					schema.filterStyles(name, styles, type);
-				}
 				if (
 					this.editor.trigger(
 						'paser:value',
@@ -327,24 +430,28 @@ class Parser implements ParserInterface {
 				}
 				result.push(text);
 			},
-			onClose: (child, name, attrs, styles) => {
+			onClose: (_, name) => {
 				if (nodeApi.isVoid(name, schema ? schema : undefined)) return;
-				if (schema) {
-					let node = child;
-					if (child.name !== name) {
-						node = $(`<${name} />`);
-						node.attributes(attrs);
-						node.css(styles);
-					}
-					const type = schema.getType(node);
-					if (type === undefined) return;
-					schema.filterAttributes(name, attrs, type);
-					schema.filterStyles(name, styles, type);
-				}
 				result.push('</'.concat(name, '>'));
 			},
 		});
 		this.editor.trigger('paser:value-after', result);
+		//移除前后的换行符
+		result.some((value, index) => {
+			if (/^\n+/g.test(value)) {
+				result[index] = value.replace(/^\n+/g, '');
+				return;
+			}
+			return true;
+		});
+		for (let i = result.length - 1; i >= 0; i--) {
+			const value = result[i];
+			if (/^\n+/g.test(value)) {
+				result[i] = value.replace(/^\n+/g, '');
+				continue;
+			}
+			break;
+		}
 		const value = result.join('');
 		return customTags ? transformCustomTags(value) : value;
 	}
@@ -355,7 +462,6 @@ class Parser implements ParserInterface {
 	 * @param outter 外包裹节点
 	 */
 	toHTML(inner?: Node, outter?: Node) {
-		const { trigger } = this.editor;
 		const element = $('<div />');
 		if (inner && outter) {
 			$(inner)
@@ -365,7 +471,7 @@ class Parser implements ParserInterface {
 		} else {
 			element.append(this.root);
 		}
-		trigger('paser:html-before', this.root);
+		this.editor.trigger('paser:html-before', this.root);
 		element.traverse(domNode => {
 			const node = domNode.get<HTMLElement>();
 			if (
@@ -377,20 +483,26 @@ class Parser implements ParserInterface {
 				node.parentNode.removeChild(node);
 			}
 		});
-		trigger('paser:html', element);
+		this.editor.trigger('paser:html', element);
 		element.find('p').css(style);
-		trigger('paser:html-after', element);
+		this.editor.trigger('paser:html-after', element);
 		return {
 			html: element.html(),
-			text: new Parser(element, this.editor).toText(null, true),
+			text: new Parser(element, this.editor).toText(
+				this.editor.schema,
+				true,
+			),
 		};
 	}
 
 	/**
 	 * 返回DOM树
 	 */
-	toDOM(schema: SchemaInterface | null = null, conversionRules: any = null) {
-		const value = this.toValue(schema, conversionRules, false, true);
+	toDOM(
+		schema: SchemaInterface | null = null,
+		conversion: ConversionInterface | null,
+	) {
+		const value = this.toValue(schema, conversion, false, true);
 		const doc = new DOMParser().parseFromString(value, 'text/html');
 		const fragment = doc.createDocumentFragment();
 		const nodes = doc.body.childNodes;
@@ -403,18 +515,15 @@ class Parser implements ParserInterface {
 
 	/**
 	 * 转换为文本
-	 * @param conversionRules 标签转换规则
-	 * @param includeCard 是否包含卡片
+	 * @param includeCard 是遍历卡片内部
 	 */
-	toText(
-		schema: SchemaInterface | null = null,
-		conversionRules: any = null,
-		includeCard?: boolean,
-	) {
+	toText(schema: SchemaInterface | null = null, includeCard?: boolean) {
+		const root = this.root.clone(true);
 		const result: Array<string> = [];
 		this.walkTree(
-			this.root,
-			conversionRules,
+			root,
+			null,
+			null,
 			{
 				onOpen: (node, name) => {
 					if (name === 'br') {
@@ -463,13 +572,15 @@ class Parser implements ParserInterface {
 				onClose: (node, name) => {
 					if (
 						name === 'p' ||
-						this.editor.node.isBlock(node, schema || undefined)
+						this.editor.node.isBlock(
+							node,
+							schema || this.editor.schema,
+						)
 					) {
 						result.push('\n');
 					}
 				},
 			},
-			false,
 			includeCard,
 		);
 		return result

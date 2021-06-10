@@ -1,9 +1,9 @@
 <template>
     <div className="editor-ot-users">
-        <p style="color: '#888888'">
-            当前在线用户：<strong>{{members.length}}</strong> 人
-        </p>
-        <div class="editor-ot-users-content">
+        <space class="editor-ot-users-content" size="small">
+			<span v-if="!isMobile" style="color: '#888888'">
+                当前在线<strong>{{members.length}}</strong>人
+            </span>
             <avatar
             v-for="member in members"
             :key="member['id']"
@@ -12,20 +12,22 @@
             >
                 {{member['name']}}
             </avatar>
-        </div>
+        </space>
     </div>
     <am-toolbar v-if="engine" :engine="engine" :items="items" />
-    <div className="editor-wrapper">
-        <div className="editor-container">
-            <div ref="container">This is Container</div>
+    <div :class="['editor-wrapper',{'editor-mobile': isMobile}]">
+        <div class="editor-container">
+            <div class="editor-content">
+                <div ref="container">This is Container</div>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
-import { Avatar, message } from 'ant-design-vue'
-import Engine, { EngineInterface } from "@aomao/engine"
+import { Avatar, message, Modal, Space } from 'ant-design-vue'
+import Engine, { EngineInterface, isMobile } from "@aomao/engine"
 import Redo from '@aomao/plugin-redo';
 import Undo from '@aomao/plugin-undo';
 import Bold from '@aomao/plugin-bold';
@@ -54,7 +56,7 @@ import Link from '@aomao/plugin-link-vue';
 import Codeblock, { CodeBlockComponent } from '@aomao/plugin-codeblock-vue';
 import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
 import Table, { TableComponent } from '@aomao/plugin-table'
-import AmToolbar , { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar-vue'
+import AmToolbar , { ToolbarPlugin, ToolbarComponent } from '../../../packages/toolbar-vue/src'
 import OTClient from './ot-client'
 
 const plugins = [
@@ -105,11 +107,79 @@ export default defineComponent({
     name:"engine-demo",
     components:{
         Avatar,
+        Space,
         AmToolbar
     },
     data(){
         return {
-            items:[['collapse'],
+            items:isMobile ? [
+                        ['undo', 'redo'],
+                        {
+                            icon:"text",
+                            items:[
+                                'bold',
+                                'italic',
+                                'strikethrough',
+                                'underline',
+                                'moremark',
+                            ]
+                        },
+                        [
+                            {
+                                type: "button",
+                                name: 'image-uploader',
+                                icon: "image"
+                            },
+                            "link",
+                            "tasklist",
+                            "heading"
+                        ],
+                        {
+                            icon: "more",
+                            items: [
+                                {
+                                    type: "button",
+                                    name: 'video-uploader',
+                                    icon: "video"
+                                },
+                                {
+                                    type: "button",
+                                    name: 'file-uploader',
+                                    icon: "attachment"
+                                },
+                                {
+                                    type: "button",
+                                    name: 'table',
+                                    icon: "table"
+                                },
+                                {
+                                    type: "button",
+                                    name: 'math',
+                                    icon: "math"
+                                },
+                                {
+                                    type: "button",
+                                    name: 'codeblock',
+                                    icon: "codeblock"
+                                },
+                                {
+                                    type: "button",
+                                    name: "orderedlist",
+                                    icon: "orderedlist"
+                                },
+                                {
+                                    type: "button",
+                                    name: "unorderedlist",
+                                    icon: "unorderedlist"
+                                },
+                                {
+                                    type: "button",
+                                    name: "hr",
+                                    icon: "hr"
+                                },
+                            ]
+                        }
+                    ]:[['collapse'],
 						['undo', 'redo', 'paintformat', 'removeformat'],
 						['heading', 'fontsize'],
 						[
@@ -122,7 +192,7 @@ export default defineComponent({
 						['fontcolor', 'backcolor'],
 						['alignment'],
 						['unorderedlist', 'orderedlist', 'tasklist', 'indent'],
-						['link', 'quote', 'hr'],]
+						['link', 'quote', 'hr']]
         }
     },
     setup(){
@@ -132,7 +202,7 @@ export default defineComponent({
         onMounted(() => {
             if(container.value){
                 //实例化引擎
-                engine.value = new Engine(container.value,{
+                 const engineInstance = new Engine(container.value,{
                     plugins,
                     cards,
                     config: {
@@ -147,12 +217,21 @@ export default defineComponent({
                         },
                     },
                 });
-                const engineInstance = engine.value
+                
                 engineInstance.messageSuccess = (msg: string) => {
                     message.success(msg);
                 };
                 engineInstance.messageError = (error: string) => {
                     message.error(error);
+                };
+                engineInstance.messageConfirm = (msg: string) => {
+                    return new Promise<boolean>((resolve, reject) => {
+                        Modal.confirm({
+                            content: msg,
+                            onOk: () => resolve(true),
+                            onCancel: () => reject(),
+                        });
+                    });
                 };
                 //初始化本地协作，用作记录历史
                 engineInstance.ot.initLockMode();
@@ -183,6 +262,7 @@ export default defineComponent({
                 otClient.on('membersChange', members => {
                     members.value = members;
                 });
+                engine.value = engineInstance
             }
         })
 
@@ -191,6 +271,7 @@ export default defineComponent({
         })
 
         return {
+            isMobile,
             container,
             engine,
             members
@@ -199,18 +280,20 @@ export default defineComponent({
 })
 </script>
 <style>
-.editor-ot-users {
-	margin-top: 42px;
-	width: 200px;
-	font-size: 12px;
-	position: fixed;
-	left: 0;
-	background: #ffffff;
-	min-height: 100%;
-	padding: 10px;
-	z-index: 999;
-	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.08);
+#app {
+    padding:0
 }
+#nav {
+    position: relative
+}
+.editor-ot-users {
+	font-size: 12px;
+	background: #ffffff;
+	padding: 0px 0 8px 266px;
+	z-index: 999;
+	width: 100%;
+}
+
 .editor-ot-users-content {
 	display: flex;
 	flex-wrap: wrap;
@@ -219,6 +302,7 @@ export default defineComponent({
 .editor-ot-users .ant-avatar {
 	margin: 0 2px;
 }
+
 .editor-toolbar {
 	position: fixed;
 	width: 100%;
@@ -226,24 +310,57 @@ export default defineComponent({
 	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.02);
 	z-index: 1000;
 }
-
 .editor-wrapper {
-	background: #fafafa;
-	padding: 62px 0;
-	height: calc(100vh - 20px);
-	overflow: auto;
+	position: relative;
+	width: 100%;
+	min-width: 1440px;
+}
+
+.editor-wrapper.editor-mobile {
+    min-width: auto;
+    padding: 0 12px;
 }
 
 .editor-container {
+	background: #fafafa;
+	background-color: #fafafa;
+	padding: 62px 0 64px;
+	height: calc(100vh - 68px);
+	width: 100%;
+	margin: 0 auto;
+	overflow: auto;
+	position: relative;
+}
+
+.editor-mobile .editor-container {
+    padding: 0;
+    height: auto;
+    overflow: hidden;
+}
+
+.editor-content {
 	position: relative;
 	width: 812px;
 	margin: 0 auto;
 	background: #fff;
 	border: 1px solid #f0f0f0;
+	overflow: hidden;
+	min-height: 800px;
+    
 }
 
-.editor-container .am-engine {
-	min-height: 824px;
-	padding: 40px 60px 90px;
+.editor-mobile .editor-content {
+    width: auto;
+    min-height:calc(100vh - 68px);
+    border: 0 none;
 }
+
+.editor-content .am-engine {
+	padding: 40px 60px 60px;
+}
+
+.editor-mobile .editor-content .am-engine {
+    padding:18px 0 0 0;
+}
+
 </style>

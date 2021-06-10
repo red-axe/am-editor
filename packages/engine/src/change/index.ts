@@ -260,9 +260,7 @@ class ChangeModel implements ChangeInterface {
 					}
 				});
 			});
-			container.html(
-				parser.toValue(schema, conversion.getValue(), false, true),
-			);
+			container.html(parser.toValue(schema, conversion, false, true));
 			container.allChildren().forEach(child => {
 				if (node.isInline(child)) {
 					inline.repairCursor(child);
@@ -302,8 +300,11 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	getOriginValue() {
-		const { container, schema } = this.engine;
-		return new Parser(container.clone(true), this.engine).toValue(schema);
+		const { container, schema, conversion } = this.engine;
+		return new Parser(container.clone(true), this.engine).toValue(
+			schema,
+			conversion,
+		);
 	}
 
 	getValue(
@@ -792,6 +793,7 @@ class ChangeModel implements ChangeInterface {
 
 			const parser = new Parser(source, this.engine);
 			const schema = this.engine.schema.clone();
+			//转换Text，没那么严格，加入以下规则，以免被过滤掉，并且 div后面会加换行符
 			schema.add([
 				{
 					name: 'span',

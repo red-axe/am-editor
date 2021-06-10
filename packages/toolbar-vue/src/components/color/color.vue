@@ -1,5 +1,5 @@
 <template>
-    <div class="toolbar-dropdown colorpicker-button">
+    <div :class="['toolbar-dropdown','colorpicker-button', {'toolbar-dropdown-right': isRight}]" ref="buttonRef">
         <div
         :class="['toolbar-dropdown-trigger colorpicker-button-group',
             { 'colorpicker-button-group-active': visible },
@@ -40,6 +40,7 @@
 <script lang="ts">
 import { defineComponent, onUnmounted, ref } from 'vue'
 import { colorProps } from '../../types'
+import { useRight } from '../../hooks';
 import AmButton from '../button.vue'
 import AmColorPicker from './picker/picker.vue'
 import Palette from './picker/palette';
@@ -60,6 +61,9 @@ export default defineComponent({
                         Palette.getStroke(props.defaultActiveColor),
                         props.disabled,
                 ))
+
+        const buttonRef = ref<HTMLDivElement | null>(null)
+        const isRight = useRight(buttonRef)
   
         const currentColor = ref(props.defaultActiveColor);
 
@@ -115,6 +119,8 @@ export default defineComponent({
         onUnmounted(() => document.removeEventListener('click', hideDropdown))
 
         return {
+            buttonRef,
+            isRight,
             visible,
             buttonContent,
             currentColor,

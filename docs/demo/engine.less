@@ -1,7 +1,13 @@
+@import (reference) './variables.less';
+
 .__dumi-default-layout[data-site-mode='true'][data-route='/'],
 .__dumi-default-layout[data-site-mode='true'][data-route='/zh-CN'] {
 	padding-top: 138px !important;
 	min-height: auto;
+
+	@media @mobile {
+		padding-top: 86px !important;
+	}
 }
 
 .__dumi-default-layout[data-site-mode='true'][data-route='/'],
@@ -42,6 +48,13 @@
 	position: fixed;
 	width: 100%;
 	top: 64px;
+
+	@media @mobile {
+		padding: 8px 16px;
+		z-index: 1;
+		left: 0;
+		top: 50px;
+	}
 }
 
 .editor-ot-users-content {
@@ -70,6 +83,10 @@
 	position: relative;
 	width: 100%;
 	min-width: 1440px;
+
+	@media @mobile {
+		min-width: auto;
+	}
 }
 
 .editor-container {
@@ -81,6 +98,12 @@
 	margin: 0 auto;
 	overflow: auto;
 	position: relative;
+
+	@media @mobile {
+		padding: 0;
+		height: auto;
+		overflow: hidden;
+	}
 }
 
 .editor-content {
@@ -91,8 +114,17 @@
 	border: 1px solid #f0f0f0;
 	overflow: hidden;
 	min-height: 800px;
+	@media @mobile {
+		width: auto;
+		min-height: calc(100vh - 96px);
+		border: 0 none;
+	}
 }
 
 .editor-content .am-engine {
 	padding: 40px 60px 60px;
+
+	@media @mobile {
+		padding: 18px 0 0 0;
+	}
 }

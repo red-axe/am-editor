@@ -16,4 +16,27 @@ export default class extends MarkPlugin<Options> {
 	}
 
 	markdown = this.options.markdown !== false ? '~~' : '';
+
+	conversion() {
+		return [
+			{
+				from: {
+					span: {
+						style: {
+							'text-decoration': 'line-through',
+						},
+					},
+				},
+				to: this.tagName,
+			},
+			{
+				from: 's',
+				to: this.tagName,
+			},
+			{
+				from: 'strike',
+				to: this.tagName,
+			},
+		];
+	}
 }

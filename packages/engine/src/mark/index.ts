@@ -97,6 +97,20 @@ class Mark implements MarkModelInterface {
 		return result;
 	}
 	/**
+	 * 获取最近的 Mark 节点，找不到返回 node
+	 */
+	closest(node: NodeInterface) {
+		const nodeApi = this.editor.node;
+		while (node && node.parent() && !nodeApi.isBlock(node)) {
+			if (node.isEditable()) break;
+			if (nodeApi.isMark(node)) return node;
+			const parentNode = node.parent();
+			if (!parentNode) break;
+			node = parentNode;
+		}
+		return node;
+	}
+	/**
 	 * 获取向上第一个非 Mark 节点
 	 */
 	closestNotMark(node: NodeInterface) {

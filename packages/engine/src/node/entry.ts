@@ -22,7 +22,6 @@ import {
 } from '../utils';
 import { Path } from 'sharedb';
 import {
-	EditorInterface,
 	NodeInterface,
 	EventInterface,
 	Selector,
@@ -709,7 +708,7 @@ class NodeEntry implements NodeInterface {
 	text(text?: string): string | NodeEntry {
 		// 返回的数据包含 HTML 特殊字符，innerHTML 之前需要 escape
 		// https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
-		if (text) {
+		if (text !== undefined) {
 			this.each(node => {
 				node.textContent = text;
 			});

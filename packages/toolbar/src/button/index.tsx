@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Tooltip from 'antd/es/tooltip';
 import classnames from 'classnames-es-ts';
-import { EngineInterface, formatHotkey } from '@aomao/engine';
+import { EngineInterface, formatHotkey, isMobile } from '@aomao/engine';
 import { autoGetHotkey } from '../utils';
 import 'antd/es/tooltip/style';
 import './index.css';
@@ -138,7 +138,7 @@ const ToolbarButton: React.FC<ButtonProps> = props => {
 			</>
 		);
 	}
-	return title ? (
+	return title && !isMobile ? (
 		<Tooltip
 			placement={props.placement || 'bottom'}
 			title={title}

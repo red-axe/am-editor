@@ -1,7 +1,13 @@
 import { merge, omit } from 'lodash-es';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	useRef,
+} from 'react';
 import classnames from 'classnames-es-ts';
-import { EngineInterface } from '@aomao/engine';
+import { EngineInterface, isMobile } from '@aomao/engine';
 import ToolbarGroup from './group';
 import { getToolbarDefaultConfig } from './config/toolbar';
 import { ButtonProps, DropdownProps, ColorProps, CollapseProps } from './types';
@@ -15,23 +21,58 @@ type ToolbarItemProps =
 	| ColorProps
 	| CollapseProps;
 
+type GroupItemDataProps = {
+	icon?: React.ReactNode;
+	content?: React.ReactNode | (() => React.ReactNode);
+	items: Array<ToolbarItemProps | string>;
+};
+
+type GroupItemProps = Array<ToolbarItemProps | string> | GroupItemDataProps;
+
+type GroupProps = Omit<GroupItemDataProps, 'items'> & {
+	items: Array<ToolbarItemProps>;
+};
+
 export type ToolbarProps = {
 	engine: EngineInterface;
-	items: Array<Array<ToolbarItemProps | string>>;
+	items: Array<GroupItemProps>;
 	className?: string;
 };
 
 const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
-	const [data, setData] = useState<Array<Array<ToolbarItemProps>>>([]);
-
+	const [data, setData] = useState<Array<GroupProps>>([]);
+	//移动端浏览器视图信息
+	const toolbarRef = useRef<HTMLDivElement | null>(null);
+	const [mobileView, setMobileView] = useState({ top: 0 });
+	//计算移动浏览器的视图变化
+	const calcuMobileView = () => {
+		const rect = toolbarRef.current?.getBoundingClientRect();
+		const height = rect?.height || 0;
+		setMobileView({
+			top:
+				global.Math.max(
+					document.body.scrollTop,
+					document.documentElement.scrollTop,
+				) +
+				(window.visualViewport.height || 0) -
+				height,
+		});
+	};
 	/**
 	 * 更新状态
 	 */
 	const updateState = useCallback(() => {
-		const data: Array<Array<ToolbarItemProps>> = [];
+		calcuMobileView();
+		const data: Array<GroupProps> = [];
 		const defaultConfig = getToolbarDefaultConfig(engine);
 		items.forEach(group => {
-			const dataGroup: Array<ToolbarItemProps> = [];
+			const dataGroup: GroupProps = { items: [] };
+			if (!Array.isArray(group)) {
+				dataGroup.icon = group.icon;
+				dataGroup.content = group.content;
+
+				group = group.items;
+			}
 			group.forEach(item => {
 				let customItem = undefined;
 				if (typeof item === 'string') {
@@ -49,7 +90,10 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 							: config.type !== 'collapse' &&
 							  config.name === item.name,
 					);
-					customItem = merge(omit(item, 'type'), defaultItem);
+					customItem = merge(
+						defaultItem ? omit(item, 'type') : item,
+						defaultItem,
+					);
 				}
 				if (customItem) {
 					if (customItem.type === 'button') {
@@ -69,10 +113,10 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 					}
 					if (customItem.type !== 'collapse' && customItem.onDisabled)
 						customItem.disabled = customItem.onDisabled();
-					dataGroup.push(customItem);
+					dataGroup.items.push(customItem);
 				}
 			});
-			if (dataGroup.length > 0) data.push(dataGroup);
+			if (dataGroup.items.length > 0) data.push(dataGroup);
 		});
 		setData(data);
 	}, [engine, items]);
@@ -86,9 +130,32 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 		engine.on('select', updateState);
 		engine.on('change', updateState);
 
+		let scrollTimer: NodeJS.Timeout;
+
+		const hideMobileToolbar = () => {
+			setMobileView({
+				top: -120,
+			});
+			clearTimeout(scrollTimer);
+			scrollTimer = setTimeout(() => {
+				calcuMobileView();
+			}, 200);
+		};
+
+		if (isMobile) {
+			document.addEventListener('scroll', hideMobileToolbar);
+			visualViewport.addEventListener('resize', calcuMobileView);
+			visualViewport.addEventListener('scroll', calcuMobileView);
+		}
+
 		return () => {
 			engine.off('select', updateState);
 			engine.off('change', updateState);
+			if (isMobile) {
+				document.removeEventListener('scroll', hideMobileToolbar);
+				visualViewport.removeEventListener('resize', calcuMobileView);
+				visualViewport.removeEventListener('scroll', calcuMobileView);
+			}
 		};
 	}, [engine]);
 
@@ -102,7 +169,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 
 	return (
 		<div
-			className={classnames('editor-toolbar', className)}
+			ref={toolbarRef}
+			className={classnames('editor-toolbar', className, {
+				'editor-toolbar-mobile': isMobile,
+			})}
+			style={isMobile ? { top: `${mobileView.top}px` } : {}}
 			data-element="ui"
 			onMouseDown={onMouseDown}
 			onMouseOver={event => event.preventDefault()}
@@ -111,7 +182,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 		>
 			<div className="editor-toolbar-content">
 				{data.map((group, index) => (
-					<ToolbarGroup key={index} engine={engine} items={group} />
+					<ToolbarGroup key={index} engine={engine} {...group} />
 				))}
 			</div>
 		</div>

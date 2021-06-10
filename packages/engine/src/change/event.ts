@@ -66,7 +66,6 @@ class ChangeEvent implements ChangeEventInterface {
 			if (this.engine.readonly) {
 				return;
 			}
-			console.log(this.engine.change.getRange().base);
 			this.isComposing = true;
 		});
 		this.onContainer('compositionend', () => {
@@ -74,6 +73,25 @@ class ChangeEvent implements ChangeEventInterface {
 				return;
 			}
 			this.isComposing = false;
+		});
+		//对系统工具栏操作拦截，一般针对移动端的文本上下文工具栏
+		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
+		this.onContainer('beforeinput', (event: InputEvent) => {
+			const { inputType } = event;
+			if (this.engine.readonly) {
+				event.preventDefault();
+				return;
+			}
+			const commandTypes = ['format', 'history'];
+			commandTypes.forEach(type => {
+				if (inputType.indexOf(type) === 0) {
+					event.preventDefault();
+					const commandName = inputType
+						.substring(type.length)
+						.toLowerCase();
+					this.engine.command.execute(commandName);
+				}
+			});
 		});
 		this.onContainer('input', (e: Event) => {
 			if (this.engine.readonly) {

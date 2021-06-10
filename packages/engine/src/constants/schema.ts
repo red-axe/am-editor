@@ -1,5 +1,10 @@
 import { SchemaGlobal, SchemaRule } from '../types';
-import { CARD_KEY, CARD_TYPE_KEY, CARD_VALUE_KEY } from './card';
+import {
+	CARD_KEY,
+	CARD_TYPE_KEY,
+	CARD_VALUE_KEY,
+	READY_CARD_KEY,
+} from './card';
 import { ANCHOR, CURSOR, FOCUS } from './selection';
 
 const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
@@ -66,6 +71,23 @@ const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 		},
 	},
 	{
+		name: 'span',
+		type: 'inline',
+		attributes: {
+			[READY_CARD_KEY]: {
+				required: true,
+				value: /\w+/,
+			},
+			[CARD_TYPE_KEY]: {
+				required: true,
+				value: 'inline',
+			},
+			[CARD_VALUE_KEY]: '*',
+			class: '*',
+			contenteditable: '*',
+		},
+	},
+	{
 		name: 'card',
 		type: 'block',
 		attributes: {
@@ -85,6 +107,23 @@ const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 		type: 'block',
 		attributes: {
 			[CARD_KEY]: {
+				required: true,
+				value: /\w+/,
+			},
+			[CARD_TYPE_KEY]: {
+				required: true,
+				value: 'block',
+			},
+			[CARD_VALUE_KEY]: '*',
+			class: '*',
+			contenteditable: '*',
+		},
+	},
+	{
+		name: 'div',
+		type: 'block',
+		attributes: {
+			[READY_CARD_KEY]: {
 				required: true,
 				value: /\w+/,
 			},

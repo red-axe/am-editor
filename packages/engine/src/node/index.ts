@@ -535,20 +535,12 @@ class NodeModel implements NodeModelInterface {
 	removeSide(node: NodeInterface, tagName: string = 'br') {
 		// 删除第一个 BR
 		const firstNode = node.first();
-		if (
-			firstNode &&
-			firstNode.name === tagName &&
-			node.children().length > 1
-		) {
+		if (firstNode?.name === tagName && node.children().length > 1) {
 			firstNode.remove();
 		}
 		// 删除最后一个 BR
 		const lastNode = node.last();
-		if (
-			lastNode &&
-			lastNode.name === tagName &&
-			node.children().length > 1
-		) {
+		if (lastNode?.name === tagName && node.children().length > 1) {
 			lastNode.remove();
 		}
 	}
@@ -571,7 +563,7 @@ class NodeModel implements NodeModelInterface {
 		while (childNode) {
 			//获取下一个兄弟节点
 			let nextNode = childNode.next();
-			//如果当前子节点是块级的Card组件或者是表格，或者是简单的block
+			//如果当前子节点是块级的Card组件，或者是简单的block
 			if (childNode.isBlockCard() || this.isSimpleBlock(childNode)) {
 				block.flatten(childNode, $(rootElement || []));
 			}
@@ -584,8 +576,41 @@ class NodeModel implements NodeModelInterface {
 				childNode.before(cloneNode);
 				while (childNode) {
 					nextNode = childNode.next();
+
 					const isBR = 'br' === childNode.name && !isLI;
+					//判断当前节点末尾是否是换行符，有换行符就跳出
+					if (childNode.isText()) {
+						let text = childNode.text();
+						//先移除开头的换行符
+						let match = /^((\n|\r)+)/.exec(text);
+						let isBegin = false;
+						if (match) {
+							text = text.substring(match[1].length);
+							isBegin = true;
+							if (text.length === 0) {
+								childNode.remove();
+								break;
+							}
+						}
+						//移除末尾换行符
+						match = /((\n|\r)+)$/.exec(text);
+						if (match) {
+							childNode.text(text.substr(0, match.index));
+							cloneNode.append(childNode);
+							break;
+						} else if (isBegin) {
+							childNode.text(text);
+						}
+					}
 					cloneNode.append(childNode);
+					//判断下一个节点的开头是换行符，有换行符就跳出
+					if (nextNode?.isText()) {
+						const text = nextNode.text();
+						let match = /^(\n|\r)+/.exec(text);
+						if (match) {
+							break;
+						}
+					}
 					if (
 						isBR ||
 						!nextNode ||
@@ -593,10 +618,17 @@ class NodeModel implements NodeModelInterface {
 						nextNode.isBlockCard()
 					)
 						break;
+
 					childNode = nextNode;
 				}
 				this.removeSide(cloneNode);
 				block.flatten(cloneNode, $(rootElement || []));
+				if (
+					cloneNode.name === 'p' &&
+					cloneNode.children().length === 0
+				) {
+					cloneNode.append($('<br />'));
+				}
 			}
 			childNode = nextNode;
 		}
