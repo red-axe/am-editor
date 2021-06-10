@@ -3,6 +3,9 @@ import { EditorInterface, NodeInterface } from '@aomao/engine';
 
 export type Options = {
 	onSave?: (mode: string, value: string) => void;
+	onFocus?: () => void;
+	onBlur?: () => void;
+	onMouseDown?: (event: MouseEvent | TouchEvent) => void;
 	container?: NodeInterface;
 };
 

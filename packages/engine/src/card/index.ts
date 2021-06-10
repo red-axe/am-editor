@@ -46,7 +46,7 @@ class CardModel implements CardModelInterface {
 	}
 
 	get active() {
-		return this.components.find(component => component.activated);
+		return this.components.find((component) => component.activated);
 	}
 
 	get length() {
@@ -61,40 +61,40 @@ class CardModel implements CardModelInterface {
 			const enter = new Enter(editor);
 			typing
 				.getHandleListener('enter', 'keydown')
-				?.on(event => enter.trigger(event));
+				?.on((event) => enter.trigger(event));
 			//删除事件
 			const backspace = new Backspace(editor);
 			typing
 				.getHandleListener('backspace', 'keydown')
-				?.on(event => backspace.trigger(event));
+				?.on((event) => backspace.trigger(event));
 			//方向键事件
 			const left = new Left(editor);
 			typing
 				.getHandleListener('left', 'keydown')
-				?.on(event => left.trigger(event));
+				?.on((event) => left.trigger(event));
 
 			const right = new Right(editor);
 			typing
 				.getHandleListener('right', 'keydown')
-				?.on(event => right.trigger(event));
+				?.on((event) => right.trigger(event));
 
 			const up = new Up(editor);
 			typing
 				.getHandleListener('up', 'keydown')
-				?.on(event => up.trigger(event));
+				?.on((event) => up.trigger(event));
 
 			const down = new Down(editor);
 			typing
 				.getHandleListener('down', 'keydown')
-				?.on(event => down.trigger(event));
+				?.on((event) => down.trigger(event));
 
 			const _default = new Default(editor);
 			typing
 				.getHandleListener('default', 'keydown')
-				?.on(event => _default.trigger(event));
+				?.on((event) => _default.trigger(event));
 		}
 
-		cards.forEach(card => {
+		cards.forEach((card) => {
 			this.classes[card.cardName] = card;
 		});
 	}
@@ -152,7 +152,7 @@ class CardModel implements CardModelInterface {
 			return value ? decodeCardValue(value) : {};
 		};
 
-		const cards = this.components.filter(item => {
+		const cards = this.components.filter((item) => {
 			if (typeof selector === 'string') return item.id === selector;
 			return (
 				item.root.equal(selector) || item.id === getValue(selector).id
@@ -207,7 +207,7 @@ class CardModel implements CardModelInterface {
 		if (isInline) {
 			inline.insert(card.root, range);
 		} else {
-			block.insert(card.root, range, container => {
+			block.insert(card.root, range, (container) => {
 				//获取最外层的block嵌套节点
 				let blockParent = container.parent();
 				while (blockParent && !blockParent.isEditable()) {
@@ -240,7 +240,7 @@ class CardModel implements CardModelInterface {
 			);
 		}
 		if (card.contenteditable.length > 0) {
-			center.find(card.contenteditable.join(',')).each(node => {
+			center.find(card.contenteditable.join(',')).each((node) => {
 				const child = $(node);
 				child.attributes('contenteditable', 'true');
 				child.attributes(DATA_ELEMENT, EDITABLE);
@@ -380,7 +380,7 @@ class CardModel implements CardModelInterface {
 			const index = parentNode
 				.children()
 				.toArray()
-				.findIndex(child => child.equal(root));
+				.findIndex((child) => child.equal(root));
 			range.setStart(parentNode, index);
 			range.setEnd(parentNode, index + 1);
 			editor.change.select(range);
@@ -545,7 +545,7 @@ class CardModel implements CardModelInterface {
 				: container.find(`${READY_CARD_SELECTOR},${CARD_SELECTOR}`)
 			: this.editor.container.find(READY_CARD_SELECTOR);
 		this.gc();
-		cards.each(node => {
+		cards.each((node) => {
 			const cardNode = $(node);
 			const readyKey = cardNode.attributes(READY_CARD_KEY);
 			const key = cardNode.attributes(CARD_KEY);
@@ -567,7 +567,7 @@ class CardModel implements CardModelInterface {
 					value: decodeCardValue(value),
 					root: key ? cardNode : undefined,
 				});
-				Object.keys(attributes).forEach(attributesName => {
+				Object.keys(attributes).forEach((attributesName) => {
 					if (
 						attributesName.indexOf('data-') === 0 &&
 						attributesName.indexOf('data-card') !== 0
@@ -589,7 +589,7 @@ class CardModel implements CardModelInterface {
 					);
 				}
 				if (card.contenteditable.length > 0) {
-					center.find(card.contenteditable.join(',')).each(node => {
+					center.find(card.contenteditable.join(',')).each((node) => {
 						const child = $(node);
 						child.attributes('contenteditable', 'true');
 						child.attributes(DATA_ELEMENT, EDITABLE);
@@ -597,6 +597,9 @@ class CardModel implements CardModelInterface {
 				}
 				//创建工具栏
 				card.didRender();
+				if (readyKey) {
+					card.root.removeAttributes(READY_CARD_KEY);
+				}
 			}
 		});
 	}

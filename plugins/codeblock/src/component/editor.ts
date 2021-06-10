@@ -31,7 +31,7 @@ let CodeMirrorModule: {
 	CodeMirror: any;
 };
 if (!isServer) {
-	import('codemirror').then(module => {
+	import('codemirror').then((module) => {
 		CodeMirrorModule = {
 			CodeMirror: module.default,
 		};
@@ -97,13 +97,23 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			},
 		) as Editor;
 		this.codeMirror.on('focus', () => {
-			//this.engine.toolbar.disable(true);
+			const { onFocus } = this.options;
+			if (onFocus) onFocus();
 		});
 
 		this.codeMirror.on('blur', () => {
-			//this.engine.toolbar.disable(false);
+			const { onBlur } = this.options;
+			if (onBlur) onBlur();
 		});
 
+		this.codeMirror.on('mousedown', (_, event) => {
+			const { onMouseDown } = this.options;
+			if (onMouseDown) onMouseDown(event);
+		});
+		this.codeMirror.on('touchstart', (_, event) => {
+			const { onMouseDown } = this.options;
+			if (onMouseDown) onMouseDown(event);
+		});
 		this.codeMirror.on(
 			'change',
 			debounce(() => {
@@ -114,9 +124,9 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		);
 
 		this.codeMirror.setOption('extraKeys', {
-			Enter: mirror => {
+			Enter: (mirror) => {
 				const config = this.getConfig(mirror.getValue());
-				Object.keys(config).forEach(key => {
+				Object.keys(config).forEach((key) => {
 					return mirror.setOption(
 						key as keyof EditorConfiguration,
 						config[key],

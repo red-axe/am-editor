@@ -1,5 +1,6 @@
 import {
 	$,
+	ActiveTrigger,
 	Card,
 	CardToolbarItemOptions,
 	CardType,
@@ -42,10 +43,20 @@ class CodeBlcok extends Card<CodeBlockValue> {
 					code: value,
 				});
 			},
+			onMouseDown: (event) => {
+				if (!this.activated)
+					this.editor.card.activate(
+						this.root,
+						ActiveTrigger.MOUSE_DOWN,
+					);
+			},
 		});
 	}
 
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
+		if (this.readonly) {
+			return [{ type: 'copy' }];
+		}
 		return [
 			{
 				type: 'dnd',
@@ -59,11 +70,11 @@ class CodeBlcok extends Card<CodeBlockValue> {
 			{
 				type: 'node',
 				node: $('<div />'),
-				didMount: node => {
+				didMount: (node) => {
 					renderSelect(
 						node.get<HTMLElement>()!,
 						this.codeEditor?.mode || 'plain',
-						mode => this.codeEditor?.update(mode),
+						(mode) => this.codeEditor?.update(mode),
 					);
 				},
 			},
@@ -85,6 +96,22 @@ class CodeBlcok extends Card<CodeBlockValue> {
 			this.codeEditor.create(mode, code);
 		} else {
 			this.codeEditor.render(mode, code);
+			let hideTimeout: NodeJS.Timeout;
+			const hide = () => {
+				hideTimeout = setTimeout(() => {
+					this.toolbarModel?.hide();
+				}, 50);
+			};
+
+			this.root.on('mouseover', () => {
+				this.toolbarModel?.show();
+				this.toolbarModel?.getContainer()?.on('mouseover', () => {
+					if (hideTimeout) clearTimeout(hideTimeout);
+				});
+
+				this.toolbarModel?.getContainer()?.on('mouseleave', hide);
+			});
+			this.root.on('mouseleave', hide);
 		}
 	}
 }

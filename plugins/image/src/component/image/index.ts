@@ -8,6 +8,7 @@ import {
 	NodeInterface,
 	sanitizeUrl,
 	Tooltip,
+	isMobile,
 } from '@aomao/engine';
 import Pswp from '../pswp';
 import Resizer from '../resizer';
@@ -121,9 +122,9 @@ class Image {
 		const { link, percent, className, onBeforeRender } = this.options;
 
 		if (this.status === 'error') {
-			return `<span class="data-image-error"><span class="data-icon data-icon-error"></span>${message ||
-				this.options
-					.message}<span class="data-icon data-icon-copy"></span></span>`;
+			return `<span class="data-image-error"><span class="data-icon data-icon-error"></span>${
+				message || this.options.message
+			}<span class="data-icon data-icon-copy"></span></span>`;
 		}
 		const src = onBeforeRender
 			? onBeforeRender(this.status, this.options.src)
@@ -140,8 +141,9 @@ class Image {
 		const alt = escape(this.options.alt || '');
 		const attr = !!alt ? ` alt="${alt}" title="${alt}" ` : '';
 		//加上 data-drag-image 样式可以拖动图片
-		let img = `<img src="${sanitizeUrl(src)}" class="${className ||
-			''} data-drag-image" ${attr}/>`;
+		let img = `<img src="${sanitizeUrl(src)}" class="${
+			className || ''
+		} data-drag-image" ${attr}/>`;
 		//只读渲染加载链接
 		if (link && !isEngine(this.editor)) {
 			const target = link.target || '_blank';
@@ -370,7 +372,7 @@ class Image {
 		this.editor.container
 			.find('[data-card-key="image"]')
 			.toArray()
-			.filter(image => {
+			.filter((image) => {
 				return image.find('img').length > 0;
 			})
 			.forEach((imageNode, index) => {
@@ -414,6 +416,7 @@ class Image {
 		}
 		this.maxWidth = this.getMaxWidth();
 		this.rate = clientHeight / clientWidth;
+		if (isMobile) return;
 		// 拖动调整图片大小
 		const resizer = new Resizer({
 			src: this.src,
@@ -497,22 +500,23 @@ class Image {
 		this.image.on('error', () => this.imageLoadError());
 		container.append(this.root);
 		if (isEngine(this.editor) || !this.root.inEditor()) {
-			this.root.on('mouseenter', () => {
-				this.maximize.show();
-			});
-			this.root.on('mouseleave', () => {
-				this.maximize.hide();
-			});
-
+			if (!isMobile) {
+				this.root.on('mouseenter', () => {
+					this.maximize.show();
+				});
+				this.root.on('mouseleave', () => {
+					this.maximize.hide();
+				});
+			}
 			if (!isEngine(this.editor)) {
 				const link = this.image.closest('a');
 				if (link.length === 0) {
-					this.image.on('click', event => this.openZoom(event));
+					this.image.on('click', (event) => this.openZoom(event));
 				}
 			}
 			// 无链接
-			this.image.on('dblclick', event => this.openZoom(event));
-			this.maximize.on('click', event => this.openZoom(event));
+			this.image.on('dblclick', (event) => this.openZoom(event));
+			this.maximize.on('click', (event) => this.openZoom(event));
 		}
 
 		// 避免图片抖动，让加载过程比较好看

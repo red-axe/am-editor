@@ -1,4 +1,4 @@
-import { $, Card, CardType, NodeInterface } from '@aomao/engine';
+import { $, Card, CardType, isMobile, NodeInterface } from '@aomao/engine';
 import './index.css';
 
 const CHECKBOX_CLASS = 'data-checkbox';
@@ -51,7 +51,9 @@ class Checkbox extends Card<CheckboxValue> {
 
 	render() {
 		const html = `
-            <span class="${CHECKBOX_CLASS}">
+            <span class="${CHECKBOX_CLASS}${
+			isMobile ? ` ${CHECKBOX_CLASS}-mobile` : ''
+		}">
                 <input type="checkbox" class="${CHECKBOX_INPUT_CLASS}" value="">
                 <span class="${CHECKBOX_INNER_CLASS}"></span>
             </span>`;

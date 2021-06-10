@@ -1,4 +1,4 @@
-import { $, EngineInterface, NodeInterface } from '@aomao/engine';
+import { $, EngineInterface, isMobile, NodeInterface } from '@aomao/engine';
 import { createApp, App } from 'vue';
 import AmEditor from './editor.vue';
 import AmPreview from './preview.vue';
@@ -26,7 +26,11 @@ class Toolbar {
 		if (!this.target) return;
 		let root = $('.data-link-container');
 		if (root.length === 0) {
-			root = $('<div class="data-link-container"></div>');
+			root = $(
+				`<div class="data-link-container${
+					isMobile ? ' data-link-container-mobile' : ''
+				}"></div>`,
+			);
 			document.body.appendChild(root[0]);
 		}
 		this.root = root;
@@ -50,7 +54,7 @@ class Toolbar {
 		const { height, width } = rootRect;
 		const styleLeft =
 			left + width > window.innerWidth - 20
-				? window.pageXOffset + window.innerWidth - width - 20
+				? window.pageXOffset + window.innerWidth - width - 10
 				: 20 > left - window.pageXOffset
 				? window.pageXOffset + 20
 				: window.pageXOffset + left;
@@ -80,7 +84,6 @@ class Toolbar {
 		text = text.trim() === '' ? link : text;
 		this.target.text(text);
 
-		inline.repairCursor(this.target);
 		range.setStart(this.target.next()!, 1);
 		range.setEnd(this.target.next()!, 1);
 		change.apply(range);
@@ -145,10 +148,14 @@ class Toolbar {
 		const name = !href || forceEdit ? 'am-link-editor' : 'am-link-preview';
 		if (this.vm && this.vm._component.name === name) {
 			this.update();
+			window.addEventListener('scroll', this.update, true);
+			window.addEventListener('resize', this.update, true);
 			return;
 		} else if (this.vm) {
 			this.vm.unmount();
 			this.vm = undefined;
+			window.removeEventListener('scroll', this.update, true);
+			window.removeEventListener('resize', this.update, true);
 		}
 		setTimeout(() => {
 			this.vm =
@@ -166,6 +173,8 @@ class Toolbar {
 			if (this.vm) {
 				this.vm.unmount();
 				this.vm = undefined;
+				window.removeEventListener('scroll', this.update, true);
+				window.removeEventListener('resize', this.update, true);
 			}
 			document.body.removeChild(elment);
 			this.root = undefined;

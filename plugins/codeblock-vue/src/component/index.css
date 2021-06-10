@@ -32,8 +32,6 @@
 .am-engine .CodeMirror-lines,
 .am-engine-view .CodeMirror-lines {
      padding: 8px 0;
-     user-select:none
-    /* Vertical padding around content */
     
 }
 

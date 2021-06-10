@@ -1,6 +1,7 @@
 import { DATA_ELEMENT, ROOT } from '../constants';
 import { EngineInterface, NodeInterface, Selector } from '../types';
 import { $ } from '../node';
+import { isMobile } from '../utils';
 
 export type Options = {
 	engine: EngineInterface;
@@ -42,11 +43,13 @@ class Container {
 			this.node.addClass('am-engine');
 		}
 
+		if (isMobile) this.node.addClass('am-engine-mobile');
+
 		if (className !== undefined) {
 			(Array.isArray(className)
 				? className
 				: className.split(/\s+/)
-			).forEach(name => {
+			).forEach((name) => {
 				if (name.trim() !== '') this.node.addClass(name);
 			});
 		}
@@ -54,7 +57,7 @@ class Container {
 
 	init() {
 		const { engine } = this.options;
-		this.node.on('input', e => {
+		this.node.on('input', (e) => {
 			if (engine.readonly) {
 				return;
 			}
@@ -125,7 +128,7 @@ class Container {
 			(Array.isArray(className)
 				? className
 				: (className || '').split(/\s+/)
-			).forEach(name => {
+			).forEach((name) => {
 				if (name.trim() !== '') this.node.removeClass(name);
 			});
 		}

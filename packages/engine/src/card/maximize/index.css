@@ -57,3 +57,7 @@
     overflow: auto;
     padding: 20px;
 }
+
+.am-engine-mobile .data-card-block-max [data-card-element="center"] {
+    top:56px;
+}

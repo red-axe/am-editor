@@ -9,12 +9,14 @@
                 {{href}}
             </a>
         </a-tooltip>
-        <a-tooltip :title="editTitle">
-            <a class="data-icon data-icon-edit" @click="onEdit" />
-        </a-tooltip>
-        <a-tooltip :title="removeTitle">
-            <a class="data-icon data-icon-unlink" @click="onRemove" />
-        </a-tooltip>
+        <div class="data-link-op">
+            <a-tooltip :title="editTitle">
+                <a class="data-icon data-icon-edit" @click="onEdit" />
+            </a-tooltip>
+            <a-tooltip :title="removeTitle">
+                <a class="data-icon data-icon-unlink" @click="onRemove" />
+            </a-tooltip>
+        </div>
     </div>
 </template>
 <script lang="ts">

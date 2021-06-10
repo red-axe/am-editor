@@ -3,7 +3,6 @@ import {
 	DATA_ELEMENT,
 	DATA_TRANSIENT_ATTRIBUTES,
 	EDITABLE,
-	EditorInterface,
 	UI,
 } from '@aomao/engine';
 import {
@@ -123,7 +122,7 @@ class Template implements TemplateInterface {
 		let tableHeader = `<div ${DATA_ELEMENT}="${UI}" class="${HEADER_CLASS_NAME}"><div class="${HEADER_CLASS_NAME}-item"></div></div>`;
 
 		const placeholder = `<div ${DATA_ELEMENT}="${UI}" class="${PLACEHOLDER_CLASS_NAME}"></div>`;
-		let menuBar = menus.map(menu => {
+		let menuBar = menus.map((menu) => {
 			if (menu.split) {
 				return '<div class="split"></div>';
 			}
@@ -153,7 +152,7 @@ class Template implements TemplateInterface {
 			const hasColGroup = html.indexOf('<colgroup') > -1;
 
 			if (!hasColGroup) {
-				html = html.replace(/^(<table[^>]+>)/, function(match) {
+				html = html.replace(/^(<table[^>]+>)/, function (match) {
 					return match + colgroup;
 				});
 			}

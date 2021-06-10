@@ -1,7 +1,6 @@
 import { EventEmitter2 } from 'eventemitter2';
 import { DATA_ELEMENT, UI } from '../constants';
 import { isNode, NodeInterface } from '../types';
-import { isFirefox, isMobile } from '../utils';
 import { $ } from '../node';
 import './index.css';
 
@@ -52,56 +51,50 @@ class Scrollbar extends EventEmitter2 {
 	}
 
 	init() {
-		if (!isFirefox && !isMobile) {
-			const children = this.container.children();
-			let hasScrollbar = false;
-			children.each(child => {
-				if ($(child).hasClass('data-scrollbar')) {
-					hasScrollbar = true;
-				}
-			});
-			if (!hasScrollbar) {
-				this.container.css('position', 'relative');
-				this.container.addClass('data-scrollable');
-				if (this.x) {
-					this.scrollBarX = $(
-						`<div ${DATA_ELEMENT}="${UI}" class="data-scrollbar data-scrollbar-x "><div class="data-scrollbar-trigger"></div></div>`,
-					);
-					this.slideX = this.scrollBarX.find(
-						'.data-scrollbar-trigger',
-					);
-					this.container.append(this.scrollBarX);
-					this.container.addClass('scroll-x');
-				}
-				if (this.y) {
-					this.scrollBarY = $(
-						`<div ${DATA_ELEMENT}="${UI}" class="data-scrollbar data-scrollbar-y "><div class="data-scrollbar-trigger"></div></div>`,
-					);
-					this.slideY = this.scrollBarY.find(
-						'.data-scrollbar-trigger',
-					);
-					this.container.append(this.scrollBarY);
-					this.container.addClass('scroll-y');
-				}
-				if (this.shadow) {
-					this.shadowLeft = $(
-						`<div ${DATA_ELEMENT}="${UI}" class="scrollbar-shadow-left"></div>`,
-					);
-					this.shadowRight = $(
-						`<div ${DATA_ELEMENT}="${UI}" class="scrollbar-shadow-right"></div>`,
-					);
-					this.container.append(this.shadowLeft);
-					this.container.append(this.shadowRight);
-				}
-				this.refresh();
-				this.bindEvents();
+		const children = this.container.children();
+		let hasScrollbar = false;
+		children.each((child) => {
+			if ($(child).hasClass('data-scrollbar')) {
+				hasScrollbar = true;
 			}
+		});
+		if (!hasScrollbar) {
+			this.container.css('position', 'relative');
+			this.container.addClass('data-scrollable');
+			if (this.x) {
+				this.scrollBarX = $(
+					`<div ${DATA_ELEMENT}="${UI}" class="data-scrollbar data-scrollbar-x "><div class="data-scrollbar-trigger"></div></div>`,
+				);
+				this.slideX = this.scrollBarX.find('.data-scrollbar-trigger');
+				this.container.append(this.scrollBarX);
+				this.container.addClass('scroll-x');
+			}
+			if (this.y) {
+				this.scrollBarY = $(
+					`<div ${DATA_ELEMENT}="${UI}" class="data-scrollbar data-scrollbar-y "><div class="data-scrollbar-trigger"></div></div>`,
+				);
+				this.slideY = this.scrollBarY.find('.data-scrollbar-trigger');
+				this.container.append(this.scrollBarY);
+				this.container.addClass('scroll-y');
+			}
+			if (this.shadow) {
+				this.shadowLeft = $(
+					`<div ${DATA_ELEMENT}="${UI}" class="scrollbar-shadow-left"></div>`,
+				);
+				this.shadowRight = $(
+					`<div ${DATA_ELEMENT}="${UI}" class="scrollbar-shadow-right"></div>`,
+				);
+				this.container.append(this.shadowLeft);
+				this.container.append(this.shadowRight);
+			}
+			this.refresh();
+			this.bindEvents();
 		}
 	}
 
 	refresh() {
 		const element = this.container.get<HTMLElement>();
-		if (!isFirefox && !isMobile && element) {
+		if (element) {
 			const {
 				offsetWidth,
 				offsetHeight,
@@ -139,7 +132,7 @@ class Scrollbar extends EventEmitter2 {
 	}
 
 	bindEvents() {
-		this.container.on('scroll', event => {
+		this.container.on('scroll', (event) => {
 			const { target } = event;
 			const { scrollTop, scrollLeft } = target;
 			this.reRenderX(scrollLeft);
@@ -191,7 +184,7 @@ class Scrollbar extends EventEmitter2 {
 
 	bindXScrollEvent = () => {
 		if (this.x) {
-			this.slideX?.on('mousedown', event => {
+			this.slideX?.on('mousedown', (event) => {
 				this.container.addClass('scrolling');
 				this.sildeXDragging = {
 					point: event.clientX,
@@ -205,7 +198,7 @@ class Scrollbar extends EventEmitter2 {
 
 	bindYScrollEvent = () => {
 		if (this.y) {
-			this.slideY?.on('mousedown', event => {
+			this.slideY?.on('mousedown', (event) => {
 				this.container.addClass('scrolling');
 				this.sildeXDragging = {
 					point: event.clientY,

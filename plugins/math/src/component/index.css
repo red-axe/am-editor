@@ -31,6 +31,9 @@
     text-indent: 0;
     top:0
   }
+.data-card-math-editor-mobile {
+    width: calc(100vw - 20px);
+}
   .data-card-math-editor textarea {
     width: 100%;
     border: none;
@@ -44,6 +47,10 @@
     vertical-align: bottom;
     font-size: 14px;
     font-weight: 400;
+  }
+
+  .data-card-math-editor-mobile textarea{
+    min-width:auto;
   }
   .data-card-math-editor .data-math-editor-toolbar {
     position: relative;

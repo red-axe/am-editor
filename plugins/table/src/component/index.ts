@@ -82,9 +82,9 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		const { schema, conversion } = this.editor;
 		const container = $('<div></div>');
 		container.append(tableRoot.clone(true));
-		const parser = new Parser(container, this.editor, node => {
+		const parser = new Parser(container, this.editor, (node) => {
 			node.find(Template.TABLE_TD_BG_CLASS).remove();
-			node.find(EDITABLE_SELECTOR).each(root => {
+			node.find(EDITABLE_SELECTOR).each((root) => {
 				this.editor.node.unwrap($(root));
 			});
 		});
@@ -161,11 +161,9 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 
 	didRender() {
 		super.didRender();
-		this.viewport = this.wrapper?.find(
-			isEngine(this.editor)
-				? Template.VIEWPORT
-				: Template.VIEWPORT_READER,
-		);
+		this.viewport = isEngine(this.editor)
+			? this.wrapper?.find(Template.VIEWPORT)
+			: this.wrapper;
 
 		this.selection.init();
 		this.conltrollBar.init();

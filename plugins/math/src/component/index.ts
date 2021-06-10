@@ -84,12 +84,31 @@ export default class MathCard extends Card<MathValue> {
 	}
 
 	updateEditorPosition = () => {
-		if (this.editorContainer) {
-			const clientRect = this.container?.getBoundingClientRect();
-			if (!clientRect) return;
-			this.editorContainer.css('left', `${clientRect.left}px`);
-			this.editorContainer.css('top', `${clientRect.bottom + 8}px`);
-		}
+		if (!this.editorContainer || !this.container) return;
+		const targetRect = this.container
+			.get<Element>()
+			?.getBoundingClientRect();
+		if (!targetRect) return;
+		const rootRect = this.editorContainer
+			.get<Element>()
+			?.getBoundingClientRect();
+		if (!rootRect) return;
+		const { top, left, bottom } = targetRect;
+		const { height, width } = rootRect;
+		const styleLeft =
+			left + width > window.innerWidth - 20
+				? window.pageXOffset + window.innerWidth - width - 10
+				: 20 > left - window.pageXOffset
+				? window.pageXOffset + 20
+				: window.pageXOffset + left;
+		const styleTop =
+			bottom + height > window.innerHeight - 20
+				? window.pageYOffset + top - height - 4
+				: window.pageYOffset + bottom + 4;
+		this.editorContainer.css({
+			top: `${styleTop}px`,
+			left: `${styleLeft}px`,
+		});
 	};
 
 	focusTextarea() {

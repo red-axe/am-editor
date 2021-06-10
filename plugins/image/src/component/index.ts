@@ -2,6 +2,7 @@ import {
 	Card,
 	CardToolbarItemOptions,
 	CardType,
+	isMobile,
 	NodeInterface,
 	ToolbarItemOptions,
 } from '@aomao/engine';
@@ -89,14 +90,10 @@ class ImageComponent extends Card<ImageValue> {
 	setSize(size: Size) {
 		this.setValue({ size } as ImageValue);
 		if (this.widthInput) {
-			this.widthInput.get<
-				HTMLInputElement
-			>()!.value = size.width.toString();
+			this.widthInput.get<HTMLInputElement>()!.value = size.width.toString();
 		}
 		if (this.heightInput) {
-			this.heightInput.get<
-				HTMLInputElement
-			>()!.value = size.height.toString();
+			this.heightInput.get<HTMLInputElement>()!.value = size.height.toString();
 		}
 	}
 
@@ -105,18 +102,14 @@ class ImageComponent extends Card<ImageValue> {
 		if (typeof width === 'string') {
 			if (!/^[1-9]+(\d+)?$/.test(width) && this.widthInput) {
 				width = value?.size?.width || value?.size?.naturalWidth || 0;
-				this.widthInput.get<
-					HTMLInputElement
-				>()!.value = width.toString();
+				this.widthInput.get<HTMLInputElement>()!.value = width.toString();
 			}
 			width = parseInt(width.toString(), 10);
 		}
 		if (typeof height === 'string') {
 			if (!/^[1-9]+(\d+)?$/.test(height) && this.heightInput) {
 				height = value?.size?.height || value?.size?.naturalHeight || 0;
-				this.heightInput.get<
-					HTMLInputElement
-				>()!.value = height.toString();
+				this.heightInput.get<HTMLInputElement>()!.value = height.toString();
 			}
 			height = parseInt(height.toString(), 10);
 		}
@@ -133,13 +126,17 @@ class ImageComponent extends Card<ImageValue> {
 				},
 			];
 
-		return [
+		const items: Array<CardToolbarItemOptions | ToolbarItemOptions> = [
 			{
 				type: 'copy',
 			},
 			{
 				type: 'delete',
 			},
+		];
+		if (isMobile) return items;
+
+		return items.concat([
 			{
 				type: 'input',
 				placeholder: language
@@ -147,10 +144,10 @@ class ImageComponent extends Card<ImageValue> {
 					.toString(),
 				prefix: 'W:',
 				value: value?.size?.width || 0,
-				didMount: node => {
+				didMount: (node) => {
 					this.widthInput = node.find('input[type=input]');
 				},
-				onChange: value => {
+				onChange: (value) => {
 					const height = Math.round(
 						parseInt(value, 10) * (this.image?.rate || 1),
 					);
@@ -164,10 +161,10 @@ class ImageComponent extends Card<ImageValue> {
 					.toString(),
 				prefix: 'H:',
 				value: value?.size?.height || 0,
-				didMount: node => {
+				didMount: (node) => {
 					this.heightInput = node.find('input[type=input]');
 				},
-				onChange: value => {
+				onChange: (value) => {
 					const width = Math.round(
 						parseInt(value, 10) / (this.image?.rate || 1),
 					);
@@ -188,7 +185,7 @@ class ImageComponent extends Card<ImageValue> {
 					);
 				},
 			},
-		];
+		]);
 	}
 
 	onSelect(selected: boolean) {
@@ -214,7 +211,7 @@ class ImageComponent extends Card<ImageValue> {
 			link: value.link,
 			percent: value.percent,
 			message: value.message,
-			onChange: size => {
+			onChange: (size) => {
 				if (size) this.setSize(size);
 			},
 			onError: () => {

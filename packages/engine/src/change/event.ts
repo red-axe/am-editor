@@ -78,12 +78,8 @@ class ChangeEvent implements ChangeEventInterface {
 		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
 		this.onContainer('beforeinput', (event: InputEvent) => {
 			const { inputType } = event;
-			if (this.engine.readonly) {
-				event.preventDefault();
-				return;
-			}
 			const commandTypes = ['format', 'history'];
-			commandTypes.forEach(type => {
+			commandTypes.forEach((type) => {
 				if (inputType.indexOf(type) === 0) {
 					event.preventDefault();
 					const commandName = inputType
@@ -114,13 +110,13 @@ class ChangeEvent implements ChangeEventInterface {
 		const { bindSelect } = this.options;
 		if (bindSelect && !bindSelect()) return;
 		// 模拟 selection change 事件
-		this.onContainer('mousedown', e => {
+		this.onContainer('mousedown', (e) => {
 			if (this.isCardInput(e)) {
 				return;
 			}
 			this.isSelecting = true;
 		});
-		this.onDocument('mouseup', e => {
+		this.onDocument('mouseup', (e) => {
 			if (!this.isSelecting) {
 				return;
 			}
@@ -135,7 +131,7 @@ class ChangeEvent implements ChangeEventInterface {
 			this.keydownRange = range;
 		});
 		// 补齐通过键盘选中的情况
-		this.onContainer('keyup', e => {
+		this.onContainer('keyup', (e) => {
 			if (this.engine.readonly) {
 				return;
 			}
@@ -183,7 +179,7 @@ class ChangeEvent implements ChangeEventInterface {
 		const { bindPaste } = this.options;
 		if (bindPaste && !bindPaste()) return;
 		let isPasteText = false;
-		this.onContainer('keydown', e => {
+		this.onContainer('keydown', (e) => {
 			if (this.engine.readonly) {
 				return;
 			}
@@ -201,7 +197,7 @@ class ChangeEvent implements ChangeEventInterface {
 			}
 		});
 		// https://developer.mozilla.org/en-US/docs/Web/Events/paste
-		this.onContainer('paste', e => {
+		this.onContainer('paste', (e) => {
 			if (this.engine.readonly) {
 				return;
 			}
@@ -314,7 +310,7 @@ class ChangeEvent implements ChangeEventInterface {
 			// Edge 兼容性处理
 			try {
 				if (transfer && transfer.items && transfer.items.length > 0) {
-					Array.from(transfer.items).forEach(item => {
+					Array.from(transfer.items).forEach((item) => {
 						if (item.kind === 'file') {
 							const file = item.getAsFile();
 							if (file) files.push(file);
@@ -385,7 +381,7 @@ class ChangeEvent implements ChangeEventInterface {
 	}
 
 	destroy() {
-		this.events.forEach(item => {
+		this.events.forEach((item) => {
 			if (item.type === 'window') {
 				window.removeEventListener(
 					item.eventType,

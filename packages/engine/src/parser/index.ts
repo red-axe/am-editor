@@ -10,7 +10,7 @@ import {
 	ConversionRule,
 	SchemaRule,
 } from '../types';
-import { CARD_ELEMENT_KEY } from '../constants';
+import { CARD_ELEMENT_KEY, CARD_KEY, READY_CARD_KEY } from '../constants';
 import {
 	escape,
 	unescape,
@@ -41,7 +41,7 @@ const escapeAttr = (value: string) => {
 
 const attrsToString = (attrs: { [k: string]: string }) => {
 	let attrsString = '';
-	Object.keys(attrs).forEach(key => {
+	Object.keys(attrs).forEach((key) => {
 		if (key === 'style') {
 			return;
 		}
@@ -53,7 +53,7 @@ const attrsToString = (attrs: { [k: string]: string }) => {
 
 const stylesToString = (styles: { [k: string]: string }) => {
 	let stylesString = '';
-	Object.keys(styles).forEach(key => {
+	Object.keys(styles).forEach((key) => {
 		let val = escape(styles[key]);
 
 		if (
@@ -101,7 +101,7 @@ class Parser implements ParserInterface {
 			);
 			this.root = $(doc.body);
 			const p = $('<p></p>');
-			this.root.find('paragraph').each(child => {
+			this.root.find('paragraph').each((child) => {
 				node.replace($(child), p.clone());
 			});
 		} else if (isNodeEntry(source)) {
@@ -120,7 +120,7 @@ class Parser implements ParserInterface {
 		const inlineApi = this.editor.inline;
 		const markApi = this.editor.mark;
 		//转换标签和分割 mark 和 inline 标签
-		root.allChildren().forEach(child => {
+		root.allChildren().forEach((child) => {
 			let node = $(child);
 			if (node.isElement()) {
 				//转换标签
@@ -138,7 +138,10 @@ class Parser implements ParserInterface {
 						});
 						//把旧节点的子节点追加到新节点下
 						newNode.append(node.children());
-						if (node.isCard()) {
+						if (
+							node.attributes(CARD_KEY) ||
+							node.attributes(READY_CARD_KEY)
+						) {
 							node.before(newNode);
 							node.remove();
 							value = undefined;
@@ -150,11 +153,15 @@ class Parser implements ParserInterface {
 						//排除之前的过滤规则后再次过滤
 						value = conversion.transform(
 							node,
-							r => oldRules.indexOf(r) < 0,
+							(r) => oldRules.indexOf(r) < 0,
 						);
 					}
 				}
-				if (node.isCard()) return;
+				if (
+					node.attributes(CARD_KEY) ||
+					node.attributes(READY_CARD_KEY)
+				)
+					return;
 				//分割
 				const filter = (node: NodeInterface) => {
 					//获取节点属性样式
@@ -168,12 +175,12 @@ class Parser implements ParserInterface {
 					//移除 data-id，以免在下次判断类型的时候使用缓存
 					newNode.removeAttributes('data-id');
 					//移除符合当前节点的属性样式，剩余的属性样式组成新的节点
-					Object.keys(attributes).forEach(name => {
+					Object.keys(attributes).forEach((name) => {
 						if (attributes[name]) {
 							newNode.removeAttributes(name);
 						}
 					});
-					Object.keys(style).forEach(name => {
+					Object.keys(style).forEach((name) => {
 						if (style[name]) {
 							newNode.css(name, '');
 						}
@@ -201,7 +208,7 @@ class Parser implements ParserInterface {
 						) {
 							const cloneMark = parentMark.clone();
 							const inlineMark = node.clone();
-							parentMark.each(markChild => {
+							parentMark.each((markChild) => {
 								if (node.equal(markChild)) {
 									nodeApi.wrap(
 										nodeApi.replace(node, cloneMark),
@@ -226,7 +233,7 @@ class Parser implements ParserInterface {
 						//获取这个新的节点所属类型，并且不能是之前节点一样的规则
 						let type = schema.getType(
 							newNode,
-							rule =>
+							(rule) =>
 								rule.name === newNode.name &&
 								rule.type === 'mark' &&
 								oldRules.indexOf(rule) < 0,
@@ -239,7 +246,7 @@ class Parser implements ParserInterface {
 							//获取这个新的节点所属类型，并且不能是之前节点一样的规则
 							type = schema.getType(
 								newNode,
-								rule =>
+								(rule) =>
 									rule.name === newNode.name &&
 									rule.type === 'mark' &&
 									oldRules.indexOf(rule) < 0,
@@ -420,7 +427,7 @@ class Parser implements ParserInterface {
 			},
 			onText: (_, text) => {
 				if (replaceSpaces && text.length > 1) {
-					text = text.replace(/[\u00a0 ]+/g, item => {
+					text = text.replace(/[\u00a0 ]+/g, (item) => {
 						const strArray = [];
 						item = item.replace(/\u00a0/g, ' ');
 						for (let n = 0; n < item.length; n++)
@@ -464,15 +471,13 @@ class Parser implements ParserInterface {
 	toHTML(inner?: Node, outter?: Node) {
 		const element = $('<div />');
 		if (inner && outter) {
-			$(inner)
-				.append(this.root)
-				.css(style);
+			$(inner).append(this.root).css(style);
 			element.append(outter);
 		} else {
 			element.append(this.root);
 		}
 		this.editor.trigger('paser:html-before', this.root);
-		element.traverse(domNode => {
+		element.traverse((domNode) => {
 			const node = domNode.get<HTMLElement>();
 			if (
 				node &&

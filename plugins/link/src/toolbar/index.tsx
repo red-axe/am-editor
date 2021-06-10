@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ConfigProvider from 'antd/es/config-provider';
-import { $, EngineInterface, NodeInterface } from '@aomao/engine';
+import { $, EngineInterface, NodeInterface, isMobile } from '@aomao/engine';
 import Editor from './editor';
 import Preview from './preview';
 
@@ -27,7 +27,11 @@ class Toolbar {
 		if (!this.target) return;
 		let root = $('.data-link-container');
 		if (root.length === 0) {
-			root = $('<div class="data-link-container"></div>');
+			root = $(
+				`<div class="data-link-container${
+					isMobile ? ' data-link-container-mobile' : ''
+				}"></div>`,
+			);
 			document.body.appendChild(root[0]);
 		}
 		this.root = root;
@@ -51,7 +55,7 @@ class Toolbar {
 		const { height, width } = rootRect;
 		const styleLeft =
 			left + width > window.innerWidth - 20
-				? window.pageXOffset + window.innerWidth - width - 20
+				? window.pageXOffset + window.innerWidth - width - 10
 				: 20 > left - window.pageXOffset
 				? window.pageXOffset + 20
 				: window.pageXOffset + left;
@@ -67,7 +71,7 @@ class Toolbar {
 
 	private onOk(text: string, link: string) {
 		if (!this.target) return;
-		const { change, history, inline } = this.engine;
+		const { change, history } = this.engine;
 		const range = change.getRange();
 		if (!change.rangePathBeforeCommand) {
 			if (!range.startNode.inEditor()) {
@@ -145,6 +149,8 @@ class Toolbar {
 			container,
 			() => {
 				this.update();
+				window.addEventListener('scroll', this.update, true);
+				window.addEventListener('resize', this.update, true);
 			},
 		);
 	}
@@ -155,6 +161,8 @@ class Toolbar {
 		if (elment && !this.mouseInContainer) {
 			ReactDOM.unmountComponentAtNode(elment);
 			document.body.removeChild(elment);
+			window.removeEventListener('scroll', this.update, true);
+			window.removeEventListener('resize', this.update, true);
 			this.root = undefined;
 			if (this.target && !this.target.attributes('href')) {
 				const { change, inline } = this.engine;

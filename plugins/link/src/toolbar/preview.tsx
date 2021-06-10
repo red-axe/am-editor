@@ -29,12 +29,17 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({
 					{href}
 				</a>
 			</Tooltip>
-			<Tooltip title={language.get('link', 'link_edit')}>
-				<a className="data-icon data-icon-edit" onClick={onEdit} />
-			</Tooltip>
-			<Tooltip title={language.get('link', 'link_remove')}>
-				<a className="data-icon data-icon-unlink" onClick={onRemove} />
-			</Tooltip>
+			<div className="data-link-op">
+				<Tooltip title={language.get('link', 'link_edit')}>
+					<a className="data-icon data-icon-edit" onClick={onEdit} />
+				</Tooltip>
+				<Tooltip title={language.get('link', 'link_remove')}>
+					<a
+						className="data-icon data-icon-unlink"
+						onClick={onRemove}
+					/>
+				</Tooltip>
+			</div>
 		</div>
 	);
 };

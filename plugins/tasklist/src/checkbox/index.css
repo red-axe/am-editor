@@ -33,7 +33,7 @@
 	visibility: hidden;
 }
 
-.data-checkbox:focus .data-checkbox-inner,.data-checkbox:hover .data-checkbox-inner {
+.data-checkbox:not(.data-checkbox-mobile):focus .data-checkbox-inner,.data-checkbox:not(.data-checkbox-mobile) .data-checkbox-inner {
     border-color: #347eff
 }
 

@@ -10,9 +10,10 @@ import {
 	ToolbarInterface as ToolbarBaseInterface,
 } from '../../types/toolbar';
 import { EditorInterface } from '../../types/engine';
-import './index.css';
 import { DATA_ELEMENT, UI } from '../../constants';
 import { $ } from '../../node';
+import { isMobile } from '../../utils';
+import './index.css';
 
 export const isCardToolbarItemOptions = (
 	item: ToolbarItemOptions | CardToolbarItemOptions,
@@ -115,11 +116,12 @@ class CardToolbar implements CardToolbarInterface {
 			const { root, language } = this.editor;
 			this.hide();
 			const items: Array<ToolbarItemOptions> = [];
-			config.forEach(item => {
+			config.forEach((item) => {
 				//默认项
 				if (isCardToolbarItemOptions(item)) {
 					switch (item.type) {
 						case 'dnd':
+							if (isMobile) return;
 							const dndNode = this.createDnd(
 								item.content ||
 									'<span class="data-icon data-icon-drag"></span>',
@@ -241,7 +243,7 @@ class CardToolbar implements CardToolbarInterface {
 		dndNode.on('mouseleave', () => {
 			Tooltip.hide();
 		});
-		dndNode.on('mousedown', e => {
+		dndNode.on('mousedown', (e) => {
 			e.stopPropagation();
 			Tooltip.hide();
 			this.hideCardToolbar();
