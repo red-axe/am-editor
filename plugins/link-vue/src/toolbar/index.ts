@@ -40,11 +40,11 @@ class Toolbar {
 			top: `${window.pageYOffset + rect.bottom + 4}px`,
 			left: `${window.pageXOffset}px`,
 			position: 'absolute',
-			'z-index': 1400,
+			'z-index': 1,
 		});
 	}
 
-	private update() {
+	private update = () => {
 		if (!this.root || !this.target) return;
 		const targetRect = this.target.get<Element>()?.getBoundingClientRect();
 		if (!targetRect) return;
@@ -66,11 +66,11 @@ class Toolbar {
 			top: `${styleTop}px`,
 			left: `${styleLeft}px`,
 		});
-	}
+	};
 
 	private onOk(text: string, link: string) {
 		if (!this.target) return;
-		const { change, history, inline } = this.engine;
+		const { change, history } = this.engine;
 		const range = change.getRange();
 		if (!change.rangePathBeforeCommand) {
 			if (!range.startNode.inEditor()) {
@@ -142,9 +142,7 @@ class Toolbar {
 		const text = target.text().replace(/\u200B/g, '');
 		const href = target.attributes('href');
 		const container = this.root!.get<HTMLDivElement>()!;
-		const callback = () => {
-			this.update();
-		};
+
 		const name = !href || forceEdit ? 'am-link-editor' : 'am-link-preview';
 		if (this.vm && this.vm._component.name === name) {
 			this.update();
@@ -160,8 +158,8 @@ class Toolbar {
 		setTimeout(() => {
 			this.vm =
 				!href || forceEdit
-					? this.editor(text, href, callback)
-					: this.preview(href, callback);
+					? this.editor(text, href, this.update)
+					: this.preview(href, this.update);
 			this.vm.mount(container);
 		}, 20);
 	}

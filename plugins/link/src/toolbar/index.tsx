@@ -41,11 +41,11 @@ class Toolbar {
 			top: `${window.pageYOffset + rect.bottom + 4}px`,
 			left: `${window.pageXOffset}px`,
 			position: 'absolute',
-			'z-index': 1400,
+			'z-index': 1,
 		});
 	}
 
-	private update() {
+	private update = () => {
 		if (!this.root || !this.target) return;
 		const targetRect = this.target.get<Element>()?.getBoundingClientRect();
 		if (!targetRect) return;
@@ -67,7 +67,7 @@ class Toolbar {
 			top: `${styleTop}px`,
 			left: `${styleLeft}px`,
 		});
-	}
+	};
 
 	private onOk(text: string, link: string) {
 		if (!this.target) return;
