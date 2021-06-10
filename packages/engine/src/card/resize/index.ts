@@ -97,7 +97,6 @@ class Resize implements ResizeInterface {
 	};
 
 	dragMove = (event: MouseEvent) => {
-		console.log(this.point);
 		if (this.point) {
 			const { dragMove } = this.options;
 			if (dragMove) dragMove(event.clientY - this.point.y);

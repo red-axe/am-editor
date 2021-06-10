@@ -50,9 +50,9 @@ class ChangeModel implements ChangeInterface {
 		this.engine = engine;
 		this.event = new ChangeEvent(engine, {});
 
-		this.onChange = this.options.onChange || function() {};
-		this.onSelect = this.options.onSelect || function() {};
-		this.onSetValue = this.options.onSetValue || function() {};
+		this.onChange = this.options.onChange || function () {};
+		this.onSelect = this.options.onSelect || function () {};
+		this.onSetValue = this.options.onSetValue || function () {};
 
 		this.initNativeEvents();
 	}
@@ -249,9 +249,9 @@ class ChangeModel implements ChangeInterface {
 			range.collapse(true);
 			this.select(range);
 		} else {
-			const parser = new Parser(value, this.engine, root => {
+			const parser = new Parser(value, this.engine, (root) => {
 				mark.removeEmptyMarks(root);
-				root.allChildren().forEach(child => {
+				root.allChildren().forEach((child) => {
 					if (node.isInline(child)) {
 						inline.repairCursor(child);
 					}
@@ -261,7 +261,7 @@ class ChangeModel implements ChangeInterface {
 				});
 			});
 			container.html(parser.toValue(schema, conversion, false, true));
-			container.allChildren().forEach(child => {
+			container.allChildren().forEach((child) => {
 				if (node.isInline(child)) {
 					inline.repairCursor(child);
 				}
@@ -357,9 +357,9 @@ class ChangeModel implements ChangeInterface {
 					cardLeftText = escape(cardLeftText);
 					range.setStartBefore(card.root);
 					range.collapse(true);
-					this.select(range);
 					node.html(cardLeft, '&#8203;');
-					node.insertText(cardLeftText);
+					node.insertText(cardLeftText, range);
+					this.select(range);
 				}
 			} else if (card.isRightCursor(commonAncestorNode)) {
 				const cardRight = commonAncestorNode.closest(
@@ -370,9 +370,9 @@ class ChangeModel implements ChangeInterface {
 					cardRightText = escape(cardRightText);
 					range.setEndAfter(card.root);
 					range.collapse(false);
-					this.select(range);
 					node.html(cardRight, '&#8203;');
-					node.insertText(cardRightText);
+					node.insertText(cardRightText, range);
+					this.select(range);
 				}
 			} else this.getSafeRange(range);
 		}
@@ -456,15 +456,12 @@ class ChangeModel implements ChangeInterface {
 					);
 					lastText.remove();
 					if (node.isEmpty(parent)) parent.remove();
-					mark.unwrap(markTops.map(mark => mark.clone()));
+					mark.unwrap(markTops.map((mark) => mark.clone()));
 					node.insertText(
 						text.substr(text.length - event.data.length),
 					);
 					mark.merge();
-					range = change
-						.getRange()
-						.cloneRange()
-						.shrinkToTextNode();
+					range = change.getRange().cloneRange().shrinkToTextNode();
 					startNode = range.startNode;
 					startOffset = range.startOffset;
 					textNode = startNode.get<Text>()!;
@@ -537,13 +534,10 @@ class ChangeModel implements ChangeInterface {
 					textNode.splitText(event.data.length);
 					textNode.remove();
 					if (node.isEmpty(parent)) parent.remove();
-					mark.unwrap(markTops.map(mark => mark.clone()));
+					mark.unwrap(markTops.map((mark) => mark.clone()));
 					node.insertText(event.data);
 					mark.merge();
-					range = change
-						.getRange()
-						.cloneRange()
-						.shrinkToTextNode();
+					range = change.getRange().cloneRange().shrinkToTextNode();
 					startNode = range.startNode;
 					startOffset = range.startOffset;
 					textNode = startNode.get<Text>()!;
@@ -671,7 +665,7 @@ class ChangeModel implements ChangeInterface {
 			const selection = window?.getSelection();
 			if (selection && selection.anchorNode) {
 				const range = Range.from(this.engine, selection)!;
-				card.each(card => {
+				card.each((card) => {
 					const center = card.getCenter();
 					if (center && center.length > 0) {
 						let isSelect = selection.containsNode(center[0]);
@@ -706,7 +700,7 @@ class ChangeModel implements ChangeInterface {
 					cardComponent.select(true);
 				}
 			} else {
-				card.each(card => card.select(false));
+				card.each((card) => card.select(false));
 			}
 		});
 		this.event.onSelect(() => {
@@ -776,11 +770,11 @@ class ChangeModel implements ChangeInterface {
 			card.activate(targetNode, ActiveTrigger.MOUSE_DOWN);
 		});
 
-		this.event.onDocument('copy', event => {
+		this.event.onDocument('copy', (event) => {
 			clipboard.write(event);
 		});
 
-		this.event.onContainer('cut', event => {
+		this.event.onContainer('cut', (event) => {
 			event.stopPropagation();
 			clipboard.write(event, undefined, () => {
 				clipboard.cut();
@@ -827,7 +821,7 @@ class ChangeModel implements ChangeInterface {
 			}
 		};
 
-		this.event.onPaste(data => {
+		this.event.onPaste((data) => {
 			const { html, text, files, isPasteText } = data;
 			let source = '';
 			if (files.length === 0) {
@@ -893,7 +887,7 @@ class ChangeModel implements ChangeInterface {
 	paste(source: string) {
 		const fragment = new Paste(source, this.engine).normalize();
 		this.engine.trigger('paste:before', fragment);
-		this.insertFragment(fragment, range => {
+		this.insertFragment(fragment, (range) => {
 			this.engine.trigger('paste:insert', range);
 			const selection = range.createSelection();
 			this.engine.card.render();
@@ -960,7 +954,7 @@ class ChangeModel implements ChangeInterface {
 		const endNode = range.startContainer.childNodes[range.startOffset];
 
 		if (mergeNode[0]) {
-			childNodes.forEach(node => {
+			childNodes.forEach((node) => {
 				if (mergeTags.indexOf($(node).name) < 0) {
 					nodeApi.wrap($(node), nodeApi.clone(mergeNode, false));
 				}
@@ -1204,7 +1198,7 @@ class ChangeModel implements ChangeInterface {
 		) {
 			deepMergeNode(safeRange, $(prevNode), $(nextNode), activeMarks);
 		}
-		startNode.children().each(node => {
+		startNode.children().each((node) => {
 			const domNode = $(node);
 			if (
 				!nodeApi.isVoid(domNode) &&
