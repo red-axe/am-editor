@@ -27,6 +27,7 @@ In modern enterprises, collaborative office is synonymous with high efficiency. 
 -   📋 Rich multimedia support, not only supports pictures, audio and video, but also supports inserting embedded multimedia content
 -   🐠 Do not rely on front-end framework, easy to deal with complex architecture
 -   📡 Built-in collaborative editing program, ready to use with lightweight configuration
+-   📱 Compatible with most of the latest mobile browsers
 
 ## All plugins
 
@@ -104,7 +105,7 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', value => {
+		engine.on('change', (value) => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
