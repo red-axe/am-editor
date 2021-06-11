@@ -114,7 +114,7 @@ const EngineDemo = () => {
 					content: content.current,
 				},
 			})
-			.then(res => {
+			.then((res) => {
 				console.log(res);
 			});
 	}, [value, engineRef]);
@@ -122,6 +122,16 @@ const EngineDemo = () => {
 	 * 60秒内无更改自动保存
 	 */
 	const onSave = useCallback(debounce(save, 60000), [save]);
+
+	//用户主动保存
+	const userSave = () => {
+		if (!engineRef.current) return;
+		//获取异步的值，有些组件可能还在处理中，比如正在上传
+		engineRef.current.getValueAsync().then((editorValue) => {
+			value.current = editorValue;
+			save();
+		});
+	};
 
 	useEffect(() => {
 		if (!ref.current || loading) return;
@@ -208,15 +218,7 @@ const EngineDemo = () => {
 		};
 		//初始化本地协作，用作记录历史
 		engine.ot.initLockMode();
-		//用户主动保存
-		const userSave = () => {
-			if (!engine) return;
-			//获取异步的值，有些组件可能还在处理中，比如正在上传
-			engine.getValueAsync().then(editorValue => {
-				value.current = editorValue;
-				save();
-			});
-		};
+
 		//手动保存
 		engine.container.on('keydown', (event: KeyboardEvent) => {
 			if (isHotkey('mod+s', event)) {
@@ -225,7 +227,7 @@ const EngineDemo = () => {
 			}
 		});
 		//监听编辑器值改变事件
-		engine.on('change', editorValue => {
+		engine.on('change', (editorValue) => {
 			value.current = editorValue;
 			//自动保存
 			onSave();
@@ -234,30 +236,45 @@ const EngineDemo = () => {
 		});
 		//卡片最大化时设置编辑页面样式
 		engine.on('card:maximize', () => {
-			$('.editor-toolbar')
-				.css('z-index', '9999')
-				.css('top', '56px');
+			$('.editor-toolbar').css('z-index', '9999').css('top', '56px');
 		});
 		engine.on('card:minimize', () => {
-			$('.editor-toolbar')
-				.css('z-index', '')
-				.css('top', '');
+			$('.editor-toolbar').css('z-index', '').css('top', '');
 		});
+
+		engineRef.current = engine;
+		setEditorLoading(false);
+		return () => {
+			engine.destroy();
+		};
+	}, [loading]);
+
+	useEffect(() => {
+		if (editorLoading || !engineRef.current) return;
+		//设置编辑器值
+		const wrapValue = engineRef.current.command.execute(
+			MarkRange.pluginName,
+			'comment',
+			'wrap',
+			content.current.paths,
+			content.current.value,
+		);
+		engineRef.current.setValue(wrapValue);
 		//实例化协作编辑客户端
-		const ot = new OTClient(engine);
+		const ot = new OTClient(engineRef.current);
 		//连接到协作服务端，demo文档
 		const ws = IS_DEV
 			? `ws://${window.location.hostname}:8080`
 			: 'wss://collab.aomao.com';
 		const member = getMember();
 		ot.connect(`${ws}${member ? '?uid=' + member.id : ''}`, 'demo');
-		ot.on('ready', member => {
+		ot.on('ready', (member) => {
 			//保存当前会员信息
 			if (member) localStorage.setItem('member', JSON.stringify(member));
 			setMember(member);
 		});
 		//用户加入或退出改变
-		ot.on('membersChange', members => {
+		ot.on('membersChange', (members) => {
 			setMembers(members);
 		});
 		//状态改变，退出时，强制保存
@@ -278,25 +295,9 @@ const EngineDemo = () => {
 		});
 
 		otClient.current = ot;
-		engineRef.current = engine;
-		setEditorLoading(false);
 		return () => {
 			ot.exit();
-			engine.destroy();
 		};
-	}, [loading]);
-
-	useEffect(() => {
-		if (editorLoading || !engineRef.current) return;
-		//设置编辑器值
-		const wrapValue = engineRef.current.command.execute(
-			MarkRange.pluginName,
-			'comment',
-			'wrap',
-			content.current.paths,
-			content.current.value,
-		);
-		engineRef.current.setValue(wrapValue);
 	}, [editorLoading]);
 
 	if (loading) return <Loading />;
@@ -324,7 +325,7 @@ const EngineDemo = () => {
 							)}
 						</span>
 					)}
-					{members.map(member => {
+					{members.map((member) => {
 						return (
 							<Avatar
 								key={member['id']}

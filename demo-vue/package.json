@@ -22,7 +22,7 @@
     "@aomao/plugin-image": "^2.2.1",
     "@aomao/plugin-indent": "^2.2.1",
     "@aomao/plugin-italic": "^2.2.1",
-    "@aomao/plugin-link-vue": "^2.2.1",
+    "@aomao/plugin-link-vue": "^2.2.2",
     "@aomao/plugin-mark": "^2.2.1",
     "@aomao/plugin-orderedlist": "^2.2.1",
     "@aomao/plugin-paintformat": "^2.2.1",
