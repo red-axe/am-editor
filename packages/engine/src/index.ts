@@ -22,7 +22,7 @@ import Request, {
 	getFileSize,
 } from './request';
 import Scrollbar from './scrollbar';
-import { $ } from './node';
+import { $, getHashId } from './node';
 
 export * from './types';
 export * from './utils';
@@ -32,6 +32,7 @@ export default Engine;
 
 export {
 	$,
+	getHashId,
 	Selection,
 	Range,
 	View,

@@ -16,7 +16,7 @@ The following three plugins are different
 
 [React case](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
 
-[Vue case](https://github.com/itellyou-com/am-editor/tree/master/demo-vue)
+[Vue case](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
 
 ### Installation
 
@@ -56,7 +56,7 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', value => {
+		engine.on('change', (value) => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -114,7 +114,7 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', value => {
+		engine.on('change', (value) => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -176,7 +176,7 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', value => {
+		engine.on('change', (value) => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -261,7 +261,7 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', value => {
+		engine.on('change', (value) => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});

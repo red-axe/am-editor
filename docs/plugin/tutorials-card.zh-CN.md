@@ -194,7 +194,7 @@ export default class extends Card {
 			{
 				type: 'node',
 				node: $('<div />'),
-				didMount: node => {
+				didMount: (node) => {
 					//加载完成后，可以使用前端框架渲染组件到 node 节点上
 					console.log(`按钮加载好了，${node}`);
 				},
@@ -245,10 +245,8 @@ export default class extends Card {
 
 ### 与插件结合
 
-````ts
-import {
-	Plugin
-} from '@aomao/engine';
+```ts
+import { Plugin } from '@aomao/engine';
 import CardComponent from './component';
 
 export default class extends Plugin<Options> {
@@ -259,12 +257,11 @@ export default class extends Plugin<Options> {
 	execute() {
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
-        //插入卡片
+		//插入卡片
 		card.insert(CardComponent.cardName);
 	}
 }
 export { CardComponent };
-
 ```
 
 ## 静态属性
@@ -279,12 +276,12 @@ export { CardComponent };
 
 ```ts
 export default class extends Plugin {
-    //定义卡片名称，它是必须的
+	//定义卡片名称，它是必须的
 	static get cardName() {
 		return '卡片名称';
 	}
 }
-````
+```
 
 ### `cardType`
 

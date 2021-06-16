@@ -7,4 +7,4 @@ nav:
     order: 1
 ---
 
-<code src="../demo/view.tsx" inline />
+<code src="../../examples/react/view.tsx" inline />

@@ -1,8 +1,6 @@
 const { Controller } = require('egg');
 const fs = require('fs');
 
-let index = 0;
-
 const path = './app/data/comment.json';
 
 const getComments = () => {
@@ -15,7 +13,7 @@ const getComments = () => {
 	}
 };
 
-const saveComments = comments => {
+const saveComments = (comments) => {
 	try {
 		fs.writeFileSync(path, JSON.stringify(comments));
 	} catch (error) {
@@ -30,10 +28,8 @@ class CommentController extends Controller {
 		const { title, render_id, content, username } = ctx.request.body;
 
 		const comments = getComments();
-		//自增编号
-		index++;
 		//获取评论集合
-		let comment = comments.find(c => c.id === render_id);
+		let comment = comments.find((c) => c.id === render_id);
 		const isHave = !!comment;
 		comment = comment || {
 			id: render_id,
@@ -43,7 +39,7 @@ class CommentController extends Controller {
 		};
 		//加入子评论
 		const info = {
-			id: index,
+			id: comments.length + 1,
 			username,
 			content,
 			createdAt: new Date().getTime(),
@@ -61,7 +57,7 @@ class CommentController extends Controller {
 		const comments = getComments();
 		//移除评论集合
 		if (!!render_id && !id) {
-			const index = comments.findIndex(c => c.id === render_id);
+			const index = comments.findIndex((c) => c.id === render_id);
 			if (index > -1) {
 				comments.splice(index, 1);
 			}
@@ -70,7 +66,7 @@ class CommentController extends Controller {
 		else if (!!render_id && !!id) {
 			comments.some((comment, index) => {
 				const cIndex = comment.children.findIndex(
-					c => c.id === parseInt(id, 10),
+					(c) => c.id === parseInt(id, 10),
 				);
 				if (cIndex > -1) {
 					comment.children.splice(cIndex, 1);
@@ -90,10 +86,10 @@ class CommentController extends Controller {
 
 		const { render_id, id, content } = ctx.request.body;
 		const comments = getComments();
-		const index = comments.findIndex(c => c.id === render_id);
+		const index = comments.findIndex((c) => c.id === render_id);
 		if (index > -1) {
 			const comment = comments[index].children.find(
-				c => c.id === parseInt(id, 10),
+				(c) => c.id === parseInt(id, 10),
 			);
 			comment.content = content;
 			comment.createdAt = new Date().getTime();
@@ -110,7 +106,7 @@ class CommentController extends Controller {
 
 		const { ids, status } = ctx.request.body;
 		const comments = getComments();
-		comments.forEach(comment => {
+		comments.forEach((comment) => {
 			if (ids.split(',').indexOf(comment.id) > -1) {
 				comment.status = status;
 			}
@@ -128,7 +124,7 @@ class CommentController extends Controller {
 	async find() {
 		const { render_id } = ctx.request.body;
 		const comments = getComments();
-		const comment = comments.findIndex(c => c.id === render_id);
+		const comment = comments.findIndex((c) => c.id === render_id);
 		ctx.body = !!comment
 			? { code: 200, message: '', data: comment }
 			: { code: 404, message: 'Not found' };

@@ -5,7 +5,7 @@ import {
 	isNodeEntry,
 	isNodeList,
 } from '../types/node';
-import { getDocument, getWindow } from '../utils';
+import { getDocument, getWindow } from '../utils/node';
 
 /**
  * 解析节点
@@ -69,7 +69,7 @@ function domParser(
 	//类型为 DOMNode 类型
 	if (isNodeEntry(selector)) {
 		const nodes: Array<Node> = [];
-		selector.each(node => {
+		selector.each((node) => {
 			nodes.push(node);
 		});
 		return nodes;

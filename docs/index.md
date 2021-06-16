@@ -5,4 +5,4 @@ showFooter: false
 mobile: false
 ---
 
-<code src="./demo/engine.tsx" inline />
+<code src="../examples/react/editor.tsx" inline />

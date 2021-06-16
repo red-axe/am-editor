@@ -7,7 +7,8 @@ import {
 	BlockPlugin,
 	PluginEntry,
 } from '@aomao/engine';
-import Outline, { OutlineData } from './outline';
+import Outline from './outline';
+import type { OutlineData } from './outline';
 import './index.css';
 
 export type Options = {
@@ -43,13 +44,13 @@ export default class extends BlockPlugin<Options> {
 
 	init() {
 		super.init();
-		this.editor.on('paser:html', node => this.parseHtml(node));
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
 		const { language } = this.editor;
 		//阅读模式处理
 		if (!isEngine(this.editor) && this.options.showAnchor !== false) {
 			this.editor.on('render', (root: Node) => {
 				const container = $(root);
-				container.find(this.tagName.join(',')).each(heading => {
+				container.find(this.tagName.join(',')).each((heading) => {
 					const node = $(heading);
 					const id = node.attributes('id');
 					if (id) {
@@ -72,7 +73,7 @@ export default class extends BlockPlugin<Options> {
 							Tooltip.hide();
 						});
 
-						button.on('click', e => {
+						button.on('click', (e) => {
 							e.preventDefault();
 							e.stopPropagation();
 							const url = this.options.anchorCopy
@@ -95,10 +96,10 @@ export default class extends BlockPlugin<Options> {
 			});
 		}
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:backspace', event =>
+			this.editor.on('keydown:backspace', (event) =>
 				this.onBackspace(event),
 			);
-			this.editor.on('paste:markdown', child =>
+			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
 		}
@@ -125,7 +126,7 @@ export default class extends BlockPlugin<Options> {
 	}
 
 	updateId() {
-		this.editor.container.find(this.tagName.join(',')).each(titleNode => {
+		this.editor.container.find(this.tagName.join(',')).each((titleNode) => {
 			const node = $(titleNode);
 
 			if (!node.parent()?.isEditable()) {
@@ -240,7 +241,7 @@ export default class extends BlockPlugin<Options> {
 			Tooltip.hide();
 		});
 
-		button.on('click', e => {
+		button.on('click', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
 			const id = block.attributes('id');
@@ -275,8 +276,8 @@ export default class extends BlockPlugin<Options> {
 		if (blocks.length === 0) {
 			return '';
 		}
-		const name = this.tagName.find(name =>
-			blocks.some(block => block.name === name),
+		const name = this.tagName.find((name) =>
+			blocks.some((block) => block.name === name),
 		);
 		return name || '';
 	}
@@ -398,7 +399,7 @@ export default class extends BlockPlugin<Options> {
 				margin: '0',
 				'font-weight': '700',
 			})
-			.each(node => {
+			.each((node) => {
 				const element = node as HTMLElement;
 				if ('H1' === element.tagName) {
 					element.style['font-size'] = '28px';
@@ -424,4 +425,6 @@ export default class extends BlockPlugin<Options> {
 	}
 }
 
-export { Outline, OutlineData };
+export type { OutlineData };
+
+export { Outline };

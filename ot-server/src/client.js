@@ -8,15 +8,29 @@ class Client {
 		this.backend = backend;
 	}
 
+	getDoc(docId) {
+		return this.docs.find((doc) => doc.id === docId);
+	}
+
+	getUUID(docId, id) {
+		return v3(docId.toString().concat('/' + id), v3.URL);
+	}
+
+	hasUUID(docId, uuid) {
+		const doc = this.getDoc(docId);
+		if (!doc) return false;
+		return doc.hasMember(uuid);
+	}
+
 	add(ws, docId, member) {
 		if (!member.uuid) {
-			member.uuid = v3(docId.toString().concat('/' + member.id), v3.URL);
+			member.uuid = this.getUUID(docId, member.id);
 		}
-		let doc = this.docs.find(doc => doc.id === docId);
+		let doc = this.docs.find((doc) => doc.id === docId);
 		if (!doc) {
 			doc = new Doc(docId, this.backend, () => {
 				//注销
-				const index = this.docs.findIndex(doc => doc.id === docId);
+				const index = this.docs.findIndex((doc) => doc.id === docId);
 				if (index > -1) {
 					doc.doc.destroy();
 					this.docs.splice(index, 1);

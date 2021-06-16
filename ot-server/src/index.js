@@ -8,7 +8,7 @@ const Client = require('./client');
 
 startServer();
 
-const getParams = request => {
+const getParams = (request) => {
 	return queryString.parse(url.parse(request.url).query);
 };
 
@@ -28,13 +28,24 @@ function startServer() {
 		var wss = new WebSocket.Server({ server });
 		const client = new Client();
 		let id = 1;
-		wss.on('connection', function(ws, request) {
+		const getId = (docId, userId) => {
+			let uuid = client.getUUID(docId, userId);
+			while (client.hasUUID(uuid)) {
+				id++;
+				userId = id;
+				uuid = client.getUUID(docId, userId);
+			}
+			return userId;
+		};
+		wss.on('connection', function (ws, request) {
 			//用户连接到 socket，此处应根据request获取到相关参数，并且处理用户token，传递到api，效验数据合法性
 			//此处为模拟演示数据
 			const params = getParams(request);
 			let { uid } = params;
 			if (!uid) uid = id;
-			client.add(ws, 'demo', {
+			const docId = 'demo';
+			uid = getId(docId, uid);
+			client.add(ws, docId, {
 				id: uid,
 				name: `Guest-${uid}`,
 			});

@@ -1,4 +1,3 @@
-import md5 from 'blueimp-md5';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import {
 	CARD_TYPE_KEY,
@@ -6,10 +5,9 @@ import {
 	READY_CARD_KEY,
 } from '../constants/card';
 import { DATA_ELEMENT } from '../constants/root';
-import { $ } from '../node';
+
 import { getWindow } from './node';
 import { isMacos } from './user-agent';
-import { isNode, isNodeEntry, NodeInterface } from '../types';
 
 /**
  * 随机字符串
@@ -24,38 +22,6 @@ export const random = (length: number = 5) => {
 		word += str.charAt(Math.floor(Math.random() * str.length));
 	}
 	return word;
-};
-
-const _counters: { [key: string]: number } = {};
-
-export const getHashId = (
-	value: string | NodeInterface | Node,
-	unique: boolean = true,
-) => {
-	let prefix = '';
-	if (isNode(value)) value = $(value);
-	if (isNodeEntry(value)) {
-		const attributes = value.attributes();
-		const styles = attributes['style'];
-		delete attributes['style'];
-		prefix = value.name.substring(0, 1);
-		value = `${value.name}_${Object.keys(attributes || {}).join(
-			',',
-		)}_${Object.values(attributes || {}).join(',')}_${Object.keys(
-			styles || {},
-		).join(',')}_${Object.values(styles || {}).join(',')}`;
-	}
-
-	let hash = prefix + md5(value).substr(0, 8);
-	if (unique) {
-		const counter = _counters[hash] || 0;
-		_counters[hash] = counter + 1;
-		if (counter > 0) {
-			hash = `${hash}-${counter}`;
-		}
-	}
-
-	return hash;
 };
 
 /**
@@ -95,9 +61,7 @@ export const toCamelCase = (
  */
 export const toHex = (rgb: string): string => {
 	const hex = (num: string) => {
-		const char = parseInt(num, 10)
-			.toString(16)
-			.toUpperCase();
+		const char = parseInt(num, 10).toString(16).toUpperCase();
 		return char.length > 1 ? char : '0' + char;
 	};
 
@@ -113,7 +77,8 @@ export const toHex = (rgb: string): string => {
  */
 export const getAttrMap = (value: string): { [k: string]: string } => {
 	const map: { [k: string]: string } = {};
-	const reg = /\s+(?:([\w\-:]+)|(?:([\w\-:]+)=([^\s"'<>]+))|(?:([\w\-:"]+)="([^"]*)")|(?:([\w\-:"]+)='([^']*)'))(?=(?:\s|\/|>)+)/g;
+	const reg =
+		/\s+(?:([\w\-:]+)|(?:([\w\-:]+)=([^\s"'<>]+))|(?:([\w\-:"]+)="([^"]*)")|(?:([\w\-:"]+)='([^']*)'))(?=(?:\s|\/|>)+)/g;
 	let match;
 
 	while ((match = reg.exec(value))) {
@@ -218,7 +183,7 @@ export const isUrl = (url: string) => {
 	}
 
 	if (
-		!!['http:', 'https:', 'data:', 'ftp:'].some(protocol => {
+		!!['http:', 'https:', 'data:', 'ftp:'].some((protocol) => {
 			return url.startsWith(protocol);
 		})
 	) {
@@ -311,7 +276,7 @@ export const transformCustomTags = (value: string) => {
 			const list = ['<'.concat(tagName)];
 			list.push(' '.concat(CARD_TYPE_KEY, '="').concat(type || '', '"'));
 			list.push(' '.concat(READY_CARD_KEY, '="').concat(name || '', '"'));
-			Object.keys(attrs).forEach(attrsName => {
+			Object.keys(attrs).forEach((attrsName) => {
 				if (
 					attrsName.indexOf('data-') === 0 &&
 					attrsName.indexOf('data-card') !== 0
@@ -352,7 +317,7 @@ export const validUrl = (url: string) => {
 	}
 
 	if (
-		!!['http:', 'https:', 'data:', 'ftp:'].some(protocol => {
+		!!['http:', 'https:', 'data:', 'ftp:'].some((protocol) => {
 			return url.startsWith(protocol);
 		})
 	) {
@@ -391,7 +356,7 @@ export const formatEngineValue = (value: string) => {
  */
 export const formatHotkey = (key: string) => {
 	let keys = key.toLowerCase().split('+');
-	keys = keys.map(key => {
+	keys = keys.map((key) => {
 		if (key === 'mod') {
 			return isMacos ? '⌘' : 'Ctrl';
 		} else if (key === 'opt') {

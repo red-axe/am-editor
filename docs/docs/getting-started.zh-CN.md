@@ -16,7 +16,7 @@ title: 快速上手
 
 [React 案例](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
 
-[Vue 案例](https://github.com/itellyou-com/am-editor/tree/master/demo-vue)
+[Vue 案例](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
 
 ### 安装
 
@@ -56,7 +56,7 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', value => {
+		engine.on('change', (value) => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -114,7 +114,7 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', value => {
+		engine.on('change', (value) => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -176,7 +176,7 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', value => {
+		engine.on('change', (value) => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -261,7 +261,7 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', value => {
+		engine.on('change', (value) => {
 			setContent(value);
 			console.log(`value:${value}`);
 		});

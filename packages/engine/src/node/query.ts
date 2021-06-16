@@ -6,7 +6,7 @@ import {
 	NodeEntry,
 	isNode,
 } from '../types/node';
-import { getDocument, getWindow } from '../utils';
+import { getDocument, getWindow } from '../utils/node';
 import Parse from './parse';
 
 /**

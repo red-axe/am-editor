@@ -22,9 +22,9 @@ import {
 	BlockModelInterface,
 	isBlockPlugin,
 } from '../types/block';
-import { getDocument, getHashId, getWindow } from '../utils';
+import { getDocument, getWindow } from '../utils';
 import { Backspace, Enter } from './typing';
-import { $ } from '../node';
+import { $, getHashId } from '../node';
 
 class Block implements BlockModelInterface {
 	private editor: EditorInterface;
@@ -41,14 +41,14 @@ class Block implements BlockModelInterface {
 			const enter = new Enter(editor);
 			typing
 				.getHandleListener('enter', 'keydown')
-				?.on(event => enter.trigger(event));
+				?.on((event) => enter.trigger(event));
 			//删除事件
 			const backspace = new Backspace(editor);
 			typing
 				.getHandleListener('backspace', 'keydown')
-				?.on(event => backspace.trigger(event));
+				?.on((event) => backspace.trigger(event));
 
-			event.on('keydown:space', event => this.triggerMarkdown(event));
+			event.on('keydown:space', (event) => this.triggerMarkdown(event));
 		}
 	}
 
@@ -71,7 +71,7 @@ class Block implements BlockModelInterface {
 		const blockNode = block.closest(node);
 		if (!editor.node.isRootBlock(blockNode)) return;
 		const text = block.getLeftText(blockNode);
-		return !Object.keys(editor.plugin.components).some(pluginName => {
+		return !Object.keys(editor.plugin.components).some((pluginName) => {
 			const plugin = editor.plugin.components[pluginName];
 			if (isBlockPlugin(plugin) && !!plugin.markdown) {
 				const reuslt = plugin.markdown(event, text, blockNode, node);
@@ -88,7 +88,7 @@ class Block implements BlockModelInterface {
 		const { node, schema, plugin } = this.editor;
 		if (!node.isBlock(block)) return;
 		let result: BlockInterface | undefined = undefined;
-		Object.keys(plugin.components).some(pluginName => {
+		Object.keys(plugin.components).some((pluginName) => {
 			const blockPlugin = plugin.components[pluginName];
 			if (
 				isBlockPlugin(blockPlugin) &&
@@ -100,7 +100,7 @@ class Block implements BlockModelInterface {
 				if (
 					(blockPlugin.attributes || blockPlugin.style) &&
 					!(Array.isArray(schemaRule)
-						? schemaRule.find(rule =>
+						? schemaRule.find((rule) =>
 								schema.checkNode(block, rule.attributes),
 						  )
 						: schema.checkNode(block, schemaRule.attributes))
@@ -178,7 +178,7 @@ class Block implements BlockModelInterface {
 		const targetPlugin = this.findPlugin(block);
 		//一样的block插件不嵌套
 		blocks = blocks
-			.map(blockNode => {
+			.map((blockNode) => {
 				if (!blockNode || blockNode.isCard()) return null;
 				const wrapBlock = block as NodeInterface;
 				let blockParent = blockNode?.parent();
@@ -199,7 +199,7 @@ class Block implements BlockModelInterface {
 				}
 				return blockNode;
 			})
-			.filter(block => block !== null);
+			.filter((block) => block !== null);
 
 		// 不在段落内
 		if (blocks.length === 0) {
@@ -211,7 +211,7 @@ class Block implements BlockModelInterface {
 			)
 				return;
 			const selection = safeRange.createSelection();
-			root.children().each(node => {
+			root.children().each((node) => {
 				(block as NodeInterface).append(node);
 			});
 			root.append(block);
@@ -221,11 +221,11 @@ class Block implements BlockModelInterface {
 
 		const selection = safeRange.createSelection();
 		blocks[0]?.before(block);
-		blocks.forEach(child => {
+		blocks.forEach((child) => {
 			if (child) {
 				//先移除不能放入块级节点的mark标签
 				if (targetPlugin) {
-					child.allChildren().forEach(child => {
+					child.allChildren().forEach((child) => {
 						const markNode = $(child);
 						if (node.isMark(markNode)) {
 							const markPlugin = mark.findPlugin(markNode);
@@ -273,8 +273,8 @@ class Block implements BlockModelInterface {
 		if (!firstNodeParent?.inEditor()) {
 			return;
 		}
-		const hasLeft = blocks.some(item => item.position === 'left');
-		const hasRight = blocks.some(item => item.position === 'right');
+		const hasLeft = blocks.some((item) => item.position === 'left');
+		const hasRight = blocks.some((item) => item.position === 'right');
 		let leftParent: NodeInterface | undefined = undefined;
 
 		if (hasLeft) {
@@ -295,7 +295,7 @@ class Block implements BlockModelInterface {
 		// 插入范围的开始和结束标记
 		const selection = safeRange.createSelection();
 		const nodeApi = node;
-		blocks.forEach(item => {
+		blocks.forEach((item) => {
 			const status = item.position,
 				node = item.node,
 				parent = node.parent();
@@ -413,19 +413,13 @@ class Block implements BlockModelInterface {
 			const sc =
 				safeRange.startContainer.childNodes[safeRange.startOffset];
 			if (sc) {
-				safeRange
-					.select(sc, true)
-					.shrinkToElementNode()
-					.collapse(true);
+				safeRange.select(sc, true).shrinkToElementNode().collapse(true);
 			}
 			if (!range) change.apply(safeRange);
 			return;
 		}
 		const cloneRange = safeRange.cloneRange();
-		cloneRange
-			.shrinkToElementNode()
-			.shrinkToTextNode()
-			.collapse(true);
+		cloneRange.shrinkToElementNode().shrinkToTextNode().collapse(true);
 		const activeMarks = mark.findMarks(cloneRange);
 
 		const sideBlock = this.createSide({
@@ -435,7 +429,7 @@ class Block implements BlockModelInterface {
 			keepID: true,
 		});
 		const nodeApi = this.editor.node;
-		sideBlock.traverse(node => {
+		sideBlock.traverse((node) => {
 			if (
 				!nodeApi.isVoid(node) &&
 				(nodeApi.isInline(node) || nodeApi.isMark(node)) &&
@@ -471,12 +465,12 @@ class Block implements BlockModelInterface {
 				nodeApi.getBatchAppendHTML(activeMarks, '<br />'),
 			);
 		}
-		block.children().each(child => {
+		block.children().each((child) => {
 			if (nodeApi.isInline(child)) {
 				this.editor.inline.repairCursor(child);
 			}
 		});
-		sideBlock.children().each(child => {
+		sideBlock.children().each((child) => {
 			if (nodeApi.isInline(child)) {
 				this.editor.inline.repairCursor(child);
 			}
@@ -553,7 +547,7 @@ class Block implements BlockModelInterface {
 		container = splitNode ? splitNode(container) : container;
 		// 切割 Block
 		const leftNodes = selection.getNode(container, 'left');
-		leftNodes.allChildren().forEach(child => {
+		leftNodes.allChildren().forEach((child) => {
 			const leftNode = $(child);
 			if (
 				node.isBlock(leftNode) &&
@@ -566,7 +560,7 @@ class Block implements BlockModelInterface {
 			container,
 			'right',
 			true,
-			child => {
+			(child) => {
 				if (child.isCard()) {
 					const parent = child.parent();
 					if (parent && node.isCustomize(parent)) return false;
@@ -575,7 +569,7 @@ class Block implements BlockModelInterface {
 			},
 		);
 
-		rightNodes.allChildren().forEach(child => {
+		rightNodes.allChildren().forEach((child) => {
 			const rightNode = $(child);
 			if (
 				node.isBlock(rightNode) &&
@@ -646,7 +640,7 @@ class Block implements BlockModelInterface {
 
 			const selection = safeRange.createSelection();
 
-			startNode.children().each(node => {
+			startNode.children().each((node) => {
 				newBlock.append(node);
 			});
 
@@ -659,7 +653,7 @@ class Block implements BlockModelInterface {
 			? this.findPlugin(targetNode)
 			: undefined;
 		const selection = safeRange.createSelection();
-		blocks.forEach(child => {
+		blocks.forEach((child) => {
 			// Card 不做处理
 			if (child.attributes(CARD_KEY)) {
 				return;
@@ -682,7 +676,7 @@ class Block implements BlockModelInterface {
 			}
 			//先移除不能放入块级节点的mark标签
 			if (targetPlugin) {
-				child.allChildren().forEach(child => {
+				child.allChildren().forEach((child) => {
 					const markNode = $(child);
 					if (node.isMark(markNode)) {
 						const markPlugin = mark.findPlugin(markNode);
@@ -785,7 +779,7 @@ class Block implements BlockModelInterface {
 			preppend?: boolean,
 		) => {
 			if (
-				!nodes.some(nodeA => {
+				!nodes.some((nodeA) => {
 					return nodeA[0] === nodeB[0];
 				})
 			) {
@@ -815,12 +809,12 @@ class Block implements BlockModelInterface {
 
 		const nodes = this.getBlocks(range);
 		// rang头部应该往数组头部插入节点
-		findNodes($(startNode)).forEach(node => {
+		findNodes($(startNode)).forEach((node) => {
 			return addNode(nodes, node, true);
 		});
 
 		if (!range.collapsed) {
-			findNodes($(endNode)).forEach(node => {
+			findNodes($(endNode)).forEach((node) => {
 				return addNode(nodes, node);
 			});
 		}
@@ -907,7 +901,7 @@ class Block implements BlockModelInterface {
 		const blocks: Array<NodeInterface> = [];
 		let started = false;
 
-		closest.traverse(node => {
+		closest.traverse((node) => {
 			const child = $(node);
 			if (child.equal(startBlock)) {
 				started = true;
@@ -976,7 +970,7 @@ class Block implements BlockModelInterface {
 			: this.editor.node.clone(block, false);
 		dupBlock.append(fragement);
 		if (clone) {
-			dupBlock.find(CARD_SELECTOR).each(card => {
+			dupBlock.find(CARD_SELECTOR).each((card) => {
 				const domCard = $(card);
 				const cardName = domCard.attributes(CARD_KEY);
 				domCard.attributes(READY_CARD_KEY, cardName);
@@ -1017,7 +1011,7 @@ class Block implements BlockModelInterface {
 		const cursor = block.find(CURSOR_SELECTOR);
 		let isRemove = false;
 		// 删除左侧文本节点
-		block.traverse(node => {
+		block.traverse((node) => {
 			const child = $(node);
 			if (child.equal(cursor)) {
 				cursor.remove();
@@ -1083,7 +1077,7 @@ class Block implements BlockModelInterface {
 	 */
 	getMarkIdTags() {
 		const names: Array<string> = [];
-		this.editor.schema.data.blocks.forEach(schema => {
+		this.editor.schema.data.blocks.forEach((schema) => {
 			if (names.indexOf(schema.name) < 0) {
 				names.push(schema.name);
 			}
@@ -1124,7 +1118,7 @@ class Block implements BlockModelInterface {
 	generateDataIDForDescendant(root: Element) {
 		const tags = this.getMarkIdTags().join(',');
 		const nodes = root.querySelectorAll(tags);
-		nodes.forEach(child => {
+		nodes.forEach((child) => {
 			const node = $(child);
 			if (
 				!node.attributes('data-id') &&
@@ -1161,10 +1155,10 @@ class Block implements BlockModelInterface {
 			root.nodeType === getWindow().Node.ELEMENT_NODE ||
 			root.nodeType === getWindow().Node.DOCUMENT_FRAGMENT_NODE
 		) {
-			this.getMarkIdTags().forEach(nodeName => {
-				const nodes = (root as
-					| Element
-					| DocumentFragment).querySelectorAll(nodeName);
+			this.getMarkIdTags().forEach((nodeName) => {
+				const nodes = (
+					root as Element | DocumentFragment
+				).querySelectorAll(nodeName);
 				for (let i = 0; i < nodes.length; i++) {
 					const node = $(nodes[i]);
 					if (node.isCard() || node.attributes(DATA_ELEMENT) === UI)
@@ -1258,7 +1252,7 @@ class Block implements BlockModelInterface {
 			block.css(styles);
 		}
 		let node = block.find('br');
-		marks.forEach(mark => {
+		marks.forEach((mark) => {
 			// 回车后，默认是否复制makr样式
 			const plugin = editor.mark.findPlugin(mark);
 			mark = nodeApi.clone(mark);

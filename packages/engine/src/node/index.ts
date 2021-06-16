@@ -24,6 +24,7 @@ import {
 } from '../constants';
 import { getDocument, getStyleMap, getWindow } from '../utils';
 import $ from './query';
+import getHashId from './hash';
 
 class NodeModel implements NodeModelInterface {
 	private editor: EditorInterface;
@@ -37,8 +38,8 @@ class NodeModel implements NodeModelInterface {
 		if (isNode(node)) name = node.nodeName.toLowerCase();
 		else if (isNodeEntry(node)) name = node.name;
 		return schema
-			.find(rule => rule.name === name)
-			.some(rule => rule.isVoid);
+			.find((rule) => rule.name === name)
+			.some((rule) => rule.isVoid);
 	}
 
 	isMark(node: NodeInterface | Node, schema?: SchemaInterface) {
@@ -91,8 +92,8 @@ class NodeModel implements NodeModelInterface {
 		if (!this.isSimpleBlock(node)) return false;
 		//并且规则上不可以设置子节点
 		return (schema || this.editor.schema)
-			.find(schema => schema.name === node.name)
-			.every(schema => {
+			.find((schema) => schema.name === node.name)
+			.every((schema) => {
 				if (schema.type !== 'block') return false;
 				const allowIn = (schema as SchemaBlock).allowIn;
 				if (!allowIn) return true;
@@ -232,7 +233,7 @@ class NodeModel implements NodeModelInterface {
 			if (source.name === outer.name) {
 				const attrs = source.attributes();
 				delete attrs.style;
-				Object.keys(attrs).forEach(key => {
+				Object.keys(attrs).forEach((key) => {
 					if (!outer.attributes(key))
 						outer.attributes(key, attrs[key]);
 					else {
@@ -244,7 +245,7 @@ class NodeModel implements NodeModelInterface {
 				});
 
 				const styles = source.css();
-				Object.keys(styles).forEach(key => {
+				Object.keys(styles).forEach((key) => {
 					if (!outer.css(key)) outer.css(key, styles[key]);
 				});
 				outer.append(node.clone(source, true).children());
@@ -253,7 +254,7 @@ class NodeModel implements NodeModelInterface {
 			}
 
 			const children = outer.allChildren();
-			children.forEach(node => {
+			children.forEach((node) => {
 				const child = $(node);
 				if (
 					!child.isText() &&
@@ -414,10 +415,9 @@ class NodeModel implements NodeModelInterface {
 		const { change } = editor;
 		range = range || change.getRange();
 		const nodeApi = editor.node;
-		const {
-			startNode,
-			startOffset,
-		} = range.cloneRange().shrinkToTextNode();
+		const { startNode, startOffset } = range
+			.cloneRange()
+			.shrinkToTextNode();
 		const prev = startNode.prev();
 		const parent = startNode.parent();
 		let text = startNode.text() || '';
@@ -438,10 +438,7 @@ class NodeModel implements NodeModelInterface {
 		}
 
 		range.insertNode(node);
-		return range
-			.select(node, true)
-			.shrinkToElementNode()
-			.collapse(false);
+		return range.select(node, true).shrinkToElementNode().collapse(false);
 	}
 
 	/**
@@ -451,17 +448,17 @@ class NodeModel implements NodeModelInterface {
 	 */
 	setAttributes(node: NodeInterface, attributes: any) {
 		let { style, ...attrs } = attributes;
-		Object.keys(attrs).forEach(key => {
+		Object.keys(attrs).forEach((key) => {
 			if (key === 'className') {
 				const value = attrs[key];
 				if (Array.isArray(value)) {
-					value.forEach(name => node.addClass(name));
+					value.forEach((name) => node.addClass(name));
 				} else node.addClass(value);
 			} else node.attributes(key, attrs[key].toString());
 		});
 		if (typeof style === 'number') style = {};
 		if (typeof style === 'string') style = getStyleMap(style);
-		Object.keys(style || {}).forEach(key => {
+		Object.keys(style || {}).forEach((key) => {
 			let val = (<{ [k: string]: string | number }>style)[key];
 			if (/^0(px|em)?$/.test(val.toString())) {
 				val = '';
@@ -660,7 +657,7 @@ class NodeModel implements NodeModelInterface {
 				: '';
 		}
 
-		node.each(node => {
+		node.each((node) => {
 			const element = <Element>node;
 			element.innerHTML = val;
 			this.editor.block.generateRandomIDForDescendant(element);
@@ -676,7 +673,7 @@ class NodeModel implements NodeModelInterface {
 	clone(node: NodeInterface, deep?: boolean): NodeInterface {
 		const { block } = this.editor;
 		const nodes: Array<Node> = [];
-		node.each(node => {
+		node.each((node) => {
 			const cloneNode = node.cloneNode(deep);
 			block.generateRandomIDForDescendant(cloneNode, true);
 			if (block.needMarkDataID(cloneNode.nodeName)) {
@@ -695,7 +692,7 @@ class NodeModel implements NodeModelInterface {
 	getBatchAppendHTML(nodes: Array<NodeInterface>, appendExp: string) {
 		if (nodes.length === 0) return appendExp;
 		let appendNode = $(appendExp);
-		nodes.forEach(node => {
+		nodes.forEach((node) => {
 			node = node.clone(false);
 			node.append(appendNode);
 			appendNode = node;
@@ -705,7 +702,7 @@ class NodeModel implements NodeModelInterface {
 
 	removeZeroWidthSpace(node: NodeInterface) {
 		const nodeApi = this.editor.node;
-		node.traverse(child => {
+		node.traverse((child) => {
 			const node = child[0];
 			if (node.nodeType !== getWindow().Node.TEXT_NODE) {
 				return;
@@ -756,4 +753,4 @@ class NodeModel implements NodeModelInterface {
 
 export default NodeModel;
 
-export { Entry as NodeEntry, Event, $ };
+export { Entry as NodeEntry, Event, $, getHashId };

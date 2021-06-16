@@ -194,7 +194,7 @@ export default class extends Card {
 			{
 				type: 'node',
 				node: $('<div />'),
-				didMount: node => {
+				didMount: (node) => {
 					//After loading, you can use the front-end framework to render components to the node node
 					console.log(`The button is loaded, ${node}`);
 				},
@@ -245,23 +245,23 @@ export default class extends Card {
 
 ### Combine with plugins
 
-````ts
-import { Plugin } from'@aomao/engine';
-import CardComponent from'./component';
+```ts
+import { Plugin } from '@aomao/engine';
+import CardComponent from './component';
 
 export default class extends Plugin<Options> {
-    static get pluginName() {
-        return'card-plugin';
-    }
+	static get pluginName() {
+		return 'card-plugin';
+	}
 
-    execute() {
-        if (!isEngine(this.editor)) return;
-        const {card} = this.editor;
-        //Insert card
-        card.insert(CardComponent.cardName);
-    }
+	execute() {
+		if (!isEngine(this.editor)) return;
+		const { card } = this.editor;
+		//Insert card
+		card.insert(CardComponent.cardName);
+	}
 }
-export {CardComponent };
+export { CardComponent };
 ```
 
 ## Static properties
@@ -276,12 +276,12 @@ The card name is unique and cannot be repeated with all the card names passed in
 
 ```ts
 export default class extends Plugin {
-    //Define the card name, it is required
-static get cardName() {
-return'Card Name';
+	//Define the card name, it is required
+	static get cardName() {
+		return 'Card Name';
+	}
 }
-}
-````
+```
 
 ### `cardType`
 

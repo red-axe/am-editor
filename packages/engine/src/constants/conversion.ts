@@ -1,4 +1,4 @@
-import { $ } from '../node';
+import $ from '../node/query';
 import { ConversionData } from '../types';
 import {
 	CARD_KEY,
@@ -22,7 +22,7 @@ const defaultConversion: ConversionData = [
 				).toLowerCase(),
 			};
 			//其它 data 属性
-			Object.keys(oldAttrs).forEach(attrName => {
+			Object.keys(oldAttrs).forEach((attrName) => {
 				if (
 					attrName !== READY_CARD_KEY &&
 					attrName.indexOf('data-') === 0 &&
@@ -37,7 +37,7 @@ const defaultConversion: ConversionData = [
 			}
 			style = {};
 			const card = $('<card />');
-			Object.keys(attributes).forEach(name => {
+			Object.keys(attributes).forEach((name) => {
 				card.attributes(name, attributes[name]);
 			});
 			return card;

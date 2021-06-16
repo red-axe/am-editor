@@ -11,7 +11,8 @@ import {
 	SchemaValue,
 	SchemaValueObject,
 } from './types';
-import { getHashId, getWindow, validUrl } from './utils';
+import { getWindow, validUrl } from './utils';
+import { getHashId } from './node';
 
 /**
  * 标签规则
@@ -45,15 +46,15 @@ class Schema implements SchemaInterface {
 			rules = [rules];
 		}
 
-		rules.forEach(rule => {
+		rules.forEach((rule) => {
 			if (isSchemaRule(rule)) {
 				//删除全局属性已有的规则
 				if (rule.attributes) {
-					Object.keys(rule.attributes).forEach(key => {
+					Object.keys(rule.attributes).forEach((key) => {
 						if (!this.data.globals[rule.type]) return;
 						if (key === 'style') {
 							Object.keys(rule.attributes!.style).forEach(
-								styleName => {
+								(styleName) => {
 									if (
 										this.data.globals[rule.type][key] &&
 										this.data.globals[rule.type][key][
@@ -95,7 +96,7 @@ class Schema implements SchemaInterface {
 			const aStyles = aAttributes.style || {};
 			let aCount = 0;
 			let sCount = 0;
-			Object.keys(aAttributes).forEach(attributesName => {
+			Object.keys(aAttributes).forEach((attributesName) => {
 				const attributesValue = aAttributes[attributesName];
 				if (
 					isSchemaValueObject(attributesValue) &&
@@ -103,7 +104,7 @@ class Schema implements SchemaInterface {
 				)
 					aCount++;
 			});
-			Object.keys(aStyles).forEach(stylesName => {
+			Object.keys(aStyles).forEach((stylesName) => {
 				const stylesValue = aStyles[stylesName];
 				if (isSchemaValueObject(stylesValue) && stylesValue.required)
 					sCount++;
@@ -136,11 +137,11 @@ class Schema implements SchemaInterface {
 	 */
 	find(callback: (rule: SchemaRule) => boolean): Array<SchemaRule> {
 		let schemas: Array<SchemaRule> = [];
-		Object.keys(this.data).some(key => {
+		Object.keys(this.data).some((key) => {
 			if (key !== 'globals') {
-				const rules = (this.data[key] as Array<
-					SchemaRule
-				>).filter(rule => callback(rule));
+				const rules = (this.data[key] as Array<SchemaRule>).filter(
+					(rule) => callback(rule),
+				);
 				if (rules && rules.length > 0) {
 					schemas = schemas.concat(rules);
 				}
@@ -169,10 +170,10 @@ class Schema implements SchemaInterface {
 	 * @returns
 	 */
 	getRule(node: NodeInterface, filter?: (rule: SchemaRule) => boolean) {
-		filter = filter || (rule => rule.name === node.name);
+		filter = filter || ((rule) => rule.name === node.name);
 		if (node.type !== getWindow().Node.ELEMENT_NODE) return undefined;
 		return this._all.find(
-			rule => filter!(rule) && this.checkNode(node, rule.attributes),
+			(rule) => filter!(rule) && this.checkNode(node, rule.attributes),
 		);
 	}
 
@@ -192,7 +193,7 @@ class Schema implements SchemaInterface {
 		const styles = (attributes || {}).style as SchemaAttributes;
 		attributes = omit({ ...attributes }, 'style');
 		//需要属性每一项都能效验通过
-		const attrResult = Object.keys(attributes).every(attributesName => {
+		const attrResult = Object.keys(attributes).every((attributesName) => {
 			return this.checkValue(
 				attributes as SchemaAttributes,
 				attributesName,
@@ -200,7 +201,7 @@ class Schema implements SchemaInterface {
 			);
 		});
 		if (!attrResult) return false;
-		return Object.keys(styles || {}).every(styleName => {
+		return Object.keys(styles || {}).every((styleName) => {
 			return this.checkValue(styles, styleName, nodeStyles[styleName]);
 		});
 	}
@@ -259,7 +260,7 @@ class Schema implements SchemaInterface {
 			if (attributesName === 'class') {
 				return (attributesValue || '')
 					.split(/\s+/)
-					.some(value => value.trim() === rule);
+					.some((value) => value.trim() === rule);
 			}
 
 			return rule === attributesValue;
@@ -271,7 +272,7 @@ class Schema implements SchemaInterface {
 			if (attributesName === 'class') {
 				return (attributesValue || '')
 					.split(/\s+/)
-					.every(value =>
+					.every((value) =>
 						value.trim() === ''
 							? true
 							: (rule as Array<string>).indexOf(value.trim()) >
@@ -287,7 +288,7 @@ class Schema implements SchemaInterface {
 			if (attributesName === 'class') {
 				return (attributesValue || '')
 					.split(/\s+/)
-					.every(value =>
+					.every((value) =>
 						value.trim() === ''
 							? true
 							: (rule as RegExp).test(value.trim()),
@@ -310,7 +311,7 @@ class Schema implements SchemaInterface {
 	 */
 	filterStyles(styles: { [k: string]: string }, rule: SchemaRule) {
 		if (!rule.attributes?.style) return;
-		Object.keys(styles).forEach(styleName => {
+		Object.keys(styles).forEach((styleName) => {
 			if (
 				!this.checkValue(
 					rule?.attributes?.style! as SchemaAttributes,
@@ -328,7 +329,7 @@ class Schema implements SchemaInterface {
 	 */
 	filterAttributes(attributes: { [k: string]: string }, rule: SchemaRule) {
 		if (!rule.attributes?.style) return;
-		Object.keys(attributes).forEach(attributesName => {
+		Object.keys(attributes).forEach((attributesName) => {
 			if (
 				!this.checkValue(
 					rule?.attributes! as SchemaAttributes,
@@ -356,7 +357,7 @@ class Schema implements SchemaInterface {
 		if (!rule) return;
 		let allRule: SchemaRule = { ...rule };
 		const globalRule = Object.keys(this.data.globals).find(
-			dataType => rule.type === dataType,
+			(dataType) => rule.type === dataType,
 		);
 		if (globalRule) {
 			allRule.attributes = {
@@ -377,11 +378,11 @@ class Schema implements SchemaInterface {
 	closest(name: string) {
 		let topName = name;
 		this.data.blocks
-			.filter(rule => rule.name === name)
-			.forEach(block => {
+			.filter((rule) => rule.name === name)
+			.forEach((block) => {
 				const schema = block as SchemaBlock;
 				if (schema.allowIn) {
-					schema.allowIn.forEach(parentName => {
+					schema.allowIn.forEach((parentName) => {
 						if (this.isAllowIn(parentName, topName)) {
 							topName = parentName;
 						}
@@ -403,8 +404,8 @@ class Schema implements SchemaInterface {
 		//目标节点是p标签
 		if (target === 'p' && source !== 'p') return true;
 		return this.data.blocks
-			.filter(rule => rule.name === target)
-			.some(block => {
+			.filter((rule) => rule.name === target)
+			.some((block) => {
 				const schema = block as SchemaBlock;
 				if (schema.allowIn && schema.allowIn.indexOf(source) > -1) {
 					return true;
@@ -418,10 +419,10 @@ class Schema implements SchemaInterface {
 	 */
 	getAllowInTags() {
 		const tags: Array<string> = [];
-		this.data.blocks.forEach(rule => {
+		this.data.blocks.forEach((rule) => {
 			const schema = rule as SchemaBlock;
 			if (schema.allowIn) {
-				schema.allowIn.forEach(name => {
+				schema.allowIn.forEach((name) => {
 					if (tags.indexOf(name) < 0) tags.push(name);
 				});
 			}
@@ -434,7 +435,7 @@ class Schema implements SchemaInterface {
 	 */
 	getCanMergeTags() {
 		const tags: Array<string> = [];
-		this.data.blocks.forEach(rule => {
+		this.data.blocks.forEach((rule) => {
 			const schema = rule as SchemaBlock;
 			if (schema.canMerge === true) {
 				if (tags.indexOf(schema.name) < 0) tags.push(schema.name);

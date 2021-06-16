@@ -2,14 +2,11 @@ import {
 	DATA_ELEMENT,
 	ROOT,
 	ROOT_SELECTOR,
-	ANCHOR,
-	CURSOR,
-	FOCUS,
-	CARD_TAG,
-	CARD_TYPE_KEY,
 	EDITABLE,
 	EDITABLE_SELECTOR,
-} from '../constants';
+} from '../constants/root';
+import { CARD_TAG, CARD_TYPE_KEY } from '../constants/card';
+import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import DOMEvent from './event';
 import $ from './parse';
 import {
@@ -124,7 +121,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	toArray(): Array<NodeInterface> {
 		const nodeArray: Array<NodeInterface> = [];
-		this.each(node => {
+		this.each((node) => {
 			nodeArray.push(new NodeEntry(node));
 		});
 		return nodeArray;
@@ -399,7 +396,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	closest(
 		selector: string,
-		callback: (node: Node) => Node | undefined = node => {
+		callback: (node: Node) => Node | undefined = (node) => {
 			return node.parentNode || undefined;
 		},
 	): NodeInterface {
@@ -491,7 +488,7 @@ class NodeEntry implements NodeInterface {
 				return;
 			}
 
-			Object.keys(this.events[i].listeners).forEach(eventType => {
+			Object.keys(this.events[i].listeners).forEach((eventType) => {
 				const listeners = this.events[i].listeners[eventType];
 				for (let _i = 0; _i < listeners.length; _i++) {
 					node.removeEventListener(eventType, listeners[_i], false);
@@ -538,7 +535,7 @@ class NodeEntry implements NodeInterface {
 		}
 
 		if (typeof key === 'object') {
-			Object.keys(key).forEach(k => {
+			Object.keys(key).forEach((k) => {
 				const v = key[k];
 				this.attributes(k, v);
 			});
@@ -552,7 +549,7 @@ class NodeEntry implements NodeInterface {
 				: '';
 		}
 
-		this.each(node => {
+		this.each((node) => {
 			const element = node as Element;
 			element.setAttribute(key, val.toString());
 		});
@@ -565,7 +562,7 @@ class NodeEntry implements NodeInterface {
 	 * @return 返当前实例
 	 */
 	removeAttributes(key: string): NodeInterface {
-		this.each(node => {
+		this.each((node) => {
 			const element = <Element>node;
 			element.removeAttribute(key);
 		});
@@ -596,7 +593,7 @@ class NodeEntry implements NodeInterface {
 	 * @return 返当前实例
 	 */
 	addClass(className: string): NodeInterface {
-		this.each(node => {
+		this.each((node) => {
 			const element = <Element>node;
 			element.classList.add(className);
 		});
@@ -609,7 +606,7 @@ class NodeEntry implements NodeInterface {
 	 * @return 返当前实例
 	 */
 	removeClass(className: string): NodeEntry {
-		this.each(node => {
+		this.each((node) => {
 			const element = <Element>node;
 			element.classList.remove(className);
 		});
@@ -636,7 +633,7 @@ class NodeEntry implements NodeInterface {
 		}
 
 		if (typeof key === 'object') {
-			Object.keys(key).forEach(attr => {
+			Object.keys(key).forEach((attr) => {
 				const value = key[attr];
 				this.css(attr, value);
 			});
@@ -656,7 +653,7 @@ class NodeEntry implements NodeInterface {
 			);
 		}
 
-		this.each(node => {
+		this.each((node) => {
 			const element = <HTMLElement>node;
 			element.style[toCamelCase(key)] = val.toString();
 		});
@@ -693,7 +690,7 @@ class NodeEntry implements NodeInterface {
 	html(html: string): NodeEntry;
 	html(html?: string): NodeEntry | string {
 		if (html) {
-			this.each(node => {
+			this.each((node) => {
 				(node as Element).innerHTML = html;
 			});
 			return this;
@@ -709,7 +706,7 @@ class NodeEntry implements NodeInterface {
 		// 返回的数据包含 HTML 特殊字符，innerHTML 之前需要 escape
 		// https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
 		if (text !== undefined) {
-			this.each(node => {
+			this.each((node) => {
 				node.textContent = text;
 			});
 			return this;
@@ -773,7 +770,7 @@ class NodeEntry implements NodeInterface {
 	 * @return 当前实例
 	 */
 	empty(): NodeInterface {
-		this.each(node => {
+		this.each((node) => {
 			let child = node.firstChild;
 			while (child) {
 				if (!node.parentNode) {
@@ -801,7 +798,7 @@ class NodeEntry implements NodeInterface {
 
 	clone(deep?: boolean): NodeInterface {
 		const nodes: Array<Node> = [];
-		this.each(node => {
+		this.each((node) => {
 			nodes.push(node.cloneNode(deep));
 		});
 		return new NodeEntry(nodes);
@@ -812,7 +809,7 @@ class NodeEntry implements NodeInterface {
 	 * @return 当前实例
 	 */
 	prepend(selector: Selector): NodeInterface {
-		this.each(node => {
+		this.each((node) => {
 			const nodes = $(selector, this.context);
 			if (node.firstChild) {
 				node.insertBefore(nodes[0], node.firstChild);
@@ -829,7 +826,7 @@ class NodeEntry implements NodeInterface {
 	 * @return 当前实例
 	 */
 	append(selector: Selector): NodeInterface {
-		this.each(node => {
+		this.each((node) => {
 			const nodes = $(selector, this.context);
 			for (let i = 0; i < nodes.length; i++) {
 				const child = nodes[i];
@@ -849,7 +846,7 @@ class NodeEntry implements NodeInterface {
 	 * @return 当前实例
 	 */
 	before(selector: Selector): NodeInterface {
-		this.each(node => {
+		this.each((node) => {
 			const nodes = $(selector, this.context);
 			node.parentNode?.insertBefore(nodes[0], node);
 		});
@@ -862,7 +859,7 @@ class NodeEntry implements NodeInterface {
 	 * @return 当前实例
 	 */
 	after(selector: Selector): NodeInterface {
-		this.each(node => {
+		this.each((node) => {
 			const nodes = $(selector, this.context);
 			if (node.nextSibling) {
 				node.parentNode?.insertBefore(nodes[0], node.nextSibling);
@@ -880,7 +877,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	replaceWith(selector: Selector): NodeInterface {
 		const newNodes: Array<Node> = [];
-		this.each(node => {
+		this.each((node) => {
 			const nodes = $(selector, this.context);
 			const newNode = nodes[0];
 			node.parentNode?.replaceChild(newNode, node);
@@ -971,7 +968,7 @@ class NodeEntry implements NodeInterface {
 
 	allChildren() {
 		const childNodes: Array<Node> = [];
-		this.traverse(node => {
+		this.traverse((node) => {
 			childNodes.push(node[0]);
 		});
 		childNodes.shift();
@@ -1020,12 +1017,8 @@ class NodeEntry implements NodeInterface {
 			view = new NodeEntry(viewNode);
 		}
 		const viewElement = view[0] as Element;
-		const {
-			top,
-			left,
-			right,
-			bottom,
-		} = viewElement.getBoundingClientRect();
+		const { top, left, right, bottom } =
+			viewElement.getBoundingClientRect();
 		const vp = this.getViewport(node);
 		if (viewNode) viewNode.parentNode?.removeChild(viewNode);
 		return !(

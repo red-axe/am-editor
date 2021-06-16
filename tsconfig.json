@@ -4,11 +4,15 @@
 		"module": "esnext",
 		"moduleResolution": "node",
 		"importHelpers": true,
-		"jsx": "react",
+		"lib": ["esnext", "dom"],
+		"jsx": "react-jsx",
 		"allowJs": true,
 		"skipLibCheck": true,
 		"experimentalDecorators": true,
 		"noImplicitReturns": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"noUnusedLocals": true,
 		"declaration": true,
 		"suppressImplicitAnyIndexErrors": true,
 		"esModuleInterop": true,
@@ -18,8 +22,7 @@
 		"paths": {
 			"@/*": ["./src/*"],
 			"@@/*": [".umi/*"]
-		},
-		"allowSyntheticDefaultImports": true
+		}
 	},
 	"exclude": [
 		"node_modules",
