@@ -264,7 +264,10 @@ class ChangeModel implements ChangeInterface {
 				}
 			});
 			block.generateDataIDForDescendant(container.get<Element>()!);
-			card.render();
+			this.engine.history.startCache();
+			card.render(undefined, () => {
+				this.engine.history.destroyCache();
+			});
 			const cursor = container.find(CURSOR_SELECTOR);
 			const selection: SelectionInterface = new Selection(
 				this.engine,
@@ -810,7 +813,8 @@ class ChangeModel implements ChangeInterface {
 						this.setValue(oldValue);
 						textNode.get<Text>()?.normalize();
 						this.paste(textNode.text());
-					});
+					})
+					.catch(() => {});
 			}
 		};
 
@@ -846,7 +850,9 @@ class ChangeModel implements ChangeInterface {
 			if (this.engine.trigger('paste:event', data, source) === false)
 				return;
 			if (files.length === 0) {
-				pasteMarkdown(source);
+				setTimeout(() => {
+					pasteMarkdown(source);
+				}, 200);
 				this.paste(source);
 			}
 		});
@@ -883,7 +889,10 @@ class ChangeModel implements ChangeInterface {
 		this.insertFragment(fragment, (range) => {
 			this.engine.trigger('paste:insert', range);
 			const selection = range.createSelection();
-			this.engine.card.render();
+			this.engine.history.startCache();
+			this.engine.card.render(undefined, () => {
+				this.engine.history.submitCache();
+			});
 			selection.move();
 			range.scrollRangeIntoView();
 		});
@@ -976,7 +985,6 @@ class ChangeModel implements ChangeInterface {
 			const component = card.find(range.startNode);
 			if (component) component.focus(range, false);
 		}
-
 		const getFirstChild = (node: NodeInterface) => {
 			let child = node.first();
 			if (!child || !nodeApi.isBlock(child)) return node;
@@ -1039,7 +1047,6 @@ class ChangeModel implements ChangeInterface {
 			if (nodeApi.isCustomize(lastNode) === nodeApi.isCustomize(nextNode))
 				list.unwrapCustomize(nextNode);
 		};
-
 		if (startNode) {
 			const _firstNode = getFirstChild($(startNode.nextSibling || []))!;
 			const _lastNode = getLastChild($(startNode))!;
@@ -1057,7 +1064,6 @@ class ChangeModel implements ChangeInterface {
 				}
 			}
 		}
-
 		if (endNode) {
 			const prevNode = getLastChild($(endNode.previousSibling || []));
 			const nextNode = getFirstChild($(endNode))!;

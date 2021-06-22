@@ -540,19 +540,23 @@ class CardModel implements CardModelInterface {
 	 * 渲染
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
 	 */
-	render(container?: NodeInterface) {
+	render(container?: NodeInterface, asyncRender?: (count: number) => void) {
 		const cards = container
 			? container.isCard()
 				? container
 				: container.find(`${READY_CARD_SELECTOR}`)
 			: this.editor.container.find(READY_CARD_SELECTOR);
 		this.gc();
+		let count = 0;
+		let setp = 0;
+		let setpTimeout: NodeJS.Timeout | undefined = undefined;
 		cards.each((node) => {
 			const cardNode = $(node);
 			const readyKey = cardNode.attributes(READY_CARD_KEY);
 			const key = cardNode.attributes(CARD_KEY);
 			const name = readyKey || key;
 			if (this.classes[name]) {
+				count++;
 				const value = cardNode.attributes(CARD_VALUE_KEY);
 				const attributes = cardNode.attributes();
 
@@ -582,24 +586,40 @@ class CardModel implements CardModelInterface {
 				});
 				if (readyKey) cardNode.replaceWith(card.root);
 				this.components.push(card);
+				const render = () => {
+					const result = card!.render();
+					const center = card!.getCenter();
+					if (result !== undefined) {
+						center.append(
+							typeof result === 'string' ? $(result) : result,
+						);
+					}
+					if (card!.contenteditable.length > 0) {
+						center
+							.find(card!.contenteditable.join(','))
+							.each((node) => {
+								const child = $(node);
+								if (!child.attributes('contenteditable'))
+									child.attributes('contenteditable', 'true');
+								child.attributes(DATA_ELEMENT, EDITABLE);
+							});
+					}
+					card!.didRender();
+				};
 				// 重新渲染
-				const result = card.render();
-				const center = card.getCenter();
-				if (result !== undefined) {
-					center.append(
-						typeof result === 'string' ? $(result) : result,
-					);
-				}
-				if (card.contenteditable.length > 0) {
-					center.find(card.contenteditable.join(',')).each((node) => {
-						const child = $(node);
-						if (!child.attributes('contenteditable'))
-							child.attributes('contenteditable', 'true');
-						child.attributes(DATA_ELEMENT, EDITABLE);
-					});
-				}
-				//创建工具栏
-				card.didRender();
+				if (asyncRender) {
+					setTimeout(() => {
+						render();
+						setp++;
+						if (setpTimeout) clearTimeout(setpTimeout);
+						setpTimeout = setTimeout(() => {
+							if (setp === count) {
+								asyncRender(count);
+							}
+						}, 50);
+					}, 20);
+				} else render();
+
 				if (readyKey) {
 					card.root.removeAttributes(READY_CARD_KEY);
 				}
