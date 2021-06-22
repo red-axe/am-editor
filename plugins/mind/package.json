@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-mind",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "脑图 Mind",
   "keywords": [
     "Mind",
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@antv/x6": "^1.23.10",
-    "@aomao/engine": "^2.2.2",
+    "@aomao/engine": "^2.2.3",
     "@babel/runtime": "^7.13.10"
   }
 }
