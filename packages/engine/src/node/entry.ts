@@ -932,11 +932,17 @@ class NodeEntry implements NodeInterface {
 		return node;
 	}
 
-	inside(node: Node | NodeInterface): boolean {
-		let parentNode = this.parent();
+	inside(
+		node: Node | NodeInterface,
+		callback: (node: Node) => Node | undefined = (node) => {
+			return node.parentNode || undefined;
+		},
+	): boolean {
+		let parentNode: Node | null = this[0].parentNode;
 		while (parentNode) {
-			if (parentNode.equal(node)) return true;
-			parentNode = parentNode.parent();
+			if (parentNode === (isNodeEntry(node) ? node[0] : node))
+				return true;
+			parentNode = callback(parentNode) || null;
 		}
 		return false;
 	}
@@ -945,12 +951,12 @@ class NodeEntry implements NodeInterface {
 		let index = 0;
 		const parent = this[0].parentNode;
 		if (!parent) return index;
-		Array.from(parent.childNodes)
-			.filter(filter || (() => true))
-			.forEach((child, i) => {
-				if (child === this.get()) index = i;
-			});
-		return index;
+		index = (
+			filter
+				? Array.from(parent.childNodes).filter(filter)
+				: Array.from(parent.childNodes)
+		).indexOf(this.get()!);
+		return index < 0 ? 0 : index;
 	}
 
 	findParent(

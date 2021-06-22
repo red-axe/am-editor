@@ -183,6 +183,9 @@ export default {
 		math: {
 			title: '公式',
 		},
+		mind: {
+			title: '脑图',
+		},
 		commonlyUsed: {
 			title: '常用',
 		},

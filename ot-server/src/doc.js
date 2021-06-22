@@ -63,7 +63,7 @@ class Doc {
 
 	hasMember(uuid) {
 		const member = this.members.find((member) => member.uuid === uuid);
-		return member && !!this.sockets[uuid];
+		return !!member && !!this.sockets[uuid];
 	}
 
 	removeMember(uuid) {

@@ -93,7 +93,9 @@ class CodeBlcok extends Card<CodeBlockValue> {
 		const mode = value?.mode || 'plain';
 		const code = value?.code || '';
 		if (isEngine(this.editor)) {
-			this.codeEditor.create(mode, code);
+			setTimeout(() => {
+				this.codeEditor?.create(mode, code);
+			}, 50);
 		} else {
 			this.codeEditor.render(mode, code);
 			let hideTimeout: NodeJS.Timeout;

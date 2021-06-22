@@ -1,3 +1,4 @@
+import { DATA_ELEMENT, ROOT } from '../constants/root';
 import { NodeInterface, isNodeEntry } from '../types/node';
 
 export const getDocument = (node?: Node): Document => {
@@ -62,4 +63,27 @@ export const getTextNodes = (
 		}
 	}
 	return textNodes;
+};
+
+export const getParentInRoot = (node: Node) => {
+	return node.nodeType === getDocument().ELEMENT_NODE &&
+		(node as Element).getAttribute(DATA_ELEMENT) === ROOT
+		? undefined
+		: node.parentNode || undefined;
+};
+
+export const inside = (
+	source: Node | NodeInterface,
+	node: Node | NodeInterface,
+	callback: (node: Node) => Node | undefined = (node) => {
+		return node.parentNode || undefined;
+	},
+): boolean => {
+	let parentNode: Node | null = (isNodeEntry(source) ? source[0] : source)
+		.parentNode;
+	while (parentNode) {
+		if (parentNode === (isNodeEntry(node) ? node[0] : node)) return true;
+		parentNode = callback(parentNode) || null;
+	}
+	return false;
 };

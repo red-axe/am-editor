@@ -32,6 +32,7 @@ import MarkRange from '@aomao/plugin-mark-range';
 import File, { FileComponent, FileUploader } from '@aomao/plugin-file';
 import Video, { VideoComponent, VideoUploader } from '@aomao/plugin-video';
 import Math, { MathComponent } from '@aomao/plugin-math';
+//import Mind, { MindComponent } from '@aomao/plugin-mind';
 import { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 import { DOMAIN } from '../../config';
 
@@ -72,6 +73,7 @@ export const plugins: Array<PluginEntry> = [
 	VideoUploader,
 	Math,
 	ToolbarPlugin,
+	//Mind
 ];
 
 export const cards: Array<CardEntry> = [
@@ -84,6 +86,7 @@ export const cards: Array<CardEntry> = [
 	VideoComponent,
 	MathComponent,
 	ToolbarComponent,
+	//MindComponent
 ];
 
 export const pluginConfig: PluginOptions = {

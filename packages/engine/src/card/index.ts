@@ -327,6 +327,7 @@ class CardModel implements CardModelInterface {
 			if (this.active && !isCurrentActiveCard) {
 				this.active.toolbarModel?.hide();
 				const type = (this.active.constructor as CardEntry).cardType;
+				this.active.select(false);
 				this.active.activate(false);
 				if (type === CardType.BLOCK) {
 					editor.readonly = false;
@@ -352,8 +353,9 @@ class CardModel implements CardModelInterface {
 				) {
 					card.select(false);
 					//不在可编辑器区域内，设置为只读
-					if (editableElement.length === 0) editor.readonly = true;
-					else editor.readonly = false;
+					if (editableElement.length === 0) {
+						editor.readonly = true;
+					} else editor.readonly = false;
 				}
 				if (
 					!isCurrentActiveCard &&
@@ -542,7 +544,7 @@ class CardModel implements CardModelInterface {
 		const cards = container
 			? container.isCard()
 				? container
-				: container.find(`${READY_CARD_SELECTOR},${CARD_SELECTOR}`)
+				: container.find(`${READY_CARD_SELECTOR}`)
 			: this.editor.container.find(READY_CARD_SELECTOR);
 		this.gc();
 		cards.each((node) => {
@@ -591,7 +593,8 @@ class CardModel implements CardModelInterface {
 				if (card.contenteditable.length > 0) {
 					center.find(card.contenteditable.join(',')).each((node) => {
 						const child = $(node);
-						child.attributes('contenteditable', 'true');
+						if (!child.attributes('contenteditable'))
+							child.attributes('contenteditable', 'true');
 						child.attributes(DATA_ELEMENT, EDITABLE);
 					});
 				}

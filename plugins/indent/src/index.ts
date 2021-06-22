@@ -23,9 +23,9 @@ export default class extends Plugin<Options> {
 
 	init() {
 		this.editor.schema.add(this.schema());
-		this.editor.on('keydown:backspace', event => this.onBackspace(event));
-		this.editor.on('keydown:tab', event => this.onTab(event));
-		this.editor.on('keydown:shift-tab', event => this.onShiftTab(event));
+		this.editor.on('keydown:backspace', (event) => this.onBackspace(event));
+		this.editor.on('keydown:tab', (event) => this.onTab(event));
+		this.editor.on('keydown:shift-tab', (event) => this.onShiftTab(event));
 	}
 
 	execute(type: 'in' | 'out' = 'in', isTab: boolean = false) {
@@ -40,7 +40,7 @@ export default class extends Plugin<Options> {
 		}
 		const maxPadding = this.options.maxPadding || 50;
 		// 其它情况
-		blocks.forEach(block => {
+		blocks.forEach((block) => {
 			this.addPadding(block, type === 'in' ? 2 : -2, isTab, maxPadding);
 		});
 		list.merge();
@@ -50,6 +50,7 @@ export default class extends Plugin<Options> {
 		if (!isEngine(this.editor)) return;
 		const { change, list, node } = this.editor;
 		const range = change.getRange();
+		if (!range.startNode.inEditor()) return 0;
 		const block = this.editor.block.closest(range.startNode);
 		if (block.name === 'li') {
 			return list.getIndent(block.closest('ul,ol'));

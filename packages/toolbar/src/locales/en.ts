@@ -183,6 +183,9 @@ export default {
 		math: {
 			title: 'Formula',
 		},
+		mind: {
+			title: 'Mind Map',
+		},
 		commonlyUsed: {
 			title: 'Commonly used',
 		},

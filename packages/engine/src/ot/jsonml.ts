@@ -1,4 +1,5 @@
 import { Op, Path } from 'sharedb';
+import { CARD_KEY, READY_CARD_KEY } from '../constants';
 import { NodeInterface } from '../types/node';
 import { RepairOp } from '../types/ot';
 import { unescapeDots, unescape, toHex, getWindow } from '../utils';
@@ -26,6 +27,13 @@ export const toDOM = (ops: Op[] | Op[][]): Node => {
 						unescapeDots(attr),
 						unescape(ops[i][attr]),
 					);
+				}
+				//不是待渲染Card，转换为待渲染Card
+				if (
+					Object.keys(ops[i]).indexOf(CARD_KEY) > -1 &&
+					Object.keys(ops[i]).indexOf(READY_CARD_KEY) < 0
+				) {
+					element?.setAttribute(READY_CARD_KEY, ops[i][CARD_KEY]);
 				}
 			}
 		} else if ('number' === typeof ops[i] || 'string' === typeof ops[i]) {
@@ -61,9 +69,8 @@ function fromChildDom(node: NodeInterface, values: Array<{} | string>) {
 export const fromDOM = (node: NodeInterface) => {
 	let values: Array<{} | string>;
 	if (!isTransientElement(node)) {
-		const { nodeName, nodeType, attributes, nodeValue } = node.get<
-			Element
-		>()!;
+		const { nodeName, nodeType, attributes, nodeValue } =
+			node.get<Element>()!;
 		if (nodeType === getWindow().Node.ELEMENT_NODE) {
 			values = [nodeName.toLowerCase()];
 			const data = {};
@@ -101,7 +108,7 @@ export const getPathValue = (data: any, path: Path) => {
 
 export const pushAndRepair = (ops: RepairOp[], op: RepairOp) => {
 	const oldPath = op.oldPath?.slice() || [];
-	ops.forEach(opItem => {
+	ops.forEach((opItem) => {
 		const opOffset = op.newPath[op.newPath.length - 1];
 		const itemOffset = opItem.newPath[opItem.newPath.length - 1];
 

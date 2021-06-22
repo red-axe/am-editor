@@ -1,6 +1,7 @@
 import { EditorInterface, isEngine, isSafari, Plugin } from '@aomao/engine';
 import { CollapseItemProps } from '../collapse/item';
 import ToolbarComponent from './component';
+import locales from '../locales';
 
 type Config = Array<{
 	title: React.ReactNode;
@@ -25,6 +26,7 @@ const defaultConfig = (editor: EditorInterface): Config => {
 				'file',
 				'video',
 				'math',
+				//'mind'
 			],
 		},
 	];
@@ -36,7 +38,8 @@ class ToolbarPlugin extends Plugin<Options> {
 	}
 
 	init() {
-		this.editor.on('keydown:slash', event => this.onSlash(event));
+		this.editor.on('keydown:slash', (event) => this.onSlash(event));
+		this.editor.language.add(locales);
 	}
 
 	onSlash(event: KeyboardEvent) {

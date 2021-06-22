@@ -19,7 +19,7 @@ export default class Paste {
 	parser() {
 		const conversion = this.engine.conversion.clone();
 		this.engine.trigger('paste:schema', this.schema);
-		const parser = new Parser(this.source, this.engine, root => {
+		const parser = new Parser(this.source, this.engine, (root) => {
 			this.engine.trigger('paste:origin', root);
 		});
 		return parser.toDOM(this.schema, conversion);
@@ -46,7 +46,7 @@ export default class Paste {
 		const nodeApi = this.engine.node;
 		// 第一轮预处理，主要处理 span 节点
 		let nodes = $(fragment).allChildren();
-		nodes.forEach(child => {
+		nodes.forEach((child) => {
 			const node = $(child);
 			// 跳过Card
 			if (node.isCard()) {
@@ -54,7 +54,7 @@ export default class Paste {
 			}
 			// 删除与默认样式一样的 inline 样式
 			if (node.isElement()) {
-				defaultStyle.forEach(style => {
+				defaultStyle.forEach((style) => {
 					const key = Object.keys(style)[0];
 					const defaultValue = style[key];
 					let value = node.get<HTMLElement>()?.style[key];
@@ -102,7 +102,7 @@ export default class Paste {
 						node.text('\n');
 						return;
 					}
-					text.split(/(\r|\n)+/).forEach(text => {
+					text.split(/(\r|\n)+/).forEach((text) => {
 						if (text === '') return;
 						node.before(document.createTextNode(`${text}`));
 					});
@@ -112,7 +112,7 @@ export default class Paste {
 		});
 		// 第二轮处理
 		nodes = $(fragment).allChildren();
-		nodes.forEach(child => {
+		nodes.forEach((child) => {
 			const node = $(child);
 			// 跳过已被删除的节点
 			if (!node.parent()) {
@@ -172,7 +172,7 @@ export default class Paste {
 				const parent = node.parent();
 				let li: NodeInterface | null;
 				const isCustomizeList = parent?.parent()?.hasClass('data-list');
-				parent?.children().each(child => {
+				parent?.children().each((child) => {
 					const node = $(child);
 					if (nodeApi.isEmptyWithTrim(node)) {
 						return;
@@ -232,7 +232,8 @@ export default class Paste {
 				return;
 			}
 			if (nodeApi.isInline(node)) {
-				inline.repairCursor(node);
+				if (nodeApi.isEmptyWithTrim(node)) node.remove();
+				else inline.repairCursor(node);
 			}
 			// 移除两边的 BR
 			nodeApi.removeSide(node);
@@ -265,12 +266,12 @@ export default class Paste {
 		}
 
 		let nodes = $(fragment).allChildren();
-		nodes.forEach(child => {
+		nodes.forEach((child) => {
 			const node = $(child);
 			if (node.parent()) this.engine.trigger('paste:each', node);
 		});
 		nodes = $(fragment).allChildren();
-		nodes.forEach(child => {
+		nodes.forEach((child) => {
 			const node = $(child);
 			this.engine.trigger('paste:each-after', node);
 			// 删除包含Card的 pre 标签
@@ -298,7 +299,7 @@ export default class Paste {
 		}
 		nodes = $(fragment).allChildren();
 
-		nodes.forEach(child => {
+		nodes.forEach((child) => {
 			const node = $(child);
 			if (['ol', 'ul'].includes(node.name)) {
 				this.engine.list.addStart(node);
@@ -310,7 +311,7 @@ export default class Paste {
 
 	removeElementNodes(fragment: NodeInterface) {
 		const nodes = fragment.allChildren();
-		nodes.forEach(child => {
+		nodes.forEach((child) => {
 			const node = $(child);
 			if (node.isElement()) {
 				this.engine.node.unwrap(node);

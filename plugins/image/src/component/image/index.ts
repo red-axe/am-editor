@@ -25,6 +25,10 @@ export type Size = {
 
 export type Options = {
 	/**
+	 * 卡片根节点
+	 */
+	root: NodeInterface;
+	/**
 	 * 容器
 	 */
 	container: NodeInterface;
@@ -267,7 +271,7 @@ class Image {
 		if (onError) onError();
 	}
 
-	getMaxWidth(node: NodeInterface = this.options.container) {
+	getMaxWidth(node: NodeInterface = this.options.root) {
 		const block = this.editor.block.closest(node).get<HTMLElement>();
 		if (!block) return 0;
 		return block.clientWidth - 6;

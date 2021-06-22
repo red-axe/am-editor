@@ -117,13 +117,16 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 
 		//设置编辑器值，还原评论标记
 		if (defaultValue) {
-			const value = engine.current.command.execute(
-				'mark-range',
-				'comment',
-				'wrap',
-				defaultValue.paths,
-				defaultValue.value,
-			);
+			const value =
+				defaultValue.paths.length > 0
+					? engine.current.command.execute(
+							'mark-range',
+							'comment',
+							'wrap',
+							defaultValue.paths,
+							defaultValue.value,
+					  )
+					: defaultValue.value;
 			engine.current.setValue(value);
 			setValue(value);
 		}

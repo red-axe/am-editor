@@ -484,7 +484,10 @@ export interface NodeInterface {
 	 * 检查当前节点是否在目标节点内
 	 * @param node 节点
 	 */
-	inside(node: Node | NodeInterface): boolean;
+	inside(
+		node: Node | NodeInterface,
+		callback: (node: Node) => Node | undefined,
+	): boolean;
 
 	/**
 	 * 获取当前节点所在父节点中的索引
@@ -506,9 +509,12 @@ export interface NodeInterface {
 	 * 返回当前节点或者传入的节点所在当前节点的顶级window对象的视图边界
 	 * @param node 节点
 	 */
-	getViewport(
-		node?: NodeInterface,
-	): { top: number; left: number; bottom: number; right: number };
+	getViewport(node?: NodeInterface): {
+		top: number;
+		left: number;
+		bottom: number;
+		right: number;
+	};
 
 	/**
 	 * 判断view是否在node节点根据当前节点的顶级window对象计算的视图边界内

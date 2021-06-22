@@ -359,6 +359,16 @@ export const getToolbarDefaultConfig = (
 							title: language['math']['title'],
 							search: '公式,数学公式,gongshi,formula,math,latex',
 						},
+						/**{
+							name: 'mind',
+							icon: (
+								<span>
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><g fill="none" fillRule="evenodd"><rect stroke="#E8E8E8" fill="#FFF" x=".5" y=".5" width="23" height="23" rx="2"/><g transform="translate(6 5.25)"><path d="M2.25 6.375h6M9 .75c-3.728 0-6.75 2.686-6.75 6s3.022 6 6.75 6" stroke="#BFBFBF" strokeWidth=".9"/><rect fill="#BFBFBF" x="8.25" width="3.75" height="1.875" rx=".225"/><rect fill="#BFBFBF" x="8.25" y="5.75" width="3.75" height="1.875" rx=".225"/><rect fill="#BFBFBF" x="8.25" y="11.75" width="3.75" height="1.875" rx=".225"/><rect fill="#595959" y="5.25" width="3.75" height="2.25" rx=".225"/></g></g></svg>
+								</span>
+							),
+							title: language['mind']['title'],
+							search: '脑图,思维导图,mind,naotu,shiweidaotu',
+						},**/
 					],
 				},
 			],

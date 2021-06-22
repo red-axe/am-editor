@@ -65,7 +65,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 		calcuMobileView();
 		const data: Array<GroupProps> = [];
 		const defaultConfig = getToolbarDefaultConfig(engine);
-		items.forEach(group => {
+		items.forEach((group) => {
 			const dataGroup: GroupProps = { items: [] };
 			if (!Array.isArray(group)) {
 				dataGroup.icon = group.icon;
@@ -73,10 +73,10 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 
 				group = group.items;
 			}
-			group.forEach(item => {
+			group.forEach((item) => {
 				let customItem = undefined;
 				if (typeof item === 'string') {
-					const defaultItem = defaultConfig.find(config =>
+					const defaultItem = defaultConfig.find((config) =>
 						item === 'collapse'
 							? config.type === item
 							: config.type !== 'collapse' &&
@@ -84,7 +84,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 					);
 					if (defaultItem) customItem = defaultItem;
 				} else {
-					const defaultItem = defaultConfig.find(config =>
+					const defaultItem = defaultConfig.find((config) =>
 						item.type === 'collapse'
 							? config.type === item.type
 							: config.type !== 'collapse' &&
@@ -122,11 +122,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 	}, [engine, items]);
 
 	useMemo(() => {
-		engine.language.add(locales);
 		updateState();
 	}, [engine, items]);
 
 	useEffect(() => {
+		engine.language.add(locales);
 		engine.on('select', updateState);
 		engine.on('change', updateState);
 
@@ -176,9 +176,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 			style={isMobile ? { top: `${mobileView.top}px` } : {}}
 			data-element="ui"
 			onMouseDown={onMouseDown}
-			onMouseOver={event => event.preventDefault()}
-			onMouseMove={event => event.preventDefault()}
-			onContextMenu={event => event.preventDefault()}
+			onMouseOver={(event) => event.preventDefault()}
+			onMouseMove={(event) => event.preventDefault()}
+			onContextMenu={(event) => event.preventDefault()}
 		>
 			<div className="editor-toolbar-content">
 				{data.map((group, index) => (

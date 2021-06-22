@@ -19,9 +19,11 @@ import {
 	DATA_ELEMENT,
 	DATA_TRANSIENT_ATTRIBUTES,
 	DATA_TRANSIENT_ELEMENT,
+	ROOT,
 	UI,
 	UI_SELECTOR,
 } from '../constants/root';
+import { getDocument, getParentInRoot } from '../utils';
 
 /**
  * 随机一个数字
@@ -43,33 +45,68 @@ export const randomString = (length: number = 8) => {
 	return word;
 };
 
-export const isTransientElement = (node: NodeInterface) => {
+export const isTransientElement = (
+	node: NodeInterface,
+	transientElements?: Array<Node>,
+) => {
 	if (node.isElement()) {
 		//范围标记
-		if ([CURSOR, ANCHOR, FOCUS].indexOf(node.attributes(DATA_ELEMENT)) > -1)
+		if (
+			[CURSOR, ANCHOR, FOCUS].indexOf(node.attributes(DATA_ELEMENT)) > -1
+		) {
 			return true;
+		}
+
 		//data-element=ui 属性
 		if (
 			!!node.attributes(DATA_TRANSIENT_ELEMENT) ||
-			node.attributes(DATA_ELEMENT) === UI ||
-			node.closest(UI_SELECTOR).length > 0
-		)
+			node.attributes(DATA_ELEMENT) === UI
+		) {
 			return true;
-		//在卡片里面
-		let card = node.closest(CARD_SELECTOR);
-		if (!node.isCard() && card.isCard() && !card.isEditableCard())
-			return true;
-		//当前是卡片，父级也是卡片
+		}
 		const parent = node.parent();
-		const parentCard = parent?.closest(CARD_SELECTOR);
-		if (
-			node.isCard() &&
-			!node.isEditableCard() &&
-			parentCard &&
-			parentCard.isCard() &&
-			!parentCard.isEditableCard()
-		)
+		if (node.isRoot() || parent?.isRoot()) return false;
+
+		const isCard = node.isCard();
+		//父级是卡片，并且没有可编辑区域
+		if (!isCard && parent?.isCard() && !parent.isEditableCard()) {
 			return true;
+		}
+
+		if (transientElements) {
+			if (
+				!isCard &&
+				transientElements.find((element) => element === node[0])
+			)
+				return true;
+		} else {
+			let closestNode = node.closest(
+				`${CARD_SELECTOR},${UI_SELECTOR}`,
+				getParentInRoot,
+			);
+			if (
+				closestNode.length > 0 &&
+				closestNode.attributes(DATA_ELEMENT) === UI
+			) {
+				return true;
+			}
+			//在卡片里面，并且卡片不是可编辑卡片
+			if (
+				!isCard &&
+				closestNode.length > 0 &&
+				closestNode.isCard() &&
+				!closestNode.isEditableCard()
+			) {
+				return true;
+			}
+			if (closestNode.length === 0) return false;
+		}
+		if (!isCard || node.isEditableCard()) return false;
+		//当前是卡片，父级也是卡片
+		const parentCard = parent?.closest(CARD_SELECTOR, getParentInRoot);
+		if (parentCard && parentCard.isCard() && !parentCard.isEditableCard()) {
+			return true;
+		}
 	}
 	return false;
 };
@@ -82,7 +119,7 @@ export const isTransientAttribute = (node: NodeInterface, attr: string) => {
 		transient === '*' ||
 		transient
 			.split(',')
-			.some(value => value.trim().toLowerCase() === attr.toLowerCase())
+			.some((value) => value.trim().toLowerCase() === attr.toLowerCase())
 	)
 		return true;
 	return false;
@@ -158,10 +195,10 @@ const isPathEqual = (op: Path, next: Path, length: number = 1): boolean => {
 export const transformOp = (op: Op[], otherOp: Operation[]) => {
 	const ops: Op[][] = [];
 
-	otherOp.forEach(op => {
+	otherOp.forEach((op) => {
 		if (op.ops) ops.push(op.ops);
 	});
-	ops.forEach(o => {
+	ops.forEach((o) => {
 		op = OTJSON.type.transform(op, o, 'left');
 	});
 	return op;
@@ -173,19 +210,19 @@ export const transformPath = (
 ): Path[] => {
 	const [startPath, endPath] = path;
 	if (!startPath || !endPath) return path;
-	let start: Path = startPath.map(p => parseInt(p.toString()) + 2);
-	let end: Path = endPath.map(p => parseInt(p.toString()) + 2);
+	let start: Path = startPath.map((p) => parseInt(p.toString()) + 2);
+	let end: Path = endPath.map((p) => parseInt(p.toString()) + 2);
 	let ops: Op[] = [];
-	operation?.forEach(op => {
+	operation?.forEach((op) => {
 		if (op.ops) ops = ops.concat(op.ops);
 	});
-	ops.forEach(op => {
+	ops.forEach((op) => {
 		start = handlePath(start, op);
 		end = handlePath(end, op);
 	});
 	return [
-		start.map(p => parseInt(p.toString()) - 2),
-		end.map(p => parseInt(p.toString()) - 2),
+		start.map((p) => parseInt(p.toString()) - 2),
+		end.map((p) => parseInt(p.toString()) - 2),
 	];
 };
 
@@ -232,7 +269,7 @@ export const affectPath = (path: Path, otherPath: Path) => {
 
 export const getOldIndex = (index: number, ops: Op[]) => {
 	let i = index;
-	ops.forEach(op => {
+	ops.forEach((op) => {
 		if (parseInt(op.p[op.p.length - 1].toString()) - 2 <= index) {
 			if ('li' in op) i -= 1;
 			else if ('ld' in op) i += 1;

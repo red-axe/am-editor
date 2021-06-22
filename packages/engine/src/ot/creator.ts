@@ -21,12 +21,15 @@ import { Op, Path, StringInsertOp, StringDeleteOp, Doc } from 'sharedb';
 import { NodeInterface } from '../types/node';
 import { DocInterface, RepairOp } from '../types/ot';
 import { $ } from '../node';
+import { DATA_ELEMENT, ROOT, UI_SELECTOR } from '../constants';
+import { getDocument } from '../utils/node';
 
 class Creator extends EventEmitter2 {
 	private engine: EngineInterface;
 	private doc?: DocInterface | Doc;
 	private dmp: diff_match_patch;
 	private addedNodes: Array<Node> = [];
+	private cacheTransientElements?: Array<Node>;
 	timer: NodeJS.Timeout | null = null;
 	lineStart: boolean = false;
 	laterOps: Op[] | null = null;
@@ -44,10 +47,10 @@ class Creator extends EventEmitter2 {
 	patchesToOps(path: Path, text1: string, text2: string) {
 		const ops: Array<StringDeleteOp | StringInsertOp> = [];
 		const patches = this.dmp.patch_make(text1, text2);
-		Object.keys(patches).forEach(key => {
+		Object.keys(patches).forEach((key) => {
 			const patch: patch_obj = patches[key];
 			let start1 = patch.start1;
-			patch.diffs.forEach(diff => {
+			patch.diffs.forEach((diff) => {
 				const [type, data] = diff;
 				if (type !== DIFF_DELETE) {
 					if (type !== DIFF_INSERT) {
@@ -76,6 +79,10 @@ class Creator extends EventEmitter2 {
 
 	cacheAddedNode(node: Node) {
 		this.addedNodes.push(node);
+		node.childNodes.forEach((child) => {
+			this.addedNodes.push(child);
+			this.cacheAddedNode(child);
+		});
 	}
 
 	clearAddedNodeCache() {
@@ -83,30 +90,35 @@ class Creator extends EventEmitter2 {
 	}
 
 	inAddedCache(node: Node) {
-		return this.addedNodes.find(n => $(node).inside(n) || n === node);
+		return this.addedNodes.find((n) => n === node);
 	}
 
-	isTransientMutation(record: MutationRecord) {
-		const {
-			addedNodes,
-			removedNodes,
-			target,
-			type,
-			attributeName,
-		} = record;
+	isTransientMutation(
+		record: MutationRecord,
+		transientElements?: Array<Node>,
+	) {
+		const { addedNodes, removedNodes, target, type, attributeName } =
+			record;
+		const targetNode = $(target);
 		if (type === 'childList') {
-			if (addedNodes[0] && isTransientElement($(addedNodes[0])))
+			if (
+				addedNodes[0] &&
+				isTransientElement($(addedNodes[0]), transientElements)
+			)
 				return true;
-			if (removedNodes[0] && isTransientElement($(removedNodes[0])))
+			if (
+				removedNodes[0] &&
+				isTransientElement($(removedNodes[0]), transientElements)
+			)
 				return true;
-			if (isTransientElement($(target))) return true;
+			if (isTransientElement(targetNode, transientElements)) return true;
 		}
 		return (
-			!(
-				type !== 'attributes' ||
-				(!isTransientElement($(target)) &&
-					!isTransientAttribute($(target), attributeName || ''))
-			) || !(type !== 'characterData' || !isTransientElement($(target)))
+			(type === 'attributes' &&
+				(isTransientAttribute(targetNode, attributeName || '') ||
+					isTransientElement(targetNode, transientElements))) ||
+			(type === 'characterData' &&
+				isTransientElement(targetNode, transientElements))
 		);
 	}
 
@@ -133,7 +145,8 @@ class Creator extends EventEmitter2 {
 		for (let i = 0; records[i]; ) {
 			const record = records[i];
 			const { target, addedNodes, removedNodes, type } = record;
-			if (this.inAddedCache(target)) {
+			const inCache = this.inAddedCache(target);
+			if (inCache) {
 				i++;
 				continue;
 			}
@@ -144,8 +157,8 @@ class Creator extends EventEmitter2 {
 							record,
 							records,
 						);
-						Array.from(removedNodes).forEach(removedNode => {
-							if (!addNodes.find(n => n === removedNode)) {
+						Array.from(removedNodes).forEach((removedNode) => {
+							if (!addNodes.find((n) => n === removedNode)) {
 								let p: Path = [];
 								p = p.concat([...path], [removeIndex + 2]);
 								let op: Path = [];
@@ -160,20 +173,24 @@ class Creator extends EventEmitter2 {
 						});
 					}
 					if (addedNodes[0]) {
-						Array.from(addedNodes).forEach(addedNode => {
+						Array.from(addedNodes).forEach((addedNode) => {
 							const domAddedNode = $(addedNode);
 							const data = fromDOM(domAddedNode);
 							if (addedNode.parentNode === node.get()) {
+								//父节点就是编辑器根节点，就不需要过滤
+								const index =
+									domAddedNode.getIndex(
+										domAddedNode.parent()?.isRoot()
+											? undefined
+											: (node) =>
+													!isTransientElement(
+														$(node),
+														this
+															.cacheTransientElements,
+													),
+									) + 2;
 								let p: Path = [];
-								p = p.concat(
-									[...path],
-									[
-										domAddedNode.getIndex(
-											node =>
-												!isTransientElement($(node)),
-										) + 2,
-									],
-								);
+								p = p.concat([...path], [index]);
 								pushAndRepair(ops, {
 									li: data,
 									p,
@@ -218,10 +235,11 @@ class Creator extends EventEmitter2 {
 				}
 			} else if (type === 'attributes') {
 				if (node.equal(target)) {
-					const { oldValue, attributeName } = record;
+					let { oldValue, attributeName } = record;
 					let attrValue = attributeName
 						? (target as Element).getAttribute(attributeName)
 						: '';
+					if (!oldValue) oldValue = '';
 					attrValue = attrValue ? escape(attrValue) : '';
 					if (oldValue !== attrValue) {
 						const p: Path = [];
@@ -244,7 +262,7 @@ class Creator extends EventEmitter2 {
 			i++;
 		}
 		let allOps: Array<Op> = [];
-		ops.forEach(op => {
+		ops.forEach((op) => {
 			if ('ld' in op) {
 				const pathValue = getPathValue(
 					this.doc?.data,
@@ -265,12 +283,19 @@ class Creator extends EventEmitter2 {
 			}
 		});
 		allOps = allOps.concat(attrOps);
-		mutationsNodes.forEach(node => {
+		mutationsNodes.forEach((node) => {
 			const mutations = node['mutations'];
 			delete node['mutations'];
 			if (node !== null) {
-				const index = $(node).getIndex(
-					node => !isTransientElement($(node)),
+				const element = $(node);
+				const index = element.getIndex(
+					element.parent()?.isRoot()
+						? undefined
+						: (node) =>
+								!isTransientElement(
+									$(node),
+									this.cacheTransientElements,
+								),
 				);
 				const oldIndex = getOldIndex(index, ops);
 				const p: Path = [];
@@ -279,7 +304,7 @@ class Creator extends EventEmitter2 {
 						mutations,
 						p.concat(...path, [index + 2]),
 						p.concat([...oldPath], [oldIndex + 2]),
-						$(node),
+						element,
 					),
 				);
 			}
@@ -292,9 +317,18 @@ class Creator extends EventEmitter2 {
 		records: MutationRecord[],
 	): number {
 		const { target, nextSibling, previousSibling, addedNodes } = record;
-		const childNodes = Array.from(target.childNodes).filter(
-			node => !isTransientElement($(node)),
-		);
+		const targetElement = target as Element;
+		const childNodes =
+			target.nodeType === getDocument().ELEMENT_NODE &&
+			targetElement.getAttribute(DATA_ELEMENT) === ROOT
+				? Array.from(target.childNodes)
+				: Array.from(target.childNodes).filter(
+						(node) =>
+							!isTransientElement(
+								$(node),
+								this.cacheTransientElements,
+							),
+				  );
 		const addedIndex = childNodes.indexOf(addedNodes[0] as ChildNode);
 		const prevIndex = childNodes.indexOf(previousSibling as ChildNode);
 		const nextIndex = childNodes.indexOf(nextSibling as ChildNode);
@@ -327,7 +361,7 @@ class Creator extends EventEmitter2 {
 		records: MutationRecord[],
 	) {
 		const record = records.find(
-			record =>
+			(record) =>
 				record.target === target && record.removedNodes[0] === node,
 		);
 		if (record) {
@@ -337,9 +371,36 @@ class Creator extends EventEmitter2 {
 	}
 
 	handleMutations(records: MutationRecord[]) {
-		records = records.filter(record => !this.isTransientMutation(record));
+		//记录大于1000的时候，先获取所有的不需要参与协同交互的节点，以提高效率
+		if (records.length > 999) {
+			this.cacheTransientElements = [];
+			//非可编辑卡片的子节点
+			const { card, container } = this.engine;
+			card.each((card) => {
+				if (!card.isEditable) {
+					card.root.allChildren().forEach((child) => {
+						if (child.nodeType === getDocument().ELEMENT_NODE)
+							this.cacheTransientElements?.push(child);
+					});
+				}
+			});
+			//所有的UI子节点
+			container
+				.find(`${UI_SELECTOR}`)
+				.allChildren()
+				.forEach((child) => {
+					if (child.nodeType === getDocument().ELEMENT_NODE)
+						this.cacheTransientElements?.push(child);
+				});
+		}
+		records = records.filter(
+			(record) =>
+				!this.isTransientMutation(record, this.cacheTransientElements),
+		);
 		this.clearAddedNodeCache();
 		let ops = this.makeOpsFromMutations(records);
+		//重置缓存
+		this.cacheTransientElements = undefined;
 		ops = reduceOperations(ops);
 		if (ops.length !== 0) {
 			this.normalizeOps(ops);
@@ -395,7 +456,7 @@ class Creator extends EventEmitter2 {
 	readyToEmitOps(ops: any[]) {
 		let emitOps: Op[] = [];
 		let removeCount = 0;
-		ops.forEach(op => {
+		ops.forEach((op) => {
 			if ('path' in op && op.newValue !== undefined) {
 				const pathValue = getPathValue(this.doc?.data, op.oldPath);
 				emitOps = emitOps.concat(

@@ -122,12 +122,9 @@ class ChangeModel implements ChangeInterface {
 			}
 		}
 		//修复inline光标
-		const {
-			startNode,
-			endNode,
-			startOffset,
-			endOffset,
-		} = range.cloneRange().shrinkToTextNode();
+		const { startNode, endNode, startOffset, endOffset } = range
+			.cloneRange()
+			.shrinkToTextNode();
 		const prev = startNode.prev();
 		const next = endNode.next();
 		//光标上一个节点是inline节点，让其选择在inline节点后的零宽字符后面
@@ -362,9 +359,8 @@ class ChangeModel implements ChangeInterface {
 					this.select(range);
 				}
 			} else if (card.isRightCursor(commonAncestorNode)) {
-				const cardRight = commonAncestorNode.closest(
-					CARD_RIGHT_SELECTOR,
-				);
+				const cardRight =
+					commonAncestorNode.closest(CARD_RIGHT_SELECTOR);
 				let cardRightText = cardRight.text().replace(/\u200B/g, '');
 				if (cardRightText) {
 					cardRightText = escape(cardRightText);
@@ -429,9 +425,8 @@ class ChangeModel implements ChangeInterface {
 					//循环找到下一个节点，如果没有下一级节点，从父级节点查找父级的下一级。如果有下一级节点，并且父节点
 					while (!next && curNode) {
 						//找到父节点
-						const parent:
-							| NodeInterface
-							| undefined = curNode.parent();
+						const parent: NodeInterface | undefined =
+							curNode.parent();
 						//如果父节点是块级节点，就不找了
 						if (parent && node.isBlock(parent)) break;
 						//找到父级节点的下一级
@@ -512,9 +507,8 @@ class ChangeModel implements ChangeInterface {
 					//循环找到上一个节点，如果没有上一级节点，从父级节点查找父级的上一级。如果有上一级节点，并且父节点
 					while (!prev && curNode) {
 						//找到父节点
-						const parent:
-							| NodeInterface
-							| undefined = curNode.parent();
+						const parent: NodeInterface | undefined =
+							curNode.parent();
 						//如果父节点是块级节点，就不找了
 						if (parent && node.isBlock(parent)) break;
 						//找到父级节点的下一级
@@ -620,7 +614,7 @@ class ChangeModel implements ChangeInterface {
 	private focusCardRang(range: RangeInterface) {
 		const { startNode, startOffset } = range;
 		const card = this.engine.card.find(startNode);
-		if (card && !card.isEditable) {
+		if (card) {
 			const cardCenter = card.getCenter().get();
 			if (
 				cardCenter &&
@@ -689,9 +683,8 @@ class ChangeModel implements ChangeInterface {
 								isSelect = true;
 							}
 						}
-						const {
-							singleSelectable,
-						} = card.constructor as CardEntry;
+						const { singleSelectable } =
+							card.constructor as CardEntry;
 						if (singleSelectable !== false) card.select(isSelect);
 					}
 				});

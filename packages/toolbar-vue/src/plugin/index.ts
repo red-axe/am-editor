@@ -1,5 +1,6 @@
 import { EditorInterface, isEngine, isSafari, Plugin } from '@aomao/engine';
 import { CollapseItemProps } from '../types';
+import locales from '../locales';
 import ToolbarComponent from './component';
 
 type Config = Array<{
@@ -36,7 +37,8 @@ class ToolbarPlugin extends Plugin<Options> {
 	}
 
 	init() {
-		this.editor.on('keydown:slash', event => this.onSlash(event));
+		this.editor.on('keydown:slash', (event) => this.onSlash(event));
+		this.editor.language.add(locales);
 	}
 
 	onSlash(event: KeyboardEvent) {

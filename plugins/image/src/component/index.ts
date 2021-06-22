@@ -90,10 +90,12 @@ class ImageComponent extends Card<ImageValue> {
 	setSize(size: Size) {
 		this.setValue({ size } as ImageValue);
 		if (this.widthInput) {
-			this.widthInput.get<HTMLInputElement>()!.value = size.width.toString();
+			this.widthInput.get<HTMLInputElement>()!.value =
+				size.width.toString();
 		}
 		if (this.heightInput) {
-			this.heightInput.get<HTMLInputElement>()!.value = size.height.toString();
+			this.heightInput.get<HTMLInputElement>()!.value =
+				size.height.toString();
 		}
 	}
 
@@ -102,14 +104,16 @@ class ImageComponent extends Card<ImageValue> {
 		if (typeof width === 'string') {
 			if (!/^[1-9]+(\d+)?$/.test(width) && this.widthInput) {
 				width = value?.size?.width || value?.size?.naturalWidth || 0;
-				this.widthInput.get<HTMLInputElement>()!.value = width.toString();
+				this.widthInput.get<HTMLInputElement>()!.value =
+					width.toString();
 			}
 			width = parseInt(width.toString(), 10);
 		}
 		if (typeof height === 'string') {
 			if (!/^[1-9]+(\d+)?$/.test(height) && this.heightInput) {
 				height = value?.size?.height || value?.size?.naturalHeight || 0;
-				this.heightInput.get<HTMLInputElement>()!.value = height.toString();
+				this.heightInput.get<HTMLInputElement>()!.value =
+					height.toString();
 			}
 			height = parseInt(height.toString(), 10);
 		}
@@ -203,6 +207,7 @@ class ImageComponent extends Card<ImageValue> {
 		const value = this.getValue();
 		if (!value) return;
 		this.image = new Image(this.editor, {
+			root: this.root,
 			container: this.getCenter(),
 			status: value.status || 'done',
 			src: value.src,

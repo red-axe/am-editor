@@ -162,7 +162,7 @@ class RangeColoring implements RangeColoringInterface {
 			}
 		}
 
-		subRanges.forEach(subRange => {
+		subRanges.forEach((subRange) => {
 			if (this.isRangeWrap(subRange)) {
 				this.drawOneByOne(child, targetCanvas, subRange, fill);
 			} else {
@@ -179,10 +179,7 @@ class RangeColoring implements RangeColoringInterface {
 		if (
 			node.isCard() &&
 			node.parent()?.hasClass('data-list-item') &&
-			node
-				.parent()
-				?.first()
-				?.equal(node) &&
+			node.parent()?.first()?.equal(node) &&
 			node.next()
 		) {
 			node = node.next()!;
@@ -470,7 +467,7 @@ class RangeColoring implements RangeColoringInterface {
 			cardInfo = undefined;
 		}
 
-		card.each(cardComponent => {
+		card.each((cardComponent) => {
 			if (cardComponent.isEditable) return;
 			if (!cardInfo || !cardComponent.root.equal(cardInfo.root)) {
 				if (cardComponent.activatedByOther === uuid) {
@@ -479,6 +476,7 @@ class RangeColoring implements RangeColoringInterface {
 				this.root
 					.children(`.${USER_MASK_CLASS}[data-uuid="${uuid}"]`)
 					.remove();
+				Tooltip.hide();
 			}
 		});
 		if (cardInfo && !cardInfo.isEditable) {
@@ -496,7 +494,7 @@ class RangeColoring implements RangeColoringInterface {
 				this.drawBackground(range, member);
 				return;
 			}
-			card.each(cardComponent => {
+			card.each((cardComponent) => {
 				const centerNode = cardComponent.getCenter();
 				if (centerNode && centerNode.length > 0) {
 					if (cardComponent.isEditable) {
@@ -541,7 +539,7 @@ class RangeColoring implements RangeColoringInterface {
 				range.shrinkToElementNode();
 				const ranges = this.drawBackground(range, member);
 				if (!range.collapsed) {
-					ranges.forEach(sub => {
+					ranges.forEach((sub) => {
 						if (!sub.collapsed) {
 							range = sub;
 						}
@@ -555,7 +553,7 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	updateBackgroundPosition() {
-		this.root.children(`.${USER_BACKGROUND_CLASS}`).each(child => {
+		this.root.children(`.${USER_BACKGROUND_CLASS}`).each((child) => {
 			const node = $(child);
 			const range = child['__targetRange'];
 			const uuid = node.attributes('data-uuid');
@@ -568,7 +566,7 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	updateCursorPosition() {
-		this.root.children(`.${USER_CURSOR_CLASS}`).each(child => {
+		this.root.children(`.${USER_CURSOR_CLASS}`).each((child) => {
 			const node = $(child);
 			const target = child['__target'];
 			if (
@@ -588,7 +586,7 @@ class RangeColoring implements RangeColoringInterface {
 			left: 0,
 			top: 0,
 		};
-		this.root.children(`.${USER_MASK_CLASS}`).each(child => {
+		this.root.children(`.${USER_MASK_CLASS}`).each((child) => {
 			const node = $(child);
 			const target = child['__targetNode'];
 			if (0 !== $(target).closest('body').length) {
@@ -609,7 +607,7 @@ class RangeColoring implements RangeColoringInterface {
 
 	updateBackgroundAlpha(range: RangeInterface) {
 		const cursorRect = this.getCursorRect(range);
-		this.root.children(`.${USER_CURSOR_CLASS}`).each(child => {
+		this.root.children(`.${USER_CURSOR_CLASS}`).each((child) => {
 			const node = $(child);
 			const trigger = node.find(`.${USER_CURSOR_TRIGGER_CLASS}`);
 			const left = node.css('left');
@@ -628,9 +626,9 @@ class RangeColoring implements RangeColoringInterface {
 	render(data: Array<Attribute>, members: Array<Member>, idDraw: boolean) {
 		const { root, engine } = this;
 		const info = {};
-		data.forEach(item => {
+		data.forEach((item) => {
 			const { path, uuid, active } = item;
-			const member = members.find(m => m.uuid === uuid);
+			const member = members.find((m) => m.uuid === uuid);
 			if (member && (idDraw || active)) {
 				if (path.length !== 0) {
 					const range = Range.fromPath(engine, path);
@@ -640,10 +638,10 @@ class RangeColoring implements RangeColoringInterface {
 				}
 			}
 		});
-		this.root.children('[data-uuid]').each(child => {
+		this.root.children('[data-uuid]').each((child) => {
 			const domChild = $(child);
 			const uuid = domChild.attributes('data-uuid');
-			const member = members.find(m => m.uuid === uuid);
+			const member = members.find((m) => m.uuid === uuid);
 			if (!member || info[uuid]) {
 				if (domChild.hasClass(USER_MASK_CLASS)) {
 					const target = $(domChild[0]['__targetNode']);
@@ -659,10 +657,10 @@ class RangeColoring implements RangeColoringInterface {
 				domChild.remove();
 			}
 		});
-		engine.card.each(component => {
+		engine.card.each((component) => {
 			if (component.isEditable) return;
 			const member = members.find(
-				m => m.uuid === component.selectedByOther,
+				(m) => m.uuid === component.selectedByOther,
 			);
 			if (!member || info[member.uuid]) {
 				this.setCardSelectedByOther(component);
