@@ -11,12 +11,9 @@ class Backspace {
 	trigger(event: KeyboardEvent) {
 		const { change, mark, inline, node } = this.engine;
 		const range = change.getRange();
-		const {
-			collapsed,
-			endNode,
-			startNode,
-			startOffset,
-		} = range.cloneRange().shrinkToTextNode();
+		const { collapsed, endNode, startNode, startOffset } = range
+			.cloneRange()
+			.shrinkToTextNode();
 		if (
 			endNode.type === Node.TEXT_NODE ||
 			startNode.type === Node.TEXT_NODE
@@ -54,6 +51,11 @@ class Backspace {
 							return false;
 						}
 					}
+				}
+				if (node.isInline(inlineNode) && !inlineNode.isCard()) {
+					setTimeout(() => {
+						inline.repairCursor(inlineNode);
+					}, 100);
 				}
 				return true;
 			}

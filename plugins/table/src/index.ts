@@ -25,9 +25,9 @@ class Table extends Plugin<Options> {
 		const editor = this.editor;
 		editor.language.add(locales);
 		editor.schema.add(this.schema());
-		editor.on('paser:html', node => this.parseHtml(node));
-		editor.on('paste:each-after', child => this.pasteHtml(child));
-		editor.on('paste:markdown-after', child => this.pasteMarkdown(child));
+		editor.on('paser:html', (node) => this.parseHtml(node));
+		editor.on('paste:each-after', (child) => this.pasteHtml(child));
+		editor.on('paste:markdown-after', (child) => this.pasteMarkdown(child));
 	}
 
 	hotkey() {
@@ -127,32 +127,35 @@ class Table extends Plugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${TableComponent.cardName}`).each(tableNode => {
-			const node = $(tableNode);
-			const table = node.find('table');
-			if (table.length === 0) {
-				node.remove();
-				return;
-			}
-			table.css({
-				outline: 'none',
-				'border-collapse': 'collapse',
-			});
-			table.find('td').css({
-				'min-width': '90px',
-				'font-size': '14px',
-				'white-space': 'normal',
-				'word-wrap': 'break-word',
-				border: '1px solid #d9d9d9',
-				padding: '4px 8px',
-				cursor: 'default',
-			});
-			table.find(Template.TABLE_TD_BG_CLASS).remove();
-			table.find(Template.TABLE_TD_CONTENT_CLASS).each(content => {
-				this.editor.node.unwrap($(content));
-			});
-			node.replaceWith(table);
-		});
+		root.find(`[${CARD_KEY}=${TableComponent.cardName}`).each(
+			(tableNode) => {
+				const node = $(tableNode);
+				const table = node.find('table');
+				if (table.length === 0) {
+					node.remove();
+					return;
+				}
+				table.css({
+					outline: 'none',
+					'border-collapse': 'collapse',
+				});
+				table.find('td').css({
+					'min-width': '90px',
+					'font-size': '14px',
+					'white-space': 'normal',
+					'word-wrap': 'break-word',
+					margin: '4px 8px',
+					border: '1px solid #d9d9d9',
+					padding: '4px 8px',
+					cursor: 'default',
+				});
+				table.find(Template.TABLE_TD_BG_CLASS).remove();
+				table.find(Template.TABLE_TD_CONTENT_CLASS).each((content) => {
+					this.editor.node.unwrap($(content));
+				});
+				node.replaceWith(table);
+			},
+		);
 	}
 
 	pasteMarkdown(node: NodeInterface) {
@@ -178,12 +181,12 @@ class Table extends Plugin<Options> {
 		let newText = '';
 		const rows = text.split(/\n|\r\n/);
 		let nodes: Array<string> = [];
-		rows.forEach(row => {
+		rows.forEach((row) => {
 			const match = /^\s*\|(?:(?:[^\|]+?)\|){2,}\s*$/.exec(row);
 			if (match) {
 				const cols = match[0].split('|');
 				const colNodes: Array<string> = [];
-				cols.forEach(col => {
+				cols.forEach((col) => {
 					if (col.trim().indexOf('---') === 0) return;
 					colNodes.push(`<td>${col}</td>`);
 				});

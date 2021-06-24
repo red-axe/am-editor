@@ -479,13 +479,13 @@ export interface CardModelInterface {
 		},
 	): CardInterface;
 	/**
-	 * 渲染卡片
+	 * 渲染
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
-	 * @param asyncRender 异步渲染回调，不传则同步渲染
+	 * @param asyncRender 是否异步渲染，全部异步渲染完成后触发
 	 */
 	render(
 		container?: NodeInterface,
-		asyncRender?: (count: number) => void,
+		asyncRender?: ((count: number) => void) | true,
 	): void;
 	/**
 	 * 释放卡片

@@ -9,7 +9,6 @@ import {
 	$,
 	EDITABLE_SELECTOR,
 	DATA_TRANSIENT_ATTRIBUTES,
-	EditorInterface,
 	isNode,
 	NodeInterface,
 	transformCustomTags,
@@ -107,11 +106,11 @@ class Helper implements HelperInterface {
 			}
 		}
 
-		const colCounts = model.map(trModel => {
+		const colCounts = model.map((trModel) => {
 			return trModel.length;
 		});
 		const MaxColCount = Math.max.apply(Math, [...colCounts]);
-		model.forEach(trModel => {
+		model.forEach((trModel) => {
 			if (trModel.length < MaxColCount) {
 				let addCount = MaxColCount - trModel.length;
 				while (addCount--) {
@@ -168,7 +167,7 @@ class Helper implements HelperInterface {
 		// 表格 table 标签不允许有背景色，无法设置
 		table.css('background-color', '');
 		//补充可编辑器区域
-		table.find('td').each(tdElement => {
+		table.find('td').each((tdElement) => {
 			const tdNode = $(tdElement);
 			tdNode.attributes(
 				DATA_TRANSIENT_ATTRIBUTES,
@@ -220,14 +219,13 @@ class Helper implements HelperInterface {
 				colgroup = document.createElement('colgroup');
 			}
 			table.prepend(colgroup);
-			const widths = (function(table) {
+			const widths = (function (table) {
 				const tr = table.find('tr')[0];
 				const tds = $(tr).find('td');
 				const widthArray: Array<number | undefined> = [];
-				tds.each(td => {
-					let colWidth: string | Array<string> = $(td).attributes(
-						'data-colwidth',
-					);
+				tds.each((td) => {
+					let colWidth: string | Array<string> =
+						$(td).attributes('data-colwidth');
 					let tdWidth: string | number = $(td).attributes('width');
 					const tdColSpan = ($(td)[0] as HTMLTableDataCellElement)
 						.colSpan;
@@ -269,7 +267,7 @@ class Helper implements HelperInterface {
 			if (!tableElement.rows[r]) {
 				tableElement.insertRow(r);
 			}
-			const shadow = tr.filter(td => {
+			const shadow = tr.filter((td) => {
 				return this.isEmptyModelCol(td) ? false : td.isShadow;
 			});
 			let shadowCount = shadow.length;
@@ -283,7 +281,7 @@ class Helper implements HelperInterface {
 		});
 		// 修正行高
 		const trs = table.find('tr');
-		trs.each(tr => {
+		trs.each((tr) => {
 			const $tr = $(tr);
 			let height = parseInt($(tr).css('height'));
 			height = height || 33;
@@ -342,7 +340,7 @@ class Helper implements HelperInterface {
 
 		if (isNumber) {
 			let lossCellCounts = 0;
-			cellCounts.forEach(cellCount => {
+			cellCounts.forEach((cellCount) => {
 				lossCellCounts += maxCellCounts - cellCount;
 			});
 
@@ -373,7 +371,7 @@ class Helper implements HelperInterface {
 						}
 					}
 
-					lossRowIndex.forEach(row => {
+					lossRowIndex.forEach((row) => {
 						tableElement.insertRow(row);
 					});
 				}
@@ -527,14 +525,13 @@ class Helper implements HelperInterface {
 				colgroup = document.createElement('colgroup');
 			}
 			table.prepend(colgroup);
-			const widths = (function(table) {
+			const widths = (function (table) {
 				const tr = table.find('tr')[0];
 				const tds = $(tr).find('td');
 				const widthArray: Array<number | undefined> = [];
-				tds.each(td => {
-					let colWidth: string | Array<string> = $(td).attributes(
-						'data-colwidth',
-					);
+				tds.each((td) => {
+					let colWidth: string | Array<string> =
+						$(td).attributes('data-colwidth');
 					let tdWidth: string | number = $(td).attributes('width');
 					const tdColSpan = ($(td)[0] as HTMLTableDataCellElement)
 						.colSpan;
@@ -576,7 +573,7 @@ class Helper implements HelperInterface {
 			if (!tableElement.rows[r]) {
 				tableElement.insertRow(r);
 			}
-			const shadow = tr.filter(td => {
+			const shadow = tr.filter((td) => {
 				return (td as TableModelCol).isShadow;
 			});
 			let shadowCount = shadow.length;
@@ -590,7 +587,7 @@ class Helper implements HelperInterface {
 		});
 		// 修正行高
 		const trs = table.find('tr');
-		trs.each(tr => {
+		trs.each((tr) => {
 			const $tr = $(tr);
 			let height = parseInt($(tr).css('height'));
 			height = height || 33;

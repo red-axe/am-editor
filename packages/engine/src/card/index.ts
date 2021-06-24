@@ -11,6 +11,7 @@ import {
 	EDITABLE_SELECTOR,
 	DATA_TRANSIENT_ELEMENT,
 	DATA_TRANSIENT_ATTRIBUTES,
+	CARD_ASYNC_RENDER,
 } from '../constants';
 import {
 	ActiveTrigger,
@@ -539,24 +540,42 @@ class CardModel implements CardModelInterface {
 	/**
 	 * 渲染
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
+	 * @param asyncRender 是否异步渲染， 全部异步渲染完成后触发
 	 */
-	render(container?: NodeInterface, asyncRender?: (count: number) => void) {
+	render(
+		container?: NodeInterface,
+		asyncRender?: ((count: number) => void) | true,
+	) {
 		const cards = container
 			? container.isCard()
 				? container
 				: container.find(`${READY_CARD_SELECTOR}`)
 			: this.editor.container.find(READY_CARD_SELECTOR);
 		this.gc();
-		let count = 0;
 		let setp = 0;
-		let setpTimeout: NodeJS.Timeout | undefined = undefined;
+		const render = (card: CardInterface) => {
+			const result = card.render();
+			const center = card.getCenter();
+			if (result !== undefined) {
+				center.append(typeof result === 'string' ? $(result) : result);
+			}
+			if (card.contenteditable.length > 0) {
+				center.find(card.contenteditable.join(',')).each((node) => {
+					const child = $(node);
+					if (!child.attributes('contenteditable'))
+						child.attributes('contenteditable', 'true');
+					child.attributes(DATA_ELEMENT, EDITABLE);
+				});
+			}
+			card.didRender();
+		};
+		const asyncRenderCards: Array<CardInterface> = [];
 		cards.each((node) => {
 			const cardNode = $(node);
 			const readyKey = cardNode.attributes(READY_CARD_KEY);
 			const key = cardNode.attributes(CARD_KEY);
 			const name = readyKey || key;
 			if (this.classes[name]) {
-				count++;
 				const value = cardNode.attributes(CARD_VALUE_KEY);
 				const attributes = cardNode.attributes();
 
@@ -573,6 +592,9 @@ class CardModel implements CardModelInterface {
 					value: decodeCardValue(value),
 					root: key ? cardNode : undefined,
 				});
+				if (asyncRender) {
+					card.root.attributes(CARD_ASYNC_RENDER, 'true');
+				}
 				Object.keys(attributes).forEach((attributesName) => {
 					if (
 						attributesName.indexOf('data-') === 0 &&
@@ -586,44 +608,35 @@ class CardModel implements CardModelInterface {
 				});
 				if (readyKey) cardNode.replaceWith(card.root);
 				this.components.push(card);
-				const render = () => {
-					const result = card!.render();
-					const center = card!.getCenter();
-					if (result !== undefined) {
-						center.append(
-							typeof result === 'string' ? $(result) : result,
-						);
-					}
-					if (card!.contenteditable.length > 0) {
-						center
-							.find(card!.contenteditable.join(','))
-							.each((node) => {
-								const child = $(node);
-								if (!child.attributes('contenteditable'))
-									child.attributes('contenteditable', 'true');
-								child.attributes(DATA_ELEMENT, EDITABLE);
-							});
-					}
-					card!.didRender();
-				};
+
 				// 重新渲染
-				if (asyncRender) {
-					setTimeout(() => {
-						render();
-						setp++;
-						if (setpTimeout) clearTimeout(setpTimeout);
-						setpTimeout = setTimeout(() => {
-							if (setp === count) {
-								asyncRender(count);
-							}
-						}, 50);
-					}, 20);
-				} else render();
+				if (!asyncRender) {
+					render(card);
+				} else {
+					asyncRenderCards.push(card);
+				}
 
 				if (readyKey) {
 					card.root.removeAttributes(READY_CARD_KEY);
 				}
 			}
+		});
+		if (!asyncRender) return;
+		asyncRenderCards.forEach((card) => {
+			setTimeout(() => {
+				render(card);
+				//协同记录后移除标记属性
+				setTimeout(() => {
+					card.root.removeAttributes(CARD_ASYNC_RENDER);
+				}, 50);
+				setp++;
+				if (
+					setp === asyncRenderCards.length &&
+					typeof asyncRender === 'function'
+				) {
+					asyncRender(asyncRenderCards.length);
+				}
+			}, 20);
 		});
 	}
 

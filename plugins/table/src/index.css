@@ -637,6 +637,27 @@ div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
 .data-table-reader .data-table tr td {
     border: 1px solid rgb(217, 217, 217);
     cursor: auto;
+    padding: 4px 8px;
+}
+
+.data-table-reader.data-scrollable.scroll-x {
+    padding-bottom: 8px;
+}
+
+.data-table-reader .scrollbar-shadow-left, .data-table-reader .scrollbar-shadow-right {
+    bottom: 8px;
+}
+
+.data-table-reader.scrollbar-show.data-scrollable.scroll-x .data-scrollbar-x{
+    margin-bottom: 2px;
+}
+
+.data-table-reader.data-scrollable .data-scrollbar.data-scrollbar-x {
+    height: 4px;
+}
+
+.data-table-reader.data-scrollable .data-scrollbar.data-scrollbar-x .data-scrollbar-trigger {
+    height: 4px;
 }
 
 [data-card-key="table"].data-card-block-max [data-card-element="center"] {

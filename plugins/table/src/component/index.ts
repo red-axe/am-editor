@@ -230,8 +230,13 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			  )
 			: $(this.template.htmlView(value));
 		if (!isEngine(this.editor)) {
-			this.wrapper.find('table').addClass('data-table');
+			this.wrapper
+				.find('table')
+				.addClass('data-table')
+				.addClass('data-table-view');
 		}
+		if (value.width)
+			this.wrapper.find('table').css('width', `${value.width}px`);
 		return this.wrapper;
 	}
 }

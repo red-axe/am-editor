@@ -15,3 +15,4 @@ export const CARD_CENTER_SELECTOR = 'div['
 	.concat(CARD_ELEMENT_KEY, '=center],span[')
 	.concat(CARD_ELEMENT_KEY, '=center]');
 export const CARD_RIGHT_SELECTOR = 'span['.concat(CARD_ELEMENT_KEY, '=right]');
+export const CARD_ASYNC_RENDER = 'data-card-async-render';

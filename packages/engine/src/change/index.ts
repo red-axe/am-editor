@@ -264,10 +264,7 @@ class ChangeModel implements ChangeInterface {
 				}
 			});
 			block.generateDataIDForDescendant(container.get<Element>()!);
-			this.engine.history.startCache();
-			card.render(undefined, () => {
-				this.engine.history.destroyCache();
-			});
+			card.render(undefined, true);
 			const cursor = container.find(CURSOR_SELECTOR);
 			const selection: SelectionInterface = new Selection(
 				this.engine,
@@ -779,8 +776,6 @@ class ChangeModel implements ChangeInterface {
 		});
 
 		const pasteMarkdown = async (source: string) => {
-			const oldValue = this.getValue({ ignoreCursor: false });
-
 			const parser = new Parser(source, this.engine);
 			const schema = this.engine.schema.clone();
 			//转换Text，没那么严格，加入以下规则，以免被过滤掉，并且 div后面会加换行符
@@ -810,7 +805,6 @@ class ChangeModel implements ChangeInterface {
 						),
 					)
 					.then(() => {
-						this.setValue(oldValue);
 						textNode.get<Text>()?.normalize();
 						this.paste(textNode.text());
 					})
@@ -889,13 +883,12 @@ class ChangeModel implements ChangeInterface {
 		this.insertFragment(fragment, (range) => {
 			this.engine.trigger('paste:insert', range);
 			const selection = range.createSelection();
-			this.engine.history.startCache();
 			this.engine.card.render(undefined, () => {
-				this.engine.history.submitCache();
+				selection.move();
+				range.scrollRangeIntoView();
 			});
-			selection.move();
-			range.scrollRangeIntoView();
 		});
+
 		this.engine.trigger('paste:after');
 	}
 
@@ -942,12 +935,14 @@ class ChangeModel implements ChangeInterface {
 			this.deleteContent(range, onlyOne || !isBlockLast);
 		}
 		if (!firstNode[0]) {
+			if (callback) callback(range);
 			this.apply(range);
 			return;
 		}
 		if (!nodeApi.isBlock(firstNode) && !firstNode.isCard()) {
 			range.shrinkToElementNode().insertNode(fragment);
-			this.apply(range.collapse(false));
+			if (callback) callback(range);
+			this.apply(range);
 			return;
 		}
 		range.deepCut();

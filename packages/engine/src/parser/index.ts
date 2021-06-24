@@ -102,7 +102,13 @@ class Parser implements ParserInterface {
 			this.root = $(doc.body);
 			const p = $('<p></p>');
 			this.root.find('paragraph').each((child) => {
-				node.replace($(child), p.clone());
+				const cNode = $(child);
+				const pNode = p.clone();
+				const attributes = cNode.attributes();
+				Object.keys(attributes).forEach((name) => {
+					pNode.attributes(name, attributes[name]);
+				});
+				node.replace(cNode, pNode);
 			});
 		} else if (isNodeEntry(source)) {
 			this.root = source;

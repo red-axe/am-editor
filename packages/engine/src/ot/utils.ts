@@ -2,7 +2,7 @@ import { isEqual } from 'lodash-es';
 import OTJSON from 'ot-json0';
 import { NodeInterface } from '../types/node';
 import { FOCUS, ANCHOR, CURSOR } from '../constants/selection';
-import { CARD_SELECTOR } from '../constants/card';
+import { CARD_ASYNC_RENDER, CARD_SELECTOR } from '../constants/card';
 
 import {
 	Op,
@@ -19,11 +19,10 @@ import {
 	DATA_ELEMENT,
 	DATA_TRANSIENT_ATTRIBUTES,
 	DATA_TRANSIENT_ELEMENT,
-	ROOT,
 	UI,
 	UI_SELECTOR,
 } from '../constants/root';
-import { getDocument, getParentInRoot } from '../utils';
+import { getParentInRoot } from '../utils';
 
 /**
  * 随机一个数字
@@ -90,12 +89,13 @@ export const isTransientElement = (
 			) {
 				return true;
 			}
-			//在卡片里面，并且卡片不是可编辑卡片
+			//在卡片里面，并且卡片不是可编辑卡片 或者是标记为正在异步渲染时的卡片
 			if (
 				!isCard &&
 				closestNode.length > 0 &&
 				closestNode.isCard() &&
-				!closestNode.isEditableCard()
+				(!closestNode.isEditableCard() ||
+					!!closestNode.attributes(CARD_ASYNC_RENDER))
 			) {
 				return true;
 			}
@@ -112,6 +112,7 @@ export const isTransientElement = (
 };
 
 export const isTransientAttribute = (node: NodeInterface, attr: string) => {
+	if (attr === CARD_ASYNC_RENDER) return true;
 	if (node.isRoot() && !/^data-selection-/.test(attr)) return true;
 	if (node.isCard() && ['id', 'class', 'style'].includes(attr)) return true;
 	const transient = node.attributes(DATA_TRANSIENT_ATTRIBUTES);

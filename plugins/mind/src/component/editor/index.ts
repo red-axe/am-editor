@@ -78,7 +78,7 @@ class GraphEditor {
 			getDragNode: (sourceNode) => sourceNode,
 		});
 		this.#graph.on('node:mousedown', ({ e, node }) => {
-			this.#dnd.start(node, e);
+			//this.#dnd.start(node, e);
 		});
 	}
 

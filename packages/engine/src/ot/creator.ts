@@ -21,7 +21,12 @@ import { Op, Path, StringInsertOp, StringDeleteOp, Doc } from 'sharedb';
 import { NodeInterface } from '../types/node';
 import { DocInterface, RepairOp } from '../types/ot';
 import { $ } from '../node';
-import { DATA_ELEMENT, ROOT, UI_SELECTOR } from '../constants';
+import {
+	CARD_ASYNC_RENDER,
+	DATA_ELEMENT,
+	ROOT,
+	UI_SELECTOR,
+} from '../constants';
 import { getDocument } from '../utils/node';
 
 class Creator extends EventEmitter2 {
@@ -371,13 +376,16 @@ class Creator extends EventEmitter2 {
 	}
 
 	handleMutations(records: MutationRecord[]) {
-		//记录大于1000的时候，先获取所有的不需要参与协同交互的节点，以提高效率
-		if (records.length > 999) {
+		//记录大于300的时候，先获取所有的不需要参与协同交互的节点，以提高效率
+		if (records.length > 299) {
 			this.cacheTransientElements = [];
 			//非可编辑卡片的子节点
 			const { card, container } = this.engine;
 			card.each((card) => {
-				if (!card.isEditable) {
+				if (
+					!card.isEditable ||
+					!!card.root.attributes(CARD_ASYNC_RENDER)
+				) {
 					card.root.allChildren().forEach((child) => {
 						if (child.nodeType === getDocument().ELEMENT_NODE)
 							this.cacheTransientElements?.push(child);
