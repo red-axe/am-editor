@@ -12,7 +12,7 @@ import 'antd/es/modal/style';
 
 export type EngineProps = EngineOptions & {
 	defaultValue?: string;
-	onChange?: (content: string) => void;
+	onChange?: (content: string, trigger: 'remote' | 'local' | 'both') => void;
 	ref?: React.Ref<EngineInterface | null>;
 };
 
@@ -47,8 +47,8 @@ const EngineComponent: React.FC<EngineProps> = forwardRef<
 		engine.ot.initLockMode();
 
 		//监听编辑器值改变事件
-		engine.on('change', (value) => {
-			if (onChange) onChange(value);
+		engine.on('change', (value, trigger) => {
+			if (onChange) onChange(value, trigger);
 		});
 
 		engine.setValue(defaultValue || '');

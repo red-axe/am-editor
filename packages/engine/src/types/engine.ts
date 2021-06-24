@@ -1137,7 +1137,7 @@ export interface EngineInterface extends EditorInterface {
 	 */
 	on(
 		eventType: 'change',
-		listener: (value: string) => void,
+		listener: (value: string, trigger: 'remote' | 'local' | 'both') => void,
 		rewrite?: boolean,
 	): void;
 	/**
@@ -1365,7 +1365,10 @@ export interface EngineInterface extends EditorInterface {
 	 * @param eventType
 	 * @param listener
 	 */
-	off(eventType: 'change', listener: (value: string) => void): void;
+	off(
+		eventType: 'change',
+		listener: (value: string, trigger: 'remote' | 'local' | 'both') => void,
+	): void;
 	/**
 	 * 设置编辑器值之前
 	 * @param eventType
@@ -1526,7 +1529,11 @@ export interface EngineInterface extends EditorInterface {
 	 * @param eventType
 	 * @param listener
 	 */
-	trigger(eventType: 'change', value: string): void;
+	trigger(
+		eventType: 'change',
+		value: string,
+		trigger: 'remote' | 'local' | 'both',
+	): void;
 	/**
 	 * 设置编辑器值之前
 	 * @param eventType

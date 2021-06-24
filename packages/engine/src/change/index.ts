@@ -37,13 +37,14 @@ class ChangeModel implements ChangeInterface {
 	private changeTimer: NodeJS.Timeout | null = null;
 	event: ChangeEvent;
 	valueCached: string | null = null;
-	onChange: (value: string) => void;
+	onChange: (value: string, trigger: 'remote' | 'local' | 'both') => void;
 	onSelect: () => void;
 	onSetValue: () => void;
 	rangePathBeforeCommand: Path[] | null = null;
 	marks: Array<NodeInterface> = [];
 	blocks: Array<NodeInterface> = [];
 	inlines: Array<NodeInterface> = [];
+	changeTrigger: Array<string> = [];
 
 	constructor(engine: EngineInterface, options: ChangeOptions = {}) {
 		this.options = options;
@@ -64,19 +65,29 @@ class ChangeModel implements ChangeInterface {
 				ignoreCursor: true,
 			});
 			if (!this.valueCached || value !== this.valueCached) {
-				this.onChange(value);
+				const trigger =
+					this.changeTrigger.length === 2
+						? 'both'
+						: this.changeTrigger[0] === 'remote'
+						? 'remote'
+						: 'local';
+				this.onChange(value, trigger);
+				this.changeTrigger = [];
 				this.valueCached = value;
 			}
 		}
 	}
 
-	change() {
+	change(isRemote?: boolean) {
 		const range = this.getRange();
 		const editableElement = range.startNode.closest(EDITABLE_SELECTOR);
 		if (editableElement.length > 0) {
 			const card = this.engine.card.find(editableElement, true);
 			if (card?.onChange) card?.onChange(editableElement);
 		}
+		const trigger = isRemote ? 'remote' : 'local';
+		if (this.changeTrigger.indexOf(trigger) < 0)
+			this.changeTrigger.push(trigger);
 		this.clearChangeTimer();
 		this.changeTimer = setTimeout(() => {
 			this._change();

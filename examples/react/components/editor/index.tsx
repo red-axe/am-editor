@@ -58,12 +58,12 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 			...pluginConfig,
 			'mark-range': getConfig(engine, comment),
 		},
-		onChange: (value: string) => {
+		onChange: (value: string, trigger: 'remote' | 'local' | 'both') => {
 			setValue(value);
-			//自动保存
-			onSave();
+			//自动保存，非远程更改，触发保存
+			if (trigger !== 'remote') onSave();
 			if (props.onChange) props.onChange(value);
-			console.log('value', value);
+			console.log(`value ${trigger} update:`, value);
 			//console.log('html:', engine.getHtml());
 		},
 	};

@@ -44,7 +44,7 @@ export type ChangeEventOptions = {
 };
 
 export type ChangeOptions = {
-	onChange?: (value: string) => void;
+	onChange?: (value: string, trigger: 'remote' | 'local' | 'both') => void;
 	onSelect?: () => void;
 	onSetValue?: () => void;
 };
@@ -62,10 +62,10 @@ export interface ChangeInterface {
 	marks: Array<NodeInterface>;
 	blocks: Array<NodeInterface>;
 	inlines: Array<NodeInterface>;
-	onChange: (value: string) => void;
+	onChange: (value: string, trigger: 'remote' | 'local' | 'both') => void;
 	onSelect: () => void;
 	onSetValue: () => void;
-	change(): void;
+	change(isRemote?: boolean): void;
 	/**
 	 * 获取当前选区的范围
 	 */

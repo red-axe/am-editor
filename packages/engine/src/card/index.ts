@@ -465,8 +465,24 @@ class CardModel implements CardModelInterface {
 				range.collapse(false);
 			}
 		}
-		change.select(range);
-		change.change();
+		change.apply(range);
+	}
+
+	removeRemote(selector: NodeInterface | Node | string) {
+		if (!isEngine(this.editor)) return;
+		const { node } = this.editor;
+		const card = this.find(selector);
+		if (!card) return;
+
+		const parent = card.root.parent();
+		this.removeNode(card);
+		if (parent && node.isEmpty(parent)) {
+			if (parent.isEditable()) {
+				node.html(parent, '<p><br /></p>');
+			} else {
+				node.html(parent, '<br />');
+			}
+		}
 	}
 
 	// 创建Card DOM 节点

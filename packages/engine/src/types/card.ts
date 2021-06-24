@@ -467,6 +467,11 @@ export interface CardModelInterface {
 	 */
 	remove(selector: NodeInterface | Node | string): void;
 	/**
+	 * 协作者移除卡片
+	 * @param selector 卡片选择器
+	 */
+	removeRemote(selector: NodeInterface | Node | string): void;
+	/**
 	 * 创建卡片
 	 * @param name 插件名称
 	 * @param options 选项

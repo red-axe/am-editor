@@ -120,7 +120,7 @@ class Engine implements EngineInterface {
 		this.schema = new Schema();
 		this.schema.add(schemaDefaultData);
 		this.conversion = new Conversion(this);
-		conversionDefault.forEach(rule =>
+		conversionDefault.forEach((rule) =>
 			this.conversion.add(rule.from, rule.to),
 		);
 		this.history = new History(this);
@@ -144,7 +144,8 @@ class Engine implements EngineInterface {
 		);
 		this._container.init();
 		this.change = new Change(this, {
-			onChange: value => this.trigger('change', value),
+			onChange: (value, trigger) =>
+				this.trigger('change', value, trigger),
 			onSelect: () => this.trigger('select'),
 			onSetValue: () => this.trigger('afterSetValue'),
 		});
@@ -195,8 +196,8 @@ class Engine implements EngineInterface {
 	}
 
 	async getValueAsync(ignoreCursor: boolean = false): Promise<string> {
-		return new Promise(resolve => {
-			Object.keys(this.plugin.components).forEach(async pluginName => {
+		return new Promise((resolve) => {
+			Object.keys(this.plugin.components).forEach(async (pluginName) => {
 				const plugin = this.plugin.components[pluginName];
 				if (plugin.waiting) await plugin.waiting();
 			});
@@ -269,7 +270,7 @@ class Engine implements EngineInterface {
 		if (anchorNext) selection.anchor?.remove();
 		if (focusPrev) selection.focus?.remove();
 		// 保证所有行内元素都在段落内
-		this.container.children().each(child => {
+		this.container.children().each((child) => {
 			const node = $(child);
 			if (this.node.isBlock(node)) {
 				if (block.children().length > 0) {
@@ -298,7 +299,7 @@ class Engine implements EngineInterface {
 			if (block.children().length > 0) this.container.append(block);
 		}
 		// 处理空段落
-		this.container.children().each(child => {
+		this.container.children().each((child) => {
 			const node = $(child);
 			this.node.removeMinusStyle(node, 'text-indent');
 			if (this.node.isRootBlock(node)) {

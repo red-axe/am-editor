@@ -25,7 +25,7 @@ class Applier implements ApplierInterface {
 		if (index === JSONML.ATTRIBUTE_INDEX)
 			return [node, undefined, node, index];
 		const offset = index - JSONML.ELEMENT_LIST_OFFSET;
-		const childNode = Array.from(node.childNodes).filter(node => {
+		const childNode = Array.from(node.childNodes).filter((node) => {
 			const childNode = $(node);
 			return !isTransientElement(childNode);
 		})[offset];
@@ -187,18 +187,21 @@ class Applier implements ApplierInterface {
 		}
 	}
 
-	deleteNode(path: Path) {
+	deleteNode(path: Path, isRemote?: boolean) {
 		const { engine } = this;
 		const [begine] = this.elementAtPath(engine.container[0], path);
 		const domBegine = $(begine);
 		if (domBegine.length > 0 && !domBegine.isRoot()) {
 			if (domBegine.isCard()) {
 				engine.readonly = false;
-				engine.card.remove(domBegine);
-				const card = engine.card.find(domBegine);
-				if (card && card.activated && engine.readonly) {
-					engine.readonly = false;
-					if (!engine.isFocus()) engine.focus();
+				if (isRemote) engine.card.removeRemote(domBegine);
+				else {
+					engine.card.remove(domBegine);
+					const card = engine.card.find(domBegine);
+					if (card && card.activated && engine.readonly) {
+						engine.readonly = false;
+						if (!engine.isFocus()) engine.focus();
+					}
 				}
 			} else domBegine.remove();
 		}
@@ -255,7 +258,7 @@ class Applier implements ApplierInterface {
 		}
 	}
 
-	applyOperation(op: Op) {
+	applyOperation(op: Op, isRemote?: boolean) {
 		let path = op.p;
 		let attr: string, offset: number;
 
@@ -277,7 +280,7 @@ class Applier implements ApplierInterface {
 			} else if ('si' in op) {
 				return this.insertInText(path, offset!, op.si);
 			} else if ('ld' in op) {
-				return this.deleteNode(path);
+				return this.deleteNode(path, isRemote);
 			} else if ('li' in op) {
 				return this.insertNode(path, op.li);
 			}
@@ -288,16 +291,16 @@ class Applier implements ApplierInterface {
 	applyRemoteOperations(ops: Op[]) {
 		try {
 			const path = this.getRangeRemotePath();
-			ops.forEach(op => this.applyOperation(op));
+			ops.forEach((op) => this.applyOperation(op, true));
 			if (path) this.setRangeByRemotePath(path);
-			this.engine.change.change();
+			this.engine.change.change(true);
 		} catch (error) {
 			console.log(error);
 		}
 	}
 
 	applySelfOperations(ops: Op[]) {
-		ops.forEach(op => this.applyOperation(op));
+		ops.forEach((op) => this.applyOperation(op));
 		this.engine.change.change();
 	}
 
@@ -389,11 +392,11 @@ class Applier implements ApplierInterface {
 				const { container, change } = this.engine;
 				const startChild = container.getChildByPath(
 					startClone,
-					child => !isTransientElement($(child)),
+					(child) => !isTransientElement($(child)),
 				);
 				const endChild = container.getChildByPath(
 					endClone,
-					child => !isTransientElement($(child)),
+					(child) => !isTransientElement($(child)),
 				);
 				try {
 					const range = change.getRange();
