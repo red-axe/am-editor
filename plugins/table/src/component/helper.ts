@@ -166,22 +166,7 @@ class Helper implements HelperInterface {
 		}
 		// 表格 table 标签不允许有背景色，无法设置
 		table.css('background-color', '');
-		//补充可编辑器区域
-		table.find('td').each((tdElement) => {
-			const tdNode = $(tdElement);
-			tdNode.attributes(
-				DATA_TRANSIENT_ATTRIBUTES,
-				'table-cell-selection',
-			);
-			let editableElement = tdNode.find(EDITABLE_SELECTOR);
-			if (editableElement.length === 0) {
-				const content = tdNode.html();
-				tdNode.empty();
-				tdNode.append(Template.EmptyCell);
-				editableElement = tdNode.find(EDITABLE_SELECTOR);
-				editableElement.html(content);
-			}
-		});
+
 		const model = this.getTableModel(table);
 
 		// 修正列的 span 场景
@@ -286,6 +271,22 @@ class Helper implements HelperInterface {
 			let height = parseInt($(tr).css('height'));
 			height = height || 33;
 			$tr.css('height', height + 'px');
+		});
+		//补充可编辑器区域
+		table.find('td').each((tdElement) => {
+			const tdNode = $(tdElement);
+			tdNode.attributes(
+				DATA_TRANSIENT_ATTRIBUTES,
+				'table-cell-selection',
+			);
+			let editableElement = tdNode.find(EDITABLE_SELECTOR);
+			if (editableElement.length === 0) {
+				const content = tdNode.html();
+				tdNode.empty();
+				tdNode.append(Template.EmptyCell);
+				editableElement = tdNode.find(EDITABLE_SELECTOR);
+				editableElement.html(content);
+			}
 		});
 		return table;
 	}

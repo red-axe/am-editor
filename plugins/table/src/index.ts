@@ -121,7 +121,9 @@ class Table extends Plugin<Options> {
 		if (!isEngine(this.editor)) return;
 		if (node.name === 'table') {
 			this.editor.card.replaceNode(node, TableComponent.cardName, {
-				html: node.get<HTMLElement>()!.outerHTML,
+				html: node
+					.get<HTMLElement>()!
+					.outerHTML.replaceAll(/\n|\r\n|\s/g, ''),
 			});
 		}
 	}
@@ -166,13 +168,15 @@ class Table extends Plugin<Options> {
 		)
 			return;
 
-		const text = node.text();
+		let text = node.text();
 		if (!text) return;
 
 		const reg = /\|(?:(?:[^\|]+?)\|){2,}/;
 		let match = reg.exec(text);
 		if (!match) return;
-
+		text = text.replaceAll(/\|\|/g, '|\n|');
+		match = reg.exec(text);
+		if (!match) return;
 		const createTable = (nodes: Array<string>) => {
 			const tableNode = $(`<table>${nodes.join('')}</table>`);
 			return tableNode.get<Element>()?.outerHTML;

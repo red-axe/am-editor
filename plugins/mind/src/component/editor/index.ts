@@ -118,14 +118,16 @@ class GraphEditor {
 	}
 
 	didRender() {
-		this.#graph.on('cell:dblclick', ({ cell }) => {
+		this.#graph.on('node:dblclick', ({ cell }) => {
 			if (cell.shape !== 'html') return;
 			cell.setData({ editable: true });
+			console.log('node:dblclick');
 			this.#editableCell = cell;
 			const { onSelectedEditable } = this.#options;
 			if (onSelectedEditable) onSelectedEditable(cell);
 		});
 		this.#graph.on('node:unselected', () => {
+			console.log('node:unselected');
 			this.#editableCell?.setData({ editable: false });
 			this.#editableCell = undefined;
 		});

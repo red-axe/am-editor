@@ -897,6 +897,7 @@ class ChangeModel implements ChangeInterface {
 			this.engine.card.render(undefined, () => {
 				selection.move();
 				range.scrollRangeIntoView();
+				this.apply(range);
 			});
 		});
 
@@ -1294,7 +1295,7 @@ class ChangeModel implements ChangeInterface {
 		let prevBlock = node.prev();
 		// 前面没有 DOM 节点
 		if (!prevBlock) {
-			if (node.parent()?.inEditor()) {
+			if (node.parent()?.inEditor() && !node.parent()?.isEditable()) {
 				this.unwrapNode(node);
 			}
 			return;

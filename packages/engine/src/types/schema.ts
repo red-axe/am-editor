@@ -103,11 +103,13 @@ export interface SchemaInterface {
 	 * @param rule 规则
 	 * @param attributesName 属性名称
 	 * @param attributesValue 属性值
+	 * @param force 是否强制比较值
 	 */
 	checkValue(
 		rule: SchemaAttributes | SchemaStyle,
 		attributesName: string,
 		attributesValue: string,
+		force?: boolean,
 	): boolean;
 	/**
 	 * 过滤节点样式

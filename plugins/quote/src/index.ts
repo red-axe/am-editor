@@ -22,13 +22,13 @@ export default class extends BlockPlugin<Options> {
 
 	init() {
 		super.init();
-		this.editor.on('paser:html', node => this.parseHtml(node));
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
 		if (isEngine(this.editor)) {
-			this.editor.on('keydow:backspace', event =>
+			this.editor.on('keydown:backspace', (event) =>
 				this.onBackspace(event),
 			);
-			this.editor.on('keydow:enter', event => this.onEnter(event));
-			this.editor.on('paste:markdown', child =>
+			this.editor.on('keydown:enter', (event) => this.onEnter(event));
+			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
 		}
@@ -103,7 +103,7 @@ export default class extends BlockPlugin<Options> {
 		let newText = '';
 		const rows = text.split(/\n|\r\n/);
 		let nodes: Array<string> = [];
-		rows.forEach(row => {
+		rows.forEach((row) => {
 			const match = /^([>]{1,})/.exec(row);
 			if (match) {
 				const codeLength = match[1].length;
@@ -155,7 +155,7 @@ export default class extends BlockPlugin<Options> {
 		if (
 			parentBlock &&
 			parentBlock.name === 'blockquote' &&
-			node.isRootBlock(block)
+			node.isBlock(block)
 		) {
 			event.preventDefault();
 			if (block.prevElement()) {

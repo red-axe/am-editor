@@ -654,6 +654,12 @@ class CardModel implements CardModelInterface {
 				}
 			}, 20);
 		});
+		if (
+			asyncRenderCards.length === 0 &&
+			typeof asyncRender === 'function'
+		) {
+			asyncRender(0);
+		}
 	}
 
 	removeComponent(card: CardInterface): void {

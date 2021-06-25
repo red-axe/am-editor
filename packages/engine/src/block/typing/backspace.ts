@@ -32,7 +32,7 @@ class Backspace {
 			if (
 				cloneRange.startContainer.nodeType ===
 					getWindow().Node.TEXT_NODE &&
-				(function(range: RangeInterface) {
+				(function (range: RangeInterface) {
 					const { commonAncestorContainer } = range;
 					if (
 						range.collapsed &&
@@ -66,14 +66,12 @@ class Backspace {
 									if (startOffset === 1) {
 										const prev = markNode.prev();
 										if (prev && !node.isEmpty(prev)) {
-											const {
-												startNode,
-												startOffset,
-											} = range
-												.cloneRange()
-												.select(prev, true)
-												.shrinkToTextNode()
-												.collapse(false);
+											const { startNode, startOffset } =
+												range
+													.cloneRange()
+													.select(prev, true)
+													.shrinkToTextNode()
+													.collapse(false);
 											range.setStart(
 												startNode,
 												startOffset - 1,
@@ -105,7 +103,7 @@ class Backspace {
 		}
 		const blockNode = block.closest(range.startNode);
 		// 在正文里
-		if (!isCard && this.engine.node.isRootBlock(blockNode)) {
+		if (!isCard && node.isRootBlock(blockNode)) {
 			event.preventDefault();
 			change.mergeAfterDeletePrevNode(blockNode);
 			return false;

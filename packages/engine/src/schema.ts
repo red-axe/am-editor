@@ -215,6 +215,7 @@ class Schema implements SchemaInterface {
 		schema: SchemaAttributes,
 		attributesName: string,
 		attributesValue: string,
+		force?: boolean,
 	): boolean {
 		if (!schema[attributesName]) return false;
 		let rule = schema[attributesName];
@@ -224,7 +225,7 @@ class Schema implements SchemaInterface {
 			rule = rule.value;
 		}
 		//默认都不为强制的
-		else if (attributesValue === undefined) return true;
+		else if (!force || attributesValue === undefined) return true;
 		/**
 		 * 自定义规则解析
 		 */
@@ -321,6 +322,7 @@ class Schema implements SchemaInterface {
 					rule?.attributes?.style! as SchemaAttributes,
 					styleName,
 					styles[styleName],
+					true,
 				)
 			)
 				delete styles[styleName];
@@ -343,6 +345,7 @@ class Schema implements SchemaInterface {
 					rule?.attributes! as SchemaAttributes,
 					attributesName,
 					attributes[attributesName],
+					true,
 				)
 			)
 				delete attributes[attributesName];
