@@ -1,5 +1,6 @@
 import { NodeData } from '../../types';
 import { Graph, Node, Cell } from '@antv/x6';
+import Hierarchy from '@antv/hierarchy';
 import { $, DATA_ELEMENT, EDITABLE } from '@aomao/engine';
 
 const template = `<div class="mind-container" readonly="true">
@@ -102,12 +103,18 @@ class HtmlNode {
 		}
 		const addTool = base.find('.mind-tool-add');
 		addTool.on('click', () => {
+			const bbox = node.getBBox();
+			const edgeBeginX = bbox.x + bbox.width - 5;
+			const edgeBeginY = bbox.y + bbox.height / 2;
+			const nodeX = bbox.x + bbox.width + 80;
+			const nodeY = bbox.y - 80;
+
 			const target = this.graph.addNode({
 				shape: 'rect', // 指定使用何种图形，默认值为 'rect'
-				x: 100,
-				y: 200,
-				width: 80,
-				height: 40,
+				x: nodeX,
+				y: nodeY,
+				width: 60,
+				height: 25,
 				attrs: {
 					body: {
 						fill: 'blue',
@@ -118,18 +125,39 @@ class HtmlNode {
 					},
 				},
 			});
-			this.graph.addEdge({
+			node.addChild(target);
+			const targetBBox = target.getBBox();
+			const edgeEndX = nodeX + targetBBox.width;
+			const edgeEndY = nodeY + targetBBox.height + 4;
+			const edge = this.graph.addEdge({
 				shape: 'edge', // 指定使用何种图形，默认值为 'edge'
-				source: node,
-				target: target,
+				source: { x: edgeBeginX, y: edgeBeginY },
+				target: { x: edgeEndX, y: edgeEndY },
+				vertices: [
+					{
+						x: edgeBeginX + 18,
+						y: edgeBeginY - 24,
+					},
+					{
+						x: edgeBeginX + 24 + 18,
+						y: edgeEndY,
+					},
+				],
+				connector: {
+					name: 'rounded',
+					args: {
+						radius: 20,
+					},
+				},
 				attrs: {
 					line: {
 						stroke: '#ccc',
-						strokeWidth: 1,
+						strokeWidth: 3,
 						targetMarker: null,
 					},
 				},
 			});
+			node.addChild(edge);
 		});
 		return base.get<HTMLElement>()!;
 	}

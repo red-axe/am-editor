@@ -35,15 +35,12 @@ class GraphEditor {
 			selecting: {
 				enabled: true,
 			},
-			connecting: {
-				connector: 'smooth',
-			},
 			getHTMLComponent: (node: Node) => {
 				return this.#htmlNode.render(node);
 			},
-			interacting: (cellView) => {
-				const data = cellView.cell.getData<NodeData>();
-				return { nodeMovable: false };
+			interacting: ({ cell }) => {
+				if (cell.isNode() && cell.id === 'main') return true;
+				return { nodeMovable: false, edgeMovable: false };
 			},
 		});
 		this.#graph.on('cell:changed', () => {
@@ -95,6 +92,7 @@ class GraphEditor {
 		options?: Model.FromJSONOptions,
 	) {
 		const { nodes, edges } = data;
+
 		nodes?.forEach((node) => {
 			if (node.shape === 'html') {
 				node.attrs = {
@@ -114,6 +112,7 @@ class GraphEditor {
 				if (!node.data) node.data = {};
 			}
 		});
+
 		this.#graph.fromJSON(data, options);
 	}
 

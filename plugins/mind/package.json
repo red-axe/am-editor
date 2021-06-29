@@ -25,6 +25,7 @@
     "url": "https://github.com/itellyou-com/am-editor/issues"
   },
   "dependencies": {
+    "@antv/hierarchy": "^0.6.7",
     "@antv/x6": "^1.23.10",
     "@aomao/engine": "^2.2.6",
     "@babel/runtime": "^7.13.10"

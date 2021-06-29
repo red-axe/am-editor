@@ -51,15 +51,15 @@ export default class MindCard extends Card<MindValue> {
 		const data = value?.data || {
 			nodes: [
 				{
-					id: 'node1', // String，可选，节点的唯一标识
+					id: 'main', // String，可选，节点的唯一标识
 					shape: 'html',
 					x: 40, // Number，必选，节点位置的 x 值
 					y: 40, // Number，必选，节点位置的 y 值
 					width: 180, // Number，可选，节点大小的 width 值
-					height: 28, // Number，可选，节点大小的 height 值
+					height: 40, // Number，可选，节点大小的 height 值
 					data: {
 						value: `<p><span style="color:#ffffff"><span style="font-size:16px">思维导图</span></span></p>`,
-						classNames: 'mind-root-node',
+						classNames: 'mind-main-node',
 					},
 				},
 			],

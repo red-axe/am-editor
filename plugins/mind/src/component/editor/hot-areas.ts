@@ -8,14 +8,13 @@ class HotAreas {
 		this.#graph = graph;
 	}
 
-	setHotArea() {
-		/**let hotAreas = []
+	/*setHotArea() {
+		let hotAreas = []
         const roots = this.#graph.getRootNodes()
         const postFix = 'placeholder'
         //const showHotArea = this.get('showHotArea')
         // 设置根节点热区
         const root = roots[0]
-        root.getBBox
         const rootBox = root.getBBox()
         const rootDx = 90
         const rootDy = 60
@@ -203,6 +202,6 @@ class HotAreas {
             return parent.children
         })
         this.set('hotAreas', hotAreas)
-        showHotArea && this._drawHotAreaShape()**/
-	}
+        showHotArea && this._drawHotAreaShape()
+	}*/
 }
