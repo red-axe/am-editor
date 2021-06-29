@@ -62,7 +62,7 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 			setValue(value);
 			//自动保存，非远程更改，触发保存
 			if (trigger !== 'remote') onSave();
-			if (props.onChange) props.onChange(value);
+			if (props.onChange) props.onChange(value, trigger);
 			console.log(`value ${trigger} update:`, value);
 			//console.log('html:', engine.getHtml());
 		},
@@ -127,56 +127,68 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 							defaultValue.value,
 					  )
 					: defaultValue.value;
-			engine.current.setValue(value);
+			//异步设置值
+			engine.current.setValue(value, {
+				triggerOT: false,
+				callback: () => {
+					//卡片异步渲染完成后
+					if (!props.ot) return setLoading(false);
+					//实例化协作编辑客户端
+					const ot = new OTClient(engine.current);
+					//连接到协作服务端，demo文档
+					const {
+						url,
+						docId,
+						onReady,
+						onMembersChange,
+						onStatusChange,
+						onError,
+						onMessage,
+					} = props.ot;
+					ot.connect(url, docId);
+					ot.on('ready', (member) => {
+						if (onReady) onReady(member);
+						setMember(member);
+						setLoading(false);
+					});
+					//用户加入或退出改变
+					ot.on('membersChange', (members) => {
+						if (onMembersChange) onMembersChange(members);
+						setMembers(members);
+					});
+					//状态改变，退出时，强制保存
+					ot.on(
+						'statusChange',
+						(
+							from: keyof typeof STATUS,
+							to: keyof typeof STATUS,
+						) => {
+							if (onStatusChange) onStatusChange(from, to);
+							if (to === STATUS.exit) {
+								userSave();
+							}
+						},
+					);
+					ot.on('error', (error: ERROR) => {
+						if (onError) onError(error);
+					});
+					ot.on('message', (message) => {
+						if (onMessage) onMessage(message);
+						//更新评论列表
+						if (
+							message.type === 'updateCommentList' &&
+							comment.current?.reload
+						)
+							comment.current.reload();
+					});
+					otClient.current = ot;
+				},
+			});
 			setValue(value);
 		}
 
-		if (!props.ot) return setLoading(false);
-		//实例化协作编辑客户端
-		const ot = new OTClient(engine.current);
-		//连接到协作服务端，demo文档
-		const {
-			url,
-			docId,
-			onReady,
-			onMembersChange,
-			onStatusChange,
-			onError,
-			onMessage,
-		} = props.ot;
-		ot.connect(url, docId);
-		ot.on('ready', (member) => {
-			if (onReady) onReady(member);
-			setMember(member);
-			setLoading(false);
-		});
-		//用户加入或退出改变
-		ot.on('membersChange', (members) => {
-			if (onMembersChange) onMembersChange(members);
-			setMembers(members);
-		});
-		//状态改变，退出时，强制保存
-		ot.on(
-			'statusChange',
-			(from: keyof typeof STATUS, to: keyof typeof STATUS) => {
-				if (onStatusChange) onStatusChange(from, to);
-				if (to === STATUS.exit) {
-					userSave();
-				}
-			},
-		);
-		ot.on('error', (error: ERROR) => {
-			if (onError) onError(error);
-		});
-		ot.on('message', (message) => {
-			if (onMessage) onMessage(message);
-			//更新评论列表
-			if (message.type === 'updateCommentList' && comment.current?.reload)
-				comment.current.reload();
-		});
-		otClient.current = ot;
 		return () => {
-			ot.exit();
+			otClient.current?.exit();
 			engine.current = null;
 			otClient.current = null;
 		};

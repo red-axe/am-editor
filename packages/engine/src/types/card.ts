@@ -490,7 +490,10 @@ export interface CardModelInterface {
 	 */
 	render(
 		container?: NodeInterface,
-		asyncRender?: ((count: number) => void) | true,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
 	): void;
 	/**
 	 * 释放卡片

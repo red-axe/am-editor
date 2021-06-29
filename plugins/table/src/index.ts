@@ -123,7 +123,8 @@ class Table extends Plugin<Options> {
 			this.editor.card.replaceNode(node, TableComponent.cardName, {
 				html: node
 					.get<HTMLElement>()!
-					.outerHTML.replaceAll(/\n|\r\n|\s/g, ''),
+					.outerHTML.replaceAll(/\n|\r\n/g, '')
+					.replaceAll(/>\s+</g, '><'),
 			});
 		}
 	}

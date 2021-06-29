@@ -97,7 +97,14 @@ export interface ChangeInterface {
 	combinTextNode(): void;
 	isComposing(): boolean;
 	isSelecting(): boolean;
-	setValue(value: string, onParse?: (node: Node) => void): void;
+	setValue(
+		value: string,
+		onParse?: (node: Node) => void,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
+	): void;
 	getOriginValue(): string;
 	getValue(options: { ignoreCursor?: boolean }): string;
 	cacheRangeBeforeCommand(): void;

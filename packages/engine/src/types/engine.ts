@@ -483,12 +483,24 @@ export interface EngineInterface extends EditorInterface {
 	 * 设置编辑器值
 	 * @param value 值
 	 */
-	setValue(value: string): EngineInterface;
+	setValue(
+		value: string,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
+	): EngineInterface;
 	/**
 	 * 设置json格式值，主要用于协同
 	 * @param value 值
 	 */
-	setJsonValue(value: Array<any>): EngineInterface;
+	setJsonValue(
+		value: Array<any>,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
+	): EngineInterface;
 	/**
 	 * 绑定事件
 	 * @param eventType 事件类型

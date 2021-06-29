@@ -560,7 +560,10 @@ class CardModel implements CardModelInterface {
 	 */
 	render(
 		container?: NodeInterface,
-		asyncRender?: ((count: number) => void) | true,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
 	) {
 		const cards = container
 			? container.isCard()
@@ -608,7 +611,7 @@ class CardModel implements CardModelInterface {
 					value: decodeCardValue(value),
 					root: key ? cardNode : undefined,
 				});
-				if (asyncRender) {
+				if (asyncRender && !asyncRender.triggerOT) {
 					card.root.attributes(CARD_ASYNC_RENDER, 'true');
 				}
 				Object.keys(attributes).forEach((attributesName) => {
@@ -638,27 +641,33 @@ class CardModel implements CardModelInterface {
 			}
 		});
 		if (!asyncRender) return;
+		if (isEngine(this.editor) && asyncRender.triggerOT) {
+			this.editor.history.startCache();
+		}
 		asyncRenderCards.forEach((card) => {
 			setTimeout(() => {
 				render(card);
 				//协同记录后移除标记属性
-				setTimeout(() => {
-					card.root.removeAttributes(CARD_ASYNC_RENDER);
-				}, 50);
+				if (!asyncRender.triggerOT) {
+					setTimeout(() => {
+						card.root.removeAttributes(CARD_ASYNC_RENDER);
+					}, 50);
+				}
 				setp++;
-				if (
-					setp === asyncRenderCards.length &&
-					typeof asyncRender === 'function'
-				) {
-					asyncRender(asyncRenderCards.length);
+				if (setp === asyncRenderCards.length) {
+					if (isEngine(this.editor) && asyncRender.triggerOT) {
+						this.editor.history.submitCache();
+					}
+					if (asyncRender.callback)
+						asyncRender.callback(asyncRenderCards.length);
 				}
 			}, 20);
 		});
-		if (
-			asyncRenderCards.length === 0 &&
-			typeof asyncRender === 'function'
-		) {
-			asyncRender(0);
+		if (asyncRenderCards.length === 0) {
+			if (isEngine(this.editor) && asyncRender.triggerOT) {
+				this.editor.history.submitCache();
+			}
+			if (asyncRender.callback) asyncRender.callback(0);
 		}
 	}
 

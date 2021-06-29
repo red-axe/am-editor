@@ -239,7 +239,14 @@ class ChangeModel implements ChangeInterface {
 		return this.event.isSelecting;
 	}
 
-	setValue(value: string, onParse?: (node: Node) => void) {
+	setValue(
+		value: string,
+		onParse?: (node: Node) => void,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
+	) {
 		const range = this.getRange();
 		const {
 			schema,
@@ -275,7 +282,7 @@ class ChangeModel implements ChangeInterface {
 				}
 			});
 			block.generateDataIDForDescendant(container.get<Element>()!);
-			card.render(undefined, true);
+			card.render(undefined, asyncRender);
 			const cursor = container.find(CURSOR_SELECTOR);
 			const selection: SelectionInterface = new Selection(
 				this.engine,
@@ -894,10 +901,13 @@ class ChangeModel implements ChangeInterface {
 		this.insertFragment(fragment, (range) => {
 			this.engine.trigger('paste:insert', range);
 			const selection = range.createSelection();
-			this.engine.card.render(undefined, () => {
-				selection.move();
-				range.scrollRangeIntoView();
-				this.apply(range);
+			this.engine.card.render(undefined, {
+				triggerOT: true,
+				callback: () => {
+					selection.move();
+					range.scrollRangeIntoView();
+					this.apply(range);
+				},
 			});
 		});
 

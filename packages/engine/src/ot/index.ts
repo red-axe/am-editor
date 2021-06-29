@@ -52,7 +52,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.rangeColoring = new RangeColoring(engine);
 		this.applier = new Applier(engine);
 		this.mutation = new Mutation(engine.container, { engine });
-		this.mutation.on('ops', ops => this.handleOps(ops));
+		this.mutation.on('ops', (ops) => this.handleOps(ops));
 		this.clientId = randomString();
 		this.waitingOps = [];
 		this.engine.on('select', () => {
@@ -166,7 +166,9 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	}
 
 	setData(data: Array<any>) {
-		this.engine.setJsonValue(data);
+		this.engine.setJsonValue(data, {
+			triggerOT: false,
+		});
 	}
 
 	startMutation() {
@@ -207,7 +209,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	getMembers() {
 		const members = cloneDeep(this.members);
-		members.forEach(member => {
+		members.forEach((member) => {
 			this.setMemberUuidToId(member);
 		});
 		return members;
@@ -215,7 +217,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	setMembers(members: Array<Member>) {
 		members = cloneDeep(members);
-		members.forEach(member => {
+		members.forEach((member) => {
 			this.setMemberIdToUuid(member);
 			this.setMemberColor(member);
 		});
@@ -226,7 +228,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		member = cloneDeep(member);
 		this.setMemberIdToUuid(member);
 		this.setMemberColor(member);
-		if (!this.members.find(m => m.uuid === member.uuid)) {
+		if (!this.members.find((m) => m.uuid === member.uuid)) {
 			this.members.push(member);
 		}
 	}
@@ -235,7 +237,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		member = cloneDeep(member);
 		if (!member.uuid) return;
 		this.setMemberIdToUuid(member);
-		this.members = this.members.filter(m => {
+		this.members = this.members.filter((m) => {
 			return m.uuid !== member.uuid;
 		});
 		this.selectionData.remove(member.uuid);
@@ -247,7 +249,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		member = cloneDeep(member);
 		this.setMemberIdToUuid(member);
 		this.setMemberColor(member);
-		const findMember = this.members.find(m => m.uuid === member.uuid);
+		const findMember = this.members.find((m) => m.uuid === member.uuid);
 		if (!findMember) return;
 		this.currentMember = findMember;
 	}
@@ -260,7 +262,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	doRangeColoring(attrs: Array<Attribute>, isDraw: boolean = false) {
 		const { members, currentMember } = this;
-		attrs = attrs.filter(item => item.uuid !== currentMember?.uuid);
+		attrs = attrs.filter((item) => item.uuid !== currentMember?.uuid);
 		this.rangeColoring.render(attrs, members, isDraw);
 		this.rangeColoring.updatePosition();
 	}
