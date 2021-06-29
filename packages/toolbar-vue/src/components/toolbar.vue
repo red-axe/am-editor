@@ -32,7 +32,7 @@ export default defineComponent({
     setup(props){
         let groups = ref<Array<GroupDataProps>>([])
         const update = () => {
-            calcuMobileView()
+            if(isMobile) calcuMobileView()
             const data: Array<GroupDataProps> = [];
             const defaultConfig = getToolbarDefaultConfig(props.engine);
             props.items.forEach(group => {
