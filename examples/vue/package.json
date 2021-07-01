@@ -33,7 +33,7 @@
     "@aomao/plugin-strikethrough": "^2.2.9",
     "@aomao/plugin-sub": "^2.2.9",
     "@aomao/plugin-sup": "^2.2.9",
-    "@aomao/plugin-table": "^2.2.9",
+    "@aomao/plugin-table": "^2.2.10",
     "@aomao/plugin-tasklist": "^2.2.9",
     "@aomao/plugin-underline": "^2.2.9",
     "@aomao/plugin-undo": "^2.2.9",
