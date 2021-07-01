@@ -56,7 +56,7 @@ import Link from '@aomao/plugin-link-vue';
 import Codeblock, { CodeBlockComponent } from '@aomao/plugin-codeblock-vue';
 import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
 import Table, { TableComponent } from '@aomao/plugin-table'
-import AmToolbar , { ToolbarPlugin, ToolbarComponent } from '../../../packages/toolbar-vue/src'
+import AmToolbar , { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar-vue'
 import OTClient from './ot-client'
 
 const plugins = [

@@ -25,6 +25,7 @@ class Table extends Plugin<Options> {
 		const editor = this.editor;
 		editor.language.add(locales);
 		editor.schema.add(this.schema());
+		editor.conversion.add('th', 'td');
 		editor.on('paser:html', (node) => this.parseHtml(node));
 		editor.on('paste:each-after', (child) => this.pasteHtml(child));
 		editor.on('paste:markdown-after', (child) => this.pasteMarkdown(child));

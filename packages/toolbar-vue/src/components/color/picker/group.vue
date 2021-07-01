@@ -11,7 +11,7 @@
     </span>
 </template>
 <script lang="ts">
-import { defineComponent, watch } from 'vue'
+import { defineComponent } from 'vue'
 import { colorPickerGroupProps } from '../../../types'
 import AmColorPickerItem from './item.vue'
 

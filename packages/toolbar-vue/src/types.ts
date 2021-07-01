@@ -34,10 +34,19 @@ export const buttonProps = {
 	placement: String as PropType<Placement>,
 	hotkey: [String, Object] as PropType<boolean | string | undefined>,
 	command: Object as PropType<Command>,
-	autoExecute: [Boolean, undefined] as PropType<boolean | undefined>,
+	autoExecute: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
 	className: String,
-	active: [Boolean, undefined] as PropType<boolean | undefined>,
-	disabled: [Boolean, undefined] as PropType<boolean | undefined>,
+	active: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
+	disabled: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
 	onClick: Function as PropType<(event: MouseEvent) => void | boolean>,
 	onMouseDown: Function as PropType<(event: MouseEvent) => void | boolean>,
 	onMouseEnter: Function as PropType<(event: MouseEvent) => void | boolean>,
@@ -85,7 +94,10 @@ export const dropdownListProps = {
 	onSelect: Function as PropType<
 		(event: MouseEvent, key: string) => void | boolean
 	>,
-	hasDot: [Boolean, undefined] as PropType<boolean | undefined>,
+	hasDot: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
 };
 export type DropdownListProps = ExtractPropTypes<typeof dropdownListProps>;
 //下拉
@@ -105,15 +117,27 @@ export const dropdownProps = {
 	icon: String,
 	content: [String, Function] as PropType<string | (() => string)>,
 	title: String,
-	disabled: [Boolean, undefined] as PropType<boolean | undefined>,
-	single: [Boolean, undefined] as PropType<boolean | undefined>,
+	disabled: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
+	single: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
 	className: String,
 	direction: String as PropType<'vertical' | 'horizontal'>,
 	onSelect: Function as PropType<
 		(event: MouseEvent, key: string) => void | boolean
 	>,
-	hasArrow: [Boolean, undefined] as PropType<boolean | undefined>,
-	hasDot: [Boolean, undefined] as PropType<boolean | undefined>,
+	hasArrow: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
+	hasDot: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
 };
 export type DropdownProps = ExtractPropTypes<typeof dropdownProps>;
 
@@ -132,7 +156,10 @@ export const colorPickerItemProps = {
 		required: true,
 	} as const,
 	active: Boolean,
-	setStroke: [Boolean, undefined] as PropType<boolean | undefined>,
+	setStroke: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
 	onSelect: Function as PropType<(color: string, event: MouseEvent) => void>,
 };
 export type ColorPickerItemProps = ExtractPropTypes<
