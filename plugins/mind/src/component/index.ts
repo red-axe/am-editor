@@ -1,3 +1,4 @@
+import { ShapeData } from '../types';
 import { Node, Edge } from '@antv/x6';
 import {
 	$,
@@ -10,10 +11,7 @@ import {
 import GraphEditor from './editor';
 
 export type MindValue = {
-	data: {
-		nodes: Node.Metadata[];
-		edges: Edge.Metadata[];
-	};
+	data: Array<ShapeData>;
 };
 
 export default class MindCard extends Card<MindValue> {
@@ -48,22 +46,21 @@ export default class MindCard extends Card<MindValue> {
 			});
 		}
 		const value = this.getValue();
-		const data = value?.data || {
-			nodes: [
-				{
-					id: 'main', // String，可选，节点的唯一标识
-					shape: 'html',
-					x: 40, // Number，必选，节点位置的 x 值
-					y: 40, // Number，必选，节点位置的 y 值
-					width: 180, // Number，可选，节点大小的 width 值
-					height: 40, // Number，可选，节点大小的 height 值
-					data: {
-						value: `<p><span style="color:#ffffff"><span style="font-size:16px">思维导图</span></span></p>`,
-						classNames: 'mind-main-node',
-					},
+		const data = value?.data || [
+			{
+				id: 'main', // String，可选，节点的唯一标识
+				shape: 'html',
+				x: 40, // Number，必选，节点位置的 x 值
+				y: 40, // Number，必选，节点位置的 y 值
+				width: 180, // Number，可选，节点大小的 width 值
+				height: 40, // Number，可选，节点大小的 height 值
+				zIndex: 1,
+				data: {
+					value: `<p><span style="color:#ffffff"><span style="font-size:16px">思维导图</span></span></p>`,
+					classNames: 'mind-main-node',
 				},
-			],
-		};
+			},
+		];
 		this.graphEditor.render(data);
 	}
 

@@ -105,6 +105,18 @@ export interface ChangeInterface {
 			callback?: (count: number) => void;
 		},
 	): void;
+	/**
+	 * 设置html，会格式化为合法的编辑器值
+	 * @param html html
+	 * @param asyncRender 异步渲染卡片配置
+	 */
+	setHtml(
+		html: string,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
+	): void;
 	getOriginValue(): string;
 	getValue(options: { ignoreCursor?: boolean }): string;
 	cacheRangeBeforeCommand(): void;

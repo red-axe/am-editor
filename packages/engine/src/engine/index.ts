@@ -231,6 +231,17 @@ class Engine implements EngineInterface {
 		return this;
 	}
 
+	setHtml(
+		html: string,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
+	) {
+		this.change.setHtml(html, asyncRender);
+		return this;
+	}
+
 	setJsonValue(
 		value: Array<any>,
 		asyncRender?: {

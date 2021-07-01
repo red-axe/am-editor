@@ -156,8 +156,28 @@ isSelecting(): boolean;
 /**
  * @param value 值
  * @param onParse 在转换为符合标准的编辑器值前使用根节点解析过滤
+ * @param asyncRender 异步渲染卡片配置
  * */
-setValue(value: string, onParse?: (node: Node) => void): void;
+setValue(value: string, onParse?: (node: Node) => void, asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		}): void;
+```
+
+### `setHtml`
+
+设置 html 作为编辑器值
+
+```ts
+/**
+ * 设置html，会格式化为合法的编辑器值
+ * @param html html
+ * @param asyncRender 异步渲染卡片配置
+ */
+setHtml(html: string, asyncRender?: {
+    triggerOT?: boolean;
+    callback?: (count: number) => void;
+}): void
 ```
 
 ### `getOriginValue`

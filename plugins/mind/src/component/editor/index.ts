@@ -1,5 +1,6 @@
-import { NodeData } from '../../types';
+import { NodeData, ShapeData } from '../../types';
 import { Graph, Model, Cell, Node, Edge, Addon } from '@antv/x6';
+import Hierarchy from '@antv/hierarchy';
 import { $, DATA_ELEMENT, NodeInterface, UI } from '@aomao/engine';
 import HtmlNode from './html-node';
 import './index.css';
@@ -12,10 +13,7 @@ if (!isServer) {
 }*/
 
 export type Options = {
-	onChange?: (data: {
-		nodes: Node.Metadata[];
-		edges: Edge.Metadata[];
-	}) => void;
+	onChange?: (data: Array<ShapeData>) => void;
 
 	onSelectedEditable?: (cell: Cell) => void;
 };
@@ -46,28 +44,39 @@ class GraphEditor {
 		this.#graph.on('cell:changed', () => {
 			const { onChange } = this.#options;
 			if (!onChange) return;
-			const { cells } = this.#graph.toJSON();
-			const nodes: Node.Metadata[] = [];
-			const edges: Edge.Metadata[] = [];
-			cells.forEach((cell) => {
-				const { id, zIndex, shape, data } = cell;
-				if (cell.shape === 'edge') {
-					edges.push(cell);
-				} else {
-					nodes.push({
-						...cell.position,
-						...cell.size,
-						id,
-						shape,
-						data,
-						zIndex,
+			console.log('changed');
+			const nodes = this.#graph.getNodes();
+			const data: Array<ShapeData> = [];
+			nodes.forEach((node) => {
+				if (!node.isNode()) return;
+				const getItem = (node: Cell) => {
+					const bbox = node.getBBox();
+					const children: Array<ShapeData> = [];
+					node.children?.forEach((child) => {
+						if (!child.isNode()) return;
+						children.push(getItem(child));
 					});
-				}
+					return {
+						id: node.id,
+						x: bbox.x,
+						y: bbox.y,
+						width: bbox.width,
+						height: bbox.height,
+						data: node.getData<NodeData>(),
+						children,
+						zIndex: node.getZIndex() || 1,
+					};
+				};
+				data.push(getItem(node));
 			});
-			onChange({
-				nodes,
-				edges,
-			});
+			console.log(data);
+			onChange(data);
+		});
+		this.#graph.on('node:added', ({ node }) => {
+			console.log('added');
+			const { parent } = node;
+			if (parent) {
+			}
 		});
 		this.#htmlNode = new HtmlNode(this.#graph);
 		this.#dnd = new Addon.Dnd({
@@ -84,36 +93,81 @@ class GraphEditor {
 		this.#editableCell.setData({ value }, { silent: true });
 	}
 
-	render(
-		data: {
-			nodes?: Node.Metadata[];
-			edges?: Edge.Metadata[];
-		},
-		options?: Model.FromJSONOptions,
-	) {
-		const { nodes, edges } = data;
+	render(data: Array<ShapeData>) {
+		const hierarchyData = Hierarchy.mindmap(data[0], {
+			direction: 'H',
+			getSubTreeSep: (node: ShapeData) => {
+				if (node.children && node.children.length > 0) {
+					if (node.zIndex <= 2) {
+						return 8;
+					}
+					return 2;
+				}
+				return 0;
+			},
+			getHGap: (node: ShapeData) => {
+				if (node.zIndex === 1) {
+					return 8;
+				}
 
-		nodes?.forEach((node) => {
-			if (node.shape === 'html') {
-				node.attrs = {
+				if (node.zIndex === 2) {
+					return 24;
+				}
+
+				return 18;
+			},
+			getVGap: (node: ShapeData) => {
+				if (node.zIndex === 1) {
+					return 8;
+				}
+
+				if (node.zIndex === 2) {
+					return 12;
+				}
+
+				return 2;
+			},
+			getSide: (node: ShapeData) => {
+				/*if (node.data.side) {
+                    return node.data.side
+                }*/
+
+				return 'right';
+			},
+		});
+		const getNode = (item: any): Node.Metadata => {
+			return {
+				...item,
+				data: item.data.data,
+				shape: 'html',
+				attrs: {
 					body: {
 						fill: 'transparent',
 						strokeWidth: 0,
 					},
-				};
-				node.html = {
-					render: (node: any) => {
+				},
+				html: {
+					render: (node: Node) => {
 						return this.#htmlNode.render(node);
 					},
-					shouldComponentUpdate: (node: any) => {
+					shouldComponentUpdate: (node: Node) => {
 						return node.hasChanged('data');
 					},
-				};
-				if (!node.data) node.data = {};
-			}
-		});
+				},
+			};
+		};
+		const metadata = getNode(hierarchyData);
+		console.log(metadata);
+		const node = this.#graph.addNode(getNode(hierarchyData));
 
-		this.#graph.fromJSON(data, options);
+		const appendChild = (root: Node, item: any) => {
+			item.children?.forEach((child: any) => {
+				const node = this.#graph.addNode(getNode(child));
+				root.addChild(node);
+				appendChild(node, child);
+			});
+		};
+		appendChild(node, hierarchyData);
 	}
 
 	didRender() {

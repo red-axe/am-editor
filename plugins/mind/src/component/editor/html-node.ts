@@ -109,24 +109,16 @@ class HtmlNode {
 			const nodeX = bbox.x + bbox.width + 80;
 			const nodeY = bbox.y - 80;
 
-			const target = this.graph.addNode({
-				shape: 'rect', // 指定使用何种图形，默认值为 'rect'
-				x: nodeX,
-				y: nodeY,
-				width: 60,
-				height: 25,
-				attrs: {
-					body: {
-						fill: 'blue',
-					},
-					label: {
-						text: 'Hello',
-						fill: 'white',
-					},
-				},
-			});
+			const target = this.graph.addNode(
+				this.getNodeConfig({
+					x: nodeX,
+					y: nodeY,
+					width: 60,
+					height: 25,
+				}),
+			);
 			node.addChild(target);
-			const targetBBox = target.getBBox();
+			/*const targetBBox = target.getBBox();
 			const edgeEndX = nodeX + targetBBox.width;
 			const edgeEndY = nodeY + targetBBox.height + 4;
 			const edge = this.graph.addEdge({
@@ -157,7 +149,7 @@ class HtmlNode {
 					},
 				},
 			});
-			node.addChild(edge);
+			node.addChild(edge);*/
 		});
 		return base.get<HTMLElement>()!;
 	}

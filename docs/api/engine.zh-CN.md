@@ -125,8 +125,28 @@ getHtml(): string;
 /**
  * 设置编辑器值
  * @param value 值
+ * @param asyncRender 异步渲染卡片配置
  */
-setValue(value: string): EngineInterface;
+setValue(value: string, asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		}): EngineInterface;
+```
+
+### `setHtml`
+
+设置 html 作为编辑器值
+
+```ts
+/**
+* 设置html，会格式化为合法的编辑器值
+* @param html html
+* @param asyncRender 异步渲染卡片配置
+*/
+setHtml(html: string, asyncRender?: {
+    triggerOT?: boolean;
+    callback?: (count: number) => void;
+}): EngineInterface
 ```
 
 ### `setJsonValue`

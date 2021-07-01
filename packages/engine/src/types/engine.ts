@@ -491,6 +491,18 @@ export interface EngineInterface extends EditorInterface {
 		},
 	): EngineInterface;
 	/**
+	 * 设置html，会格式化为合法的编辑器值
+	 * @param html html
+	 * @param asyncRender 异步渲染卡片配置
+	 */
+	setHtml(
+		html: string,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
+	): EngineInterface;
+	/**
 	 * 设置json格式值，主要用于协同
 	 * @param value 值
 	 */

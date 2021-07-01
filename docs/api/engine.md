@@ -123,10 +123,30 @@ Set editor value
 
 ```ts
 /**
- * Set editor value
- * @param value
- */
-setValue(value: string): EngineInterface;
+  * Set editor value
+  * @param value
+  * @param asyncRender Asynchronous rendering card configuration
+  */
+setValue(value: string, asyncRender?: {
+    triggerOT?: boolean;
+    callback?: (count: number) => void;
+}): EngineInterface;
+```
+
+### `setHtml`
+
+Set html as editor value
+
+```ts
+/**
+* Set html, it will be formatted as a legal editor value
+* @param html html
+* @param asyncRender Asynchronous rendering card configuration
+*/
+setHtml(html: string, asyncRender?: {
+     triggerOT?: boolean;
+     callback?: (count: number) => void;
+}): EngineInterface
 ```
 
 ### `setJsonValue`

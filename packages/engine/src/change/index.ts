@@ -314,12 +314,22 @@ class ChangeModel implements ChangeInterface {
 		}
 	}
 
+	setHtml(
+		html: string,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
+	) {
+		this.paste(html, asyncRender);
+	}
+
 	getOriginValue() {
 		const { container, schema, conversion } = this.engine;
-		return new Parser(container.clone(true), this.engine).toValue(
-			schema,
-			conversion,
-		);
+		return new Parser(
+			container.get<HTMLElement>()?.outerHTML || '',
+			this.engine,
+		).toValue(schema, conversion);
 	}
 
 	getValue(
@@ -895,18 +905,30 @@ class ChangeModel implements ChangeInterface {
 		});
 	}
 
-	paste(source: string) {
+	paste(
+		source: string,
+		asyncRender?: {
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		},
+	) {
 		const fragment = new Paste(source, this.engine).normalize();
 		this.engine.trigger('paste:before', fragment);
 		this.insertFragment(fragment, (range) => {
 			this.engine.trigger('paste:insert', range);
 			const selection = range.createSelection();
 			this.engine.card.render(undefined, {
-				triggerOT: true,
-				callback: () => {
+				triggerOT:
+					asyncRender?.triggerOT === undefined
+						? true
+						: asyncRender.triggerOT,
+				callback: (count) => {
 					selection.move();
 					range.scrollRangeIntoView();
 					this.apply(range);
+					if (asyncRender?.callback) {
+						asyncRender.callback(count);
+					}
 				},
 			});
 		});
