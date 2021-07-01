@@ -83,7 +83,7 @@ class Toolbar {
 		this.target.attributes('href', link);
 		text = text.trim() === '' ? link : text;
 		this.target.text(text);
-
+		this.engine.inline.repairCursor(this.target);
 		range.setStart(this.target.next()!, 1);
 		range.setEnd(this.target.next()!, 1);
 		change.apply(range);

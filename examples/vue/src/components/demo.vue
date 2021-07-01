@@ -58,6 +58,7 @@ import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
 import Table, { TableComponent } from '@aomao/plugin-table'
 import AmToolbar , { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar-vue'
 import OTClient from './ot-client'
+import 'ant-design-vue/es/style'
 
 const plugins = [
 	Redo,

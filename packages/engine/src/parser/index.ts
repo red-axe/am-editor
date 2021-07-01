@@ -214,7 +214,7 @@ class Parser implements ParserInterface {
 						) {
 							const cloneMark = parentMark.clone();
 							const inlineMark = node.clone();
-							parentMark.each((markChild) => {
+							parentMark.children().each((markChild) => {
 								if (node.equal(markChild)) {
 									nodeApi.wrap(
 										nodeApi.replace(node, cloneMark),

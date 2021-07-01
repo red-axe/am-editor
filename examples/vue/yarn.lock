@@ -82,17 +82,17 @@
     "@aomao/engine" "^2.2.8"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-codeblock-vue@^2.2.8":
-  version "2.2.8"
-  resolved "https://registry.yarnpkg.com/@aomao/plugin-codeblock-vue/-/plugin-codeblock-vue-2.2.8.tgz#56f84bac2b49830df2d6b75c6584b41bcc721027"
-  integrity sha512-AjznyqIPeR0NIv/nD3RoTDJ0KoClwNcT3Vydwaf22sQQhk8f0COkFcpOSOncxL0flRadNLSd66tG/MwgiNpL7g==
+"@aomao/plugin-codeblock-vue@^2.2.9":
+  version "2.2.9"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-codeblock-vue/-/plugin-codeblock-vue-2.2.9.tgz#412a8084c95c12305d1c137b8d0bcc525afe0a63"
+  integrity sha512-OAMcadLslUy9Bz71waFhsHcbes2dlaPXm1CpfcU00XJvBlhP0Lz7SEpTEt1PT/CbZ4m47EXMWPpr9lfhcJI8vA==
   dependencies:
     "@aomao/engine" "^2.2.8"
     "@babel/runtime" "^7.13.10"
     ant-design-vue "^2.1.2"
     codemirror "^5.60.0"
     lodash-es "^4.17.21"
-    vue "^3.0.11"
+    vue "^3.1.2"
 
 "@aomao/plugin-file@^2.1.8":
   version "2.1.8"
@@ -160,15 +160,15 @@
     "@aomao/engine" "^2.2.8"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/plugin-link-vue@^2.2.9":
-  version "2.2.9"
-  resolved "https://registry.yarnpkg.com/@aomao/plugin-link-vue/-/plugin-link-vue-2.2.9.tgz#25e3fa7ced4f11d6c573b97e97e4cfe8ec18f113"
-  integrity sha512-KYrn7PLqx0gcjwKx+X38FHOuIhUqIwzPEKnqCxlzJZZXKMoqm0SbRURXsLqza+yAxaKtyXSNZnHC2Bg/iO+7Vw==
+"@aomao/plugin-link-vue@^2.2.10":
+  version "2.2.10"
+  resolved "https://registry.yarnpkg.com/@aomao/plugin-link-vue/-/plugin-link-vue-2.2.10.tgz#3e96562f8627c892fe28b3b7c4985d9ed06d6f6d"
+  integrity sha512-KL3X8/pPUDQjhfNcvyY1lFBbWkVyn7G8/T+4oUZypMi4uX8Zxnxi4L7eWyk3ieKRsir23QM4uYC/g5z6yleOeg==
   dependencies:
     "@aomao/engine" "^2.2.8"
     "@babel/runtime" "^7.13.10"
     ant-design-vue "^2.1.2"
-    vue "^3.0.11"
+    vue "^3.1.2"
 
 "@aomao/plugin-mark@^2.2.8":
   version "2.2.8"
@@ -291,10 +291,10 @@
     "@aomao/engine" "^2.2.8"
     "@babel/runtime" "^7.13.10"
 
-"@aomao/toolbar-vue@^2.2.8":
-  version "2.2.9"
-  resolved "https://registry.yarnpkg.com/@aomao/toolbar-vue/-/toolbar-vue-2.2.9.tgz#e6d7afdbb76d9f158348c2edf211e8f4a292bffb"
-  integrity sha512-FxnrFdoDpbrrNYSYZN4KpAMQqmiG77OXFrpMgQEhU/92XgQihYEbpIojzyKnPrP86aYpk6o4IJqxrqguGs//UQ==
+"@aomao/toolbar-vue@^2.2.10":
+  version "2.2.10"
+  resolved "https://registry.yarnpkg.com/@aomao/toolbar-vue/-/toolbar-vue-2.2.10.tgz#0642e224bd576a98bbbf4de3b1fc571d73ac4fd8"
+  integrity sha512-9gADCsWAaoStPea5AqdG32LJjjZxloqO9A7Yb9M0nJ7AgVbdSvhiaAJeNEzpLM6VRn+fLVyL5PeJ2SpHJlw0ww==
   dependencies:
     "@aomao/engine" "^2.2.8"
     "@babel/runtime" "^7.13.10"
@@ -302,7 +302,7 @@
     keymaster "^1.6.2"
     lodash-es "^4.17.21"
     tinycolor2 "^1.4.2"
-    vue "^3.0.11"
+    vue "^3.1.2"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.8.3":
   version "7.12.13"
@@ -8794,7 +8794,7 @@ vue-types@^3.0.0:
   dependencies:
     is-plain-object "3.0.1"
 
-vue@^3.0.0, vue@^3.0.11:
+vue@^3.0.0:
   version "3.0.11"
   resolved "https://registry.npm.taobao.org/vue/download/vue-3.0.11.tgz?cache=0&sync_timestamp=1617321643721&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fvue%2Fdownload%2Fvue-3.0.11.tgz#c82f9594cbf4dcc869241d4c8dd3e08d9a8f4b5f"
   integrity sha1-yC+VlMv03MhpJB1MjdPgjZqPS18=
