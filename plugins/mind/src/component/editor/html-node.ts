@@ -1,6 +1,5 @@
 import { NodeData } from '../../types';
 import { Graph, Node, Cell } from '@antv/x6';
-import Hierarchy from '@antv/hierarchy';
 import { $, DATA_ELEMENT, EDITABLE } from '@aomao/engine';
 
 const template = `<div class="mind-container" readonly="true">
@@ -12,11 +11,17 @@ const template = `<div class="mind-container" readonly="true">
     </div>
 </div>`;
 
+export type Options = {
+	onAdded?: (node: Node) => void;
+};
+
 class HtmlNode {
 	graph: Graph;
+	#options: Options;
 
-	constructor(graph: Graph) {
+	constructor(graph: Graph, options: Options) {
 		this.graph = graph;
+		this.#options = options;
 	}
 
 	/**
@@ -80,7 +85,7 @@ class HtmlNode {
 				'readonly',
 				`${!editable}`,
 			);
-			editableElement.html(value || '<p><br /></p>');
+			editableElement.html(value || '<p>Heelo</p>');
 			if (editable) {
 				setTimeout(() => {
 					node.get<HTMLElement>()?.focus();
@@ -104,6 +109,7 @@ class HtmlNode {
 		const addTool = base.find('.mind-tool-add');
 		addTool.on('click', () => {
 			const bbox = node.getBBox();
+			const data = node.getData<NodeData>();
 			const edgeBeginX = bbox.x + bbox.width - 5;
 			const edgeBeginY = bbox.y + bbox.height / 2;
 			const nodeX = bbox.x + bbox.width + 80;
@@ -115,9 +121,12 @@ class HtmlNode {
 					y: nodeY,
 					width: 60,
 					height: 25,
+					hierarchy: (data.hierarchy || 0) + 1,
 				}),
 			);
 			node.addChild(target);
+			const { onAdded } = this.#options;
+			if (onAdded) onAdded(target);
 			/*const targetBBox = target.getBBox();
 			const edgeEndX = nodeX + targetBBox.width;
 			const edgeEndY = nodeY + targetBBox.height + 4;

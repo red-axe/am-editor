@@ -135,7 +135,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		if (isInit) {
 			let tdWidth: Array<number> = [];
 			const { tableModel } = this.table.selection;
-			tableModel?.table?.forEach(trModel => {
+			tableModel?.table?.forEach((trModel) => {
 				trModel.forEach((tdModel, c) => {
 					if (
 						!tdWidth[c] &&
@@ -195,21 +195,25 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 */
 	bindEvents() {
 		this.colsHeader
-			?.on('mousedown', event => this.onMouseDownColsHeader(event))
-			.on('click', event => this.onClickColsHeader(event))
-			.on('dragstart', event => this.onDragStartColsHeader(event));
+			?.on('mousedown', (event) => this.onMouseDownColsHeader(event))
+			.on('click', (event) => this.onClickColsHeader(event))
+			.on('dragstart', (event) => this.onDragStartColsHeader(event));
 		this.rowsHeader
-			?.on('mousedown', event => this.onMouseDownRowsHeader(event))
-			.on('click', event => this.onClickRowsHeader(event))
-			.on('dragstart', event => this.onDragStartRowsHeader(event));
-		this.tableHeader?.on('click', event => this.onClickTableHeader(event));
-		this.tableRoot?.on('contextmenu', event => event.preventDefault());
-		this.colsHeader?.on('contextmenu', event => event.preventDefault());
-		this.rowsHeader?.on('contextmenu', event => event.preventDefault());
-		this.tableRoot?.on('mousedown', event => this.onTableMouseDown(event));
-		this.menuBar?.on('click', event => this.handleClickMenu(event));
-		this.menuBar?.on('mouseover', event => this.handleHoverMenu(event));
-		this.menuBar?.on('mouseleave', event => this.hideHighlight(event));
+			?.on('mousedown', (event) => this.onMouseDownRowsHeader(event))
+			.on('click', (event) => this.onClickRowsHeader(event))
+			.on('dragstart', (event) => this.onDragStartRowsHeader(event));
+		this.tableHeader?.on('click', (event) =>
+			this.onClickTableHeader(event),
+		);
+		this.tableRoot?.on('contextmenu', (event) => event.preventDefault());
+		this.colsHeader?.on('contextmenu', (event) => event.preventDefault());
+		this.rowsHeader?.on('contextmenu', (event) => event.preventDefault());
+		this.tableRoot?.on('mousedown', (event) =>
+			this.onTableMouseDown(event),
+		);
+		this.menuBar?.on('click', (event) => this.handleClickMenu(event));
+		this.menuBar?.on('mouseover', (event) => this.handleHoverMenu(event));
+		this.menuBar?.on('mouseleave', (event) => this.hideHighlight(event));
 		//列头部 padding 区域单击让其选中表格卡片上方的blcok
 		this.viewport?.on('mousedown', (event: MouseEvent) => {
 			if (!event.target) return;
@@ -233,16 +237,16 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		});
 		//行删除按钮
 		this.rowDeleteButton
-			?.on('mouseover', event => this.handleHighlightRow())
-			.on('mouseleave', event => this.hideHighlight(event))
-			.on('click', event => {
+			?.on('mouseover', (event) => this.handleHighlightRow())
+			.on('mouseleave', (event) => this.hideHighlight(event))
+			.on('click', (event) => {
 				this.table.command['removeRow']();
 			});
 		//列删除按钮
 		this.colDeleteButton
-			?.on('mouseover', event => this.handleHighlightCol())
-			.on('mouseleave', event => this.hideHighlight(event))
-			.on('click', event => {
+			?.on('mouseover', (event) => this.handleHighlightCol())
+			.on('mouseleave', (event) => this.hideHighlight(event))
+			.on('click', (event) => {
 				this.table.command['removeCol']();
 			});
 		//列增加按钮
@@ -338,7 +342,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const width = itemNode.width();
 		const buttonWidth = this.colAddButton.width();
 		let left = itemNode.get<HTMLElement>()!.offsetLeft;
-		const index = items.findIndex(item => item.equal(itemNode));
+		const index = items.findIndex((item) => item.equal(itemNode));
 		const isEnd =
 			event.offsetX > width / 2 || targetNode.hasClass('cols-trigger');
 		const isLast = items[items.length - 1].equal(itemNode);
@@ -375,13 +379,14 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		).toArray();
 		const height = itemNode.height();
 		let top = itemNode.get<HTMLElement>()!.offsetTop;
-		const index = items.findIndex(item => item.equal(itemNode));
+		const index = items.findIndex((item) => item.equal(itemNode));
 		const isEnd =
 			event.offsetY > height / 2 || targetNode.hasClass('rows-trigger');
 		if (isEnd) {
 			top += height;
 		}
-		this.moveRowIndex = index + (isEnd ? 1 : 0);
+		this.moveRowIndex =
+			index + (isEnd ? (index === items.length - 1 ? 0 : 1) : 0);
 		this.rowAddButton.show('flex');
 		this.rowAddButton.css('top', `${top}px`);
 		const splitWidth =
@@ -448,7 +453,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const index = this.colsHeader
 			?.find(Template.COLS_HEADER_ITEM_CLASS)
 			.toArray()
-			.findIndex(item => item.equal(colHeader));
+			.findIndex((item) => item.equal(colHeader));
 		if (index === undefined) return;
 		selection.selectCol(index);
 	}
@@ -469,7 +474,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const index = this.rowsHeader
 			?.find(Template.ROWS_HEADER_ITEM_CLASS)
 			.toArray()
-			.findIndex(item => item.equal(rowHeader));
+			.findIndex((item) => item.equal(rowHeader));
 		if (index === undefined) return;
 		selection.selectRow(index);
 	}
@@ -587,7 +592,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			this.colsHeader
 				?.find(Template.COLS_HEADER_ITEM_CLASS)
 				.toArray()
-				.findIndex(item => item.equal(col)) || 0;
+				.findIndex((item) => item.equal(col)) || 0;
 		this.changeSize = {
 			trigger: {
 				element: trigger,
@@ -624,7 +629,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			this.rowsHeader
 				?.find(Template.ROWS_HEADER_ITEM_CLASS)
 				.toArray()
-				.findIndex(item => item.equal(row)) || 0;
+				.findIndex((item) => item.equal(row)) || 0;
 		this.changeSize = {
 			trigger: {
 				element: trigger,
@@ -797,7 +802,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const index = this.colsHeader
 			?.find(Template.COLS_HEADER_ITEM_CLASS)
 			.toArray()
-			.findIndex(item => item.equal(colBar));
+			.findIndex((item) => item.equal(colBar));
 		if (index === undefined) return;
 		const drag_col = index;
 		if (drag_col < selectArea.begin.col || drag_col > selectArea.end.col)
@@ -831,7 +836,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const index = this.rowsHeader
 			?.find(Template.ROWS_HEADER_ITEM_CLASS)
 			.toArray()
-			.findIndex(item => item.equal(rowBar));
+			.findIndex((item) => item.equal(rowBar));
 		if (index === undefined) return;
 		const drag_row = index;
 
@@ -987,7 +992,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			const index = this.colsHeader
 				?.find(Template.COLS_HEADER_ITEM_CLASS)
 				.toArray()
-				.findIndex(item => item.equal(colBar));
+				.findIndex((item) => item.equal(colBar));
 			if (index === undefined) return;
 			const currentCol = index;
 			const _dropCol =
@@ -1082,7 +1087,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			const index = this.rowsHeader
 				?.find(Template.ROWS_HEADER_ITEM_CLASS)
 				.toArray()
-				.findIndex(item => item.equal(rowBar));
+				.findIndex((item) => item.equal(rowBar));
 			if (index === undefined) return;
 			const currentRow = index;
 			const _dropRow =
@@ -1172,7 +1177,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const { selection } = this.table;
 		const menuItems = this.menuBar.find(Template.MENUBAR_ITEM_CLASS);
 		menuItems.removeClass('disabled');
-		menuItems.each(menu => {
+		menuItems.each((menu) => {
 			const menuNode = $(menu);
 			const action = menuNode.attributes('data-action');
 			if (this.getMenuDisabled(action)) {
@@ -1189,7 +1194,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 							parseInt(inputElement.value, 10) || 1
 						).toString();
 					})
-					.on('keydown', event => {
+					.on('keydown', (event) => {
 						if (isHotkey('enter', event)) {
 							this.handleTriggerMenu(menuNode);
 						}
@@ -1200,20 +1205,20 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				const isInsertRow =
 					['insertRowUp', 'insertRowDown'].indexOf(action) > -1;
 				if (isInsertCol) {
-					inputElement.value = `${selectArea.end.col -
-						selectArea.begin.col +
-						1}`;
+					inputElement.value = `${
+						selectArea.end.col - selectArea.begin.col + 1
+					}`;
 				}
 				if (isInsertRow) {
-					inputElement.value = `${selectArea.end.row -
-						selectArea.begin.row +
-						1}`;
+					inputElement.value = `${
+						selectArea.end.row - selectArea.begin.row + 1
+					}`;
 				}
 				inputNode.on('mousedown', this.onMenuInputMousedown);
 			}
 		});
 		const splits = this.menuBar.find('div.split');
-		splits.each(splitNode => {
+		splits.each((splitNode) => {
 			const split = $(splitNode);
 			let prev = split.prev();
 			while (prev) {
@@ -1265,7 +1270,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		}
 		const menuItems = this.menuBar?.find(Template.MENUBAR_ITEM_CLASS);
 		menuItems?.removeClass('disabled');
-		menuItems?.each(menu => {
+		menuItems?.each((menu) => {
 			const menuNode = $(menu);
 			const inputNode = menuNode.find(
 				`input${Template.MENUBAR_ITEM_INPUT_CALSS}`,

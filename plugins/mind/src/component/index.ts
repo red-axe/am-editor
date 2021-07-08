@@ -38,8 +38,10 @@ export default class MindCard extends Card<MindValue> {
 	}
 
 	render() {
+		const height = 600;
 		if (!this.graphEditor) {
 			this.graphEditor = new GraphEditor(this.getCenter(), {
+				height,
 				onChange: (data) => {
 					this.setValue({ data });
 				},
@@ -50,12 +52,14 @@ export default class MindCard extends Card<MindValue> {
 			{
 				id: 'main', // String，可选，节点的唯一标识
 				shape: 'html',
+				totalHeight: height,
+				totalWidth: 690,
 				x: 40, // Number，必选，节点位置的 x 值
 				y: 40, // Number，必选，节点位置的 y 值
 				width: 180, // Number，可选，节点大小的 width 值
 				height: 40, // Number，可选，节点大小的 height 值
-				zIndex: 1,
 				data: {
+					hierarchy: 1,
 					value: `<p><span style="color:#ffffff"><span style="font-size:16px">思维导图</span></span></p>`,
 					classNames: 'mind-main-node',
 				},

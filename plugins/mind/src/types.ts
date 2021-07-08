@@ -5,6 +5,7 @@ export type NodeData = {
 	styles?: { [key: string]: string };
 	classNames?: Array<string> | string;
 	isPlaceholder?: boolean;
+	hierarchy?: number;
 };
 
 export type ShapeData = {
@@ -13,7 +14,6 @@ export type ShapeData = {
 	y: number;
 	width: number;
 	height: number;
-	zIndex: number;
 	data?: NodeData;
 	children?: Array<ShapeData>;
 };

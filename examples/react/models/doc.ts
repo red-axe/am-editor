@@ -10,6 +10,7 @@ const doc: Model<DocState> = {
 		get: async (_, { put }) => {
 			const { code, data } = await get();
 			if (code === 200) {
+				if (!!!data.value) data.value = '<p><br /></p>';
 				put(data);
 				return data;
 			}
