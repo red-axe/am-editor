@@ -38,6 +38,8 @@
     "@aomao/plugin-underline": "^2.2.9",
     "@aomao/plugin-undo": "^2.2.9",
     "@aomao/plugin-unorderedlist": "^2.2.9",
+    "@aomao/plugin-fontfamily": "^1.0.0",
+    "@aomao/plugin-status": "^1.0.0",
     "@aomao/toolbar-vue": "^2.2.11",
     "ant-design-vue": "^2.1.2",
     "core-js": "^3.6.5",

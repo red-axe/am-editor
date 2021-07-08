@@ -57,6 +57,7 @@ import Codeblock, { CodeBlockComponent } from '@aomao/plugin-codeblock-vue';
 import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
 import Table, { TableComponent } from '@aomao/plugin-table'
 import Fontfamily from '@aomao/plugin-fontfamily';
+import Status, { StatusComponent } from '@aomao/plugin-status';
 import AmToolbar , { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar-vue'
 import OTClient from './ot-client'
 import 'ant-design-vue/es/style'
@@ -92,7 +93,8 @@ const plugins = [
 	Image,
 	ImageUploader,
     Table,
-	ToolbarPlugin
+	ToolbarPlugin,
+    Status
 ];
 const cards = [
 	HrComponent,
@@ -100,7 +102,8 @@ const cards = [
 	CodeBlockComponent,
 	ToolbarComponent,
 	ImageComponent,
-    TableComponent
+    TableComponent,
+    StatusComponent
 ];
 
 const isDev = process.env.NODE_ENV !== 'production';

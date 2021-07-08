@@ -54,7 +54,7 @@ class GraphEditor {
 				const data = this.getData();
 				const nodes = this.#graph.getNodes();
 				const hierarchy = this.getHierarchy(data);
-				const updatePosition = (data: Array<ShapeData>) => {
+				/*const updatePosition = (data: Array<ShapeData>) => {
 					data.forEach((item) => {
 						const node = nodes.find((node) => node.id === item.id);
 						if (node && node.parent) {
@@ -73,7 +73,7 @@ class GraphEditor {
 						if (item.children) updatePosition(item.children);
 					});
 				};
-				updatePosition(hierarchy);
+				updatePosition(hierarchy);*/
 			},
 		});
 		this.#dnd = new Addon.Dnd({
