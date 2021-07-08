@@ -56,6 +56,7 @@ import Link from '@aomao/plugin-link-vue';
 import Codeblock, { CodeBlockComponent } from '@aomao/plugin-codeblock-vue';
 import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
 import Table, { TableComponent } from '@aomao/plugin-table'
+import Fontfamily from '@aomao/plugin-fontfamily';
 import AmToolbar , { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar-vue'
 import OTClient from './ot-client'
 import 'ant-design-vue/es/style'
@@ -68,6 +69,7 @@ const plugins = [
 	Backcolor,
 	Fontcolor,
 	Fontsize,
+    Fontfamily,
 	Italic,
 	Underline,
 	Hr,
@@ -182,7 +184,7 @@ export default defineComponent({
                         }
                     ]:[['collapse'],
 						['undo', 'redo', 'paintformat', 'removeformat'],
-						['heading', 'fontsize'],
+						['heading', 'fontfamily', 'fontsize'],
 						[
 							'bold',
 							'italic',

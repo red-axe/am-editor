@@ -68,6 +68,7 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 					'/plugin/plugin-file',
 					'/plugin/plugin-fontcolor',
 					'/plugin/plugin-fontsize',
+					'/plugin/plugin-fontfamily',
 					'/plugin/plugin-heading',
 					'/plugin/plugin-hr',
 					'/plugin/plugin-indent',
@@ -88,6 +89,7 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 					'/plugin/plugin-removeformat',
 					'/plugin/plugin-selectall',
 					'/plugin/plugin-strikethrough',
+					'/plugin/plugin-status',
 					'/plugin/plugin-sub',
 					'/plugin/plugin-sup',
 					'/plugin/plugin-table',
@@ -348,8 +350,7 @@ export default defineConfig({
 	],
 	headScripts: [
 		{
-			src:
-				'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+			src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
 			'data-ad-client': 'ca-pub-3706417744839656',
 		},
 	],

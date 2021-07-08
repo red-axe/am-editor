@@ -61,6 +61,8 @@ am-editor，一个 Web 多人实时协同富文本编辑器。使用浏览器提
 -   [x] `@aomao/plugin-mark-range` 光标范围标记
 -   [x] `@aomao/plugin-video` 视频
 -   [x] `@aomao/plugin-math` 数学公式
+-   [x] `@aomao/plugin-status` 状态
+-   [x] `@aomao/plugin-fontfamily` 字体
 
 ## 快速上手
 

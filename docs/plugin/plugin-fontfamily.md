@@ -1,69 +1,67 @@
 # @aomao/plugin-fontfamily
 
-字体插件
+Font plugin
 
-## 安装
+## Installation
 
 ```bash
 $ yarn add @aomao/plugin-fontfamily
 ```
 
-添加到引擎
+Add to engine
 
 ```ts
-import Engine, { EngineInterface } from '@aomao/engine';
-import Fontfamily from '@aomao/plugin-fontfamily';
+import Engine, {EngineInterface} from'@aomao/engine';
+import Fontfamily from'@aomao/plugin-fontfamily';
 
 new Engine(...,{ plugins:[Fontfamily] })
 ```
 
-## 可选项
+## Optional
 
-### 快捷键
+### hot key
 
-默认无快捷键
+No shortcut keys by default
 
 ```ts
-//快捷键，key 组合键，args，执行参数，[font] ， font 必须
-hotkey?:{key:string,args:Array<string>};//默认无
+//Shortcut keys, key combination keys, args, execution parameters, [font], font must
+hotkey?:{key:string,args:Array<string>};//default none
 
-//使用配置
+//Use configuration
 new Engine(...,{
     config:{
         "fontfamily":{
-            //修改快捷键
+            //Modify shortcut keys
             hotkey:{
                 key:"mod+b",
-                args:["微软雅黑"]
+                args:["Microsoft Yahei"]
             }
         }
     }
  })
 ```
 
-### 自定义字体
+### Custom font
 
-工具栏中内置了部分字体列表，可以通过以下方法获取
+Part of the font list is built in the toolbar, which can be obtained by the following methods
 
 ```ts
-import { fontFamilyDefaultData, fontfamily } from '@aomao/toolbar'; // 或 @aomao/toolbar-vue
+import { fontFamilyDefaultData, fontfamily } from '@aomao/toolbar'; // or @aomao/toolbar-vue
 ```
 
-#### `fontfamily` 转换可用的下拉列表数据
+#### `fontfamily` Convert available drop-down list data
 
 ```ts
 /**
- * 生成字体下拉列表项
- * @param data key-value 键值对数据，key 名称，如果有传语言则是语言键值对的key否则就直接显示
- * @param language 语言，可选
+ * Generate font drop-down list items
+ * @param data key-value key-value pair data, key name, if there is a language, it is the key of the language key-value pair, otherwise it will be displayed directly
+ * @param language language, optional
  */
 fontfamily(
-	data: Array<{ key: string; value: string }>,
-	language?: { [key: string]: string },
-): Array<DropdownListItem>
+data: Array<{ key: string; value: string }>, language?: {[key: string]: string }): Array<DropdownListItem>
 ```
 
-#### `fontFamilyDefaultData` 默认字体列表
+#### `fontFamilyDefaultData` Default font list
 
 ```ts
 [
@@ -109,31 +107,31 @@ fontfamily(
 	},
 	{
 		key: 'fangSong',
-		value: 'FangSong, 仿宋, FZFangSong-Z02S, STFangsong, fangsong',
+		value: 'FangSong, Imitation Song, FZFangSong-Z02S, STFangsong, fangsong',
 	},
 	{
 		key: 'stFangsong',
-		value: 'STFangsong, 华文仿宋, FangSong, FZFangSong-Z02S, fangsong',
+		value: 'STFangsong, Chinese imitation Song, FangSong, FZFangSong-Z02S, fangsong',
 	},
 	{
 		key: 'stSong',
-		value: 'STSong, 华文宋体, SimSun, "Songti SC", NSimSun, serif',
+		value: 'STSong, Chinese Song Ti, SimSun, "Songti SC", NSimSun, serif',
 	},
 	{
 		key: 'stKaiti',
-		value: 'STKaiti, 华文楷体, KaiTi, "Kaiti SC", cursive',
+		value: 'STKaiti, KaiTi, KaiTi, "Kaiti SC", cursive',
 	},
 	{
 		key: 'simSun',
-		value: 'SimSun, 宋体, "Songti SC", NSimSun, STSong, serif',
+		value: 'SimSun, Song Ti, "Songti SC", NSimSun, STSong, serif',
 	},
 	{
 		key: 'microsoftYaHei',
-		value: '"Microsoft YaHei", 微软雅黑, "PingFang SC", SimHei, STHeiti, sans-serif;',
+		value: '"Microsoft YaHei", Microsoft YaHei, "PingFang SC", SimHei, STHeiti, sans-serif;',
 	},
 	{
 		key: 'kaiTi',
-		value: 'KaiTi, 楷体, STKaiti, "Kaiti SC", cursive',
+		value: 'KaiTi, Kaiti, STKaiti, "Kaiti SC", cursive',
 	},
 	{
 		key: 'kaitiSC',
@@ -141,7 +139,7 @@ fontfamily(
 	},
 	{
 		key: 'simHei',
-		value: 'SimHei, 黑体, "Microsoft YaHei", "PingFang SC", STHeiti, sans-serif',
+		value: 'SimHei, boldface, "Microsoft YaHei", "PingFang SC", STHeiti, sans-serif',
 	},
 	{
 		key: 'heitiSC',
@@ -162,7 +160,7 @@ fontfamily(
 ];
 ```
 
-我们可以按照默认数据的格式整理好数据，然后使用 `fontfamily` 方法生成下拉列表所需要的数据，最后覆盖工具栏的配置
+We can organize the data according to the default data format, and then use the `fontfamily` method to generate the data needed for the drop-down list, and finally overwrite the configuration of the toolbar
 
 ```ts
 items: [
@@ -176,23 +174,23 @@ items: [
 ];
 ```
 
-## 命令
+## Command
 
 ```ts
-//font：更改的字体
+//font: changed font
 engine.command.execute('fontfamily', color);
-//使用 command 执行查询当前状态，返回 Array<string> | undefined，当前光标所在处字体值集合
+//Use command to query the current state, return Array<string> | undefined, the font value collection where the cursor is currently located
 engine.command.queryState('fontfamily');
 ```
 
-## 其它
+## Other
 
-字体是否可用，是通过设置不同字体到 HTML 标签上，然后检测 HTML 标签的宽度变化与默认字体对比来判断的
+Whether the font is available is judged by setting different fonts on the HTML tags, and then detecting the change in the width of the HTML tags and comparing them with the default font
 
 ```ts
 /**
- * 是否支持字体
- * @param font 字体名称
+ * Whether to support fonts
+ * @param font font name
  * @returns
  */
 export const isSupportFontFamily = (font: string) => {

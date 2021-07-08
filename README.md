@@ -63,6 +63,8 @@ In modern enterprises, collaborative office is synonymous with high efficiency. 
 -   [x] `@aomao/plugin-mark-range` cursor range mark
 -   [x] `@aomao/plugin-video` video
 -   [x] `@aomao/plugin-math` Mathematical formula
+-   [x] `@aomao/plugin-status` Status
+-   [x] `@aomao/plugin-fontfamily` Font
 
 ## Get started quickly
 

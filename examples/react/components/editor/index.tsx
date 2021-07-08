@@ -134,7 +134,7 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 					//卡片异步渲染完成后
 					if (!props.ot) return setLoading(false);
 					//实例化协作编辑客户端
-					const ot = new OTClient(engine.current);
+					const ot = new OTClient(engine.current!);
 					//连接到协作服务端，demo文档
 					const {
 						url,

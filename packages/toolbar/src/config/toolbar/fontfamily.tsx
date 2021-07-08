@@ -108,7 +108,7 @@ export default (
 	return data.map(({ key, value }) => {
 		const disabled =
 			key !== 'default'
-				? value.split(',').every((v) => !isSupportFontFamily(v.trim()))
+				? !value.split(',').some((v) => isSupportFontFamily(v.trim()))
 				: false;
 		return {
 			key: value,

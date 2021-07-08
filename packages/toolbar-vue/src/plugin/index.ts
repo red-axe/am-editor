@@ -26,6 +26,7 @@ const defaultConfig = (editor: EditorInterface): Config => {
 				'file',
 				'video',
 				'math',
+				'status',
 			],
 		},
 	];

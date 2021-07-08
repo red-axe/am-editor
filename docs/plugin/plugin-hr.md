@@ -1,6 +1,6 @@
 # @aomao/plugin-hr
 
-Code block plugin
+Split line plugin
 
 ## Installation
 

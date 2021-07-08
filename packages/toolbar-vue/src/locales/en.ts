@@ -212,6 +212,9 @@ export default {
 		math: {
 			title: 'Formula',
 		},
+		status: {
+			title: 'Status',
+		},
 		mind: {
 			title: 'Mind Map',
 		},

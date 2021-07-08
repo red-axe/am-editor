@@ -212,6 +212,9 @@ export default {
 		math: {
 			title: '公式',
 		},
+		status: {
+			title: '状态',
+		},
 		mind: {
 			title: '脑图',
 		},
