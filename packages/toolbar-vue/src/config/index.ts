@@ -412,6 +412,24 @@ export const getToolbarDefaultConfig = (
 				...(language['fontfamily']['items'] as {}),
 				notInstalled: language['fontfamily']['notInstalled'],
 			}),
+			onActive: (items) => {
+				const values = engine.command.queryState('fontfamily');
+				if (!values || !Array.isArray(values) || values.length === 0)
+					return '';
+				const familys: Array<string> = values[0]
+					.split(',')
+					.map((name: string) =>
+						name.replace(/"/g, '').trim().toLowerCase(),
+					);
+				return (
+					items.find(
+						(item) =>
+							familys.indexOf(
+								item['faimlyName'].trim().toLowerCase(),
+							) > -1,
+					)?.key || ''
+				);
+			},
 		},
 		{
 			type: 'button',

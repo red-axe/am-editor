@@ -1,3 +1,4 @@
+import { DropdownListItem } from './dropdown/list';
 import {
 	GroupButtonProps,
 	GroupDropdownProps,
@@ -11,7 +12,7 @@ export type ButtonProps = {
 } & GroupButtonProps;
 
 export type DropdownProps = {
-	onActive?: () => string | Array<string>;
+	onActive?: (items: Array<DropdownListItem>) => string | Array<string>;
 	onDisabled?: () => boolean;
 } & GroupDropdownProps;
 

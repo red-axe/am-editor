@@ -65,7 +65,7 @@ export const defaultData = [
 	},
 	{
 		key: 'microsoftYaHei',
-		value: '"Microsoft YaHei", 微软雅黑, "PingFang SC", SimHei, STHeiti, sans-serif;',
+		value: '"Microsoft YaHei", 微软雅黑, "PingFang SC", SimHei, STHeiti, sans-serif',
 	},
 	{
 		key: 'kaiTi',
@@ -112,6 +112,7 @@ export default (
 				: false;
 		return {
 			key: value,
+			faimlyName: language ? language[key] : key,
 			content: () => (
 				<span style={{ fontFamily: value }}>
 					{language ? language[key] : key}

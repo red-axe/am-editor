@@ -848,11 +848,31 @@ class Mark implements MarkModelInterface {
 		if (marks.length === 0) {
 			return;
 		}
-
 		const mergeMarks = (marks: Array<NodeInterface>) => {
 			marks.forEach((mark) => {
 				const prevMark = mark.prev();
 				const nextMark = mark.next();
+				//查找是否有一样的父级mark
+				const parentMark = mark.parent();
+				const findSameParent = (
+					parentMark: NodeInterface,
+					sourceMark: NodeInterface,
+				): boolean => {
+					if (node.isMark(parentMark)) {
+						let parent: NodeInterface | undefined = undefined;
+						if (this.compare(parentMark, sourceMark, true)) {
+							return true;
+						} else if ((parent = parentMark.parent())) {
+							return findSameParent(parent, sourceMark);
+						}
+					}
+					return false;
+				};
+				//如果有一样的父级mark，则去除包裹
+				if (parentMark && findSameParent(parentMark, mark)) {
+					node.unwrap(mark);
+					return;
+				}
 
 				if (prevMark && this.compare(prevMark, mark, true)) {
 					const selection = safeRange
@@ -913,6 +933,7 @@ class Mark implements MarkModelInterface {
 
 		this.split(safeRange, removeMark);
 		if (safeRange.collapsed) {
+			this.merge(safeRange);
 			if (!range) change.apply(safeRange);
 			return;
 		}
@@ -925,6 +946,7 @@ class Mark implements MarkModelInterface {
 		// 插入范围的开始和结束标记
 		const selection = safeRange.createSelection();
 		if (!selection.has()) {
+			this.merge(safeRange);
 			if (!range) change.apply(safeRange);
 			return;
 		}
@@ -1030,6 +1052,7 @@ class Mark implements MarkModelInterface {
 	 * @param range 范围
 	 */
 	findMarks(range: RangeInterface) {
+		if (range.startNode.isRoot()) range.shrinkToElementNode();
 		const cloneRange = range.cloneRange();
 		const { node } = this.editor;
 		const handleRange = (

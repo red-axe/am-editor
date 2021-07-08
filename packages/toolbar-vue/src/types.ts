@@ -302,7 +302,7 @@ export type ToolbarButtonProps = {
 } & GroupButtonProps;
 
 export type ToolbarDropdownProps = {
-	onActive?: () => string | Array<string>;
+	onActive?: (items: Array<DropdownListItem>) => string | Array<string>;
 	onDisabled?: () => boolean;
 } & GroupDropdownProps;
 

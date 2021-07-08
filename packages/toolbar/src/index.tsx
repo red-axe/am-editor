@@ -109,7 +109,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 							);
 					} else if (customItem.type === 'dropdown') {
 						if (customItem.onActive)
-							customItem.values = customItem.onActive();
+							customItem.values = customItem.onActive(
+								customItem.items,
+							);
 						else if (engine.command.queryEnabled(customItem.name))
 							customItem.values = engine.command.queryState(
 								customItem.name,

@@ -27,19 +27,19 @@ class Inline implements InlineModelInterface {
 			const backspace = new Backspace(editor);
 			typing
 				.getHandleListener('backspace', 'keydown')
-				?.on(event => backspace.trigger(event));
+				?.on((event) => backspace.trigger(event));
 			//左方向键
 			const left = new Left(editor);
 			typing
 				.getHandleListener('left', 'keydown')
-				?.on(event => left.trigger(event));
+				?.on((event) => left.trigger(event));
 			//右方向键
 			const right = new Right(editor);
 			typing
 				.getHandleListener('right', 'keydown')
-				?.on(event => right.trigger(event));
+				?.on((event) => right.trigger(event));
 			//markdown
-			event.on('keydown:space', event => this.triggerMarkdown(event));
+			event.on('keydown:space', (event) => this.triggerMarkdown(event));
 		}
 	}
 
@@ -122,7 +122,7 @@ class Inline implements InlineModelInterface {
 			node.type === Node.TEXT_NODE
 				? node.text().substr(0, startOffset)
 				: node.text();
-		return !Object.keys(editor.plugin.components).some(pluginName => {
+		return !Object.keys(editor.plugin.components).some((pluginName) => {
 			const plugin = editor.plugin.components[pluginName];
 			if (isInlinePlugin(plugin) && !!plugin.markdown) {
 				const reuslt = plugin.triggerMarkdown(event, text, node);
@@ -205,7 +205,7 @@ class Inline implements InlineModelInterface {
 		// 遍历范围内的节点，添加 Inline
 		let started = false;
 		let inlineClone = node.clone(inline, false);
-		commonAncestorNode.traverse(child => {
+		commonAncestorNode.traverse((child) => {
 			if (!child.equal(selection.anchor!)) {
 				if (started) {
 					if (child.equal(selection.focus!)) {
@@ -293,7 +293,7 @@ class Inline implements InlineModelInterface {
 				: this.findInlines(safeRange);
 		// 清除 Inline
 		const selection = safeRange.createSelection();
-		inlineNodes.forEach(node => {
+		inlineNodes.forEach((node) => {
 			let prev = node.prev();
 			if (prev && prev.isCursor()) prev = prev.prev();
 			let next = node.next();
@@ -358,9 +358,7 @@ class Inline implements InlineModelInterface {
 		}
 		mark.split(safeRange);
 		// 插入新 Inline
-		node.insert(inline, safeRange)
-			?.select(inline)
-			.collapse(false);
+		node.insert(inline, safeRange)?.select(inline).collapse(false);
 
 		if (inline.name !== 'br') {
 			safeRange.addOrRemoveBr();
@@ -396,7 +394,7 @@ class Inline implements InlineModelInterface {
 	) {
 		const { node } = this.editor;
 		const children = root.allChildren();
-		children.forEach(childNode => {
+		children.forEach((childNode) => {
 			const child = $(childNode);
 			if (
 				node.isEmpty(child) &&
@@ -462,11 +460,11 @@ class Inline implements InlineModelInterface {
 			// 根据跟踪节点的root节点和path获取其在rightNodes中的新节点
 			if (keelpRoot)
 				keelpNode = rightNodes
-					.find(node => node.equal(keelpRoot!))
+					.find((node) => node.equal(keelpRoot!))
 					?.getChildByPath(keelpPath);
 			parent.append(rightChildren);
 			// 找到卡片，重新设置卡片根节点的引用
-			parent.find(CARD_SELECTOR).each(cardNode => {
+			parent.find(CARD_SELECTOR).each((cardNode) => {
 				const cardComponent = this.editor.card.find(cardNode);
 				if (cardComponent && !cardComponent.root.equal(cardNode)) {
 					cardComponent.root[0] = cardNode;
@@ -482,7 +480,7 @@ class Inline implements InlineModelInterface {
 				rightNodes[0].remove();
 				rightNodes.splice(0, 1);
 			}
-			parent.traverse(child => {
+			parent.traverse((child) => {
 				if (node.isInline(child)) {
 					this.repairCursor(child);
 				}
@@ -613,13 +611,13 @@ class Inline implements InlineModelInterface {
 			parent.append(centerChildren);
 			parent.append(right.children());
 			// 找到卡片，重新设置卡片根节点的引用
-			parent.find(CARD_SELECTOR).each(cardNode => {
+			parent.find(CARD_SELECTOR).each((cardNode) => {
 				const cardComponent = this.editor.card.find(cardNode);
 				if (cardComponent && !cardComponent.root.equal(cardNode)) {
 					cardComponent.root[0] = cardNode;
 				}
 			});
-			parent.traverse(child => {
+			parent.traverse((child) => {
 				if (node.isInline(child)) {
 					this.repairCursor(child);
 				}
@@ -650,6 +648,7 @@ class Inline implements InlineModelInterface {
 	 * @param range 光标
 	 */
 	findInlines(range: RangeInterface) {
+		if (range.startNode.isRoot()) range.shrinkToElementNode();
 		const cloneRange = range.cloneRange();
 		const nodeApi = this.editor.node;
 		const handleRange = (
@@ -704,9 +703,8 @@ class Inline implements InlineModelInterface {
 				const startNodeClone = cloneRange.startNode;
 				const startOffsetClone = cloneRange.startOffset;
 				const startNodeCloneChildren = startNodeClone.children();
-				const startOffsetNode = startNodeCloneChildren.eq(
-					startOffsetClone,
-				);
+				const startOffsetNode =
+					startNodeCloneChildren.eq(startOffsetClone);
 				const startChildrenOffsetNode =
 					startChildren.eq(startOffset) ||
 					startChildren.eq(startOffset - 1);
@@ -773,7 +771,7 @@ class Inline implements InlineModelInterface {
 		}
 		// 不存在时添加
 		const addNode = (nodes: Array<NodeInterface>, nodeB: NodeInterface) => {
-			if (!nodes.some(nodeA => nodeA[0] === nodeB[0])) {
+			if (!nodes.some((nodeA) => nodeA[0] === nodeB[0])) {
 				nodes.push(nodeB);
 			}
 		};
@@ -792,13 +790,13 @@ class Inline implements InlineModelInterface {
 
 		const nodes = findNodes($(startNode));
 		if (!range.collapsed) {
-			findNodes($(endNode)).forEach(nodeB => {
+			findNodes($(endNode)).forEach((nodeB) => {
 				return addNode(nodes, nodeB);
 			});
 			if (sc !== ec) {
 				let isBegin = false;
 				let isEnd = false;
-				range.commonAncestorNode.traverse(child => {
+				range.commonAncestorNode.traverse((child) => {
 					if (isEnd) return false;
 					//节点不是开始节点
 					if (!child.equal(sc)) {

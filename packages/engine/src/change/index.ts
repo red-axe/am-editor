@@ -962,7 +962,7 @@ class ChangeModel implements ChangeInterface {
 		fragment: DocumentFragment,
 		callback: (range: RangeInterface) => void = () => {},
 	) {
-		const { block, list, card, schema } = this.engine;
+		const { block, list, card, schema, mark } = this.engine;
 		const nodeApi = this.engine.node;
 		const range = this.getSafeRange();
 		const firstBlock = block.closest(range.startNode);
@@ -978,15 +978,21 @@ class ChangeModel implements ChangeInterface {
 		if (!isCollapsed) {
 			this.deleteContent(range, onlyOne || !isBlockLast);
 		}
-		if (!firstNode[0]) {
+
+		const apply = (range: RangeInterface) => {
+			block.merge(range);
+			list.merge(undefined, range);
+			mark.merge(range);
 			if (callback) callback(range);
 			this.apply(range);
+		};
+		if (!firstNode[0]) {
+			apply(range);
 			return;
 		}
 		if (!nodeApi.isBlock(firstNode) && !firstNode.isCard()) {
 			range.shrinkToElementNode().insertNode(fragment);
-			if (callback) callback(range);
-			this.apply(range);
+			apply(range);
 			return;
 		}
 		range.deepCut();
@@ -1120,10 +1126,7 @@ class ChangeModel implements ChangeInterface {
 				removeEmptyNode(nextNode);
 			}
 		}
-		block.merge(range);
-		list.merge(undefined, range);
-		if (callback) callback(range);
-		this.apply(range);
+		apply(range);
 	}
 
 	/**

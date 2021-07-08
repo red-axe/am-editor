@@ -66,7 +66,7 @@ export default defineComponent({
                                 );
                         } else if (customItem.type === 'dropdown') {
                             if (customItem.onActive)
-                                customItem.values = customItem.onActive();
+                                customItem.values = customItem.onActive(customItem.items);
                             else if (props.engine.command.queryEnabled(customItem.name))
                                 customItem.values = props.engine.command.queryState(
                                     customItem.name,

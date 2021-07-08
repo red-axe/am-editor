@@ -26,6 +26,9 @@ export default class extends Plugin<Options> {
 		this.editor.on('keydown:backspace', (event) => this.onBackspace(event));
 		this.editor.on('keydown:tab', (event) => this.onTab(event));
 		this.editor.on('keydown:shift-tab', (event) => this.onShiftTab(event));
+		if (isEngine(this.editor)) {
+			this.editor.on('paste:each', (node) => this.pasteEach(node));
+		}
 	}
 
 	execute(type: 'in' | 'out' = 'in', isTab: boolean = false) {
@@ -192,5 +195,32 @@ export default class extends Plugin<Options> {
 			'out',
 		);
 		return false;
+	}
+
+	convertToPX(value: string) {
+		const match = /([\d\.]+)(pt|px)$/i.exec(value);
+		if (match && match[2] === 'pt') {
+			return (
+				String(Math.round((parseInt(match[1], 10) * 96) / 72)) + 'px'
+			);
+		}
+		return value;
+	}
+
+	pasteEach(node: NodeInterface) {
+		//pt 转为px
+		if (!node.isCard() && this.editor.node.isBlock(node)) {
+			const textIndentSource = node.css('text-indent');
+			if (!!textIndentSource && textIndentSource.endsWith('pt')) {
+				const textIndent = this.convertToPX(textIndentSource);
+				if (!!textIndent) node.css('text-indent', textIndent);
+			}
+
+			const paddingLeftSource = node.css('padding-left');
+			if (!!paddingLeftSource && paddingLeftSource.endsWith('pt')) {
+				const paddingLeft = this.convertToPX(paddingLeftSource);
+				if (!!paddingLeft) node.css('padding-left', paddingLeft);
+			}
+		}
 	}
 }
