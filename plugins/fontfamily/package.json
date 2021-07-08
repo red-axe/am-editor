@@ -1,27 +1,26 @@
 {
-    "name": "@aomao/plugin-fontfamily",
-    "version": "1.0.0",
-    "main": "dist/index.ts",
-    "module": "dist/index.esm.js",
-    "typings": "dist/index.d.ts",
-    "files": [
-      "dist",
-      "lib",
-      "src"
-    ],
-    "author": "me@aomao.com",
-    "license": "MIT",
-    "homepage": "https://github.com/itellyou-com/am-editor#readme",
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/itellyou-com/am-editor.git"
-    },
-    "bugs": {
-      "url": "https://github.com/itellyou-com/am-editor/issues"
-    },
-    "dependencies": {
-      "@aomao/engine": "^2.2.9",
-      "@babel/runtime": "^7.13.10"
-    }
+  "name": "@aomao/plugin-fontfamily",
+  "version": "1.0.0",
+  "main": "dist/index.ts",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "author": "me@aomao.com",
+  "license": "MIT",
+  "homepage": "https://github.com/itellyou-com/am-editor#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itellyou-com/am-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itellyou-com/am-editor/issues"
+  },
+  "dependencies": {
+    "@aomao/engine": "^2.2.10",
+    "@babel/runtime": "^7.13.10"
   }
-  
+}
