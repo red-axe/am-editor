@@ -26,6 +26,7 @@ export type DropdownListItem = {
 		| 'rightTop'
 		| 'rightBottom';
 	className?: string;
+	disabled?: boolean;
 	command?: { name: string; args: Array<any> } | Array<any>;
 	autoExecute?: boolean;
 };
@@ -56,7 +57,7 @@ const DropdownList: React.FC<DropdownListProps> = ({
 	const triggerSelect = (event: React.MouseEvent, key: string) => {
 		event.preventDefault();
 		event.stopPropagation();
-		const item = items.find(item => item.key === key);
+		const item = items.find((item) => item.key === key);
 		if (!item) return;
 		const { autoExecute, command } = item;
 		if (onSelect && onSelect(event, key) === false) return;
@@ -84,12 +85,16 @@ const DropdownList: React.FC<DropdownListProps> = ({
 		placement,
 		className,
 		hotkey,
+		disabled,
 	}: DropdownListItem) => {
 		const renderContent = () => (
 			<a
 				key={key}
-				className={classnames('toolbar-dropdown-list-item', className)}
-				onClick={event => {
+				className={classnames('toolbar-dropdown-list-item', className, {
+					'toolbar-dropdown-list-item-disabled': disabled,
+				})}
+				onClick={(event) => {
+					if (disabled) return;
 					return triggerSelect(event, key);
 				}}
 			>
@@ -151,7 +156,7 @@ const DropdownList: React.FC<DropdownListProps> = ({
 				className,
 			)}
 		>
-			{items.map(item => renderItem(item))}
+			{items.map((item) => renderItem(item))}
 		</div>
 	);
 };

@@ -82,6 +82,8 @@ const Dropdown: React.FC<DropdownProps> = ({
 			<span className={`data-icon data-icon-${icon}`} />
 		) : typeof content === 'string' ? (
 			<span className="toolbar-dropdown-button-text">{content}</span>
+		) : typeof content === 'function' ? (
+			content()
 		) : (
 			content
 		);
@@ -90,13 +92,13 @@ const Dropdown: React.FC<DropdownProps> = ({
 		values =
 			Array.isArray(values) && values.length > 0 ? values[0] : values;
 	const item = items.find(
-		item =>
+		(item) =>
 			(typeof values === 'string' && item.key === values) ||
 			(Array.isArray(values) && values.indexOf(item.key) > -1),
 	);
 	const defaultItem =
 		items.length > 0
-			? items.find(item => item.isDefault === true) || items[0]
+			? items.find((item) => item.isDefault === true) || items[0]
 			: null;
 	let buttonContent = item
 		? renderContent

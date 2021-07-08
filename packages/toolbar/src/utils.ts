@@ -27,3 +27,46 @@ export const autoGetHotkey = (
 	}
 	return;
 };
+
+/**
+ * 是否支持字体
+ * @param font 字体名称
+ * @returns
+ */
+export const isSupportFontFamily = (font: string) => {
+	if (typeof font !== 'string') {
+		console.log('Font name is not legal !');
+		return false;
+	}
+
+	let width;
+	const body = document.body;
+
+	const container = document.createElement('span');
+	container.innerHTML = Array(10).join('wi');
+	container.style.cssText = [
+		'position:absolute',
+		'width:auto',
+		'font-size:128px',
+		'left:-99999px',
+	].join(' !important;');
+
+	const getWidth = (fontFamily: string) => {
+		container.style.fontFamily = fontFamily;
+		body.appendChild(container);
+		width = container.clientWidth;
+		body.removeChild(container);
+
+		return width;
+	};
+
+	const monoWidth = getWidth('monospace');
+	const serifWidth = getWidth('serif');
+	const sansWidth = getWidth('sans-serif');
+
+	return (
+		monoWidth !== getWidth(font + ',monospace') ||
+		sansWidth !== getWidth(font + ',sans-serif') ||
+		serifWidth !== getWidth(font + ',serif')
+	);
+};

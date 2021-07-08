@@ -31,9 +31,9 @@ class Mark implements MarkModelInterface {
 			const backspace = new Backspace(editor);
 			editor.typing
 				.getHandleListener('backspace', 'keydown')
-				?.on(event => backspace.trigger(event));
+				?.on((event) => backspace.trigger(event));
 
-			editor.on('keydown:space', event => this.triggerMarkdown(event));
+			editor.on('keydown:space', (event) => this.triggerMarkdown(event));
 		}
 	}
 
@@ -58,7 +58,7 @@ class Mark implements MarkModelInterface {
 			node.type === Node.TEXT_NODE
 				? node.text().substr(0, startOffset)
 				: node.text();
-		return !Object.keys(editor.plugin.components).some(pluginName => {
+		return !Object.keys(editor.plugin.components).some((pluginName) => {
 			const plugin = editor.plugin.components[pluginName];
 			if (isMarkPlugin(plugin) && !!plugin.markdown) {
 				const reuslt = plugin.triggerMarkdown(event, text, node);
@@ -76,14 +76,13 @@ class Mark implements MarkModelInterface {
 		const { node, plugin, schema } = this.editor;
 		if (!node.isMark(mark)) return;
 		let result: MarkInterface | undefined = undefined;
-		Object.keys(plugin.components).some(pluginName => {
+		Object.keys(plugin.components).some((pluginName) => {
 			const markPlugin = plugin.components[pluginName];
 			if (isMarkPlugin(markPlugin) && mark.name === markPlugin.tagName) {
 				const schemaRule = markPlugin.schema();
 				if (
-					(markPlugin.attributes || markPlugin.style) &&
 					!(Array.isArray(schemaRule)
-						? schemaRule.find(rule =>
+						? schemaRule.find((rule) =>
 								schema.checkNode(mark, rule.attributes),
 						  )
 						: schema.checkNode(mark, schemaRule.attributes))
@@ -158,7 +157,7 @@ class Mark implements MarkModelInterface {
 
 		//样式名称可能是可变的，如data-fontsize-12和data-fontsize-14代表的是不同的值，如果不需要比较值，直接获取标签样式规则比较
 		const { schema } = this.editor;
-		const schemas = schema.find(rule => rule.name === source.name);
+		const schemas = schema.find((rule) => rule.name === source.name);
 		const compareClass = (classNames: Array<string>): string => {
 			for (let i = 0; i < schemas.length; i++) {
 				const schemaRule = schemas[i];
@@ -190,7 +189,7 @@ class Mark implements MarkModelInterface {
 			return false;
 		//属性名称或值不一致
 		if (
-			!Object.keys(sourceAttributes).every(attributesName =>
+			!Object.keys(sourceAttributes).every((attributesName) =>
 				isCompareValue
 					? sourceAttributes[attributesName] ===
 					  targetAttributes[attributesName]
@@ -206,7 +205,7 @@ class Mark implements MarkModelInterface {
 			return false;
 		//样式属性名称或值不一致
 		if (
-			!Object.keys(sourceStyles).every(styleName =>
+			!Object.keys(sourceStyles).every((styleName) =>
 				isCompareValue
 					? sourceStyles[styleName] === targetStyles[styleName]
 					: !!targetStyles[styleName],
@@ -218,7 +217,7 @@ class Mark implements MarkModelInterface {
 		//样式名称不一致
 		if (
 			!sourceClasses.every(
-				sourceClass => targetClasses.indexOf(sourceClass) !== -1,
+				(sourceClass) => targetClasses.indexOf(sourceClass) !== -1,
 			)
 		)
 			return false;
@@ -240,8 +239,8 @@ class Mark implements MarkModelInterface {
 		delete sourceAttributes['style'];
 
 		return (
-			Object.keys(attributes).every(key => !!sourceAttributes[key]) &&
-			Object.keys(styles).every(key => !sourceStyles[key])
+			Object.keys(attributes).every((key) => !!sourceAttributes[key]) &&
+			Object.keys(styles).every((key) => !sourceStyles[key])
 		);
 	}
 
@@ -256,7 +255,7 @@ class Mark implements MarkModelInterface {
 	) {
 		const { node } = this.editor;
 		const children = root.allChildren();
-		children.forEach(childNode => {
+		children.forEach((childNode) => {
 			const child = $(childNode);
 			if (
 				node.isEmpty(child) &&
@@ -317,7 +316,7 @@ class Mark implements MarkModelInterface {
 			} else right = selection.getNode(parent, 'right');
 			// 删除空标签
 			this.unwrapEmptyMarks(left);
-			this.unwrapEmptyMarks(right, node => {
+			this.unwrapEmptyMarks(right, (node) => {
 				if (removeMark && !Array.isArray(removeMark))
 					removeMark = [removeMark];
 				//没有传指定的mark，那就都移除。否则比较后一致就移除
@@ -325,7 +324,7 @@ class Mark implements MarkModelInterface {
 					!removeMark ||
 					removeMark.length === 0 ||
 					(!node.isCard() &&
-						removeMark.some(mark => this.compare(node, mark)));
+						removeMark.some((mark) => this.compare(node, mark)));
 				return isUnwrap;
 			});
 			// 清空原父容器，用新的内容代替
@@ -338,11 +337,11 @@ class Mark implements MarkModelInterface {
 			// 根据跟踪节点的root节点和path获取其在rightNodes中的新节点
 			if (keelpRoot)
 				keelpNode = rightNodes
-					.find(node => node.equal(keelpRoot!))
+					.find((node) => node.equal(keelpRoot!))
 					?.getChildByPath(keelpPath);
 			parent.append(rightChildren);
 			// 找到卡片，重新设置卡片根节点的引用
-			parent.find(CARD_SELECTOR).each(cardNode => {
+			parent.find(CARD_SELECTOR).each((cardNode) => {
 				const cardComponent = this.editor.card.find(cardNode);
 				if (cardComponent && !cardComponent.root.equal(cardNode)) {
 					cardComponent.root[0] = cardNode;
@@ -363,7 +362,8 @@ class Mark implements MarkModelInterface {
 				let rightContainer = rightNodes[0];
 				// 右侧没文本
 				if (node.isEmpty(rightContainer)) {
-					let firstChild: NodeInterface | null = rightContainer.first();
+					let firstChild: NodeInterface | null =
+						rightContainer.first();
 					while (firstChild && !firstChild.isText()) {
 						rightContainer = firstChild;
 						firstChild = firstChild.first();
@@ -393,7 +393,7 @@ class Mark implements MarkModelInterface {
 						const markClone = markParent.clone();
 						//不是要移除的mark
 						if (
-							!removeMark.some(mark =>
+							!removeMark.some((mark) =>
 								this.compare(markClone, mark),
 							)
 						) {
@@ -415,7 +415,7 @@ class Mark implements MarkModelInterface {
 			}
 			//替换多个零宽字符为一个零宽字符
 			let textWithEmpty = false;
-			parent.children().each(child => {
+			parent.children().each((child) => {
 				const childNode = $(child);
 				if (childNode.isText()) {
 					const { textContent } = child;
@@ -482,10 +482,11 @@ class Mark implements MarkModelInterface {
 											nodeApi.isInline(node.parentNode))
 									)
 										break;
-									node.textContent = node.textContent.substring(
-										0,
-										node.textContent.length - atTextLen,
-									);
+									node.textContent =
+										node.textContent.substring(
+											0,
+											node.textContent.length - atTextLen,
+										);
 								}
 							} else {
 								while (
@@ -502,9 +503,10 @@ class Mark implements MarkModelInterface {
 									)
 										break;
 
-									node.textContent = node.textContent.substring(
-										atText.length,
-									);
+									node.textContent =
+										node.textContent.substring(
+											atText.length,
+										);
 								}
 							}
 							if (node.textContent?.length !== 0) return;
@@ -650,7 +652,7 @@ class Mark implements MarkModelInterface {
 			parent.append(centerChildren);
 			parent.append(right.children());
 			// 找到卡片，重新设置卡片根节点的引用
-			parent.find(CARD_SELECTOR).each(cardNode => {
+			parent.find(CARD_SELECTOR).each((cardNode) => {
 				const cardComponent = this.editor.card.find(cardNode);
 				if (cardComponent && !cardComponent.root.equal(cardNode)) {
 					cardComponent.root[0] = cardNode;
@@ -737,7 +739,7 @@ class Mark implements MarkModelInterface {
 		// 遍历范围内的节点，添加 Mark
 		let started = false;
 		const nodeApi = node;
-		commonAncestorNode.traverse(node => {
+		commonAncestorNode.traverse((node) => {
 			let child = $(node);
 			mark = mark as NodeInterface;
 			if (!child.equal(selection.anchor!)) {
@@ -848,7 +850,7 @@ class Mark implements MarkModelInterface {
 		}
 
 		const mergeMarks = (marks: Array<NodeInterface>) => {
-			marks.forEach(mark => {
+			marks.forEach((mark) => {
 				const prevMark = mark.prev();
 				const nextMark = mark.next();
 
@@ -871,7 +873,7 @@ class Mark implements MarkModelInterface {
 				}
 				//合并子级mark
 				const childMarks: Array<NodeInterface> = [];
-				mark.children().each(childNode => {
+				mark.children().each((childNode) => {
 					const child = $(childNode);
 					if (node.isMark(child)) {
 						childMarks.push(child);
@@ -929,7 +931,7 @@ class Mark implements MarkModelInterface {
 		// 遍历范围内的节点，获取目标 Mark
 		const markNodes: Array<NodeInterface> = [];
 		let started = false;
-		ancestor.traverse(childNode => {
+		ancestor.traverse((childNode) => {
 			const child = $(childNode);
 			if (!child.equal(selection.anchor!)) {
 				if (started) {
@@ -949,7 +951,7 @@ class Mark implements MarkModelInterface {
 		});
 		// 清除 Mark
 		const nodeApi = node;
-		markNodes.forEach(node => {
+		markNodes.forEach((node) => {
 			removeMark = removeMark as NodeInterface | undefined;
 			if (
 				!removeMark ||
@@ -958,7 +960,7 @@ class Mark implements MarkModelInterface {
 				nodeApi.unwrap(node);
 			} else if (removeMark) {
 				const styleMap = removeMark.css();
-				Object.keys(styleMap).forEach(key => {
+				Object.keys(styleMap).forEach((key) => {
 					node.css(key, '');
 				});
 				//移除符合规则的class
@@ -968,11 +970,11 @@ class Mark implements MarkModelInterface {
 				if (removeClass) {
 					const { schema } = this.editor;
 					const schemas = schema.find(
-						rule => rule.name === node.name,
+						(rule) => rule.name === node.name,
 					);
 					for (let i = 0; i < schemas.length; i++) {
 						const schemaRule = schemas[i];
-						removeClass.forEach(className => {
+						removeClass.forEach((className) => {
 							className = className.trim();
 							if (className === '') return;
 							if (
@@ -1081,9 +1083,8 @@ class Mark implements MarkModelInterface {
 				const startNodeClone = cloneRange.startNode;
 				const startOffsetClone = cloneRange.startOffset;
 				const startNodeCloneChildren = startNodeClone.children();
-				const startOffsetNode = startNodeCloneChildren.eq(
-					startOffsetClone,
-				);
+				const startOffsetNode =
+					startNodeCloneChildren.eq(startOffsetClone);
 				const startChildrenOffsetNode =
 					startChildren.eq(startOffset) ||
 					startChildren.eq(startOffset - 1);
@@ -1151,7 +1152,7 @@ class Mark implements MarkModelInterface {
 		}
 		// 不存在时添加
 		const addNode = (nodes: Array<NodeInterface>, nodeB: NodeInterface) => {
-			if (!nodes.some(nodeA => nodeA.equal(nodeB))) {
+			if (!nodes.some((nodeA) => nodeA.equal(nodeB))) {
 				nodes.push(nodeB);
 			}
 		};
@@ -1182,13 +1183,13 @@ class Mark implements MarkModelInterface {
 
 		const nodes = findNodes($(startNode));
 		if (!range.collapsed) {
-			findNodes($(endNode)).forEach(nodeB => {
+			findNodes($(endNode)).forEach((nodeB) => {
 				return addNode(nodes, nodeB);
 			});
 			if (sc !== ec) {
 				let isBegin = false;
 				let isEnd = false;
-				range.commonAncestorNode.traverse(child => {
+				range.commonAncestorNode.traverse((child) => {
 					if (isEnd) return false;
 					//节点不是开始节点
 					if (!child.equal(sc)) {

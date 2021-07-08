@@ -19,7 +19,7 @@
                 <template #default>
                     <slot :item="content">
                         <span v-if="buttonContent && buttonContent.icon" :class="['data-icon',`data-icon-${buttonContent.icon}`]" />
-                        <span v-if="buttonContent && !buttonContent.icon && buttonContent.content" class="toolbar-dropdown-button-text">{{buttonContent.content}}</span>
+                        <span v-if="buttonContent && !buttonContent.icon && buttonContent.content" class="toolbar-dropdown-button-text" v-html="buttonContent.content"></span>
                     </slot>
                     <span v-if="hasArrow !== false" className="data-icon data-icon-arrow" />
                 </template>
@@ -175,6 +175,8 @@ export default defineComponent({
     height: auto;
     transition: all 0.25s cubic-bezier(0.3, 1.2, 0.2, 1);
     z-index: 999;
+    max-height: calc(80vh);
+    overflow: auto;
 }
 
 .toolbar-dropdown.toolbar-dropdown-right:not(.toolbar-dropdown-right) .toolbar-dropdown-list{
@@ -202,7 +204,12 @@ export default defineComponent({
     white-space: nowrap;
 }
 
-.toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item:hover {
+.toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item-disabled {
+    color: rgba(17, 31, 44, 0.24);
+    cursor: not-allowed;
+}
+
+.toolbar-dropdown .toolbar-dropdown-list .toolbar-dropdown-list-item:not(.toolbar-dropdown-list-item-disabled):hover {
     color: #262626;
     background-color: #f5f5f5;
 }

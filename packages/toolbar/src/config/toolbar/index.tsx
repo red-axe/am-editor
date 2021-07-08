@@ -8,11 +8,15 @@ import {
 } from '../../types';
 import TableSelector from '../../table';
 import './index.css';
+import fontfamily, { defaultData as fontFamilyDefaultData } from './fontfamily';
+
+export { fontfamily, fontFamilyDefaultData };
 
 export const getToolbarDefaultConfig = (
 	engine: EngineInterface,
 ): Array<ButtonProps | DropdownProps | ColorProps | CollapseProps> => {
 	const language = engine.language.get('toolbar');
+	const headingLanguage = language['heading'];
 	return [
 		{
 			type: 'collapse',
@@ -409,42 +413,42 @@ export const getToolbarDefaultConfig = (
 			type: 'dropdown',
 			name: 'heading',
 			className: 'toolbar-dropdown-heading',
-			title: language['heading']['title'],
+			title: headingLanguage['title'],
 			items: [
 				{
 					key: 'p',
 					className: 'heading-item-p',
-					content: language['heading']['p'],
+					content: headingLanguage['p'],
 				},
 				{
 					key: 'h1',
 					className: 'heading-item-h1',
-					content: language['heading']['h1'],
+					content: headingLanguage['h1'],
 				},
 				{
 					key: 'h2',
 					className: 'heading-item-h2',
-					content: language['heading']['h2'],
+					content: headingLanguage['h2'],
 				},
 				{
 					key: 'h3',
 					className: 'heading-item-h3',
-					content: language['heading']['h3'],
+					content: headingLanguage['h3'],
 				},
 				{
 					key: 'h4',
 					className: 'heading-item-h4',
-					content: language['heading']['h4'],
+					content: headingLanguage['h4'],
 				},
 				{
 					key: 'h5',
 					className: 'heading-item-h5',
-					content: language['heading']['h5'],
+					content: headingLanguage['h5'],
 				},
 				{
 					key: 'h6',
 					className: 'heading-item-h6',
-					content: language['heading']['h6'],
+					content: headingLanguage['h6'],
 				},
 			],
 		},
@@ -476,6 +480,16 @@ export const getToolbarDefaultConfig = (
 				const tag = engine.command.queryState('heading') || 'p';
 				return /^h\d$/.test(tag);
 			},
+		},
+		{
+			type: 'dropdown',
+			name: 'fontfamily',
+			className: 'toolbar-dropdown-fontfamily',
+			title: language['fontfamily']['title'],
+			items: fontfamily(fontFamilyDefaultData, {
+				...language['fontfamily']['items'],
+				notInstalled: language['fontfamily']['notInstalled'],
+			}),
 		},
 		{
 			type: 'button',

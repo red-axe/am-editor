@@ -2,7 +2,10 @@ import { h } from 'vue';
 import { CARD_SELECTOR, EngineInterface } from '@aomao/engine';
 import { ToolbarItemProps } from '../types';
 import TableSelector from '../components/table.vue';
+import fontfamily, { defaultData as fontFamilyDefaultData } from './fontfamily';
 import './index.css';
+
+export { fontfamily, fontFamilyDefaultData };
 
 export const getToolbarDefaultConfig = (
 	engine: EngineInterface,
@@ -391,6 +394,16 @@ export const getToolbarDefaultConfig = (
 				const tag = engine.command.queryState('heading') || 'p';
 				return /^h\d$/.test(tag);
 			},
+		},
+		{
+			type: 'dropdown',
+			name: 'fontfamily',
+			className: 'toolbar-dropdown-fontfamily',
+			title: language['fontfamily']['title'],
+			items: fontfamily(fontFamilyDefaultData, {
+				...(language['fontfamily']['items'] as {}),
+				notInstalled: language['fontfamily']['notInstalled'],
+			}),
 		},
 		{
 			type: 'button',

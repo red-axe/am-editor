@@ -66,6 +66,7 @@ export type DropdownListItem = {
 	content?: string | (() => string);
 	hotkey?: boolean | string;
 	isDefault?: boolean;
+	disabled?: boolean;
 	title?: string;
 	placement?: Placement;
 	className?: string;

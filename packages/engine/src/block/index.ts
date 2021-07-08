@@ -98,7 +98,6 @@ class Block implements BlockModelInterface {
 			) {
 				const schemaRule = blockPlugin.schema();
 				if (
-					(blockPlugin.attributes || blockPlugin.style) &&
 					!(Array.isArray(schemaRule)
 						? schemaRule.find((rule) =>
 								schema.checkNode(block, rule.attributes),

@@ -70,13 +70,18 @@ const defaultItems: ToolbarItemProps = isMobile
 						name: 'hr',
 						icon: 'hr',
 					},
+					{
+						type: 'button',
+						name: 'quote',
+						icon: 'quote',
+					},
 				],
 			},
 	  ]
 	: [
 			['collapse'],
 			['undo', 'redo', 'paintformat', 'removeformat'],
-			['heading', 'fontsize'],
+			['heading', 'fontfamily', 'fontsize'],
 			['bold', 'italic', 'strikethrough', 'underline', 'moremark'],
 			['fontcolor', 'backcolor'],
 			['alignment'],

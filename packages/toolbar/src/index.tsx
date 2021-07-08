@@ -9,7 +9,11 @@ import React, {
 import classnames from 'classnames-es-ts';
 import { EngineInterface, isMobile } from '@aomao/engine';
 import ToolbarGroup from './group';
-import { getToolbarDefaultConfig } from './config/toolbar';
+import {
+	getToolbarDefaultConfig,
+	fontFamilyDefaultData,
+	fontfamily,
+} from './config/toolbar';
 import { ButtonProps, DropdownProps, ColorProps, CollapseProps } from './types';
 import ToolbarPlugin, { ToolbarComponent } from './plugin';
 import locales from './locales';
@@ -190,4 +194,4 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 };
 
 export default Toolbar;
-export { ToolbarPlugin, ToolbarComponent };
+export { ToolbarPlugin, ToolbarComponent, fontFamilyDefaultData, fontfamily };

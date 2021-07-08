@@ -43,3 +43,7 @@
     font-weight: bold;
     min-width: 58px;
 }
+
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-fontfamily .toolbar-button {
+    font-size: 12px;
+}
