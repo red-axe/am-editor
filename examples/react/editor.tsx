@@ -46,6 +46,7 @@ export default () => {
 	return (
 		<Context.Provider value={{ lang }}>
 			<Editor
+				lang={lang}
 				defaultValue={doc}
 				comment={true}
 				toc={true}
