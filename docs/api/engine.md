@@ -125,12 +125,13 @@ Set editor value
 /**
   * Set editor value
   * @param value
-  * @param asyncRender Asynchronous rendering card configuration
+  * @param options Asynchronous rendering card configuration
   */
-setValue(value: string, asyncRender?: {
-    triggerOT?: boolean;
-    callback?: (count: number) => void;
-}): EngineInterface;
+setValue(value: string, options?: {
+			enableAsync?: boolean;
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		}): EngineInterface;
 ```
 
 ### `setHtml`
@@ -141,12 +142,13 @@ Set html as editor value
 /**
 * Set html, it will be formatted as a legal editor value
 * @param html html
-* @param asyncRender Asynchronous rendering card configuration
+* @param options Asynchronous rendering card configuration
 */
-setHtml(html: string, asyncRender?: {
-     triggerOT?: boolean;
-     callback?: (count: number) => void;
-}): EngineInterface
+setHtml(html: string, options?: {
+			enableAsync?: boolean;
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		}): EngineInterface
 ```
 
 ### `setJsonValue`

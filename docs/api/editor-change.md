@@ -156,12 +156,13 @@ Set editor value
 /**
   * @param value
   * @param onParse uses root node parsing and filtering before converting to standard editor values
-  * @param asyncRender Asynchronous rendering card configuration
+  * @param options Asynchronous rendering card configuration
   * */
-setValue(value: string, onParse?: (node: Node) => void, asyncRender?: {
-    triggerOT?: boolean;
-    callback?: (count: number) => void;
-}): void;
+setValue(value: string, onParse?: (node: Node) => void, options?: {
+			enableAsync?: boolean;
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		}): void;
 ```
 
 ### `setHtml`
@@ -172,12 +173,13 @@ Set html as editor value
 /**
   * Set html, it will be formatted as a legal editor value
   * @param html html
-  * @param asyncRender Asynchronous rendering card configuration
+  * @param options Asynchronous rendering card configuration
   */
-setHtml(html: string, asyncRender?: {
-     triggerOT?: boolean;
-     callback?: (count: number) => void;
-}): void
+setHtml(html: string, options?: {
+			enableAsync?: boolean;
+			triggerOT?: boolean;
+			callback?: (count: number) => void;
+		}): void
 ```
 
 ### `getOriginValue`
