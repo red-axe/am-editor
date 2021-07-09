@@ -222,7 +222,7 @@ return (
 )
 ```
 
-For more complex toolbar configuration, please check the document [https://editor.aomao.com/zh-CN/config/toolbar](https://editor.aomao.com/zh-CN/config/toolbar)
+For more complex toolbar configuration, please check the document [https://editor.aomao.com/config/toolbar](https://editor.aomao.com/config/toolbar)
 
 ### Collaborative editing
 
