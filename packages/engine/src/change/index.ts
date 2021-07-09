@@ -80,8 +80,10 @@ class ChangeModel implements ChangeInterface {
 
 	change(isRemote?: boolean) {
 		const range = this.getRange();
-		const editableElement = range.startNode.closest(EDITABLE_SELECTOR);
-		if (editableElement.length > 0) {
+		const editableElement = range.startNode.inEditor()
+			? range.startNode.closest(EDITABLE_SELECTOR)
+			: this.engine.card.active?.root.closest(EDITABLE_SELECTOR);
+		if (editableElement && editableElement.length > 0) {
 			const card = this.engine.card.find(editableElement, true);
 			if (card?.onChange) card?.onChange(editableElement);
 		}
