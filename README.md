@@ -180,7 +180,7 @@ const engine = new Engine(ref.current, {
 
 The `CodeBlock` plugin supports `markdown` by default. Enter the code block syntax ````javascript` at the beginning of a line in the editor to trigger it after pressing Enter.
 
-### toolbar
+### Toolbar
 
 Introduce the `@aomao/toolbar` toolbar. Due to the complex interaction, the toolbar is basically rendered using `React` + `Antd` UI components, while `Vue3` uses `@aomao/toolbar-vue`
 
