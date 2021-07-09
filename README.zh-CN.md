@@ -15,11 +15,17 @@
 ![aomao-preview](https://user-images.githubusercontent.com/55792257/125074830-62d79300-e0f0-11eb-8d0f-bb96a7775568.png)
 
 <p align="center">
+  <a href="./packages/engine/package.json">
+    <img src="https://img.shields.io/npm/l/@aomao/engine">
+  </a>
   <a href="https://unpkg.com/@aomao/engine/dist/index.js">
     <img src="http://img.badgesize.io/https://unpkg.com/@aomao/engine/dist/index.js?compression=gzip&amp;label=size">
   </a>
   <a href="./packages/engine/package.json">
     <img src="https://img.shields.io/npm/v/@aomao/engine.svg?maxAge=3600&label=version&colorB=007ec6">
+  </a>
+  <a href="./packages/engine/package.json">
+    <img src="https://img.shields.io/npm/dw/@aomao/engine">
   </a>
 </p>
 
