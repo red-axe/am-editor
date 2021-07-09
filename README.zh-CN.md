@@ -1,74 +1,99 @@
 # am-editor
 
-<img width="1676" alt="Demo" src="https://user-images.githubusercontent.com/55792257/119711922-a359b500-be92-11eb-9f77-459b6d468be9.png">
+<p align="center">
+	一个富文本<em>协同</em>编辑器框架，可以使用<em>React</em>和<em>Vue</em>自定义插件
+</p>
 
-am-editor，一个基于[ShareDB](https://github.com/share/sharedb) 的 Web 多人协同富文本编辑器，适用于`React`、`Vue`框架，与主流的现代浏览器兼容。
+<p align="center">
+  <a href="https://github.com/itellyou-com/am-editor/blob/master/README.md"><strong>English</strong></a> ·
+  <a href="https://editor.aomao.com"><strong>Demo</strong></a> ·
+  <a href="https://editor.aomao.com/docs"><strong>文档</strong></a> ·
+  <a href="#plugins"><strong>插件</strong></a> ·
+  <a href="https://qm.qq.com/cgi-bin/qm/qr?k=Gva5NtZ2USlHSLbFOeMroysk8Uwo7fCS&jump_from=webapi"><strong>QQ群 907664876</strong></a> ·
+</p>
 
-[查看在线文档及演示](https://editor.aomao.com)
+![aomao-preview](https://user-images.githubusercontent.com/55792257/125074830-62d79300-e0f0-11eb-8d0f-bb96a7775568.png)
 
-技术交流 QQ 群：907664876
+<p align="center">
+  <a href="https://unpkg.com/@aomao/engine/dist/index.js">
+    <img src="http://img.badgesize.io/https://unpkg.com/@aomao/engine/dist/index.js?compression=gzip&amp;label=size">
+  </a>
+  <a href="./packages/engine/package.json">
+    <img src="https://img.shields.io/npm/v/@aomao/engine.svg?maxAge=3600&label=version&colorB=007ec6">
+  </a>
+</p>
 
-[科学上网，方便、快捷的上网冲浪](https://xiyou4you.us/r/?s=18517120)
+`广告`：[科学上网，方便、快捷的上网冲浪](https://xiyou4you.us/r/?s=18517120)
 
-am-editor，一个 Web 多人实时协同富文本编辑器。使用浏览器提供的`contenteditable`属性让一个 DOM 节点具有可编辑能力。
+使用浏览器提供的 `contenteditable` 属性让一个 DOM 节点具有可编辑能力。
 
-众所周知`contenteditable`属性，在不同的浏览器厂商中实现会有不同的差异，并且其默认行为具有不可预测性，因此我们封装了一个具有一定可控性的编辑能力引擎库`@aomao/engine`，在默认行为和期望行为之间进行平衡取舍。
+引擎接管了浏览器大部分光标、事件等默认行为。
 
-引擎库使用`javascript`编写，我们对 DOM 节点插入、删除、替换等一系列操作、包括光标、事件进行了封装并派生接口。因此，在引擎中我们的所有操作都将直接编辑复杂的 DOM 树，在数据结构中我们也将以 DOM 树结构呈现。不过在实际应用中，我们非常有必要对复杂的 DOM 树结构进行约束，以免出现不可预期的行为，并且在当前流行使用`React` `Vue`等前端框架来渲染 UI 的情况下，让我们再使用`javascript`定制 UI 是一件非常痛苦的事情。所以我们把 DOM 节点按功能和特性分为以下几类：`mark` `inline` `block` `card` 并且通过 `schema` 来约束他们特定的行为和一些特质属性，在 `card` 组件中我们还可以结合前端框架来完成复杂的 UI 渲染和编辑嵌套。
+可编辑器区域内的节点通过 `schema` 规则，制定了 `mark` `inline` `block` `card` 4 种组合节点，他们由不同的属性、样式或 `html` 结构组成，并对它们的嵌套进行了一定的约束。
 
-在现代化企业中，协同办公已是高效的代名词。在即时通讯、视频会议之后让文档也协同起来，已是大势所趋。在引擎库中，我们基于[ShareDB](https://github.com/share/sharedb)提供协同编辑能力，把复杂的 DOM 结构转换为[JSON0](https://github.com/ottypes/json0)协议的数据结构后，提交给`sharedb`处理协同编辑的交互。
+通过 `MutationObserver` 监听编辑区域内的 `html` 结构的改变，并生成 `json0` 类型的数据格式与 [ShareDB](https://github.com/share/sharedb) 库进行交互达到协同编辑的需要。
+
+`Vue3` 案例 [https://github.com/itellyou-com/am-editor/tree/master/examples/vue](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
+
+`React` 案例 [https://github.com/itellyou-com/am-editor/tree/master/examples/react](https://github.com/itellyou-com/am-editor/tree/master/examples/react)
 
 ## 特性
 
 -   📦 开箱即用，提供几十种丰富的插件来满足大部分需求
--   🏷 高扩展性，除了`mark` `inline` `block`基础插件外，我们还提供`card`组件结合`React` `Vue`等前端框架渲染插件 UI
+-   🏷 高扩展性，除了 `mark` `inline` `block` 类型基础插件外，我们还提供 `card` 组件结合`React` `Vue`等前端库渲染插件 UI
 -   📋 丰富的多媒体支持，不仅支持图片和音视频，更支持插入嵌入式多媒体内容
--   🐠 不依赖前端框架，复杂架构轻松应对
+-   🐠 引擎纯 JavaScript 编写，不依赖任何前端库，插件可以使用 `React` `Vue` 等前端库渲染。复杂架构轻松应对
 -   📡 内置协同编辑方案，轻量配置即可使用
 -   📱 兼容大部分最新移动端浏览器
 
-## 所有插件
+## 插件
 
--   [x] `@aomao/plugin-alignment` 对齐方式
--   [x] `@aomao/plugin-backcolor` 背景色
--   [x] `@aomao/plugin-bold` 加粗
--   [x] `@aomao/plugin-code` 行内代码
--   [x] `@aomao/plugin-codelock` 块级代码
--   [x] `@aomao/plugin-fontcolor` 前景色
--   [x] `@aomao/plugin-fontsize` 字体大小
--   [x] `@aomao/plugin-heading` 标题
--   [x] `@aomao/plugin-hr` 分割线
--   [x] `@aomao/plugin-indent` 缩进
--   [x] `@aomao/plugin-italic` 斜体
--   [x] `@aomao/plugin-link` 链接
--   [x] `@aomao/plugin-mark` 标记
--   [x] `@aomao/plugin-orderedlist` 有序列表
--   [x] `@aomao/plugin-paintformat` 格式刷
--   [x] `@aomao/plugin-quote` 引用
--   [x] `@aomao/plugin-redo` 重做历史
--   [x] `@aomao/plugin-removeformat` 移除格式
--   [x] `@aomao/plugin-selectall` 全选
--   [x] `@aomao/plugin-strikethrough` 删除线
--   [x] `@aomao/plugin-sub` 下标
--   [x] `@aomao/plugin-sup` 上标
--   [x] `@aomao/plugin-tasklist` 任务列表
--   [x] `@aomao/plugin-underline` 下划线
--   [x] `@aomao/plugin-undo` 撤销历史
--   [x] `@aomao/plugin-unorderedlist` 无序列表
--   [x] `@aomao/plugin-image` 图片
--   [x] `@aomao/plugin-table` 表格
--   [x] `@aomao/plugin-file` 附件
--   [x] `@aomao/plugin-mark-range` 光标范围标记
--   [x] `@aomao/plugin-video` 视频
--   [x] `@aomao/plugin-math` 数学公式
--   [x] `@aomao/plugin-status` 状态
--   [x] `@aomao/plugin-fontfamily` 字体
+| **包**                                                   |                                                                                                                                   **版本** |                                                                                                                                                                           **大小** | **描述**               |
+| :------------------------------------------------------- | -----------------------------------------------------------------------------------------------------------------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------- |
+| [`@aomao/toolbar`](./packages/toolbar)                   |                   [![](https://img.shields.io/npm/v/@aomao/toolbar.svg?maxAge=3600&label=&colorB=007ec6)](./packages/toolbar/package.json) |                           [![](http://img.badgesize.io/https://unpkg.com/@aomao/toolbar/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/toolbar/dist/index.js) | 工具栏, 适用于 `React` |
+| [`@aomao/toolbar-vue`](./packages/toolbar-vue)           |           [![](https://img.shields.io/npm/v/@aomao/toolbar-vue.svg?maxAge=3600&label=&colorB=007ec6)](./packages/toolbar-vue/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/toolbar-vue/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/toolbar-vue/dist/index.js) | 工具栏, 适用于 `Vue3`  |
+| [`@aomao/plugin-alignment`](./plugins/alignment)         |         [![](https://img.shields.io/npm/v/@aomao/plugin-alignment.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/alignment/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-alignment/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-alignment/dist/index.js) | 对齐方式               |
+| [`@aomao/plugin-backcolor`](./plugins/backcolor)         |         [![](https://img.shields.io/npm/v/@aomao/plugin-backcolor.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/backcolor/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-backcolor/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-backcolor/dist/index.js) | 背景色                 |
+| [`@aomao/plugin-bold`](./plugins/bold)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-bold.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/bold/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-bold/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-bold/dist/index.js) | 加粗                   |
+| [`@aomao/plugin-code`](./plugins/code)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-code.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/code/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-code/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-code/dist/index.js) | 行内代码               |
+| [`@aomao/plugin-codeblock`](./plugins/codeblock)         |         [![](https://img.shields.io/npm/v/@aomao/plugin-codeblock.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/codeblock/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-codeblock/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-codeblock/dist/index.js) | 代码块, 适用于 `React` |
+| [`@aomao/plugin-codeblock-vue`](./plugins/codeblock-vue) | [![](https://img.shields.io/npm/v/@aomao/plugin-codeblock-vue.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/codeblock-vue/package.json) | [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-codeblock-vue/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-codeblock-vue/dist/index.js) | 代码块, 适用于 `Vue3`  |
+| [`@aomao/plugin-fontcolor`](./plugins/fontcolor)         |         [![](https://img.shields.io/npm/v/@aomao/plugin-fontcolor.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/fontcolor/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-fontcolor/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-fontcolor/dist/index.js) | 前景色                 |
+| [`@aomao/plugin-fontfamily`](./plugins/fontfamily)       |       [![](https://img.shields.io/npm/v/@aomao/plugin-fontfamily.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/fontfamily/package.json) |       [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-fontfamily/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-fontfamily/dist/index.js) | 字体                   |
+| [`@aomao/plugin-fontsize`](./plugins/fontsize)           |           [![](https://img.shields.io/npm/v/@aomao/plugin-fontsize.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/fontsize/package.json) |           [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-fontsize/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-fontsize/dist/index.js) | 字体大小               |
+| [`@aomao/plugin-heading`](./plugins/heading)             |             [![](https://img.shields.io/npm/v/@aomao/plugin-heading.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/heading/package.json) |             [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-heading/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-heading/dist/index.js) | 标题                   |
+| [`@aomao/plugin-hr`](./plugins/hr)                       |                       [![](https://img.shields.io/npm/v/@aomao/plugin-hr.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/hr/package.json) |                       [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-hr/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-hr/dist/index.js) | 分割线                 |
+| [`@aomao/plugin-indent`](./plugins/indent)               |               [![](https://img.shields.io/npm/v/@aomao/plugin-indent.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/indent/package.json) |               [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-indent/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-indent/dist/index.js) | 缩进                   |
+| [`@aomao/plugin-italic`](./plugins/italic)               |               [![](https://img.shields.io/npm/v/@aomao/plugin-italic.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/italic/package.json) |               [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-italic/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-italic/dist/index.js) | 斜体                   |
+| [`@aomao/plugin-link`](./plugins/link)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-link.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/link/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-link/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-link/dist/index.js) | 链接, 适用于 `React`   |
+| [`@aomao/plugin-link-vue`](./plugins/link-vue)           |           [![](https://img.shields.io/npm/v/@aomao/plugin-link-vue.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/link-vue/package.json) |           [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-link-vue/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-link-vue/dist/index.js) | 链接, 适用于 `Vue3`    |
+| [`@aomao/plugin-mark`](./plugins/mark)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-mark.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/mark/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-mark/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-mark/dist/index.js) | 标记                   |
+| [`@aomao/plugin-orderedlist`](./plugins/orderedlist)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-orderedlist.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/orderedlist/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-orderedlist/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-orderedlist/dist/index.js) | 有序列表               |
+| [`@aomao/plugin-paintformat`](./plugins/paintformat)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-paintformat.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/paintformat/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-paintformat/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-paintformat/dist/index.js) | 格式刷                 |
+| [`@aomao/plugin-quote`](./plugins/quote)                 |                 [![](https://img.shields.io/npm/v/@aomao/plugin-quote.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/quote/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-quote/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-quote/dist/index.js) | 引用块                 |
+| [`@aomao/plugin-redo`](./plugins/redo)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-redo.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/redo/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-redo/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-redo/dist/index.js) | 重做                   |
+| [`@aomao/plugin-removeformat`](./plugins/removeformat)   |   [![](https://img.shields.io/npm/v/@aomao/plugin-removeformat.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/removeformat/package.json) |   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-removeformat/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-removeformat/dist/index.js) | 移除样式               |
+| [`@aomao/plugin-selectall`](./plugins/selectall)         |         [![](https://img.shields.io/npm/v/@aomao/plugin-selectall.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/selectall/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-selectall/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-selectall/dist/index.js) | 全选                   |
+| [`@aomao/plugin-status`](./plugins/status)               |               [![](https://img.shields.io/npm/v/@aomao/plugin-status.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/status/package.json) |               [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-status/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-status/dist/index.js) | 状态                   |
+| [`@aomao/plugin-strikethrough`](./plugins/strikethrough) | [![](https://img.shields.io/npm/v/@aomao/plugin-strikethrough.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/strikethrough/package.json) | [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-strikethrough/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-strikethrough/dist/index.js) | 删除线                 |
+| [`@aomao/plugin-sub`](./plugins/sub)                     |                     [![](https://img.shields.io/npm/v/@aomao/plugin-sub.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/sub/package.json) |                     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-sub/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-sub/dist/index.js) | 下标                   |
+| [`@aomao/plugin-sup`](./plugins/sup)                     |                     [![](https://img.shields.io/npm/v/@aomao/plugin-sup.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/sup/package.json) |                     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-sup/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-sup/dist/index.js) | 上标                   |
+| [`@aomao/plugin-tasklist`](./plugins/tasklist)           |           [![](https://img.shields.io/npm/v/@aomao/plugin-tasklist.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/tasklist/package.json) |           [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-tasklist/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-tasklist/dist/index.js) | 任务列表               |
+| [`@aomao/plugin-underline`](./plugins/underline)         |         [![](https://img.shields.io/npm/v/@aomao/plugin-underline.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/underline/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-underline/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-underline/dist/index.js) | 下划线                 |
+| [`@aomao/plugin-undo`](./plugins/undo)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-undo.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/undo/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-undo/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-undo/dist/index.js) | 撤销                   |
+| [`@aomao/plugin-unorderedlist`](./plugins/unorderedlist) | [![](https://img.shields.io/npm/v/@aomao/plugin-unorderedlist.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/unorderedlist/package.json) | [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-unorderedlist/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-unorderedlist/dist/index.js) | 无序列表               |
+| [`@aomao/plugin-image`](./plugins/image)                 |                 [![](https://img.shields.io/npm/v/@aomao/plugin-image.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/image/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-image/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-image/dist/index.js) | 图片                   |
+| [`@aomao/plugin-table`](./plugins/table)                 |                 [![](https://img.shields.io/npm/v/@aomao/plugin-table.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/table/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-table/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-table/dist/index.js) | 表格                   |
+| [`@aomao/plugin-file`](./plugins/file)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-file.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/file/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-file/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-file/dist/index.js) | 文件                   |
+| [`@aomao/plugin-mark-range`](./plugins/mark-range)       |       [![](https://img.shields.io/npm/v/@aomao/plugin-mark-range.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/mark-range/package.json) |       [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-mark-range/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-mark-range/dist/index.js) | 标记光标, 例如: 批注.  |
+| [`@aomao/plugin-math`](./plugins/math)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-math.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/math/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-math/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-math/dist/index.js) | 数学公式               |
+| [`@aomao/plugin-video`](./plugins/video)                 |                 [![](https://img.shields.io/npm/v/@aomao/plugin-video.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/video/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-video/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-video/dist/index.js) | 视频                   |
 
 ## 快速上手
 
 ### 安装
 
-am-editor 中`引擎`、`工具栏`、`每个插件`都是单独的包。其中`引擎`是最核心的包，其它包都将依赖它
+编辑器由 `引擎`、`工具栏`、`插件` 组成。`引擎` 为我们提供了核心的编辑能力。
 
 使用 npm 或者 yarn 安装引擎包
 
@@ -77,8 +102,6 @@ $ npm install @aomao/engine
 # or
 $ yarn add @aomao/engine
 ```
-
-`Vue` 使用者请看 [https://github.com/itellyou-com/am-editor/tree/master/examples/vue](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
 
 ### 使用
 
@@ -94,7 +117,7 @@ const EngineDemo = () => {
 	//引擎实例
 	const [engine, setEngine] = useState<EngineInterface>();
 	//编辑器内容
-	const [content, setContent] = useState<string>('Hello word!');
+	const [content, setContent] = useState<string>('<p>Hello word!</p>');
 
 	useEffect(() => {
 		if (!ref.current) return;
@@ -120,13 +143,13 @@ export default EngineDemo;
 
 ### 插件
 
-现在我们在上诉代码基础上，引入`@aomao/plugin-bold`加粗插件
+引入 `@aomao/plugin-bold` 加粗插件
 
 ```tsx
 import Bold from '@aomao/plugin-bold';
 ```
 
-然后将`Bold`插件加入引擎
+把 `Bold` 插件加入引擎
 
 ```tsx
 //实例化引擎
@@ -137,15 +160,15 @@ const engine = new Engine(ref.current, {
 
 ### 卡片
 
-卡片是编辑器中单独划分的一个区域，其 UI 以及逻辑在卡片内部可以使用 React、Vue 或其它框架自定义渲染内容，最后再挂载到编辑器上。
+卡片是编辑器中单独划分的一个区域，其 UI 以及逻辑在卡片内部可以使用 React、Vue 或其它前端库自定义渲染内容，最后再挂载到编辑器上。
 
-引入`@aomao/plugin-codeblock`代码块插件，这个插件部分 UI 使用框架渲染，所以有区分。 `vue`开发者使用 `@aomao/plugin-codeblock-vue`
+引入 `@aomao/plugin-codeblock` 代码块插件，这个插件的 `语言下拉框` 使用 `React` 渲染，所以有区分。 `Vue3` 使用 `@aomao/plugin-codeblock-vue`
 
 ```tsx
 import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
 ```
 
-将`CodeBlock`插件和`CodeBlockComponent`卡片组件加入引擎
+把 `CodeBlock` 插件和 `CodeBlockComponent` 卡片组件加入引擎
 
 ```tsx
 //实例化引擎
@@ -155,17 +178,19 @@ const engine = new Engine(ref.current, {
 });
 ```
 
-`CodeBlock`插件默认支持`markdown`，在编辑器一行开头位置输入代码块语法` ```javascript `回车后，看看效果吧
+`CodeBlock` 插件默认支持 `markdown`，在编辑器一行开头位置输入代码块语法` ```javascript ` 回车后即可触发。
 
 ### 工具栏
 
-引入`@aomao/toolbar`工具栏，工具栏基本上都是使用框架渲染，`vue`开发者使用 `@aomao/toolbar-vue`
+引入 `@aomao/toolbar` 工具栏，工具栏由于交互复杂，基本上都是使用 `React` + `Antd` UI 组件渲染，`Vue3` 使用 `@aomao/toolbar-vue`
 
-```tsx | pure
+工具栏除了 UI 交互外，大部分工作只是对不同的按钮事件触发后调用了引擎执行对应的插件命令，在需求比较复杂或需要重新定制 UI 的情况下，Fork 后修改起来也比较容易。
+
+```tsx
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 ```
 
-将`ToolbarPlugin`插件和`ToolbarComponent`卡片组件加入引擎，它将让我们在编辑器中可以使用快捷键`/`唤醒出工具栏
+把 `ToolbarPlugin` 插件和 `ToolbarComponent` 卡片组件加入引擎，它可以让我们在编辑器中可以使用快捷键 `/` 唤醒出卡片工具栏
 
 ```tsx
 //实例化引擎
@@ -197,13 +222,31 @@ return (
 )
 ```
 
+更复杂的工具栏配置请查看文档 [https://editor.aomao.com/zh-CN/config/toolbar](https://editor.aomao.com/zh-CN/config/toolbar)
+
 ### 协同编辑
 
-协同编辑基于[ShareDB](https://github.com/share/sharedb)实现。每位编辑者作为[客户端](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/ot-client.ts)通过`WebSocket`与[服务端](https://github.com/itellyou-com/am-editor/tree/master/ot-server)通信交换数据。编辑器处理数据、渲染数据。
+协同编辑基于 [ShareDB](https://github.com/share/sharedb) 开源库实现，比较陌生的朋友可以先了解它。
 
-我们将 客户端 和 服务端 搭建好后 开启协同编辑。[查看完整示例](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
+#### 交互模式
 
-```tsx | pure
+每位编辑者作为 [客户端](https://github.com/itellyou-com/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 通过 `WebSocket` 与 [服务端](https://github.com/itellyou-com/am-editor/tree/master/ot-server) 通信交换由编辑器生成的 `json0` 格式的数据。
+
+服务端会保留一份 `json` 格式的 `html` 结构数据，接收到来自客户端的指令后，再去修改这份数据，最后再转发到每个客户端。
+
+在启用协同编辑前，我们需要配置好 [客户端](https://github.com/itellyou-com/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 和 [服务端](https://github.com/itellyou-com/am-editor/tree/master/ot-server)
+
+服务端是 `NodeJs` 环境，使用 `express` + `WebSocket` 搭建的网络服务。
+
+#### 案例
+
+案例中我们已经一份比较基础的客户端代码
+
+[查看 React 完整案例](https://github.com/itellyou-com/am-editor/tree/master/examples/react)
+
+[查看 Vue3 完整案例](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
+
+```tsx
 //实例化协作编辑客户端，传入当前编辑器引擎实例
 const otClient = new OTClient(engine);
 //连接到协作服务端，`demo` 与服务端文档ID相同

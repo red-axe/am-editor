@@ -242,32 +242,38 @@ export default defineComponent({
                 //初始化本地协作，用作记录历史
                 engineInstance.ot.initLockMode();
 
-                //设置编辑器值
-                engineInstance.setValue("<strong>我在这里哟～</strong>")
+                //设置编辑器值，并使用异步的方式渲染卡片
+                engineInstance.setValue("<strong>我在这里哟～</strong>", {
+                    enableAsync: true,
+                    triggerOT: false, //对于异步渲染后的卡片节点不提交到协同服务端，否则会冲突
+                    callback: () => {
+                        //获取当前保存的用户信息
+                        const memberData = localStorage.getItem('member');
+                        const currentMember = !!memberData ? JSON.parse(memberData) : null;
+                        //实例化协作编辑客户端
+                        const otClient = new OTClient(engineInstance);
+                        //连接到协作服务端，demo文档
+                        const ws = isDev ? 'ws://127.0.0.1:8080' : 'wss://collab.aomao.com';
+                        otClient.connect(
+                            `${ws}${currentMember ? '?uid=' + currentMember.id : ''}`,
+                            'demo',
+                        );
+                        otClient.on('ready', member => {
+                            //保存当前会员信息
+                            if (member) localStorage.setItem('member', JSON.stringify(member));
+                        });
+                        //用户加入或退出改变
+                        otClient.on('membersChange', members => {
+                            members.value = members;
+                        });
+                    },
+                })
                 //监听编辑器值改变事件
                 engineInstance.on('change', value => {
                     console.log('value', value);
                     console.log('html:', engineInstance.getHtml());
                 });
-                //获取当前保存的用户信息
-                const memberData = localStorage.getItem('member');
-                const currentMember = !!memberData ? JSON.parse(memberData) : null;
-                //实例化协作编辑客户端
-                const otClient = new OTClient(engineInstance);
-                //连接到协作服务端，demo文档
-                const ws = isDev ? 'ws://127.0.0.1:8080' : 'wss://collab.aomao.com';
-                otClient.connect(
-                    `${ws}${currentMember ? '?uid=' + currentMember.id : ''}`,
-                    'demo',
-                );
-                otClient.on('ready', member => {
-                    //保存当前会员信息
-                    if (member) localStorage.setItem('member', JSON.stringify(member));
-                });
-                //用户加入或退出改变
-                otClient.on('membersChange', members => {
-                    members.value = members;
-                });
+                
                 engine.value = engineInstance
             }
         })
