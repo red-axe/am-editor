@@ -33,9 +33,9 @@ The nodes in the editor area have four types of combined nodes of `mark`, `inlin
 
 Use the `MutationObserver` to monitor the changes of the `html` structure in the editing area, and generate a `json0` type data format to interact with the [ShareDB](https://github.com/share/sharedb) library to meet the needs of collaborative editing .
 
-`Vue3` example [https://github.com/itellyou-com/am-editor/tree/master/examples/vue](https://github.com/itellyou-com/am-editor/tree/master/ examples/vue)
+`Vue3` example [https://github.com/itellyou-com/am-editor/tree/master/examples/vue](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
 
-`React` example [https://github.com/itellyou-com/am-editor/tree/master/examples/react](https://github.com/itellyou-com/am-editor/tree/master/ examples/react)
+`React` example [https://github.com/itellyou-com/am-editor/tree/master/examples/react](https://github.com/itellyou-com/am-editor/tree/master/examples/react)
 
 ## Features
 
