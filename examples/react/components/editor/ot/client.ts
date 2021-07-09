@@ -202,10 +202,7 @@ class OTClient extends EventEmitter {
 		});
 
 		doc.on('error', (error) => {
-			console.log('collab doc error', {
-				error,
-				origin_code: error.code,
-			});
+			console.error(error);
 		});
 	}
 

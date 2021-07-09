@@ -1,11 +1,4 @@
-import {
-	$,
-	ActiveTrigger,
-	Card,
-	CardType,
-	isEngine,
-	NodeInterface,
-} from '@aomao/engine';
+import { $, ActiveTrigger, Card, CardType, NodeInterface } from '@aomao/engine';
 import StatusEditor from './editor';
 import './index.css';
 
@@ -175,9 +168,11 @@ class Status extends Card<StatusValue> {
 	renderEditor() {
 		if (!this.#statusEditor) return;
 		const value = this.getValue();
+		if (!value) return;
 		this.#editorContainer = this.#statusEditor.render(
-			value?.text || '',
-			value?.color || this.getDefaultColor(),
+			value.id,
+			value.text || '',
+			value.color || this.getDefaultColor(),
 		);
 		$(document.body).append(this.#editorContainer);
 		this.updateEditorPosition();

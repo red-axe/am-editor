@@ -207,7 +207,6 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 
 		const tableRoot = this.wrapper?.find(Template.TABLE_CLASS);
 		if (!tableRoot) return;
-		this.editor.card.render(tableRoot);
 		const value = this.getValue();
 		if (!value?.html) this.onChange();
 	}

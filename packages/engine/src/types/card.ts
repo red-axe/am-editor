@@ -486,11 +486,12 @@ export interface CardModelInterface {
 	/**
 	 * 渲染
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
-	 * @param asyncRender 是否异步渲染，全部异步渲染完成后触发
+	 * @param options 是否异步渲染，全部异步渲染完成后触发
 	 */
 	render(
 		container?: NodeInterface,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},

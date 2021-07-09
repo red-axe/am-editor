@@ -1,4 +1,11 @@
-import { $, DATA_ELEMENT, NodeInterface, UI, isMobile } from '@aomao/engine';
+import {
+	$,
+	DATA_ELEMENT,
+	NodeInterface,
+	UI,
+	TRIGGER_CARD_ID,
+	isMobile,
+} from '@aomao/engine';
 
 export type Options = {
 	colors: Array<{
@@ -42,6 +49,7 @@ class StatusEditor {
 	}
 
 	render(
+		cardId: string,
 		defaultValue: string,
 		defaultColor: {
 			background: string;
@@ -54,10 +62,10 @@ class StatusEditor {
 		this.container = $(
 			`<div class="data-card-status-editor${
 				isMobile ? ' data-card-status-editor-mobile' : ''
-			}" ${DATA_ELEMENT}="${UI}"></div>`,
+			}" ${DATA_ELEMENT}="${UI}" ${TRIGGER_CARD_ID}="${cardId}"></div>`,
 		);
 
-		const { colors, onBlur, onFocus, onChange, onOk } = this.options;
+		const { colors, onBlur, onFocus, onOk } = this.options;
 		const input = $(`<input value="${defaultValue}" />`);
 
 		input.on('focus', () => {

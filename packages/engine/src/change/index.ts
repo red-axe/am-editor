@@ -18,12 +18,14 @@ import {
 	CARD_ELEMENT_KEY,
 	CARD_LEFT_SELECTOR,
 	CARD_RIGHT_SELECTOR,
+	TRIGGER_CARD_ID,
 } from '../constants/card';
 import {
 	DATA_ELEMENT,
 	EDITABLE,
 	EDITABLE_SELECTOR,
 	ROOT,
+	UI_SELECTOR,
 } from '../constants/root';
 import Paste from './paste';
 import { SelectionInterface } from '../types/selection';
@@ -78,15 +80,38 @@ class ChangeModel implements ChangeInterface {
 		}
 	}
 
-	change(isRemote?: boolean) {
-		const range = this.getRange();
-		const editableElement = range.startNode.inEditor()
-			? range.startNode.closest(EDITABLE_SELECTOR)
-			: this.engine.card.active?.root.closest(EDITABLE_SELECTOR);
-		if (editableElement && editableElement.length > 0) {
-			const card = this.engine.card.find(editableElement, true);
-			if (card?.onChange) card?.onChange(editableElement);
+	change(isRemote?: boolean, applyNodes?: Array<NodeInterface>) {
+		//动态触发可编辑卡片的onChange事件
+		let editableElement: NodeInterface | undefined = undefined;
+		if (isRemote) {
+			applyNodes?.forEach((node) => {
+				editableElement = node.closest(EDITABLE_SELECTOR);
+				if (editableElement && editableElement.length > 0) {
+					const card = this.engine.card.find(editableElement, true);
+					if (card?.onChange) card?.onChange(editableElement);
+				}
+			});
+		} else {
+			const range = this.getRange();
+			const { startNode } = range;
+			//如果开始节点在编辑器中就查找可编辑器卡片节点。如果是UI节点，就找到 trigger-card-id 属性，再找到card
+			if (startNode.inEditor()) {
+				editableElement = startNode.closest(EDITABLE_SELECTOR);
+			} else {
+				const uiElement = startNode.closest(UI_SELECTOR);
+				const cardId = uiElement.attributes(TRIGGER_CARD_ID);
+				if (cardId) {
+					editableElement = this.engine.card
+						.find(cardId)
+						?.root.closest(EDITABLE_SELECTOR);
+				}
+			}
+			if (editableElement && editableElement.length > 0) {
+				const card = this.engine.card.find(editableElement, true);
+				if (card?.onChange) card?.onChange(editableElement);
+			}
 		}
+
 		const trigger = isRemote ? 'remote' : 'local';
 		if (this.changeTrigger.indexOf(trigger) < 0)
 			this.changeTrigger.push(trigger);
@@ -244,7 +269,8 @@ class ChangeModel implements ChangeInterface {
 	setValue(
 		value: string,
 		onParse?: (node: Node) => void,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
@@ -284,7 +310,7 @@ class ChangeModel implements ChangeInterface {
 				}
 			});
 			block.generateDataIDForDescendant(container.get<Element>()!);
-			card.render(undefined, asyncRender);
+			card.render(undefined, options);
 			const cursor = container.find(CURSOR_SELECTOR);
 			const selection: SelectionInterface = new Selection(
 				this.engine,
@@ -318,12 +344,13 @@ class ChangeModel implements ChangeInterface {
 
 	setHtml(
 		html: string,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
 	) {
-		this.paste(html, asyncRender);
+		this.paste(html, options);
 	}
 
 	getOriginValue() {
@@ -909,7 +936,8 @@ class ChangeModel implements ChangeInterface {
 
 	paste(
 		source: string,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
@@ -920,16 +948,18 @@ class ChangeModel implements ChangeInterface {
 			this.engine.trigger('paste:insert', range);
 			const selection = range.createSelection();
 			this.engine.card.render(undefined, {
-				triggerOT:
-					asyncRender?.triggerOT === undefined
+				enableAsync:
+					options?.enableAsync === undefined
 						? true
-						: asyncRender.triggerOT,
+						: options.enableAsync,
+				triggerOT:
+					options?.triggerOT === undefined ? true : options.triggerOT,
 				callback: (count) => {
 					selection.move();
 					range.scrollRangeIntoView();
 					this.apply(range);
-					if (asyncRender?.callback) {
-						asyncRender.callback(count);
+					if (options?.callback) {
+						options.callback(count);
 					}
 				},
 			});

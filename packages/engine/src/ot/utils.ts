@@ -114,7 +114,12 @@ export const isTransientElement = (
 export const isTransientAttribute = (node: NodeInterface, attr: string) => {
 	if (attr === CARD_ASYNC_RENDER) return true;
 	if (node.isRoot() && !/^data-selection-/.test(attr)) return true;
-	if (node.isCard() && ['id', 'class', 'style'].includes(attr)) return true;
+	if (
+		node.isCard() &&
+		(['id', 'class', 'style'].includes(attr) ||
+			!!node.attributes(CARD_ASYNC_RENDER))
+	)
+		return true;
 	const transient = node.attributes(DATA_TRANSIENT_ATTRIBUTES);
 	if (
 		transient === '*' ||

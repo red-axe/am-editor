@@ -485,7 +485,8 @@ export interface EngineInterface extends EditorInterface {
 	 */
 	setValue(
 		value: string,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
@@ -493,11 +494,12 @@ export interface EngineInterface extends EditorInterface {
 	/**
 	 * 设置html，会格式化为合法的编辑器值
 	 * @param html html
-	 * @param asyncRender 异步渲染卡片配置
+	 * @param options 异步渲染卡片配置
 	 */
 	setHtml(
 		html: string,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
@@ -508,7 +510,8 @@ export interface EngineInterface extends EditorInterface {
 	 */
 	setJsonValue(
 		value: Array<any>,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},

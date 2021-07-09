@@ -556,11 +556,12 @@ class CardModel implements CardModelInterface {
 	/**
 	 * 渲染
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
-	 * @param asyncRender 是否异步渲染， 全部异步渲染完成后触发
+	 * @param options 是否异步渲染， 全部异步渲染完成后触发
 	 */
 	render(
 		container?: NodeInterface,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
@@ -585,10 +586,15 @@ class CardModel implements CardModelInterface {
 						child.attributes('contenteditable', 'true');
 					child.attributes(DATA_ELEMENT, EDITABLE);
 				});
+				this.render(center, {
+					enableAsync: false,
+					triggerOT: options?.triggerOT,
+				});
 			}
 			card.didRender();
 		};
 		const asyncRenderCards: Array<CardInterface> = [];
+		const renderedCards: Array<CardInterface> = [];
 		cards.each((node) => {
 			const cardNode = $(node);
 			const readyKey = cardNode.attributes(READY_CARD_KEY);
@@ -611,7 +617,7 @@ class CardModel implements CardModelInterface {
 					value: decodeCardValue(value),
 					root: key ? cardNode : undefined,
 				});
-				if (asyncRender && !asyncRender.triggerOT) {
+				if (options && !options.triggerOT) {
 					card.root.attributes(CARD_ASYNC_RENDER, 'true');
 				}
 				Object.keys(attributes).forEach((attributesName) => {
@@ -629,10 +635,11 @@ class CardModel implements CardModelInterface {
 				this.components.push(card);
 
 				// 重新渲染
-				if (!asyncRender) {
-					render(card);
-				} else {
+				if (options?.enableAsync === true) {
 					asyncRenderCards.push(card);
+				} else {
+					render(card);
+					renderedCards.push(card);
 				}
 
 				if (readyKey) {
@@ -640,34 +647,43 @@ class CardModel implements CardModelInterface {
 				}
 			}
 		});
-		if (!asyncRender) return;
-		if (isEngine(this.editor) && asyncRender.triggerOT) {
+		if (!options?.enableAsync) {
+			if (!options?.triggerOT) {
+				setTimeout(() => {
+					renderedCards.forEach((card) => {
+						card.root.removeAttributes(CARD_ASYNC_RENDER);
+					});
+				}, 50);
+			}
+			return;
+		}
+		if (isEngine(this.editor) && options.triggerOT) {
 			this.editor.history.startCache();
 		}
 		asyncRenderCards.forEach((card) => {
 			setTimeout(() => {
 				render(card);
 				//协同记录后移除标记属性
-				if (!asyncRender.triggerOT) {
+				if (!options.triggerOT) {
 					setTimeout(() => {
 						card.root.removeAttributes(CARD_ASYNC_RENDER);
 					}, 50);
 				}
 				setp++;
 				if (setp === asyncRenderCards.length) {
-					if (isEngine(this.editor) && asyncRender.triggerOT) {
+					if (isEngine(this.editor) && options.triggerOT) {
 						this.editor.history.submitCache();
 					}
-					if (asyncRender.callback)
-						asyncRender.callback(asyncRenderCards.length);
+					if (options.callback)
+						options.callback(asyncRenderCards.length);
 				}
 			}, 20);
 		});
 		if (asyncRenderCards.length === 0) {
-			if (isEngine(this.editor) && asyncRender.triggerOT) {
+			if (isEngine(this.editor) && options.triggerOT) {
 				this.editor.history.submitCache();
 			}
-			if (asyncRender.callback) asyncRender.callback(0);
+			if (options.callback) options.callback(0);
 		}
 	}
 

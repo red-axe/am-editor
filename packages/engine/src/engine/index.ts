@@ -219,32 +219,35 @@ class Engine implements EngineInterface {
 
 	setValue(
 		value: string,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
 	) {
 		this.readonly = false;
 		value = this.trigger('beforeSetValue', value) || value;
-		this.change.setValue(value, undefined, asyncRender);
+		this.change.setValue(value, undefined, options);
 		this.normalizeTree();
 		return this;
 	}
 
 	setHtml(
 		html: string,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
 	) {
-		this.change.setHtml(html, asyncRender);
+		this.change.setHtml(html, options);
 		return this;
 	}
 
 	setJsonValue(
 		value: Array<any>,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
@@ -261,7 +264,7 @@ class Engine implements EngineInterface {
 			}
 		}
 		const html = this.node.html(dom);
-		this.change.setValue(html, undefined, asyncRender);
+		this.change.setValue(html, undefined, options);
 		const range = this.change.getRange();
 		range.shrinkToElementNode();
 		this.change.select(range);

@@ -29,8 +29,9 @@ export default class MathCard extends Card<MathValue> {
 	isSaving: boolean = false;
 
 	init() {
-		const tips = getLocales<{ text: string; href: string }>(this.editor)
-			.tips;
+		const tips = getLocales<{ text: string; href: string }>(
+			this.editor,
+		).tips;
 		const { card } = this.editor;
 		this.mathEditor = new MathEditor(this.editor, {
 			tips: `<a class="tips-text" href="${tips.href}" target="_blank"><span class="data-icon data-icon-question-circle-o"></span>${tips.text}</a>`,
@@ -208,7 +209,8 @@ export default class MathCard extends Card<MathValue> {
 	renderEditor() {
 		if (!this.mathEditor) return;
 		const value = this.getValue();
-		this.editorContainer = this.mathEditor.render(value?.code);
+		if (!value) return;
+		this.editorContainer = this.mathEditor.render(value.id, value.code);
 		$(document.body).append(this.editorContainer);
 		this.updateEditorPosition();
 		window.addEventListener('scroll', this.updateEditorPosition, true);

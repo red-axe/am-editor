@@ -151,6 +151,7 @@ class Applier implements ApplierInterface {
 				if (!component?.isEditable) card.render($(node));
 			}
 		}
+		return domNode;
 	}
 
 	removeAttribute(path: Path, attr: string) {
@@ -163,6 +164,7 @@ class Applier implements ApplierInterface {
 		) {
 			domNode.get<Element>()?.removeAttribute(attr);
 		}
+		return domNode;
 	}
 
 	insertNode(path: Path, value: string | Op[] | Op[][]) {
@@ -183,8 +185,11 @@ class Applier implements ApplierInterface {
 			} else {
 				domEnd.get()?.insertBefore(element, null);
 			}
-			engine.card.render($(element));
+			const node = $(element);
+			engine.card.render(node);
+			return node;
 		}
+		return;
 	}
 
 	deleteNode(path: Path, isRemote?: boolean) {
@@ -192,6 +197,7 @@ class Applier implements ApplierInterface {
 		const [begine] = this.elementAtPath(engine.container[0], path);
 		const domBegine = $(begine);
 		if (domBegine.length > 0 && !domBegine.isRoot()) {
+			const parent = domBegine.parent();
 			if (domBegine.isCard()) {
 				engine.readonly = false;
 				if (isRemote) engine.card.removeRemote(domBegine);
@@ -204,7 +210,9 @@ class Applier implements ApplierInterface {
 					}
 				}
 			} else domBegine.remove();
+			return parent?.isRoot() ? undefined : parent;
 		}
+		return;
 	}
 
 	insertInText(path: Path, offset: number, text: string) {
@@ -220,7 +228,8 @@ class Applier implements ApplierInterface {
 			case JSONML.ATTRIBUTE_INDEX:
 				throw Error('Unsupported indexType JSONML.ATTRIBUTE_INDEX (1)');
 			default:
-				if (begine && !$(begine).isText()) return;
+				const node = $(begine);
+				if (begine && !node.isText()) return;
 				const nodeValue =
 					begine && begine.nodeValue ? begine.nodeValue : '';
 				const value =
@@ -233,6 +242,7 @@ class Applier implements ApplierInterface {
 					const textNode = document.createTextNode(value);
 					end.insertBefore(textNode, end.firstChild);
 				}
+				return node;
 		}
 	}
 
@@ -249,12 +259,14 @@ class Applier implements ApplierInterface {
 				throw Error('Unsupported indexType JSONML.ATTRIBUTE_INDEX (1)');
 			default:
 				end = begine;
-				if (!$(end).isText()) return;
+				const node = $(end);
+				if (!node.isText()) return;
 				const nodeValue = end && end.nodeValue ? end.nodeValue : '';
 				const value =
 					nodeValue.substring(0, offset) +
 					nodeValue.substring(offset + text.length);
 				end.nodeValue = value;
+				return node;
 		}
 	}
 
@@ -286,14 +298,19 @@ class Applier implements ApplierInterface {
 			}
 			return;
 		}
+		return;
 	}
 
 	applyRemoteOperations(ops: Op[]) {
 		try {
 			const path = this.getRangeRemotePath();
-			ops.forEach((op) => this.applyOperation(op, true));
+			const applyNodes: Array<NodeInterface> = [];
+			ops.forEach((op) => {
+				const applyNode = this.applyOperation(op, true);
+				if (applyNode) applyNodes.push(applyNode);
+			});
 			if (path) this.setRangeByRemotePath(path);
-			this.engine.change.change(true);
+			this.engine.change.change(true, applyNodes);
 		} catch (error) {
 			console.log(error);
 		}

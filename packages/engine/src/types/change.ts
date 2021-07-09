@@ -65,7 +65,7 @@ export interface ChangeInterface {
 	onChange: (value: string, trigger: 'remote' | 'local' | 'both') => void;
 	onSelect: () => void;
 	onSetValue: () => void;
-	change(isRemote?: boolean): void;
+	change(isRemote?: boolean, node?: Array<NodeInterface>): void;
 	/**
 	 * 获取当前选区的范围
 	 */
@@ -100,7 +100,8 @@ export interface ChangeInterface {
 	setValue(
 		value: string,
 		onParse?: (node: Node) => void,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
@@ -108,11 +109,12 @@ export interface ChangeInterface {
 	/**
 	 * 设置html，会格式化为合法的编辑器值
 	 * @param html html
-	 * @param asyncRender 异步渲染卡片配置
+	 * @param options 异步渲染卡片配置
 	 */
 	setHtml(
 		html: string,
-		asyncRender?: {
+		options?: {
+			enableAsync?: boolean;
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},

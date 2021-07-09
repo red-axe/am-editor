@@ -30,7 +30,7 @@ class Doc extends EventEmitter2 implements DocInterface {
 			try {
 				this.data = OTJSON.type.apply(this.data, ops);
 			} catch (error) {
-				console.log(error);
+				console.error(error);
 			}
 		}
 	}

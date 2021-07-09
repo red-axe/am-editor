@@ -5,6 +5,7 @@ import {
 	NodeInterface,
 	Tooltip,
 	UI,
+	TRIGGER_CARD_ID,
 	isMobile,
 } from '@aomao/engine';
 import { getLocales } from '../utils';
@@ -32,13 +33,13 @@ class MathEditor {
 		this.container?.find('textarea').get<HTMLTextAreaElement>()?.focus();
 	}
 
-	render(defaultValue?: string) {
+	render(cardId: string, defaultValue?: string) {
 		this.destroy();
 
 		this.container = $(
 			`<div class="data-card-math-editor${
 				isMobile ? ' data-card-math-editor-mobile' : ''
-			}" ${DATA_ELEMENT}="${UI}"></div>`,
+			}" ${DATA_ELEMENT}="${UI}" ${TRIGGER_CARD_ID}="${cardId}"></div>`,
 		);
 
 		const locales = getLocales(this.editor);

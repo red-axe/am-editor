@@ -167,6 +167,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	setData(data: Array<any>) {
 		this.engine.setJsonValue(data, {
+			enableAsync: true,
 			triggerOT: false,
 		});
 	}

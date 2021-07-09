@@ -129,6 +129,7 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 					: defaultValue.value;
 			//异步设置值
 			engine.current.setValue(value, {
+				enableAsync: true,
 				triggerOT: false,
 				callback: () => {
 					//卡片异步渲染完成后
