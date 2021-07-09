@@ -24,7 +24,7 @@
   <a href="./packages/engine/package.json">
     <img src="https://img.shields.io/npm/v/@aomao/engine.svg?maxAge=3600&label=version&colorB=007ec6">
   </a>
-  <a href="./packages/engine/package.json">
+  <a href="https://www.npmjs.com/package/@aomao/engine">
     <img src="https://img.shields.io/npm/dw/@aomao/engine">
   </a>
 </p>
