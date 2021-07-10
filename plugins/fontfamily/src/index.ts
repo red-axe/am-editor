@@ -24,6 +24,13 @@ export default class extends MarkPlugin<Options> {
 		},
 	};
 
+	init() {
+		super.init();
+		if (isEngine(this.editor)) {
+			this.editor.on('paste:each', (node) => this.pasteEach(node));
+		}
+	}
+
 	isTrigger(font: string) {
 		const state = this.queryState() as string[] | undefined;
 		if (!state) return true;
