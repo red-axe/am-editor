@@ -8,7 +8,7 @@ The browser has provided us with a rich API [Range](https://developer.mozilla.or
 
 ## Meet Range
 
-There are five important attributes in the `Range` object. If you need to understand other detailed attributes and methods, please visit the browser API [Range](https://developer.mozilla.org/zh-CN/docs/Web/API/Range /Range)
+There are five important attributes in the `Range` object. If you need to understand other detailed attributes and methods, please visit the browser API [Range](https://developer.mozilla.org/zh-CN/docs/Web/API/Range/Range)
 
 -   `startContainer` range start position node
 -   `startOffset` the offset under the node where the range starts

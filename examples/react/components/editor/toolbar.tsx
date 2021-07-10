@@ -85,7 +85,13 @@ const defaultItems: ToolbarItemProps = isMobile
 			['bold', 'italic', 'strikethrough', 'underline', 'moremark'],
 			['fontcolor', 'backcolor'],
 			['alignment'],
-			['unorderedlist', 'orderedlist', 'tasklist', 'indent'],
+			[
+				'unorderedlist',
+				'orderedlist',
+				'tasklist',
+				'indent',
+				'line-height',
+			],
 			['link', 'quote', 'hr'],
 	  ];
 

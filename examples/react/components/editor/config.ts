@@ -34,8 +34,13 @@ import Video, { VideoComponent, VideoUploader } from '@aomao/plugin-video';
 import Math, { MathComponent } from '@aomao/plugin-math';
 import Fontfamily from '@aomao/plugin-fontfamily';
 import Status, { StatusComponent } from '@aomao/plugin-status';
+import LineHeihgt from '@aomao/plugin-line-height';
 //import Mind, { MindComponent } from '@aomao/plugin-mind';
-import { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
+import {
+	ToolbarPlugin,
+	ToolbarComponent,
+	fontFamilyDefaultData,
+} from '@aomao/toolbar';
 import { DOMAIN } from '../../config';
 
 export const plugins: Array<PluginEntry> = [
@@ -77,6 +82,7 @@ export const plugins: Array<PluginEntry> = [
 	ToolbarPlugin,
 	Fontfamily,
 	Status,
+	LineHeihgt,
 	//Mind
 ];
 
@@ -115,6 +121,58 @@ export const pluginConfig: PluginOptions = {
 		parse: (res: any) => {
 			if (res.success) return { result: true, data: res.svg };
 			return { result: false };
+		},
+	},
+	[Fontsize.pluginName]: {
+		//配置粘贴后需要过滤的字体大小
+		filter: (fontSize: string) => {
+			return (
+				[
+					'12px',
+					'13px',
+					'14px',
+					'15px',
+					'16px',
+					'19px',
+					'22px',
+					'24px',
+					'29px',
+					'32px',
+					'40px',
+					'48px',
+				].indexOf(fontSize) > -1
+			);
+		},
+	},
+	[Fontfamily.pluginName]: {
+		//配置粘贴后需要过滤的字体
+		filter: (fontfamily: string) => {
+			const item = fontFamilyDefaultData.find((item) =>
+				fontfamily
+					.split(',')
+					.some(
+						(name) =>
+							item.value
+								.toLowerCase()
+								.indexOf(name.replace(/"/, '').toLowerCase()) >
+							-1,
+					),
+			);
+			return item ? item.value : false;
+		},
+	},
+	[LineHeihgt.pluginName]: {
+		//配置粘贴后需要过滤的行高
+		filter: (lineHeight: string) => {
+			if (lineHeight === '14px') return '1';
+			if (lineHeight === '16px') return '1.15';
+			if (lineHeight === '21px') return '1.5';
+			if (lineHeight === '28px') return '2';
+			if (lineHeight === '35px') return '2.5';
+			if (lineHeight === '42px') return '3';
+			return (
+				['1', '1.15', '1.5', '2', '2.5', '3'].indexOf(lineHeight) > -1
+			);
 		},
 	},
 };

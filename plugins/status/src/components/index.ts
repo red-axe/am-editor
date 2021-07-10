@@ -190,6 +190,10 @@ class Status extends Card<StatusValue> {
 		}
 		return this.#container;
 	}
+
+	destroy() {
+		this.#statusEditor?.destroy();
+	}
 }
 
 export default Status;

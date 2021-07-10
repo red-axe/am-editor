@@ -108,6 +108,10 @@ export default {
 			in: '增加缩进',
 			out: '减少缩进',
 		},
+		'line-height': {
+			title: '行高',
+			default: '默认',
+		},
 		link: {
 			title: '链接',
 		},

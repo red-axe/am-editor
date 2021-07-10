@@ -19,6 +19,31 @@ new Engine(...,{ plugins:[Fontfamily] })
 
 ## 可选项
 
+### 粘贴过滤自定义字体
+
+支持过滤不符合自定义的字体
+
+```ts
+/**
+ * @param fontFamily 当前字体
+ * @returns 返回 string 修改当前值，false 移除，true 保留
+ * */
+filter?: (fontFamily: string) => string | boolean
+//配置
+new Engine(...,{
+    config:{
+        [Fontfamily.pluginName]: {
+            //配置粘贴后需要过滤的字体
+            filter: (fontfamily: string) => {
+                // fontFamilyDefaultData 从toolbar包中导出的默认字体数据
+                const item = fontFamilyDefaultData.find(item => fontfamily.split(",").some(name => item.value.toLowerCase().indexOf(name.replace(/"/,"").toLowerCase()) > -1))
+                return item ? item.value : false
+            }
+        }
+    }
+}
+```
+
 ### 快捷键
 
 默认无快捷键

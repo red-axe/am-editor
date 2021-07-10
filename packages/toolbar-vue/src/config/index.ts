@@ -655,6 +655,43 @@ export const getToolbarDefaultConfig = (
 			],
 		},
 		{
+			type: 'dropdown',
+			name: 'line-height',
+			content: () =>
+				`<span className="data-icon data-icon-line-height"></span>`,
+			title: language['line-height']['title'],
+			items: [
+				{
+					key: '',
+					content: language['line-height']['default'],
+				},
+				{
+					key: '1',
+					content: '1',
+				},
+				{
+					key: '1.15',
+					content: '1.15',
+				},
+				{
+					key: '1.5',
+					content: '1.5',
+				},
+				{
+					key: '2',
+					content: '2',
+				},
+				{
+					key: '2.5',
+					content: '2.5',
+				},
+				{
+					key: '3',
+					content: '3',
+				},
+			],
+		},
+		{
 			type: 'button',
 			name: 'link',
 			icon: 'link',

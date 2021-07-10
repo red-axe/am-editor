@@ -158,7 +158,7 @@ This returns the key combination characters that need to be matched, such as mod
 
 `mod` means the `ctrl` key under windows, and the `command` (⌘) key under mac
 
-We use [is-hotkey](https://github.com/ianstormtaylor/is-hotkey) to match whether the hotkey is hit or not. For more usage methods, please go to [is-hotkey](https://github.com/ianstormtaylor /is-hotkey) view
+We use [is-hotkey](https://github.com/ianstormtaylor/is-hotkey) to match whether the hotkey is hit or not. For more usage methods, please go to [is-hotkey](https://github.com/ianstormtaylor/is-hotkey) view
 
 We can also directly use isHotkey to determine whether it is hit
 

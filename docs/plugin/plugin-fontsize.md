@@ -19,17 +19,27 @@ new Engine(...,{ plugins:[Fontsize] })
 
 ## Optional
 
-### Font size list
+### Paste filter custom font size
 
-Support custom font size list, incoming list, or key-value pair
+Supports filtering of font sizes that do not meet the custom
 
 ```ts
 /**
- * You can specify the font size list ["12px","14px","15px"]
- * Or set an alias for the font size {"9pt":"12px","10pt":"13px"}
- * Filter when pasting. If the list conditions are not met, the font size style will be removed.
- * */
-data?:Array<string> | {[key:string]:string}
+  * @param fontSize current font size
+  * @returns returns string to modify the current value, false is removed, true is retained
+  * */
+filter?: (fontSize: string) => string | boolean
+//Configuration
+new Engine(...,{
+     config:{
+         [Fontsize.pluginName]: {
+             //Configure the font size to be filtered after pasting
+             filter: (fontSize: string) => {
+                 return ["12px","13px","14px","15px","16px","19px","22px","24px","29px","32px","40px","48px"] .indexOf(fontSize)> -1
+             }
+         }
+     }
+}
 ```
 
 ### Default font size

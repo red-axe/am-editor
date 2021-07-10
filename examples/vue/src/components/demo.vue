@@ -58,7 +58,11 @@ import Image, { ImageComponent, ImageUploader } from '@aomao/plugin-image';
 import Table, { TableComponent } from '@aomao/plugin-table'
 import Fontfamily from '@aomao/plugin-fontfamily';
 import Status, { StatusComponent } from '@aomao/plugin-status';
-import AmToolbar , { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar-vue'
+import Math, { MathComponent } from '@aomao/plugin-math';
+import File, { FileComponent, FileUploader } from '@aomao/plugin-file';
+import Video, { VideoComponent, VideoUploader } from '@aomao/plugin-video';
+import LineHeight from '@aomao/plugin-line-height';
+import AmToolbar , { ToolbarPlugin, ToolbarComponent, fontFamilyDefaultData } from '@aomao/toolbar-vue'
 import OTClient from './ot-client'
 import 'ant-design-vue/es/style'
 
@@ -94,7 +98,13 @@ const plugins = [
 	ImageUploader,
     Table,
 	ToolbarPlugin,
-    Status
+    Status,
+    LineHeight,
+    File,
+    Video,
+    FileUploader,
+    VideoUploader,
+    Math
 ];
 const cards = [
 	HrComponent,
@@ -103,7 +113,10 @@ const cards = [
 	ToolbarComponent,
 	ImageComponent,
     TableComponent,
-    StatusComponent
+    StatusComponent,
+    FileComponent,
+    VideoComponent,
+    MathComponent
 ];
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -197,7 +210,7 @@ export default defineComponent({
 						],
 						['fontcolor', 'backcolor'],
 						['alignment'],
-						['unorderedlist', 'orderedlist', 'tasklist', 'indent'],
+						['unorderedlist', 'orderedlist', 'tasklist', 'indent', 'line-height'],
 						['link', 'quote', 'hr']]
         }
     },
@@ -221,6 +234,44 @@ export default defineComponent({
                             },
                             isRemote: (src: string) => src.indexOf(domain) < 0,
                         },
+                        [FileUploader.pluginName]: {
+                            action: `${domain}/upload/file`,
+                        },
+                        [VideoUploader.pluginName]: {
+                            action: `${domain}/upload/video`,
+                        },
+                        [Math.pluginName]: {
+                            action: `https://g.aomao.com/latex`,
+                            parse: (res: any) => {
+                                if (res.success) return { result: true, data: res.svg };
+                                return { result: false };
+                            },
+                        },
+                        [Fontsize.pluginName]: {
+                            //配置粘贴后需要过滤的字体大小
+                            filter: (fontSize: string) => {
+                                return ["12px","13px","14px","15px","16px","19px","22px","24px","29px","32px","40px","48px"].indexOf(fontSize) > -1
+                            }
+                        },
+                        [Fontfamily.pluginName]: {
+                            //配置粘贴后需要过滤的字体
+                            filter: (fontfamily: string) => {
+                                const item = fontFamilyDefaultData.find(item => fontfamily.split(",").some(name => item.value.toLowerCase().indexOf(name.replace(/"/,"").toLowerCase()) > -1))
+                                return item ? item.value : false
+                            }
+                        },
+                        [LineHeight.pluginName]: {
+                            //配置粘贴后需要过滤的行高
+                            filter: (lineHeight: string) => {
+                                if(lineHeight === "14px") return "1"
+                                if(lineHeight === "16px") return "1.15"
+                                if(lineHeight === "21px") return "1.5"
+                                if(lineHeight === "28px") return "2"
+                                if(lineHeight === "35px") return "2.5"
+                                if(lineHeight === "42px") return "3"
+                                return ["1","1.15","1.5","2","2.5","3"].indexOf(lineHeight) > -1
+                            }
+                        }
                     },
                 });
                 

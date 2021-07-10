@@ -1,7 +1,8 @@
-import { $, isEngine, MarkPlugin } from '@aomao/engine';
+import { $, isEngine, MarkPlugin, NodeInterface } from '@aomao/engine';
 
 export type Options = {
 	hotkey?: { key: string; args: Array<string> };
+	filter?: (fontfamily: string) => string | boolean;
 };
 export default class extends MarkPlugin<Options> {
 	static get pluginName() {
@@ -10,8 +11,10 @@ export default class extends MarkPlugin<Options> {
 
 	tagName = 'span';
 
+	#styleName = 'font-family';
+
 	style = {
-		'font-family': '@var0',
+		[this.#styleName]: '@var0',
 	};
 
 	variable = {
@@ -54,5 +57,22 @@ export default class extends MarkPlugin<Options> {
 
 	hotkey() {
 		return this.options.hotkey || [];
+	}
+
+	pasteEach(node: NodeInterface) {
+		//pt 转为px
+		if (node.name === this.tagName) {
+			const fontFamily = node.css(this.#styleName);
+			if (!fontFamily) return;
+			const { filter } = this.options;
+			if (filter) {
+				const result = filter(fontFamily);
+				if (result === false) {
+					node.css(this.#styleName, '');
+				} else if (typeof result === 'string') {
+					node.css(this.#styleName, result);
+				}
+			} else node.css(this.#styleName, '');
+		}
 	}
 }

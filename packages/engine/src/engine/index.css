@@ -1,9 +1,9 @@
 @font-face {
-    font-family: 'data-icon';  /* Project id 1456030 */
-    src: url('//at.alicdn.com/t/font_1456030_n0z6ova55ec.woff2?t=1623060824976') format('woff2'),
-         url('//at.alicdn.com/t/font_1456030_n0z6ova55ec.woff?t=1623060824976') format('woff'),
-         url('//at.alicdn.com/t/font_1456030_n0z6ova55ec.ttf?t=1623060824976') format('truetype');
-  }
+    font-family: "data-icon"; /* Project id 1456030 */
+    src: url('//at.alicdn.com/t/font_1456030_p4nw2xam1u.woff2?t=1625934513957') format('woff2'),
+         url('//at.alicdn.com/t/font_1456030_p4nw2xam1u.woff?t=1625934513957') format('woff'),
+         url('//at.alicdn.com/t/font_1456030_p4nw2xam1u.ttf?t=1625934513957') format('truetype');
+  }  
   
   .data-icon {
     font-family: "data-icon" !important;
@@ -11,6 +11,10 @@
     font-style: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  .data-icon-line-height:before {
+    content: "\e697";
   }
   
   .data-icon-text:before {
@@ -607,7 +611,7 @@
 .am-engine p , .am-engine-view p {
     white-space: normal;
     margin: 0;
-    min-height: 24px;
+    line-height: 1.74;
 }
 
 .am-engine [contenteditable="true"],.am-engine-view [contenteditable="true"] {

@@ -19,17 +19,27 @@ new Engine(...,{ plugins:[Fontsize] })
 
 ## 可选项
 
-### 字体大小列表
+### 粘贴过滤自定义字体大小
 
-支持自定义字体大小列表，传入列表，或键值对
+支持过滤不符合自定义的字体大小
 
 ```ts
 /**
- * 可以指定字体大小列表 ["12px","14px","15px"]
- * 或者为字体小大设置别名 { "9pt":"12px","10pt":"13px"}
- * 在粘贴的时候过滤，不满足列表条件，将移除字体大小样式。
+ * @param fontSize 当前字体大小
+ * @returns 返回 string 修改当前值，false 移除，true 保留
  * */
-data?:Array<string> | {[key:string]:string}
+filter?: (fontSize: string) => string | boolean
+//配置
+new Engine(...,{
+    config:{
+        [Fontsize.pluginName]: {
+            //配置粘贴后需要过滤的字体大小
+            filter: (fontSize: string) => {
+                return ["12px","13px","14px","15px","16px","19px","22px","24px","29px","32px","40px","48px"].indexOf(fontSize) > -1
+            }
+        }
+    }
+}
 ```
 
 ### 默认字体大小

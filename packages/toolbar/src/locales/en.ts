@@ -108,6 +108,10 @@ export default {
 			in: 'Increase indent',
 			out: 'Reduce indent',
 		},
+		'line-height': {
+			title: 'Line height',
+			default: 'Default',
+		},
 		link: {
 			title: 'Insert Link',
 		},

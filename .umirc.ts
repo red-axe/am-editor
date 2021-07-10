@@ -75,6 +75,7 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 					'/plugin/plugin-italic',
 					'/plugin/plugin-image',
 					'/plugin/plugin-link',
+					'/plugin/plugin-line-height',
 					{
 						title: '@aomao/plugin-mark',
 						path: '/plugin/plugin-mark',

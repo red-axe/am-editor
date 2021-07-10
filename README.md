@@ -73,6 +73,7 @@ Use the `MutationObserver` to monitor the changes of the `html` structure in the
 | [`@aomao/plugin-italic`](./plugins/italic)               |               [![](https://img.shields.io/npm/v/@aomao/plugin-italic.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/italic/package.json) |               [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-italic/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-italic/dist/index.js) | Italic.                                |
 | [`@aomao/plugin-link`](./plugins/link)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-link.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/link/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-link/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-link/dist/index.js) | Link, for React.                       |
 | [`@aomao/plugin-link-vue`](./plugins/link-vue)           |           [![](https://img.shields.io/npm/v/@aomao/plugin-link-vue.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/link-vue/package.json) |           [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-link-vue/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-link-vue/dist/index.js) | Link, for Vue3.                        |
+| [`@aomao/plugin-line-height`](./plugins/line-height)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-line-height.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/line-height/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-line-height/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-line-height/dist/index.js) | Line height.                           |
 | [`@aomao/plugin-mark`](./plugins/mark)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-mark.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/mark/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-mark/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-mark/dist/index.js) | Mark.                                  |
 | [`@aomao/plugin-orderedlist`](./plugins/orderedlist)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-orderedlist.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/orderedlist/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-orderedlist/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-orderedlist/dist/index.js) | Ordered list.                          |
 | [`@aomao/plugin-paintformat`](./plugins/paintformat)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-paintformat.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/paintformat/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-paintformat/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-paintformat/dist/index.js) | Format Painter.                        |
@@ -264,7 +265,38 @@ otClient.connect(
 
 ### Project icon
 
-[Iconfont](https://at.alicdn.com/t/project/1456030/575170a6-50ef-4156-9ad0-2cd0341752a7.html?spm=a313x.7781069.1998910419.35)
+[Iconfont](https://at.alicdn.com/t/project/1456030/1ffb87c5-048b-46f0-9f1e-4829116f7825.html?spm=a313x.7781069.1998910419.35)
+
+## Development
+
+### React
+
+The dependencies need to be installed separately in the `root directory` `site-ssr` `ot-server`
+
+```base
+//After the dependencies are installed, you only need to execute the following commands in the root directory
+
+yarn ssr
+```
+
+Visit localhost:7001 after startup
+
+### Vue
+
+Just enter the examples/vue directory to install the dependencies
+
+```base
+//After the dependencies are installed, execute the following commands in the examples/vue directory
+
+yarn serve
+```
+
+In the Vue runtime environment, the default is the installed code that has been published to npm. If you need to modify the code of the engine or plug-in and see the effect immediately, we need to do the following steps:
+
+-   Delete the examples/vue/node_modules/@aomao folder
+-   Delete the examples/vue/node_modules/vue folder. Because there are plugins that depend on Vue, the Vue package will be installed in the project root directory. If you do not delete the Vue package in examples/vue, and the Vue package of the plugin is not in the same environment, the plugin cannot be loaded
+-   Execute the installation of all dependent commands in the root directory of am-editor, for example: `yarn`
+-   Finally restart in examples/vue
 
 ## Contribution
 

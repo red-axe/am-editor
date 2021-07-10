@@ -3,7 +3,7 @@ import { NodeInterface, MarkPlugin, isEngine } from '@aomao/engine';
 export type Options = {
 	hotkey?: { key: string; args: Array<string> };
 	defaultSize?: string;
-	data?: Array<string> | { [key: string]: string };
+	filter?: (fontSize: string) => string | boolean;
 };
 
 export default class extends MarkPlugin<Options> {
@@ -14,20 +14,7 @@ export default class extends MarkPlugin<Options> {
 	tagName = 'span';
 
 	style = {
-		'font-size': {
-			value: '@var0',
-			format: (value: string) => {
-				value = this.convertToPX(value);
-				const { data } = this.options;
-				if (typeof data === 'object') {
-					const key = Object.keys(data).find(
-						(key) => data[key] === value,
-					);
-					if (!!key) value = key;
-				}
-				return value;
-			},
-		},
+		'font-size': '@var0',
 	};
 
 	variable = {
@@ -36,6 +23,8 @@ export default class extends MarkPlugin<Options> {
 			value: /[\d\.]+(pt|px)$/,
 		},
 	};
+
+	#styleName = 'font-size';
 
 	init() {
 		super.init();
@@ -66,25 +55,21 @@ export default class extends MarkPlugin<Options> {
 	}
 
 	pasteEach(node: NodeInterface) {
-		if (node.name === 'span') {
-			const source = node.css('font-size');
+		if (node.name === this.tagName) {
+			const source = node.css(this.#styleName);
+			if (!source) return;
 			const fontsize = this.convertToPX(source);
-			if (!!fontsize && source.endsWith('pt'))
-				node.css('font-size', fontsize);
-			if (!!fontsize && fontsize !== this.options.defaultSize) {
-				const { data } = this.options;
-				if (Array.isArray(data) && data.indexOf(fontsize) === -1) {
-					node.css('font-size', '');
-				} else if (typeof data === 'object') {
-					if (
-						!Object.keys(data).some((key) => {
-							if (data[key] === fontsize) return true;
-							return;
-						})
-					) {
-						node.css('font-size', '');
+			if (source.endsWith('pt')) node.css(this.#styleName, fontsize);
+			if (fontsize !== this.options.defaultSize) {
+				const { filter } = this.options;
+				if (filter) {
+					const result = filter(fontsize);
+					if (result === false) {
+						node.css(this.#styleName, '');
+					} else if (typeof result === 'string') {
+						node.css(this.#styleName, result);
 					}
-				}
+				} else node.css(this.#styleName, '');
 			}
 		}
 	}

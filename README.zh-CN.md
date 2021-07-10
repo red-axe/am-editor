@@ -73,6 +73,7 @@
 | [`@aomao/plugin-italic`](./plugins/italic)               |               [![](https://img.shields.io/npm/v/@aomao/plugin-italic.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/italic/package.json) |               [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-italic/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-italic/dist/index.js) | 斜体                   |
 | [`@aomao/plugin-link`](./plugins/link)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-link.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/link/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-link/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-link/dist/index.js) | 链接, 适用于 `React`   |
 | [`@aomao/plugin-link-vue`](./plugins/link-vue)           |           [![](https://img.shields.io/npm/v/@aomao/plugin-link-vue.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/link-vue/package.json) |           [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-link-vue/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-link-vue/dist/index.js) | 链接, 适用于 `Vue3`    |
+| [`@aomao/plugin-line-height`](./plugins/line-height)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-line-height.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/line-height/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-line-height/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-line-height/dist/index.js) | 行高                   |
 | [`@aomao/plugin-mark`](./plugins/mark)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-mark.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/mark/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-mark/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-mark/dist/index.js) | 标记                   |
 | [`@aomao/plugin-orderedlist`](./plugins/orderedlist)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-orderedlist.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/orderedlist/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-orderedlist/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-orderedlist/dist/index.js) | 有序列表               |
 | [`@aomao/plugin-paintformat`](./plugins/paintformat)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-paintformat.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/paintformat/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-paintformat/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-paintformat/dist/index.js) | 格式刷                 |
@@ -264,7 +265,38 @@ otClient.connect(
 
 ### 项目图标
 
-[Iconfont](https://at.alicdn.com/t/project/1456030/575170a6-50ef-4156-9ad0-2cd0341752a7.html?spm=a313x.7781069.1998910419.35)
+[Iconfont](https://at.alicdn.com/t/project/1456030/1ffb87c5-048b-46f0-9f1e-4829116f7825.html?spm=a313x.7781069.1998910419.35)
+
+## 开发
+
+### React
+
+需要在 `根目录` `site-ssr` `ot-server` 中分别安装依赖
+
+```base
+//依赖安装好后，只需要在根目录执行以下命令
+
+yarn ssr
+```
+
+启动后访问 localhost:7001
+
+### Vue
+
+只需要进入 examples/vue 目录安装依赖
+
+```base
+//依赖安装好后，在 examples/vue 目录执行以下命令
+
+yarn serve
+```
+
+在 Vue 运行环境中，默认是安装的已发布到 npm 上的代码。如果需要修改引擎或者插件的代码后立即看到效果，我们需要做以下步骤：
+
+-   删除 examples/vue/node_modules/@aomao 文件夹
+-   删除 examples/vue/node_modules/vue 文件夹。因为有插件依赖了 Vue，所以 Vue 的包会在项目根目录中安装。如果不删除 examples/vue 中的 Vue 包，和插件的 Vue 包不在一个环境中，就无法加载插件
+-   在 am-editor 根目录下执行安装所有依赖命令，例如：`yarn`
+-   最后在 examples/vue 中重新启动
 
 ## 贡献
 

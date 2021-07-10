@@ -1,3 +1,6 @@
+.am-engine a, .am-engine a:hover, .am-engine-view a, .am-engine-view a:hover {
+    color: #1890ff !important;
+}
 .data-link-container {
     max-width: 398px;
     display: inline-block;

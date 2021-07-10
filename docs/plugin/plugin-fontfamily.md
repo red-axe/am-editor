@@ -19,6 +19,31 @@ new Engine(...,{ plugins:[Fontfamily] })
 
 ## Optional
 
+### Paste and filter custom fonts
+
+Supports filtering of fonts that do not conform to the definition
+
+```ts
+/**
+  * @param fontFamily current font
+  * @returns returns string to modify the current value, false is removed, true is retained
+  * */
+filter?: (fontFamily: string) => string | boolean
+//Configuration
+new Engine(...,{
+     config:{
+         [Fontfamily.pluginName]: {
+             //Configure the font to be filtered after pasting
+             filter: (fontfamily: string) => {
+                 // fontFamilyDefaultData The default font data exported from the toolbar package
+                 const item = fontFamilyDefaultData.find(item => fontfamily.split(",").some(name => item.value.toLowerCase().indexOf(name.replace(/"/,"").toLowerCase()) > -1))
+                 return item? item.value: false
+             }
+         }
+     }
+}
+```
+
 ### hot key
 
 No shortcut keys by default
