@@ -80,6 +80,8 @@ export default class extends MarkPlugin<Options> {
 					node.css(this.#styleName, result);
 				}
 			} else node.css(this.#styleName, '');
+			const nodeApi = this.editor.node;
+			if (!nodeApi.isMark(node)) nodeApi.unwrap(node);
 		}
 	}
 }

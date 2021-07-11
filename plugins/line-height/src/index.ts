@@ -103,6 +103,8 @@ export default class extends Plugin<Options> {
 					node.css(this.#styleName, result);
 				}
 			} else node.css(this.#styleName, '');
+			const nodeApi = this.editor.node;
+			if (!nodeApi.isBlock(node)) nodeApi.unwrap(node);
 		}
 	}
 }

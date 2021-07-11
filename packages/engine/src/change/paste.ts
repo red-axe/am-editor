@@ -42,7 +42,7 @@ export default class Paste {
 
 	commonNormalize(fragment: DocumentFragment) {
 		const defaultStyle = this.getDefaultStyle();
-		const { inline } = this.engine;
+		const { inline, schema } = this.engine;
 		const nodeApi = this.engine.node;
 		// 第一轮预处理，主要处理 span 节点
 		let nodes = $(fragment).allChildren();
@@ -52,7 +52,7 @@ export default class Paste {
 			if (node.isCard()) {
 				return;
 			}
-			// 删除与默认样式一样的 inline 样式
+			// 删除与默认样式一样的样式
 			if (node.isElement()) {
 				defaultStyle.forEach((style) => {
 					const key = Object.keys(style)[0];
@@ -67,6 +67,8 @@ export default class Paste {
 						}
 					}
 				});
+				//处理后如果不是一个有效的节点就移除包裹
+				if (!schema.getType(node)) nodeApi.unwrap(node);
 			}
 			nodeApi.removeMinusStyle(node, 'text-indent');
 			if (['ol', 'ul'].includes(node.name)) {
