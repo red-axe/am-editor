@@ -1286,6 +1286,14 @@ class Mark implements MarkModelInterface {
 			}
 		}
 	}
+
+	repairCursor(mark: NodeInterface | Node) {
+		const { node } = this.editor;
+		mark = isNode(mark) ? $(mark) : mark;
+		if (node.isMark(mark) && mark.children().length === 0) {
+			mark.append($('\u200b', null));
+		}
+	}
 }
 
 export default Mark;

@@ -297,6 +297,8 @@ class ChangeModel implements ChangeInterface {
 				root.allChildren().forEach((child) => {
 					if (node.isInline(child)) {
 						inline.repairCursor(child);
+					} else if (node.isMark(child)) {
+						mark.repairCursor(child);
 					}
 					if (onParse) {
 						onParse(child);
@@ -307,6 +309,8 @@ class ChangeModel implements ChangeInterface {
 			container.allChildren().forEach((child) => {
 				if (node.isInline(child)) {
 					inline.repairCursor(child);
+				} else if (node.isMark(child)) {
+					mark.repairCursor(child);
 				}
 			});
 			block.generateDataIDForDescendant(container.get<Element>()!);

@@ -84,6 +84,11 @@ export interface MarkModelInterface {
 	 * @param addBr 是否添加br
 	 */
 	removeEmptyMarks(node: NodeInterface, addBr?: boolean): void;
+	/**
+	 * 修复空 mark 节点占位符
+	 * @param node mark 节点
+	 */
+	repairCursor(node: NodeInterface | Node): void;
 }
 
 export interface MarkInterface extends ElementPluginInterface {

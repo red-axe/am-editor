@@ -602,6 +602,8 @@ class Block implements BlockModelInterface {
 			safeRange.setStartAfter(last);
 			safeRange.collapse(true);
 		}
+		if (selection.focus) selection.focus.remove();
+		if (selection.anchor) selection.anchor.remove();
 		// 插入新 Block
 		node.insert(block, safeRange);
 		if (!range) change.apply(safeRange);
