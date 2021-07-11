@@ -27,6 +27,9 @@
   <a href="https://www.npmjs.com/package/@aomao/engine">
     <img src="https://img.shields.io/npm/dw/@aomao/engine">
   </a>
+  <a href="https://github.com/umijs/dumi">
+    <img src="https://img.shields.io/badge/docs%20by-dumi-blue">
+  </a>
 </p>
 
 `广告`：[科学上网，方便、快捷的上网冲浪](https://xiyou4you.us/r/?s=18517120) 稳定、可靠，访问 Github 或者其它外网资源很方便。

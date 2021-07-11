@@ -27,6 +27,9 @@
   <a href="https://www.npmjs.com/package/@aomao/engine">
     <img src="https://img.shields.io/npm/dw/@aomao/engine">
   </a>
+  <a href="https://github.com/umijs/dumi">
+    <img src="https://img.shields.io/badge/docs%20by-dumi-blue">
+  </a>
 </p>
 
 > Thanks to Google Translate
