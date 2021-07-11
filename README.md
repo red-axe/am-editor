@@ -45,12 +45,13 @@ Use the `MutationObserver` to monitor the changes of the `html` structure in the
 
 ## Features
 
--   📦 Out of the box, it provides dozens of rich plug-ins to meet most needs
--   🏷 High extensibility, in addition to the basic plug-in of `mark` `inline` `block` type, we also provide `card` component combined with `React` `Vue` and other front-end libraries to render the plug-in UI
--   📋 Rich multimedia support, not only supports pictures, audio and video, but also supports inserting embedded multimedia content
--   🐠 The engine is written in pure JavaScript and does not rely on any front-end libraries. Plug-ins can be rendered using front-end libraries such as `React` and `Vue`. Easily cope with complex architecture
--   📡 Built-in collaborative editing program, ready to use with lightweight configuration
--   📱 Compatible with most of the latest mobile browsers
+-   Out of the box, it provides dozens of rich plug-ins to meet most needs
+-   High extensibility, in addition to the basic plug-in of `mark`, inline`and`block`type, we also provide`card`component combined with`React`, `Vue` and other front-end libraries to render the plug-in UI
+-   Rich multimedia support, not only supports pictures, audio and video, but also supports insertion of embedded multimedia content
+-   Support Markdown syntax
+-   The engine is written in pure JavaScript and does not rely on any front-end libraries. Plug-ins can be rendered using front-end libraries such as `React` and `Vue`. Easily cope with complex architecture
+-   Built-in collaborative editing program, ready to use with lightweight configuration
+-   Compatible with most of the latest mobile browsers
 
 ## Plugins
 

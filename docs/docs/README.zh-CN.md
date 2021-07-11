@@ -4,16 +4,28 @@ title: 介绍
 
 ## 是什么？
 
-am-editor，一个 Web 多人实时协同富文本编辑器。使用浏览器提供的`contenteditable`属性让一个 DOM 节点具有可编辑能力，众所周知`contenteditable`属性，在不同的浏览器厂商中实现会有不同的差异，并且其默认行为具有不可预测性，因此我们封装了一个具有一定可控性的编辑能力引擎库`@aomao/engine`，在默认行为和期望行为之间进行平衡取舍。
+一个富文本<em>协同</em>编辑器框架，可以使用<em>React</em>和<em>Vue</em>自定义插件
 
-引擎库使用`javascript`编写，我们对 DOM 节点插入、删除、替换等一系列操作、包括光标、事件进行了封装并派生接口。因此，在引擎中我们的所有操作都将直接编辑复杂的 DOM 树，在数据结构中我们也将以 DOM 树结构呈现。不过在实际应用中，我们非常有必要对复杂的 DOM 树结构进行约束，以免出现不可预期的行为，并且在当前流行使用`React` `Vue`等前端框架来渲染 UI 的情况下，让我们再使用`javascript`定制 UI 是一件非常痛苦的事情。所以我们把 DOM 节点按功能和特性分为以下几类：`mark` `inline` `block` `card` 并且通过 `schema` 来约束他们特定的行为和一些特质属性，在 `card` 组件中我们还可以结合前端框架来完成复杂的 UI 渲染和编辑嵌套。
+`广告`：[科学上网，方便、快捷的上网冲浪](https://xiyou4you.us/r/?s=18517120) 稳定、可靠，访问 Github 或者其它外网资源很方便。
 
-在现代化企业中，协同办公已是高效的代名词。在即时通讯、视频会议之后让文档也协同起来，已是大势所趋。在引擎库中，我们基于[ShareDB](https://github.com/share/sharedb)提供协同编辑能力，把复杂的 DOM 结构转换为[JSON0](https://github.com/ottypes/json0)协议的数据结构后，提交给`sharedb`处理协同编辑的交互。
+使用浏览器提供的 `contenteditable` 属性让一个 DOM 节点具有可编辑能力。
+
+引擎接管了浏览器大部分光标、事件等默认行为。
+
+可编辑器区域内的节点通过 `schema` 规则，制定了 `mark` `inline` `block` `card` 4 种组合节点，他们由不同的属性、样式或 `html` 结构组成，并对它们的嵌套进行了一定的约束。
+
+通过 `MutationObserver` 监听编辑区域内的 `html` 结构的改变，并生成 `json0` 类型的数据格式与 [ShareDB](https://github.com/share/sharedb) 库进行交互达到协同编辑的需要。
+
+**`Vue3`** 案例 [https://github.com/itellyou-com/am-editor/tree/master/examples/vue](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
+
+**`React`** 案例 [https://github.com/itellyou-com/am-editor/tree/master/examples/react](https://github.com/itellyou-com/am-editor/tree/master/examples/react)
 
 ## 特性
 
--   📦 开箱即用，提供几十种丰富的插件来满足大部分需求
--   🏷 高扩展性，除了`mark` `inline` `block`基础插件外，我们还提供`card`组件结合`React` `Vue`等前端框架渲染插件 UI
--   📋 丰富的多媒体支持，不仅支持图片和音视频，更支持插入嵌入式多媒体内容
--   🐠 不依赖前端框架，复杂架构轻松应对
--   📡 内置协同编辑方案，轻量配置即可使用
+-   开箱即用，提供几十种丰富的插件来满足大部分需求
+-   高扩展性，除了 `mark` `inline` `block` 类型基础插件外，我们还提供 `card` 组件结合`React` `Vue`等前端库渲染插件 UI
+-   丰富的多媒体支持，不仅支持图片和音视频，更支持插入嵌入式多媒体内容
+-   支持 Markdown 语法
+-   引擎纯 JavaScript 编写，不依赖任何前端库，插件可以使用 `React` `Vue` 等前端库渲染。复杂架构轻松应对
+-   内置协同编辑方案，轻量配置即可使用
+-   兼容大部分最新移动端浏览器
