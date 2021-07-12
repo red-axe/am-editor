@@ -35,6 +35,7 @@ import Math, { MathComponent } from '@aomao/plugin-math';
 import Fontfamily from '@aomao/plugin-fontfamily';
 import Status, { StatusComponent } from '@aomao/plugin-status';
 import LineHeihgt from '@aomao/plugin-line-height';
+import Mention, { MentionComponent } from '@aomao/plugin-mention';
 //import Mind, { MindComponent } from '@aomao/plugin-mind';
 import {
 	ToolbarPlugin,
@@ -83,6 +84,7 @@ export const plugins: Array<PluginEntry> = [
 	Fontfamily,
 	Status,
 	LineHeihgt,
+	Mention,
 	//Mind
 ];
 
@@ -97,6 +99,7 @@ export const cards: Array<CardEntry> = [
 	MathComponent,
 	ToolbarComponent,
 	StatusComponent,
+	MentionComponent,
 	//MindComponent
 ];
 
@@ -121,6 +124,19 @@ export const pluginConfig: PluginOptions = {
 		parse: (res: any) => {
 			if (res.success) return { result: true, data: res.svg };
 			return { result: false };
+		},
+	},
+	[Mention.pluginName]: {
+		action: `${DOMAIN}/user/search`,
+		defaultData: [
+			{
+				key: '1',
+				name: '输入1-3查询',
+				avatar: 'https://cdn-image.aomao.com/10012/avatar/2020/04/11/1586596344-3b71be94-c861-428d-a8c3-9a1ebfb82a26.png?x-oss-process=image/resize,w_20',
+			},
+		],
+		onClick: (key: string, name: string) => {
+			console.log('mention click:', key, '-', name);
 		},
 	},
 	[Fontsize.pluginName]: {

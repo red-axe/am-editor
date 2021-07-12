@@ -3,7 +3,7 @@
 /**
  * @param {Egg.Application} app - egg application
  */
-module.exports = app => {
+module.exports = (app) => {
 	const { router, controller } = app;
 	router.post('/upload/image', controller.upload.image);
 	router.post('/upload/file', controller.upload.file);
@@ -17,5 +17,6 @@ module.exports = app => {
 	router.get('/comment/list', controller.comment.list);
 	router.get('/comment/find', controller.comment.find);
 	router.get('/doc/get', controller.doc.get);
+	router.get('/user/search', controller.user.search);
 	router.get('*', controller.home.index);
 };

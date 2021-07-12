@@ -1,0 +1,56 @@
+.am-engine .data-mention-component, .am-engine-view .data-mention-component {
+    color: #1890ff !important;
+    cursor: pointer;
+}
+
+.am-engine [data-card-key="mention"].card-selected [data-card-element="center"].data-card-border-selected {
+    outline: 0 none;
+}
+
+.data-mention-component-list {
+    position: absolute;
+    left: 0;
+    top: 32px;
+    font-size: 12px;
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 3px 3px;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 12%);
+    padding: 5px 0;
+    height: auto;
+    transition: all 0.25s cubic-bezier(0.3, 1.2, 0.2, 1);
+    z-index: 999;
+    max-height: calc(80vh);
+    overflow: auto;
+    display: none;
+}
+
+.data-mention-component-placeholder {
+    color: rgba(0,0,0,0.25);
+    pointer-events: none;
+    position: absolute;
+    width: 76px;
+    left: 16px;
+}
+
+.data-mention-item {
+    display: flex;
+    cursor: pointer;
+    padding: 4px 16px 0;
+    min-width: 120px;
+    align-items: center;
+}
+
+.data-mention-item .data-mention-item-text {
+    display: block;
+    text-align: left;
+    margin-left: 8px;
+    color: #595959;
+    line-height: 24px;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.data-mention-item.data-mention-item-active {
+    background-color: #f4f4f4;
+}

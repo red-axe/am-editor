@@ -64,6 +64,10 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 			if (trigger !== 'remote') onSave();
 			if (props.onChange) props.onChange(value, trigger);
 			console.log(`value ${trigger} update:`, value);
+			console.log(
+				'mention:',
+				engine.current?.command.execute('mention', 'getList'),
+			);
 			//console.log('html:', engine.getHtml());
 		},
 	};

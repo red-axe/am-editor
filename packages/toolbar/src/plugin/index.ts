@@ -1,4 +1,11 @@
-import { EditorInterface, isEngine, isSafari, Plugin } from '@aomao/engine';
+import {
+	decodeCardValue,
+	EditorInterface,
+	isEngine,
+	isSafari,
+	NodeInterface,
+	Plugin,
+} from '@aomao/engine';
 import { CollapseItemProps } from '../collapse/item';
 import ToolbarComponent from './component';
 import locales from '../locales';
@@ -39,8 +46,21 @@ class ToolbarPlugin extends Plugin<Options> {
 	}
 
 	init() {
-		this.editor.on('keydown:slash', (event) => this.onSlash(event));
+		if (isEngine(this.editor)) {
+			this.editor.on('keydown:slash', (event) => this.onSlash(event));
+			this.editor.on('paser:value', (node) => this.paserValue(node));
+		}
 		this.editor.language.add(locales);
+	}
+
+	paserValue(node: NodeInterface) {
+		if (
+			node.isCard() &&
+			node.attributes('name') === ToolbarComponent.cardName
+		) {
+			return false;
+		}
+		return true;
 	}
 
 	onSlash(event: KeyboardEvent) {
