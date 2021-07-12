@@ -1,7 +1,4 @@
 {
 	"id": "demo",
-	"content": {
-		"value": "<p data-id=\"peafa3674-2\">@12 @1 @13  <card type=\"inline\" name=\"mention\" value=\"data:%7B%22key%22%3A%221%22%2C%22name%22%3A%22%25u8F93%25u51651-3%25u67E5%25u8BE2%22%2C%22id%22%3A%22yGey0%22%7D\"></card>dfg <card type=\"inline\" name=\"mention\" value=\"data:%7B%22key%22%3A%226%22%2C%22name%22%3A%22Test3%22%2C%22id%22%3A%22L6gUA%22%7D\"></card></p>",
-		"paths": []
-	}
+	"content": { "value": "<p data-id=\"peafa3674-2\">fgfgg</p>", "paths": [] }
 }

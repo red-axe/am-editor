@@ -1,6 +1,7 @@
 import {
 	$,
 	ClipboardData,
+	DATA_TRANSIENT_ATTRIBUTES,
 	EditorInterface,
 	isEngine,
 	NodeInterface,
@@ -62,7 +63,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		}
 
 		if (Array.isArray(widths)) {
-			widths.forEach(w => {
+			widths.forEach((w) => {
 				totalWidth += w;
 			});
 		} else if (typeof widths === 'number') {
@@ -85,10 +86,17 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			const cloneColHeader = $(baseColHeader.outerHTML);
 			$(baseColHeader)[insertMethod](cloneColHeader);
 			const insertCloneCol = cloneNode?.clone();
-			$(insertCloneCol).attributes(
+			insertCloneCol.attributes(
 				'width',
 				Array.isArray(widths) ? widths[count - counter] : widths,
 			);
+			insertCloneCol.attributes(
+				DATA_TRANSIENT_ATTRIBUTES,
+				'table-cell-selection',
+			);
+			if (insertCloneCol.find(Template.TABLE_TD_BG_CLASS).length === 0) {
+				insertCloneCol.append($(Template.CellBG));
+			}
 			const baseCol = cols[index];
 			colgroup[0].insertBefore(insertCloneCol[0], baseCol);
 			counter--;
@@ -99,6 +107,10 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			for (let r = 0; r < count; r++) {
 				const td = (tr as HTMLTableRowElement).insertCell(insertIndex);
 				td.innerHTML = Template.EmptyCell;
+				$(td).attributes(
+					DATA_TRANSIENT_ATTRIBUTES,
+					'table-cell-selection',
+				);
 			}
 		});
 
@@ -145,7 +157,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		if (!tableModel || !this.tableRoot) return;
 		const table = tableModel.table;
 		const selectArea = { ...selection.getSelectArea() };
-		selection.each(cell => {
+		selection.each((cell) => {
 			if (!helper.isEmptyModelCol(cell)) {
 				selectArea.end.col += cell.colSpan - 1;
 			}
@@ -186,8 +198,9 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 								selectArea.begin.col,
 						);
 						if (parentTd.element) {
-							(parentTd.element as HTMLTableDataCellElement).colSpan =
-								parentTd.colSpan - colRemoved;
+							(
+								parentTd.element as HTMLTableDataCellElement
+							).colSpan = parentTd.colSpan - colRemoved;
 						}
 					}
 					continue;
@@ -297,7 +310,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 				?.get<HTMLTableElement>()
 				?.insertRow(insertRow);
 			if (!tr) return;
-			insertTdProps.forEach(props => {
+			insertTdProps.forEach((props) => {
 				const td = tr.insertCell();
 				td.innerHTML = Template.EmptyCell;
 				td.colSpan = props.tdBase.colSpan;
@@ -334,7 +347,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 
 		if (!isEnd) {
 			let rows = selectArea.end.row;
-			selection.each(cell => {
+			selection.each((cell) => {
 				if (!helper.isEmptyModelCol(cell)) {
 					rows += cell.rowSpan - 1;
 				}
@@ -360,7 +373,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const table = tableModel.table;
 		const selectArea = { ...selection.getSelectArea() };
 		const { begin, end } = selectArea;
-		selection.each(cell => {
+		selection.each((cell) => {
 			if (!helper.isEmptyModelCol(cell)) {
 				end.row += cell.rowSpan - 1;
 			}
@@ -387,9 +400,9 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 							end.row + 1,
 							c,
 						);
-						const td = (trs[
-							end.row + 1
-						] as HTMLTableRowElement).insertCell(insertIndex);
+						const td = (
+							trs[end.row + 1] as HTMLTableRowElement
+						).insertCell(insertIndex);
 						const cutCount = end.row - r + 1;
 						td.innerHTML = Template.EmptyCell;
 						td.colSpan = tdModel.colSpan;
@@ -498,7 +511,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			this.colCleared = true;
 		}
 
-		selection.each(tdModel => {
+		selection.each((tdModel) => {
 			if (!helper.isEmptyModelCol(tdModel) && tdModel.element) {
 				tdModel.element.innerHTML = Template.EmptyCell;
 			}
@@ -509,7 +522,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 	clearFormat = () => {
 		const { selection, helper } = this.table;
 		const selectArea = selection.getSelectArea();
-		selection.each(tdModel => {
+		selection.each((tdModel) => {
 			if (!helper.isEmptyModelCol(tdModel) && tdModel.element) {
 				tdModel.element.removeAttribute('style');
 			}
@@ -594,7 +607,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			const newArea = selection.getSelectArea();
 
 			// 先拆分单元格，拷贝的表格中可能有合并单元格，需要重新复制合并单元格情况
-			this.splitCell(true);
+			if (!args[0]) this.splitCell(true);
 			selection.each((tdModel, r, c) => {
 				const paste_r = (r - newArea.begin.row) % rowCount;
 				const paste_c = (c - newArea.begin.col) % colCount;
@@ -701,7 +714,8 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 				for (let c = cols - 1; c >= col; c--) {
 					const tdModel = tableModel.table[r][c];
 					if (!helper.isEmptyModelCol(tdModel) && tdModel.isMulti) {
-						tdModel.element = tdModel.element as HTMLTableCellElement;
+						tdModel.element =
+							tdModel.element as HTMLTableCellElement;
 						tdModel.element.colSpan = 1;
 						tdModel.element.rowSpan = 1;
 					} else if (helper.isEmptyModelCol(tdModel)) {

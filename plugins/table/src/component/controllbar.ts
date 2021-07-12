@@ -14,6 +14,7 @@ import {
 	isEngine,
 	isHotkey,
 	NodeInterface,
+	removeUnit,
 } from '@aomao/engine';
 import Template from './template';
 
@@ -102,6 +103,16 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		for (let i = start; i < end; i++) {
 			rowBars?.eq(i)?.css('height', `${trs[i].offsetHeight}px`);
 		}
+		const rowTrigger = this.rowsHeader?.find(
+			Template.ROWS_HEADER_TRIGGER_CLASS,
+		);
+		rowTrigger?.css(
+			'width',
+			`${
+				(this.table.wrapper?.width() || 0) +
+				(this.rowsHeader?.width() || 0)
+			}px`,
+		);
 	}
 
 	renderColBars() {
@@ -132,9 +143,9 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const colBars = this.colsHeader?.find(Template.COLS_HEADER_ITEM_CLASS);
 		if (!colBars) return;
 		//初始化，col的宽度为0的时候
+		const { tableModel } = this.table.selection;
 		if (isInit) {
 			let tdWidth: Array<number> = [];
-			const { tableModel } = this.table.selection;
 			tableModel?.table?.forEach((trModel) => {
 				trModel.forEach((tdModel, c) => {
 					if (
@@ -189,6 +200,13 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				cols.eq(index)?.attributes('width', width);
 			});
 		}
+		const colTrigger = this.colsHeader?.find(
+			Template.COLS_HEADER_TRIGGER_CLASS,
+		);
+		colTrigger?.css(
+			'height',
+			`${(tableModel?.height || 0) + (this.colsHeader?.height() || 0)}px`,
+		);
 	}
 	/**
 	 * 绑定事件
@@ -204,6 +222,9 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			.on('dragstart', (event) => this.onDragStartRowsHeader(event));
 		this.tableHeader?.on('click', (event) =>
 			this.onClickTableHeader(event),
+		);
+		this.table.wrapper?.on('contextmenu', (event) =>
+			event.preventDefault(),
 		);
 		this.tableRoot?.on('contextmenu', (event) => event.preventDefault());
 		this.colsHeader?.on('contextmenu', (event) => event.preventDefault());
@@ -934,10 +955,15 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			const height =
 				(this.table.selection.tableModel?.height || 0) +
 				colBars.height();
+			const paddingTop = this.viewport?.css('padding-top');
+			const paddingLeft = this.viewport?.css('padding-left') || '0';
 			this.placeholder?.css('width', '3px');
 			this.placeholder?.css('height', `${height}px`);
-			this.placeholder?.css('left', left + 'px');
-			this.placeholder?.css('top', 0 + 'px');
+			this.placeholder?.css(
+				'left',
+				left - 2 + removeUnit(paddingLeft) + 'px',
+			);
+			this.placeholder?.css('top', paddingTop);
 			this.placeholder?.css('display', 'block');
 		} else if (element.closest(Template.ROWS_HEADER_CLASS).length > 0) {
 			if (dropIndex === this.draggingHeader.index) return;
@@ -960,13 +986,25 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 							.get<HTMLElement>()!.offsetTop +
 					  rowBars
 							.eq(this.draggingHeader.index - 1)!
-							.get<HTMLElement>()!.offsetHeight +
+							.get<HTMLElement>()!.offsetHeight -
 					  2;
 			const width = this.table.selection.tableModel?.width || 0;
+			const paddingTop = this.viewport?.css('padding-top');
+			const paddingLeft = this.viewport?.css('padding-left') || '0';
+			const colBars = this.colsHeader?.find(
+				Template.COLS_HEADER_ITEM_CLASS,
+			);
 			this.placeholder?.css('height', '3px');
 			this.placeholder?.css('width', `${width}px`);
-			this.placeholder?.css('left', '3px');
-			this.placeholder?.css('top', 21 + top + 'px');
+			this.placeholder?.css('left', paddingLeft);
+			this.placeholder?.css(
+				'top',
+				top +
+					removeUnit(paddingTop || '0') +
+					(colBars?.height() || 0) -
+					2 +
+					'px',
+			);
 			this.placeholder?.css('display', 'block');
 		}
 	}
@@ -1042,23 +1080,28 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			widths.push(colBars.eq(c)?.get<HTMLElement>()?.offsetWidth || 0);
 		}
 		command.mockCopy();
+		if (isEngine(this.editor)) this.editor.history.hold(12);
 		if (selectArea.begin.col > index) {
 			command.insertColAt(index, count, false, widths, true);
 			selection.selectCol(index, index + count - 1);
-			command.mockPaste(true);
-			selection.selectCol(
-				selectArea.begin.col + count,
-				selectArea.end.col + count,
-			);
-			command.removeCol();
-			selection.selectCol(index, index + count - 1);
+			setTimeout(() => {
+				command.mockPaste(true);
+				selection.selectCol(
+					selectArea.begin.col + count,
+					selectArea.end.col + count,
+				);
+				command.removeCol();
+				selection.selectCol(index, index + count - 1);
+			}, 10);
 		} else {
 			command.insertColAt(index, count, false, widths, true);
 			selection.selectCol(index, index + count - 1);
-			command.mockPaste(true);
-			selection.selectCol(selectArea.begin.col, selectArea.end.col);
-			command.removeCol();
-			selection.selectCol(index - count, index - 1);
+			setTimeout(() => {
+				command.mockPaste(true);
+				selection.selectCol(selectArea.begin.col, selectArea.end.col);
+				command.removeCol();
+				selection.selectCol(index - count, index - 1);
+			}, 10);
 		}
 		this.placeholder?.css('display', 'none');
 		this.draggingHeader = undefined;
@@ -1128,21 +1171,25 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const selectArea = selection.getSelectArea();
 		const { begin, end } = selectArea;
 		command.mockCopy();
-
+		if (isEngine(this.editor)) this.editor.history.hold(12);
 		if (begin.row > index) {
 			command.insertRowAt(index, count, false, true);
 			selection.selectRow(index, index + count - 1);
-			command.mockPaste(true);
-			selection.selectRow(begin.row + count, end.row + count);
-			command.removeRow();
-			selection.selectRow(index, index + count - 1);
+			setTimeout(() => {
+				command.mockPaste(true);
+				selection.selectRow(begin.row + count, end.row + count);
+				command.removeRow();
+				selection.selectRow(index, index + count - 1);
+			}, 10);
 		} else {
 			command.insertRowAt(index, count, false, true);
 			selection.selectRow(index, index + count - 1);
-			command.mockPaste(true);
-			selection.selectRow(begin.row, end.row);
-			command.removeRow();
-			selection.selectRow(index - count, index - 1);
+			setTimeout(() => {
+				command.mockPaste(true);
+				selection.selectRow(begin.row, end.row);
+				command.removeRow();
+				selection.selectRow(index - count, index - 1);
+			}, 10);
 		}
 		this.placeholder?.css('display', 'none');
 		this.draggingHeader = undefined;

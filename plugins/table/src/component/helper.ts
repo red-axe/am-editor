@@ -414,6 +414,15 @@ class Helper implements HelperInterface {
 		if (isNode(from)) from = $(from);
 		if (isNode(to)) to = $(to);
 		to.html(transformCustomTags(from.html()));
+		if (
+			to.name === 'td' &&
+			to.find(Template.TABLE_TD_BG_CLASS).length === 0
+		) {
+			to.append($(Template.CellBG));
+		}
+		if (to.name === 'td') {
+			to.attributes('data-transient-attributes', 'table-cell-selection');
+		}
 		//this.copyCss(from, to)
 	}
 

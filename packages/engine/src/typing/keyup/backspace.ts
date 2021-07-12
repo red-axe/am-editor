@@ -28,11 +28,9 @@ class Backspace implements TypingHandleInterface {
 
 	trigger(event: KeyboardEvent) {
 		const { change } = this.engine;
-		const range = change.getRange();
 		// 编辑器没有内容
 		if (change.isEmpty()) {
 			event.preventDefault();
-			change.setValue('<p><br /><cursor /></p>');
 			return;
 		}
 

@@ -69,12 +69,13 @@ class HistoryModel implements HistoryInterface {
 				isUndo = true;
 			} catch (error) {
 				this.reset();
-				console.log(error);
+				console.error(error);
 			}
 			this.engine.ot.startMutation();
 			if (isUndo) {
 				this.engine.ot.applier.setRangeByPath(undoOp.startRangePath!);
 				this.engine.change.change();
+				this.engine.trigger('undo');
 			}
 		}
 	}
@@ -102,12 +103,13 @@ class HistoryModel implements HistoryInterface {
 				isRedo = true;
 			} catch (error) {
 				this.reset();
-				console.log(error);
+				console.error(error);
 			}
 			this.engine.ot.startMutation();
 			if (isRedo) {
 				this.engine.ot.applier.setRangeByPath(redoOp.rangePath!);
 				this.engine.change.change();
+				this.engine.trigger('redo');
 			}
 		}
 	}
@@ -186,7 +188,7 @@ class HistoryModel implements HistoryInterface {
 		if (this.locked) return;
 		if (!this.currentAction?.self) this.saveOp();
 		let isSave = false;
-		ops.forEach(op => {
+		ops.forEach((op) => {
 			if (!isCursorOp(op)) {
 				isSave = true;
 				if (this.holded && this.actionOps.length > 0)
@@ -196,11 +198,13 @@ class HistoryModel implements HistoryInterface {
 					if (!this.currentAction.ops) this.currentAction.ops = [];
 
 					if (!this.currentAction.startRangePath) {
-						this.currentAction.startRangePath = this.getRangePathBeforeCommand();
+						this.currentAction.startRangePath =
+							this.getRangePathBeforeCommand();
 					}
-					const lastOp = this.currentAction.ops[
-						this.currentAction.ops.length - 1
-					];
+					const lastOp =
+						this.currentAction.ops[
+							this.currentAction.ops.length - 1
+						];
 					if (lastOp && isReverseOp(op, lastOp)) {
 						this.currentAction.ops.pop();
 					} else {
@@ -214,14 +218,13 @@ class HistoryModel implements HistoryInterface {
 
 	collectRemoteOps(ops: Op[]) {
 		if (this.currentAction.self) this.saveOp();
-		ops.forEach(op => {
+		ops.forEach((op) => {
 			if (!isCursorOp(op)) {
 				if (!this.currentAction.ops) {
 					this.currentAction.ops = [];
 				}
-				const lastOp = this.currentAction.ops[
-					this.currentAction.ops.length - 1
-				];
+				const lastOp =
+					this.currentAction.ops[this.currentAction.ops.length - 1];
 				if (lastOp && isReverseOp(op, lastOp)) {
 					this.currentAction.ops.pop();
 				} else {
@@ -237,7 +240,7 @@ class HistoryModel implements HistoryInterface {
 			let prevOp = cloneDeep(this.actionOps[prevIndex]);
 			let opIndex = findLastIndex(
 				this.totalOps,
-				op => op.uid == prevOp.uid,
+				(op) => op.uid == prevOp.uid,
 			);
 			if (opIndex !== -1) prevOp = this.totalOps[opIndex];
 			else opIndex = prevIndex;
@@ -267,7 +270,7 @@ class HistoryModel implements HistoryInterface {
 			let currentOp = cloneDeep(this.actionOps[currentIndex]);
 			let opIndex = findLastIndex(
 				this.totalOps,
-				op => op.uid === currentOp.uid,
+				(op) => op.uid === currentOp.uid,
 			);
 			if (opIndex !== -1) currentOp = this.totalOps[opIndex];
 			else opIndex = currentIndex;

@@ -3,7 +3,7 @@
     top: 0;
     right: 0;
     left: 0;
-    z-index: 1032;
+    z-index: 9999;
     height: 56px;
     background: #fff;
     border-bottom: 1px solid #e8e8e8;
@@ -22,7 +22,7 @@
 
 .card-maximize-header .header-crumb a
 {
-    color: #595959;
+    color: #595959 !important;
     font-size: 14px;
     cursor: pointer;
 }

@@ -56,6 +56,13 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	scrollbar?: Scrollbar;
 	viewport?: NodeInterface;
 
+	init() {
+		if (isEngine(this.editor)) {
+			this.editor.on('undo', () => this.onChange());
+			this.editor.on('redo', () => this.onChange());
+		}
+	}
+
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
 		return [
 			{
@@ -90,6 +97,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		});
 		const { rows, cols, height, width } = tableModel;
 		const html = parser.toValue(schema, conversion, false, true);
+		console.log(html);
 		return {
 			rows,
 			cols,
@@ -157,6 +165,17 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.selection.render('change');
 		const value = this.getTableValue();
 		if (value && value !== this.getValue()) this.setValue(value);
+	}
+
+	maximize() {
+		super.maximize();
+		this.scrollbar?.refresh();
+	}
+
+	minimize() {
+		super.minimize();
+		this.scrollbar?.refresh();
+		console.log(3435);
 	}
 
 	didRender() {

@@ -2,6 +2,7 @@ import { NodeInterface } from '../../types/node';
 import { CardInterface, MaximizeInterface } from '../../types/card';
 import { EditorInterface, isEngine } from '../../types/engine';
 import { $ } from '../../node';
+import { DATA_ELEMENT, DATA_TRANSIENT_ELEMENT, UI } from '../../constants';
 import './index.css';
 
 class Maximize implements MaximizeInterface {
@@ -32,7 +33,8 @@ class Maximize implements MaximizeInterface {
 		const editor = this.editor;
 		const { language } = editor;
 		const lang = language.get('maximize', 'back').toString();
-		const node = $(`<div class="card-maximize-header" data-transient="true">
+		const node =
+			$(`<div class="card-maximize-header" ${DATA_TRANSIENT_ELEMENT}="true" ${DATA_ELEMENT}="${UI}">
             <div class="header-crumb">
                 <a class="split">
                     <span class="data-icon data-icon-arrow-left"></span>
@@ -48,7 +50,7 @@ class Maximize implements MaximizeInterface {
 
 		const crumnNode = node.find('.header-crumb');
 		crumnNode.on('click', () => {
-			this.restore();
+			this.card.minimize();
 		});
 
 		const body = this.card.findByKey('body');

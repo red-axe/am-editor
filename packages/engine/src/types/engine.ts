@@ -1246,6 +1246,28 @@ export interface EngineInterface extends EditorInterface {
 		rewrite?: boolean,
 	): void;
 	/**
+	 * 历史撤销
+	 * @param eventType
+	 * @param listener
+	 * @param rewrite
+	 */
+	on(
+		eventType: 'undo',
+		listener: () => boolean | void,
+		rewrite?: boolean,
+	): void;
+	/**
+	 * 历史重做
+	 * @param eventType
+	 * @param listener
+	 * @param rewrite
+	 */
+	on(
+		eventType: 'redo',
+		listener: () => boolean | void,
+		rewrite?: boolean,
+	): void;
+	/**
 	 * 回车键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
@@ -1450,6 +1472,18 @@ export interface EngineInterface extends EditorInterface {
 	 */
 	off(eventType: 'drop:files', listener: (files: Array<File>) => void): void;
 	/**
+	 * 历史撤销
+	 * @param eventType
+	 * @param listener
+	 */
+	off(eventType: 'undo', listener: () => boolean | void): void;
+	/**
+	 * 历史重做
+	 * @param eventType
+	 * @param listener
+	 */
+	off(eventType: 'redo', listener: () => boolean | void): void;
+	/**
 	 * 回车键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
@@ -1612,6 +1646,16 @@ export interface EngineInterface extends EditorInterface {
 	 * @param files 文件集合
 	 */
 	trigger(eventType: 'drop:files', files: Array<File>): void;
+	/**
+	 * 历史撤销
+	 * @param eventType
+	 */
+	trigger(eventType: 'undo'): void;
+	/**
+	 * 历史重做
+	 * @param eventType
+	 */
+	trigger(eventType: 'redo'): void;
 	/**
 	 * 销毁
 	 */

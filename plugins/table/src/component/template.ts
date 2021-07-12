@@ -66,8 +66,8 @@ class Template implements TemplateInterface {
 	static readonly COL_ADD_BUTTON_SPLIT_CLASS = `.${COL_ADD_BUTTON_SPLIT_CLASS_NAME}`;
 	static readonly TABLE_TD_CONTENT_CLASS = `.${TABLE_TD_CONTENT_CLASS_NAME}`;
 	static readonly TABLE_TD_BG_CLASS = `.${TABLE_TD_BG_CLASS_NAME}`;
-	static readonly EmptyCell = `<div class="${TABLE_TD_CONTENT_CLASS_NAME}" contenteditable="true" ${DATA_ELEMENT}="${EDITABLE}"><p><br /></p></div><div class="${TABLE_TD_BG_CLASS_NAME}"><div class="table-main-border-top"></div><div class="table-main-border-right"></div><div class="table-main-border-bottom"></div><div class="table-main-border-left"></div></div>`;
-
+	static readonly CellBG = `<div class="${TABLE_TD_BG_CLASS_NAME}"><div class="table-main-border-top"></div><div class="table-main-border-right"></div><div class="table-main-border-bottom"></div><div class="table-main-border-left"></div></div>`;
+	static readonly EmptyCell = `<div class="${TABLE_TD_CONTENT_CLASS_NAME}" contenteditable="true" ${DATA_ELEMENT}="${EDITABLE}"><p><br /></p></div>${this.CellBG}`;
 	private table: TableInterface;
 
 	constructor(table: TableInterface) {
@@ -83,9 +83,10 @@ class Template implements TemplateInterface {
 	 * @return {string} 返回 html 字符串
 	 */
 	htmlEdit({ rows, cols, html }: TableValue, menus: TableMenu): string {
-		const tds = `<td ${DATA_TRANSIENT_ATTRIBUTES}="table-cell-selection">${Template.EmptyCell}</td>`.repeat(
-			cols,
-		);
+		const tds =
+			`<td ${DATA_TRANSIENT_ATTRIBUTES}="table-cell-selection">${Template.EmptyCell}</td>`.repeat(
+				cols,
+			);
 		const trs = `<tr>${tds}</tr>`.repeat(rows);
 		const col = `<col />`.repeat(cols);
 		const colgroup = `<colgroup>${col}</colgroup>`;

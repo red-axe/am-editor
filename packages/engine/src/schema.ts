@@ -371,10 +371,12 @@ class Schema implements SchemaInterface {
 			(dataType) => rule.type === dataType,
 		);
 		if (globalRule) {
-			allRule.attributes = {
-				...allRule.attributes,
-				...this.data.globals[globalRule],
-			};
+			allRule.attributes = merge(
+				{
+					...allRule.attributes,
+				},
+				{ ...this.data.globals[globalRule] },
+			);
 		}
 		this.filterAttributes(attributes, allRule);
 		this.filterStyles(styles, allRule);

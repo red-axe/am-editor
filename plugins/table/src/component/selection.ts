@@ -79,7 +79,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				if (action === 'mergeCell') {
 					this.clearSelect();
 					this.selectCellRange(cell.element);
-				} else this.focusCell(cell.element);
+				}
 			}
 		} else if (action === 'removeRow') {
 			const row =
@@ -185,7 +185,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		if (td.name !== 'td') return [-1, -1];
 		const row = td.parent()?.index();
 		if (row === undefined || row < 0) return [-1, -1];
-		const col = this.tableModel?.table[row].findIndex(cell =>
+		const col = this.tableModel?.table[row].findIndex((cell) =>
 			td.equal(
 				(this.table.helper.isEmptyModelCol(cell)
 					? (this.tableModel?.table[cell.parent.row][
@@ -262,9 +262,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			} else if (this.selectArea) {
 				begin = this.selectArea.begin.col;
 				if (this.tableModel) {
-					const tdModel = this.tableModel.table[
-						this.selectArea.begin.row
-					][this.selectArea.begin.col];
+					const tdModel =
+						this.tableModel.table[this.selectArea.begin.row][
+							this.selectArea.begin.col
+						];
 					if (
 						!this.table.helper.isEmptyModelCol(tdModel) &&
 						tdModel.element
@@ -288,9 +289,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			} else if (this.selectArea) {
 				begin = this.selectArea.begin.row;
 				if (this.tableModel) {
-					const tdModel = this.tableModel.table[
-						this.selectArea.begin.row
-					][this.selectArea.begin.col];
+					const tdModel =
+						this.tableModel.table[this.selectArea.begin.row][
+							this.selectArea.begin.col
+						];
 					if (
 						!this.table.helper.isEmptyModelCol(tdModel) &&
 						tdModel.element
@@ -346,9 +348,8 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				if (this.table.helper.isEmptyModelCol(cell)) {
 					if (beginRow > cell.parent.row) beginRow = cell.parent.row;
 					if (beginCol >= cell.parent.col) beginCol = cell.parent.col;
-					const parent = this.tableModel.table[cell.parent.row][
-						cell.parent.col
-					];
+					const parent =
+						this.tableModel.table[cell.parent.row][cell.parent.col];
 					if (!this.table.helper.isEmptyModelCol(parent)) {
 						if (
 							parent.rowSpan > 1 &&

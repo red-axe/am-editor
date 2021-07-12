@@ -188,9 +188,9 @@ div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
 }
 .table-wrapper .table-cols-header .table-cols-header-item .cols-trigger {
     position: absolute;
-    right: -4px;
+    right: -1px;
     top: -1px;
-    width: 7px;
+    width: 2px;
     height: 14px;
     z-index: 10;
     cursor: col-resize;
@@ -212,12 +212,17 @@ div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
     display: none;
 }
 .table-wrapper .table-cols-header .table-cols-header-item .col-dragger .data-icon-drag {
-    transform: rotate(90deg);
     font-size: 10px;
     color: #fff;
     position: relative;
     top: -6px;
 }
+
+.table-wrapper .table-cols-header .table-cols-header-item .col-dragger .data-icon-drag::before {
+    transform: rotate(90deg);
+    display: inline-block;
+}
+
 .table-wrapper.data-table-highlight-col .table-cols-header .table-cols-header-item .col-dragger .data-icon-drag,.table-wrapper.data-table-highlight-all .table-cols-header .table-cols-header-item .col-dragger .data-icon-drag{
     display: none;
 }
@@ -310,8 +315,8 @@ div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
 }
 .table-wrapper .table-rows-header .table-rows-header-item .rows-trigger {
     position: absolute;
-    bottom: -4px;
-    height: 7px;
+    bottom: -1px;
+    height: 2px;
     width: 14px;
     left: -1px;
     z-index: 10;

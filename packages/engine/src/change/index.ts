@@ -340,9 +340,7 @@ class ChangeModel implements ChangeInterface {
 				this.onSelect();
 			}
 			this.onSetValue();
-			if (history) {
-				history.clear();
-			}
+			history.clear();
 		}
 	}
 

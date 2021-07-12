@@ -90,6 +90,9 @@ class Table extends Plugin<Options> {
 						'table-last-column',
 						'table-cell-selection',
 					],
+					style: {
+						'background-color': '@color',
+					},
 				},
 				allowIn: ['tr'],
 			},
