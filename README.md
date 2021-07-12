@@ -304,6 +304,8 @@ In the Vue runtime environment, the default is the installed code that has been 
 
 ## Contribution
 
+Thanks [Nirongxu](https://github.com/Nirongxu) for donation
+
 ### Alipay
 
 ![alipay](https://cdn-object.aomao.com/contribution/alipay.png?x-oss-process=image/resize,w_200)

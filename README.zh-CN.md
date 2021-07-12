@@ -304,6 +304,8 @@ yarn serve
 
 ## 贡献
 
+感谢 [Nirongxu](https://github.com/Nirongxu) 的捐赠
+
 ### 支付宝
 
 ![alipay](https://cdn-object.aomao.com/contribution/alipay.png?x-oss-process=image/resize,w_200)
