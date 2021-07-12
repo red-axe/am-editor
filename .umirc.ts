@@ -83,6 +83,7 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 					},
 					'/plugin/plugin-mark-range',
 					'/plugin/plugin-math',
+					'/plugin/plugin-mention',
 					'/plugin/plugin-orderedlist',
 					'/plugin/plugin-paintformat',
 					'/plugin/plugin-quote',
