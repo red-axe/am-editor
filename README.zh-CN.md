@@ -79,6 +79,7 @@
 | [`@aomao/plugin-link-vue`](./plugins/link-vue)           |           [![](https://img.shields.io/npm/v/@aomao/plugin-link-vue.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/link-vue/package.json) |           [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-link-vue/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-link-vue/dist/index.js) | 链接, 适用于 `Vue3`    |
 | [`@aomao/plugin-line-height`](./plugins/line-height)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-line-height.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/line-height/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-line-height/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-line-height/dist/index.js) | 行高                   |
 | [`@aomao/plugin-mark`](./plugins/mark)                   |                   [![](https://img.shields.io/npm/v/@aomao/plugin-mark.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/mark/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-mark/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-mark/dist/index.js) | 标记                   |
+| [`@aomao/plugin-mention`](./plugins/mention)             |             [![](https://img.shields.io/npm/v/@aomao/plugin-mention.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/mention/package.json) |             [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-mention/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-mention/dist/index.js) | 提及                   |
 | [`@aomao/plugin-orderedlist`](./plugins/orderedlist)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-orderedlist.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/orderedlist/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-orderedlist/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-orderedlist/dist/index.js) | 有序列表               |
 | [`@aomao/plugin-paintformat`](./plugins/paintformat)     |     [![](https://img.shields.io/npm/v/@aomao/plugin-paintformat.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/paintformat/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-paintformat/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-paintformat/dist/index.js) | 格式刷                 |
 | [`@aomao/plugin-quote`](./plugins/quote)                 |                 [![](https://img.shields.io/npm/v/@aomao/plugin-quote.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/quote/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-quote/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-quote/dist/index.js) | 引用块                 |
@@ -269,7 +270,7 @@ otClient.connect(
 
 ### 项目图标
 
-[Iconfont](https://at.alicdn.com/t/project/1456030/1ffb87c5-048b-46f0-9f1e-4829116f7825.html?spm=a313x.7781069.1998910419.35)
+[Iconfont](https://at.alicdn.com/t/project/1456030/91ee9824-8591-463d-ad0b-6f26044781f6.html?spm=a313x.7781069.1998910419.63)
 
 ## 开发
 

@@ -48,6 +48,7 @@ import Sub from '@aomao/plugin-sub';
 import Sup from '@aomao/plugin-sup';
 import Alignment from '@aomao/plugin-alignment';
 import Mark from '@aomao/plugin-mark';
+import Mention, { MentionComponent } from '@aomao/plugin-mention';
 import Quote from '@aomao/plugin-quote';
 import PaintFormat from '@aomao/plugin-paintformat';
 import RemoveFormat from '@aomao/plugin-removeformat';
@@ -104,7 +105,8 @@ const plugins = [
     Video,
     FileUploader,
     VideoUploader,
-    Math
+    Math,
+    Mention
 ];
 const cards = [
 	HrComponent,
@@ -116,7 +118,8 @@ const cards = [
     StatusComponent,
     FileComponent,
     VideoComponent,
-    MathComponent
+    MathComponent,
+    MentionComponent
 ];
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -271,6 +274,19 @@ export default defineComponent({
                                 if(lineHeight === "42px") return "3"
                                 return ["1","1.15","1.5","2","2.5","3"].indexOf(lineHeight) > -1
                             }
+                        },
+                        [Mention.pluginName]: {
+                            action: `${domain}/user/search`,
+                            defaultData: [
+                                {
+                                    key: '1',
+                                    name: '输入1-3查询',
+                                    avatar: 'https://cdn-image.aomao.com/10012/avatar/2020/04/11/1586596344-3b71be94-c861-428d-a8c3-9a1ebfb82a26.png?x-oss-process=image/resize,w_20',
+                                },
+                            ],
+                            onClick: (key: string, name: string) => {
+                                console.log('mention click:', key, '-', name);
+                            },
                         }
                     },
                 });
