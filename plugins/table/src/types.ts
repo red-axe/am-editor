@@ -102,6 +102,8 @@ export type TableValue = {
 	width?: number;
 	height?: number;
 	html?: string;
+	color?: string;
+	noBorder?: boolean;
 };
 
 export type TableMenuItem = {
@@ -215,6 +217,10 @@ export interface ControllBarInterface extends EventEmitter2 {
 	showContextMenu(event: MouseEvent): void;
 
 	hideContextMenu(): void;
+
+	drawBackgroundColor(color?: string): void;
+
+	setAlign(align?: 'top' | 'middle' | 'bottom'): void;
 }
 
 export interface TableCommandInterface extends EventEmitter2 {

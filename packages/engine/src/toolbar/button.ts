@@ -47,10 +47,10 @@ export default class Button implements ButtonInterface {
 			});
 		}
 
-		this.root.find('a').on('click', e => {
+		this.root.find('a').on('click', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			if (onClick) onClick();
+			if (onClick) onClick(e, this.root);
 		});
 
 		if (didMount) {

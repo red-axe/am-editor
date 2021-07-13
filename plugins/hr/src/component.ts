@@ -23,6 +23,7 @@ class Hr extends Card {
 	}
 
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+		if (this.readonly) return [];
 		return [
 			{
 				type: 'dnd',

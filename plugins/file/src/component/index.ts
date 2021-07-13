@@ -146,10 +146,9 @@ export default class FileCard extends Card<FileValue> {
 		const { name, status, message, percent, size } = value;
 		const locales = this.getLocales();
 		if (status === 'error') {
-			return `<span class="data-file-error"><span class="data-icon data-icon-error"></span>${message ||
-				locales[
-					'loadError'
-				]}<span class="data-icon data-icon-copy"></span></span>`;
+			return `<span class="data-file-error"><span class="data-icon data-icon-error"></span>${
+				message || locales['loadError']
+			}<span class="data-icon data-icon-copy"></span></span>`;
 		}
 
 		let icon = '<span class="data-icon data-icon-attachment"></span>';
@@ -215,30 +214,6 @@ export default class FileCard extends Card<FileValue> {
 	renderView() {
 		// 默认点击都是下载
 		this.container?.on('click', this.downloadFile);
-		// 显示或隐藏工具栏
-		let canHide = true;
-
-		const handleMouseleave = () => {
-			canHide = true;
-			window.setTimeout(() => {
-				if (canHide) {
-					this.toolbarModel?.hideCardToolbar();
-				}
-			}, 300);
-		};
-
-		const handleMouseenter = () => {
-			canHide = false;
-			this.toolbarModel?.showCardToolbar();
-			const container = this.toolbarModel?.getContainer();
-			container?.on('mouseenter', () => {
-				canHide = false;
-			});
-			container?.on('mouseleave', handleMouseleave);
-		};
-
-		this.container?.on('mouseenter', handleMouseenter);
-		this.container?.on('mouseleave', handleMouseleave);
 	}
 
 	didUpdate() {

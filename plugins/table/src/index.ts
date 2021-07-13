@@ -41,7 +41,8 @@ class Table extends Plugin<Options> {
 				name: 'table',
 				type: 'block',
 				attributes: {
-					class: 'data-table',
+					class: ['data-table'],
+					'data-table-no-border': '*',
 					style: {
 						width: '@length',
 					},
@@ -92,6 +93,7 @@ class Table extends Plugin<Options> {
 					],
 					style: {
 						'background-color': '@color',
+						'vertical-align': ['top', 'middle', 'bottom'],
 					},
 				},
 				allowIn: ['tr'],

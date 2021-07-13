@@ -8,7 +8,7 @@ export type ButtonOptions = {
 	class?: string;
 	content: string;
 	title?: string | (() => string);
-	onClick?: () => void;
+	onClick?: (event: MouseEvent, node: NodeInterface) => void;
 	didMount?: (node: NodeInterface) => void;
 };
 
@@ -30,14 +30,14 @@ export type DropdownSwitchOptions = {
 	content: string;
 	checked?: boolean;
 	getState?: () => boolean;
-	onClick?: () => void;
+	onClick?: (event: MouseEvent, node: NodeInterface) => void;
 };
 
 export type DropdownButtonOptions = {
 	type: 'button';
 	disabled?: boolean;
 	content: string;
-	onClick?: () => void;
+	onClick?: (event: MouseEvent, node: NodeInterface) => void;
 };
 
 export type DropdownOptions = {
@@ -46,6 +46,7 @@ export type DropdownOptions = {
 	content: string;
 	title?: string | (() => string);
 	items: Array<DropdownSwitchOptions | DropdownButtonOptions>;
+	didMount?: (node: NodeInterface) => void;
 };
 
 export type NodeOptions = {

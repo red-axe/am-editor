@@ -98,7 +98,27 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		value = value || {};
 		value['id'] = this.getId(value['id']);
 		this.setValue(value as T);
-		if (this.toolbar) this.toolbarModel = new Toolbar(this.editor, this);
+		if (this.toolbar) {
+			this.toolbarModel = new Toolbar(this.editor, this);
+			if (this.readonly) {
+				let hideTimeout: NodeJS.Timeout;
+				const hide = () => {
+					hideTimeout = setTimeout(() => {
+						this.toolbarModel?.hide();
+					}, 200);
+				};
+
+				this.root.on('mouseover', () => {
+					this.toolbarModel?.show();
+					this.toolbarModel?.getContainer()?.on('mouseover', () => {
+						if (hideTimeout) clearTimeout(hideTimeout);
+					});
+
+					this.toolbarModel?.getContainer()?.on('mouseleave', hide);
+				});
+				this.root.on('mouseleave', hide);
+			}
+		}
 		this.defaultMaximize = new Maximize(this.editor, this);
 	}
 
@@ -106,7 +126,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 
 	private getId(curId?: string) {
 		const idCache: Array<string> = [];
-		this.editor.card.each(card => {
+		this.editor.card.each((card) => {
 			idCache.push(card.id);
 		});
 		if (curId && idCache.indexOf(curId) < 0) return curId;
@@ -142,7 +162,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		const { card } = this.editor;
 		const nodes = this.root.find(selector);
 		const children: Array<Node> = [];
-		nodes.each(item => {
+		nodes.each((item) => {
 			const cardComponent = card.find(item);
 			if (cardComponent && cardComponent.root.equal(this.root)) {
 				children.push(item);
@@ -256,10 +276,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 			}
 		}
 
-		range
-			.select(prevBlock, true)
-			.shrinkToElementNode()
-			.collapse(false);
+		range.select(prevBlock, true).shrinkToElementNode().collapse(false);
 	}
 	// 焦点移动到下一个 Block
 	focusNextBlock(range: RangeInterface, hasModify: boolean) {
@@ -296,10 +313,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 			}
 		}
 
-		range
-			.select(nextBlock, true)
-			.shrinkToElementNode()
-			.collapse(true);
+		range.select(nextBlock, true).shrinkToElementNode().collapse(true);
 	}
 
 	/**

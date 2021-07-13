@@ -82,7 +82,10 @@ class Template implements TemplateInterface {
 	 * @param {string} value.html html 字符串
 	 * @return {string} 返回 html 字符串
 	 */
-	htmlEdit({ rows, cols, html }: TableValue, menus: TableMenu): string {
+	htmlEdit(
+		{ rows, cols, html, noBorder }: TableValue,
+		menus: TableMenu,
+	): string {
 		const tds =
 			`<td ${DATA_TRANSIENT_ATTRIBUTES}="table-cell-selection">${Template.EmptyCell}</td>`.repeat(
 				cols,
@@ -164,7 +167,9 @@ class Template implements TemplateInterface {
 
 		const table =
 			html ||
-			`<table class="${TABLE_CLASS_NAME}" ${DATA_TRANSIENT_ATTRIBUTES}="class">${colgroup}${trs}</table>`;
+			`<table class="${TABLE_CLASS_NAME}"${
+				noBorder === true ? " data-table-no-border='true'" : ''
+			} ${DATA_TRANSIENT_ATTRIBUTES}="class">${colgroup}${trs}</table>`;
 
 		return `<div class="${TABLE_WRAPPER_CLASS_NAME}" ${DATA_TRANSIENT_ATTRIBUTES}="*">
                 ${tableHeader}
@@ -179,8 +184,10 @@ class Template implements TemplateInterface {
             </div>`;
 	}
 
-	htmlView({ html }: TableValue) {
-		return `<div class="${VIEWPORT_READER}">${html}</div>`;
+	htmlView({ html, noBorder }: TableValue) {
+		return `<div class="${VIEWPORT_READER}"${
+			noBorder === true ? " data-table-no-border='true'" : ''
+		}>${html}</div>`;
 	}
 }
 

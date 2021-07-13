@@ -32,11 +32,12 @@ export default class {
 		this.root = $(template(this.options));
 		this.switch = this.root.find('.ant-switch');
 		container.append(this.root);
-		this.root.on('mousedown', e => e.preventDefault());
-		this.root.on('click', e => {
+		this.root.on('mousedown', (e) => e.preventDefault());
+		const { onClick } = this.options;
+		this.root.on('click', (e) => {
 			e.stopPropagation();
-			if (this.options.onClick) {
-				this.options.onClick();
+			if (onClick) {
+				onClick(e, this.root!);
 				this.updateSwitch();
 			}
 		});

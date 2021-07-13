@@ -1445,6 +1445,28 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		selectArea.end = { row: tableModel.rows - 1, col: tableModel.cols - 1 };
 		selection.showHighlight(selectArea);
 	};
+
+	drawBackgroundColor(color?: string) {
+		const { selection, helper } = this.table;
+		selection.each((cell) => {
+			if (!helper.isEmptyModelCol(cell) && cell.element) {
+				if (!color || color === 'transparent')
+					cell.element.style.removeProperty('background-color');
+				else cell.element.style.backgroundColor = color;
+			}
+		});
+	}
+
+	setAlign(align?: 'top' | 'middle' | 'bottom') {
+		const { selection, helper } = this.table;
+		selection.each((cell) => {
+			if (!helper.isEmptyModelCol(cell) && cell.element) {
+				if (!align || align === 'top')
+					cell.element.style.removeProperty('vertical-align');
+				else cell.element.style.verticalAlign = align;
+			}
+		});
+	}
 }
 
 export default ControllBar;

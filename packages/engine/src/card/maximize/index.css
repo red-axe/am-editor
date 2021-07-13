@@ -53,11 +53,11 @@
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 1032;
+    z-index: 99999;
     overflow: auto;
     padding: 20px;
 }
 
-.am-engine-mobile .data-card-block-max [data-card-element="center"] {
+.am-engine-mobile .data-card-block-max [data-card-element="center"],.am-engine-view .data-card-block-max [data-card-element="center"] {
     top:56px;
 }

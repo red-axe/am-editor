@@ -26,6 +26,7 @@ import menuData from './menu';
 import ControllBar from './controllbar';
 import TableSelection from './selection';
 import TableCommand from './command';
+import { ColorTool, Palette } from './toolbar';
 
 class TableComponent extends Card<TableValue> implements TableInterface {
 	readonly contenteditable: string[] = [
@@ -44,6 +45,12 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		return 'background';
 	}
 
+	static colors = Palette.getColors().map((group) =>
+		group.map((color) => {
+			return { color, border: Palette.getStroke(color) };
+		}),
+	);
+
 	wrapper?: NodeInterface;
 	helper: HelperInterface = new Helper();
 	template: TemplateInterface = new Template(this);
@@ -55,15 +62,36 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	command: TableCommandInterface = new TableCommand(this.editor, this);
 	scrollbar?: Scrollbar;
 	viewport?: NodeInterface;
+	colorTool?: ColorTool;
+	noBorderToolButton?: NodeInterface;
+	alignToolButton?: NodeInterface;
 
 	init() {
 		if (isEngine(this.editor)) {
 			this.editor.on('undo', () => this.onChange());
 			this.editor.on('redo', () => this.onChange());
 		}
+
+		this.colorTool = new ColorTool(this.editor, this.id, {
+			colors: TableComponent.colors,
+			defaultColor: this.getValue()?.color,
+			onChange: (color: string) => {
+				this.setValue({
+					color,
+				});
+				this.conltrollBar.drawBackgroundColor(color);
+			},
+		});
 	}
 
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+		if (this.readonly)
+			return [
+				{
+					type: 'maximize',
+				},
+			];
+		const language = this.editor.language.get('table');
 		return [
 			{
 				type: 'dnd',
@@ -77,7 +105,85 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			{
 				type: 'delete',
 			},
+			{
+				type: 'separator',
+			},
+			{
+				type: 'node',
+				title: this.editor.language.get<string>(
+					'table',
+					'color',
+					'title',
+				),
+				node: this.colorTool!.getButton(),
+			},
+			{
+				type: 'button',
+				title: language['noBorder'],
+				content: '<span class="data-icon data-icon-no-border"></span>',
+				didMount: (node) => {
+					const value = this.getValue();
+					if (value?.noBorder === true) {
+						node.addClass('active');
+					}
+					this.noBorderToolButton = node;
+				},
+				onClick: (_, node) => {
+					const value = this.getValue();
+					this.setValue({
+						noBorder: !value?.noBorder,
+					});
+					const table = this.wrapper?.find('.data-table');
+					if (value?.noBorder === true) {
+						table?.removeAttributes('data-table-no-border');
+						node.removeClass('active');
+					} else {
+						table?.attributes('data-table-no-border', 'true');
+						node.addClass('active');
+					}
+				},
+			},
+			{
+				type: 'dropdown',
+				content: '<span class="data-icon data-icon-align-top" />',
+				title: language['verticalAlign']['title'],
+				didMount: (node) => {
+					console.log(node);
+					this.alignToolButton = node.find('.data-toolbar-btn');
+				},
+				items: [
+					{
+						type: 'button',
+						content: `<span class="data-icon data-icon-align-top"></span> ${language['verticalAlign']['top']}`,
+						onClick: (event: MouseEvent) =>
+							this.updateAlign(event, 'top'),
+					},
+					{
+						type: 'button',
+						content: `<span class="data-icon data-icon-align-middle"></span> ${language['verticalAlign']['middle']}`,
+						onClick: (event: MouseEvent) =>
+							this.updateAlign(event, 'middle'),
+					},
+					{
+						type: 'button',
+						content: `<span class="data-icon data-icon-align-bottom"></span> ${language['verticalAlign']['bottom']}`,
+						onClick: (event: MouseEvent) =>
+							this.updateAlign(event, 'bottom'),
+					},
+				],
+			},
 		];
+	}
+
+	updateAlign(event: MouseEvent, align: 'top' | 'middle' | 'bottom' = 'top') {
+		event.preventDefault();
+		this.conltrollBar.setAlign(align);
+		this.updateAlignText(align);
+	}
+
+	updateAlignText(align: 'top' | 'middle' | 'bottom' = 'top') {
+		const alignHtml = `<span class="data-icon data-icon-align-${align}"></span>`;
+		this.alignToolButton?.html(alignHtml);
 	}
 
 	getTableValue() {
@@ -97,7 +203,6 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		});
 		const { rows, cols, height, width } = tableModel;
 		const html = parser.toValue(schema, conversion, false, true);
-		console.log(html);
 		return {
 			rows,
 			cols,
@@ -164,7 +269,13 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.conltrollBar.refresh();
 		this.selection.render('change');
 		const value = this.getTableValue();
-		if (value && value !== this.getValue()) this.setValue(value);
+		const oldValue = this.getValue();
+		if (value && value !== oldValue) {
+			if (oldValue?.noBorder) {
+				this.noBorderToolButton?.addClass('active');
+			} else this.noBorderToolButton?.removeClass('active');
+			this.setValue(value);
+		}
 	}
 
 	maximize() {
@@ -206,6 +317,8 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			if (selectArea && selectArea.count > 1 && tableModel) {
 				this.editor.ot.updateSelectionData();
 			}
+			const align = this.selection.getSingleCell()?.css('vertical-align');
+			this.updateAlignText(align as any);
 		});
 
 		this.conltrollBar.on('sizeChanged', () => {

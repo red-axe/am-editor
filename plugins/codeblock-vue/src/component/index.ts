@@ -94,22 +94,6 @@ class CodeBlcok extends Card<CodeBlockValue> {
 			}, 50);
 		} else {
 			this.codeEditor.render(mode, code);
-			let hideTimeout: NodeJS.Timeout;
-			const hide = () => {
-				hideTimeout = setTimeout(() => {
-					this.toolbarModel?.hide();
-				}, 50);
-			};
-
-			this.root.on('mouseover', () => {
-				this.toolbarModel?.show();
-				this.toolbarModel?.getContainer()?.on('mouseover', () => {
-					if (hideTimeout) clearTimeout(hideTimeout);
-				});
-
-				this.toolbarModel?.getContainer()?.on('mouseleave', hide);
-			});
-			this.root.on('mouseleave', hide);
 		}
 	}
 }

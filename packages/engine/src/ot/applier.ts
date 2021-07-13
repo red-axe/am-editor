@@ -148,7 +148,9 @@ class Applier implements ApplierInterface {
 			domNode.get<Element>()?.setAttribute(attr, value);
 			if (domNode.isCard()) {
 				const component = card.find(domNode);
-				if (!component?.isEditable) card.render($(node));
+				if (!component?.isEditable) card.render(domNode);
+				else if (component.isEditable && component.onChange)
+					component.onChange(domNode);
 			}
 		}
 		return domNode;

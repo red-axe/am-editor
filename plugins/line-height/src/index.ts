@@ -38,7 +38,7 @@ export default class extends Plugin<Options> {
 		if (!isEngine(this.editor)) return;
 		const { change, node } = this.editor;
 		const range = change.getRange();
-		if (!range.startNode.inEditor()) return 0;
+		if (!range.startNode.inEditor()) return '';
 		const { blocks } = change;
 
 		const values: Array<string> = [];

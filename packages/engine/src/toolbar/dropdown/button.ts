@@ -26,7 +26,7 @@ export default class {
 		container.append(this.root);
 		const { onClick } = this.options;
 		if (onClick) {
-			this.root.on('click', () => onClick());
+			this.root.on('click', (event) => onClick(event, this.root!));
 		}
 	}
 }

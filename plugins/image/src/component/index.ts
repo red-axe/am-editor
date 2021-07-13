@@ -121,6 +121,7 @@ class ImageComponent extends Card<ImageValue> {
 	}
 
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
+		if (this.readonly) return [];
 		const { language } = this.editor;
 		let value = this.getValue();
 		if (this.isLocalError === true || value?.status === 'error')

@@ -36,11 +36,11 @@ export default class Dropdown implements DropdownInterface {
 
 	initToggleEvent() {
 		const dropdownBtn = this.root!.find('.data-toolbar-dropdown');
-		dropdownBtn.on('mousedown', e => {
+		dropdownBtn.on('mousedown', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
 		});
-		dropdownBtn.on('click', e => {
+		dropdownBtn.on('click', (e) => {
 			e.stopPropagation();
 			this.toggleDropdown();
 		});
@@ -84,7 +84,7 @@ export default class Dropdown implements DropdownInterface {
 	renderDropdown(container: NodeInterface) {
 		this.dropdown = container.find('.dropdown-container');
 		const { items } = this.options;
-		items.forEach(item => {
+		items.forEach((item) => {
 			switch (item.type) {
 				case 'switch':
 					return new Switch(item).renderTo(this.dropdown!);
@@ -92,7 +92,7 @@ export default class Dropdown implements DropdownInterface {
 					return new Button(item).renderTo(this.dropdown!);
 			}
 		});
-		this.dropdown.on('click', e => {
+		this.dropdown.on('click', (e) => {
 			e.stopPropagation();
 			this.hideDropdown();
 		});
@@ -104,6 +104,10 @@ export default class Dropdown implements DropdownInterface {
 		this.initToggleEvent();
 		this.renderTooltip();
 		this.renderDropdown(container);
+		const { didMount } = this.options;
+		if (didMount) {
+			didMount(this.root);
+		}
 	}
 
 	destroy() {
