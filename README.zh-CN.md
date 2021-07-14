@@ -40,7 +40,7 @@
 
 可编辑器区域内的节点通过 `schema` 规则，制定了 `mark` `inline` `block` `card` 4 种组合节点，他们由不同的属性、样式或 `html` 结构组成，并对它们的嵌套进行了一定的约束。
 
-通过 `MutationObserver` 监听编辑区域内的 `html` 结构的改变，并生成 `json0` 类型的数据格式与 [ShareDB](https://github.com/share/sharedb) 库进行交互达到协同编辑的需要。
+通过 `MutationObserver` 监听编辑区域内的 `DOM` 树的改变，并生成 `json0` 类型的数据格式与 [ShareDB](https://github.com/share/sharedb) 库进行交互，从而达到协同编辑的需要。
 
 **`Vue3`** 案例 [https://github.com/itellyou-com/am-editor/tree/master/examples/vue](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
 

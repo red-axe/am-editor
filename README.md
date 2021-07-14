@@ -38,7 +38,7 @@ Use the `contenteditable` attribute provided by the browser to make a DOM node e
 
 The engine takes over most of the browser's default behaviors such as cursors and events.
 
-The nodes in the editor area have four types of combined nodes of `mark`, `inline`, `block` and `card` through the `schema` rule. They are composed of different attributes, styles or `html` structures. Certain constraints are imposed on nesting.
+Monitor the changes of the `DOM` tree in the editing area through `MutationObserver`, and generate a data format of `json0` type to interact with the [ShareDB](https://github.com/share/sharedb) library to achieve collaborative editing Needs.
 
 Use the `MutationObserver` to monitor the changes of the `html` structure in the editing area, and generate a `json0` type data format to interact with the [ShareDB](https://github.com/share/sharedb) library to meet the needs of collaborative editing .
 
