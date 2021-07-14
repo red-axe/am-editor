@@ -40,8 +40,6 @@ The engine takes over most of the browser's default behaviors such as cursors an
 
 Monitor the changes of the `DOM` tree in the editing area through `MutationObserver`, and generate a data format of `json0` type to interact with the [ShareDB](https://github.com/share/sharedb) library to achieve collaborative editing Needs.
 
-Use the `MutationObserver` to monitor the changes of the `html` structure in the editing area, and generate a `json0` type data format to interact with the [ShareDB](https://github.com/share/sharedb) library to meet the needs of collaborative editing .
-
 **`Vue3`** example [https://github.com/itellyou-com/am-editor/tree/master/examples/vue](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
 
 **`React`** example [https://github.com/itellyou-com/am-editor/tree/master/examples/react](https://github.com/itellyou-com/am-editor/tree/master/examples/react)
