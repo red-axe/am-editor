@@ -17,18 +17,34 @@ const engine = new Engine(渲染节点, {
 
 -   类型: `string`
 -   默认值：`zh-cn`
--   详细：语言配置，暂时支持 `zh-cn`、`en`。可使用 `engine.language` 添加
+-   详细：语言配置，暂时支持 `zh-cn`、`en`。可使用 `locale` 配置
 
 ```ts
-const engine = new Engine(渲染节点, {
+const view = new View(渲染节点, {
 	lang: 'zh-cn',
 });
-engine.language.add({
-	'zh-cn': {
-		test: '测试',
+```
+
+### locale
+
+-   类型: `object`
+-   默认值：`zh-cn`
+-   详细：配置额外语言包
+
+语言包，默认语言包 [https://github.com/itellyou-com/am-editor/tree/master/locale](https://github.com/itellyou-com/am-editor/tree/master/locale)
+
+```ts
+const view = new View(渲染节点, {
+	locale: {
+		'zh-cn': {
+			test: '测试',
+			a: {
+				b: 'B',
+			},
+		},
 	},
 });
-console.log(engine.language.get('test'));
+console.log(view.language.get<string>('test'));
 ```
 
 ### className

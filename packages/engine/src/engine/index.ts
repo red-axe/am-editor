@@ -1,3 +1,4 @@
+import { merge } from 'lodash-es';
 import NodeModel, { Event, $ } from '../node';
 import language from '../locales';
 import Change from '../change';
@@ -64,6 +65,7 @@ class Engine implements EngineInterface {
 	readonly kind = 'engine';
 	options: EngineOptions = {
 		lang: 'zh-cn',
+		locale: {},
 		plugins: [],
 		cards: [],
 		config: {},
@@ -114,7 +116,10 @@ class Engine implements EngineInterface {
 
 	constructor(selector: Selector, options?: EngineOptions) {
 		this.options = { ...this.options, ...options };
-		this.language = new Language(this.options.lang || 'zh-cn', language);
+		this.language = new Language(
+			this.options.lang || 'zh-cn',
+			merge(language, options?.locale),
+		);
 		this.event = new Event();
 		this.command = new Command(this);
 		this.schema = new Schema();

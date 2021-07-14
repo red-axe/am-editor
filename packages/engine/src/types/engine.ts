@@ -406,6 +406,7 @@ export interface EditorInterface {
 
 export type EngineOptions = {
 	lang?: string;
+	locale?: { [key: string]: {} };
 	className?: string;
 	tabIndex?: number;
 	root?: Node;

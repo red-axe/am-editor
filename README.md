@@ -50,6 +50,7 @@ Monitor the changes of the `DOM` tree in the editing area through `MutationObser
 -   High extensibility, in addition to the basic plug-in of `mark`, inline`and`block`type`, we also provide`card`component combined with`React`, `Vue` and other front-end libraries to render the plug-in UI
 -   Rich multimedia support, not only supports pictures, audio and video, but also supports insertion of embedded multimedia content
 -   Support Markdown syntax
+-   Support internationalization
 -   The engine is written in pure JavaScript and does not rely on any front-end libraries. Plug-ins can be rendered using front-end libraries such as `React` and `Vue`. Easily cope with complex architecture
 -   Built-in collaborative editing program, ready to use with lightweight configuration
 -   Compatible with most of the latest mobile browsers

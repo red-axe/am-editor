@@ -30,6 +30,7 @@ export interface ViewInterface extends EditorInterface {
 export type ContentViewOptions = {
 	//语言，默认中文
 	lang?: string;
+	locale?: { [key: string]: {} };
 	plugins?: Array<PluginEntry>;
 	cards?: Array<CardEntry>;
 	//插件选项，每个插件具体选项请在插件查看

@@ -18,18 +18,34 @@ const view = new View(render node, {
 
 -   Type: `string`
 -   Default value: `zh-cn`
--   Detailed: Language configuration, temporarily supports `zh-cn`, `en`. Can be added using `view.language`
+-   Detailed: Language configuration, temporarily supports `zh-cn`, `en`. Can use `locale` configuration
 
 ```ts
 const view = new View(render node, {
-lang:'zh-cn',
+    lang:'zh-cn',
 });
-view.language.add({
-'zh-cn': {
-test:'Test',
-},
+```
+
+### locale
+
+-   Type: `object`
+-   Default value: `zh-cn`
+-   Detailed: Configure additional language packs
+
+Language pack, default language pack [https://github.com/itellyou-com/am-editor/tree/master/locale](https://github.com/itellyou-com/am-editor/tree/master/ locale)
+
+```ts
+const view = new View(render node, {
+     locale: {
+         'zh-cn': {
+             test:'Test',
+             a: {
+                 b: "B"
+             }
+         },
+     }
 });
-console.log(view.language.get('test'));
+console.log(view.language.get<string>('test'));
 ```
 
 ### root
