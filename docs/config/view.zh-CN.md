@@ -32,7 +32,7 @@ const view = new View(渲染节点, {
 -   默认值：`zh-cn`
 -   详细：配置额外语言包
 
-语言包，默认语言包 [https://github.com/itellyou-com/am-editor/tree/master/locale](https://github.com/itellyou-com/am-editor/tree/master/locale)
+语言包，默认语言包 [https://github.com/itellyou-com/am-editor/blob/master/locale](https://github.com/itellyou-com/am-editor/blob/master/locale)
 
 ```ts
 const view = new View(渲染节点, {

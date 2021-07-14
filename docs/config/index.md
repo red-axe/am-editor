@@ -31,7 +31,7 @@ const view = new View(render node, {
 -   Default value: `zh-cn`
 -   Detailed: Configure additional language packs
 
-Language pack, default language pack [https://github.com/itellyou-com/am-editor/tree/master/locale](https://github.com/itellyou-com/am-editor/tree/master/ locale)
+Language pack, default language pack [https://github.com/itellyou-com/am-editor/blob/master/locale](https://github.com/itellyou-com/am-editor/blob/master/locale)
 
 ```ts
 const view = new View(render node, {
