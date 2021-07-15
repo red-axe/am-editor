@@ -154,7 +154,9 @@ class Table extends Plugin<Options> {
 					'white-space': 'normal',
 					'word-wrap': 'break-word',
 					margin: '4px 8px',
-					border: '1px solid #d9d9d9',
+					border: !!table.attributes('data-table-no-border')
+						? '0 none'
+						: '1px solid #d9d9d9',
 					padding: '4px 8px',
 					cursor: 'default',
 				});
