@@ -31,6 +31,10 @@ class Mention extends Card<MentionValue> {
 		return CardType.INLINE;
 	}
 
+	static get singleSelectable() {
+		return false;
+	}
+
 	/**
 	 * 默认数据
 	 */
@@ -53,6 +57,14 @@ class Mention extends Card<MentionValue> {
 	 * @param name
 	 */
 	static itemClick(key: string, name: string) {}
+
+	/**
+	 * 鼠标移入
+	 * @param node
+	 * @param key
+	 * @param name
+	 */
+	static mouseEnter(node: NodeInterface, key: string, name: string) {}
 
 	init() {
 		if (!isEngine(this.editor) || isServer) {
@@ -152,6 +164,14 @@ class Mention extends Card<MentionValue> {
 			);
 			this.#container.on('click', () => {
 				Mention.itemClick(unescape(key || ''), unescape(name));
+			});
+			this.#container.on('mouseenter', () => {
+				if (!this.#container) return;
+				Mention.mouseEnter(
+					this.#container,
+					unescape(key || ''),
+					unescape(name),
+				);
 			});
 		}
 

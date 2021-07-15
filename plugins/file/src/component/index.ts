@@ -61,6 +61,10 @@ export default class FileCard extends Card<FileValue> {
 		return 'background';
 	}
 
+	static get singleSelectable() {
+		return false;
+	}
+
 	private container?: NodeInterface;
 
 	private maxWidth: number = 752;

@@ -16,6 +16,7 @@ export type Options = {
 	defaultData?: Array<MentionItem>;
 	onSearch?: (keyword: string) => Promise<Array<MentionItem>>;
 	onClick?: (key: string, name: string) => void;
+	onMouseEnter?: (node: NodeInterface, key: string, name: string) => void;
 	/**
 	 * 查询地址
 	 */
@@ -51,6 +52,7 @@ class MentionPlugin extends Plugin<Options> {
 			defaultData,
 			onSearch,
 			onClick,
+			onMouseEnter,
 			action,
 			contentType,
 			type,
@@ -59,6 +61,7 @@ class MentionPlugin extends Plugin<Options> {
 		const { request } = this.editor;
 		if (defaultData) MentionComponent.defaultData = defaultData;
 		if (onClick) MentionComponent.itemClick = onClick;
+		if (onMouseEnter) MentionComponent.mouseEnter = onMouseEnter;
 		MentionComponent.search = (keyword: string) => {
 			if (onSearch) return onSearch(keyword);
 			return new Promise((resolve) => {
