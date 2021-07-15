@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-fontcolor",
-  "version": "2.2.15",
+  "version": "2.2.16",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/itellyou-com/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.2.15",
+    "@aomao/engine": "^2.2.16",
     "@babel/runtime": "^7.13.10"
   }
 }
