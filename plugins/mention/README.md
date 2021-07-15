@@ -37,6 +37,8 @@ new Engine(...,{
 
 `onClick`: 在“提及”上单击时触发
 
+`onMouseEnter`: 鼠标移入“提及”上时触发
+
 `action`: 查询地址，始终使用 `GET` 请求
 
 `data`: 查询时同时将这些数据一起传到到服务端
@@ -48,6 +50,8 @@ defaultData?: Array<{ key: string, name: string, avatar?: string}>
 onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar?: string}>>
 //在“提及”上单击事件
 onClick?:(key: string, name: string) => void
+//鼠标移入“提及”上时触发
+onMouseEnter?:(node: NodeInterface, key: string, name: string) => void
 /**
  * 查询地址
  */

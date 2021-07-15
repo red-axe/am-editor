@@ -37,6 +37,8 @@ new Engine(...,{
 
 `onClick`: Triggered when clicking on the "mention"
 
+`onMouseEnter`: Triggered when the mouse moves over the "mention"
+
 `action`: query address, always use `GET` request
 
 `data`: When querying, these data will be sent to the server at the same time
@@ -44,10 +46,12 @@ new Engine(...,{
 ```ts
 //List data displayed by default
 defaultData?: Array<{ key: string, name: string, avatar?: string}>
-//The method of query, or configure action, choose one of the two
+//Method for query, or configure action, choose one of the two
 onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar?: string}>>
 //Click event on "mention"
 onClick?:(key: string, name: string) => void
+// Triggered when the mouse moves over the "mention"
+onMouseEnter?:(node: NodeInterface, key: string, name: string) => void
 /**
  * look for the address
  */
