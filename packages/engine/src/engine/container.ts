@@ -29,9 +29,9 @@ class Container {
 		this.node.attributes({
 			contenteditable: 'true',
 			role: 'textbox',
-			autocorrect: lang === 'en' ? 'on' : 'off',
+			autocorrect: lang === 'en-US' ? 'on' : 'off',
 			autocomplete: 'off',
-			spellcheck: lang === 'en' ? 'true' : 'false',
+			spellcheck: lang === 'en-US' ? 'true' : 'false',
 			'data-gramm': 'false',
 		});
 

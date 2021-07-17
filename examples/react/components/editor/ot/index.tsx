@@ -16,7 +16,7 @@ const OTComponent: React.FC<{ members: Array<Member> }> = ({ members }) => {
 			<Space className="editor-ot-users-content" size="small">
 				{!isMobile && (
 					<span style={{ color: '#888888' }}>
-						{lang === 'zh-cn' ? (
+						{lang === 'zh-CN' ? (
 							<>
 								当前在线<strong>{members.length}</strong>人
 							</>

@@ -33,7 +33,7 @@ class Ajax implements AjaxInterface {
 	 * @param options 选项
 	 */
 	static setup = (options: SetupOptions) => {
-		Object.keys(options).forEach(key => {
+		Object.keys(options).forEach((key) => {
 			if (globalSetup[key]) globalSetup[key] = options[key];
 		});
 	};
@@ -167,7 +167,7 @@ class Ajax implements AjaxInterface {
 			headers[CONTENT_TYPE] =
 				this.options.contentType || globalSetup.contentType;
 		}
-		Object.keys(headers).forEach(name => {
+		Object.keys(headers).forEach((name) => {
 			request.setRequestHeader(name, headers[name]);
 		});
 	}
@@ -269,15 +269,8 @@ class Ajax implements AjaxInterface {
 	): XMLHttpRequest | undefined {
 		const method = this.options.method?.toUpperCase() || 'GET';
 		// convert non-string objects to query-string form unless o.processData is false
-		const {
-			processData,
-			traditional,
-			type,
-			context,
-			xhr,
-			async,
-			before,
-		} = this.options;
+		const { processData, traditional, type, context, xhr, async, before } =
+			this.options;
 		if (!context) return;
 
 		let { data, url } = this.options;
@@ -323,11 +316,11 @@ class Ajax implements AjaxInterface {
 			http instanceof context[X_DOMAIN_REQUEST]
 		) {
 			http.onload = success;
-			http.onerror = function() {
+			http.onerror = function () {
 				error('http error', http);
 			};
 			// NOTE: see
-			// http://social.msdn.microsoft.com/Forums/en-US/iewebdevelopment/thread/30ef3add-767c-4436-b8a9-f1ca19b4812e
+			// http://social.msdn.microsoft.com/Forums/en-US-US/iewebdevelopment/thread/30ef3add-767c-4436-b8a9-f1ca19b4812e
 			http.onprogress = this.noop;
 			sendWait = true;
 		} else {

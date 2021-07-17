@@ -560,7 +560,7 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 			return (
 				<div className="doc-comment-layer" ref={containerRef}>
 					<div className="doc-comment-title">
-						{lang === 'zh-cn' ? '评论' : 'Comments'}
+						{lang === 'zh-CN' ? '评论' : 'Comments'}
 					</div>
 					{list.map((item) => (
 						<CommentItem

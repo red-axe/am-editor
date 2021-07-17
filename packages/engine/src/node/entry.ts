@@ -704,7 +704,7 @@ class NodeEntry implements NodeInterface {
 	text(text: string): NodeEntry;
 	text(text?: string): string | NodeEntry {
 		// 返回的数据包含 HTML 特殊字符，innerHTML 之前需要 escape
-		// https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
+		// https://developer.mozilla.org/en-US-US/docs/Web/API/Node/textContent
 		if (text !== undefined) {
 			this.each((node) => {
 				node.textContent = text;

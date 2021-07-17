@@ -46,11 +46,6 @@ const EngineComponent: React.FC<EngineProps> = forwardRef<
 		//初始化本地协作，用作记录历史
 		engine.ot.initLockMode();
 
-		//监听编辑器值改变事件
-		engine.on('change', (value, trigger) => {
-			if (onChange) onChange(value, trigger);
-		});
-
 		engine.setValue(defaultValue || '');
 
 		engineRef.current = engine;
@@ -62,6 +57,18 @@ const EngineComponent: React.FC<EngineProps> = forwardRef<
 			engineRef.current?.destroy();
 		};
 	}, []);
+
+	const change = (value: string, trigger: 'remote' | 'local' | 'both') => {
+		if (onChange) onChange(value, trigger);
+	};
+
+	useEffect(() => {
+		// 监听编辑器值改变事件
+		engineRef.current?.on('change', change);
+		return () => {
+			engineRef.current?.off('change', change);
+		};
+	}, [onChange]);
 
 	useImperativeHandle<EngineInterface | null, EngineInterface | null>(
 		ref,

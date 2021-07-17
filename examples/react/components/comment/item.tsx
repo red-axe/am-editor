@@ -90,7 +90,7 @@ const CommentItem: React.FC<CommentItemProps> = forwardRef<
 												onEdit(item, id);
 											}}
 										>
-											{lang === 'zh-cn' ? '编辑' : 'Edit'}
+											{lang === 'zh-CN' ? '编辑' : 'Edit'}
 										</a>
 										<a
 											onClick={(event) => {
@@ -99,7 +99,7 @@ const CommentItem: React.FC<CommentItemProps> = forwardRef<
 												onRemove(item.id, id);
 											}}
 										>
-											{lang === 'zh-cn'
+											{lang === 'zh-CN'
 												? '删除'
 												: 'Remove'}
 										</a>

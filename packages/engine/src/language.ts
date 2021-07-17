@@ -3,7 +3,7 @@ import { LanguageInterface } from './types/language';
 
 class Language implements LanguageInterface {
 	private data: {} = {};
-	private lange: string = 'zh-cn';
+	private lange: string = 'zh-CN';
 
 	constructor(lange: string, data: {} = {}) {
 		this.lange = lange;

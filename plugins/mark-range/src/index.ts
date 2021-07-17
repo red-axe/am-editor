@@ -60,7 +60,7 @@ export default class extends MarkPlugin<Options> {
 	init() {
 		super.init();
 		const globals: Array<SchemaGlobal> = [];
-		this.options.keys.forEach(key => {
+		this.options.keys.forEach((key) => {
 			globals.push(
 				{
 					type: 'block',
@@ -111,7 +111,7 @@ export default class extends MarkPlugin<Options> {
 	}
 
 	schema() {
-		const rules: Array<SchemaMark> = this.options.keys.map(key => {
+		const rules: Array<SchemaMark> = this.options.keys.map((key) => {
 			return {
 				name: 'span',
 				type: 'mark',
@@ -138,13 +138,8 @@ export default class extends MarkPlugin<Options> {
 			.cloneRange()
 			.shrinkToElementNode()
 			.shrinkToTextNode();
-		const {
-			startNode,
-			startOffset,
-			endNode,
-			endOffset,
-			collapsed,
-		} = cloneRange;
+		const { startNode, startOffset, endNode, endOffset, collapsed } =
+			cloneRange;
 		let startMark = startNode.closest(`[${this.MARK_KEY}]`);
 		const startChild = startNode.children().eq(startOffset);
 		//如果选择是块级卡片就选择在卡片根节点
@@ -215,12 +210,9 @@ export default class extends MarkPlugin<Options> {
 	findElements(key: string, id: string) {
 		const { container } = this.editor;
 		const elements: Array<NodeInterface> = [];
-		container.find(`[${this.getIdName(key)}]`).each(markNode => {
+		container.find(`[${this.getIdName(key)}]`).each((markNode) => {
 			const mark = $(markNode);
-			const ids = mark
-				.attributes(this.getIdName(key))
-				.trim()
-				.split(',');
+			const ids = mark.attributes(this.getIdName(key)).trim().split(',');
 			if (ids.indexOf(id) > -1) elements.push(mark);
 		});
 		return elements;
@@ -232,7 +224,7 @@ export default class extends MarkPlugin<Options> {
 	preview(key: string, id?: string) {
 		if (id) {
 			const elements = this.findElements(key, id);
-			elements.forEach(markNode => {
+			elements.forEach((markNode) => {
 				markNode.attributes(
 					DATA_TRANSIENT_ATTRIBUTES,
 					this.getPreviewName(key),
@@ -269,7 +261,7 @@ export default class extends MarkPlugin<Options> {
 			//遍历当前光标选择节点，拼接选择的文本
 			let text = '';
 			const subRanges = range.getSubRanges(true);
-			subRanges.forEach(subRange => {
+			subRanges.forEach((subRange) => {
 				//如果是卡片，就给卡片加上预览样式
 				const cardComponent = card.find(subRange.startNode);
 				if (cardComponent) {
@@ -301,7 +293,7 @@ export default class extends MarkPlugin<Options> {
 		//遍历预览节点
 		this.editor.container
 			.find(`[${this.getPreviewName(key)}]`)
-			.each(markNode => {
+			.each((markNode) => {
 				const mark = $(markNode);
 				//获取旧id
 				const oldIds = mark
@@ -388,7 +380,7 @@ export default class extends MarkPlugin<Options> {
 				.find(`[${this.getPreviewName(key)}]`)
 				.toArray();
 		//遍历预览节点
-		elements.forEach(markNode => {
+		elements.forEach((markNode) => {
 			const mark = $(markNode);
 			//获取旧id传
 			const oldIds = mark
@@ -424,7 +416,7 @@ export default class extends MarkPlugin<Options> {
 		);
 
 		//遍历节点
-		elements.forEach(markNode => {
+		elements.forEach((markNode) => {
 			const mark = $(markNode);
 			//获取旧id传
 			const oldIds = mark
@@ -433,7 +425,7 @@ export default class extends MarkPlugin<Options> {
 				.split(',');
 			if (oldIds[0] === '') oldIds.splice(0, 1);
 			//移除标记样式包裹
-			if (oldIds.length === 1 && !!oldIds.find(i => i === id)) {
+			if (oldIds.length === 1 && !!oldIds.find((i) => i === id)) {
 				if (mark.isCard()) {
 					mark.removeAttributes(this.MARK_KEY);
 					mark.removeAttributes(this.getIdName(key));
@@ -445,7 +437,7 @@ export default class extends MarkPlugin<Options> {
 				//移除预览样式
 				mark.removeAttributes(this.getPreviewName(key));
 				//移除id
-				const index = oldIds.findIndex(i => i === id);
+				const index = oldIds.findIndex((i) => i === id);
 				oldIds.splice(index, 1);
 				mark.attributes(this.getIdName(key), oldIds.join(','));
 			}
@@ -503,11 +495,11 @@ export default class extends MarkPlugin<Options> {
 
 	getIds() {
 		const ids: { [key: string]: Array<string> } = {};
-		this.editor.container.find(`[${this.MARK_KEY}]`).each(markNode => {
+		this.editor.container.find(`[${this.MARK_KEY}]`).each((markNode) => {
 			const mark = $(markNode);
 			const key = mark.attributes(this.MARK_KEY);
 			const idArray = mark.attributes(this.getIdName(key)).split(',');
-			idArray.forEach(id => {
+			idArray.forEach((id) => {
 				if (!!id) {
 					if (!ids[key]) ids[key] = [];
 					if (ids[key].indexOf(id) < 0) ids[key].push(id);
@@ -559,16 +551,16 @@ export default class extends MarkPlugin<Options> {
 		const addIds: { [key: string]: Array<string> } = {};
 		const removeIds: { [key: string]: Array<string> } = {};
 		const ids = this.getIds();
-		this.options.keys.forEach(key => {
+		this.options.keys.forEach((key) => {
 			const prevIds = this.ids[key] || [];
 			const curIds = ids[key] || [];
-			curIds.forEach(id => {
+			curIds.forEach((id) => {
 				if (prevIds.indexOf(id) < 0) {
 					if (!addIds[key]) addIds[key] = [];
 					addIds[key].push(id);
 				}
 			});
-			prevIds.forEach(id => {
+			prevIds.forEach((id) => {
 				if (curIds.indexOf(id) < 0) {
 					if (!removeIds[key]) removeIds[key] = [];
 					removeIds[key].push(id);
@@ -604,9 +596,12 @@ export default class extends MarkPlugin<Options> {
 		card.render(container);
 
 		const selection = container.window?.getSelection();
-		const range = selection
-			? Range.from(this.editor, selection) || Range.create(this.editor)
-			: Range.create(this.editor);
+		const range = (
+			selection
+				? Range.from(this.editor, selection) ||
+				  Range.create(this.editor)
+				: Range.create(this.editor)
+		).cloneRange();
 
 		const parser = new Parser(container, this.editor);
 		const { schema, conversion } = this.editor;
@@ -620,7 +615,7 @@ export default class extends MarkPlugin<Options> {
 		range.select(container, true).collapse(true);
 
 		const paths: Array<{ id: Array<string>; path: Array<Path> }> = [];
-		container.traverse(childNode => {
+		container.traverse((childNode) => {
 			const id = childNode.attributes(this.getIdName(key));
 			if (!!id) {
 				const rangeClone = range.cloneRange();
@@ -675,9 +670,12 @@ export default class extends MarkPlugin<Options> {
 
 		card.render(container);
 		const selection = container.window?.getSelection();
-		const range = selection
-			? Range.from(this.editor, selection) || Range.create(this.editor)
-			: Range.create(this.editor);
+		const range = (
+			selection
+				? Range.from(this.editor, selection) ||
+				  Range.create(this.editor)
+				: Range.create(this.editor)
+		).cloneRange();
 
 		const parser = new Parser(container, this.editor);
 		const { schema, conversion } = this.editor;
@@ -691,7 +689,7 @@ export default class extends MarkPlugin<Options> {
 		(paths || []).forEach(({ id, path }) => {
 			const pathRange = Range.fromPath(this.editor, path, container);
 			const elements = pathRange.findElementsInSimpleRange();
-			elements.forEach(element => {
+			elements.forEach((element) => {
 				const node = $(element);
 				if (node.isCard()) {
 					node.attributes(this.getIdName(key), id.join(','));

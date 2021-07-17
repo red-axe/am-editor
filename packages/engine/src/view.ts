@@ -39,7 +39,7 @@ import Request from './request';
 
 class View implements ViewInterface {
 	private options: ContentViewOptions = {
-		lang: 'zh-cn',
+		lang: 'zh-CN',
 		plugins: [],
 		cards: [],
 	};
@@ -63,7 +63,7 @@ class View implements ViewInterface {
 
 	constructor(selector: Selector, options?: ContentViewOptions) {
 		this.options = { ...this.options, ...options };
-		this.language = new Language(this.options.lang || 'zh-cn', language);
+		this.language = new Language(this.options.lang || 'zh-CN', language);
 		this.event = new Event();
 		this.command = new Command(this);
 		this.schema = new Schema();

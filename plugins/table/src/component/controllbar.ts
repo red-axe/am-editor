@@ -106,12 +106,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const rowTrigger = this.rowsHeader?.find(
 			Template.ROWS_HEADER_TRIGGER_CLASS,
 		);
+		const tableWidth = this.tableRoot.width();
+		const wrapperWidth = this.table.wrapper?.width() || 0;
+		const width = tableWidth < wrapperWidth ? tableWidth : wrapperWidth;
 		rowTrigger?.css(
 			'width',
-			`${
-				(this.table.wrapper?.width() || 0) +
-				(this.rowsHeader?.width() || 0)
-			}px`,
+			`${width + (this.rowsHeader?.width() || 0) - 1}px`,
 		);
 	}
 

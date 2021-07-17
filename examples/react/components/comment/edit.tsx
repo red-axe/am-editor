@@ -38,7 +38,7 @@ const CommentEdit: React.FC<EditProps> = ({
 			</div>
 			<div className="doc-comment-edit-button">
 				<Button size="small" onClick={onCancel}>
-					{lang === 'zh-cn' ? '取消' : 'Cancel'}
+					{lang === 'zh-CN' ? '取消' : 'Cancel'}
 				</Button>
 				<Button
 					size="small"
@@ -49,7 +49,7 @@ const CommentEdit: React.FC<EditProps> = ({
 					}}
 					loading={loading}
 				>
-					{lang === 'zh-cn' ? '确定' : 'Ok'}
+					{lang === 'zh-CN' ? '确定' : 'Ok'}
 				</Button>
 			</div>
 		</div>

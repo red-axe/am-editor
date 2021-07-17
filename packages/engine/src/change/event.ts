@@ -61,7 +61,7 @@ class ChangeEvent implements ChangeEventInterface {
 		const { bindInput } = this.options;
 		if (bindInput && !bindInput()) return;
 		// 处理中文输入法状态
-		// https://developer.mozilla.org/en-US/docs/Web/Events/compositionstart
+		// https://developer.mozilla.org/en-US-US/docs/Web/Events/compositionstart
 		this.onContainer('compositionstart', () => {
 			if (this.engine.readonly) {
 				return;
@@ -196,7 +196,7 @@ class ChangeEvent implements ChangeEventInterface {
 				isPasteText = true;
 			}
 		});
-		// https://developer.mozilla.org/en-US/docs/Web/Events/paste
+		// https://developer.mozilla.org/en-US-US/docs/Web/Events/paste
 		this.onContainer('paste', (e) => {
 			if (this.engine.readonly) {
 				return;

@@ -64,7 +64,7 @@ class Engine implements EngineInterface {
 	private _container: ContainerInterface;
 	readonly kind = 'engine';
 	options: EngineOptions = {
-		lang: 'zh-cn',
+		lang: 'zh-CN',
 		locale: {},
 		plugins: [],
 		cards: [],
@@ -117,7 +117,7 @@ class Engine implements EngineInterface {
 	constructor(selector: Selector, options?: EngineOptions) {
 		this.options = { ...this.options, ...options };
 		this.language = new Language(
-			this.options.lang || 'zh-cn',
+			this.options.lang || 'zh-CN',
 			merge(language, options?.locale),
 		);
 		this.event = new Event();

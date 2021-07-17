@@ -46,31 +46,8 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 	const [value, setValue] = useState('');
 	const comment = useRef<CommentRef | null>(null);
 	const [loading, setLoading] = useState(true);
-	const [members, setMembers] = useState([]);
+	const [members, setMembers] = useState<Array<Member>>([]);
 	const [member, setMember] = useState<Member | null>(null);
-
-	const engineProps: EngineProps = {
-		...props,
-		plugins: props.plugins || plugins,
-		cards: props.cards || cards,
-		config: {
-			...props.config,
-			...pluginConfig,
-			'mark-range': getConfig(engine, comment),
-		},
-		onChange: (value: string, trigger: 'remote' | 'local' | 'both') => {
-			setValue(value);
-			//自动保存，非远程更改，触发保存
-			if (trigger !== 'remote') onSave();
-			if (props.onChange) props.onChange(value, trigger);
-			console.log(`value ${trigger} update:`, value);
-			console.log(
-				'mention:',
-				engine.current?.command.execute('mention', 'getList'),
-			);
-			//console.log('html:', engine.getHtml());
-		},
-	};
 
 	/**
 	 * 保存到服务器
@@ -90,27 +67,47 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 	/**
 	 * 60秒内无更改自动保存
 	 */
-	const onSave = useCallback(debounce(save, 60000), [save]);
+	const autoSave = useCallback(debounce(save, 60000), [save]);
+
+	const engineProps: EngineProps = {
+		...props,
+		plugins: props.plugins || plugins,
+		cards: props.cards || cards,
+		config: {
+			...props.config,
+			...pluginConfig,
+			'mark-range': getConfig(engine, comment),
+		},
+		onChange: useCallback(
+			(value: string, trigger: 'remote' | 'local' | 'both') => {
+				if (loading) return;
+				setValue(value);
+				//自动保存，非远程更改，触发保存
+				if (trigger !== 'remote') autoSave();
+				if (props.onChange) props.onChange(value, trigger);
+				console.log(`value ${trigger} update:`, value);
+				console.log(
+					'mention:',
+					engine.current?.command.execute('mention', 'getList'),
+				);
+				//console.log('html:', engine.getHtml());
+			},
+			[loading, autoSave],
+		),
+	};
 
 	//用户主动保存
-	const userSave = () => {
+	const userSave = useCallback(() => {
 		if (!engine.current) return;
 		//获取异步的值，有些组件可能还在处理中，比如正在上传
 		engine.current.getValueAsync().then((value) => {
 			setValue(value);
 			save();
 		});
-	};
+	}, [engine, save]);
 
 	useEffect(() => {
 		if (!engine.current) return;
-		//手动保存
-		engine.current.container.on('keydown', (event: KeyboardEvent) => {
-			if (isHotkey('mod+s', event)) {
-				event.preventDefault();
-				userSave();
-			}
-		});
 		//卡片最大化时设置编辑页面样式
 		engine.current.on('card:maximize', () => {
 			$('.editor-toolbar').css('z-index', '9999').css('top', '56px');
@@ -141,50 +138,12 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 					//实例化协作编辑客户端
 					const ot = new OTClient(engine.current!);
 					//连接到协作服务端，demo文档
-					const {
-						url,
-						docId,
-						onReady,
-						onMembersChange,
-						onStatusChange,
-						onError,
-						onMessage,
-					} = props.ot;
+					const { url, docId, onReady } = props.ot;
 					ot.connect(url, docId);
 					ot.on('ready', (member) => {
 						if (onReady) onReady(member);
 						setMember(member);
 						setLoading(false);
-					});
-					//用户加入或退出改变
-					ot.on('membersChange', (members) => {
-						if (onMembersChange) onMembersChange(members);
-						setMembers(members);
-					});
-					//状态改变，退出时，强制保存
-					ot.on(
-						'statusChange',
-						(
-							from: keyof typeof STATUS,
-							to: keyof typeof STATUS,
-						) => {
-							if (onStatusChange) onStatusChange(from, to);
-							if (to === STATUS.exit) {
-								userSave();
-							}
-						},
-					);
-					ot.on('error', (error: ERROR) => {
-						if (onError) onError(error);
-					});
-					ot.on('message', (message) => {
-						if (onMessage) onMessage(message);
-						//更新评论列表
-						if (
-							message.type === 'updateCommentList' &&
-							comment.current?.reload
-						)
-							comment.current.reload();
 					});
 					otClient.current = ot;
 				},
@@ -198,6 +157,68 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 			otClient.current = null;
 		};
 	}, [engine]);
+
+	// 引擎事件绑定
+	useEffect(() => {
+		if (!engine.current || loading) return;
+		const keydown = (event: KeyboardEvent) => {
+			if (isHotkey('mod+s', event)) {
+				event.preventDefault();
+				userSave();
+			}
+		};
+		// 手动保存
+		document.addEventListener('keydown', keydown);
+		return () => {
+			document.removeEventListener('keydown', keydown);
+		};
+	}, [engine, userSave, loading]);
+	// 协同事件绑定
+	useEffect(() => {
+		if (!props.ot || !otClient.current || loading) return;
+		const { onMembersChange, onStatusChange, onError, onMessage } =
+			props.ot;
+		// 用户加入或退出改变
+		const membersChange = (members: Array<Member>) => {
+			if (onMembersChange) onMembersChange(members);
+			setMembers(members);
+		};
+		otClient.current.on('membersChange', membersChange);
+		// 状态改变，退出时，强制保存
+		const statusChange = (
+			from: keyof typeof STATUS,
+			to: keyof typeof STATUS,
+		) => {
+			if (onStatusChange) onStatusChange(from, to);
+			if (to === STATUS.exit) {
+				userSave();
+			}
+		};
+		otClient.current.on('statusChange', statusChange);
+		// 错误监听
+		const error = (error: ERROR) => {
+			if (onError) onError(error);
+		};
+		otClient.current.on('error', error);
+		// 消息监听
+		const message = (message: { type: string; body: any }) => {
+			if (onMessage) onMessage(message);
+			// 更新评论列表
+			if (
+				message.type === 'updateCommentList' &&
+				comment.current?.reload
+			) {
+				comment.current.reload();
+			}
+		};
+		otClient.current.on('message', message);
+		return () => {
+			otClient.current?.off('membersChange', membersChange);
+			otClient.current?.off('statusChange', statusChange);
+			otClient.current?.off('error', error);
+			otClient.current?.off('message', message);
+		};
+	}, [otClient, loading, props.ot, userSave]);
 
 	//广播通知更新评论列表吧
 	const onCommentRequestUpdate = () => {

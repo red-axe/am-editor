@@ -172,7 +172,7 @@ export const unescapeDots = (value: string) => {
  * @param url 需要验证的字符串
  */
 export const isUrl = (url: string) => {
-	url = url.toLowerCase(); // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+	url = url.toLowerCase(); // https://developer.mozilla.org/en-US-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
 
 	if (url.startsWith('data:text/html')) {
 		return false;
@@ -306,7 +306,7 @@ export const validUrl = (url: string) => {
 		return false;
 	}
 
-	url = url.toLowerCase(); // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+	url = url.toLowerCase(); // https://developer.mozilla.org/en-US-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
 
 	if (url.startsWith('data:text/html')) {
 		return false;

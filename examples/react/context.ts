@@ -5,5 +5,5 @@ type Props = {
 };
 
 export default createContext<Props>({
-	lang: 'en',
+	lang: 'en-US',
 });

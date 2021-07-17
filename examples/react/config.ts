@@ -12,5 +12,5 @@ export const DOMAIN = IS_DEV
 export const lang = (
 	!isServer ? window.location.href.indexOf('zh-CN') > 0 : false
 )
-	? 'zh-cn'
-	: 'en';
+	? 'zh-CN'
+	: 'en-US';

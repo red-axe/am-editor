@@ -57,7 +57,7 @@ const Toc: React.FC<Props> = ({ editor }) => {
 	return (
 		<div className="data-toc-wrapper">
 			<div className="data-toc-title">
-				{lang === 'zh-cn' ? '大纲' : 'Outline'}
+				{lang === 'zh-CN' ? '大纲' : 'Outline'}
 			</div>
 			<div className="data-toc" ref={rootRef}>
 				{datas.map((data, index) => {

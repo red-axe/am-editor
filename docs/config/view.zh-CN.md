@@ -17,19 +17,19 @@ const view = new View(渲染节点, {
 ### lang
 
 -   类型: `string`
--   默认值：`zh-cn`
--   详细：语言配置，暂时支持 `zh-cn`、`en`。可使用 `locale` 配置
+-   默认值：`zh-CN`
+-   详细：语言配置，暂时支持 `zh-CN`、`en-US`。可使用 `locale` 配置
 
 ```ts
 const view = new View(渲染节点, {
-	lang: 'zh-cn',
+	lang: 'zh-CN',
 });
 ```
 
 ### locale
 
 -   类型: `object`
--   默认值：`zh-cn`
+-   默认值：`zh-CN`
 -   详细：配置额外语言包
 
 语言包，默认语言包 [https://github.com/itellyou-com/am-editor/blob/master/locale](https://github.com/itellyou-com/am-editor/blob/master/locale)
@@ -37,7 +37,7 @@ const view = new View(渲染节点, {
 ```ts
 const view = new View(渲染节点, {
 	locale: {
-		'zh-cn': {
+		'zh-CN': {
 			test: '测试',
 			a: {
 				b: 'B',
