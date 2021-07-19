@@ -275,13 +275,18 @@ otClient.connect(
 
 ### React
 
-The dependencies need to be installed separately in the `root directory` `site-ssr` `ot-server`
+Need to install dependencies separately in `am-editor root directory` `site-ssr` `ot-server`
 
 ```base
 //After the dependencies are installed, you only need to execute the following commands in the root directory
 
 yarn ssr
 ```
+
+-   `packages` engine and toolbar
+-   `plugins` all plugins
+-   `site-ssr` All backend API and SSR configuration. The egg used. Use yarn ssr in the am-editor root directory to automatically start `site-ssr`
+-   `ot-server` collaborative server. Start: yarn start
 
 Visit localhost:7001 after startup
 
@@ -299,8 +304,10 @@ In the Vue runtime environment, the default is the installed code that has been 
 
 -   Delete the examples/vue/node_modules/@aomao folder
 -   Delete the examples/vue/node_modules/vue folder. Because there are plugins that depend on Vue, the Vue package will be installed in the project root directory. If you do not delete the Vue package in examples/vue, and the Vue package of the plugin is not in the same environment, the plugin cannot be loaded
--   Execute the installation of all dependent commands in the root directory of am-editor, for example: `yarn`
+-   Execute and install all dependent commands in the root directory of am-editor, for example: `yarn`
 -   Finally restart in examples/vue
+
+There is no backend API configured in the `Vue` case. For details, please refer to `React` and `site-ssr`
 
 ## Contribution
 

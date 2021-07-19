@@ -277,13 +277,18 @@ otClient.connect(
 
 ### React
 
-需要在 `根目录` `site-ssr` `ot-server` 中分别安装依赖
+需要在 `am-editor 根目录` `site-ssr` `ot-server` 中分别安装依赖
 
 ```base
 //依赖安装好后，只需要在根目录执行以下命令
 
 yarn ssr
 ```
+
+-   `packages` 引擎和工具栏
+-   `plugins` 所有的插件
+-   `site-ssr` 所有的后端 API 和 SSR 配置。使用的 egg 。在 am-editor 根目录下使用 yarn ssr 自动启动 `site-ssr`
+-   `ot-server` 协同服务端。启动：yarn start
 
 启动后访问 localhost:7001
 
@@ -303,6 +308,8 @@ yarn serve
 -   删除 examples/vue/node_modules/vue 文件夹。因为有插件依赖了 Vue，所以 Vue 的包会在项目根目录中安装。如果不删除 examples/vue 中的 Vue 包，和插件的 Vue 包不在一个环境中，就无法加载插件
 -   在 am-editor 根目录下执行安装所有依赖命令，例如：`yarn`
 -   最后在 examples/vue 中重新启动
+
+`Vue` 案例中没有配置任何后端 API，具体可以参考 `React` 和 `site-ssr`
 
 ## 贡献
 
