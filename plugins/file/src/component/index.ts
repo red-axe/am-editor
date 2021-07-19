@@ -130,9 +130,6 @@ export default class FileCard extends Card<FileValue> {
 
 			if (!this.readonly) {
 				items.push({
-					type: 'copy',
-				});
-				items.push({
 					type: 'separator',
 				});
 			}

@@ -42,7 +42,7 @@ export default class Paste {
 
 	commonNormalize(fragment: DocumentFragment) {
 		const defaultStyle = this.getDefaultStyle();
-		const { inline, schema } = this.engine;
+		const { inline } = this.engine;
 		const nodeApi = this.engine.node;
 		// 第一轮预处理，主要处理 span 节点
 		let nodes = $(fragment).allChildren();
@@ -68,7 +68,7 @@ export default class Paste {
 					}
 				});
 				//处理后如果不是一个有效的节点就移除包裹
-				if (!schema.getType(node)) nodeApi.unwrap(node);
+				if (!this.schema.getType(node)) nodeApi.unwrap(node);
 			}
 			nodeApi.removeMinusStyle(node, 'text-indent');
 			if (['ol', 'ul'].includes(node.name)) {
