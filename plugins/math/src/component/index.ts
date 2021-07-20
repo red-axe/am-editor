@@ -4,7 +4,6 @@ import {
 	ActiveTrigger,
 	Card,
 	CardType,
-	isEngine,
 	NodeInterface,
 	Position,
 } from '@aomao/engine';
@@ -18,7 +17,7 @@ export type MathValue = {
 };
 
 export default class MathCard extends Card<MathValue> {
-	#position: Position;
+	#position?: Position;
 
 	static get cardName() {
 		return 'math';
@@ -185,7 +184,8 @@ export default class MathCard extends Card<MathValue> {
 		const value = this.getValue();
 		if (!value) return;
 		this.editorContainer = this.mathEditor.render(value.id, value.code);
-		this.#position?.bind(this.editorContainer, this.container);
+		if (this.container)
+			this.#position?.bind(this.editorContainer, this.container);
 	}
 
 	render(): string | void | NodeInterface {

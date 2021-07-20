@@ -82,3 +82,9 @@ console.log(view.language.get<string>('test'));
 -   类型: `{ [key: string]: PluginOptions }`
 -   默认值：`{}`
 -   详细：每个插件的配置项，key 为插件名称，详细配置请参考每个插件的说明
+
+### placeholder
+
+-   类型: `string`
+-   默认值：`无`
+-   详细：占位符

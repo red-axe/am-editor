@@ -82,3 +82,9 @@ console.log(view.language.get<string>('test'));
 -   Type: `{ [key: string]: PluginOptions }`
 -   Default value: `{}`
 -   Detailed: the configuration item of each plug-in, the key is the name of the plug-in, please refer to the description of each plug-in for detailed configuration
+
+### placeholder
+
+-   Type: `string`
+-   Default value: `None`
+-   Detailed: placeholder

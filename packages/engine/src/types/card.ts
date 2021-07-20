@@ -48,6 +48,11 @@ export interface CardToolbarInterface {
 	 * 获取工具栏容器
 	 */
 	getContainer(): NodeInterface | undefined;
+	/**
+	 * 设置工具栏偏移量[上x，上y，下x，下y]
+	 * @param offset 偏移量 [tx,ty,bx,by]
+	 */
+	setOffset(offset: Array<number>): void;
 }
 
 export type CardToolbarItemOptions =
