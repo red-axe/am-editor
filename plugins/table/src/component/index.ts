@@ -148,7 +148,6 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 				content: '<span class="data-icon data-icon-align-top" />',
 				title: language['verticalAlign']['title'],
 				didMount: (node) => {
-					console.log(node);
 					this.alignToolButton = node.find('.data-toolbar-btn');
 				},
 				items: [
@@ -286,7 +285,6 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	minimize() {
 		super.minimize();
 		this.scrollbar?.refresh();
-		console.log(3435);
 	}
 
 	didRender() {
@@ -298,7 +296,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.selection.init();
 		this.conltrollBar.init();
 		this.command.init();
-
+		this.toolbarModel?.setOffset([0, -28, 0, -6]);
 		if (this.viewport) {
 			this.scrollbar = new Scrollbar(this.viewport, true, false, true);
 			this.scrollbar.on('display', (display: 'node' | 'block') => {

@@ -66,6 +66,14 @@ class Mention extends Card<MentionValue> {
 	 */
 	static mouseEnter(node: NodeInterface, key: string, name: string) {}
 
+	/**
+	 * 自定义渲染列表项
+	 * @param item 数据项
+	 */
+	static set renderItem(fun: (item: MentionItem) => string | NodeInterface) {
+		CollapseComponent.renderItem = fun;
+	}
+
 	init() {
 		if (!isEngine(this.editor) || isServer) {
 			return;
@@ -139,7 +147,7 @@ class Mention extends Card<MentionValue> {
 		const keyword = content.substr(1);
 		// 搜索关键词为空
 		if (keyword === '') {
-			this.component?.render(this.root, []);
+			this.component?.render(this.root, Mention.defaultData);
 			return;
 		}
 		Mention.search(keyword).then((data) => {

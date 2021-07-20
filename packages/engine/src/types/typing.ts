@@ -10,6 +10,10 @@ export interface TypingHandle {
  */
 export interface TypingHandleInterface {
 	/**
+	 * 事件集合
+	 */
+	listeners: Array<EventListener>;
+	/**
 	 * 按键类型 键盘按下 | 键盘弹起
 	 */
 	type: 'keydown' | 'keyup';

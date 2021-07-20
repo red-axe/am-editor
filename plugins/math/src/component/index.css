@@ -29,7 +29,6 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     z-index: 20;
     text-indent: 0;
-    top:0
   }
 .data-card-math-editor-mobile {
     width: calc(100vw - 20px);

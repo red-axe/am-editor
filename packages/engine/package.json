@@ -24,6 +24,7 @@
     "blueimp-md5": "^2.18.0",
     "copy-to-clipboard": "^3.3.1",
     "diff-match-patch": "^1.0.5",
+    "dom-align": "^1.12.2",
     "eventemitter2": "^6.4.4",
     "filesize": "^6.3.0",
     "is-hotkey": "^0.2.0",

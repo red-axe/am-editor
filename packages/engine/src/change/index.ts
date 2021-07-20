@@ -40,6 +40,7 @@ class ChangeModel implements ChangeInterface {
 	event: ChangeEvent;
 	valueCached: string | null = null;
 	onChange: (value: string, trigger: 'remote' | 'local' | 'both') => void;
+	onRealtimeChange: (trigger: 'remote' | 'local') => void;
 	onSelect: () => void;
 	onSetValue: () => void;
 	rangePathBeforeCommand: Path[] | null = null;
@@ -54,6 +55,7 @@ class ChangeModel implements ChangeInterface {
 		this.event = new ChangeEvent(engine, {});
 
 		this.onChange = this.options.onChange || function () {};
+		this.onRealtimeChange = this.options.onRealtimeChange || function () {};
 		this.onSelect = this.options.onSelect || function () {};
 		this.onSetValue = this.options.onSetValue || function () {};
 
@@ -111,8 +113,8 @@ class ChangeModel implements ChangeInterface {
 				if (card?.onChange) card?.onChange(editableElement);
 			}
 		}
-
 		const trigger = isRemote ? 'remote' : 'local';
+		this.onRealtimeChange(trigger);
 		if (this.changeTrigger.indexOf(trigger) < 0)
 			this.changeTrigger.push(trigger);
 		this.clearChangeTimer();
@@ -342,6 +344,7 @@ class ChangeModel implements ChangeInterface {
 			this.onSetValue();
 			history.clear();
 		}
+		this.change();
 	}
 
 	setHtml(

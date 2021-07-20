@@ -1,4 +1,11 @@
-import { $, ActiveTrigger, Card, CardType, NodeInterface } from '@aomao/engine';
+import {
+	$,
+	ActiveTrigger,
+	Card,
+	CardType,
+	NodeInterface,
+	Position,
+} from '@aomao/engine';
 import StatusEditor from './editor';
 import './index.css';
 
@@ -11,6 +18,8 @@ export type StatusValue = {
 };
 
 class Status extends Card<StatusValue> {
+	#position?: Position;
+
 	static get cardName() {
 		return 'status';
 	}
@@ -62,6 +71,7 @@ class Status extends Card<StatusValue> {
 
 	init() {
 		const { card } = this.editor;
+		this.#position = new Position(this.editor);
 		this.#statusEditor = new StatusEditor({
 			colors: Status.colors,
 			onChange: (
@@ -84,47 +94,10 @@ class Status extends Card<StatusValue> {
 				card.focus(this);
 			},
 			onDestroy: () => {
-				window.removeEventListener(
-					'scroll',
-					this.updateEditorPosition,
-					true,
-				);
-				window.removeEventListener(
-					'resize',
-					this.updateEditorPosition,
-					true,
-				);
+				this.#position?.destroy();
 			},
 		});
 	}
-
-	updateEditorPosition = () => {
-		if (!this.#editorContainer || !this.#container) return;
-		const targetRect = this.#container
-			.get<Element>()
-			?.getBoundingClientRect();
-		if (!targetRect) return;
-		const rootRect = this.#editorContainer
-			.get<Element>()
-			?.getBoundingClientRect();
-		if (!rootRect) return;
-		const { top, left, bottom } = targetRect;
-		const { height, width } = rootRect;
-		const styleLeft =
-			left + width > window.innerWidth - 20
-				? window.pageXOffset + window.innerWidth - width - 10
-				: 20 > left - window.pageXOffset
-				? window.pageXOffset + 20
-				: window.pageXOffset + left;
-		const styleTop =
-			bottom + height > window.innerHeight - 20
-				? window.pageYOffset + top - height - 4
-				: window.pageYOffset + bottom + 4;
-		this.#editorContainer.css({
-			top: `${styleTop}px`,
-			left: `${styleLeft}px`,
-		});
-	};
 
 	updateContent() {
 		if (!this.#container) return;
@@ -174,10 +147,8 @@ class Status extends Card<StatusValue> {
 			value.text || '',
 			value.color || this.getDefaultColor(),
 		);
-		$(document.body).append(this.#editorContainer);
-		this.updateEditorPosition();
-		window.addEventListener('scroll', this.updateEditorPosition, true);
-		window.addEventListener('resize', this.updateEditorPosition, true);
+		if (!this.#container) return;
+		this.#position?.bind(this.#editorContainer, this.#container);
 	}
 
 	render() {

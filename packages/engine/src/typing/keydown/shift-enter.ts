@@ -10,7 +10,7 @@ class ShitEnter implements TypingHandleInterface {
 	type: 'keydown' | 'keyup' = 'keydown';
 	hotkey: string | string[] | ((event: KeyboardEvent) => boolean) =
 		'shift+enter';
-	private listeners: Array<EventListener> = [];
+	listeners: Array<EventListener> = [];
 
 	constructor(engine: EngineInterface) {
 		this.engine = engine;

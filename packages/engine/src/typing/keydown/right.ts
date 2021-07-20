@@ -14,7 +14,7 @@ class Right implements TypingHandleInterface {
 		isHotkey('ctrl+f', event);
 
 	private engine: EngineInterface;
-	private listeners: Array<EventListener> = [];
+	listeners: Array<EventListener> = [];
 
 	constructor(engine: EngineInterface) {
 		this.engine = engine;

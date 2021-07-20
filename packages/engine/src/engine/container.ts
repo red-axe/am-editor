@@ -8,12 +8,15 @@ export type Options = {
 	lang?: string;
 	tabIndex?: number;
 	className?: string | Array<string>;
+	placeholder?: string;
 };
 
 class Container {
 	private options: Options;
 	private node: NodeInterface;
 	private _focused: boolean = false;
+	#styleElement?: Element;
+
 	constructor(selector: Selector, options: Options) {
 		this.node = $(selector);
 		this.options = options;
@@ -114,6 +117,36 @@ class Container {
 		this.node.attributes('contenteditable', readonly ? 'false' : 'true');
 	}
 
+	showPlaceholder() {
+		const { placeholder } = this.options;
+		if (placeholder) {
+			if (this.#styleElement)
+				document.body.removeChild(this.#styleElement);
+			this.#styleElement = document.createElement('style');
+			const left = this.node.css('left');
+			const top = this.node.css('top');
+			const styleText = document.createTextNode(`.am-engine:before {
+                content: attr(data-placeholder);
+                pointer-events: none;
+                position: absolute;
+                left: ${left}px;
+                top: ${top}px;
+                color: #bbbfc4;
+                height: 0;
+            }`);
+			this.#styleElement.appendChild(styleText);
+			document.body.appendChild(this.#styleElement);
+			this.node.attributes({
+				'data-placeholder': placeholder,
+			});
+		} else if (this.#styleElement)
+			document.body.removeChild(this.#styleElement);
+	}
+
+	hidePlaceholder() {
+		this.node.removeAttributes('data-placeholder');
+	}
+
 	destroy() {
 		const { className, engine } = this.options;
 		this.node.removeAttributes(DATA_ELEMENT);
@@ -124,6 +157,8 @@ class Container {
 		this.node.removeAttributes('spellcheck');
 		this.node.removeAttributes('data-gramm');
 		this.node.removeAttributes('tabindex');
+		this.node.removeAttributes('data-placeholder');
+		if (this.#styleElement) document.body.removeChild(this.#styleElement);
 		if (this.options.className) {
 			(Array.isArray(className)
 				? className

@@ -143,7 +143,9 @@ class Engine implements EngineInterface {
 			lang: this.options.lang,
 			className: this.options.className,
 			tabIndex: this.options.tabIndex,
+			placeholder: this.options.placeholder,
 		});
+
 		this.root = $(
 			this.options.root || this.container.parent() || getDocument().body,
 		);
@@ -152,6 +154,14 @@ class Engine implements EngineInterface {
 			onChange: (value, trigger) =>
 				this.trigger('change', value, trigger),
 			onSelect: () => this.trigger('select'),
+			onRealtimeChange: (trigger) => {
+				if (this.isEmpty()) {
+					this._container.showPlaceholder();
+				} else {
+					this._container.hidePlaceholder();
+				}
+				this.trigger('realtimeChange', trigger);
+			},
 			onSetValue: () => this.trigger('afterSetValue'),
 		});
 		this.typing = new Typing(this);
@@ -167,6 +177,13 @@ class Engine implements EngineInterface {
 		this.card.init(this.options.cards || []);
 		this.plugin.init(this.options.plugins || [], this.options.config || {});
 		this.ot = new OT(this);
+		if (this.isEmpty()) {
+			this._container.showPlaceholder();
+		}
+	}
+
+	setScrollNode(node?: HTMLElement) {
+		this.scrollNode = node ? $(node) : null;
 	}
 
 	isSub() {
@@ -175,6 +192,10 @@ class Engine implements EngineInterface {
 
 	isFocus() {
 		return this._container.isFocus();
+	}
+
+	isEmpty() {
+		return this.change.isEmpty();
 	}
 
 	focus() {

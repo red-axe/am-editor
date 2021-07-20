@@ -7,8 +7,9 @@ import {
 class Enter implements TypingHandleInterface {
 	type: 'keydown' | 'keyup' = 'keydown';
 	hotkey: Array<string> | string = 'enter';
+	listeners: Array<EventListener> = [];
 	private engine: EngineInterface;
-	private listeners: Array<EventListener> = [];
+
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
 	}

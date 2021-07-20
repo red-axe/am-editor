@@ -1,5 +1,13 @@
 import debounce from 'lodash-es/debounce';
-import { $, ActiveTrigger, Card, CardType, NodeInterface } from '@aomao/engine';
+import {
+	$,
+	ActiveTrigger,
+	Card,
+	CardType,
+	isEngine,
+	NodeInterface,
+	Position,
+} from '@aomao/engine';
 import { getLocales } from '../utils';
 import MathEditor from './editor';
 import './index.css';
@@ -10,6 +18,8 @@ export type MathValue = {
 };
 
 export default class MathCard extends Card<MathValue> {
+	#position: Position;
+
 	static get cardName() {
 		return 'math';
 	}
@@ -33,6 +43,7 @@ export default class MathCard extends Card<MathValue> {
 			this.editor,
 		).tips;
 		const { card } = this.editor;
+		this.#position = new Position(this.editor);
 		this.mathEditor = new MathEditor(this.editor, {
 			tips: `<a class="tips-text" href="${tips.href}" target="_blank"><span class="data-icon data-icon-question-circle-o"></span>${tips.text}</a>`,
 			onFocus: () => {
@@ -49,16 +60,7 @@ export default class MathCard extends Card<MathValue> {
 				card.focus(this);
 			},
 			onDestroy: () => {
-				window.removeEventListener(
-					'scroll',
-					this.updateEditorPosition,
-					true,
-				);
-				window.removeEventListener(
-					'resize',
-					this.updateEditorPosition,
-					true,
-				);
+				this.#position?.destroy();
 			},
 		});
 	}
@@ -84,34 +86,6 @@ export default class MathCard extends Card<MathValue> {
 		return this.readonly ? width : width - 2;
 	}
 
-	updateEditorPosition = () => {
-		if (!this.editorContainer || !this.container) return;
-		const targetRect = this.container
-			.get<Element>()
-			?.getBoundingClientRect();
-		if (!targetRect) return;
-		const rootRect = this.editorContainer
-			.get<Element>()
-			?.getBoundingClientRect();
-		if (!rootRect) return;
-		const { top, left, bottom } = targetRect;
-		const { height, width } = rootRect;
-		const styleLeft =
-			left + width > window.innerWidth - 20
-				? window.pageXOffset + window.innerWidth - width - 10
-				: 20 > left - window.pageXOffset
-				? window.pageXOffset + 20
-				: window.pageXOffset + left;
-		const styleTop =
-			bottom + height > window.innerHeight - 20
-				? window.pageYOffset + top - height - 4
-				: window.pageYOffset + bottom + 4;
-		this.editorContainer.css({
-			top: `${styleTop}px`,
-			left: `${styleLeft}px`,
-		});
-	};
-
 	focusTextarea() {
 		this.mathEditor?.focus();
 	}
@@ -128,7 +102,7 @@ export default class MathCard extends Card<MathValue> {
 		this.container?.html(
 			`<span class="data-math-content-tmp" style="max-width: ${maxWidth}px">${text}</span>`,
 		);
-		this.updateEditorPosition();
+		this.#position?.update();
 	}
 
 	renderMath(code: string) {
@@ -170,7 +144,7 @@ export default class MathCard extends Card<MathValue> {
 		image.css('width', `${width}px`);
 		image.css('height', `${height}px`);
 		image.css('max-width', `${maxWidth}px`);
-		this.updateEditorPosition();
+		this.#position?.update();
 	}
 
 	renderView() {
@@ -211,10 +185,7 @@ export default class MathCard extends Card<MathValue> {
 		const value = this.getValue();
 		if (!value) return;
 		this.editorContainer = this.mathEditor.render(value.id, value.code);
-		$(document.body).append(this.editorContainer);
-		this.updateEditorPosition();
-		window.addEventListener('scroll', this.updateEditorPosition, true);
-		window.addEventListener('resize', this.updateEditorPosition, true);
+		this.#position?.bind(this.editorContainer, this.container);
 	}
 
 	render(): string | void | NodeInterface {

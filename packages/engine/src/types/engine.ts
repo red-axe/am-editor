@@ -43,6 +43,14 @@ export interface ContainerInterface {
 	 */
 	setReadonly(readonly: boolean): void;
 	/**
+	 * 显示占位符
+	 */
+	showPlaceholder(): void;
+	/**
+	 * 隐藏占位符
+	 */
+	hidePlaceholder(): void;
+	/**
 	 * 销毁
 	 */
 	destroy(): void;
@@ -414,6 +422,7 @@ export type EngineOptions = {
 	plugins?: Array<PluginEntry>;
 	cards?: Array<CardEntry>;
 	config?: { [k: string]: PluginOptions };
+	placeholder?: string;
 };
 
 export interface Engine {
@@ -465,6 +474,15 @@ export interface EngineInterface extends EditorInterface {
 	 * 是否聚焦到编辑器
 	 */
 	isFocus(): boolean;
+	/**
+	 * 是否为空内容
+	 */
+	isEmpty(): boolean;
+	/**
+	 * 设置滚动节点
+	 * @param node 节点
+	 */
+	setScrollNode(node: HTMLElement): void;
 	/**
 	 * 获取编辑器值
 	 * @param ignoreCursor 是否包含光标位置信息
@@ -1169,6 +1187,17 @@ export interface EngineInterface extends EditorInterface {
 		rewrite?: boolean,
 	): void;
 	/**
+	 * 编辑器值有变化时就触发，与 change 相比，change 需要在组合输入法完成输入后才会触发，在一定时间内如果内容没有改版也不会触发 change
+	 * @param eventType
+	 * @param listener
+	 * @param rewrite
+	 */
+	on(
+		eventType: 'realtimeChange',
+		listener: (trigger: 'remote' | 'local') => void,
+		rewrite?: boolean,
+	): void;
+	/**
 	 * 设置编辑器值之前
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
@@ -1420,6 +1449,16 @@ export interface EngineInterface extends EditorInterface {
 		listener: (value: string, trigger: 'remote' | 'local' | 'both') => void,
 	): void;
 	/**
+	 * 编辑器值有变化时就触发，与 change 相比，change 需要在组合输入法完成输入后才会触发，在一定时间内如果内容没有改版也不会触发 change
+	 * @param eventType
+	 * @param listener
+	 * @param rewrite
+	 */
+	off(
+		eventType: 'realtimeChange',
+		listener: (trigger: 'remote' | 'local') => void,
+	): void;
+	/**
 	 * 设置编辑器值之前
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
@@ -1594,6 +1633,16 @@ export interface EngineInterface extends EditorInterface {
 	trigger(
 		eventType: 'change',
 		value: string,
+		trigger: 'remote' | 'local' | 'both',
+	): void;
+	/**
+	 * 编辑器值有变化时就触发，与 change 相比，change 需要在组合输入法完成输入后才会触发，在一定时间内如果内容没有改版也不会触发 change
+	 * @param eventType
+	 * @param listener
+	 * @param rewrite
+	 */
+	trigger(
+		eventType: 'realtimeChange',
 		trigger: 'remote' | 'local' | 'both',
 	): void;
 	/**

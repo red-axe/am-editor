@@ -48,6 +48,7 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 	const [loading, setLoading] = useState(true);
 	const [members, setMembers] = useState<Array<Member>>([]);
 	const [member, setMember] = useState<Member | null>(null);
+	const scrollNode = useRef<HTMLDivElement | null>();
 
 	/**
 	 * 保存到服务器
@@ -108,6 +109,7 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 
 	useEffect(() => {
 		if (!engine.current) return;
+		engine.current.setScrollNode(scrollNode.current);
 		//卡片最大化时设置编辑页面样式
 		engine.current.on('card:maximize', () => {
 			$('.editor-toolbar').css('z-index', '9999').css('top', '56px');
@@ -233,13 +235,16 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 					<Toolbar engine={engine.current} items={props.toolbar} />
 				)}
 				<div className="editor-wrapper">
-					<div className="editor-container">
+					<div className="editor-container" ref={scrollNode}>
 						<div className="editor-content">
-							<EngineComponent
-								ref={engine}
-								{...engineProps}
-								defaultValue=""
-							/>
+							{
+								<EngineComponent
+									ref={engine}
+									{...engineProps}
+									scrollNode={scrollNode}
+									defaultValue=""
+								/>
+							}
 						</div>
 						{engine.current &&
 							!isMobile &&

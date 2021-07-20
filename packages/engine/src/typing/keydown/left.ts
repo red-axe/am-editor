@@ -9,7 +9,7 @@ class Left implements TypingHandleInterface {
 		isHotkey('ctrl+a', event) ||
 		isHotkey('ctrl+b', event);
 
-	private listeners: Array<EventListener> = [];
+	listeners: Array<EventListener> = [];
 
 	on(listener: EventListener) {
 		this.listeners.push(listener);

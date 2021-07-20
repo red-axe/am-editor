@@ -8,7 +8,7 @@ class Backspace implements TypingHandleInterface {
 	type: 'keydown' | 'keyup' = 'keyup';
 	hotkey: Array<string> | string = 'backspace';
 	private engine: EngineInterface;
-	private listeners: Array<EventListener> = [];
+	listeners: Array<EventListener> = [];
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
 	}

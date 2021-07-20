@@ -1,7 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ConfigProvider from 'antd/es/config-provider';
-import { $, EngineInterface, NodeInterface, isMobile } from '@aomao/engine';
+import {
+	$,
+	EngineInterface,
+	NodeInterface,
+	isMobile,
+	Position,
+} from '@aomao/engine';
 import Editor from './editor';
 import Preview from './preview';
 
@@ -10,10 +16,12 @@ class Toolbar {
 	private root?: NodeInterface;
 	private target?: NodeInterface;
 	private mouseInContainer: boolean = false;
+	#position: Position;
 
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
 		const { change } = this.engine;
+		this.#position = new Position(this.engine);
 		change.event.onWindow('mousedown', (event: MouseEvent) => {
 			if (!event.target) return;
 			const target = $(event.target);
@@ -32,7 +40,6 @@ class Toolbar {
 					isMobile ? ' data-link-container-mobile' : ''
 				}"></div>`,
 			);
-			document.body.appendChild(root[0]);
 		}
 		this.root = root;
 		const rect = this.target.get<Element>()?.getBoundingClientRect();
@@ -44,30 +51,6 @@ class Toolbar {
 			'z-index': 1,
 		});
 	}
-
-	private update = () => {
-		if (!this.root || !this.target) return;
-		const targetRect = this.target.get<Element>()?.getBoundingClientRect();
-		if (!targetRect) return;
-		const rootRect = this.root.get<Element>()?.getBoundingClientRect();
-		if (!rootRect) return;
-		const { top, left, bottom } = targetRect;
-		const { height, width } = rootRect;
-		const styleLeft =
-			left + width > window.innerWidth - 20
-				? window.pageXOffset + window.innerWidth - width - 10
-				: 20 > left - window.pageXOffset
-				? window.pageXOffset + 20
-				: window.pageXOffset + left;
-		const styleTop =
-			bottom + height > window.innerHeight - 20
-				? window.pageYOffset + top - height - 4
-				: window.pageYOffset + bottom + 4;
-		this.root.css({
-			top: `${styleTop}px`,
-			left: `${styleLeft}px`,
-		});
-	};
 
 	private onOk(text: string, link: string) {
 		if (!this.target) return;
@@ -148,9 +131,8 @@ class Toolbar {
 			</ConfigProvider>,
 			container,
 			() => {
-				this.update();
-				window.addEventListener('scroll', this.update, true);
-				window.addEventListener('resize', this.update, true);
+				if (!this.root || !this.target) return;
+				this.#position?.bind(this.root, this.target);
 			},
 		);
 	}
@@ -160,9 +142,7 @@ class Toolbar {
 		const elment = this.root?.get<Element>();
 		if (elment && !this.mouseInContainer) {
 			ReactDOM.unmountComponentAtNode(elment);
-			document.body.removeChild(elment);
-			window.removeEventListener('scroll', this.update, true);
-			window.removeEventListener('resize', this.update, true);
+			this.#position?.destroy();
 			this.root = undefined;
 			if (this.target && !this.target.attributes('href')) {
 				const { change, inline } = this.engine;

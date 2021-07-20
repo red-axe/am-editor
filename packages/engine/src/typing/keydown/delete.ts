@@ -13,7 +13,7 @@ class Delete implements TypingHandleInterface {
 	private engine: EngineInterface;
 	type: 'keydown' | 'keyup' = 'keydown';
 	hotkey: string | string[] | ((event: KeyboardEvent) => boolean) = 'delete';
-	private listeners: Array<EventListener> = [];
+	listeners: Array<EventListener> = [];
 
 	constructor(engine: EngineInterface) {
 		this.engine = engine;

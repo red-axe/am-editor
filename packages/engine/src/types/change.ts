@@ -46,6 +46,7 @@ export type ChangeEventOptions = {
 export type ChangeOptions = {
 	onChange?: (value: string, trigger: 'remote' | 'local' | 'both') => void;
 	onSelect?: () => void;
+	onRealtimeChange?: (trigger: 'remote' | 'local') => void;
 	onSetValue?: () => void;
 };
 

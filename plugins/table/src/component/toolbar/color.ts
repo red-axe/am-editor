@@ -6,6 +6,7 @@ import {
 	TRIGGER_CARD_ID,
 	isMobile,
 	EditorInterface,
+	Position,
 } from '@aomao/engine';
 import tinycolor2, { ColorInput } from 'tinycolor2';
 import Palette from './palette';
@@ -29,11 +30,13 @@ class Color {
 	#button: NodeInterface;
 	#cardId: string;
 	#container?: NodeInterface;
+	#position?: Position;
 
 	constructor(editor: EditorInterface, cardId: string, options: Options) {
 		this.#editor = editor;
 		this.#cardId = cardId;
 		this.#options = options;
+		this.#position = new Position(this.#editor);
 		this.#color = options.defaultColor || 'transparent';
 		this.#button = $(`<div class="table-color-dropdown-trigger">
         <button class="table-color-dropdown-button-text">
@@ -88,32 +91,6 @@ class Color {
 		const { onChange } = this.#options;
 		if (onChange) onChange(color);
 	}
-
-	updatePosition = () => {
-		if (!this.#container || !this.#button) return;
-		const targetRect = this.#button.get<Element>()?.getBoundingClientRect();
-		if (!targetRect) return;
-		const rootRect = this.#container
-			.get<Element>()
-			?.getBoundingClientRect();
-		if (!rootRect) return;
-		const { top, left, bottom } = targetRect;
-		const { height, width } = rootRect;
-		const styleLeft =
-			left + width > window.innerWidth - 20
-				? window.pageXOffset + window.innerWidth - width - 10
-				: 20 > left - window.pageXOffset
-				? window.pageXOffset + 20
-				: window.pageXOffset + left;
-		const styleTop =
-			bottom + height > window.innerHeight - 20
-				? window.pageYOffset + top - height - 4
-				: window.pageYOffset + bottom + 4;
-		this.#container.css({
-			top: `${styleTop + 2}px`,
-			left: `${styleLeft}px`,
-		});
-	};
 
 	toState(color: ColorInput, oldHue?: number) {
 		const tinyColor = color['hex']
@@ -227,10 +204,7 @@ class Color {
 			colorPanle.append(groupElement);
 		});
 		this.#container.append(colorPanle);
-		$(document.body).append(this.#container);
-		this.updatePosition();
-		window.addEventListener('scroll', this.updatePosition, true);
-		window.addEventListener('resize', this.updatePosition, true);
+		this.#position?.bind(this.#container, this.#button);
 		document.addEventListener('mousedown', this.windowClick, true);
 	}
 
@@ -247,8 +221,7 @@ class Color {
 
 	remove() {
 		this.#container?.remove();
-		window.removeEventListener('scroll', this.updatePosition, true);
-		window.removeEventListener('resize', this.updatePosition, true);
+		this.#position?.destroy();
 		document.removeEventListener('mousedown', this.windowClick, true);
 		this.#container = undefined;
 	}

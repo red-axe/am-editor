@@ -47,6 +47,7 @@ export default () => {
 		<Context.Provider value={{ lang }}>
 			<Editor
 				lang={lang}
+				placeholder="这里是编辑区域哦~"
 				defaultValue={doc}
 				comment={true}
 				toc={true}

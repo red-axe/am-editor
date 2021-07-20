@@ -12,7 +12,7 @@ import {
 import { EditorInterface } from '../../types/engine';
 import { DATA_ELEMENT, UI } from '../../constants';
 import { $ } from '../../node';
-import { isMobile } from '../../utils';
+import { isMobile, Position } from '../../utils';
 import './index.css';
 
 export const isCardToolbarItemOptions = (
@@ -25,10 +25,21 @@ class CardToolbar implements CardToolbarInterface {
 	private card: CardInterface;
 	private toolbar?: ToolbarBaseInterface;
 	private editor: EditorInterface;
+	private offset?: Array<number>;
+	private position: Position;
 
 	constructor(editor: EditorInterface, card: CardInterface) {
 		this.editor = editor;
 		this.card = card;
+		this.position = new Position(this.editor);
+	}
+
+	/**
+	 * 设置工具栏偏移量[上x，上y，下x，下y]
+	 * @param offset 偏移量 [tx,ty,bx,by]
+	 */
+	setOffset(offset: Array<number>) {
+		this.offset = offset;
 	}
 
 	getContainer() {
@@ -145,7 +156,7 @@ class CardToolbar implements CardToolbarInterface {
 				});
 				toolbar.root.addClass('data-card-toolbar');
 				//渲染工具栏
-				toolbar.render(root);
+				toolbar.render($(document.body));
 				toolbar.hide();
 				this.toolbar = toolbar;
 			}
@@ -164,6 +175,7 @@ class CardToolbar implements CardToolbarInterface {
 
 	hideCardToolbar(): void {
 		this.toolbar?.destroy();
+		this.position.destroy();
 	}
 
 	showCardToolbar(event?: MouseEvent): void {
@@ -206,8 +218,6 @@ class CardToolbar implements CardToolbarInterface {
 				};
 				const top = cardRect.top - rootRect.top;
 				const left = cardRect.left - rootRect.left;
-				element.style.top = `${top - 48}px`;
-				element.style.left = `${left}px`;
 
 				const dnd = root.find('.data-card-dnd');
 				const dndElement = dnd.get<HTMLElement>();
@@ -224,6 +234,39 @@ class CardToolbar implements CardToolbarInterface {
 				(this.card.constructor as CardEntry).cardName,
 			);
 			if (this.toolbar) this.toolbar.show();
+			let prevAlign = 'topLeft';
+			setTimeout(() => {
+				this.position.bind(
+					container,
+					this.card.root,
+					'topLeft',
+					this.offset,
+					(rect) => {
+						if (
+							this.offset &&
+							this.offset.length === 4 &&
+							rect.align === 'bottomLeft' &&
+							rect.align !== prevAlign
+						) {
+							this.position.setOffset([
+								this.offset[2],
+								this.offset[3],
+							]);
+							prevAlign = rect.align;
+							this.position.update();
+						} else if (
+							this.offset &&
+							rect.align === 'topLeft' &&
+							rect.align !== prevAlign
+						) {
+							this.position.setOffset(this.offset);
+							prevAlign = rect.align;
+							this.position.update();
+						}
+						prevAlign = rect.align;
+					},
+				);
+			}, 10);
 		}
 	}
 

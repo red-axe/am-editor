@@ -9,8 +9,6 @@
 
 .data-mention-component-list {
     position: absolute;
-    left: 0;
-    top: 32px;
     font-size: 12px;
     background: #ffffff;
     border: 1px solid #e8e8e8;
@@ -22,7 +20,6 @@
     z-index: 999;
     max-height: calc(80vh);
     overflow: auto;
-    display: none;
 }
 
 .data-mention-component-placeholder {
@@ -36,7 +33,7 @@
 .data-mention-item {
     display: flex;
     cursor: pointer;
-    padding: 4px 16px 0;
+    padding: 4px 16px;
     min-width: 120px;
     align-items: center;
 }
