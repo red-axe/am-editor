@@ -198,8 +198,8 @@ class Engine implements EngineInterface {
 		return this.change.isEmpty();
 	}
 
-	focus() {
-		this.change.focus();
+	focus(toStart?: boolean) {
+		this.change.focus(toStart);
 	}
 
 	on(eventType: string, listener: EventListener, rewrite?: boolean) {

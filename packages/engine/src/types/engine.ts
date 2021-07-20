@@ -465,7 +465,7 @@ export interface EngineInterface extends EditorInterface {
 	/**
 	 * 聚焦到编辑器
 	 */
-	focus(): void;
+	focus(toStart?: boolean): void;
 	/**
 	 * 是否是子编辑器
 	 */
