@@ -20,7 +20,6 @@
 }
 
 .data-mention-component-body {
-    overflow: hidden;
     max-height: calc(40vh);
     height: auto;
     overflow: hidden;

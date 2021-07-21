@@ -246,25 +246,40 @@ class CollapseComponent implements CollapseComponentInterface {
 		return node;
 	};
 
+	getBody() {
+		return this.root?.find('.data-mention-component-body');
+	}
+
 	render(target: NodeInterface, data: Array<MentionItem>) {
 		this.remove();
 		this.root = $(
 			`<div class="data-mention-component-list" ${DATA_ELEMENT}="${UI}"><div style>联系人</div><div class="data-mention-component-body"></div></div>`,
 		);
-		const body = this.root.find('.data-mention-component-body');
-		this.target = target;
-		this.#scrollbar = new Scrollbar(body, false, true, false);
 
+		this.target = target;
+
+		let body = this.getBody();
 		if (CollapseComponent.renderLoading) {
 			const result = CollapseComponent.renderLoading(this.root);
-			if (result) body.append(result);
+			body = this.getBody();
+			if (result) body?.append(result);
 		} else if (data.filter((item) => !!item.key).length === 0) {
 			const result = CollapseComponent.renderEmpty(this.root);
-			if (result) body.append(result);
+			body = this.getBody();
+			if (result) body?.append(result);
 		} else if (CollapseComponent.render) {
 			CollapseComponent.render(this.root, data, this.bindItem).then(
 				(result) => {
-					if (result) body.append(result);
+					const body = this.getBody();
+					if (result) body?.append(result);
+					this.#scrollbar?.destroy();
+					if (body)
+						this.#scrollbar = new Scrollbar(
+							body,
+							false,
+							true,
+							false,
+						);
 					this.scroll('down');
 					this.bindEvents();
 					this.#scrollbar?.refresh();
@@ -278,10 +293,11 @@ class CollapseComponent implements CollapseComponentInterface {
 					: this.renderTemplate(data);
 				if (!result) return;
 
-				body.append(this.bindItem($(result), data.name, data.key));
+				body?.append(this.bindItem($(result), data.name, data.key));
 			});
 			this.scroll('down');
 		}
+		if (body) this.#scrollbar = new Scrollbar(body, false, true, false);
 		this.bindEvents();
 		this.#scrollbar.refresh();
 	}

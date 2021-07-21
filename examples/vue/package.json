@@ -25,7 +25,7 @@
     "@aomao/plugin-italic": "^2.2.19",
     "@aomao/plugin-link-vue": "^2.2.21",
     "@aomao/plugin-mark": "^2.2.19",
-    "@aomao/plugin-mention": "^1.0.6",
+    "@aomao/plugin-mention": "^1.0.7",
     "@aomao/plugin-orderedlist": "^2.2.19",
     "@aomao/plugin-paintformat": "^2.2.19",
     "@aomao/plugin-quote": "^2.2.19",
