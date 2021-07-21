@@ -253,7 +253,7 @@ class CollapseComponent implements CollapseComponentInterface {
 	render(target: NodeInterface, data: Array<MentionItem>) {
 		this.remove();
 		this.root = $(
-			`<div class="data-mention-component-list" ${DATA_ELEMENT}="${UI}"><div style>联系人</div><div class="data-mention-component-body"></div></div>`,
+			`<div class="data-mention-component-list" ${DATA_ELEMENT}="${UI}"><div class="data-mention-component-body"></div></div>`,
 		);
 
 		this.target = target;
@@ -299,7 +299,7 @@ class CollapseComponent implements CollapseComponentInterface {
 		}
 		if (body) this.#scrollbar = new Scrollbar(body, false, true, false);
 		this.bindEvents();
-		this.#scrollbar.refresh();
+		this.#scrollbar?.refresh();
 	}
 }
 

@@ -30,6 +30,7 @@ class Scrollbar extends EventEmitter2 {
 	private xWidth: number = 0;
 	private yHeight: number = 0;
 	private maxScrollLeft: number = 0;
+	#observer?: MutationObserver;
 	shadowTimer?: NodeJS.Timeout;
 	/**
 	 * @param {nativeNode} container 需要添加滚动条的容器元素
@@ -151,7 +152,8 @@ class Scrollbar extends EventEmitter2 {
 		event.preventDefault();
 		const wheelValue = event.wheelDelta / 120 || -event.detail;
 		const dir = wheelValue > 0 ? 'up' : 'down';
-		const containerElement = this.container.get<HTMLElement>()!;
+		const containerElement = this.container.get<HTMLElement>();
+		if (!containerElement) return;
 		let left = containerElement.scrollLeft + (dir === 'up' ? -20 : 20);
 		left =
 			dir === 'up'
@@ -164,7 +166,8 @@ class Scrollbar extends EventEmitter2 {
 		event.preventDefault();
 		const wheelValue = event.wheelDelta / 120 || -event.detail;
 		const dir = wheelValue > 0 ? 'up' : 'down';
-		const containerElement = this.container.get<HTMLElement>()!;
+		const containerElement = this.container.get<HTMLElement>();
+		if (!containerElement) return;
 		let top = containerElement.scrollTop + (dir === 'up' ? -20 : 20);
 		top =
 			dir === 'up'
@@ -187,6 +190,30 @@ class Scrollbar extends EventEmitter2 {
 			isFirefox ? 'DOMMouseScroll' : 'mousewheel',
 			this.bindWheelScroll,
 		);
+		const containerElement = this.container.get<HTMLElement>();
+		if (!containerElement) return;
+		let size = {
+			width: this.container.width(),
+			height: this.container.height(),
+		};
+		this.#observer = new MutationObserver(() => {
+			const width = this.container.width();
+			const height = this.container.height();
+			if (width === size.width && height === size.height) return;
+			size = {
+				width,
+				height,
+			};
+			this.refresh();
+		});
+		this.#observer.observe(containerElement, {
+			attributes: true,
+			attributeFilter: ['style'],
+			attributeOldValue: true,
+			childList: true,
+			subtree: true,
+		});
+
 		this.bindXScrollEvent();
 		this.bindYScrollEvent();
 	}
@@ -321,6 +348,7 @@ class Scrollbar extends EventEmitter2 {
 			this.shadowLeft?.remove();
 			this.shadowRight?.remove();
 		}
+		this.#observer?.disconnect();
 	}
 }
 

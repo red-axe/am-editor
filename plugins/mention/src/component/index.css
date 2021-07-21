@@ -17,13 +17,13 @@
     transition: all 0.25s cubic-bezier(0.3, 1.2, 0.2, 1);
     z-index: 999;
     overflow: hidden;
+    padding: 5px 0;
+    max-width: 250px;
 }
 
 .data-mention-component-body {
     max-height: calc(40vh);
-    height: auto;
     overflow: hidden;
-    max-width: 250px;
 }
 
 .data-mention-component-placeholder {

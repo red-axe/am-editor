@@ -11,6 +11,7 @@ div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
     white-space: pre-wrap;
     width: 100%;
     border-collapse: collapse;
+    background-color: #ffffff;
 }
 
 .data-table tr,.data-table td {
@@ -684,6 +685,7 @@ div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
     height: 4px;
 }
 
-[data-card-key="table"].data-card-block-max [data-card-element="center"] {
+[data-card-key="table"].data-card-block-max > [data-card-element="body"] > [data-card-element="center"] {
     padding: 48px;
+    margin-top: 4px;
 }
