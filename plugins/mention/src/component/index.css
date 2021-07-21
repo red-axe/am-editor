@@ -19,7 +19,7 @@
     z-index: 999;
     max-height: calc(40vh);
     overflow: hidden;
-    max-width: 350px;
+    max-width: 250px;
 }
 
 .data-mention-component-placeholder {
