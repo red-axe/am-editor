@@ -60,7 +60,7 @@ onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar
 onClick?:(key: string, name: string) => void
 // Triggered when the mouse moves over the "mention"
 onMouseEnter?:(node: NodeInterface, key: string, name: string) => void
-//Custom rendering list
+//Custom rendering list, bindItem can bind required attributes and events for list items
 onRender?: (data: MentionItem, root: NodeInterface) => string | NodeInterface | void
 //Custom rendering list items
 onRenderItem?: (item: MentionItem, root: NodeInterface) => string | NodeInterface | void

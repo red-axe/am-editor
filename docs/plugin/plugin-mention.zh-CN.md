@@ -60,7 +60,7 @@ onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar
 onClick?:(key: string, name: string) => void
 //鼠标移入“提及”上时触发
 onMouseEnter?:(node: NodeInterface, key: string, name: string) => void
-//自定义渲染列表
+//自定义渲染列表，bindItem 可以为列表项绑定需要的属性和事件
 onRender?: (data: MentionItem, root: NodeInterface) => string | NodeInterface | void
 //自定义渲染列表项
 onRenderItem?: (item: MentionItem, root: NodeInterface) => string | NodeInterface | void

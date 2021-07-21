@@ -20,6 +20,11 @@ export type Options = {
 	onRender?: (
 		root: NodeInterface,
 		data: MentionItem[],
+		bindItem: (
+			node: NodeInterface,
+			name: string,
+			key?: string,
+		) => NodeInterface,
 	) => string | NodeInterface | void;
 	onRenderItem?: (
 		item: MentionItem,

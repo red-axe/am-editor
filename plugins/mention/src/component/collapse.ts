@@ -71,6 +71,11 @@ class CollapseComponent implements CollapseComponentInterface {
 	static render?: (
 		root: NodeInterface,
 		data: MentionItem[],
+		bindItem: (
+			node: NodeInterface,
+			name: string,
+			key?: string,
+		) => NodeInterface,
 	) => string | NodeInterface | void;
 
 	constructor(engine: EngineInterface, options: Options) {
@@ -209,20 +214,60 @@ class CollapseComponent implements CollapseComponentInterface {
         </div>`;
 	}
 
+	bindItem(node: NodeInterface, name: string, key?: string) {
+		const { onSelect } = this.otpions;
+		node.addClass('data-mention-item');
+		if (key) {
+			node.attributes({ 'data-key': escape(key) });
+		} else {
+			node.removeAttributes('data-key');
+		}
+		node.attributes({
+			'data-name': escape(name),
+		});
+		node.on('click', (event: MouseEvent) => {
+			if (!key) return;
+			event.stopPropagation();
+			event.preventDefault();
+			if (onSelect)
+				onSelect(
+					event,
+					node.attributes('data-key'),
+					node.attributes('data-name'),
+				);
+		});
+		node.on('mouseenter', () => {
+			if (!key) return;
+			this.root
+				?.find('.data-mention-item-active')
+				.removeClass('data-mention-item-active');
+			node.addClass('data-mention-item-active');
+		});
+		return node;
+	}
+
 	render(target: NodeInterface, data: Array<MentionItem>) {
 		this.remove();
 		this.root = $(
-			`<div class="data-mention-component-list" ${DATA_ELEMENT}="${UI}"></div>`,
+			`<div class="data-mention-component-list" ${DATA_ELEMENT}="${UI}"><div style>联系人</div><div class="data-mention-component-body"></div></div>`,
 		);
+		const body = this.root.find('.data-mention-component-body');
 		this.target = target;
-		this.#scrollbar = new Scrollbar(this.root, false, true, false);
-		const { onSelect } = this.otpions;
+		this.#scrollbar = new Scrollbar(body, false, true, false);
+
 		if (CollapseComponent.renderLoading) {
 			const result = CollapseComponent.renderLoading(this.root);
-			if (result) this.root.append(result);
+			if (result) body.append(result);
+		} else if (data.filter((item) => !!item.key).length === 0) {
+			const result = CollapseComponent.renderEmpty(this.root);
+			if (result) body.append(result);
 		} else if (CollapseComponent.render) {
-			const result = CollapseComponent.render(this.root, data);
-			if (result) this.root.append(result);
+			const result = CollapseComponent.render(
+				this.root,
+				data,
+				this.bindItem,
+			);
+			if (result) body.append(result);
 			this.scroll('down');
 		} else {
 			data.forEach((data) => {
@@ -230,40 +275,9 @@ class CollapseComponent implements CollapseComponentInterface {
 					? CollapseComponent.renderItem(data, this.root!)
 					: this.renderTemplate(data);
 				if (!result) return;
-				const itemNode = $(result);
-				itemNode.addClass('data-mention-item');
-				if (data.key) {
-					itemNode.attributes({ 'data-key': escape(data.key) });
-				} else {
-					itemNode.removeAttributes('data-key');
-				}
-				itemNode.attributes({
-					'data-name': escape(data.name),
-				});
-				itemNode.on('click', (event: MouseEvent) => {
-					if (!data.key) return;
-					event.stopPropagation();
-					event.preventDefault();
-					if (onSelect)
-						onSelect(
-							event,
-							itemNode.attributes('data-key'),
-							itemNode.attributes('data-name'),
-						);
-				});
-				itemNode.on('mouseenter', () => {
-					if (!data.key) return;
-					this.root
-						?.find('.data-mention-item-active')
-						.removeClass('data-mention-item-active');
-					itemNode.addClass('data-mention-item-active');
-				});
-				this.root?.append(itemNode);
+
+				body.append(this.bindItem($(result), data.name, data.key));
 			});
-			if (data.length === 0) {
-				const result = CollapseComponent.renderEmpty(this.root);
-				if (result) this.root.append(result);
-			}
 			this.scroll('down');
 		}
 		this.bindEvents();
