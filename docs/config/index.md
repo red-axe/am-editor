@@ -81,7 +81,7 @@ console.log(view.language.get<string>('test'));
 
 -   Type: `{ [key: string]: PluginOptions }`
 -   Default value: `{}`
--   Detailed: the configuration item of each plug-in, the key is the name of the plug-in, please refer to the description of each plug-in for detailed configuration. (Configuration example)[https://github.com/itellyou-com/am-editor/blob/master/examples/react/components/editor/config.tsx]
+-   Detailed: the configuration item of each plug-in, the key is the name of the plug-in, please refer to the description of each plug-in for detailed configuration. [Configuration example](https://github.com/itellyou-com/am-editor/blob/master/examples/react/components/editor/config.tsx)
 
 ### placeholder
 

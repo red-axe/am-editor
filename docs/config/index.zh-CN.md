@@ -81,7 +81,7 @@ console.log(view.language.get<string>('test'));
 
 -   类型: `{ [key: string]: PluginOptions }`
 -   默认值：`{}`
--   详细：每个插件的配置项，key 为插件名称，详细配置请参考每个插件的说明。 (配置案例)[https://github.com/itellyou-com/am-editor/blob/master/examples/react/components/editor/config.tsx]
+-   详细：每个插件的配置项，key 为插件名称，详细配置请参考每个插件的说明。 [配置案例](https://github.com/itellyou-com/am-editor/blob/master/examples/react/components/editor/config.tsx)
 
 ### placeholder
 
