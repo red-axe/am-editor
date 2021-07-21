@@ -214,7 +214,7 @@ class CollapseComponent implements CollapseComponentInterface {
         </div>`;
 	}
 
-	bindItem(node: NodeInterface, name: string, key?: string) {
+	bindItem = (node: NodeInterface, name: string, key?: string) => {
 		const { onSelect } = this.otpions;
 		node.addClass('data-mention-item');
 		if (key) {
@@ -244,7 +244,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			node.addClass('data-mention-item-active');
 		});
 		return node;
-	}
+	};
 
 	render(target: NodeInterface, data: Array<MentionItem>) {
 		this.remove();
