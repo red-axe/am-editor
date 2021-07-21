@@ -9,6 +9,8 @@ import {
 	UI,
 	Position,
 	Scrollbar,
+	unescape,
+	escape,
 } from '@aomao/engine';
 import { MentionItem } from '../types';
 

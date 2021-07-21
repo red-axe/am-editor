@@ -7,6 +7,7 @@ import {
 	NodeInterface,
 	Plugin,
 	CardEntry,
+	unescape,
 } from '@aomao/engine';
 import MentionComponent from './component';
 import locales from './locales';
@@ -180,9 +181,14 @@ class MentionPlugin extends Plugin<Options> {
 				this.editor.card.each((card) => {
 					const Component = card.constructor as CardEntry;
 					if (Component.cardName === MentionComponent.cardName) {
-						const { id, name, ...value } =
+						const { id, key, name, ...value } =
 							(card as MentionComponent).getValue() || {};
-						if (name) values.push({ name, ...value });
+						if (name && key)
+							values.push({
+								key: unescape(key),
+								name: unescape(name),
+								...value,
+							});
 					}
 				});
 				return values;
