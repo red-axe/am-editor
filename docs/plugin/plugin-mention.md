@@ -39,19 +39,35 @@ new Engine(...,{
 
 `onMouseEnter`: Triggered when the mouse moves over the "mention"
 
-`action`: query address, always use `GET` request
+`onRender`: custom rendering list
+
+`onRenderItem`: custom rendering list item
+
+`onLoading`: custom rendering loading status
+
+`onEmpty`: custom render empty state
+
+`action`: query address, always use `GET` request, parameter `keyword`
 
 `data`: When querying, these data will be sent to the server at the same time
 
 ```ts
 //List data displayed by default
 defaultData?: Array<{ key: string, name: string, avatar?: string}>
-//Method for query, or configure action, choose one of the two
+//The method of query, or configure action, choose one of the two
 onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar?: string}>>
 //Click event on "mention"
 onClick?:(key: string, name: string) => void
 // Triggered when the mouse moves over the "mention"
 onMouseEnter?:(node: NodeInterface, key: string, name: string) => void
+//Custom rendering list
+onRender?: (data: MentionItem, root: NodeInterface) => string | NodeInterface | void
+//Custom rendering list items
+onRenderItem?: (item: MentionItem, root: NodeInterface) => string | NodeInterface | void
+// Customize the rendering loading status
+onLoading?: (root: NodeInterface) => string | NodeInterface | void
+// Custom render empty state
+onEmpty?: (root: NodeInterface) => string | NodeInterface | void
 /**
  * look for the address
  */
@@ -82,7 +98,7 @@ parse?: (
 
 ### Analyze server response data
 
-`result`: true upload is successful, data data collection. false upload failed, data is an error message
+`result`: true upload is successful, data is a collection. false upload failed, data is an error message
 
 ```ts
 /**
