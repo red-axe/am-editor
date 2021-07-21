@@ -76,7 +76,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			name: string,
 			key?: string,
 		) => NodeInterface,
-	) => string | NodeInterface | void;
+	) => Promise<string | NodeInterface | void>;
 
 	constructor(engine: EngineInterface, options: Options) {
 		this.otpions = options;
@@ -262,13 +262,15 @@ class CollapseComponent implements CollapseComponentInterface {
 			const result = CollapseComponent.renderEmpty(this.root);
 			if (result) body.append(result);
 		} else if (CollapseComponent.render) {
-			const result = CollapseComponent.render(
-				this.root,
-				data,
-				this.bindItem,
+			CollapseComponent.render(this.root, data, this.bindItem).then(
+				(result) => {
+					if (result) body.append(result);
+					this.scroll('down');
+					this.bindEvents();
+					this.#scrollbar?.refresh();
+				},
 			);
-			if (result) body.append(result);
-			this.scroll('down');
+			return;
 		} else {
 			data.forEach((data) => {
 				const result = CollapseComponent.renderItem

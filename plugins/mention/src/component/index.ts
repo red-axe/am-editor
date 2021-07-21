@@ -79,7 +79,7 @@ class Mention extends Card<MentionValue> {
 				name: string,
 				key?: string,
 			) => NodeInterface,
-		) => string | NodeInterface | void,
+		) => Promise<string | NodeInterface | void>,
 	) {
 		CollapseComponent.render = fun;
 	}

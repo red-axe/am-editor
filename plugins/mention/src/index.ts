@@ -25,7 +25,7 @@ export type Options = {
 			name: string,
 			key?: string,
 		) => NodeInterface,
-	) => string | NodeInterface | void;
+	) => Promise<string | NodeInterface | void>;
 	onRenderItem?: (
 		item: MentionItem,
 		root: NodeInterface,

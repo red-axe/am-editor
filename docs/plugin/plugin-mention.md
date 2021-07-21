@@ -61,7 +61,7 @@ onClick?:(key: string, name: string) => void
 // Triggered when the mouse moves over the "mention"
 onMouseEnter?:(node: NodeInterface, key: string, name: string) => void
 //Custom rendering list, bindItem can bind required attributes and events for list items
-onRender?: (data: MentionItem, root: NodeInterface) => string | NodeInterface | void
+onRender?: (data: MentionItem, root: NodeInterface) => Promise<string | NodeInterface | void>;
 //Custom rendering list items
 onRenderItem?: (item: MentionItem, root: NodeInterface) => string | NodeInterface | void
 // Customize the rendering loading status
