@@ -54,15 +54,24 @@ class CollapseComponent implements CollapseComponentInterface {
 	private readonly SCOPE_NAME = 'data-mention-component';
 	#position?: Position;
 	#scrollbar?: Scrollbar;
-	static renderItem?: (item: MentionItem) => string | NodeInterface;
+	static renderItem?: (
+		item: MentionItem,
+		root: NodeInterface,
+	) => string | NodeInterface | void;
 
-	static renderEmpty = () => {
-		return `<div class="data-mention-item"><span class="data-mention-item-text">Empty Data</span></div>`;
-	};
+	static renderEmpty: (root: NodeInterface) => string | NodeInterface | void =
+		() => {
+			return `<div class="data-mention-item"><span class="data-mention-item-text">Empty Data</span></div>`;
+		};
 
-	static renderLoading = () => {
-		return `<div class="data-mention-loading"><span class="data-mention-item-text">加载中...</span></div>`;
-	};
+	static renderLoading?: (
+		root: NodeInterface,
+	) => string | NodeInterface | void;
+
+	static render?: (
+		root: NodeInterface,
+		data: MentionItem[],
+	) => string | NodeInterface | void;
 
 	constructor(engine: EngineInterface, options: Options) {
 		this.otpions = options;
@@ -205,48 +214,58 @@ class CollapseComponent implements CollapseComponentInterface {
 		this.root = $(
 			`<div class="data-mention-component-list" ${DATA_ELEMENT}="${UI}"></div>`,
 		);
+		this.target = target;
 		this.#scrollbar = new Scrollbar(this.root, false, true, false);
 		const { onSelect } = this.otpions;
-		data.forEach((data) => {
-			const itemNode = $(
-				CollapseComponent.renderItem
-					? CollapseComponent.renderItem(data)
-					: this.renderTemplate(data),
-			);
-			itemNode.addClass('data-mention-item');
-			if (data.key) {
-				itemNode.attributes({ 'data-key': escape(data.key) });
-			} else {
-				itemNode.removeAttributes('data-key');
+		if (CollapseComponent.renderLoading) {
+			const result = CollapseComponent.renderLoading(this.root);
+			if (result) this.root.append(result);
+		} else if (CollapseComponent.render) {
+			const result = CollapseComponent.render(this.root, data);
+			if (result) this.root.append(result);
+			this.scroll('down');
+		} else {
+			data.forEach((data) => {
+				const result = CollapseComponent.renderItem
+					? CollapseComponent.renderItem(data, this.root!)
+					: this.renderTemplate(data);
+				if (!result) return;
+				const itemNode = $(result);
+				itemNode.addClass('data-mention-item');
+				if (data.key) {
+					itemNode.attributes({ 'data-key': escape(data.key) });
+				} else {
+					itemNode.removeAttributes('data-key');
+				}
+				itemNode.attributes({
+					'data-name': escape(data.name),
+				});
+				itemNode.on('click', (event: MouseEvent) => {
+					if (!data.key) return;
+					event.stopPropagation();
+					event.preventDefault();
+					if (onSelect)
+						onSelect(
+							event,
+							itemNode.attributes('data-key'),
+							itemNode.attributes('data-name'),
+						);
+				});
+				itemNode.on('mouseenter', () => {
+					if (!data.key) return;
+					this.root
+						?.find('.data-mention-item-active')
+						.removeClass('data-mention-item-active');
+					itemNode.addClass('data-mention-item-active');
+				});
+				this.root?.append(itemNode);
+			});
+			if (data.length === 0) {
+				const result = CollapseComponent.renderEmpty(this.root);
+				if (result) this.root.append(result);
 			}
-			itemNode.attributes({
-				'data-name': escape(data.name),
-			});
-			itemNode.on('click', (event: MouseEvent) => {
-				if (!data.key) return;
-				event.stopPropagation();
-				event.preventDefault();
-				if (onSelect)
-					onSelect(
-						event,
-						itemNode.attributes('data-key'),
-						itemNode.attributes('data-name'),
-					);
-			});
-			itemNode.on('mouseenter', () => {
-				if (!data.key) return;
-				this.root
-					?.find('.data-mention-item-active')
-					.removeClass('data-mention-item-active');
-				itemNode.addClass('data-mention-item-active');
-			});
-			this.root?.append(itemNode);
-		});
-		if (data.length === 0) {
-			this.root.append(CollapseComponent.renderEmpty());
+			this.scroll('down');
 		}
-		this.target = target;
-		this.scroll('down');
 		this.bindEvents();
 		this.#scrollbar.refresh();
 	}

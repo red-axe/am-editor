@@ -2,7 +2,7 @@ import { EventEmitter2 } from 'eventemitter2';
 import { DATA_ELEMENT, UI } from '../constants';
 import { isNode, NodeInterface } from '../types';
 import { $ } from '../node';
-import { isFirefox } from '../utils';
+import { isFirefox, removeUnit } from '../utils';
 import './index.css';
 
 export type ScrollbarDragging = {
@@ -105,15 +105,21 @@ class Scrollbar extends EventEmitter2 {
 				scrollTop,
 			} = element;
 
-			this.oWidth = offsetWidth;
-			this.oHeight = offsetHeight;
+			this.oWidth =
+				offsetWidth -
+				removeUnit(this.container.css('border-left-width')) -
+				removeUnit(this.container.css('border-right-width'));
+			this.oHeight =
+				offsetHeight -
+				removeUnit(this.container.css('border-top-width')) -
+				removeUnit(this.container.css('border-bottom-width'));
 			this.sWidth = scrollWidth;
 			this.sHeight = scrollHeight;
-			this.xWidth = Math.floor((offsetWidth * offsetWidth) / scrollWidth);
+			this.xWidth = Math.floor((this.oWidth * this.oWidth) / scrollWidth);
 			this.yHeight = Math.floor(
-				(offsetHeight * offsetHeight) / scrollHeight,
+				(this.oHeight * this.oHeight) / scrollHeight,
 			);
-			this.maxScrollLeft = scrollWidth - offsetWidth;
+			this.maxScrollLeft = scrollWidth - this.oWidth;
 			if (this.x) {
 				this.slideX?.css('width', this.xWidth + 'px');
 				const display = this.oWidth === this.sWidth ? 'none' : 'block';
@@ -150,11 +156,7 @@ class Scrollbar extends EventEmitter2 {
 		left =
 			dir === 'up'
 				? Math.max(0, left)
-				: Math.min(
-						left,
-						containerElement.scrollWidth -
-							containerElement.offsetWidth,
-				  );
+				: Math.min(left, this.sWidth - this.oWidth);
 		containerElement.scrollLeft = left;
 	};
 
@@ -167,11 +169,7 @@ class Scrollbar extends EventEmitter2 {
 		top =
 			dir === 'up'
 				? Math.max(0, top)
-				: Math.min(
-						top,
-						containerElement.scrollHeight -
-							containerElement.offsetHeight,
-				  );
+				: Math.min(top, this.sHeight - this.oHeight);
 		containerElement.scrollTop = top;
 	};
 

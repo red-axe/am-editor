@@ -1,4 +1,9 @@
-import { PluginEntry, CardEntry, PluginOptions } from '@aomao/engine';
+import {
+	PluginEntry,
+	CardEntry,
+	PluginOptions,
+	NodeInterface,
+} from '@aomao/engine';
 //引入插件 begin
 import Redo from '@aomao/plugin-redo';
 import Undo from '@aomao/plugin-undo';
@@ -43,6 +48,10 @@ import {
 	fontFamilyDefaultData,
 } from '@aomao/toolbar';
 import { DOMAIN } from '../../config';
+import ReactDOM from 'react-dom';
+import Loading from '../loading';
+import Empty from 'antd/es/empty';
+import 'antd/es/empty/style';
 
 export const plugins: Array<PluginEntry> = [
 	Redo,
@@ -141,6 +150,12 @@ export const pluginConfig: PluginOptions = {
 	[Mention.pluginName]: {
 		action: `${DOMAIN}/user/search`,
 		defaultData: userList(20),
+		onLoading: (root: NodeInterface) => {
+			return ReactDOM.render(<Loading />, root.get<HTMLElement>()!);
+		},
+		onEmpty: (root: NodeInterface) => {
+			return ReactDOM.render(<Empty />, root.get<HTMLElement>()!);
+		},
 		onClick: (key: string, name: string) => {
 			console.log('mention click:', key, '-', name);
 		},

@@ -56,7 +56,7 @@ class Mention extends Card<MentionValue> {
 	 * @param key
 	 * @param name
 	 */
-	static itemClick(key: string, name: string) {}
+	static itemClick(node: NodeInterface, key: string, name: string) {}
 
 	/**
 	 * 鼠标移入
@@ -67,11 +67,39 @@ class Mention extends Card<MentionValue> {
 	static mouseEnter(node: NodeInterface, key: string, name: string) {}
 
 	/**
+	 * 自定义渲染列表
+	 * @param root 根节点
+	 */
+	static set render(
+		fun: (
+			root: NodeInterface,
+			data: MentionItem[],
+		) => string | NodeInterface | void,
+	) {
+		CollapseComponent.render = fun;
+	}
+
+	/**
 	 * 自定义渲染列表项
 	 * @param item 数据项
 	 */
-	static set renderItem(fun: (item: MentionItem) => string | NodeInterface) {
+	static set renderItem(
+		fun: (
+			item: MentionItem,
+			root: NodeInterface,
+		) => string | NodeInterface | void,
+	) {
 		CollapseComponent.renderItem = fun;
+	}
+
+	static renderLoading?: (
+		root: NodeInterface,
+	) => string | NodeInterface | void;
+
+	static set renderEmpty(
+		fun: (root: NodeInterface) => string | NodeInterface | void,
+	) {
+		CollapseComponent.renderEmpty = fun;
 	}
 
 	init() {
@@ -150,6 +178,11 @@ class Mention extends Card<MentionValue> {
 			this.component?.render(this.root, Mention.defaultData);
 			return;
 		}
+		if (Mention.renderLoading) {
+			CollapseComponent.renderLoading = Mention.renderLoading;
+			this.component?.render(this.root, []);
+			CollapseComponent.renderLoading = undefined;
+		}
 		Mention.search(keyword).then((data) => {
 			this.component?.render(this.root, data);
 		});
@@ -171,7 +204,11 @@ class Mention extends Card<MentionValue> {
 				)}</span>`,
 			);
 			this.#container.on('click', () => {
-				Mention.itemClick(unescape(key || ''), unescape(name));
+				Mention.itemClick(
+					this.#container!,
+					unescape(key || ''),
+					unescape(name),
+				);
 			});
 			this.#container.on('mouseenter', () => {
 				if (!this.#container) return;

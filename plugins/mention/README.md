@@ -39,9 +39,15 @@ new Engine(...,{
 
 `onMouseEnter`: 鼠标移入“提及”上时触发
 
+`onRender`: 自定义渲染列表
+
 `onRenderItem`: 自定义渲染列表项
 
-`action`: 查询地址，始终使用 `GET` 请求
+`onLoading`: 自定渲染加载状态
+
+`onEmpty`: 自定渲染空状态
+
+`action`: 查询地址，始终使用 `GET` 请求，参数 `keyword`
 
 `data`: 查询时同时将这些数据一起传到到服务端
 
@@ -54,8 +60,14 @@ onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar
 onClick?:(key: string, name: string) => void
 //鼠标移入“提及”上时触发
 onMouseEnter?:(node: NodeInterface, key: string, name: string) => void
+//自定义渲染列表
+onRender?: (data: MentionItem, root: NodeInterface) => string | NodeInterface | void
 //自定义渲染列表项
-onRenderItem?: (item: MentionItem) => string | NodeInterface => void
+onRenderItem?: (item: MentionItem, root: NodeInterface) => string | NodeInterface | void
+// 自定渲染加载状态
+onLoading?: (root: NodeInterface) => string | NodeInterface | void
+// 自定渲染空状态
+onEmpty?: (root: NodeInterface) => string | NodeInterface | void
 /**
  * 查询地址
  */

@@ -15,9 +15,18 @@ import { MentionItem } from './types';
 export type Options = {
 	defaultData?: Array<MentionItem>;
 	onSearch?: (keyword: string) => Promise<Array<MentionItem>>;
-	onClick?: (key: string, name: string) => void;
+	onClick?: (node: NodeInterface, key: string, name: string) => void;
 	onMouseEnter?: (node: NodeInterface, key: string, name: string) => void;
-	onRenderItem?: (item: MentionItem) => string | NodeInterface;
+	onRender?: (
+		root: NodeInterface,
+		data: MentionItem[],
+	) => string | NodeInterface | void;
+	onRenderItem?: (
+		item: MentionItem,
+		root: NodeInterface,
+	) => string | NodeInterface | void;
+	onLoading?: (root: NodeInterface) => string | NodeInterface | void;
+	onEmpty?: (root: NodeInterface) => string | NodeInterface | void;
 	spaceTrigger?: boolean;
 	/**
 	 * 查询地址
@@ -55,7 +64,10 @@ class MentionPlugin extends Plugin<Options> {
 			onSearch,
 			onClick,
 			onMouseEnter,
+			onRender,
 			onRenderItem,
+			onLoading,
+			onEmpty,
 			action,
 			contentType,
 			type,
@@ -65,7 +77,10 @@ class MentionPlugin extends Plugin<Options> {
 		if (defaultData) MentionComponent.defaultData = defaultData;
 		if (onClick) MentionComponent.itemClick = onClick;
 		if (onMouseEnter) MentionComponent.mouseEnter = onMouseEnter;
+		if (onRender) MentionComponent.render = onRender;
 		if (onRenderItem) MentionComponent.renderItem = onRenderItem;
+		if (onLoading) MentionComponent.renderLoading = onLoading;
+		if (onEmpty) MentionComponent.renderEmpty = onEmpty;
 		MentionComponent.search = (keyword: string) => {
 			if (onSearch) return onSearch(keyword);
 			return new Promise((resolve) => {
