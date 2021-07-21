@@ -2,6 +2,7 @@ import { EventEmitter2 } from 'eventemitter2';
 import { DATA_ELEMENT, UI } from '../constants';
 import { isNode, NodeInterface } from '../types';
 import { $ } from '../node';
+import { isFirefox } from '../utils';
 import './index.css';
 
 export type ScrollbarDragging = {
@@ -16,7 +17,7 @@ class Scrollbar extends EventEmitter2 {
 	private shadow: boolean;
 	private scrollBarX?: NodeInterface;
 	private slideX?: NodeInterface;
-	private sildeXDragging?: ScrollbarDragging;
+	private slideXDragging?: ScrollbarDragging;
 	private scrollBarY?: NodeInterface;
 	private slideY?: NodeInterface;
 	private slideYDragging?: ScrollbarDragging;
@@ -131,20 +132,70 @@ class Scrollbar extends EventEmitter2 {
 		}
 	}
 
+	scroll = (event: Event) => {
+		const { target } = event;
+		if (!target) return;
+
+		const { scrollTop, scrollLeft } = target as HTMLElement;
+		this.reRenderX(scrollLeft);
+		this.reRenderY(scrollTop);
+	};
+
+	wheelXScroll = (event: any) => {
+		event.preventDefault();
+		const wheelValue = event.wheelDelta / 120 || -event.detail;
+		const dir = wheelValue > 0 ? 'up' : 'down';
+		const containerElement = this.container.get<HTMLElement>()!;
+		let left = containerElement.scrollLeft + (dir === 'up' ? -20 : 20);
+		left =
+			dir === 'up'
+				? Math.max(0, left)
+				: Math.min(
+						left,
+						containerElement.scrollWidth -
+							containerElement.offsetWidth,
+				  );
+		containerElement.scrollLeft = left;
+	};
+
+	wheelYScroll = (event: any) => {
+		event.preventDefault();
+		const wheelValue = event.wheelDelta / 120 || -event.detail;
+		const dir = wheelValue > 0 ? 'up' : 'down';
+		const containerElement = this.container.get<HTMLElement>()!;
+		let top = containerElement.scrollTop + (dir === 'up' ? -20 : 20);
+		top =
+			dir === 'up'
+				? Math.max(0, top)
+				: Math.min(
+						top,
+						containerElement.scrollHeight -
+							containerElement.offsetHeight,
+				  );
+		containerElement.scrollTop = top;
+	};
+
+	bindWheelScroll = (event: any) => {
+		if (this.x && !this.y) {
+			this.wheelXScroll(event);
+		} else if (this.y) {
+			this.wheelYScroll(event);
+		}
+	};
+
 	bindEvents() {
-		this.container.on('scroll', (event) => {
-			const { target } = event;
-			const { scrollTop, scrollLeft } = target;
-			this.reRenderX(scrollLeft);
-			this.reRenderY(scrollTop);
-		});
+		this.container.on('scroll', this.scroll);
+		this.container.on(
+			isFirefox ? 'DOMMouseScroll' : 'mousewheel',
+			this.bindWheelScroll,
+		);
 		this.bindXScrollEvent();
 		this.bindYScrollEvent();
 	}
 
 	scrollX = (event: MouseEvent) => {
-		if (this.sildeXDragging) {
-			const { point, position } = this.sildeXDragging;
+		if (this.slideXDragging) {
+			const { point, position } = this.slideXDragging;
 			let left = position + (event.clientX - point);
 			left = Math.max(0, Math.min(left, this.oWidth - this.xWidth));
 			this.slideX?.css('left', left + 'px');
@@ -169,7 +220,7 @@ class Scrollbar extends EventEmitter2 {
 	};
 
 	scrollXEnd = () => {
-		this.sildeXDragging = undefined;
+		this.slideXDragging = undefined;
 		document.body.removeEventListener('mousemove', this.scrollX);
 		document.body.removeEventListener('mouseup', this.scrollXEnd);
 		this.container.removeClass('scrolling');
@@ -182,31 +233,35 @@ class Scrollbar extends EventEmitter2 {
 		this.container.removeClass('scrolling');
 	};
 
+	scrollXStart = (event: MouseEvent) => {
+		this.container.addClass('scrolling');
+		this.slideXDragging = {
+			point: event.clientX,
+			position: parseInt(this.slideX?.css('left') || '0'),
+		};
+		document.body.addEventListener('mousemove', this.scrollX);
+		document.body.addEventListener('mouseup', this.scrollXEnd);
+	};
+
+	scrollYStart = (event: MouseEvent) => {
+		this.container.addClass('scrolling');
+		this.slideYDragging = {
+			point: event.clientY,
+			position: parseInt(this.slideY?.css('top') || '0'),
+		};
+		document.body.addEventListener('mousemove', this.scrollY);
+		document.body.addEventListener('mouseup', this.scrollYEnd);
+	};
+
 	bindXScrollEvent = () => {
 		if (this.x) {
-			this.slideX?.on('mousedown', (event) => {
-				this.container.addClass('scrolling');
-				this.sildeXDragging = {
-					point: event.clientX,
-					position: parseInt(this.slideX?.css('left') || '0'),
-				};
-				document.body.addEventListener('mousemove', this.scrollX);
-				document.body.addEventListener('mouseup', this.scrollXEnd);
-			});
+			this.slideX?.on('mousedown', this.scrollXStart);
 		}
 	};
 
 	bindYScrollEvent = () => {
 		if (this.y) {
-			this.slideY?.on('mousedown', (event) => {
-				this.container.addClass('scrolling');
-				this.sildeXDragging = {
-					point: event.clientY,
-					position: parseInt(this.slideY?.css('top') || '0'),
-				};
-				document.body.addEventListener('mousemove', this.scrollY);
-				document.body.addEventListener('mouseup', this.scrollYEnd);
-			});
+			this.slideY?.on('mousedown', this.scrollYStart);
 		}
 	};
 
@@ -246,6 +301,29 @@ class Scrollbar extends EventEmitter2 {
 			this.slideY?.css('top', (this.oHeight - this.yHeight) * min + 'px');
 		}
 	};
+
+	destroy() {
+		this.container.off('scroll', this.scroll);
+		this.slideX?.off('mousedown', this.scrollXStart);
+		this.slideY?.off('mousedown', this.scrollYStart);
+		this.container.off(
+			isFirefox ? 'DOMMouseScroll' : 'mousewheel',
+			this.bindWheelScroll,
+		);
+		this.container.removeClass('data-scrollable');
+		if (this.x) {
+			this.scrollBarX?.remove();
+			this.container.removeClass('scroll-x');
+		}
+		if (this.y) {
+			this.scrollBarY?.remove();
+			this.container.removeClass('scroll-y');
+		}
+		if (this.shadow) {
+			this.shadowLeft?.remove();
+			this.shadowRight?.remove();
+		}
+	}
 }
 
 export default Scrollbar;

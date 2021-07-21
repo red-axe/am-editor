@@ -8,6 +8,7 @@ import {
 	NodeInterface,
 	UI,
 	Position,
+	Scrollbar,
 } from '@aomao/engine';
 import { MentionItem } from '../types';
 
@@ -52,6 +53,7 @@ class CollapseComponent implements CollapseComponentInterface {
 	private otpions: Options;
 	private readonly SCOPE_NAME = 'data-mention-component';
 	#position?: Position;
+	#scrollbar?: Scrollbar;
 	static renderItem?: (item: MentionItem) => string | NodeInterface;
 
 	static renderEmpty = () => {
@@ -113,13 +115,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			this.select(-1);
 			return;
 		}
-		this.select(
-			items.findIndex(
-				(n) =>
-					n.attributes('data-key') ===
-					activeNode?.attributes('data-key'),
-			),
-		);
+		this.select(items.findIndex((n) => n.equal(activeNode!)));
 		let offset = 0;
 		this.root.find('.data-mention-item').each((node) => {
 			if (activeNode?.equal(node)) return false;
@@ -187,6 +183,7 @@ class CollapseComponent implements CollapseComponentInterface {
 
 	remove() {
 		if (!this.root || this.root.length === 0) return;
+		this.#scrollbar?.destroy();
 		this.unbindEvents();
 		this.root.remove();
 		this.root = undefined;
@@ -206,8 +203,9 @@ class CollapseComponent implements CollapseComponentInterface {
 	render(target: NodeInterface, data: Array<MentionItem>) {
 		this.remove();
 		this.root = $(
-			`<div class="data-mention-component-list" ${DATA_ELEMENT}="${UI}" />`,
+			`<div class="data-mention-component-list" ${DATA_ELEMENT}="${UI}"></div>`,
 		);
+		this.#scrollbar = new Scrollbar(this.root, false, true, false);
 		const { onSelect } = this.otpions;
 		data.forEach((data) => {
 			const itemNode = $(
@@ -250,6 +248,7 @@ class CollapseComponent implements CollapseComponentInterface {
 		this.target = target;
 		this.scroll('down');
 		this.bindEvents();
+		this.#scrollbar.refresh();
 	}
 }
 

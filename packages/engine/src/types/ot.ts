@@ -62,6 +62,7 @@ export type CursorRect = {
 	top: string;
 	left: string;
 	height: string | number;
+	elementHeight: number;
 };
 
 export interface RangeColoringInterface {

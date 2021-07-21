@@ -234,6 +234,7 @@ class RangeColoring implements RangeColoringInterface {
 				top: top + 'px',
 				left: left + 'px',
 				height: height > 0 ? height + 'px' : -1,
+				elementHeight: rect.height || 0,
 			};
 		}
 
@@ -242,6 +243,7 @@ class RangeColoring implements RangeColoringInterface {
 		const rect = node.get<Element>()?.getBoundingClientRect() || {
 			top: 0,
 			left: 0,
+			height: 0,
 		};
 		let top = rect.top - parentRect.top - 1;
 		let left = rect.left - parentRect.left;
@@ -253,6 +255,7 @@ class RangeColoring implements RangeColoringInterface {
 			left: left + 'px',
 			top: top + 'px',
 			height: 0,
+			elementHeight: rect.height || 0,
 		};
 	}
 
@@ -292,7 +295,7 @@ class RangeColoring implements RangeColoringInterface {
 
 	drawCursor(selector: RangeInterface | NodeInterface, member: Member) {
 		const { uuid, name, color } = member;
-		const cursorRect = this.getCursorRect(selector);
+		let cursorRect = this.getCursorRect(selector);
 		let childCursor = this.root.children(
 			`.${USER_CURSOR_CLASS}[data-uuid="${uuid}"]`,
 		);
@@ -307,7 +310,25 @@ class RangeColoring implements RangeColoringInterface {
             </div>`;
 			childCursor = $(userCursor);
 			const trigger = childCursor.find(`.${USER_CURSOR_TRIGGER_CLASS}`);
-			this.setCursorRect(childCursor, cursorRect);
+
+			if (cursorRect.elementHeight === 0) {
+				// 刚加载获取不到高度，就定时循环获取，获取次数超过50次就不再获取
+				let count = 0;
+				const getRect = () => {
+					count++;
+					cursorRect = this.getCursorRect(selector);
+					if (cursorRect.elementHeight < 20 && count <= 50) {
+						setTimeout(() => {
+							getRect();
+						}, 20);
+					} else {
+						this.setCursorRect(childCursor, cursorRect);
+					}
+				};
+				getRect();
+			} else {
+				this.setCursorRect(childCursor, cursorRect);
+			}
 			childCursor.on('mouseenter', () => {
 				return this.showCursorInfo(childCursor!, member);
 			});
@@ -353,7 +374,7 @@ class RangeColoring implements RangeColoringInterface {
 			width: 0,
 			height: 0,
 		};
-		const nodeRect = node.get<Element>()?.getBoundingClientRect() || {
+		let nodeRect = node.get<Element>()?.getBoundingClientRect() || {
 			left: 0,
 			top: 0,
 			width: 0,
@@ -374,12 +395,40 @@ class RangeColoring implements RangeColoringInterface {
 			`<div class="${USER_MASK_CLASS}" data-uuid="${member.uuid}" />`,
 		);
 		mask[0]['__targetNode'] = node[0];
-		mask.css({
-			left: nodeRect.left - parentRect.left + 'px',
-			top: nodeRect.top - parentRect.top + 'px',
-			width: nodeRect.width + 'px',
-			height: nodeRect.height + 'px',
-		});
+		if (nodeRect.height === 0) {
+			// 刚加载获取不到高度，就定时循环获取，获取次数超过50次就不再获取
+			let count = 0;
+			const getRect = () => {
+				count++;
+				nodeRect = node.get<Element>()?.getBoundingClientRect() || {
+					left: 0,
+					top: 0,
+					width: 0,
+					height: 0,
+				};
+				if (nodeRect.height < 20 && count <= 50) {
+					setTimeout(() => {
+						getRect();
+					}, 20);
+				} else {
+					mask.css({
+						left: nodeRect.left - parentRect.left + 'px',
+						top: nodeRect.top - parentRect.top + 'px',
+						width: nodeRect.width + 'px',
+						height: nodeRect.height + 'px',
+					});
+				}
+			};
+			getRect();
+		} else {
+			mask.css({
+				left: nodeRect.left - parentRect.left + 'px',
+				top: nodeRect.top - parentRect.top + 'px',
+				width: nodeRect.width + 'px',
+				height: nodeRect.height + 'px',
+			});
+		}
+
 		mask.on('mouseenter', () => {
 			this.showCursorInfo(cursor, member);
 			Tooltip.show(mask, language.get('card', 'lockAlert').toString(), {

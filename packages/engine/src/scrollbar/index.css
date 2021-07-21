@@ -1,20 +1,17 @@
 .data-scrollable::-webkit-scrollbar {
     display: none;
+    overflow: hidden;
   }
   .data-scrollable.scroll-x {
     padding-bottom: 10px;
     overflow-x: hidden;
   }
-  .data-scrollable.scroll-x:hover {
-    overflow-x: auto;
-  }
+  
   .data-scrollable.scroll-y {
     padding-right: 10px;
     overflow-y: hidden;
   }
-  .data-scrollable.scroll-y:hover {
-    overflow-y: auto;
-  }
+
   .data-scrollable:hover .data-scrollbar {
     display: block;
   }

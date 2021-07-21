@@ -18,6 +18,7 @@ export type Options = {
 	onClick?: (key: string, name: string) => void;
 	onMouseEnter?: (node: NodeInterface, key: string, name: string) => void;
 	onRenderItem?: (item: MentionItem) => string | NodeInterface;
+	spaceTrigger?: boolean;
 	/**
 	 * 查询地址
 	 */
@@ -117,15 +118,18 @@ class MentionPlugin extends Plugin<Options> {
 			block.empty();
 		}
 
-		const selection = range.createSelection();
-		if (selection.anchor) {
-			const prevNode = $(selection.anchor).prev();
-			const prevText =
-				prevNode && prevNode.isText() ? prevNode[0].nodeValue : '';
-			selection.move();
-			// 前面有非空格文本时，应该要输入普通 at 字符
-			if (prevText && /[^\s@]$/.test(prevText)) {
-				return;
+		// 空格触发
+		if (this.options.spaceTrigger) {
+			const selection = range.createSelection();
+			if (selection.anchor) {
+				const prevNode = $(selection.anchor).prev();
+				const prevText =
+					prevNode && prevNode.isText() ? prevNode[0].nodeValue : '';
+				selection.move();
+				// 前面有非空格文本时，应该要输入普通 at 字符
+				if (prevText && /[^\s@]$/.test(prevText)) {
+					return;
+				}
 			}
 		}
 

@@ -553,7 +553,7 @@ div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
 }
 
 .table-wrapper.scrollbar-show .data-scrollable.scroll-x:hover {
-    overflow-x: auto;
+    /**overflow-x: auto;**/
 }
 
 .table-wrapper.scrollbar-show .data-scrollable.scroll-x .data-scrollbar-x{

@@ -103,6 +103,18 @@ export const cards: Array<CardEntry> = [
 	//MindComponent
 ];
 
+const userList = (count: number = 10) => {
+	const users: Array<{ key?: string; name: string; avatar: string }> = [];
+	for (let i = 0; i < count; i++) {
+		users.push({
+			key: `u1000${i}`,
+			name: `user${i + 1}`,
+			avatar: 'https://cdn-image.aomao.com/10016/avatar/2020/04/17/1587113793-da092550-5b12-477e-b229-631908d0ac2b.png',
+		});
+	}
+	return users;
+};
+
 export const pluginConfig: PluginOptions = {
 	[ImageUploader.pluginName]: {
 		file: {
@@ -128,24 +140,7 @@ export const pluginConfig: PluginOptions = {
 	},
 	[Mention.pluginName]: {
 		action: `${DOMAIN}/user/search`,
-		defaultData: [
-			{
-				name: '输入1、2、3可以模糊查询到测试数据',
-			},
-			{
-				key: '1',
-				name: '输入1-3查询',
-				avatar: 'https://cdn-image.aomao.com/10012/avatar/2020/04/11/1586596344-3b71be94-c861-428d-a8c3-9a1ebfb82a26.png?x-oss-process=image/resize,w_20',
-			},
-			{
-				name: '分割线',
-			},
-			{
-				key: '2',
-				name: '测试',
-				avatar: 'https://cdn-image.aomao.com/10012/avatar/2020/04/11/1586596344-3b71be94-c861-428d-a8c3-9a1ebfb82a26.png?x-oss-process=image/resize,w_20',
-			},
-		],
+		defaultData: userList(20),
 		onClick: (key: string, name: string) => {
 			console.log('mention click:', key, '-', name);
 		},
