@@ -35,6 +35,8 @@ new Engine(...,{
 
 `onSearch`: the method to query, or configure the action, choose one of the two
 
+`onSelect`: Call back after selecting an item in the list, here you can return a custom value combined with `key` and `name` to form a new value and store it in cardValue. And it will return together after executing the `getList` command
+
 `onClick`: Triggered when clicking on the "mention"
 
 `onMouseEnter`: Triggered when the mouse moves over the "mention"
@@ -56,12 +58,14 @@ new Engine(...,{
 defaultData?: Array<{ key: string, name: string, avatar?: string}>
 //The method of query, or configure action, choose one of the two
 onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar?: string}>>
+//Call back after selecting an item in the list, here you can return a custom value combined with key and name to form a new value and store it in cardValue. And it will return together after executing the getList command
+onSelect?: (key: string, name: string) => void | {[key: string]: string}
 //Click event on "mention"
 onClick?:(key: string, name: string) => void
 // Triggered when the mouse moves over the "mention"
 onMouseEnter?:(node: NodeInterface, key: string, name: string) => void
-//Custom rendering list, bindItem can bind required attributes and events for list items
-onRender?: (data: MentionItem, root: NodeInterface) => Promise<string | NodeInterface | void>;
+//Customize the rendering list, bindItem can bind the required properties and events for the list item
+onRender?: (data: MentionItem, root: NodeInterface, bindItem: (node: NodeInterface, name: string, key?: string) => NodeInterface) => Promise<string | NodeInterface | void>;
 //Custom rendering list items
 onRenderItem?: (item: MentionItem, root: NodeInterface) => string | NodeInterface | void
 // Customize the rendering loading status

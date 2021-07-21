@@ -15,6 +15,7 @@ import { MentionItem } from './types';
 export type Options = {
 	defaultData?: Array<MentionItem>;
 	onSearch?: (keyword: string) => Promise<Array<MentionItem>>;
+	onSelect?: (key: string, name: string) => void | { [key: string]: string };
 	onClick?: (node: NodeInterface, key: string, name: string) => void;
 	onMouseEnter?: (node: NodeInterface, key: string, name: string) => void;
 	onRender?: (
@@ -67,6 +68,7 @@ class MentionPlugin extends Plugin<Options> {
 		const {
 			defaultData,
 			onSearch,
+			onSelect,
 			onClick,
 			onMouseEnter,
 			onRender,
@@ -86,6 +88,7 @@ class MentionPlugin extends Plugin<Options> {
 		if (onRenderItem) MentionComponent.renderItem = onRenderItem;
 		if (onLoading) MentionComponent.renderLoading = onLoading;
 		if (onEmpty) MentionComponent.renderEmpty = onEmpty;
+		if (onSelect) MentionComponent.onSelect = onSelect;
 		MentionComponent.search = (keyword: string) => {
 			if (onSearch) return onSearch(keyword);
 			return new Promise((resolve) => {
@@ -173,13 +176,13 @@ class MentionPlugin extends Plugin<Options> {
 	execute(action: string) {
 		switch (action) {
 			case 'getList':
-				const values: Array<Omit<MentionItem, 'avatar'>> = [];
+				const values: Array<{ [key: string]: string }> = [];
 				this.editor.card.each((card) => {
 					const Component = card.constructor as CardEntry;
 					if (Component.cardName === MentionComponent.cardName) {
-						const { key, name } =
+						const { id, name, ...value } =
 							(card as MentionComponent).getValue() || {};
-						if (name) values.push({ key: key || '', name });
+						if (name) values.push({ name, ...value });
 					}
 				});
 				return values;

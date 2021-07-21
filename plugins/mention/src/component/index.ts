@@ -84,6 +84,11 @@ class Mention extends Card<MentionValue> {
 		CollapseComponent.render = fun;
 	}
 
+	static onSelect?: (
+		key: string,
+		name: string,
+	) => void | { [key: string]: string };
+
 	/**
 	 * 自定义渲染列表项
 	 * @param item 数据项
@@ -116,6 +121,11 @@ class Mention extends Card<MentionValue> {
 				this.changeToText();
 			},
 			onSelect: (_, key, name) => {
+				let newValue = {};
+				if (Mention.onSelect) {
+					newValue = Mention.onSelect(key, name) || {};
+					delete newValue['id'];
+				}
 				const { card } = this.editor;
 				this.component?.remove();
 				this.component = undefined;
@@ -123,6 +133,7 @@ class Mention extends Card<MentionValue> {
 				const newCard = card.insert(Mention.cardName, {
 					key,
 					name,
+					...newValue,
 				});
 				setTimeout(() => {
 					card.focus(newCard, false);
