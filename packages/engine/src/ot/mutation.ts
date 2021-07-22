@@ -37,7 +37,7 @@ class Mutation extends EventEmitter2 implements MutationInterface {
 		this.doc = options.doc;
 		this.creator = new Creator(this.engine, { doc: this.doc });
 		//https://dom.spec.whatwg.org/#mutationobserver
-		this.observer = new MutationObserver(records => {
+		this.observer = new MutationObserver((records) => {
 			if (this.isCache) {
 				this.cache.push(...records);
 			}
@@ -45,7 +45,7 @@ class Mutation extends EventEmitter2 implements MutationInterface {
 				this.creator.handleMutations(records);
 			}
 		});
-		this.creator.on('ops', ops => {
+		this.creator.on('ops', (ops) => {
 			this.onOpsReady(ops);
 		});
 	}

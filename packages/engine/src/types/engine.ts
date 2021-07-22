@@ -423,6 +423,7 @@ export type EngineOptions = {
 	cards?: Array<CardEntry>;
 	config?: { [k: string]: PluginOptions };
 	placeholder?: string;
+	readonly?: boolean;
 };
 
 export interface Engine {

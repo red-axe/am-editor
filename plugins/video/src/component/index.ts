@@ -163,13 +163,13 @@ class VideoComponent extends Card<VideoValue> {
 
 		this.container?.find('.data-video-content').append(video);
 
-		video.oncontextmenu = function() {
+		video.oncontextmenu = function () {
 			return false;
 		};
 		// 一次渲染时序开启 controls 会触发一次内容为空的 window.onerror，疑似 chrome bug
 		setTimeout(() => {
 			video.controls = true;
-			if (this.readonly)
+			if (!isEngine(this.editor))
 				(video as HTMLMediaElement)['controlsList'] = 'nodownload';
 		}, 0);
 	}
@@ -197,7 +197,7 @@ class VideoComponent extends Card<VideoValue> {
 				});
 			}
 
-			if (!this.readonly) {
+			if (isEngine(this.editor) && !this.editor.readonly) {
 				items.push({
 					type: 'copy',
 				});
@@ -207,7 +207,7 @@ class VideoComponent extends Card<VideoValue> {
 			}
 		}
 
-		if (!this.readonly) {
+		if (isEngine(this.editor) && !this.editor.readonly) {
 			items.push({
 				type: 'delete',
 			});
@@ -270,7 +270,7 @@ class VideoComponent extends Card<VideoValue> {
 		const { video_id, status } = value;
 		const locales = this.getLocales();
 		//阅读模式
-		if (this.readonly) {
+		if (!isEngine(this.editor)) {
 			if (status === 'done') {
 				//设置为加载状态
 				this.container = $(

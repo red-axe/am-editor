@@ -67,7 +67,12 @@ class Template implements TemplateInterface {
 	static readonly TABLE_TD_CONTENT_CLASS = `.${TABLE_TD_CONTENT_CLASS_NAME}`;
 	static readonly TABLE_TD_BG_CLASS = `.${TABLE_TD_BG_CLASS_NAME}`;
 	static readonly CellBG = `<div class="${TABLE_TD_BG_CLASS_NAME}"><div class="table-main-border-top"></div><div class="table-main-border-right"></div><div class="table-main-border-bottom"></div><div class="table-main-border-left"></div></div>`;
-	static readonly EmptyCell = `<div class="${TABLE_TD_CONTENT_CLASS_NAME}" contenteditable="true" ${DATA_ELEMENT}="${EDITABLE}"><p><br /></p></div>${this.CellBG}`;
+	static isReadonly = false;
+	static get EmptyCell() {
+		return `<div class="${TABLE_TD_CONTENT_CLASS_NAME}" ${DATA_TRANSIENT_ATTRIBUTES}="contenteditable" contenteditable="${
+			Template.isReadonly ? 'false' : 'true'
+		}" ${DATA_ELEMENT}="${EDITABLE}"><p><br /></p></div>${this.CellBG}`;
+	}
 	private table: TableInterface;
 
 	constructor(table: TableInterface) {

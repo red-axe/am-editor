@@ -1467,6 +1467,28 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			}
 		});
 	}
+
+	destroy() {
+		this.colsHeader?.removeAllEvents();
+		this.rowsHeader?.removeAllEvents();
+		this.tableHeader?.removeAllEvents();
+		this.table.wrapper?.removeAllEvents();
+		this.tableRoot?.removeAllEvents();
+		this.menuBar?.removeAllEvents();
+		//列头部 padding 区域单击让其选中表格卡片上方的blcok
+		this.viewport?.removeAllEvents();
+		//行删除按钮
+		this.rowDeleteButton?.removeAllEvents();
+		//列删除按钮
+		this.colDeleteButton?.removeAllEvents();
+		//列增加按钮
+		this.colAddButton?.removeAllEvents();
+		this.colsHeader?.removeAllEvents();
+		//行增加按钮
+		this.rowAddButton?.removeAllEvents();
+
+		this.rowsHeader?.removeAllEvents();
+	}
 }
 
 export default ControllBar;

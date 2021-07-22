@@ -9,7 +9,7 @@ import {
 	ToolbarItemOptions,
 	ToolbarInterface as ToolbarBaseInterface,
 } from '../../types/toolbar';
-import { EditorInterface } from '../../types/engine';
+import { EditorInterface, isEngine } from '../../types/engine';
 import { DATA_ELEMENT, UI } from '../../constants';
 import { $ } from '../../node';
 import { isMobile, Position } from '../../utils';
@@ -27,11 +27,57 @@ class CardToolbar implements CardToolbarInterface {
 	private editor: EditorInterface;
 	private offset?: Array<number>;
 	private position: Position;
+	#hideTimeout: NodeJS.Timeout | null = null;
+	#showTimeout: NodeJS.Timeout | null = null;
 
 	constructor(editor: EditorInterface, card: CardInterface) {
 		this.editor = editor;
 		this.card = card;
 		this.position = new Position(this.editor);
+		this.unbindEnterShow();
+		if (!isEngine(this.editor) || this.editor.readonly) {
+			this.bindEnterShow();
+		}
+	}
+
+	clearHide = () => {
+		if (this.#hideTimeout) clearTimeout(this.#hideTimeout);
+		this.#hideTimeout = null;
+	};
+
+	clearShow = () => {
+		if (this.#showTimeout) clearTimeout(this.#showTimeout);
+		this.#showTimeout = null;
+	};
+
+	enterHide = () => {
+		this.clearShow();
+		this.#hideTimeout = setTimeout(() => {
+			this.hide();
+			this.#hideTimeout = null;
+			this.toolbar?.root?.off('mouseenter', this.clearHide);
+			this.toolbar?.root?.off('mouseleave', this.enterHide);
+		}, 200);
+	};
+
+	enterShow = () => {
+		this.clearHide();
+		this.#showTimeout = setTimeout(() => {
+			this.#showTimeout = null;
+			this.show();
+			this.toolbar?.root?.on('mouseenter', this.clearHide);
+			this.toolbar?.root?.on('mouseleave', this.enterHide);
+		}, 200);
+	};
+
+	bindEnterShow() {
+		this.card.root.on('mouseenter', this.enterShow);
+		this.card.root.on('mouseleave', this.enterHide);
+	}
+
+	unbindEnterShow() {
+		this.card.root.off('mouseenter', this.enterShow);
+		this.card.root.off('mouseleave', this.enterHide);
 	}
 
 	/**
@@ -296,6 +342,11 @@ class CardToolbar implements CardToolbarInterface {
 			this.showCardToolbar();
 		});
 		return dndNode;
+	}
+
+	destroy() {
+		this.unbindEnterShow();
+		this.position.destroy();
 	}
 }
 

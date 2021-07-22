@@ -123,14 +123,12 @@ class Container {
 			if (this.#styleElement)
 				document.body.removeChild(this.#styleElement);
 			this.#styleElement = document.createElement('style');
-			const left = this.node.css('left');
-			const top = this.node.css('top');
+			//const left = this.node.css('padding-left');
+			//const top = this.node.css('padding-top');
 			const styleText = document.createTextNode(`.am-engine:before {
                 content: attr(data-placeholder);
                 pointer-events: none;
                 position: absolute;
-                left: ${left}px;
-                top: ${top}px;
                 color: #bbbfc4;
                 height: 0;
             }`);

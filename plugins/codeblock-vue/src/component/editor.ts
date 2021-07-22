@@ -89,13 +89,19 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				lineWrapping: false,
 				autofocus: false,
 				dragDrop: false,
-				readOnly: false,
+				readOnly: !isEngine(this.editor) || this.editor.readonly,
 				scrollbarStyle: 'null',
 				viewportMargin: 1 / 0,
 				...this.getConfig(value, syntaxMode),
 				...options,
 			},
 		) as Editor;
+		this.codeMirror.on('mousedown', (_, event) => {
+			if (!isEngine(this.editor) || this.editor.readonly) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		});
 		this.codeMirror.on('focus', () => {
 			const { onFocus } = this.options;
 			if (onFocus) onFocus();
@@ -136,6 +142,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				mirror.execCommand('newlineAndIndent');
 			},
 		});
+		return this.codeMirror;
 	}
 
 	update(mode: string) {

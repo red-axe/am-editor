@@ -221,6 +221,8 @@ export interface ControllBarInterface extends EventEmitter2 {
 	drawBackgroundColor(color?: string): void;
 
 	setAlign(align?: 'top' | 'middle' | 'bottom'): void;
+
+	destroy(): void;
 }
 
 export interface TableCommandInterface extends EventEmitter2 {
@@ -364,4 +366,6 @@ export interface TableSelectionInterface extends EventEmitter2 {
 	focusCell(cell: NodeInterface | Node): void;
 
 	selectCellRange(cell: NodeInterface | Node): void;
+
+	destroy(): void;
 }

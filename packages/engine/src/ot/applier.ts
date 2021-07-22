@@ -148,8 +148,10 @@ class Applier implements ApplierInterface {
 			domNode.get<Element>()?.setAttribute(attr, value);
 			if (domNode.isCard()) {
 				const component = card.find(domNode);
-				if (!component?.isEditable) card.render(domNode);
-				else if (component.isEditable && component.onChange)
+				if (!component) return;
+				if (!component.isEditable) {
+					card.reRender(component);
+				} else if (component.isEditable && component.onChange)
 					component.onChange(domNode);
 			}
 		}
@@ -201,15 +203,9 @@ class Applier implements ApplierInterface {
 		if (domBegine.length > 0 && !domBegine.isRoot()) {
 			const parent = domBegine.parent();
 			if (domBegine.isCard()) {
-				engine.readonly = false;
 				if (isRemote) engine.card.removeRemote(domBegine);
 				else {
 					engine.card.remove(domBegine);
-					const card = engine.card.find(domBegine);
-					if (card && card.activated && engine.readonly) {
-						engine.readonly = false;
-						if (!engine.isFocus()) engine.focus();
-					}
 				}
 			} else domBegine.remove();
 			return parent?.isRoot() ? undefined : parent;

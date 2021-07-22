@@ -382,7 +382,7 @@ class Range implements RangeInterface {
 	 */
 	getSubRanges = (includeCard: boolean = false) => {
 		const ranges: Array<RangeInterface> = [];
-		this.commonAncestorNode.traverse(child => {
+		this.commonAncestorNode.traverse((child) => {
 			if (child.isText()) {
 				let offset = 0;
 				const childNode = child.get()!;
@@ -595,15 +595,12 @@ class Range implements RangeInterface {
 	 */
 	addOrRemoveBr = (isLeft?: boolean) => {
 		const block = this.editor.block.closest(this.commonAncestorNode);
-		block.find('br').each(br => {
+		block.find('br').each((br) => {
 			const domBr = $(br);
 			if (
 				((!domBr.prev() ||
 					(domBr.parent()?.hasClass('data-list-item') &&
-						domBr
-							.parent()
-							?.first()
-							?.equal(domBr.prev()!))) &&
+						domBr.parent()?.first()?.equal(domBr.prev()!))) &&
 					domBr.next() &&
 					domBr.next()!.name !== 'br' &&
 					![CURSOR, ANCHOR, FOCUS].includes(
@@ -616,10 +613,7 @@ class Range implements RangeInterface {
 					domBr.prev() &&
 					!(
 						domBr.parent()?.hasClass('data-list-item') &&
-						domBr
-							.parent()
-							?.first()
-							?.equal(domBr.prev()!)
+						domBr.parent()?.first()?.equal(domBr.prev()!)
 					)
 				)
 					return;
@@ -793,8 +787,8 @@ Range.fromPath = (
 	path: Path[],
 	context: NodeInterface = editor.container,
 ) => {
-	const startPath = path[0].slice();
-	const endPath = path[1].slice();
+	const startPath = path.length === 0 ? [] : path[0].slice();
+	const endPath = path.length < 2 ? [] : path[1].slice();
 	const startOffset = startPath.pop();
 	const endOffset = endPath.pop();
 

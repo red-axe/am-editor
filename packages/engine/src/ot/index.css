@@ -36,6 +36,10 @@
 	cursor: not-allowed;
 }
 
+.ot-user-background {
+  z-index: 99999;
+}
+
 .ot-user-cursor-card {
 	position: absolute;
 }

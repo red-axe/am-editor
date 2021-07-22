@@ -2,6 +2,7 @@ import {
 	Card,
 	CardToolbarItemOptions,
 	CardType,
+	isEngine,
 	isMobile,
 	NodeInterface,
 	ToolbarItemOptions,
@@ -121,7 +122,7 @@ class ImageComponent extends Card<ImageValue> {
 	}
 
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
-		if (this.readonly) return [];
+		if (!isEngine(this.editor) || this.editor.readonly) return [];
 		const { language } = this.editor;
 		let value = this.getValue();
 		if (this.isLocalError === true || value?.status === 'error')
@@ -207,24 +208,30 @@ class ImageComponent extends Card<ImageValue> {
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
-		this.image = new Image(this.editor, {
-			root: this.root,
-			container: this.getCenter(),
-			status: value.status || 'done',
-			src: value.src,
-			size: value.size,
-			alt: value.alt,
-			link: value.link,
-			percent: value.percent,
-			message: value.message,
-			onChange: (size) => {
-				if (size) this.setSize(size);
-			},
-			onError: () => {
-				this.isLocalError = true;
-				this.didUpdate();
-			},
-		});
+		if (!this.image) {
+			this.image = new Image(this.editor, {
+				root: this.root,
+				container: this.getCenter(),
+				status: value.status || 'done',
+				src: value.src,
+				size: value.size,
+				alt: value.alt,
+				link: value.link,
+				percent: value.percent,
+				message: value.message,
+				onChange: (size) => {
+					if (size) this.setSize(size);
+				},
+				onError: () => {
+					this.isLocalError = true;
+					this.didUpdate();
+				},
+			});
+		} else {
+			this.image.status = value.status || 'done';
+			this.image.size.width = value.size?.width || 0;
+			this.image.size.height = value.size?.height || 0;
+		}
 		this.image.render();
 	}
 

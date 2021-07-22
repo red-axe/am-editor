@@ -56,7 +56,10 @@ class Mention extends Card<MentionValue> {
 	 * @param key
 	 * @param name
 	 */
-	static itemClick(node: NodeInterface, key: string, name: string) {}
+	static itemClick?: (
+		node: NodeInterface,
+		data: { [key: string]: string },
+	) => void;
 
 	/**
 	 * 鼠标移入
@@ -64,7 +67,10 @@ class Mention extends Card<MentionValue> {
 	 * @param key
 	 * @param name
 	 */
-	static mouseEnter(node: NodeInterface, key: string, name: string) {}
+	static mouseEnter?: (
+		node: NodeInterface,
+		data: { [key: string]: string },
+	) => void;
 
 	/**
 	 * 自定义渲染列表
@@ -116,6 +122,8 @@ class Mention extends Card<MentionValue> {
 		if (!isEngine(this.editor) || isServer) {
 			return;
 		}
+		super.init();
+		if (this.component) return;
 		this.component = new CollapseComponent(this.editor, {
 			onCancel: () => {
 				this.changeToText();
@@ -213,26 +221,30 @@ class Mention extends Card<MentionValue> {
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
 		if (value?.name) {
-			const { key, name } = value;
+			const { id, key, name, ...info } = value;
 			this.#container = $(
 				`<span class="data-mention-component">@${unescape(
 					name,
 				)}</span>`,
 			);
+
 			this.#container.on('click', () => {
-				Mention.itemClick(
-					this.#container!,
-					unescape(key || ''),
-					unescape(name),
-				);
+				if (!this.#container || !Mention.itemClick) return;
+				Mention.itemClick(this.#container, {
+					key: unescape(key || ''),
+					name: unescape(name),
+					...info,
+				});
 			});
+
 			this.#container.on('mouseenter', () => {
-				if (!this.#container) return;
-				Mention.mouseEnter(
-					this.#container,
-					unescape(key || ''),
-					unescape(name),
-				);
+				if (!this.#container || !Mention.mouseEnter) return;
+				if (Mention.itemClick)
+					Mention.mouseEnter(this.#container, {
+						key: unescape(key || ''),
+						name: unescape(name),
+						...info,
+					});
 			});
 		}
 

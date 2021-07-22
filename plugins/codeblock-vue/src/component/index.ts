@@ -36,6 +36,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 
 	init() {
 		if (isServer) return;
+		super.init();
 		this.codeEditor = new CodeBlockEditor(this.editor, {
 			onSave: (mode, value) => {
 				this.setValue({
@@ -47,7 +48,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 	}
 
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
-		if (this.readonly) {
+		if (!isEngine(this.editor) || this.editor.readonly) {
 			return [{ type: 'copy' }];
 		}
 		return [

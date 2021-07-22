@@ -418,7 +418,7 @@ class ChangeModel implements ChangeInterface {
 					range.collapse(true);
 					node.html(cardLeft, '&#8203;');
 					node.insertText(cardLeftText, range);
-					this.select(range);
+					this.apply(range);
 				}
 			} else if (card.isRightCursor(commonAncestorNode)) {
 				const cardRight =
@@ -430,7 +430,7 @@ class ChangeModel implements ChangeInterface {
 					range.collapse(false);
 					node.html(cardRight, '&#8203;');
 					node.insertText(cardRightText, range);
-					this.select(range);
+					this.apply(range);
 				}
 			} else this.getSafeRange(range);
 		}

@@ -1054,6 +1054,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		this.table.wrapper?.removeClass('data-table-highlight-col');
 		this.table.wrapper?.removeClass('data-table-highlight-all');
 	}
+
+	destroy() {
+		this.unbindEvents();
+	}
 }
 
 export default TableSelection;

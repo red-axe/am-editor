@@ -10,12 +10,11 @@ export default class extends Plugin<Options> {
 
 	execute() {
 		if (!isEngine(this.editor)) return;
-		this.editor.readonly = false;
-		this.editor.history.undo();
+		if (!this.editor.readonly) this.editor.history.undo();
 	}
 
 	queryState() {
-		if (!isEngine(this.editor)) return;
+		if (!isEngine(this.editor) || this.editor.readonly) return;
 		return this.editor.history.hasUndo();
 	}
 

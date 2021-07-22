@@ -67,11 +67,12 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	alignToolButton?: NodeInterface;
 
 	init() {
+		super.init();
 		if (isEngine(this.editor)) {
-			this.editor.on('undo', () => this.onChange());
-			this.editor.on('redo', () => this.onChange());
+			this.editor.on('undo', this.onChange);
+			this.editor.on('redo', this.onChange);
 		}
-
+		if (this.colorTool) return;
 		this.colorTool = new ColorTool(this.editor, this.id, {
 			colors: TableComponent.colors,
 			defaultColor: this.getValue()?.color,
@@ -85,7 +86,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	}
 
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
-		if (this.readonly)
+		if (!isEngine(this.editor) || this.editor.readonly)
 			return [
 				{
 					type: 'maximize',
@@ -232,11 +233,11 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	drawBackground?(
 		node: NodeInterface,
 		range: RangeInterface,
-	): DOMRect | void {
+	): DOMRect | void | false | RangeInterface[] {
 		const backgroundRect = node.get<HTMLElement>()!.getBoundingClientRect();
 		const domRect = new DOMRect(backgroundRect.x, backgroundRect.y, 0, 0);
 		const { startNode, endNode } = range;
-		if (startNode.name !== 'td' || endNode.name !== 'td') return;
+		if (startNode.name !== 'td' || endNode.name !== 'td') return [range];
 
 		const startRect = startNode.get<HTMLElement>()!.getBoundingClientRect();
 
@@ -262,7 +263,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.scrollbar?.refresh();
 	}
 
-	onChange() {
+	onChange = () => {
 		if (!isEngine(this.editor)) return;
 		this.editor.history.hold();
 		this.conltrollBar.refresh();
@@ -274,8 +275,9 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 				this.noBorderToolButton?.addClass('active');
 			} else this.noBorderToolButton?.removeClass('active');
 			this.setValue(value);
+			this.scrollbar?.refresh();
 		}
-	}
+	};
 
 	maximize() {
 		super.maximize();
@@ -296,7 +298,9 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.selection.init();
 		this.conltrollBar.init();
 		this.command.init();
-		this.toolbarModel?.setOffset([0, -28, 0, -6]);
+		if (!isEngine(this.editor) || this.editor.readonly)
+			this.toolbarModel?.setOffset([0, 0]);
+		else this.toolbarModel?.setOffset([0, -28, 0, -6]);
 		if (this.viewport) {
 			this.scrollbar = new Scrollbar(this.viewport, true, false, true);
 			this.scrollbar.on('display', (display: 'node' | 'block') => {
@@ -342,6 +346,8 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	}
 
 	render() {
+		Template.isReadonly = !isEngine(this.editor) || this.editor.readonly;
+		if (this.wrapper) return;
 		const value = this.getValue();
 		if (!value) return 'Error value';
 		if (value.html) {
@@ -367,6 +373,14 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		if (value.width)
 			this.wrapper.find('table').css('width', `${value.width}px`);
 		return this.wrapper;
+	}
+
+	destroy() {
+		super.destroy();
+		this.selection.destroy();
+		this.conltrollBar.destroy();
+		this.editor.off('undo', this.onChange);
+		this.editor.off('redo', this.onChange);
 	}
 }
 

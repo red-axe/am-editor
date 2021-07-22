@@ -17,8 +17,11 @@ export type Options = {
 	defaultData?: Array<MentionItem>;
 	onSearch?: (keyword: string) => Promise<Array<MentionItem>>;
 	onSelect?: (key: string, name: string) => void | { [key: string]: string };
-	onClick?: (node: NodeInterface, key: string, name: string) => void;
-	onMouseEnter?: (node: NodeInterface, key: string, name: string) => void;
+	onClick?: (node: NodeInterface, data: { [key: string]: string }) => void;
+	onMouseEnter?: (
+		node: NodeInterface,
+		data: { [key: string]: string },
+	) => void;
 	onRender?: (
 		root: NodeInterface,
 		data: MentionItem[],

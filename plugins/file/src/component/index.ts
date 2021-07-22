@@ -8,6 +8,7 @@ import {
 	CardToolbarItemOptions,
 	ToolbarItemOptions,
 	getFileSize,
+	isEngine,
 } from '@aomao/engine';
 import './index.css';
 
@@ -128,14 +129,14 @@ export default class FileCard extends Card<FileValue> {
 				});
 			}
 
-			if (!this.readonly) {
+			if (!(!isEngine(this.editor) || this.editor.readonly)) {
 				items.push({
 					type: 'separator',
 				});
 			}
 		}
 
-		if (!this.readonly) {
+		if (!(!isEngine(this.editor) || this.editor.readonly)) {
 			items.push({
 				type: 'delete',
 			});
@@ -198,14 +199,15 @@ export default class FileCard extends Card<FileValue> {
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
-
 		this.container = $(this.renderTemplate(value));
-		if (!this.readonly) {
+		this.getCenter().empty().append(this.container);
+
+		if (isEngine(this.editor)) {
 			this.container.attributes('draggable', 'true');
 		} else {
 			this.renderView();
 		}
-		this.getCenter().append(this.container);
+
 		this.maxWidth = this.getMaxWidth();
 		this.updateMaxWidth();
 		window.removeEventListener('resize', this.onWindowResize);

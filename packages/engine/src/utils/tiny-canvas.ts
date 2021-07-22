@@ -30,7 +30,7 @@ class TinyCanvas implements TinyCanvasInterface {
 
 	private removeCanvas() {
 		const { canvasCache } = this.options;
-		canvasCache?.forEach(canvas => {
+		canvasCache?.forEach((canvas) => {
 			canvas?.parentElement?.removeChild(canvas);
 		});
 		this.options.canvasCache = [];
@@ -70,7 +70,7 @@ class TinyCanvas implements TinyCanvasInterface {
 			this.options.canvasCache = canvasCache;
 		} else {
 			const canvas = this.getCanvas(index);
-			canvasCache?.forEach(can => {
+			canvasCache?.forEach((can) => {
 				can.setAttribute('width', width.toString());
 			});
 			if (canvas) {
@@ -161,7 +161,7 @@ class TinyCanvas implements TinyCanvasInterface {
 
 	clear() {
 		const { canvasCache } = this.options;
-		canvasCache?.forEach(canvas => {
+		canvasCache?.forEach((canvas) => {
 			const context = canvas.getContext('2d');
 			const width = Number(canvas.getAttribute('width'));
 			const height = Number(canvas.getAttribute('height'));

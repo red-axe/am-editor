@@ -71,6 +71,10 @@ class Resize implements ResizeInterface {
 		if (!this.component) return;
 		this.component.hide();
 		container.append(this.component);
+		const value: any = this.card.getValue() || {};
+		if (value.height) {
+			container.css('height', `${value.height}px`);
+		}
 	}
 
 	touchStart = (event: TouchEvent) => {
@@ -134,12 +138,11 @@ class Resize implements ResizeInterface {
 			this.component.off('touchend', this.dragEnd);
 			this.component.off('touchcancel', this.dragEnd);
 		} else {
-			if (this.component) {
-				this.component.off('dragstart', this.dragStart);
-			}
+			this.component?.off('dragstart', this.dragStart);
 			document.removeEventListener('mousemove', this.dragMove);
 			document.removeEventListener('mouseup', this.dragEnd);
 		}
+		this.component?.remove();
 	}
 }
 

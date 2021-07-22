@@ -4,6 +4,7 @@ import {
 	ActiveTrigger,
 	Card,
 	CardType,
+	isEngine,
 	NodeInterface,
 	Position,
 } from '@aomao/engine';
@@ -28,7 +29,7 @@ export default class MathCard extends Card<MathValue> {
 	}
 
 	static get selectStyleType(): 'background' | 'border' {
-		return 'background';
+		return 'border';
 	}
 
 	private container?: NodeInterface;
@@ -38,11 +39,13 @@ export default class MathCard extends Card<MathValue> {
 	isSaving: boolean = false;
 
 	init() {
+		super.init();
 		const tips = getLocales<{ text: string; href: string }>(
 			this.editor,
 		).tips;
 		const { card } = this.editor;
-		this.#position = new Position(this.editor);
+		if (!this.#position) this.#position = new Position(this.editor);
+		if (this.mathEditor) return;
 		this.mathEditor = new MathEditor(this.editor, {
 			tips: `<a class="tips-text" href="${tips.href}" target="_blank"><span class="data-icon data-icon-question-circle-o"></span>${tips.text}</a>`,
 			onFocus: () => {
@@ -82,7 +85,7 @@ export default class MathCard extends Card<MathValue> {
 			parseInt(style.width) -
 			parseInt(style['padding-left']) -
 			parseInt(style['padding-right']);
-		return this.readonly ? width : width - 2;
+		return !isEngine(this.editor) ? width : width - 2;
 	}
 
 	focusTextarea() {
@@ -91,7 +94,7 @@ export default class MathCard extends Card<MathValue> {
 
 	onActivate(activated: boolean) {
 		super.onActivate(activated);
-		if (this.readonly) return;
+		if (!isEngine(this.editor) || this.editor.readonly) return;
 		if (activated) this.renderEditor();
 		else this.mathEditor?.destroy();
 	}
@@ -150,12 +153,19 @@ export default class MathCard extends Card<MathValue> {
 		const value = this.getValue();
 		const locales = getLocales(this.editor);
 		const { url, code } = value || { url: '', code: '' };
-
-		this.container = $('<span class="data-math-container"></span>');
-		this.getCenter().append(this.container);
+		if (!this.container) {
+			this.container = $('<span class="data-math-container"></span>');
+			this.getCenter().empty().append(this.container);
+		}
 		if (url) {
-			const image = $(`<img src="${url}" />`);
-			this.container.append(image);
+			let image = this.container.find('img');
+			if (image.length === 0) {
+				image = $(`<img src="${url}" />`);
+				this.container.empty().append(image);
+			} else {
+				image.attributes('src', url);
+			}
+
 			image.on('load', () => {
 				this.renderImage(image);
 			});
@@ -164,7 +174,7 @@ export default class MathCard extends Card<MathValue> {
 				this.renderMath(code);
 			});
 		} else if (code) {
-			if (this.readonly) {
+			if (!isEngine(this.editor)) {
 				this.renderPureText(code);
 			} else {
 				this.renderMath(code);
@@ -172,7 +182,7 @@ export default class MathCard extends Card<MathValue> {
 		} else {
 			this.renderPureText(locales.placeholder);
 		}
-		if (!this.readonly) {
+		if (!isEngine(this.editor) || this.editor.readonly) {
 			this.container.css('cursor', 'pointer');
 			this.container.attributes('draggable', 'true');
 			this.container.css('user-select', 'none');

@@ -53,6 +53,10 @@ export interface CardToolbarInterface {
 	 * @param offset 偏移量 [tx,ty,bx,by]
 	 */
 	setOffset(offset: Array<number>): void;
+	/**
+	 * 销毁
+	 */
+	destroy(): void;
 }
 
 export type CardToolbarItemOptions =
@@ -124,7 +128,7 @@ export interface CardInterface {
 	/**
 	 * 初始化调用
 	 */
-	init?(): void;
+	init(): void;
 	/**
 	 * 卡片ID
 	 */
@@ -133,10 +137,6 @@ export interface CardInterface {
 	 * 卡片是否可编辑
 	 */
 	readonly isEditable: boolean;
-	/**
-	 * 是否只读模式，没有engine
-	 */
-	readonly readonly: boolean;
 	/**
 	 * 卡片根节点
 	 */
@@ -294,7 +294,7 @@ export interface CardInterface {
 	/**
 	 * 是否可改变卡片大小，或者传入渲染节点
 	 */
-	resize?: boolean | (() => NodeInterface);
+	resize?: boolean | (() => NodeInterface | void);
 	/**
 	 * 最大化
 	 */
@@ -501,6 +501,11 @@ export interface CardModelInterface {
 			callback?: (count: number) => void;
 		},
 	): void;
+	/**
+	 * 重新渲染卡片
+	 * @param cards 卡片集合
+	 */
+	reRender(...cards: Array<CardInterface>): void;
 	/**
 	 * 释放卡片
 	 */

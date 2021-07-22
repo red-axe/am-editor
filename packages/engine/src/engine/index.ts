@@ -110,6 +110,7 @@ class Engine implements EngineInterface {
 			this._container.setReadonly(false);
 		}
 		this._readonly = readonly;
+		this.card.reRender();
 		//广播readonly事件
 		this.trigger('readonly', readonly);
 	}
@@ -165,6 +166,9 @@ class Engine implements EngineInterface {
 			onSetValue: () => this.trigger('afterSetValue'),
 		});
 		this.typing = new Typing(this);
+		this._readonly =
+			this.options.readonly === undefined ? false : this.options.readonly;
+		this._container.setReadonly(this._readonly);
 		this.mark.init();
 		this.inline.init();
 		this.block.init();
@@ -177,6 +181,7 @@ class Engine implements EngineInterface {
 		this.card.init(this.options.cards || []);
 		this.plugin.init(this.options.plugins || [], this.options.config || {});
 		this.ot = new OT(this);
+
 		if (this.isEmpty()) {
 			this._container.showPlaceholder();
 		}
@@ -251,7 +256,6 @@ class Engine implements EngineInterface {
 			callback?: (count: number) => void;
 		},
 	) {
-		this.readonly = false;
 		value = this.trigger('beforeSetValue', value) || value;
 		this.change.setValue(value, undefined, options);
 		this.normalizeTree();

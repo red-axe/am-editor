@@ -99,6 +99,7 @@ class Image {
 	size: Size;
 	maxWidth: number;
 	rate: number = 1;
+	isLoad: boolean = false;
 
 	constructor(editor: EditorInterface, options: Options) {
 		this.editor = editor;
@@ -242,6 +243,7 @@ class Image {
 		if (this.resizer) {
 			this.resizer.setSize(img.clientWidth, img.clientHeight);
 		}
+		this.isLoad = true;
 	}
 
 	onWindowResize = () => {
@@ -269,6 +271,7 @@ class Image {
 		this.bindErrorEvent(container);
 		const { onError } = this.options;
 		if (onError) onError();
+		this.isLoad = true;
 	}
 
 	getMaxWidth(node: NodeInterface = this.options.root) {
@@ -420,7 +423,7 @@ class Image {
 		}
 		this.maxWidth = this.getMaxWidth();
 		this.rate = clientHeight / clientWidth;
-		if (isMobile) return;
+		if (isMobile || !isEngine(this.editor) || this.editor.readonly) return;
 		// 拖动调整图片大小
 		const resizer = new Resizer({
 			src: this.src,
@@ -482,7 +485,7 @@ class Image {
 		}
 		this.maxWidth = this.getMaxWidth();
 		let { width, height } = this.size;
-		if (isEngine(this.editor)) {
+		if (isEngine(this.editor) && !this.isLoad) {
 			this.image.css('visibility', 'hidden');
 		} else if (width && height) {
 			if (width > this.maxWidth) {

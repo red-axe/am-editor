@@ -243,7 +243,12 @@ class CardModel implements CardModelInterface {
 		if (card.contenteditable.length > 0) {
 			center.find(card.contenteditable.join(',')).each((node) => {
 				const child = $(node);
-				child.attributes('contenteditable', 'true');
+				child.attributes(
+					'contenteditable',
+					!isEngine(this.editor) || this.editor.readonly
+						? 'false'
+						: 'true',
+				);
 				child.attributes(DATA_ELEMENT, EDITABLE);
 			});
 		}
@@ -258,12 +263,6 @@ class CardModel implements CardModelInterface {
 	// 移除Card
 	removeNode(card: CardInterface) {
 		if (card.destroy) card.destroy();
-		if (
-			isEngine(this.editor) &&
-			(card.constructor as CardEntry).cardType === CardType.BLOCK
-		) {
-			this.editor.readonly = false;
-		}
 		this.removeComponent(card);
 		card.root.remove();
 	}
@@ -304,7 +303,7 @@ class CardModel implements CardModelInterface {
 		event?: MouseEvent,
 	) {
 		const editor = this.editor;
-		if (!isEngine(editor)) return;
+		if (!isEngine(editor) || editor.readonly) return;
 		//获取当前卡片所在编辑器的根节点
 		const container = node.getRoot();
 		//如果当前编辑器根节点和引擎的根节点不匹配就不执行，主要是子父编辑器的情况
@@ -319,7 +318,14 @@ class CardModel implements CardModelInterface {
 			if (blockCard) {
 				card = blockCard;
 			}
-			if (card && card.isCursor(node)) card = undefined;
+			if (card && card.isCursor(node)) {
+				if (editableElement.length > 0) {
+					const editableParent = editableElement.parent();
+					card = editableParent
+						? this.find(editableParent)
+						: undefined;
+				} else card = undefined;
+			}
 			let isCurrentActiveCard =
 				card && this.active && this.active.root.equal(card.root);
 			if (trigger === ActiveTrigger.UPDATE_CARD) {
@@ -327,12 +333,8 @@ class CardModel implements CardModelInterface {
 			}
 			if (this.active && !isCurrentActiveCard) {
 				this.active.toolbarModel?.hide();
-				const type = (this.active.constructor as CardEntry).cardType;
 				this.active.select(false);
 				this.active.activate(false);
-				if (type === CardType.BLOCK) {
-					editor.readonly = false;
-				}
 			}
 			if (card) {
 				if (card.activatedByOther) return;
@@ -343,7 +345,8 @@ class CardModel implements CardModelInterface {
 							CardType.INLINE &&
 						(card.constructor as CardEntry).autoSelected !==
 							false &&
-						(trigger !== ActiveTrigger.CLICK || !card.readonly)
+						(trigger !== ActiveTrigger.CLICK ||
+							isEngine(this.editor))
 					) {
 						this.select(card);
 					}
@@ -353,10 +356,6 @@ class CardModel implements CardModelInterface {
 					(card.constructor as CardEntry).cardType === CardType.BLOCK
 				) {
 					card.select(false);
-					//不在可编辑器区域内，设置为只读
-					if (editableElement.length === 0) {
-						editor.readonly = true;
-					} else editor.readonly = false;
 				}
 				if (
 					!isCurrentActiveCard &&
@@ -397,7 +396,6 @@ class CardModel implements CardModelInterface {
 		const range = change.getRange();
 		card.focus(range, toStart);
 		change.select(range);
-		editor.readonly = false;
 		this.activate(range.startNode, ActiveTrigger.MOUSE_DOWN);
 		change.onSelect();
 		if (scrollNode) range.scrollIntoViewIfNeeded(container, scrollNode);
@@ -512,7 +510,9 @@ class CardModel implements CardModelInterface {
 		component.root.attributes(CARD_KEY, name);
 		//如果没有指定是否能聚集，那么当card不是只读的时候就可以聚焦
 		const hasFocus =
-			clazz.focus !== undefined ? clazz.focus : !component.readonly;
+			clazz.focus !== undefined
+				? clazz.focus
+				: isEngine(this.editor) && !this.editor.readonly;
 		const tagName = clazz.cardType === CardType.INLINE ? 'span' : 'div';
 		//center
 		const center = $(
@@ -549,8 +549,37 @@ class CardModel implements CardModelInterface {
 		}
 
 		component.root.append(body);
-		if (component.init) component.init();
+		component.init();
 		return component;
+	}
+
+	reRender(...cards: Array<CardInterface>) {
+		if (cards.length === 0) cards = this.components;
+		const render = (card: CardInterface) => {
+			const result = card.render();
+			const center = card.getCenter();
+			if (result !== undefined) {
+				center.append(typeof result === 'string' ? $(result) : result);
+			}
+			if (card.contenteditable.length > 0) {
+				center.find(card.contenteditable.join(',')).each((node) => {
+					const child = $(node);
+					child.attributes(
+						'contenteditable',
+						!isEngine(this.editor) || this.editor.readonly
+							? 'false'
+							: 'true',
+					);
+					child.attributes(DATA_ELEMENT, EDITABLE);
+				});
+			}
+			card.didRender();
+		};
+		cards.forEach((card) => {
+			if (card.destroy) card.destroy();
+			card.init();
+			render(card);
+		});
 	}
 
 	/**
@@ -583,7 +612,12 @@ class CardModel implements CardModelInterface {
 				center.find(card.contenteditable.join(',')).each((node) => {
 					const child = $(node);
 					if (!child.attributes('contenteditable'))
-						child.attributes('contenteditable', 'true');
+						child.attributes(
+							'contenteditable',
+							!isEngine(this.editor) || this.editor.readonly
+								? 'false'
+								: 'true',
+						);
 					child.attributes(DATA_ELEMENT, EDITABLE);
 				});
 				this.render(center, {

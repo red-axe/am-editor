@@ -20,7 +20,7 @@ export interface CodeBlockEditorInterface {
 	renderTemplate(): string;
 	getConfig(value: string, mode?: string): EditorConfiguration;
 	getSyntax(mode: string): string;
-	create(mode: string, value: string, options?: EditorConfiguration): void;
+	create(mode: string, value: string, options?: EditorConfiguration): Editor;
 	update(mode: string): void;
 	render(mode: string, value: string): void;
 	save(): void;

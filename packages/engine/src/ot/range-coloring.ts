@@ -133,7 +133,7 @@ class RangeColoring implements RangeColoringInterface {
 
 			child[0]['__targetCanvas'] = targetCanvas;
 		}
-		child[0]['__targetRange'] = range;
+		child[0]['__targetRange'] = range.cloneRange();
 		const parentWidth = this.root.width();
 		const parentHeight = this.root.height();
 		targetCanvas.resize(parentWidth, parentHeight);
@@ -160,6 +160,8 @@ class RangeColoring implements RangeColoringInterface {
 					return [range];
 				}
 			}
+		} else if (cardInfo) {
+			return [range];
 		}
 
 		subRanges.forEach((subRange) => {

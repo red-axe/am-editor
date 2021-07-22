@@ -55,10 +55,6 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		return this.contenteditable.length > 0;
 	}
 
-	get readonly() {
-		return !isEngine(this.editor);
-	}
-
 	get activated() {
 		return this.root.hasClass('card-activated');
 	}
@@ -98,31 +94,19 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		value = value || {};
 		value['id'] = this.getId(value['id']);
 		this.setValue(value as T);
-		if (this.toolbar) {
-			this.toolbarModel = new Toolbar(this.editor, this);
-			if (this.readonly) {
-				let hideTimeout: NodeJS.Timeout;
-				const hide = () => {
-					hideTimeout = setTimeout(() => {
-						this.toolbarModel?.hide();
-					}, 200);
-				};
-
-				this.root.on('mouseover', () => {
-					this.toolbarModel?.show();
-					this.toolbarModel?.getContainer()?.on('mouseover', () => {
-						if (hideTimeout) clearTimeout(hideTimeout);
-					});
-
-					this.toolbarModel?.getContainer()?.on('mouseleave', hide);
-				});
-				this.root.on('mouseleave', hide);
-			}
-		}
 		this.defaultMaximize = new Maximize(this.editor, this);
 	}
 
-	init?(): void;
+	init() {
+		this.toolbarModel?.hide();
+		this.toolbarModel?.destroy();
+		if (this.toolbar) {
+			this.toolbarModel = new Toolbar(this.editor, this);
+		}
+		if (this.resize) {
+			this.resizeModel = new Resize(this.editor, this);
+		}
+	}
 
 	private getId(curId?: string) {
 		const idCache: Array<string> = [];
@@ -188,7 +172,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	}
 
 	select(selected: boolean) {
-		if (this.readonly || this.activatedByOther) {
+		if (!isEngine(this.editor) || this.activatedByOther) {
 			return;
 		}
 		if (selected) {
@@ -338,7 +322,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	/**
 	 * 是否可改变卡片大小，或者传入渲染节点
 	 */
-	resize?: boolean | (() => NodeInterface);
+	resize?: boolean | (() => NodeInterface | void);
 
 	onSelect(selected: boolean): void {
 		const selectedClass = `data-card-${
@@ -381,6 +365,9 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	onChange?(node: NodeInterface): void;
 	destroy() {
 		this.toolbarModel?.hide();
+		this.toolbarModel?.destroy();
+		this.resizeModel?.hide();
+		this.resizeModel?.destroy();
 	}
 	didInsert?(): void;
 	didUpdate?(): void;
@@ -390,8 +377,9 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 				typeof this.resize === 'function'
 					? this.resize()
 					: this.findByKey('body');
-			this.resizeModel = new Resize(this.editor, this);
-			this.resizeModel.render(container);
+			if (container && container.length > 0) {
+				this.resizeModel?.render(container);
+			}
 		}
 		if (this.contenteditable.length > 0) {
 			this.editor.block.generateDataIDForDescendant(

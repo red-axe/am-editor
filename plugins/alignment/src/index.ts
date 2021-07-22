@@ -30,14 +30,14 @@ export default class extends ElementPlugin<Options> {
 
 	init() {
 		super.init();
-		this.editor.on('keydown:backspace', event => this.onBackspace(event));
+		this.editor.on('keydown:backspace', (event) => this.onBackspace(event));
 	}
 	repairListStylePosition(blocks: Array<NodeInterface>, align: string) {
 		if (!blocks || blocks.length === 0) {
 			return;
 		}
 
-		blocks.forEach(block => {
+		blocks.forEach((block) => {
 			if (block.name === 'li') {
 				if (align === 'left') {
 					block.css('list-style-position', 'outside');
@@ -49,7 +49,7 @@ export default class extends ElementPlugin<Options> {
 	}
 
 	execute(align: 'left' | 'center' | 'right' | 'justify') {
-		if (!isEngine(this.editor)) return;
+		if (!isEngine(this.editor) || this.editor.readonly) return;
 		const { change, block } = this.editor;
 		block.setBlocks({
 			style: {

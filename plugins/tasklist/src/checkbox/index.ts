@@ -1,4 +1,11 @@
-import { $, Card, CardType, isMobile, NodeInterface } from '@aomao/engine';
+import {
+	$,
+	Card,
+	CardType,
+	isEngine,
+	isMobile,
+	NodeInterface,
+} from '@aomao/engine';
 import './index.css';
 
 const CHECKBOX_CLASS = 'data-checkbox';
@@ -65,7 +72,7 @@ class Checkbox extends Card<CheckboxValue> {
 				.find(`.${CHECKBOX_INPUT_CLASS}`)
 				.attributes('checked', 'checked');
 		}
-		if (this.readonly) {
+		if (!isEngine(this.editor) || this.editor.readonly) {
 			return container;
 		}
 

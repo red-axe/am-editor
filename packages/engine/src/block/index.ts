@@ -598,7 +598,7 @@ class Block implements BlockModelInterface {
 			node.isEmpty(leftNodes) || list.isEmptyItem(leftNodes)
 				? container
 				: leftNodes.eq(leftNodes.length - 1);
-		if (last) {
+		if (last && last.length > 0) {
 			safeRange.setStartAfter(last);
 			safeRange.collapse(true);
 		}

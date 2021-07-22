@@ -2,6 +2,7 @@ import {
 	Card,
 	CardToolbarItemOptions,
 	CardType,
+	isEngine,
 	ToolbarItemOptions,
 } from '@aomao/engine';
 import './index.css';
@@ -23,7 +24,7 @@ class Hr extends Card {
 	}
 
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
-		if (this.readonly) return [];
+		if (!isEngine(this.editor) || this.editor.readonly) return [];
 		return [
 			{
 				type: 'dnd',

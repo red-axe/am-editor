@@ -1,3 +1,4 @@
+import type { Editor } from 'codemirror';
 import {
 	$,
 	ActiveTrigger,
@@ -20,6 +21,7 @@ export type CodeBlockValue = {
 };
 
 class CodeBlcok extends Card<CodeBlockValue> {
+	mirror?: Editor;
 	static get cardName() {
 		return 'codeblock';
 	}
@@ -29,15 +31,19 @@ class CodeBlcok extends Card<CodeBlockValue> {
 	}
 
 	resize = () => {
-		return this.codeEditor!.container.find('.data-codeblock-content');
+		return this.codeEditor?.container.find('.data-codeblock-content');
 	};
 
 	codeEditor?: CodeBlockEditorInterface;
 
 	init() {
 		if (isServer) return;
+		super.init();
+		if (this.codeEditor) return;
 		this.codeEditor = new CodeBlockEditor(this.editor, {
 			onSave: (mode, value) => {
+				const oldValue = this.getValue();
+				if (mode === oldValue?.mode && value === oldValue.code) return;
 				this.setValue({
 					mode,
 					code: value,
@@ -54,7 +60,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 	}
 
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
-		if (this.readonly) {
+		if (!isEngine(this.editor) || this.editor.readonly) {
 			return [{ type: 'copy' }];
 		}
 		return [
@@ -74,7 +80,12 @@ class CodeBlcok extends Card<CodeBlockValue> {
 					renderSelect(
 						node.get<HTMLElement>()!,
 						this.codeEditor?.mode || 'plain',
-						(mode) => this.codeEditor?.update(mode),
+						(mode) => {
+							this.codeEditor?.update(mode);
+							setTimeout(() => {
+								this.codeEditor?.focus();
+							}, 10);
+						},
 					);
 				},
 			},
@@ -87,14 +98,18 @@ class CodeBlcok extends Card<CodeBlockValue> {
 
 	render() {
 		if (!this.codeEditor) return;
-		this.getCenter().append(this.codeEditor.container);
+		if (!this.mirror) this.getCenter().append(this.codeEditor.container);
 		const value = this.getValue();
 
 		const mode = value?.mode || 'plain';
 		const code = value?.code || '';
 		if (isEngine(this.editor)) {
+			if (this.mirror) {
+				this.codeEditor.update(mode, code);
+				return;
+			}
 			setTimeout(() => {
-				this.codeEditor?.create(mode, code);
+				this.mirror = this.codeEditor?.create(mode, code);
 			}, 50);
 		} else {
 			this.codeEditor.render(mode, code);

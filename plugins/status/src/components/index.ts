@@ -3,6 +3,7 @@ import {
 	ActiveTrigger,
 	Card,
 	CardType,
+	isEngine,
 	NodeInterface,
 	Position,
 } from '@aomao/engine';
@@ -70,8 +71,10 @@ class Status extends Card<StatusValue> {
 	#statusEditor?: StatusEditor;
 
 	init() {
+		super.init();
 		const { card } = this.editor;
-		this.#position = new Position(this.editor);
+		if (!this.#position) this.#position = new Position(this.editor);
+		if (this.#statusEditor) return;
 		this.#statusEditor = new StatusEditor({
 			colors: Status.colors,
 			onChange: (
@@ -133,7 +136,7 @@ class Status extends Card<StatusValue> {
 
 	onActivate(activated: boolean) {
 		super.onActivate(activated);
-		if (this.readonly) return;
+		if (!isEngine(this.editor) || this.editor.readonly) return;
 		if (activated) this.renderEditor();
 		else this.#statusEditor?.destroy();
 	}
@@ -152,9 +155,13 @@ class Status extends Card<StatusValue> {
 	}
 
 	render() {
+		if (this.#container) {
+			this.updateContent();
+			return;
+		}
 		this.#container = $(`<span class="data-label-container"></span>`);
 		this.updateContent();
-		if (!this.readonly) {
+		if (isEngine(this.editor)) {
 			this.#container.css('cursor', 'pointer');
 			this.#container.attributes('draggable', 'true');
 			this.#container.css('user-select', 'none');

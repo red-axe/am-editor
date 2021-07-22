@@ -9,7 +9,11 @@ class Command implements CommandInterface {
 	}
 
 	queryEnabled(name: string) {
-		return !!this.editor.plugin.components[name];
+		return (
+			!!this.editor.plugin.components[name] &&
+			isEngine(this.editor) &&
+			!this.editor.readonly
+		);
 	}
 
 	queryState(name: string, ...args: any) {

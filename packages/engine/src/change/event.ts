@@ -77,6 +77,7 @@ class ChangeEvent implements ChangeEventInterface {
 		//对系统工具栏操作拦截，一般针对移动端的文本上下文工具栏
 		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
 		this.onContainer('beforeinput', (event: InputEvent) => {
+			if (this.engine.readonly) return;
 			const { inputType } = event;
 			const commandTypes = ['format', 'history'];
 			commandTypes.forEach((type) => {
@@ -232,7 +233,7 @@ class ChangeEvent implements ChangeEventInterface {
 		let dropRange: RangeInterface | undefined;
 
 		const dragStart = (e: DragEvent) => {
-			if (!e.target) return;
+			if (!e.target || this.engine.readonly) return;
 			e.stopPropagation();
 			this.dragoverHelper.setCursor();
 			const targetNode = $(e.target);
@@ -272,6 +273,7 @@ class ChangeEvent implements ChangeEventInterface {
 		this.onRoot('dragstart', dragStart);
 		this.onContainer('dragstart', dragStart);
 		this.onContainer('dragover', (e: DragEvent) => {
+			if (this.engine.readonly) return;
 			const { dragoverHelper } = this;
 			const cursor = dragoverHelper.getCursor();
 			if (cursor.length !== 0) {
@@ -296,6 +298,7 @@ class ChangeEvent implements ChangeEventInterface {
 			}
 		});
 		this.onContainer('drop', (e: DragEvent) => {
+			if (this.engine.readonly) return;
 			// 禁止拖图进浏览器，浏览器默认打开图片文件
 			e.preventDefault();
 

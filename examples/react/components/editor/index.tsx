@@ -21,6 +21,7 @@ export type Content = {
 export type EditorProps = Omit<EngineProps, 'defaultValue'> & {
 	defaultValue?: Content;
 	onSave?: (content: Content) => void;
+	onLoad?: (engine: EngineInterface) => void;
 	ot?:
 		| {
 				url: string;
@@ -40,7 +41,11 @@ export type EditorProps = Omit<EngineProps, 'defaultValue'> & {
 	toolbar?: ToolbarItemProps;
 };
 
-const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
+const EditorComponent: React.FC<EditorProps> = ({
+	defaultValue,
+	onLoad,
+	...props
+}) => {
 	const engine = useRef<EngineInterface | null>(null);
 	const otClient = useRef<OTClient | null>(null);
 	const [value, setValue] = useState('');
@@ -136,13 +141,17 @@ const EditorComponent: React.FC<EditorProps> = ({ defaultValue, ...props }) => {
 				triggerOT: false, //对于异步渲染后的卡片节点不提交到协同服务端，否则会冲突
 				callback: () => {
 					//卡片异步渲染完成后
-					if (!props.ot) return setLoading(false);
+					if (!props.ot) {
+						if (onLoad) onLoad(engine.current!);
+						return setLoading(false);
+					}
 					//实例化协作编辑客户端
 					const ot = new OTClient(engine.current!);
 					//连接到协作服务端，demo文档
 					const { url, docId, onReady } = props.ot;
 					ot.connect(url, docId);
 					ot.on('ready', (member) => {
+						if (onLoad) onLoad(engine.current!);
 						if (onReady) onReady(member);
 						setMember(member);
 						setLoading(false);
