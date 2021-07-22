@@ -9,10 +9,14 @@
 }
 
 .am-engine blockquote > *, .am-engine-view blockquote > * {
-    margin-left: 1em;
+    margin-left: 14px;
     color: #8C8C8C;
 }
 
 .am-engine blockquote *, .am-engine-view blockquote * {
     color: #8C8C8C;
+}
+
+.am-engine blockquote a, .am-engine blockquote a:hover, .am-engine-view blockquote a, .am-engine-view blockquote a:hover {
+  color: #1890ff !important;
 }

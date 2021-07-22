@@ -14,6 +14,10 @@ div[dnd-trigger-key="table"], div[toolbar-trigger-key="table"] {
     background-color: #ffffff;
 }
 
+div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"].card-selected-other .data-table {
+  background: transparent
+}
+
 .data-table tr,.data-table td {
     position: relative;
 }

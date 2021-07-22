@@ -893,6 +893,7 @@ class NodeEntry implements NodeInterface {
 	traverse(
 		callback: (node: NodeInterface) => boolean | void,
 		order: boolean = true,
+		includeEditableCard: boolean = false,
 	) {
 		const walk = (node: NodeInterface) => {
 			let child = order ? node.first() : node.last();
@@ -904,8 +905,14 @@ class NodeEntry implements NodeInterface {
 					return;
 				}
 
-				if (!child.isCard() && result !== true) {
-					walk(child);
+				if (result !== true) {
+					if (child.isEditableCard() && includeEditableCard) {
+						const editableElements = child.find(EDITABLE_SELECTOR);
+						editableElements.each((_, index) => {
+							const editableElement = editableElements.eq(index);
+							if (editableElement) walk(editableElement);
+						});
+					} else if (!child.isCard()) walk(child);
 				}
 
 				child = next;

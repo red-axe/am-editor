@@ -356,6 +356,7 @@ class Applier implements ApplierInterface {
 			if (window.getSelection()?.rangeCount === 0) return;
 			const range = Range.from(this.engine);
 			if (!range || range.inCard()) return;
+			if (range.startNode.isRoot()) range.shrinkToElementNode();
 			const { startNode, startOffset, endNode, endOffset } = range;
 			return {
 				start: this.getSideText(startNode, startOffset),
@@ -385,9 +386,8 @@ class Applier implements ApplierInterface {
 				range.setStart(startInfo.container, startInfo.offset);
 			}
 			if (endInfo && endInfo.container) {
-				range.setStart(endInfo.container, endInfo.offset);
+				range.setEnd(endInfo.container, endInfo.offset);
 			}
-			selection!.removeAllRanges();
 			this.engine.change.select(range);
 		} catch (error) {
 			console.log(error);

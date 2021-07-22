@@ -33,12 +33,6 @@ const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 		isVoid: true,
 	},
 	{
-		type: 'block',
-		attributes: {
-			'data-id': '*',
-		},
-	},
-	{
 		name: 'card',
 		type: 'inline',
 		attributes: {

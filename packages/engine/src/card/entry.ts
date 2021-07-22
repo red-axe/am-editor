@@ -347,6 +347,9 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		} else {
 			center.css('outline', selected ? '2px solid ' + value!.color : '');
 		}
+		const className = 'card-selected-other';
+		if (selected) this.root.addClass(className);
+		else this.root.removeClass(className);
 	}
 	onActivate(activated: boolean) {
 		if (!this.resize) return;

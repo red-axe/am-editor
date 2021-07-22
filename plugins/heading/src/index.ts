@@ -371,6 +371,7 @@ export default class extends BlockPlugin<Options> {
 		if (!isEngine(this.editor)) return;
 		const { change, node } = this.editor;
 		const range = change.getRange();
+		if (!range.collapsed) return;
 		const blockApi = this.editor.block;
 		if (!blockApi.isFirstOffset(range, 'start')) return;
 		const block = blockApi.closest(range.startNode);
@@ -384,7 +385,11 @@ export default class extends BlockPlugin<Options> {
 			blockApi.setBlocks('<p />');
 			return false;
 		}
-		if (this.tagName.indexOf(block.name) > -1) {
+		const parent = block.parent();
+		if (
+			this.tagName.indexOf(block.name) > -1 &&
+			(!parent || !node.isBlock(parent))
+		) {
 			event.preventDefault();
 			change.mergeAfterDeletePrevNode(block);
 			return false;

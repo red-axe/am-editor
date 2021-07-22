@@ -26,9 +26,11 @@ export default (
 	if (unique) {
 		const counter = _counters[hash] || 0;
 		_counters[hash] = counter + 1;
-		if (counter > 0) {
-			hash = `${hash}-${counter}`;
-		}
+		const time = new Date().getTime().toString();
+		const text =
+			time.substr(2) +
+			md5(`${_counters[hash]}-${time.substr(6)}`).substr(5, 10);
+		hash = `${hash}-${text}`;
 	}
 
 	return hash;

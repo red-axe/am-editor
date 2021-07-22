@@ -2,15 +2,21 @@ import { EditorInterface } from '../types/engine';
 import { PluginOptions, PluginInterface } from '../types/plugin';
 
 abstract class PluginEntry<T extends PluginOptions = {}>
-	implements PluginInterface {
+	implements PluginInterface
+{
 	protected readonly editor: EditorInterface;
 	protected options: T;
 	constructor(editor: EditorInterface, options: PluginOptions) {
 		this.editor = editor;
 		this.options = (options || {}) as T;
+		const { disabled, disabledPlugins } = this.options;
+		this.disabled = disabled;
+		this.disabledPlugins = disabledPlugins || [];
 	}
 	static readonly pluginName: string;
 	readonly kind: string = 'plugin';
+	disabled?: boolean;
+	disabledPlugins: Array<string> = [];
 	/**
 	 * 初始化
 	 */

@@ -902,25 +902,29 @@ class Block implements BlockModelInterface {
 		const blocks: Array<NodeInterface> = [];
 		let started = false;
 
-		closest.traverse((node) => {
-			const child = $(node);
-			if (child.equal(startBlock)) {
-				started = true;
-			}
-			if (
-				started &&
-				this.editor.node.isBlock(child) &&
-				!child.isCard() &&
-				child.inEditor()
-			) {
-				blocks.push(child);
-			}
-			if (child.equal(endBlock)) {
-				started = false;
-				return false;
-			}
-			return;
-		});
+		closest.traverse(
+			(node) => {
+				const child = $(node);
+				if (child.equal(startBlock)) {
+					started = true;
+				}
+				if (
+					started &&
+					this.editor.node.isBlock(child) &&
+					!child.isCard() &&
+					child.inEditor()
+				) {
+					blocks.push(child);
+				}
+				if (child.equal(endBlock)) {
+					started = false;
+					return false;
+				}
+				return;
+			},
+			true,
+			true,
+		);
 		// 未选中文本时忽略该 Block
 		// 示例：<h3><anchor />word</h3><p><focus />another</p>
 		if (

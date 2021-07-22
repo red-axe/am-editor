@@ -469,10 +469,12 @@ export interface NodeInterface {
 	 * 遍历所有子节点
 	 * @param callback 回调函数，false：停止遍历 ，true：停止遍历当前节点及子节点，继续遍历下一个兄弟节点
 	 * @param order true:顺序 ，false:倒序，默认 true
+	 * @param includeEditableCard 是否包含可编辑器卡片
 	 */
 	traverse(
 		callback: (node: NodeInterface) => boolean | void,
 		order?: boolean,
+		includeEditableCard?: boolean,
 	): void;
 	/**
 	 * 根据路径获取子节点

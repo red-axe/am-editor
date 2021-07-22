@@ -21,7 +21,7 @@ class PluginModel implements PluginModelInterface {
 	}
 
 	init(plugins: Array<PluginEntry>, config: { [k: string]: PluginOptions }) {
-		plugins.forEach(pluginClazz => {
+		plugins.forEach((pluginClazz) => {
 			this.data[pluginClazz.pluginName] = pluginClazz;
 			const plugin = new pluginClazz(
 				this.editor,
@@ -34,7 +34,7 @@ class PluginModel implements PluginModelInterface {
 
 	add(clazz: PluginEntry, options?: PluginOptions) {
 		this.data[clazz.pluginName] = clazz;
-		options = { ...options, editor: this.editor };
+		options = { ...options };
 		if (isEngine(this.editor)) {
 			const plugin = new clazz(this.editor, options);
 			if (plugin.init) plugin.init();

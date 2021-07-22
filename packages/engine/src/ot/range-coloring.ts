@@ -192,7 +192,7 @@ class RangeColoring implements RangeColoringInterface {
 		}
 
 		if (node.isText()) {
-			const range = Range.create(this.engine);
+			const range = Range.create(this.engine).cloneRange();
 			range.select(node, true);
 			rect = range.getClientRect();
 		}

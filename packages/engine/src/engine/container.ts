@@ -91,7 +91,7 @@ class Container {
 				this.node.append(node);
 				const range = engine.change.getRange();
 				range.select(node, true).collapse(false);
-				engine.change.select(range);
+				engine.change.apply(range);
 			}
 		});
 

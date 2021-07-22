@@ -161,7 +161,9 @@ export default class extends BlockPlugin<Options> {
 			if (block.prevElement()) {
 				change.mergeAfterDeletePrevNode(block);
 			} else {
-				blockApi.unwrap('<blockquote />');
+				if (node.isEmpty(parentBlock))
+					parentBlock.replaceWith($('<p><br/></p>'));
+				else blockApi.unwrap('<blockquote />');
 			}
 			return false;
 		}

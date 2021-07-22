@@ -1,11 +1,12 @@
+import type { Editor } from 'codemirror';
 import {
 	$,
+	ActiveTrigger,
 	Card,
 	CardToolbarItemOptions,
 	CardType,
 	isEngine,
 	isServer,
-	isMobile,
 	ToolbarItemOptions,
 } from '@aomao/engine';
 import CodeBlockEditor from './editor';
@@ -20,6 +21,7 @@ export type CodeBlockValue = {
 };
 
 class CodeBlcok extends Card<CodeBlockValue> {
+	mirror?: Editor;
 	static get cardName() {
 		return 'codeblock';
 	}
@@ -29,7 +31,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 	}
 
 	resize = () => {
-		return this.codeEditor!.container.find('.data-codeblock-content');
+		return this.codeEditor?.container.find('.data-codeblock-content');
 	};
 
 	codeEditor?: CodeBlockEditorInterface;
@@ -37,12 +39,22 @@ class CodeBlcok extends Card<CodeBlockValue> {
 	init() {
 		if (isServer) return;
 		super.init();
+		if (this.codeEditor) return;
 		this.codeEditor = new CodeBlockEditor(this.editor, {
 			onSave: (mode, value) => {
+				const oldValue = this.getValue();
+				if (mode === oldValue?.mode && value === oldValue.code) return;
 				this.setValue({
 					mode,
 					code: value,
 				});
+			},
+			onMouseDown: (event) => {
+				if (!this.activated)
+					this.editor.card.activate(
+						this.root,
+						ActiveTrigger.MOUSE_DOWN,
+					);
 			},
 		});
 	}
@@ -65,12 +77,16 @@ class CodeBlcok extends Card<CodeBlockValue> {
 				type: 'node',
 				node: $('<div />'),
 				didMount: (node) => {
-					//加个延时，不然无法渲染成功
 					setTimeout(() => {
 						renderSelect(
 							node.get<HTMLElement>()!,
 							this.codeEditor?.mode || 'plain',
-							(mode) => this.codeEditor?.update(mode),
+							(mode) => {
+								this.codeEditor?.update(mode);
+								setTimeout(() => {
+									this.codeEditor?.focus();
+								}, 10);
+							},
 						);
 					}, 20);
 				},
@@ -84,14 +100,18 @@ class CodeBlcok extends Card<CodeBlockValue> {
 
 	render() {
 		if (!this.codeEditor) return;
-		this.getCenter().append(this.codeEditor.container);
+		if (!this.mirror) this.getCenter().append(this.codeEditor.container);
 		const value = this.getValue();
 
 		const mode = value?.mode || 'plain';
 		const code = value?.code || '';
 		if (isEngine(this.editor)) {
+			if (this.mirror) {
+				this.codeEditor.update(mode, code);
+				return;
+			}
 			setTimeout(() => {
-				this.codeEditor?.create(mode, code);
+				this.mirror = this.codeEditor?.create(mode, code);
 			}, 50);
 		} else {
 			this.codeEditor.render(mode, code);

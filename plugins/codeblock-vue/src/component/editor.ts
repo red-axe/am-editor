@@ -111,7 +111,6 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			const { onBlur } = this.options;
 			if (onBlur) onBlur();
 		});
-
 		this.codeMirror.on('mousedown', (_, event) => {
 			const { onMouseDown } = this.options;
 			if (onMouseDown) onMouseDown(event);
@@ -120,14 +119,12 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			const { onMouseDown } = this.options;
 			if (onMouseDown) onMouseDown(event);
 		});
-
 		this.codeMirror.on(
 			'change',
 			debounce(() => {
 				if (!isEngine(this.editor)) return;
-				this.editor.change.change();
 				this.save();
-			}, 1000),
+			}, 200),
 		);
 
 		this.codeMirror.setOption('extraKeys', {
@@ -136,7 +133,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				Object.keys(config).forEach((key) => {
 					return mirror.setOption(
 						key as keyof EditorConfiguration,
-						(config as any)[key],
+						config[key],
 					);
 				});
 				mirror.execCommand('newlineAndIndent');
@@ -145,14 +142,17 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		return this.codeMirror;
 	}
 
-	update(mode: string) {
-		const code = this.codeMirror?.getValue() || '';
-		this.container.find('.data-codeblock-content').empty();
-		this.create(mode, code);
-		this.save();
-		setTimeout(() => {
-			this.focus();
-		}, 10);
+	update(mode: string, code?: string) {
+		this.mode = mode;
+		if (code) {
+			this.codeMirror?.setValue(code);
+		}
+		this.codeMirror?.setOption('mode', mode);
+		this.codeMirror?.setOption(
+			'readOnly',
+			!isEngine(this.editor) || this.editor.readonly ? true : false,
+		);
+		if (!code) this.save();
 	}
 
 	render(mode: string, value: string) {
@@ -199,8 +199,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		const ie = /MSIE \d/.test(navigator.userAgent);
 		const ie_lt9 =
 			ie &&
-			((document as any).documentMode == null ||
-				(document as any).documentMode < 9);
+			(document['documentMode'] == null || document['documentMode'] < 9);
 
 		if (callback.appendChild) {
 			const tabSize =

@@ -3,7 +3,12 @@ import { isRange, isSelection, RangeInterface } from './types/range';
 import { getWindow, isMobile } from './utils';
 import { CARD_SELECTOR } from './constants/card';
 import { ANCHOR, CURSOR, FOCUS } from './constants/selection';
-import { DATA_ELEMENT, DATA_TRANSIENT_ELEMENT, UI } from './constants/root';
+import {
+	DATA_ELEMENT,
+	DATA_TRANSIENT_ELEMENT,
+	EDITABLE_SELECTOR,
+	UI,
+} from './constants/root';
 import Selection from './selection';
 import { SelectionInterface } from './types/selection';
 import { EditorInterface } from './types/engine';
@@ -347,7 +352,9 @@ class Range implements RangeInterface {
 			child.nodeType === getWindow().Node.ELEMENT_NODE &&
 			!childDom.isCursor() &&
 			!node.isVoid(child) &&
-			!childDom.isCard()
+			(!childDom.isCard() ||
+				childDom.isEditableCard() ||
+				childDom.closest(EDITABLE_SELECTOR).length > 0)
 		) {
 			this.setStart(child, 0);
 		}
@@ -359,7 +366,9 @@ class Range implements RangeInterface {
 			child.nodeType === getWindow().Node.ELEMENT_NODE &&
 			!node.isVoid(child) &&
 			!childDom.isCursor() &&
-			!childDom.isCard()
+			(!childDom.isCard() ||
+				childDom.isEditableCard() ||
+				childDom.closest(EDITABLE_SELECTOR).length > 0)
 		) {
 			this.setEnd(child, child.childNodes.length);
 		}

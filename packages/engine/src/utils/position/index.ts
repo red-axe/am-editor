@@ -43,7 +43,13 @@ class Position {
 	}
 
 	update = () => {
-		if (!this.#container || !this.#target) return;
+		if (
+			!this.#container ||
+			this.#container.length === 0 ||
+			!this.#target ||
+			this.#target.length === 0
+		)
+			return;
 		const rect = domAlign(
 			this.#container.get<HTMLElement>(),
 			this.#target.get<HTMLElement>(),
