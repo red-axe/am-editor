@@ -39,6 +39,15 @@
     background-color: #f4f4f4;
 }
 
+.editor-toolbar .toolbar-collapse-item-disabled, .editor-toolbar:not(.editor-toolbar-mobile) .toolbar-collapse-item-disabled:hover {
+  background-color: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: #000000;
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
 .toolbar-collapse-item .toolbar-collapse-item-text
 {
     display: block;

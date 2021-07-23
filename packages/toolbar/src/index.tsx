@@ -117,8 +117,19 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 								customItem.name,
 							);
 					}
-					if (customItem.type !== 'collapse' && customItem.onDisabled)
-						customItem.disabled = customItem.onDisabled();
+					if (customItem.type !== 'collapse')
+						customItem.disabled = customItem.onDisabled
+							? customItem.onDisabled()
+							: !engine.command.queryEnabled(customItem.name);
+					else {
+						customItem.groups.forEach((group) =>
+							group.items.forEach((item) => {
+								item.disabled = item.onDisabled
+									? item.onDisabled()
+									: !engine.command.queryEnabled(item.name);
+							}),
+						);
+					}
 					dataGroup.items.push(customItem);
 				}
 			});
@@ -135,6 +146,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 		engine.language.add(locales);
 		engine.on('select', updateState);
 		engine.on('change', updateState);
+		engine.on('readonly', updateState);
 
 		let scrollTimer: NodeJS.Timeout;
 
@@ -157,6 +169,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 		return () => {
 			engine.off('select', updateState);
 			engine.off('change', updateState);
+			engine.off('readonly', updateState);
 			if (isMobile) {
 				document.removeEventListener('scroll', hideMobileToolbar);
 				visualViewport.removeEventListener('resize', calcuMobileView);

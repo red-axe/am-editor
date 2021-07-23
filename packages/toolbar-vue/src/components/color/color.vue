@@ -10,6 +10,7 @@
             :name="name"
             :title="buttonTitle"
             :on-click="triggerClick"
+            :disabled="disabled"
             >
                 <span v-html="buttonContent"></span>
             </am-button>
@@ -18,6 +19,7 @@
             :name="name"
             :title="dropdownTitle"
             :on-click="toggleDropdown"
+            :disabled="disabled"
             >
                 <template #icon>
                     <span className="colorpicker-button-dropdown-empty" />
@@ -122,6 +124,7 @@ export default defineComponent({
             buttonRef,
             isRight,
             visible,
+            disabled: props.disabled,
             buttonContent,
             currentColor,
             triggerSelect,

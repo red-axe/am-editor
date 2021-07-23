@@ -14,6 +14,8 @@ export type CollapseItemProps = {
 	prompt?: React.ReactNode | (() => React.ReactNode);
 	command?: { name: string; args: Array<any> } | Array<any>;
 	autoExecute?: boolean;
+	disabled?: boolean;
+	onDisabled?: () => boolean;
 	className?: string;
 	placement?:
 		| 'right'
@@ -37,6 +39,7 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 	name,
 	icon,
 	title,
+	disabled,
 	description,
 	className,
 	prompt,
@@ -46,6 +49,7 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 }) => {
 	const [active, setActive] = useState(false);
 	const onClick = (event: React.MouseEvent) => {
+		if (disabled) return;
 		const { command, onClick, autoExecute } = props;
 
 		const nodeName = (event.target as Node).nodeName;
@@ -76,9 +80,10 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 				className={classnames(
 					'toolbar-collapse-item',
 					{ 'toolbar-collapse-item-active': active },
+					{ 'toolbar-collapse-item-disabled': disabled },
 					className,
 				)}
-				onMouseEnter={() => setActive(true)}
+				onMouseEnter={() => setActive(disabled ? false : true)}
 				onMouseLeave={() => setActive(false)}
 				onClick={onClick}
 				onMouseDown={onMouseDown}

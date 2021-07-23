@@ -9,9 +9,9 @@ export type PluginOptions = {
 	 */
 	disabled?: boolean;
 	/**
-	 * 在当前插件状态下，禁用的插件名称集合，如果禁用全部卡片插件，指定名称为 card 即可，但不包扩可编辑器卡片，如果还需要包括可编辑器卡片，指定名称 card-editable
+	 * TODO:在当前插件状态下，禁用的插件名称集合，如果禁用全部卡片插件，指定名称为 card 即可，但不包扩可编辑器卡片，如果还需要包括可编辑器卡片，指定名称 card-editable
 	 */
-	disabledPlugins?: Array<string>;
+	// disabledPlugins?: Array<string>;
 };
 
 export interface PluginEntry {
@@ -27,9 +27,9 @@ export interface PluginInterface {
 	 */
 	disabled?: boolean;
 	/**
-	 * 在当前插件状态下，禁用的插件名称集合，如果禁用全部卡片插件，指定名称为 card 即可，但不包扩可编辑器卡片，如果还需要包括可编辑器卡片，指定名称 card-editable
+	 * TODO:在当前插件状态下，禁用的插件名称集合，如果禁用全部卡片插件，指定名称为 card 即可，但不包扩可编辑器卡片，如果还需要包括可编辑器卡片，指定名称 card-editable
 	 */
-	disabledPlugins: Array<string>;
+	//disabledPlugins: Array<string>;
 	/**
 	 * 初始化
 	 */

@@ -232,6 +232,7 @@ export const collapseItemProps = {
 		required: true,
 	} as const,
 	description: buttonProps.content,
+	disabled: buttonProps.disabled,
 	prompt: buttonProps.content,
 	command: buttonProps.command,
 	autoExecute: buttonProps.autoExecute,
@@ -242,7 +243,9 @@ export const collapseItemProps = {
 	>,
 	onMouseDown: Function as PropType<(event: MouseEvent) => void>,
 };
-export type CollapseItemProps = ExtractPropTypes<typeof collapseItemProps>;
+export type CollapseItemProps = ExtractPropTypes<typeof collapseItemProps> & {
+	onDisabled?: () => boolean;
+};
 
 //collapse group
 export const collapseGroupProps = {

@@ -114,17 +114,28 @@ export const getToolbarDefaultConfig = (
 							name: 'table',
 							command: { name: 'table', args: [3, 3] },
 							placement: 'rightTop',
-							prompt: (
-								<TableSelector
-									onSelect={(event, rows, cols) => {
-										engine.command.execute(
-											'table',
-											rows,
-											cols,
-										);
-									}}
-								/>
-							),
+							onDisabled: () => {
+								// 有激活卡片 或者没有启用插件
+								return (
+									!!engine.card.active ||
+									!engine.command.queryEnabled('table')
+								);
+							},
+							prompt:
+								!!engine.card.active ||
+								!engine.command.queryEnabled(
+									'table',
+								) ? undefined : (
+									<TableSelector
+										onSelect={(event, rows, cols) => {
+											engine.command.execute(
+												'table',
+												rows,
+												cols,
+											);
+										}}
+									/>
+								),
 							icon: (
 								<svg
 									width="24px"
@@ -433,7 +444,10 @@ export const getToolbarDefaultConfig = (
 			icon: 'undo',
 			title: language['undo']['title'],
 			onDisabled: () => {
-				return !engine.command.queryState('undo');
+				return (
+					!engine.command.queryState('undo') ||
+					!engine.command.queryEnabled('undo')
+				);
 			},
 			onActive: () => false,
 		},
@@ -443,7 +457,10 @@ export const getToolbarDefaultConfig = (
 			icon: 'redo',
 			title: language['redo']['title'],
 			onDisabled: () => {
-				return !engine.command.queryState('redo');
+				return (
+					!engine.command.queryState('redo') ||
+					!engine.command.queryEnabled('redo')
+				);
 			},
 			onActive: () => false,
 		},
@@ -528,7 +545,10 @@ export const getToolbarDefaultConfig = (
 			],
 			onDisabled: () => {
 				const tag = engine.command.queryState('heading') || 'p';
-				return /^h\d$/.test(tag);
+				return (
+					/^h\d$/.test(tag) ||
+					!engine.command.queryEnabled('fontsize')
+				);
 			},
 		},
 		{
@@ -566,7 +586,9 @@ export const getToolbarDefaultConfig = (
 			title: language['bold']['title'],
 			onDisabled: () => {
 				const tag = engine.command.queryState('heading') || 'p';
-				return /^h\d$/.test(tag);
+				return (
+					/^h\d$/.test(tag) || !engine.command.queryEnabled('bold')
+				);
 			},
 		},
 		{
@@ -598,21 +620,34 @@ export const getToolbarDefaultConfig = (
 					key: 'sup',
 					icon: 'sup',
 					content: language['moremark']['sup'],
+					disabled: !engine.command.queryEnabled('sup'),
 					command: { name: 'sup', args: [] },
 				},
 				{
 					key: 'sub',
 					icon: 'sub',
+					disabled: !engine.command.queryEnabled('sub'),
 					content: language['moremark']['sub'],
 					command: { name: 'sub', args: [] },
 				},
 				{
 					key: 'code',
 					icon: 'code',
+					disabled: !engine.command.queryEnabled('code'),
 					content: language['moremark']['code'],
 					command: { name: 'code', args: [] },
 				},
 			],
+			onDisabled: () => {
+				const plugins = [];
+				if (engine.command.queryEnabled('sup') === true)
+					plugins.push('sup');
+				if (engine.command.queryEnabled('sub') === true)
+					plugins.push('sub');
+				if (engine.command.queryEnabled('code') === true)
+					plugins.push('code');
+				return plugins.length === 0;
+			},
 			onActive: () => {
 				const plugins = [];
 				if (engine.command.queryState('sup') === true)
@@ -836,7 +871,8 @@ export const getToolbarDefaultConfig = (
 				const range = change.getRange();
 				return (
 					!!card.find(range.startNode) ||
-					range.commonAncestorNode.find(CARD_SELECTOR).length > 0
+					range.commonAncestorNode.find(CARD_SELECTOR).length > 0 ||
+					!engine.command.queryEnabled('link')
 				);
 			},
 		},

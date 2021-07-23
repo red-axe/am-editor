@@ -123,12 +123,14 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 					name={name}
 					title={buttonTitle}
 					content={buttonContent}
-					onClick={event => triggerSelect(currentColor, event)}
+					disabled={disabled}
+					onClick={(event) => triggerSelect(currentColor, event)}
 				/>
 				<Button
 					className="colorpicker-button-dropdown toolbar-dropdown-trigger-arrow"
 					name={name}
 					title={dropdownTitle}
+					disabled={disabled}
 					icon={
 						<span className="colorpicker-button-dropdown-empty" />
 					}

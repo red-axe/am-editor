@@ -9,11 +9,20 @@ class Command implements CommandInterface {
 	}
 
 	queryEnabled(name: string) {
-		return (
-			!!this.editor.plugin.components[name] &&
-			isEngine(this.editor) &&
-			!this.editor.readonly
-		);
+		// 没有插件
+		const plugin = this.editor.plugin.components[name];
+		if (!plugin || plugin.disabled) return false;
+		// 只读状态下，如果插件没有指定为非禁用，一律禁用
+		if (
+			(!isEngine(this.editor) || this.editor.readonly) &&
+			plugin.disabled !== false
+		)
+			return false;
+		// 当前激活非可编辑卡片时全部禁用
+		if (this.editor.card.active && !this.editor.card.active.isEditable)
+			return false;
+		// TODO:查询当前所处位置的插件
+		return true;
 	}
 
 	queryState(name: string, ...args: any) {

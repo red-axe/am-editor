@@ -5,7 +5,7 @@
     :overlayClassName="prompt ? '' : 'prompt-popover-hide'"
     >
         <div
-        :class="['toolbar-collapse-item', { 'toolbar-collapse-item-active': active }, className]"
+        :class="['toolbar-collapse-item', { 'toolbar-collapse-item-active': active }, { 'toolbar-collapse-item-disabled': disabled }, className]"
         @mouseenter="triggerMouseEnter"
         @mouseleave="triggerMouseLeave"
         @click="onClick"
@@ -42,6 +42,8 @@ export default defineComponent({
         const active = ref(false);
         const onClick = (event: MouseEvent) => {
 
+            if(props.disabled) return
+
             const nodeName = (event.target as Node).nodeName;
             if (nodeName !== 'INPUT' && nodeName !== 'TEXTAREA')
                 event.preventDefault();
@@ -65,7 +67,7 @@ export default defineComponent({
         };
 
         const triggerMouseEnter = () => {
-            active.value = true
+            active.value = props.disabled ? false : true
         }
 
         const triggerMouseLeave = () => {
@@ -74,6 +76,7 @@ export default defineComponent({
         return {
             iconIsHtml:/^<.*>/.test(props.icon?.trim() || ""),
             active,
+            disabled: props.disabled,
             onClick,
             triggerMouseEnter,
             triggerMouseLeave

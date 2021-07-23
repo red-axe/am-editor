@@ -82,6 +82,11 @@ const Collapse: React.FC<CollapseProps> = ({
 					content={content}
 					onClick={toggle}
 					active={visible}
+					disabled={
+						!groups.some((g) =>
+							g.items.some((item) => !item.disabled),
+						)
+					}
 				/>
 			)}
 			{visible && (

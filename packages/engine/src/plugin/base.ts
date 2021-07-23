@@ -9,14 +9,14 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 	constructor(editor: EditorInterface, options: PluginOptions) {
 		this.editor = editor;
 		this.options = (options || {}) as T;
-		const { disabled, disabledPlugins } = this.options;
+		const { disabled } = this.options;
 		this.disabled = disabled;
-		this.disabledPlugins = disabledPlugins || [];
+		// TODO:this.disabledPlugins = disabledPlugins || [];
 	}
 	static readonly pluginName: string;
 	readonly kind: string = 'plugin';
 	disabled?: boolean;
-	disabledPlugins: Array<string> = [];
+	// TODO:disabledPlugins: Array<string> = [];
 	/**
 	 * 初始化
 	 */

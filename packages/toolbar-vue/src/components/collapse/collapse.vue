@@ -10,6 +10,7 @@
     :content="content"
     :on-click="triggerClick"
     :active="visible"
+    :disabled="disabled"
     />
     <div v-if="visible" class="toolbar-dropdown-list" data-element="ui">
         <slot name="header">
@@ -93,7 +94,8 @@ export default defineComponent({
             collapse,
             isRight,
             triggerClick,
-            triggerSelect
+            triggerSelect,
+            disabled:!props.groups.some(g => g.items.some(item => !item.disabled))
         }
     }
 })
@@ -138,6 +140,15 @@ export default defineComponent({
 
 .toolbar-collapse-item-active {
     background-color: #f4f4f4;
+}
+
+.editor-toolbar .toolbar-collapse-item-disabled, .editor-toolbar:not(.editor-toolbar-mobile) .toolbar-collapse-item-disabled:hover {
+  background-color: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: #000000;
+  opacity: 0.25;
+  cursor: not-allowed;
 }
 
 .toolbar-collapse-item .toolbar-collapse-item-text

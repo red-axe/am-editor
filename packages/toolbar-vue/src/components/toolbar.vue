@@ -72,7 +72,13 @@ export default defineComponent({
                                     customItem.name,
                                 );
                         }
-                        if (customItem.type !== 'collapse' && customItem.onDisabled) customItem.disabled = customItem.onDisabled();
+                        if (customItem.type !== 'collapse')
+                          customItem.disabled = customItem.onDisabled ? customItem.onDisabled() : !props.engine.command.queryEnabled(customItem.name);
+                        else {
+                          customItem.groups.forEach(group => group.items.forEach((item) => {
+                            item.disabled = item.onDisabled ? item.onDisabled() : !props.engine.command.queryEnabled(item.name);
+                          }))
+                        }
                         dataGroup.items.push(customItem);
                     }
                 });
@@ -105,6 +111,7 @@ export default defineComponent({
             props.engine.language.add(locales)
             props.engine.on("select",update)
             props.engine.on("change",update)
+            props.engine.on('readonly', update);
            
             if(isMobile) {
                 document.addEventListener("scroll",hideMobileToolbar)
@@ -117,6 +124,7 @@ export default defineComponent({
         onUnmounted(() => {
             props.engine.off("select",update)
             props.engine.off("change",update)
+            props.engine.off('readonly', update);
             if(isMobile){
                 document.removeEventListener("scroll",hideMobileToolbar)
                 visualViewport.removeEventListener('resize', calcuMobileView);
