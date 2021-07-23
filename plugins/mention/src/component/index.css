@@ -63,3 +63,14 @@
 .data-mention-component-body.data-scrollable.scroll-y {
     padding-right: 0 !important;
 }
+
+.data-mention-hover-layout {
+  position: absolute;
+  font-size: 12px;
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 3px 3px;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 12%);
+  transition: all 0.25s cubic-bezier(0.3, 1.2, 0.2, 1);
+  z-index: 999;
+}

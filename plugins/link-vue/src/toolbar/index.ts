@@ -65,7 +65,43 @@ class Toolbar {
 
 		this.target.attributes('href', link);
 		text = text.trim() === '' ? link : text;
-		this.target.text(text);
+		const oldText = this.target.text();
+		if (oldText !== text) {
+			const children = this.target.children();
+			// 左右两侧有零宽字符
+			if (children.length < 3) {
+				this.target.text(text);
+			}
+			// 中间节点是文本字符
+			else if (children.length === 3 && children.eq(1)?.isText()) {
+				this.target.text(text);
+			}
+			// 中间节点是非文本节点
+			else if (children.length === 3) {
+				let element = children.eq(1);
+				while (element) {
+					const child = element.children();
+					// 有多个子节点就直接设置文本，覆盖里面的mark样式
+					if (child.length > 1 || child.length === 0) {
+						element.text(text);
+						break;
+					}
+					// 里面的子节点是文本就设置文本
+					else if (child.eq(0)?.isText()) {
+						element.text(text);
+						break;
+					}
+					// 里面的子节点非文本节点就继续循环
+					else {
+						element = child;
+					}
+				}
+			}
+			// 多个其它节点
+			else {
+				this.target.text(text);
+			}
+		}
 		this.engine.inline.repairCursor(this.target);
 		range.setStart(this.target.next()!, 1);
 		range.setEnd(this.target.next()!, 1);

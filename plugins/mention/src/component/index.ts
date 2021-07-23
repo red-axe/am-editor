@@ -3,10 +3,12 @@ import {
 	Card,
 	isEngine,
 	NodeInterface,
-	escape,
 	isHotkey,
 	CardType,
 	isServer,
+	Position,
+	DATA_ELEMENT,
+	UI,
 } from '@aomao/engine';
 import CollapseComponent, { CollapseComponentInterface } from './collapse';
 import { MentionItem } from '../types';
@@ -18,10 +20,14 @@ export type MentionValue = {
 };
 
 class Mention extends Card<MentionValue> {
+	private component?: CollapseComponentInterface;
 	#container?: NodeInterface;
 	#keyword?: NodeInterface;
 	#placeholder?: NodeInterface;
-	private component?: CollapseComponentInterface;
+	#position?: Position;
+	#showTimeout?: NodeJS.Timeout;
+	#hideTimeout?: NodeJS.Timeout;
+	#enterLayout?: NodeInterface;
 
 	static get cardName() {
 		return 'mention';
@@ -38,7 +44,7 @@ class Mention extends Card<MentionValue> {
 	/**
 	 * 默认数据
 	 */
-	static defaultData: Array<MentionItem> = [];
+	static defaultData?: Array<MentionItem>;
 
 	/**
 	 * 查询
@@ -123,6 +129,7 @@ class Mention extends Card<MentionValue> {
 			return;
 		}
 		super.init();
+		if (!this.#position) this.#position = new Position(this.editor);
 		if (this.component) return;
 		this.component = new CollapseComponent(this.editor, {
 			onCancel: () => {
@@ -169,6 +176,7 @@ class Mention extends Card<MentionValue> {
 
 	destroy() {
 		this.component?.remove();
+		this.#position?.destroy();
 	}
 
 	activate(activated: boolean) {
@@ -198,7 +206,7 @@ class Mention extends Card<MentionValue> {
 
 		const keyword = content.substr(1);
 		// 搜索关键词为空
-		if (keyword === '') {
+		if (keyword === '' && Mention.defaultData) {
 			this.component?.render(this.root, Mention.defaultData);
 			return;
 		}
@@ -217,6 +225,39 @@ class Mention extends Card<MentionValue> {
 			this.#placeholder?.show();
 		else this.#placeholder?.hide();
 	}
+
+	hideEnter = () => {
+		this.#hideTimeout = setTimeout(() => {
+			this.#position?.destroy();
+			this.#enterLayout?.remove();
+		}, 200);
+	};
+
+	showEnter = () => {
+		if (!this.#container || !Mention.mouseEnter) return;
+		const value = this.getValue();
+		if (!value?.name) return;
+		const { id, key, name, ...info } = value;
+		if (this.#hideTimeout) clearTimeout(this.#hideTimeout);
+		if (this.#showTimeout) clearTimeout(this.#showTimeout);
+		if (this.#enterLayout && this.#enterLayout.length > 0) return;
+		this.#showTimeout = setTimeout(() => {
+			if (!this.#container) return;
+			this.#enterLayout = $(
+				`<div class="data-mention-hover-layout" ${DATA_ELEMENT}="${UI}"></div>`,
+			);
+			this.#enterLayout.on('mouseenter', () => {
+				if (this.#hideTimeout) clearTimeout(this.#hideTimeout);
+			});
+			this.#enterLayout.on('mouseleave', this.hideEnter);
+			this.#position?.bind(this.#enterLayout, this.#container);
+			Mention.mouseEnter!(this.#enterLayout, {
+				key: unescape(key || ''),
+				name: unescape(name),
+				...info,
+			});
+		}, 200);
+	};
 
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
@@ -237,15 +278,8 @@ class Mention extends Card<MentionValue> {
 				});
 			});
 
-			this.#container.on('mouseenter', () => {
-				if (!this.#container || !Mention.mouseEnter) return;
-				if (Mention.itemClick)
-					Mention.mouseEnter(this.#container, {
-						key: unescape(key || ''),
-						name: unescape(name),
-						...info,
-					});
-			});
+			this.#container.on('mouseenter', this.showEnter);
+			this.#container.on('mouseleave', this.hideEnter);
 		}
 
 		//阅读模式
@@ -288,7 +322,12 @@ class Mention extends Card<MentionValue> {
 				}, 100);
 			});
 			this.getCenter().append(this.#container);
-			this.component?.render(this.root, Mention.defaultData);
+			this.component?.render(this.root, Mention.defaultData || []);
+			if (!Mention.defaultData) {
+				setTimeout(() => {
+					this.handleInput();
+				}, 50);
+			}
 		} else {
 			this.component = undefined;
 			return this.#container;

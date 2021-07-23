@@ -11,7 +11,7 @@ export type LinkEditorProps = {
 	defaultText?: string;
 	defaultLink?: string;
 	className?: string;
-	onLoad?: () => void;
+	onLoad?: (element: Input) => void;
 	onOk: (text: string, link: string) => void;
 };
 
@@ -29,8 +29,10 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 	const linkRef = useRef<Input>(null);
 
 	useEffect(() => {
-		if (onLoad) onLoad();
-		linkRef.current?.focus();
+		if (onLoad && linkRef.current) onLoad(linkRef.current);
+		setTimeout(() => {
+			linkRef.current?.focus();
+		}, 200);
 	}, []);
 
 	return (
@@ -43,7 +45,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 					placeholder={language
 						.get('link', 'text_placeholder')
 						.toString()}
-					onChange={event => {
+					onChange={(event) => {
 						setText(event.target.value);
 					}}
 				/>
@@ -57,7 +59,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 					placeholder={language
 						.get('link', 'link_placeholder')
 						.toString()}
-					onChange={event => {
+					onChange={(event) => {
 						setLink(event.target.value);
 					}}
 				/>
