@@ -22,7 +22,7 @@ class Maximize implements MaximizeInterface {
 			this.node = undefined;
 		}
 		const editor = this.editor;
-		if (!this.card.readonly && isEngine(editor)) {
+		if (isEngine(editor)) {
 			editor.trigger('card:minimize', this.card);
 			editor.history.reset();
 		}
@@ -56,7 +56,7 @@ class Maximize implements MaximizeInterface {
 		const body = this.card.findByKey('body');
 		body.prepend(node);
 
-		if (!this.card.readonly && isEngine(editor)) {
+		if (isEngine(editor)) {
 			editor.trigger('card:maximize', this.card);
 			editor.history.reset();
 		}
