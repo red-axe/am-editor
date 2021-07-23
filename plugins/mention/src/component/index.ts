@@ -144,6 +144,7 @@ class Mention extends Card<MentionValue> {
 				const { card } = this.editor;
 				this.component?.remove();
 				this.component = undefined;
+				this.#keyword?.remove();
 				card.focus(this, false);
 				const newCard = card.insert(Mention.cardName, {
 					key,
