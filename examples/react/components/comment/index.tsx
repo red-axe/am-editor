@@ -205,6 +205,7 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 
 		useEffect(() => {
 			const onMouseDown = (event: MouseEvent) => {
+				if (editItem) return;
 				event.stopPropagation();
 				if (isEngine(editor)) {
 					const text = editor.command.execute(
@@ -219,7 +220,7 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 			};
 			buttonRef.current?.on('mousedown', onMouseDown);
 			return () => buttonRef.current?.off('mousedown', onMouseDown);
-		}, [showEdit]);
+		}, [showEdit, editItem]);
 
 		/**
 		 * 在 加载数据完毕 或者 列表数据 更新后，设置每个评论项位置
