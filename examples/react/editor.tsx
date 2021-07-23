@@ -76,16 +76,18 @@ export default () => {
 				<Button
 					size="small"
 					disabled={readonly}
+					type="primary"
 					onClick={() => updateReadonly(true)}
 				>
-					协作只读模式
+					{lang === 'zh-CN' ? '只读模式' : 'Readonly mode'}
 				</Button>
 				<Button
 					size="small"
 					disabled={!readonly}
+					type="primary"
 					onClick={() => updateReadonly(false)}
 				>
-					协作编辑模式
+					{lang === 'zh-CN' ? '编辑模式' : 'Edit mode'}
 				</Button>
 			</Space>
 			<Editor

@@ -54,9 +54,10 @@ Focus on the editor
 
 ```ts
 /**
- * Focus on the editor
- */
-focus(): void;
+  * Focus on the editor
+  * @param start is the start position of the focus, the default is true, false is the focus to the end position
+  */
+focus(start?: boolean): void;
 ```
 
 ### `isSub`
@@ -79,6 +80,17 @@ Whether the current cursor is focused on the editor
  * Whether the current cursor has been focused on the editor
  */
 isFocus(): boolean;
+```
+
+### `isEmpty`
+
+Whether the current editor is empty
+
+```ts
+/**
+  * Whether the current editor is empty
+  */
+isEmpty(): boolean;
 ```
 
 ### `getValue`

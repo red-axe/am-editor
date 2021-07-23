@@ -88,3 +88,9 @@ console.log(view.language.get<string>('test'));
 -   类型: `string`
 -   默认值：`无`
 -   详细：占位符
+
+### readonly
+
+-   类型: `boolean`
+-   默认值：`false`
+-   详细：是否只读，设置为只读后不可编辑

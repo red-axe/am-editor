@@ -55,8 +55,9 @@
 ```ts
 /**
  * 聚焦到编辑器
+ * @param start 是否聚焦的开始位置，默认为 true，false 为聚焦到结束位置
  */
-focus(): void;
+focus(start?: boolean): void;
 ```
 
 ### `isSub`
@@ -79,6 +80,17 @@ isSub(): boolean;
  * 当前光标是否已聚焦到编辑器
  */
 isFocus(): boolean;
+```
+
+### `isEmpty`
+
+当前编辑器是否为空值
+
+```ts
+/**
+ * 当前编辑器是否为空值
+ */
+isEmpty(): boolean;
 ```
 
 ### `getValue`

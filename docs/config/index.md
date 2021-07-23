@@ -88,3 +88,9 @@ console.log(view.language.get<string>('test'));
 -   Type: `string`
 -   Default value: `None`
 -   Detailed: placeholder
+
+### readonly
+
+-   Type: `boolean`
+-   Default value: `false`
+-   Detailed: Whether it is read-only or not, and cannot be edited after setting to read-only
