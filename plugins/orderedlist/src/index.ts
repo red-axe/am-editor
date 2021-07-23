@@ -5,12 +5,13 @@ import {
 	isEngine,
 	SchemaBlock,
 	PluginEntry,
+	PluginOptions,
 } from '@aomao/engine';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
-};
+}
 
 export default class extends ListPlugin<Options> {
 	tagName = 'ol';
@@ -34,7 +35,7 @@ export default class extends ListPlugin<Options> {
 	init() {
 		super.init();
 		if (isEngine(this.editor)) {
-			this.editor.on('paste:markdown', child =>
+			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
 		}
@@ -132,7 +133,7 @@ export default class extends ListPlugin<Options> {
 		const rows = text.split(/\n|\r\n/);
 		let nodes: Array<string> = [];
 		let start: number | undefined = undefined;
-		rows.forEach(row => {
+		rows.forEach((row) => {
 			const match = /^(\d{1,9}\.)/.exec(row);
 			if (match) {
 				const codeLength = match[1].length;

@@ -11,13 +11,14 @@ import {
 	SchemaInterface,
 	unescape,
 	CARD_TYPE_KEY,
+	PluginOptions,
 } from '@aomao/engine';
 import CodeBlockComponent, { CodeBlockEditor, NAME_MAP } from './component';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
-};
+}
 
 // 缩写替换
 const MODE_ALIAS = {
@@ -39,12 +40,12 @@ export default class extends Plugin<Options> {
 	}
 
 	init() {
-		this.editor.on('paser:html', node => this.parseHtml(node));
-		this.editor.on('paste:schema', schema => this.pasteSchema(schema));
-		this.editor.on('paste:each', child => this.pasteHtml(child));
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
+		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
 		if (isEngine(this.editor) && this.markdown) {
-			this.editor.on('keydown:enter', event => this.markdown(event));
-			this.editor.on('paste:markdown-before', child =>
+			this.editor.on('keydown:enter', (event) => this.markdown(event));
+			this.editor.on('paste:markdown-before', (child) =>
 				this.pasteMarkdown(child),
 			);
 		}
@@ -84,9 +85,8 @@ export default class extends Plugin<Options> {
 		const match = /^```(.*){0,20}$/.exec(chars);
 
 		if (match) {
-			const modeText = (undefined === match[1]
-				? ''
-				: match[1]
+			const modeText = (
+				undefined === match[1] ? '' : match[1]
 			).toLowerCase();
 			const mode = MODE_ALIAS[modeText] || modeText;
 
@@ -180,7 +180,7 @@ export default class extends Plugin<Options> {
 		let nodes: Array<string> = [];
 		let isCode: boolean = false;
 		let mode = 'text';
-		rows.forEach(row => {
+		rows.forEach((row) => {
 			let match = /^(.*)```(\s)*$/.exec(row);
 			if (match && isCode) {
 				nodes.push(match[1]);
@@ -194,7 +194,7 @@ export default class extends Plugin<Options> {
 			if (match) {
 				isCode = true;
 				mode =
-					langs.find(key => match && match[1].indexOf(key) === 0) ||
+					langs.find((key) => match && match[1].indexOf(key) === 0) ||
 					'text';
 				let code =
 					match[1].indexOf(mode) === 0
@@ -218,7 +218,7 @@ export default class extends Plugin<Options> {
 		if (isServer) return;
 
 		root.find(`[${CARD_KEY}=${CodeBlockComponent.cardName}`).each(
-			cardNode => {
+			(cardNode) => {
 				const node = $(cardNode);
 				const card = this.editor.card.find(node) as CodeBlockComponent;
 				const value = card?.getValue();
@@ -237,7 +237,7 @@ export default class extends Plugin<Options> {
 					content.addClass('am-engine-view');
 					content.hide();
 					document.body.appendChild(content[0]);
-					content.traverse(node => {
+					content.traverse((node) => {
 						if (
 							node.type === Node.ELEMENT_NODE &&
 							(node.get<HTMLElement>()?.classList?.length || 0) >
@@ -250,10 +250,9 @@ export default class extends Plugin<Options> {
 								'margin',
 								'padding',
 								'background',
-							].forEach(attr => {
-								element.style[attr] = style.getPropertyValue(
-									attr,
-								);
+							].forEach((attr) => {
+								element.style[attr] =
+									style.getPropertyValue(attr);
 							});
 						}
 					});

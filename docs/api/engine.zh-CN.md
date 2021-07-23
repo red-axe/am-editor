@@ -174,3 +174,19 @@ setHtml(html: string, options?: {
  */
 setJsonValue(value: Array<any>): EngineInterface;
 ```
+
+### `setScrollNode`
+
+设置编辑器滚动条节点
+
+```ts
+setScrollNode(node?: HTMLElement)
+```
+
+### `destroy`
+
+销毁编辑器
+
+```ts
+destroy():void
+```

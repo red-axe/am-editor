@@ -3,16 +3,17 @@ import {
 	NodeInterface,
 	ElementPlugin,
 	PluginEntry,
+	PluginOptions,
 } from '@aomao/engine';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: {
 		left?: string;
 		center?: string;
 		right?: string;
 		justify?: string;
 	};
-};
+}
 export default class extends ElementPlugin<Options> {
 	kind = 'block';
 

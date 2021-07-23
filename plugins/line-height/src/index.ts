@@ -1,9 +1,15 @@
-import { isEngine, NodeInterface, Plugin, SchemaGlobal } from '@aomao/engine';
+import {
+	isEngine,
+	NodeInterface,
+	Plugin,
+	SchemaGlobal,
+	PluginOptions,
+} from '@aomao/engine';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string;
 	filter?: (lineHeight: string) => string | boolean;
-};
+}
 
 export default class extends Plugin<Options> {
 	static get pluginName() {

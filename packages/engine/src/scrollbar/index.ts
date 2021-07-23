@@ -178,9 +178,11 @@ class Scrollbar extends EventEmitter2 {
 
 	bindWheelScroll = (event: any) => {
 		if (this.x && !this.y) {
-			this.wheelXScroll(event);
+			if (this.slideX && this.slideX.css('display') !== 'none')
+				this.wheelXScroll(event);
 		} else if (this.y) {
-			this.wheelYScroll(event);
+			if (this.slideY && this.slideY.css('display') !== 'none')
+				this.wheelYScroll(event);
 		}
 	};
 

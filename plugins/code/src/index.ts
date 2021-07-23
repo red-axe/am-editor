@@ -1,10 +1,10 @@
-import { NodeInterface, InlinePlugin } from '@aomao/engine';
+import { NodeInterface, InlinePlugin, PluginOptions } from '@aomao/engine';
 import './index.css';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
-};
+}
 export default class extends InlinePlugin<Options> {
 	static get pluginName() {
 		return 'code';
@@ -12,7 +12,7 @@ export default class extends InlinePlugin<Options> {
 
 	init() {
 		super.init();
-		this.editor.on('paser:html', node => this.parseHtml(node));
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
 	}
 
 	tagName = 'code';

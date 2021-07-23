@@ -6,15 +6,16 @@ import {
 	PluginEntry,
 	removeUnit,
 	SchemaGlobal,
+	PluginOptions,
 } from '@aomao/engine';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: {
 		in?: string;
 		out?: string;
 	};
 	maxPadding?: number;
-};
+}
 
 export default class extends Plugin<Options> {
 	static get pluginName() {

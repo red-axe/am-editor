@@ -94,3 +94,9 @@ console.log(view.language.get<string>('test'));
 -   Type: `boolean`
 -   Default value: `false`
 -   Detailed: Whether it is read-only or not, and cannot be edited after setting to read-only
+
+### scrollNode
+
+-   Type: `Node | (() => Node | null)`
+-   Default value: `null`
+-   Detailed: The editor scroll bar node is mainly used to monitor the `scroll` event to set the floating position of the bomb layer and actively set the scroll to the editor target position

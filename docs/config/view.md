@@ -4,6 +4,8 @@ toc: menu
 
 # View configuration
 
+The reader is mainly used for draft mode editing or simple content display. It needs real-time collaborative display and is set to be non-editable. You can use the engine's readonly attribute
+
 Passed in when instantiating the reader
 
 ```ts

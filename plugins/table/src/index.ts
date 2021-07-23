@@ -6,15 +6,16 @@ import {
 	NodeInterface,
 	Plugin,
 	SchemaBlock,
+	PluginOptions,
 } from '@aomao/engine';
 import TableComponent, { Template } from './component';
 import locales from './locale';
 import './index.css';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
-};
+}
 
 class Table extends Plugin<Options> {
 	static get pluginName() {

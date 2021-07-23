@@ -6,11 +6,12 @@ import {
 	Plugin,
 	READY_CARD_KEY,
 	getExtensionName,
+	PluginOptions,
 } from '@aomao/engine';
 
 import FileComponent from './component';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	/**
 	 * 文件上传地址
 	 */
@@ -42,13 +43,11 @@ export type Options = {
 	/**
 	 * 解析上传后的Respone，返回 result:是否成功，data:成功：文件地址，失败：错误信息
 	 */
-	parse?: (
-		response: any,
-	) => {
+	parse?: (response: any) => {
 		result: boolean;
 		data: string;
 	};
-};
+}
 
 export default class extends Plugin<Options> {
 	private cardComponents: { [key: string]: FileComponent } = {};
@@ -61,17 +60,17 @@ export default class extends Plugin<Options> {
 
 	init() {
 		if (isEngine(this.editor)) {
-			this.editor.on('drop:files', files => this.dropFiles(files));
+			this.editor.on('drop:files', (files) => this.dropFiles(files));
 			this.editor.on('paste:event', ({ files }) =>
 				this.pasteFiles(files),
 			);
-			this.editor.on('paste:each', node => this.pasteEach(node));
+			this.editor.on('paste:each', (node) => this.pasteEach(node));
 		}
 		let { accept } = this.options;
 		const names: Array<string> = [];
 		if (typeof accept === 'string') accept = accept.split(',');
 
-		(accept || []).forEach(name => {
+		(accept || []).forEach((name) => {
 			name = name.trim();
 			const newName = name.split('.').pop();
 			if (newName) names.push(newName);
@@ -81,7 +80,7 @@ export default class extends Plugin<Options> {
 
 	async waiting(): Promise<void> {
 		const check = () => {
-			return Object.keys(this.cardComponents).every(key => {
+			return Object.keys(this.cardComponents).every((key) => {
 				const component = this.cardComponents[key];
 				const value = component.getValue();
 				return value?.status !== 'uploading';
@@ -89,7 +88,7 @@ export default class extends Plugin<Options> {
 		};
 		return check()
 			? Promise.resolve()
-			: new Promise(resolve => {
+			: new Promise((resolve) => {
 					let time = 0;
 					const wait = () => {
 						setTimeout(() => {
@@ -135,7 +134,7 @@ export default class extends Plugin<Options> {
 				data,
 				type,
 				contentType,
-				onBefore: file => {
+				onBefore: (file) => {
 					if (file.size > limitSize) {
 						this.editor.messageError(
 							language
@@ -150,7 +149,7 @@ export default class extends Plugin<Options> {
 					}
 					return true;
 				},
-				onReady: fileInfo => {
+				onReady: (fileInfo) => {
 					if (
 						!isEngine(this.editor) ||
 						!!this.cardComponents[fileInfo.uid]
@@ -221,7 +220,7 @@ export default class extends Plugin<Options> {
 
 	dropFiles(files: Array<File>) {
 		if (!isEngine(this.editor)) return;
-		files = files.filter(file => this.isFile(file));
+		files = files.filter((file) => this.isFile(file));
 		if (files.length === 0) return;
 		this.editor.command.execute('file-uploader', files);
 		return false;
@@ -229,11 +228,11 @@ export default class extends Plugin<Options> {
 
 	pasteFiles(files: Array<File>) {
 		if (!isEngine(this.editor)) return;
-		files = files.filter(file => this.isFile(file));
+		files = files.filter((file) => this.isFile(file));
 		if (files.length === 0) return;
 		this.editor.command.execute(
 			'file-uploader',
-			files.filter(file => this.isFile(file)),
+			files.filter((file) => this.isFile(file)),
 			files,
 		);
 		return false;

@@ -232,7 +232,8 @@ class Image {
 		this.image.css('background-repeat', '');
 		this.image.css('background-position', '');
 		this.image.css('background-image', '');
-
+		this.detail.css('width', '');
+		this.detail.css('height', '');
 		const { onChange } = this.options;
 		if (isEngine(this.editor) && onChange) {
 			onChange(this.size);
@@ -268,6 +269,8 @@ class Image {
 				this.editor.language.get('image', 'loadError').toString(),
 			),
 		);
+		this.detail.css('width', '');
+		this.detail.css('height', '');
 		this.bindErrorEvent(container);
 		const { onError } = this.options;
 		if (onError) onError();
@@ -475,13 +478,18 @@ class Image {
 		const { container } = this.options;
 		if (this.status === 'error' && isEngine(this.editor)) {
 			this.bindErrorEvent(this.root);
-			container.append(this.root);
+			container.empty().append(this.root);
 			return;
 		}
 		if (this.status === 'uploading') {
 			this.progress.show();
 		} else {
 			this.progress.remove();
+		}
+		if (this.status === 'done' && this.isLoad) {
+			const contentNode = this.root.find('.data-image-content');
+			contentNode.addClass('data-image-loaded');
+			contentNode.removeClass('data-image-loading');
 		}
 		this.maxWidth = this.getMaxWidth();
 		let { width, height } = this.size;

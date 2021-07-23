@@ -86,11 +86,11 @@ class Engine implements EngineInterface {
 	schema: SchemaInterface;
 	conversion: ConversionInterface;
 	history: HistoryInterface;
-	scrollNode: NodeInterface | null;
 	command: CommandInterface;
 	hotkey: HotkeyInterface;
 	clipboard: ClipboardInterface;
 	request: RequestInterface;
+	#_scrollNode: NodeInterface | null = null;
 
 	get container(): NodeInterface {
 		return this._container.getNode();
@@ -98,6 +98,16 @@ class Engine implements EngineInterface {
 
 	get readonly(): boolean {
 		return this._readonly;
+	}
+
+	get scrollNode(): NodeInterface | null {
+		const { scrollNode } = this.options;
+		const sn = scrollNode
+			? typeof scrollNode === 'function'
+				? scrollNode()
+				: scrollNode
+			: null;
+		return this.#_scrollNode ? this.#_scrollNode : sn ? $(sn) : null;
 	}
 
 	set readonly(readonly: boolean) {
@@ -175,9 +185,6 @@ class Engine implements EngineInterface {
 		this.list.init();
 
 		this.hotkey = new Hotkey(this);
-		this.scrollNode = this.options.scrollNode
-			? $(this.options.scrollNode)
-			: null;
 		this.card.init(this.options.cards || []);
 		this.plugin.init(this.options.plugins || [], this.options.config || {});
 		this.ot = new OT(this);
@@ -188,7 +195,7 @@ class Engine implements EngineInterface {
 	}
 
 	setScrollNode(node?: HTMLElement) {
-		this.scrollNode = node ? $(node) : null;
+		this.#_scrollNode = node ? $(node) : null;
 	}
 
 	isSub() {

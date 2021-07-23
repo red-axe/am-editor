@@ -6,12 +6,13 @@ import {
 	Tooltip,
 	BlockPlugin,
 	PluginEntry,
+	PluginOptions,
 } from '@aomao/engine';
 import Outline from './outline';
 import type { OutlineData } from './outline';
 import './index.css';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: {
 		h1?: string;
 		h2?: string;
@@ -24,7 +25,7 @@ export type Options = {
 	anchorCopy?: (id: string) => string;
 	markdown?: boolean;
 	disableMark?: Array<string>;
-};
+}
 export default class extends BlockPlugin<Options> {
 	attributes = {
 		id: '@var0',

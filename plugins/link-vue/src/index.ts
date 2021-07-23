@@ -4,16 +4,17 @@ import {
 	InlinePlugin,
 	isEngine,
 	PluginEntry,
+	PluginOptions,
 } from '@aomao/engine';
 import Toolbar from './toolbar';
 import locales from './locales';
 
 import './index.css';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
-};
+}
 export default class extends InlinePlugin<Options> {
 	private toolbar?: Toolbar;
 
@@ -42,7 +43,7 @@ export default class extends InlinePlugin<Options> {
 		if (isEngine(editor)) {
 			this.toolbar = new Toolbar(editor);
 		}
-		editor.on('paser:html', node => this.parseHtml(node));
+		editor.on('paser:html', (node) => this.parseHtml(node));
 		editor.language.add(locales);
 	}
 
@@ -76,7 +77,7 @@ export default class extends InlinePlugin<Options> {
 	queryState() {
 		if (!isEngine(this.editor)) return;
 		const { change } = this.editor;
-		const inlineNode = change.inlines.find(node => this.isSelf(node));
+		const inlineNode = change.inlines.find((node) => this.isSelf(node));
 		this.toolbar?.hide(inlineNode);
 		if (inlineNode) {
 			if (change.getRange().collapsed) this.toolbar?.show(inlineNode);

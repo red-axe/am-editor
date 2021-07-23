@@ -7,14 +7,15 @@ import {
 	isEngine,
 	PluginEntry,
 	READY_CARD_KEY,
+	PluginOptions,
 } from '@aomao/engine';
 import CheckboxComponent from './checkbox';
 import './index.css';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
-};
+}
 
 export default class extends ListPlugin<Options> {
 	static get pluginName() {
@@ -40,12 +41,12 @@ export default class extends ListPlugin<Options> {
 
 	init() {
 		super.init();
-		this.editor.on('paser:html', node => this.parseHtml(node));
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
 		if (isEngine(this.editor)) {
-			this.editor.on('paste:markdown', child =>
+			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
-			this.editor.on('paste:each-after', child => {
+			this.editor.on('paste:each-after', (child) => {
 				if (
 					child.name === 'li' &&
 					child.hasClass(this.editor.list.CUSTOMZIE_LI_CLASS) &&
@@ -99,7 +100,7 @@ export default class extends ListPlugin<Options> {
 					'checkbox',
 					value,
 				) as Array<NodeInterface>;
-				listBlocks.forEach(list => {
+				listBlocks.forEach((list) => {
 					if (this.editor.node.isList(list))
 						list.addClass('data-list-task');
 				});
@@ -129,7 +130,7 @@ export default class extends ListPlugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=checkbox`).each(checkboxNode => {
+		root.find(`[${CARD_KEY}=checkbox`).each((checkboxNode) => {
 			const node = $(checkboxNode);
 			const checkbox = $(
 				`<span>${
@@ -207,7 +208,7 @@ export default class extends ListPlugin<Options> {
 		let newText = '';
 		const rows = text.split(/\n|\r\n/);
 		let nodes: Array<string> = [];
-		rows.forEach(row => {
+		rows.forEach((row) => {
 			const match = /^(-\s*)?(\[[\sx]{0,1}\])/.exec(row);
 			if (match) {
 				const codeLength = match[0].length;

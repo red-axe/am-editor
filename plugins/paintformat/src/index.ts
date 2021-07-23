@@ -5,16 +5,17 @@ import {
 	NodeInterface,
 	Plugin,
 	RangeInterface,
+	PluginOptions,
 } from '@aomao/engine';
 import './index.css';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	removeCommand?: string | ((range: RangeInterface) => void);
 	paintBlock?: (
 		currentBlocl: NodeInterface,
 		block: NodeInterface,
 	) => boolean | void;
-};
+}
 
 const PAINTFORMAT_CLASS = 'data-paintformat-mode';
 
@@ -32,7 +33,7 @@ export default class extends Plugin<Options> {
 	init() {
 		if (!isEngine(this.editor)) return;
 
-		this.editor.on('beforeCommandExecute', name => {
+		this.editor.on('beforeCommandExecute', (name) => {
 			if ('paintformat' !== name && !this.isFormat && this.event) {
 				this.removeActiveNodes(
 					this.editor!.container[0].ownerDocument!,
@@ -41,7 +42,7 @@ export default class extends Plugin<Options> {
 		});
 
 		// 鼠标选中文本之后添加样式
-		this.editor.container.on('mouseup', e => {
+		this.editor.container.on('mouseup', (e) => {
 			if (!this.activeMarks) {
 				return;
 			}
@@ -117,7 +118,7 @@ export default class extends Plugin<Options> {
 			else command.execute(removeCommand);
 			this.paintMarks(activeMarks);
 			const blocks = block.getBlocks(range);
-			blocks.forEach(block => {
+			blocks.forEach((block) => {
 				if (activeBlocks) this.paintBlocks(block, activeBlocks);
 			});
 		}
@@ -125,7 +126,7 @@ export default class extends Plugin<Options> {
 
 	paintMarks(activeMarks: NodeInterface[]) {
 		const { mark } = this.editor!;
-		activeMarks.forEach(node => {
+		activeMarks.forEach((node) => {
 			mark.wrap(this.editor.node.clone(node));
 		});
 	}
@@ -134,7 +135,7 @@ export default class extends Plugin<Options> {
 		if (!isEngine(this.editor)) return;
 		const { command, node } = this.editor!;
 		const blockApi = this.editor.block;
-		activeBlocks.forEach(block => {
+		activeBlocks.forEach((block) => {
 			if (this.options.paintBlock) {
 				const paintResult = this.options.paintBlock(
 					currentBlock,

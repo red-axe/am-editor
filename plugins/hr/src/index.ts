@@ -6,25 +6,26 @@ import {
 	isEngine,
 	PluginEntry,
 	SchemaInterface,
+	PluginOptions,
 } from '@aomao/engine';
 import HrComponent from './component';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
-};
+}
 export default class extends Plugin<Options> {
 	static get pluginName() {
 		return 'hr';
 	}
 
 	init() {
-		this.editor.on('paser:html', node => this.parseHtml(node));
-		this.editor.on('paste:schema', schema => this.pasteSchema(schema));
-		this.editor.on('paste:each', child => this.pasteHtml(child));
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
+		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:enter', event => this.markdown(event));
-			this.editor.on('paste:markdown', child =>
+			this.editor.on('keydown:enter', (event) => this.markdown(event));
+			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
 		}
@@ -113,7 +114,7 @@ export default class extends Plugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${HrComponent.cardName}`).each(hrNode => {
+		root.find(`[${CARD_KEY}=${HrComponent.cardName}`).each((hrNode) => {
 			const node = $(hrNode);
 			const hr = node.find('hr');
 			hr.css({

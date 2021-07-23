@@ -1,8 +1,8 @@
-import { isEngine, Plugin } from '@aomao/engine';
+import { isEngine, Plugin, PluginOptions } from '@aomao/engine';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
-};
+}
 export default class extends Plugin<Options> {
 	static get pluginName() {
 		return 'undo';

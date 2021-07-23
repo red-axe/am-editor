@@ -12,6 +12,10 @@
             user-select: none;
 }
 
+.data-image-detail {
+  display: inline-block;
+}
+
 .data-image-meta {
     position: relative;
     color: #595959;

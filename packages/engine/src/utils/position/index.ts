@@ -35,6 +35,9 @@ class Position {
 		this.#onUpdate = onUpdate;
 		window.addEventListener('scroll', this.update);
 		window.addEventListener('resize', this.update);
+		if (isEngine(this.#editor)) {
+			this.#editor.scrollNode?.on('scroll', this.update);
+		}
 		this.update();
 	}
 
@@ -74,6 +77,9 @@ class Position {
 		this.#onUpdate = undefined;
 		window.removeEventListener('scroll', this.update);
 		window.removeEventListener('resize', this.update);
+		if (isEngine(this.#editor)) {
+			this.#editor.scrollNode?.off('scroll', this.update);
+		}
 		this.#root?.remove();
 	}
 }

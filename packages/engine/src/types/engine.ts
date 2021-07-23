@@ -418,7 +418,7 @@ export type EngineOptions = {
 	className?: string;
 	tabIndex?: number;
 	root?: Node;
-	scrollNode?: Node;
+	scrollNode?: Node | (() => Node | null);
 	plugins?: Array<PluginEntry>;
 	cards?: Array<CardEntry>;
 	config?: { [k: string]: PluginOptions };
@@ -441,7 +441,7 @@ export interface EngineInterface extends EditorInterface {
 	/**
 	 * 滚动条节点
 	 */
-	scrollNode: NodeInterface | null;
+	readonly scrollNode: NodeInterface | null;
 	/**
 	 * 是否只读
 	 */

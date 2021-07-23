@@ -1,8 +1,15 @@
-import { $, CARD_KEY, NodeInterface, Plugin, CardEntry } from '@aomao/engine';
+import {
+	$,
+	CARD_KEY,
+	NodeInterface,
+	Plugin,
+	CardEntry,
+	PluginOptions,
+} from '@aomao/engine';
 import MathComponent from './component';
 import locales from './locales';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	/**
 	 * 请求生成公式svg地址
 	 */
@@ -22,13 +29,11 @@ export type Options = {
 	/**
 	 * 解析上传后的Respone，返回 result:是否成功，data:成功：公式数据，失败：错误信息
 	 */
-	parse?: (
-		response: any,
-	) => {
+	parse?: (response: any) => {
 		result: boolean;
 		data: string;
 	};
-};
+}
 
 export default class Math extends Plugin<Options> {
 	static get pluginName() {
@@ -75,7 +80,7 @@ export default class Math extends Plugin<Options> {
 				...data,
 				content: code,
 			},
-			success: response => {
+			success: (response) => {
 				const url =
 					response.url || (response.data && response.data.url);
 
@@ -104,7 +109,7 @@ export default class Math extends Plugin<Options> {
 					failed(result.data);
 				}
 			},
-			error: error => {
+			error: (error) => {
 				failed(
 					error.message ||
 						this.editor.language.get('image', 'uploadError'),
@@ -140,7 +145,7 @@ export default class Math extends Plugin<Options> {
 		const { card } = this.editor;
 		const check = () => {
 			let isSaving = false;
-			card.each(component => {
+			card.each((component) => {
 				if (isSaving) return;
 				if (
 					component.root.inEditor() &&
@@ -154,7 +159,7 @@ export default class Math extends Plugin<Options> {
 		};
 		return check()
 			? Promise.resolve()
-			: new Promise(resolve => {
+			: new Promise((resolve) => {
 					let time = 0;
 					const wait = () => {
 						setTimeout(() => {
@@ -168,7 +173,7 @@ export default class Math extends Plugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${MathComponent.cardName}`).each(cardNode => {
+		root.find(`[${CARD_KEY}=${MathComponent.cardName}`).each((cardNode) => {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as MathComponent;
 			const value = card?.getValue();

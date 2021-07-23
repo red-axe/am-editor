@@ -1,10 +1,15 @@
-import { NodeInterface, MarkPlugin, isEngine } from '@aomao/engine';
+import {
+	NodeInterface,
+	MarkPlugin,
+	isEngine,
+	PluginOptions,
+} from '@aomao/engine';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: { key: string; args: Array<string> };
 	defaultSize?: string;
 	filter?: (fontSize: string) => string | boolean;
-};
+}
 
 export default class extends MarkPlugin<Options> {
 	static get pluginName() {

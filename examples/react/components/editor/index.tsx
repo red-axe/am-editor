@@ -114,7 +114,6 @@ const EditorComponent: React.FC<EditorProps> = ({
 
 	useEffect(() => {
 		if (!engine.current) return;
-		engine.current.setScrollNode(scrollNode.current);
 		//卡片最大化时设置编辑页面样式
 		engine.current.on('card:maximize', () => {
 			$('.editor-toolbar').css('z-index', '9999').css('top', '56px');
@@ -250,7 +249,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 								<EngineComponent
 									ref={engine}
 									{...engineProps}
-									scrollNode={scrollNode}
+									scrollNode={() => scrollNode.current}
 									defaultValue=""
 								/>
 							}

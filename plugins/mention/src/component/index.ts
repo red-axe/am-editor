@@ -161,6 +161,7 @@ class Mention extends Card<MentionValue> {
 	remove() {
 		if (!isEngine(this.editor)) return;
 		this.component?.remove();
+		this.#keyword?.remove();
 		this.editor.card.remove(this.id);
 	}
 
@@ -174,15 +175,10 @@ class Mention extends Card<MentionValue> {
 		this.editor.node.insertText(content);
 	}
 
-	destroy() {
-		this.component?.remove();
-		this.#position?.destroy();
-	}
-
 	activate(activated: boolean) {
 		super.activate(activated);
-		if (!activated && this.component) {
-			this.component.unbindEvents();
+		if (!activated && this.#keyword && this.#keyword.length > 0) {
+			this.component?.unbindEvents();
 			this.changeToText();
 		}
 	}
@@ -261,7 +257,8 @@ class Mention extends Card<MentionValue> {
 
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
-		if (value?.name) {
+		// 有值的情况、展示模式
+		if (value?.name && !this.#container) {
 			const { id, key, name, ...info } = value;
 			this.#container = $(
 				`<span class="data-mention-component">@${unescape(
@@ -280,15 +277,17 @@ class Mention extends Card<MentionValue> {
 
 			this.#container.on('mouseenter', this.showEnter);
 			this.#container.on('mouseleave', this.hideEnter);
+		} else if (this.#container) {
+			return;
 		}
 
-		//阅读模式
+		// 不是引擎，阅读模式
 		if (!isEngine(this.editor)) {
 			return this.#container;
 		}
 		const language = this.editor.language.get('mention');
 		let timeout: NodeJS.Timeout | undefined = undefined;
-		//编辑模式
+		// 没有值的情况下，弹出下拉框编辑模式
 		if (!this.#container) {
 			this.#container = $(
 				`<span class="data-mention-component-keyword data-mention-component" contenteditable="true">@</span><span class="data-mention-component-placeholder">${language['placeholder']}</span>`,
@@ -328,10 +327,17 @@ class Mention extends Card<MentionValue> {
 					this.handleInput();
 				}, 50);
 			}
-		} else {
-			this.component = undefined;
+		}
+		// 可编辑下，展示模式
+		else {
+			this.component?.remove();
 			return this.#container;
 		}
+	}
+
+	destroy() {
+		this.component?.remove();
+		this.#position?.destroy();
 	}
 }
 

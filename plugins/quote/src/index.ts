@@ -4,13 +4,14 @@ import {
 	NodeInterface,
 	BlockPlugin,
 	PluginEntry,
+	PluginOptions,
 } from '@aomao/engine';
 import './index.css';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
-};
+}
 export default class extends BlockPlugin<Options> {
 	tagName: string = 'blockquote';
 

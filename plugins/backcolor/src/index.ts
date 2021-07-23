@@ -1,8 +1,8 @@
-import { MarkPlugin } from '@aomao/engine';
+import { MarkPlugin, PluginOptions } from '@aomao/engine';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: { key: string; args: Array<string> };
-};
+}
 export default class extends MarkPlugin<Options> {
 	static get pluginName() {
 		return 'backcolor';

@@ -9,10 +9,11 @@ import {
 	READY_CARD_KEY,
 	getExtensionName,
 	SchemaInterface,
+	PluginOptions,
 } from '@aomao/engine';
 import ImageComponent from './component';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	/**
 	 * 文件上传配置
 	 */
@@ -71,9 +72,7 @@ export type Options = {
 	/**
 	 * 解析上传后的Respone，返回 result:是否成功，data:成功：图片地址，失败：错误信息
 	 */
-	parse?: (
-		response: any,
-	) => {
+	parse?: (response: any) => {
 		result: boolean;
 		data: string;
 	};
@@ -81,7 +80,7 @@ export type Options = {
 	 * 是否是第三方图片地址，如果是，那么地址将上传服务器下载图片
 	 */
 	isRemote?: (src: string) => boolean;
-};
+}
 
 export default class extends Plugin<Options> {
 	private cardComponents: { [key: string]: ImageComponent } = {};
@@ -106,15 +105,17 @@ export default class extends Plugin<Options> {
 
 	init() {
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:enter', event => this.markdown(event));
-			this.editor.on('drop:files', files => this.dropFiles(files));
+			this.editor.on('keydown:enter', (event) => this.markdown(event));
+			this.editor.on('drop:files', (files) => this.dropFiles(files));
 			this.editor.on('paste:event', ({ files }) =>
 				this.pasteFiles(files),
 			);
-			this.editor.on('paste:schema', schema => this.pasteSchema(schema));
-			this.editor.on('paste:each', node => this.pasteEach(node));
+			this.editor.on('paste:schema', (schema) =>
+				this.pasteSchema(schema),
+			);
+			this.editor.on('paste:each', (node) => this.pasteEach(node));
 			this.editor.on('paste:after', () => this.pasteAfter());
-			this.editor.on('paste:markdown', child =>
+			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
 		}
@@ -122,7 +123,7 @@ export default class extends Plugin<Options> {
 		const names: Array<string> = [];
 		if (typeof accept === 'string') accept = accept.split(',');
 
-		(accept || []).forEach(name => {
+		(accept || []).forEach((name) => {
 			name = name.trim();
 			const newName = name.split('.').pop();
 			if (newName) names.push(newName);
@@ -145,10 +146,7 @@ export default class extends Plugin<Options> {
 			byteString = unescape(dataURI.split(',')[1]);
 		}
 		// separate out the mime component
-		const mimeString = dataURI
-			.split(',')[0]
-			.split(':')[1]
-			.split(';')[0]; // write the bytes of the string to a typed array
+		const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]; // write the bytes of the string to a typed array
 
 		const ia = new Uint8Array(byteString.length);
 
@@ -184,7 +182,7 @@ export default class extends Plugin<Options> {
 
 	async waiting(): Promise<void> {
 		const check = () => {
-			return Object.keys(this.cardComponents).every(key => {
+			return Object.keys(this.cardComponents).every((key) => {
 				const component = this.cardComponents[key];
 				const value = component.getValue();
 				return value?.status !== 'uploading';
@@ -192,7 +190,7 @@ export default class extends Plugin<Options> {
 		};
 		return check()
 			? Promise.resolve()
-			: new Promise(resolve => {
+			: new Promise((resolve) => {
 					let time = 0;
 					const wait = () => {
 						setTimeout(() => {
@@ -232,7 +230,7 @@ export default class extends Plugin<Options> {
 				data,
 				type,
 				contentType,
-				onBefore: file => {
+				onBefore: (file) => {
 					if (file.size > limitSize) {
 						this.editor.messageError(
 							language
@@ -247,7 +245,7 @@ export default class extends Plugin<Options> {
 					}
 					return true;
 				},
-				onReady: fileInfo => {
+				onReady: (fileInfo) => {
 					if (
 						!isEngine(this.editor) ||
 						!!this.cardComponents[fileInfo.uid]
@@ -318,7 +316,7 @@ export default class extends Plugin<Options> {
 
 	dropFiles(files: Array<File>) {
 		if (!isEngine(this.editor)) return;
-		files = files.filter(file => this.isImage(file));
+		files = files.filter((file) => this.isImage(file));
 		if (files.length === 0) return;
 		this.editor.command.execute('image-uploader', files);
 		return false;
@@ -349,7 +347,7 @@ export default class extends Plugin<Options> {
 
 	pasteFiles(files: Array<File>) {
 		if (!isEngine(this.editor)) return;
-		files = files.filter(file => this.isImage(file));
+		files = files.filter((file) => this.isImage(file));
 		if (files.length === 0) return;
 		this.editor.command.execute('image-uploader', files);
 		return false;
@@ -434,7 +432,7 @@ export default class extends Plugin<Options> {
 				...data,
 				url: src,
 			},
-			success: response => {
+			success: (response) => {
 				let src =
 					response.url ||
 					(response.data && response.data.url) ||
@@ -465,7 +463,7 @@ export default class extends Plugin<Options> {
 					this.loadImage(component.id, value);
 				}
 			},
-			error: error => {
+			error: (error) => {
 				this.editor.card.update(component.id, {
 					status: 'error',
 					message:
@@ -508,7 +506,7 @@ export default class extends Plugin<Options> {
 				if (
 					value?.status !== 'uploading' ||
 					Object.keys(this.cardComponents).find(
-						key => this.cardComponents[key].id === component.id,
+						(key) => this.cardComponents[key].id === component.id,
 					)
 				) {
 					return;

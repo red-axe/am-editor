@@ -94,3 +94,9 @@ console.log(view.language.get<string>('test'));
 -   类型: `boolean`
 -   默认值：`false`
 -   详细：是否只读，设置为只读后不可编辑
+
+### scrollNode
+
+-   类型: `Node | (() => Node | null)`
+-   默认值：`null`
+-   详细：编辑器滚动条节点，主要用于监听 `scroll` 事件设置弹层浮动位置和主动设置滚动到编辑器目标位置

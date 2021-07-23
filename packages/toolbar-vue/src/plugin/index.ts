@@ -4,6 +4,7 @@ import {
 	isSafari,
 	NodeInterface,
 	Plugin,
+	PluginOptions,
 } from '@aomao/engine';
 import { CollapseItemProps } from '../types';
 import locales from '../locales';
@@ -13,9 +14,9 @@ type Config = Array<{
 	title: string;
 	items: Array<Omit<CollapseItemProps, 'engine'> | string>;
 }>;
-export type Options = {
+export interface Options extends PluginOptions {
 	config: Config;
-};
+}
 
 const defaultConfig = (editor: EditorInterface): Config => {
 	return [

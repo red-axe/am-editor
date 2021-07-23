@@ -174,3 +174,19 @@ Set the json format value, which is mainly used to synchronize with the value of
  */
 setJsonValue(value: Array<any>): EngineInterface;
 ```
+
+### `setScrollNode`
+
+Set editor scroll bar node
+
+```ts
+setScrollNode(node?: HTMLElement)
+```
+
+### `destroy`
+
+Destroy the editor
+
+```ts
+destroy():void
+```

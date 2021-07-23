@@ -11,10 +11,11 @@ import {
 	SchemaGlobal,
 	SchemaMark,
 	Selection,
+	PluginOptions,
 } from '@aomao/engine';
 import { Path } from 'sharedb';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	keys: Array<string>;
 	hotkey?: string | Array<string>;
 	onChange?: (
@@ -26,7 +27,7 @@ export type Options = {
 		range: RangeInterface,
 		selectInfo?: { key: string; id: string },
 	) => void;
-};
+}
 
 const PLUGIN_NAME = 'mark-range';
 

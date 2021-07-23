@@ -6,11 +6,12 @@ import {
 	Plugin,
 	READY_CARD_KEY,
 	getExtensionName,
+	PluginOptions,
 } from '@aomao/engine';
 
 import VideoComponent from './component';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	/**
 	 * 视频上传地址
 	 */
@@ -74,7 +75,7 @@ export type Options = {
 		 */
 		contentType?: string;
 	};
-};
+}
 
 export default class extends Plugin<Options> {
 	private cardComponents: { [key: string]: VideoComponent } = {};

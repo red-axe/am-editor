@@ -1,7 +1,7 @@
-import { Plugin, isEngine, SchemaBlock } from '@aomao/engine';
+import { Plugin, isEngine, SchemaBlock, PluginOptions } from '@aomao/engine';
 import MindComponent from './component';
 
-export type Options = {};
+export interface Options extends PluginOptions {}
 
 export default class Mind extends Plugin<Options> {
 	static get pluginName() {

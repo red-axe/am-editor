@@ -1,10 +1,17 @@
-import { $, Plugin, NodeInterface, CARD_KEY, isEngine } from '@aomao/engine';
+import {
+	$,
+	Plugin,
+	NodeInterface,
+	CARD_KEY,
+	isEngine,
+	PluginOptions,
+} from '@aomao/engine';
 import StatusComponent from './components';
 import locales from './locales';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
-};
+}
 export default class extends Plugin<Options> {
 	static get pluginName() {
 		return 'status';

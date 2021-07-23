@@ -377,7 +377,11 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 
 	destroy() {
 		super.destroy();
+		this.scrollbar?.destroy();
+		this.command.removeAllListeners();
+		this.selection.removeAllListeners();
 		this.selection.destroy();
+		this.conltrollBar.removeAllListeners();
 		this.conltrollBar.destroy();
 		this.editor.off('undo', this.onChange);
 		this.editor.off('redo', this.onChange);

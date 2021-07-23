@@ -8,12 +8,13 @@ import {
 	Plugin,
 	CardEntry,
 	unescape,
+	PluginOptions,
 } from '@aomao/engine';
 import MentionComponent from './component';
 import locales from './locales';
 import { MentionItem } from './types';
 
-export type Options = {
+export interface Options extends PluginOptions {
 	defaultData?: Array<MentionItem>;
 	onSearch?: (keyword: string) => Promise<Array<MentionItem>>;
 	onSelect?: (key: string, name: string) => void | { [key: string]: string };
@@ -61,7 +62,7 @@ export type Options = {
 		result: boolean;
 		data: Array<MentionItem>;
 	};
-};
+}
 
 class MentionPlugin extends Plugin<Options> {
 	static get pluginName() {

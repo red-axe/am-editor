@@ -5,6 +5,7 @@ import {
 	isSafari,
 	NodeInterface,
 	Plugin,
+	PluginOptions,
 } from '@aomao/engine';
 import { CollapseItemProps } from '../collapse/item';
 import ToolbarComponent from './component';
@@ -14,9 +15,9 @@ type Config = Array<{
 	title: React.ReactNode;
 	items: Array<Omit<CollapseItemProps, 'engine'> | string>;
 }>;
-export type Options = {
+export interface Options extends PluginOptions {
 	config: Config;
-};
+}
 
 const defaultConfig = (editor: EditorInterface): Config => {
 	return [
