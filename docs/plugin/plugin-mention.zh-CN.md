@@ -35,7 +35,7 @@ new Engine(...,{
 
 `onSearch`: 查询时的方法，或者配置 action，二选其一
 
-`onSelect`: 选中列表中的一项后回调，这里可以返回一个自定义值与 `key`、`name` 一起组合成新的值存在 cardValue 里面。并且执行 `getList` 命令后会一起返回来
+`onSelect`: 选中列表中的一项后回调，这里可以返回一个自定义值与 key、name 一起组合成新的值存在 cardValue 里面。并且执行 getList 命令后会一起返回来
 
 `onClick`: 在“提及”上单击时触发
 
@@ -59,13 +59,13 @@ defaultData?: Array<{ key: string, name: string, avatar?: string}>
 //查询时的方法，或者配置 action，二选其一
 onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar?: string}>>
 //选中列表中的一项后回调，这里可以返回一个自定义值与 key、name 一起组合成新的值存在 cardValue 里面。并且执行 getList 命令后会一起返回来
-onSelect?: (key: string, name: string) => void | {[key: string]: string}
+onSelect?: (data: {[key:string]: string}) => void | {[key: string]: string}
 //在“提及”上单击事件
-onClick?:(key: string, name: string) => void
+onClick?:(data: {[key:string]: string}) => void
 //鼠标移入“提及”上时触发
-onMouseEnter?:(node: NodeInterface, key: string, name: string) => void
+onMouseEnter?:(node: NodeInterface, data: {[key:string]: string}) => void
 //自定义渲染列表，bindItem 可以为列表项绑定需要的属性和事件
-onRender?: (data: MentionItem, root: NodeInterface, bindItem: (node: NodeInterface, name: string, key?: string) => NodeInterface) => Promise<string | NodeInterface | void>;
+onRender?: (data: MentionItem, root: NodeInterface, bindItem: (node: NodeInterface, data: {[key:string]: string}) => NodeInterface) => Promise<string | NodeInterface | void>;
 //自定义渲染列表项
 onRenderItem?: (item: MentionItem, root: NodeInterface) => string | NodeInterface | void
 // 自定渲染加载状态

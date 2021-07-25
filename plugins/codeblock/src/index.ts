@@ -233,7 +233,7 @@ export default class extends Plugin<Options> {
 						border: '1px solid #e8e8e8',
 						'max-width': '750px',
 					});
-					codeEditor.render(value.mode || 'plain', value.code);
+					codeEditor.render(value.mode || 'plain', value.code || '');
 					content.addClass('am-engine-view');
 					content.hide();
 					document.body.appendChild(content[0]);

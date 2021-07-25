@@ -2,7 +2,7 @@
 
 Mention plugin
 
-## Installation
+## Install
 
 ```bash
 $ yarn add @aomao/plugin-mention
@@ -35,7 +35,7 @@ new Engine(...,{
 
 `onSearch`: the method to query, or configure the action, choose one of the two
 
-`onSelect`: Call back after selecting an item in the list, here you can return a custom value combined with `key` and `name` to form a new value and store it in cardValue. And it will return together after executing the `getList` command
+`onSelect`: Call back after selecting an item in the list, here you can return a custom value combined with key and name to form a new value and store it in cardValue. And it will return together after executing the getList command
 
 `onClick`: Triggered when clicking on the "mention"
 
@@ -59,13 +59,13 @@ defaultData?: Array<{ key: string, name: string, avatar?: string}>
 //The method of query, or configure action, choose one of the two
 onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar?: string}>>
 //Call back after selecting an item in the list, here you can return a custom value combined with key and name to form a new value and store it in cardValue. And it will return together after executing the getList command
-onSelect?: (key: string, name: string) => void | {[key: string]: string}
+onSelect?: (data: {[key:string]: string}) => void | {[key: string]: string}
 //Click event on "mention"
-onClick?:(key: string, name: string) => void
+onClick?:(data: {[key:string]: string}) => void
 // Triggered when the mouse moves over the "mention"
-onMouseEnter?:(node: NodeInterface, key: string, name: string) => void
+onMouseEnter?:(node: NodeInterface, data: {[key:string]: string}) => void
 //Customize the rendering list, bindItem can bind the required properties and events for the list item
-onRender?: (data: MentionItem, root: NodeInterface, bindItem: (node: NodeInterface, name: string, key?: string) => NodeInterface) => Promise<string | NodeInterface | void>;
+onRender?: (data: MentionItem, root: NodeInterface, bindItem: (node: NodeInterface, data: {[key:string]: string}) => NodeInterface) => Promise<string | NodeInterface | void>;
 //Custom rendering list items
 onRenderItem?: (item: MentionItem, root: NodeInterface) => string | NodeInterface | void
 // Customize the rendering loading status
@@ -102,7 +102,7 @@ parse?: (
 
 ### Analyze server response data
 
-`result`: true upload is successful, data is a collection. false upload failed, data is an error message
+`result`: true upload is successful, data data collection. false upload failed, data is an error message
 
 ```ts
 /**
@@ -116,7 +116,7 @@ parse?: (
 };
 ```
 
-## Command
+## Order
 
 Get all mentions in the document
 
