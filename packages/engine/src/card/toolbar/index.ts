@@ -299,7 +299,7 @@ class CardToolbar implements CardToolbarInterface {
 								this.offset[3],
 							]);
 							prevAlign = rect.align;
-							this.position.update();
+							this.position.update(false);
 						} else if (
 							this.offset &&
 							rect.align === 'topLeft' &&
@@ -307,7 +307,7 @@ class CardToolbar implements CardToolbarInterface {
 						) {
 							this.position.setOffset(this.offset);
 							prevAlign = rect.align;
-							this.position.update();
+							this.position.update(false);
 						}
 						prevAlign = rect.align;
 					},

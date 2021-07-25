@@ -45,7 +45,7 @@ class Position {
 		this.#offset = offset;
 	}
 
-	update = () => {
+	update = (triggerUpdate: boolean = true) => {
 		if (
 			!this.#container ||
 			this.#container.length === 0 ||
@@ -62,7 +62,7 @@ class Position {
 			},
 		);
 
-		if (this.#onUpdate) {
+		if (this.#onUpdate && triggerUpdate) {
 			const align = Object.keys(placements).find((p) => {
 				const points = placements[p].points;
 				return (
