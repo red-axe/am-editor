@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-codeblock-vue",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "代码块 Vue",
   "keywords": [
     "codeblock",
@@ -28,7 +28,7 @@
     "url": "https://github.com/itellyou-com/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.3.0",
+    "@aomao/engine": "^2.3.1",
     "@babel/runtime": "^7.13.10",
     "ant-design-vue": "^2.1.2",
     "codemirror": "^5.60.0",
