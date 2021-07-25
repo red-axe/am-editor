@@ -449,7 +449,9 @@ export const getToolbarDefaultConfig = (
 					items.find(
 						(item) =>
 							familys.indexOf(
-								item['faimlyName'].trim().toLowerCase(),
+								(item as any)['faimlyName']
+									.trim()
+									.toLowerCase(),
 							) > -1,
 					)?.key || ''
 				);

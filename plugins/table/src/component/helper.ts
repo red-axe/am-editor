@@ -287,6 +287,11 @@ class Helper implements HelperInterface {
 				editableElement = tdNode.find(EDITABLE_SELECTOR);
 				editableElement.html(content);
 			}
+			editableElement.find('p').each((pNode) => {
+				if (pNode.childNodes.length === 0) {
+					pNode.appendChild(document.createElement('br'));
+				}
+			});
 		});
 		return table;
 	}

@@ -20,7 +20,9 @@ import { merge, omit } from 'lodash-es';
 import { isMobile } from '@aomao/engine'
 import AmGroup from './group.vue'
 import locales from '../locales';
-import { getToolbarDefaultConfig } from '../config'
+import { getToolbarDefaultConfig,
+	fontFamilyDefaultData,
+	fontfamily, } from '../config'
 import { GroupDataProps, toolbarProps } from '../types'
 
 export default defineComponent({
@@ -157,6 +159,12 @@ export default defineComponent({
         }
     }
 })
+
+export {
+  getToolbarDefaultConfig,
+	fontFamilyDefaultData,
+	fontfamily
+}
 </script>
 <style>
 .ant-tooltip .toolbar-tooltip-title {
