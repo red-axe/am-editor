@@ -1078,6 +1078,7 @@ class Mark implements MarkModelInterface {
 	findMarks(range: RangeInterface) {
 		if (range.startNode.isRoot()) range.shrinkToElementNode();
 		const cloneRange = range.cloneRange();
+		if (!cloneRange.startNode.inEditor()) return [];
 		const { node } = this.editor;
 		const handleRange = (
 			allowBlock: boolean,

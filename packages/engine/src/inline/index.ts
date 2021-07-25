@@ -650,6 +650,7 @@ class Inline implements InlineModelInterface {
 	findInlines(range: RangeInterface) {
 		if (range.startNode.isRoot()) range.shrinkToElementNode();
 		const cloneRange = range.cloneRange();
+		if (!cloneRange.startNode.inEditor()) return [];
 		const nodeApi = this.editor.node;
 		const handleRange = (
 			allowBlock: boolean,
