@@ -29,7 +29,7 @@ export default class Clipboard implements ClipboardInterface {
 		// Edge 兼容性处理
 		try {
 			if (transfer?.items && transfer.items.length > 0) {
-				Array.from(transfer.items).forEach(item => {
+				Array.from(transfer.items).forEach((item) => {
 					let file = item.kind === 'file' ? item.getAsFile() : null;
 					if (file !== null) {
 						if (
@@ -86,8 +86,8 @@ export default class Clipboard implements ClipboardInterface {
 	) {
 		if (!range) range = Range.from(this.editor);
 		if (!range) throw 'Range is null';
-		range = range.cloneRange();
-		let card = range.startNode.closest('[data-card-key]', node => {
+		range = range.cloneRange().shrinkToElementNode();
+		let card = range.startNode.closest('[data-card-key]', (node) => {
 			return $(node).isEditable()
 				? undefined
 				: node.parentNode || undefined;
@@ -103,7 +103,7 @@ export default class Clipboard implements ClipboardInterface {
 			) {
 				const cardCenter = range.startNode.closest(
 					'[data-card-element="center"]',
-					node => {
+					(node) => {
 						return $(node).isEditable()
 							? undefined
 							: node.parentNode || undefined;
@@ -120,7 +120,7 @@ export default class Clipboard implements ClipboardInterface {
 			}
 		}
 		let root = range.commonAncestorNode;
-		card = root.closest('[data-card-key]', node => {
+		card = root.closest('[data-card-key]', (node) => {
 			return $(node).isEditable()
 				? undefined
 				: node.parentNode || undefined;
@@ -128,7 +128,7 @@ export default class Clipboard implements ClipboardInterface {
 		if (card.length > 0) {
 			const cardCenter = root.closest(
 				'[data-card-element="center"]',
-				node => {
+				(node) => {
 					return $(node).isEditable()
 						? undefined
 						: node.parentNode || undefined;
@@ -141,7 +141,7 @@ export default class Clipboard implements ClipboardInterface {
 		}
 		const nodes: Array<Node> =
 			root.name === '#text' ? [document.createElement('span')] : [];
-		card = root.closest('[data-card-key]', node => {
+		card = root.closest('[data-card-key]', (node) => {
 			if ($(node).isEditable()) return;
 			if (node.nodeType === getWindow().Node.ELEMENT_NODE) {
 				const display = window
@@ -160,15 +160,6 @@ export default class Clipboard implements ClipboardInterface {
 			root.closest('.am-engine-view').length > 0 ||
 			root.closest('.am-engine').length > 0;
 		if (card.length <= 0 && (hasChildEngine || hasParentEngine)) {
-			if (hasParentEngine && !root.isEditable()) {
-				const block = this.editor.block.closest(root);
-				if (
-					['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].indexOf(block.name) >
-					-1
-				) {
-					nodes.push(block[0].cloneNode());
-				}
-			}
 			event.preventDefault();
 			if (range.collapsed) {
 				event.clipboardData?.setData('text/html', '');
@@ -205,13 +196,13 @@ export default class Clipboard implements ClipboardInterface {
 			top: 0,
 			clip: 'rect(0, 0, 0, 0)',
 		});
-		block.on('copy', e => {
+		block.on('copy', (e) => {
 			this.write(e);
 		});
 		$(document.body).append(block);
 		block.append(editor.node.clone($(data), true));
 		if (trigger) {
-			block.allChildren().forEach(child => {
+			block.allChildren().forEach((child) => {
 				editor.trigger('copy', $(child));
 			});
 		}
@@ -246,7 +237,7 @@ export default class Clipboard implements ClipboardInterface {
 		for (let i = 0; i < listElements.length; i++) {
 			const list = $(listElements[i]);
 			const childs = list.find('li');
-			childs.each(child => {
+			childs.each((child) => {
 				if (
 					'' === (child as HTMLElement).innerText ||
 					(isSafari && '\n' === (child as HTMLElement).innerText)

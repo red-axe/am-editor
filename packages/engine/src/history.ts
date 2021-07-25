@@ -18,9 +18,8 @@ class HistoryModel implements HistoryInterface {
 	private engine: EngineInterface;
 	private currentAction: Operation = {};
 	private currentActionIndex: number = 0;
-	private holded: boolean = false;
 	private locked: boolean = false;
-	private holdTimer?: NodeJS.Timeout;
+	private cacheTimer?: NodeJS.Timeout;
 	private lockTimer?: NodeJS.Timeout;
 
 	constructor(engine: EngineInterface) {
@@ -113,15 +112,7 @@ class HistoryModel implements HistoryInterface {
 			}
 		}
 	}
-	/**
-	 * 多少毫秒内的动作保持为一个历史片段
-	 * @param time 毫秒
-	 */
-	hold(time: number = 10) {
-		this.holded = true;
-		if (this.holdTimer) clearTimeout(this.holdTimer);
-		this.holdTimer = setTimeout(() => this.releaseHold(), time);
-	}
+
 	/**
 	 * 多少毫秒内的动作将不作为历史记录
 	 * @param time 默认10毫秒
@@ -130,10 +121,6 @@ class HistoryModel implements HistoryInterface {
 		this.locked = true;
 		if (this.lockTimer) clearTimeout(this.lockTimer);
 		this.lockTimer = setTimeout(() => this.releaseLock(), time);
-	}
-
-	releaseHold() {
-		this.holded = false;
 	}
 
 	releaseLock() {
@@ -148,8 +135,11 @@ class HistoryModel implements HistoryInterface {
 	/**
 	 * 将后续操作暂时缓存，不会同步到协同服务端，不写入历史记录
 	 */
-	startCache() {
+	startCache(time?: number) {
 		this.engine.ot.startMutationCache();
+		if (time === undefined) return;
+		if (this.cacheTimer) clearTimeout(this.cacheTimer);
+		this.cacheTimer = setTimeout(() => this.submitCache(), time);
 	}
 	/**
 	 * 将暂时缓存的操作提交，同步到协同服务端，写入历史记录
@@ -191,25 +181,19 @@ class HistoryModel implements HistoryInterface {
 		ops.forEach((op) => {
 			if (!isCursorOp(op)) {
 				isSave = true;
-				if (this.holded && this.actionOps.length > 0)
-					this.actionOps[this.actionOps.length - 1].ops?.push(op);
-				else {
-					this.currentAction.self = true;
-					if (!this.currentAction.ops) this.currentAction.ops = [];
+				this.currentAction.self = true;
+				if (!this.currentAction.ops) this.currentAction.ops = [];
 
-					if (!this.currentAction.startRangePath) {
-						this.currentAction.startRangePath =
-							this.getRangePathBeforeCommand();
-					}
-					const lastOp =
-						this.currentAction.ops[
-							this.currentAction.ops.length - 1
-						];
-					if (lastOp && isReverseOp(op, lastOp)) {
-						this.currentAction.ops.pop();
-					} else {
-						this.currentAction.ops.push(op);
-					}
+				if (!this.currentAction.startRangePath) {
+					this.currentAction.startRangePath =
+						this.getRangePathBeforeCommand();
+				}
+				const lastOp =
+					this.currentAction.ops[this.currentAction.ops.length - 1];
+				if (lastOp && isReverseOp(op, lastOp)) {
+					this.currentAction.ops.pop();
+				} else {
+					this.currentAction.ops.push(op);
 				}
 			}
 		});

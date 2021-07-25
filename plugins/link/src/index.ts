@@ -44,6 +44,9 @@ export default class extends InlinePlugin<Options> {
 			this.toolbar = new Toolbar(editor);
 		}
 		editor.on('paser:html', (node) => this.parseHtml(node));
+		editor.on('select', () => {
+			this.query();
+		});
 		editor.language.add(locales);
 	}
 
@@ -74,16 +77,23 @@ export default class extends InlinePlugin<Options> {
 		}
 	}
 
-	queryState() {
+	query() {
 		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
-		const inlineNode = change.inlines.find((node) => this.isSelf(node));
+		const { change, inline } = this.editor;
+		const range = change.getRange();
+		const inlineNode = inline
+			.findInlines(range)
+			.find((node) => this.isSelf(node));
 		this.toolbar?.hide(inlineNode);
-		if (inlineNode) {
-			if (change.getRange().collapsed) this.toolbar?.show(inlineNode);
+		if (inlineNode && !inlineNode.isCard()) {
+			if (range.collapsed) this.toolbar?.show(inlineNode);
 			return true;
 		}
 		return false;
+	}
+
+	queryState() {
+		return this.query();
 	}
 
 	triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface) {
@@ -119,7 +129,7 @@ export default class extends InlinePlugin<Options> {
 		const text = node.text();
 		if (!text) return;
 
-		const reg = /([^!]\[(.+?)\]\(([\S]+?)\))/;
+		const reg = /(\[(.+?)\]\(([\S]+?)\))/;
 		let match = reg.exec(text);
 		if (!match) return;
 
@@ -130,17 +140,26 @@ export default class extends InlinePlugin<Options> {
 			(match = reg.exec(textNode.textContent))
 		) {
 			//从匹配到的位置切断
-			let regNode = textNode.splitText(match.index + 1);
+			let regNode = textNode.splitText(match.index);
+			if (
+				textNode.textContent.endsWith('!') ||
+				match[2].startsWith('!')
+			) {
+				newText += textNode.textContent;
+				textNode = regNode.splitText(match[0].length);
+				newText += regNode.textContent;
+				continue;
+			}
 			newText += textNode.textContent;
 			//从匹配结束位置分割
-			textNode = regNode.splitText(match[0].length - 1);
+			textNode = regNode.splitText(match[0].length);
 
 			const text = match[2];
 			const url = match[3];
 
 			const inlineNode = $(`<${this.tagName} />`);
 			this.setAttributes(inlineNode, '_blank', url);
-			inlineNode.text(!!text ? text : url);
+			inlineNode.html(!!text ? text : url);
 
 			newText += inlineNode.get<Element>()?.outerHTML;
 		}

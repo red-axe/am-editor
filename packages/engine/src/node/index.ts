@@ -287,6 +287,7 @@ class NodeModel implements NodeModelInterface {
 		//要合并的节点是文本，就直接追加
 		if (target.isText()) {
 			source.append(target);
+			this.removeSide(source);
 			return;
 		}
 		const { node, block, mark } = this.editor;
@@ -354,6 +355,7 @@ class NodeModel implements NodeModelInterface {
 				next = next.next();
 			}
 		}
+		this.removeSide(source);
 	}
 
 	/**
@@ -551,10 +553,8 @@ class NodeModel implements NodeModelInterface {
 		const nodeApi = this.editor.node;
 		//第一个子节点
 		let childNode = node.first();
-		const rootElement = root.isFragment
-			? root.get()?.parentNode
-			: root.get();
-		const tempNode = node.isFragment
+		const rootElement = root.fragment ? root.fragment : root.get();
+		const tempNode = node.fragment
 			? $('<p />')
 			: nodeApi.clone(node, false);
 		while (childNode) {
@@ -566,7 +566,7 @@ class NodeModel implements NodeModelInterface {
 			}
 			//如果当前是块级标签，递归循环
 			else if (this.isBlock(childNode)) {
-				this.flatten(childNode, $(rootElement || []));
+				childNode = this.flatten(childNode, $(rootElement || []));
 			} else {
 				const cloneNode = nodeApi.clone(tempNode, false);
 				const isLI = 'li' === cloneNode.name;
@@ -575,6 +575,9 @@ class NodeModel implements NodeModelInterface {
 					nextNode = childNode.next();
 
 					const isBR = 'br' === childNode.name && !isLI;
+					if (isBR && childNode.parent()?.isRoot()) {
+						cloneNode.append(childNode);
+					}
 					//判断当前节点末尾是否是换行符，有换行符就跳出
 					if (childNode.isText()) {
 						let text = childNode.text();
@@ -627,11 +630,20 @@ class NodeModel implements NodeModelInterface {
 					cloneNode.append($('<br />'));
 				}
 			}
+			if (childNode.name === 'p' && childNode.children().length === 0) {
+				childNode.append($('<br />'));
+			}
+			this.removeSide(childNode);
 			childNode = nextNode;
+		}
+		// 重新更新框架的引用
+		if (node.fragment) {
+			node = $(node.fragment);
 		}
 		//如果没有子节点了，就移除当前这个节点
 		childNode = node.first();
 		if (!childNode) node.remove();
+		return node;
 	}
 
 	/**
@@ -639,8 +651,9 @@ class NodeModel implements NodeModelInterface {
 	 * @param node 节点
 	 */
 	normalize(node: NodeInterface) {
-		this.flatten(node);
+		node = this.flatten(node);
 		this.mergeAdjacent(node);
+		return node;
 	}
 
 	/**

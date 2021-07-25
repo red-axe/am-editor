@@ -265,7 +265,6 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 
 	onChange = () => {
 		if (!isEngine(this.editor)) return;
-		this.editor.history.hold();
 		this.conltrollBar.refresh();
 		this.selection.render('change');
 		const value = this.getTableValue();

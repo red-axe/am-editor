@@ -44,6 +44,9 @@ export default class extends InlinePlugin<Options> {
 			this.toolbar = new Toolbar(editor);
 		}
 		editor.on('paser:html', (node) => this.parseHtml(node));
+		editor.on('select', () => {
+			this.query();
+		});
 		editor.language.add(locales);
 	}
 
@@ -74,16 +77,23 @@ export default class extends InlinePlugin<Options> {
 		}
 	}
 
-	queryState() {
+	query() {
 		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
-		const inlineNode = change.inlines.find((node) => this.isSelf(node));
+		const { change, inline } = this.editor;
+		const range = change.getRange();
+		const inlineNode = inline
+			.findInlines(range)
+			.find((node) => this.isSelf(node));
 		this.toolbar?.hide(inlineNode);
-		if (inlineNode) {
-			if (change.getRange().collapsed) this.toolbar?.show(inlineNode);
+		if (inlineNode && !inlineNode.isCard()) {
+			if (range.collapsed) this.toolbar?.show(inlineNode);
 			return true;
 		}
 		return false;
+	}
+
+	queryState() {
+		return this.query();
 	}
 
 	triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface) {

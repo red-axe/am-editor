@@ -32,6 +32,7 @@ class ShitEnter implements TypingHandleInterface {
 	trigger(event: KeyboardEvent): void {
 		const { change, inline, block } = this.engine;
 		event.preventDefault();
+		change.cacheRangeBeforeCommand();
 		const range = change.getRange();
 		const br = $('<br />');
 		inline.insert(br);

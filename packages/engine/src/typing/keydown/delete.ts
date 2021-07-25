@@ -88,6 +88,7 @@ class Delete implements TypingHandleInterface {
 
 	trigger(event: KeyboardEvent) {
 		const { change } = this.engine;
+		change.cacheRangeBeforeCommand();
 		const range = change.getRange();
 		if (!range.collapsed) {
 			event.preventDefault();

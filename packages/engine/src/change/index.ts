@@ -268,6 +268,14 @@ class ChangeModel implements ChangeInterface {
 		return this.event.isSelecting;
 	}
 
+	initValue() {
+		const node = $('<p><br /></p>');
+		this.engine.container.empty().append(node);
+		const range = this.getRange();
+		range.select(node, true).collapse(false);
+		this.apply(range);
+	}
+
 	setValue(
 		value: string,
 		onParse?: (node: Node) => void,
@@ -290,9 +298,8 @@ class ChangeModel implements ChangeInterface {
 			card,
 		} = this.engine;
 		if (value === '') {
-			range.setStart(container[0], 0);
-			range.collapse(true);
-			this.select(range);
+			this.initValue();
+			return;
 		} else {
 			const parser = new Parser(value, this.engine, (root) => {
 				mark.removeEmptyMarks(root);
@@ -397,8 +404,14 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	isEmpty() {
-		const { container, node } = this.engine;
-		return node.isEmptyWithTrim(container);
+		const { container, node, schema } = this.engine;
+		const tags = schema.getAllowInTags();
+		return (
+			node.isEmptyWithTrim(container) &&
+			!container
+				.allChildren()
+				.some((child) => tags.includes(child.nodeName.toLowerCase()))
+		);
 	}
 
 	private repairInput(event: InputEvent, range: RangeInterface) {
@@ -868,7 +881,7 @@ class ChangeModel implements ChangeInterface {
 					)
 					.then(() => {
 						textNode.get<Text>()?.normalize();
-						this.paste(textNode.text());
+						this.paste(textNode.text(), undefined, false);
 					})
 					.catch(() => {});
 			}
@@ -946,29 +959,36 @@ class ChangeModel implements ChangeInterface {
 			triggerOT?: boolean;
 			callback?: (count: number) => void;
 		},
+		followActiveMark: boolean = true,
 	) {
 		const fragment = new Paste(source, this.engine).normalize();
 		this.engine.trigger('paste:before', fragment);
-		this.insertFragment(fragment, (range) => {
-			this.engine.trigger('paste:insert', range);
-			const selection = range.createSelection();
-			this.engine.card.render(undefined, {
-				enableAsync:
-					options?.enableAsync === undefined
-						? true
-						: options.enableAsync,
-				triggerOT:
-					options?.triggerOT === undefined ? true : options.triggerOT,
-				callback: (count) => {
-					selection.move();
-					range.scrollRangeIntoView();
-					this.apply(range);
-					if (options?.callback) {
-						options.callback(count);
-					}
-				},
-			});
-		});
+		this.insertFragment(
+			fragment,
+			(range) => {
+				this.engine.trigger('paste:insert', range);
+				const selection = range.createSelection();
+				this.engine.card.render(undefined, {
+					enableAsync:
+						options?.enableAsync === undefined
+							? true
+							: options.enableAsync,
+					triggerOT:
+						options?.triggerOT === undefined
+							? true
+							: options.triggerOT,
+					callback: (count) => {
+						selection.move();
+						range.scrollRangeIntoView();
+						this.apply(range);
+						if (options?.callback) {
+							options.callback(count);
+						}
+					},
+				});
+			},
+			followActiveMark,
+		);
 
 		this.engine.trigger('paste:after');
 	}
@@ -994,12 +1014,14 @@ class ChangeModel implements ChangeInterface {
 	 * 插入片段
 	 * @param fragment 片段
 	 * @param callback 插入后的回调函数
+	 * @param followActiveMark 删除后空标签是否跟随当前激活的mark样式
 	 */
 	insertFragment(
 		fragment: DocumentFragment,
 		callback: (range: RangeInterface) => void = () => {},
+		followActiveMark: boolean = true,
 	) {
-		const { block, list, card, schema, mark } = this.engine;
+		const { block, list, card, schema, mark, inline } = this.engine;
 		const nodeApi = this.engine.node;
 		const range = this.getSafeRange();
 		const firstBlock = block.closest(range.startNode);
@@ -1013,13 +1035,18 @@ class ChangeModel implements ChangeInterface {
 		const childNodes = fragment.childNodes;
 		const firstNode = $(fragment.firstChild || []);
 		if (!isCollapsed) {
-			this.deleteContent(range, onlyOne || !isBlockLast);
+			this.deleteContent(
+				range,
+				onlyOne || !isBlockLast,
+				followActiveMark,
+			);
 		}
 
 		const apply = (range: RangeInterface) => {
 			block.merge(range);
 			list.merge(undefined, range);
 			mark.merge(range);
+			inline.normal(range);
 			if (callback) callback(range);
 			this.apply(range);
 		};
@@ -1027,10 +1054,21 @@ class ChangeModel implements ChangeInterface {
 			apply(range);
 			return;
 		}
+		// 第一个子节点不是block节点就追加到当前节点下
+		let startRange: { node: NodeInterface; offset: number } | undefined =
+			undefined;
 		if (!nodeApi.isBlock(firstNode) && !firstNode.isCard()) {
-			range.shrinkToElementNode().insertNode(fragment);
-			apply(range);
-			return;
+			range.shrinkToElementNode().insertNode(firstNode);
+			if (childNodes.length === 0) {
+				apply(range);
+				return;
+			} else {
+				startRange = {
+					node: range.startNode,
+					offset: range.startOffset,
+				};
+				range.collapse(false);
+			}
 		}
 		range.deepCut();
 		const startNode =
@@ -1152,16 +1190,19 @@ class ChangeModel implements ChangeInterface {
 			/**range
 				.select(prevNode, true)
 				.shrinkToElementNode()
-				.collapse(false);**/
+				.collapse(false);
 			if (prevNode && nodeApi.isEmpty(prevNode)) {
 				removeEmptyNode(prevNode);
 			}
 			if (nextNode && nodeApi.isEmpty(nextNode)) {
 				removeEmptyNode(nextNode);
-			} else if (prevNode && isSameListChild(prevNode, nextNode)) {
+			} else **/ if (prevNode && isSameListChild(prevNode, nextNode)) {
 				nodeApi.merge(prevNode, nextNode, false);
 				removeEmptyNode(nextNode);
 			}
+		}
+		if (startRange) {
+			range.setStart(startRange.node, startRange.offset);
 		}
 		apply(range);
 	}
@@ -1170,40 +1211,59 @@ class ChangeModel implements ChangeInterface {
 	 * 删除内容
 	 * @param range 光标，默认获取当前光标
 	 * @param isDeepMerge 删除后是否合并
+	 * @param followActiveMark 删除后空标签是否跟随当前激活的mark样式
 	 */
-	deleteContent(range?: RangeInterface, isDeepMerge?: boolean) {
+	deleteContent(
+		range?: RangeInterface,
+		isDeepMerge?: boolean,
+		followActiveMark: boolean = true,
+	) {
 		const safeRange = range || this.getSafeRange();
 		if (safeRange.collapsed) {
+			if (this.isEmpty()) this.initValue();
 			return;
 		}
-		const { mark, inline, list } = this.engine;
+		const { mark, inline } = this.engine;
 		const nodeApi = this.engine.node;
 		const blockApi = this.engine.block;
 		let cloneRange = safeRange.cloneRange();
 		cloneRange.collapse(true);
-		const activeMarks = mark.findMarks(cloneRange);
-		safeRange.enlargeToElementNode();
+		const activeMarks = followActiveMark ? mark.findMarks(cloneRange) : [];
+		safeRange.enlargeToElementNode(
+			safeRange.commonAncestorNode.isText() ? false : true,
+		);
 		// 获取上面第一个 Block
-		const block = blockApi.closest(safeRange.startNode);
+		const block = blockApi.closest(
+			safeRange
+				.cloneRange()
+				.shrinkToElementNode()
+				.shrinkToTextNode()
+				.enlargeToElementNode().startNode,
+		);
 		// 获取的 block 超出编辑范围
-		if (!block.isEditable() && !block.inEditor()) {
-			if (!range) this.apply(safeRange);
+		if (!block.inEditor()) {
+			if (this.isEmpty()) this.initValue();
+			else if (!range) this.apply(safeRange);
 			return;
 		}
 		// 先删除范围内的所有内容
 		safeRange.extractContents();
 		safeRange.collapse(true);
 		// 后续处理
-		const { startNode, startOffset } = safeRange;
+		const { startNode } = safeRange
+			.shrinkToElementNode()
+			.shrinkToTextNode()
+			.enlargeToElementNode();
 		// 只删除了文本，不做处理
-		if (startNode.isText()) {
-			if (!range) this.apply(safeRange);
+		if (startNode.isText() || !block.inEditor()) {
+			if (this.isEmpty()) this.initValue();
+			else if (!range) this.apply(safeRange);
 			return;
 		}
 
-		const prevNode = startNode[0].childNodes[startOffset - 1];
-		const nextNode = startNode[0].childNodes[startOffset];
-		let isEmptyNode = startNode[0].childNodes.length === 0;
+		const prevNode = block;
+		const nextNode = startNode;
+		let isEmptyNode = startNode.children().length === 0;
 		if (!isEmptyNode) {
 			const firstChild = startNode[0].firstChild!;
 			if (
@@ -1230,7 +1290,8 @@ class ChangeModel implements ChangeInterface {
 				.shrinkToElementNode()
 				.shrinkToTextNode();
 			safeRange.collapse(false);
-			if (!range) this.apply(safeRange);
+			if (this.isEmpty()) this.initValue();
+			else if (!range) this.apply(safeRange);
 			return;
 		}
 		//深度合并
@@ -1239,6 +1300,7 @@ class ChangeModel implements ChangeInterface {
 			prevNode: NodeInterface,
 			nextNode: NodeInterface,
 			marks: Array<NodeInterface>,
+			isDeepMerge: boolean = false,
 		) => {
 			if (
 				nodeApi.isBlock(prevNode) &&
@@ -1247,9 +1309,13 @@ class ChangeModel implements ChangeInterface {
 			) {
 				range.select(prevNode, true);
 				range.collapse(false);
-				const selection = range.createSelection();
+				const selection = range
+					.shrinkToElementNode()
+					.shrinkToTextNode()
+					.createSelection();
 				nodeApi.merge(prevNode, nextNode);
 				selection.move();
+				range.enlargeToElementNode(true);
 				const prev = range.getPrevNode();
 				const next = range.getNextNode();
 				// 合并之后变成空 Block
@@ -1262,7 +1328,13 @@ class ChangeModel implements ChangeInterface {
 					range.collapse(false);
 				}
 
-				if (prev && next && !prev.isCard() && !next.isCard()) {
+				if (
+					prev &&
+					next &&
+					!prev.isCard() &&
+					!next.isCard() &&
+					isDeepMerge
+				) {
 					deepMergeNode(range, prev, next, marks);
 				}
 			}
@@ -1272,10 +1344,17 @@ class ChangeModel implements ChangeInterface {
 			nextNode &&
 			nodeApi.isBlock(prevNode) &&
 			nodeApi.isBlock(nextNode) &&
-			isDeepMerge
+			!prevNode.equal(nextNode)
 		) {
-			deepMergeNode(safeRange, $(prevNode), $(nextNode), activeMarks);
+			deepMergeNode(
+				safeRange,
+				prevNode,
+				nextNode,
+				activeMarks,
+				isDeepMerge,
+			);
 		}
+
 		startNode.children().each((node) => {
 			const domNode = $(node);
 			if (
@@ -1306,8 +1385,8 @@ class ChangeModel implements ChangeInterface {
 				safeRange.collapse(false);
 			}
 		}
-
-		if (!range) this.apply(safeRange);
+		if (this.isEmpty()) this.initValue();
+		else if (!range) this.apply(safeRange);
 	}
 
 	/**
@@ -1329,7 +1408,7 @@ class ChangeModel implements ChangeInterface {
 				this.engine.node.html(parent, '<br />');
 				range.select(parent, true).collapse(false);
 			}
-			this.select(range);
+			this.apply(range);
 		}
 	}
 

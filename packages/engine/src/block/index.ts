@@ -68,7 +68,7 @@ class Block implements BlockModelInterface {
 				? startNode
 				: startNode.children().eq(startOffset - 1);
 		if (!node) return;
-		const blockNode = block.closest(node);
+		const blockNode = this.closest(node);
 		if (!editor.node.isRootBlock(blockNode)) return;
 		const text = block.getLeftText(blockNode);
 		return !Object.keys(editor.plugin.components).some((pluginName) => {
@@ -1040,7 +1040,7 @@ class Block implements BlockModelInterface {
 		const mergeTags = schema.getCanMergeTags();
 		//获取父级节点
 		let parentNode = domNode[0].parentNode;
-		const rootElement = root.isFragment ? root[0].parentNode : root[0];
+		const rootElement = root.fragment ? root[0].parentNode : root[0];
 		//在根节点内循环
 		while (parentNode !== rootElement) {
 			const domParentNode = $(parentNode || []);

@@ -45,13 +45,14 @@ class NodeEntry implements NodeInterface {
 	type: number | undefined;
 	window: Window | null = null;
 	display: string | undefined;
-	isFragment: boolean = false;
+	fragment?: DocumentFragment;
 	[n: number]: Node;
 
 	constructor(nodes: Node | NodeList | Array<Node>, context?: Context) {
 		if (isNode(nodes)) {
-			if (nodes.nodeType === getWindow().Node.DOCUMENT_FRAGMENT_NODE)
-				this.isFragment = true;
+			if (nodes.nodeType === getWindow().Node.DOCUMENT_FRAGMENT_NODE) {
+				this.fragment = nodes as DocumentFragment;
+			}
 			nodes = [nodes];
 		}
 
@@ -275,7 +276,7 @@ class NodeEntry implements NodeInterface {
 	 * @return NodeEntry 子节点
 	 */
 	first(): NodeInterface | null {
-		if (this.isFragment) return this.eq(0) || null;
+		if (this.fragment) return this.eq(0) || null;
 		const node = this.length === 0 ? null : this.get()?.firstChild;
 		return node ? new NodeEntry(node) : null;
 	}
@@ -285,7 +286,7 @@ class NodeEntry implements NodeInterface {
 	 * @return NodeEntry 子节点
 	 */
 	last(): NodeInterface | null {
-		if (this.isFragment) return this.eq(this.length - 1) || null;
+		if (this.fragment) return this.eq(this.length - 1) || null;
 		const node = this.length === 0 ? null : this.get()?.lastChild;
 		return node ? new NodeEntry(node) : null;
 	}
@@ -809,8 +810,8 @@ class NodeEntry implements NodeInterface {
 	 * @return 当前实例
 	 */
 	prepend(selector: Selector): NodeInterface {
+		const nodes = $(selector, this.context);
 		this.each((node) => {
-			const nodes = $(selector, this.context);
 			if (node.firstChild) {
 				node.insertBefore(nodes[0], node.firstChild);
 			} else {
@@ -826,8 +827,8 @@ class NodeEntry implements NodeInterface {
 	 * @return 当前实例
 	 */
 	append(selector: Selector): NodeInterface {
+		const nodes = $(selector, this.context);
 		this.each((node) => {
-			const nodes = $(selector, this.context);
 			for (let i = 0; i < nodes.length; i++) {
 				const child = nodes[i];
 				if (typeof selector === 'string') {

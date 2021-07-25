@@ -567,10 +567,18 @@ export default class extends Plugin<Options> {
 		const { isRemote } = this.options;
 		const text = node.text();
 		if (!text) return;
-
-		const reg = /(!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\))/;
-
+		// 带跳转链接的图片
+		let reg =
+			/(\[!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)\]\(([\S]+?)\))/;
 		let match = reg.exec(text);
+		let isLink = true;
+		if (!match) {
+			// 无跳转链接的图片
+			reg = /(!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\))/;
+			match = reg.exec(text);
+			isLink = false;
+		}
+
 		if (!match) return;
 
 		let newText = '';
@@ -588,6 +596,7 @@ export default class extends Plugin<Options> {
 
 			const alt = match[2];
 			const src = match[3];
+			const link = isLink ? match[4] : '';
 
 			const cardNode = card.replaceNode($(regNode), 'image', {
 				src,
@@ -597,6 +606,12 @@ export default class extends Plugin<Options> {
 						: 'done',
 				alt,
 				percent: 0,
+				link: !!link
+					? {
+							href: link,
+							target: isRemote && isRemote(link) ? '_blank' : '',
+					  }
+					: undefined,
 			});
 			regNode.remove();
 

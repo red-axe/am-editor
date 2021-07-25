@@ -8,6 +8,7 @@ export type PluginOptions = {
 	 * 是否禁用，默认不禁用。在默认不指定的情况下，编辑器为 readonly 的时候全部禁用
 	 */
 	disabled?: boolean;
+	[key: string]: any;
 	/**
 	 * TODO:在当前插件状态下，禁用的插件名称集合，如果禁用全部卡片插件，指定名称为 card 即可，但不包扩可编辑器卡片，如果还需要包括可编辑器卡片，指定名称 card-editable
 	 */

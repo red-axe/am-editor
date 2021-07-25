@@ -86,6 +86,17 @@ class Range implements RangeInterface {
 
 	insertNode(node: Node | NodeInterface): void {
 		if (isNodeEntry(node)) node = node[0];
+		const startNode = this.startNode;
+		if (
+			!$(node).isCursor() &&
+			startNode.name === 'p' &&
+			startNode.children().length === 1 &&
+			startNode.first()?.name === 'br'
+		) {
+			startNode.first()?.remove();
+		} else if (startNode.name === 'br') {
+			startNode.remove();
+		}
 		return this.base.insertNode(node);
 	}
 
@@ -301,7 +312,7 @@ class Range implements RangeInterface {
 					if (!parent || (!toBlock && nodeApi.isBlock(parent))) {
 						break;
 					}
-					if (!parent.inEditor()) {
+					if (!parent.inEditor() || parent.isEditable()) {
 						break;
 					}
 					domNode = parent;
@@ -317,7 +328,7 @@ class Range implements RangeInterface {
 					if (!parent || (!toBlock && nodeApi.isBlock(parent))) {
 						break;
 					}
-					if (!parent.inEditor()) {
+					if (!parent.inEditor() || parent.isEditable()) {
 						break;
 					}
 					domNode = parent;
@@ -738,7 +749,7 @@ class Range implements RangeInterface {
 		const range = this.cloneRange();
 		const node = range.commonAncestorNode;
 		if (!node.isRoot() && !node.inEditor()) return [];
-		range.shrinkToTextNode();
+		range.shrinkToElementNode().shrinkToTextNode();
 
 		const getPath = (node: NodeInterface, offset: number): Path => {
 			let domNode: NodeInterface | undefined = node;

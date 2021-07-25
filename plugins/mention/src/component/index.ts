@@ -88,18 +88,16 @@ class Mention extends Card<MentionValue> {
 			data: MentionItem[],
 			bindItem: (
 				node: NodeInterface,
-				name: string,
-				key?: string,
+				data: { [key: string]: string },
 			) => NodeInterface,
 		) => Promise<string | NodeInterface | void>,
 	) {
 		CollapseComponent.render = fun;
 	}
 
-	static onSelect?: (
-		key: string,
-		name: string,
-	) => void | { [key: string]: string };
+	static onSelect?: (data: {
+		[key: string]: string;
+	}) => void | { [key: string]: string };
 
 	/**
 	 * 自定义渲染列表项
@@ -135,10 +133,10 @@ class Mention extends Card<MentionValue> {
 			onCancel: () => {
 				this.changeToText();
 			},
-			onSelect: (_, key, name) => {
+			onSelect: (_, data: { [key: string]: string }) => {
 				let newValue = {};
 				if (Mention.onSelect) {
-					newValue = Mention.onSelect(key, name) || {};
+					newValue = Mention.onSelect(data) || {};
 					delete newValue['id'];
 				}
 				const { card } = this.editor;
@@ -147,8 +145,7 @@ class Mention extends Card<MentionValue> {
 				this.#keyword?.remove();
 				card.focus(this, false);
 				const newCard = card.insert(Mention.cardName, {
-					key,
-					name,
+					...data,
 					...newValue,
 				});
 				setTimeout(() => {

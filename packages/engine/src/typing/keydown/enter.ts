@@ -29,6 +29,7 @@ class Enter implements TypingHandleInterface {
 
 	trigger(event: KeyboardEvent) {
 		const { change } = this.engine;
+		change.cacheRangeBeforeCommand();
 		const range = change.getRange();
 		// 选区选中最后的节点
 		const block = this.engine.block.closest(range.endNode);

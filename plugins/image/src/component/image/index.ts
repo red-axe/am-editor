@@ -100,6 +100,7 @@ class Image {
 	maxWidth: number;
 	rate: number = 1;
 	isLoad: boolean = false;
+	message: string | undefined;
 
 	constructor(editor: EditorInterface, options: Options) {
 		this.editor = editor;
@@ -120,6 +121,7 @@ class Image {
 		this.maximize = this.root.find('.data-image-maximize');
 		this.maxWidth = this.getMaxWidth();
 		this.pswp = pswp || new Pswp(this.editor);
+		this.message = this.options.message;
 		pswp = this.pswp;
 	}
 
@@ -477,8 +479,18 @@ class Image {
 		//阅读模式不展示错误
 		const { container } = this.options;
 		if (this.status === 'error' && isEngine(this.editor)) {
+			this.root = $(
+				this.renderTemplate(
+					this.message ||
+						this.editor.language.get<string>(
+							'image',
+							'uploadError',
+						),
+				),
+			);
 			this.bindErrorEvent(this.root);
 			container.empty().append(this.root);
+			this.progress.remove();
 			return;
 		}
 		if (this.status === 'uploading') {

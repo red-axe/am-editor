@@ -73,7 +73,14 @@ const EditorComponent: React.FC<EditorProps> = ({
 	/**
 	 * 60秒内无更改自动保存
 	 */
-	const autoSave = debounce(save, 60000);
+	const autoSave = useCallback(debounce(save, 60000), [save]);
+
+	useEffect(() => {
+		window.addEventListener('beforeunload', save);
+		return () => {
+			window.removeEventListener('beforeunload', save);
+		};
+	}, [save]);
 
 	const engineProps: EngineProps = {
 		...props,

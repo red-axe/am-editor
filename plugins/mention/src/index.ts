@@ -17,7 +17,9 @@ import { MentionItem } from './types';
 export interface Options extends PluginOptions {
 	defaultData?: Array<MentionItem>;
 	onSearch?: (keyword: string) => Promise<Array<MentionItem>>;
-	onSelect?: (key: string, name: string) => void | { [key: string]: string };
+	onSelect?: (data: {
+		[key: string]: string;
+	}) => void | { [key: string]: string };
 	onClick?: (node: NodeInterface, data: { [key: string]: string }) => void;
 	onMouseEnter?: (
 		node: NodeInterface,
@@ -28,8 +30,7 @@ export interface Options extends PluginOptions {
 		data: MentionItem[],
 		bindItem: (
 			node: NodeInterface,
-			name: string,
-			key?: string,
+			data: { [key: string]: string },
 		) => NodeInterface,
 	) => Promise<string | NodeInterface | void>;
 	onRenderItem?: (

@@ -27,6 +27,6 @@ export default (
 		isNode(selector) &&
 		selector.nodeType === getWindow().Node.DOCUMENT_FRAGMENT_NODE
 	)
-		entry.isFragment = true;
+		entry.fragment = selector as DocumentFragment;
 	return entry;
 };

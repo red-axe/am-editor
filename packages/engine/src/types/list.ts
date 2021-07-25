@@ -85,7 +85,7 @@ export interface ListModelInterface {
 	/**
 	 * 将选中列表项列表分割出来单独作为一个列表
 	 */
-	split(): void;
+	split(range?: RangeInterface): void;
 	/**
 	 * 合并列表
 	 * @param blocks 节点集合，默认为当前选区的blocks

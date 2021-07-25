@@ -98,16 +98,16 @@ class Mark implements MarkModelInterface {
 	/**
 	 * 获取最近的 Mark 节点，找不到返回 node
 	 */
-	closest(node: NodeInterface) {
+	closest(source: NodeInterface) {
 		const nodeApi = this.editor.node;
-		while (node && node.parent() && !nodeApi.isBlock(node)) {
-			if (node.isEditable()) break;
+		let node = source.parent();
+		while (node && !node.isEditable() && !nodeApi.isBlock(node)) {
 			if (nodeApi.isMark(node)) return node;
 			const parentNode = node.parent();
 			if (!parentNode) break;
 			node = parentNode;
 		}
-		return node;
+		return source;
 	}
 	/**
 	 * 获取向上第一个非 Mark 节点
@@ -875,6 +875,7 @@ class Mark implements MarkModelInterface {
 		if (marks.length === 0) {
 			return;
 		}
+		const selection = safeRange.shrinkToElementNode().createSelection();
 		const mergeMarks = (marks: Array<NodeInterface>) => {
 			marks.forEach((mark) => {
 				const prevMark = mark.prev();
@@ -902,21 +903,13 @@ class Mark implements MarkModelInterface {
 				}
 
 				if (prevMark && this.compare(prevMark, mark, true)) {
-					const selection = safeRange
-						.shrinkToElementNode()
-						.createSelection();
 					node.merge(prevMark, mark);
-					selection.move();
 					// 原来 mark 已经被移除，重新指向
 					mark = prevMark;
 				}
 
 				if (nextMark && this.compare(nextMark, mark, true)) {
-					const selection = safeRange
-						.shrinkToElementNode()
-						.createSelection();
 					node.merge(mark, nextMark);
-					selection.move();
 				}
 				//合并子级mark
 				const childMarks: Array<NodeInterface> = [];
@@ -932,7 +925,7 @@ class Mark implements MarkModelInterface {
 			});
 		};
 		mergeMarks(marks);
-
+		selection.move();
 		safeRange.addOrRemoveBr();
 		if (!range) change.apply(safeRange);
 	}

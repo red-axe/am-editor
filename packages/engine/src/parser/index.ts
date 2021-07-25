@@ -196,38 +196,7 @@ class Parser implements ParserInterface {
 					return newNode;
 				};
 				//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
-				if (nodeApi.isInline(node) && node.name !== 'br') {
-					const parentInline = inlineApi.closest(node);
-					//不允许嵌套
-					if (
-						!parentInline.equal(node) &&
-						nodeApi.isInline(parentInline)
-					) {
-						nodeApi.unwrap(node);
-					}
-					//不允许放入mark
-					else {
-						const parentMark = markApi.closest(node);
-						if (
-							!parentMark.equal(node) &&
-							nodeApi.isMark(parentMark)
-						) {
-							const cloneMark = parentMark.clone();
-							const inlineMark = node.clone();
-							parentMark.children().each((markChild) => {
-								if (node.equal(markChild)) {
-									nodeApi.wrap(
-										nodeApi.replace(node, cloneMark),
-										inlineMark,
-									);
-								} else {
-									nodeApi.wrap(markChild, cloneMark);
-								}
-							});
-							nodeApi.unwrap(parentMark);
-						}
-					}
-				}
+				inlineApi.normal(node);
 				//当前节点是 mark 节点
 				if (nodeApi.isMark(node)) {
 					//过滤掉当前mark节点属性样式并使用剩下的属性样式组成新的节点
@@ -594,10 +563,7 @@ class Parser implements ParserInterface {
 			},
 			includeCard,
 		);
-		return result
-			.join('')
-			.replace(/\n{2,}/g, '\n')
-			.trim();
+		return result.join('').trim();
 	}
 }
 export default Parser;

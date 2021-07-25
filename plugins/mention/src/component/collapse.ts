@@ -16,7 +16,7 @@ import { MentionItem } from '../types';
 
 export type Options = {
 	onCancel?: () => void;
-	onSelect?: (event: MouseEvent, id: string, name: string) => void;
+	onSelect?: (event: MouseEvent, data: { [key: string]: string }) => void;
 };
 
 export interface CollapseComponentInterface {
@@ -75,8 +75,7 @@ class CollapseComponent implements CollapseComponentInterface {
 		data: MentionItem[],
 		bindItem: (
 			node: NodeInterface,
-			name: string,
-			key?: string,
+			data: { [key: string]: string },
 		) => NodeInterface,
 	) => Promise<string | NodeInterface | void>;
 
@@ -216,9 +215,10 @@ class CollapseComponent implements CollapseComponentInterface {
         </div>`;
 	}
 
-	bindItem = (node: NodeInterface, name: string, key?: string) => {
+	bindItem = (node: NodeInterface, data: { [key: string]: string }) => {
 		const { onSelect } = this.otpions;
 		node.addClass('data-mention-item');
+		const { key, name } = data;
 		if (key) {
 			node.attributes({ 'data-key': escape(key) });
 		} else {
@@ -231,12 +231,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			if (!key) return;
 			event.stopPropagation();
 			event.preventDefault();
-			if (onSelect)
-				onSelect(
-					event,
-					node.attributes('data-key'),
-					node.attributes('data-name'),
-				);
+			if (onSelect) onSelect(event, data);
 		});
 		node.on('mouseenter', () => {
 			if (!key) return;
@@ -295,7 +290,7 @@ class CollapseComponent implements CollapseComponentInterface {
 					: this.renderTemplate(data);
 				if (!result) return;
 
-				body?.append(this.bindItem($(result), data.name, data.key));
+				body?.append(this.bindItem($(result), data));
 			});
 			this.scroll('down');
 		}

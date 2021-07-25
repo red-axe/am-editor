@@ -98,7 +98,7 @@ export default class Paste {
 				this.engine.block.brToBlock(node);
 			}
 			if (node.isText()) {
-				const text = node.text();
+				/**const text = node.text();
 				if (/(\r|\n)+/.test(text)) {
 					if (/^(\r|\n)+$/.test(text)) {
 						node.text('\n');
@@ -109,7 +109,7 @@ export default class Paste {
 						node.before(document.createTextNode(`${text}`));
 					});
 					node.remove();
-				}
+				}**/
 			}
 		});
 		// 第二轮处理
@@ -244,7 +244,7 @@ export default class Paste {
 
 	normalize() {
 		const nodeApi = this.engine.node;
-		const fragment = this.parser();
+		let fragment = this.parser();
 		this.commonNormalize(fragment);
 		const range = this.engine.change.getRange();
 		const root = range.commonAncestorNode;
@@ -285,7 +285,8 @@ export default class Paste {
 			}
 		});
 
-		nodeApi.normalize($(fragment));
+		const node = nodeApi.normalize($(fragment));
+		if (node.fragment) fragment = node.fragment;
 		fragment.normalize();
 		const fragmentNode = $(fragment);
 		const first = fragmentNode.first();

@@ -82,9 +82,9 @@ export interface NodeInterface {
 	 */
 	display: string | undefined;
 	/**
-	 * 是否是片段
+	 * 片段
 	 */
-	isFragment: boolean;
+	fragment?: DocumentFragment;
 	/**
 	 * Node 集合
 	 */
@@ -673,12 +673,12 @@ export interface NodeModelInterface {
 	 * @param node 节点
 	 * @param root 根节点，默认为node节点
 	 */
-	flatten(node: NodeInterface, root?: NodeInterface): void;
+	flatten(node: NodeInterface, root?: NodeInterface): NodeInterface;
 	/**
 	 * 标准化节点
 	 * @param node 节点
 	 */
-	normalize(node: NodeInterface): void;
+	normalize(node: NodeInterface): NodeInterface;
 	/**
 	 * 获取或设置元素节点html文本
 	 * @param {string|undefined} val html文本

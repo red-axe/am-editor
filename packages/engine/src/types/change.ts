@@ -98,6 +98,7 @@ export interface ChangeInterface {
 	combinTextNode(): void;
 	isComposing(): boolean;
 	isSelecting(): boolean;
+	initValue(): void;
 	setValue(
 		value: string,
 		onParse?: (node: Node) => void,
@@ -130,14 +131,24 @@ export interface ChangeInterface {
 	 * 插入片段
 	 * @param fragment 片段
 	 * @param callback 插入后的回调函数
+	 * @param followActiveMark 删除后空标签是否跟随当前激活的mark样式
 	 */
-	insertFragment(fragment: DocumentFragment, callback?: () => void): void;
+	insertFragment(
+		fragment: DocumentFragment,
+		callback?: (range: RangeInterface) => void,
+		followActiveMark?: boolean,
+	): void;
 	/**
 	 * 删除内容
 	 * @param range 光标，默认获取当前光标
 	 * @param isDeepMerge 删除后是否合并
+	 * @param followActiveMark 删除后空标签是否跟随当前激活的mark样式
 	 */
-	deleteContent(range?: RangeInterface, isDeepMerge?: boolean): void;
+	deleteContent(
+		range?: RangeInterface,
+		isDeepMerge?: boolean,
+		followActiveMark?: boolean,
+	): void;
 	/**
 	 * 删除节点，删除后如果是空段落，自动添加 BR
 	 * @param node 要删除的节点

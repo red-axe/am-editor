@@ -104,10 +104,8 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	renderBorder() {
 		const { tableModel } = this;
 		if (!tableModel) return;
-		this.tableRoot
-			?.find('td.table-last-column')
-			.removeClass('table-last-column');
-		this.tableRoot?.find('td.table-last-row').removeClass('table-last-row');
+		//this.tableRoot?.find('td.table-last-column').removeClass('table-last-column');
+		//this.tableRoot?.find('td.table-last-row').removeClass('table-last-row');
 		tableModel.table.forEach((cols, row) => {
 			cols.forEach((cell, col) => {
 				if (!this.table.helper.isEmptyModelCol(cell)) {
@@ -122,9 +120,13 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 					}
 					if (isLastCol) {
 						cell.element.classList.add('table-last-column');
+					} else {
+						cell.element.classList.remove('table-last-column');
 					}
 					if (isLastRow) {
 						cell.element.classList.add('table-last-row');
+					} else {
+						cell.element.classList.remove('table-last-row');
 					}
 				}
 			});

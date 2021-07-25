@@ -135,16 +135,16 @@ class Inline implements InlineModelInterface {
 	/**
 	 * 获取最近的 Inline 节点，找不到返回 node
 	 */
-	closest(node: NodeInterface) {
+	closest(source: NodeInterface) {
 		const nodeApi = this.editor.node;
-		while (node && node.parent() && !nodeApi.isBlock(node)) {
-			if (node.isEditable()) break;
+		let node = source.parent();
+		while (node && !node.isEditable() && !nodeApi.isBlock(node)) {
 			if (nodeApi.isInline(node)) return node;
 			const parentNode = node.parent();
 			if (!parentNode) break;
 			node = parentNode;
 		}
-		return node;
+		return source;
 	}
 	/**
 	 * 获取向上第一个非 Inline 节点
@@ -914,6 +914,55 @@ class Inline implements InlineModelInterface {
 					if (next?.name === 'br') {
 						next.remove();
 					}
+				}
+			}
+		}
+	}
+
+	normal(node: NodeInterface | RangeInterface) {
+		if (isRangeInterface(node)) {
+			const selection = node.shrinkToElementNode().createSelection();
+			const inlines = this.findInlines(node);
+			inlines.forEach((inline) => {
+				this.normal(inline);
+			});
+			selection.move();
+			return;
+		}
+		const nodeApi = this.editor.node;
+		const markApi = this.editor.mark;
+		//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
+		if (nodeApi.isInline(node) && node.name !== 'br') {
+			const parentInline = this.closest(node);
+			//不允许嵌套
+			if (!parentInline.equal(node) && nodeApi.isInline(parentInline)) {
+				nodeApi.unwrap(node);
+			}
+			//不允许放入mark
+			else {
+				const parentMark = markApi.closest(node);
+				if (!parentMark.equal(node) && nodeApi.isMark(parentMark)) {
+					const cloneMark = parentMark.clone();
+					const inlineMark = node.clone();
+					parentMark.children().each((markChild) => {
+						// 零宽字符的文本跳过
+						if (
+							markChild.nodeType === 3 &&
+							/^\u200b$/.test(markChild.textContent || '')
+						) {
+							return;
+						}
+						if (node.equal(markChild)) {
+							nodeApi.wrap(
+								nodeApi.replace(node, cloneMark),
+								inlineMark,
+							);
+							this.repairBoth(inlineMark);
+						} else {
+							nodeApi.wrap(markChild, cloneMark);
+						}
+					});
+					nodeApi.unwrap(parentMark);
 				}
 			}
 		}

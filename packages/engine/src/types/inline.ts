@@ -52,6 +52,11 @@ export interface InlineModelInterface {
 	 * 否则在ot中，可能无法正确的应用inline节点两边&#8203;的更改
 	 */
 	repairRange(range?: RangeInterface): RangeInterface;
+	/**
+	 * 标准化inline节点，不能嵌套在mark标签内，不能嵌套inline标签
+	 * @param node
+	 */
+	normal(node: NodeInterface | RangeInterface): void;
 }
 
 export interface InlineInterface extends ElementPluginInterface {

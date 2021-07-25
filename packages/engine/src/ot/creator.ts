@@ -437,7 +437,7 @@ class Creator extends EventEmitter2 {
 			this.timer = setTimeout(() => {
 				if (!this.engine.change.isComposing()) {
 					if (this.lineStart) {
-						this.engine.history.hold();
+						this.engine.history.startCache(10);
 						this.lineStart = false;
 					}
 					if (this.laterOps) {

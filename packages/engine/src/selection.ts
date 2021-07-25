@@ -162,6 +162,9 @@ class Selection implements SelectionInterface {
 				cursor.remove();
 				_parent![0].normalize();
 			}
+			if (_parent.name === 'p' && _parent.children().length === 0) {
+				_parent.append($('<br />'));
+			}
 			return;
 		}
 		// collapsed = false
@@ -181,6 +184,9 @@ class Selection implements SelectionInterface {
 			this.range.setEndBefore(this.focus);
 			this.focus.remove();
 			parent[0].normalize();
+			if (parent.name === 'p' && parent.children().length === 0) {
+				parent.append($('<br />'));
+			}
 			if (isSafari) {
 				const selection = window.getSelection();
 				selection?.removeAllRanges();
@@ -208,9 +214,16 @@ class Selection implements SelectionInterface {
 				node.get<Element>(),
 			);
 			let isRemove = false;
-			node.traverse(node => {
+			node.traverse((node) => {
 				if (node.equal(focus)) {
+					const parent = node.parent();
 					focus.remove();
+					if (
+						parent?.name === 'p' &&
+						parent.children().length === 0
+					) {
+						parent.append($('<br />'));
+					}
 					isRemove = true;
 					return;
 				}
@@ -226,9 +239,16 @@ class Selection implements SelectionInterface {
 				node.get<Element>(),
 			);
 			let isRemove = false;
-			node.traverse(node => {
+			node.traverse((node) => {
 				if (node.equal(anchor)) {
+					const parent = node.parent();
 					anchor.remove();
+					if (
+						parent?.name === 'p' &&
+						parent.children().length === 0
+					) {
+						parent.append($('<br />'));
+					}
 					isRemove = true;
 					return;
 				}

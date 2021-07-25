@@ -210,7 +210,7 @@ export default class extends ListPlugin<Options> {
 		let nodes: Array<string> = [];
 		rows.forEach((row) => {
 			const match = /^(-\s*)?(\[[\sx]{0,1}\])/.exec(row);
-			if (match) {
+			if (match && !/(\[(.*)\]\(([\S]+?)\))/.test(row)) {
 				const codeLength = match[0].length;
 				const content = row.substr(
 					/^\s+/.test(row.substr(codeLength))

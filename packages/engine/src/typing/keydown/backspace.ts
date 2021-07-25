@@ -29,12 +29,13 @@ class Backspace implements TypingHandleInterface {
 	}
 
 	trigger(event: KeyboardEvent) {
-		const { change } = this.engine;
+		const { change, container } = this.engine;
 		const range = change.getRange();
+		change.cacheRangeBeforeCommand();
 		// 编辑器没有内容
 		if (change.isEmpty()) {
 			event.preventDefault();
-			change.setValue('<p><br /><cursor /></p>');
+			change.initValue();
 			return;
 		}
 
@@ -46,6 +47,7 @@ class Backspace implements TypingHandleInterface {
 			if (lastNode.name === 'br') {
 				event.preventDefault();
 				lastNode.remove();
+				change.apply(range);
 				return;
 			}
 		}
@@ -59,7 +61,8 @@ class Backspace implements TypingHandleInterface {
 		// 范围为展开状态
 		if (!range.collapsed) {
 			event.preventDefault();
-			change.deleteContent();
+			change.deleteContent(range);
+			change.apply(range);
 			return;
 		}
 	}

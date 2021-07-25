@@ -178,45 +178,96 @@ class Table extends Plugin<Options> {
 		)
 			return;
 
-		let text = node.text();
-		if (!text) return;
-
-		const reg = /\|(?:(?:[^\|]+?)\|){2,}/;
-		let match = reg.exec(text);
-		if (!match) return;
-		text = text.replaceAll(/\|\|/g, '|\n|');
-		match = reg.exec(text);
-		if (!match) return;
-		const createTable = (nodes: Array<string>) => {
-			const tableNode = $(`<table>${nodes.join('')}</table>`);
-			return tableNode.get<Element>()?.outerHTML;
-		};
-
-		let newText = '';
-		const rows = text.split(/\n|\r\n/);
-		let nodes: Array<string> = [];
-		rows.forEach((row) => {
-			const match = /^\s*\|(?:(?:[^\|]+?)\|){2,}\s*$/.exec(row);
-			if (match) {
+		const parse = (node: NodeInterface) => {
+			let text = node.text();
+			if (!text) return;
+			// 匹配 |-|-| 或者 -|- 或者 |-|- 或者 -|-|
+			let reg = /\n\s*(\|?(\s*:?-+:?\s*)+\|?)+\s*(\n|$)/;
+			let tbMatch = reg.exec(text);
+			if (!tbMatch || tbMatch[0].indexOf('|') < 0) return;
+			// 文本节点
+			let textNode = node.clone(true).get<Text>()!;
+			// 列数
+			const colCount = tbMatch[0]
+				.split('|')
+				.filter(
+					(cell) => cell.trim() !== '' && cell.includes('-'),
+				).length;
+			// 从匹配出分割
+			let tbRegNode = textNode.splitText(tbMatch.index);
+			// 获取表头
+			const thReg = new RegExp(
+				`(\\|?([^\\|\\n]+)\\|?){${colCount},}\\s*$`,
+			);
+			const headRows = (textNode.textContent || '').split(/\n/);
+			let match = thReg.exec(
+				headRows.length > 0 ? headRows[headRows.length - 1] : '',
+			);
+			if (!match || match[0].indexOf('|') < 0) return;
+			headRows.pop();
+			textNode.splitText(headRows.join('\n').length + match.index);
+			// 拼接之前的文本
+			let regNode = tbRegNode.splitText(tbMatch[0].length);
+			let newText = textNode.textContent || '';
+			// 生成头部td
+			const getCell = (match: RegExpExecArray, count?: number) => {
 				const cols = match[0].split('|');
+				const headeText = match[0].trim().replace(/\n/, '');
+				if (headeText.endsWith('|')) cols.pop();
+				if (headeText.startsWith('|')) cols.shift();
 				const colNodes: Array<string> = [];
-				cols.forEach((col) => {
-					if (col.trim().indexOf('---') === 0) return;
-					colNodes.push(`<td>${col}</td>`);
+				cols.some((col) => {
+					if (count !== undefined && colNodes.length === count)
+						return true;
+					colNodes.push(col);
+					return false;
 				});
-				if (colNodes.length === cols.length)
-					nodes.push(`<tr>${colNodes.join('')}</tr>`);
-			} else if (nodes.length > 0) {
-				newText += createTable(nodes) + '\n' + row + '\n';
-				nodes = [];
-			} else {
-				newText += row + '\n';
+				return colNodes;
+			};
+			const colNodes = getCell(match);
+			// 表头数量不等于列数，不操作
+			if (colNodes.length !== colCount) return;
+			let nodes: Array<string> = [];
+			nodes.push(
+				`<tr>${colNodes.map((col) => `<td>${col}</td>`).join('')}</tr>`,
+			);
+			// 遍历剩下的行
+			const tdReg = new RegExp(
+				`^\\n*(\\|?([^\\|\\n]+)\\|?){1,${colCount}}(?:\\n|$)`,
+			);
+			while (match) {
+				match = tdReg.exec(regNode.textContent || '');
+				if (
+					!match ||
+					match[0].indexOf('|') < 0 ||
+					match[0].startsWith('\n\n')
+				)
+					break;
+				const colNodes = getCell(match, colCount);
+				if (colNodes.length === 0) break;
+				if (colNodes.length < colCount) {
+					while (colCount - colNodes.length > 0) {
+						colNodes.push('');
+					}
+				}
+				nodes.push(
+					`<tr>${colNodes
+						.map((col) => `<td>${col}</td>`)
+						.join('')}</tr>`,
+				);
+				regNode = regNode.splitText(match[0].length);
 			}
-		});
-		if (nodes.length > 0) {
+
+			const createTable = (nodes: Array<string>) => {
+				const tableNode = $(`<table>${nodes.join('')}</table>`);
+				return tableNode.get<Element>()?.outerHTML;
+			};
 			newText += createTable(nodes) + '\n';
-		}
-		node.text(newText);
+			newText += regNode.textContent;
+			node.text(newText);
+			parse(node);
+		};
+		parse(node);
 	}
 }
 

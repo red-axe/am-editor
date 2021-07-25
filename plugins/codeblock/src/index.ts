@@ -222,7 +222,7 @@ export default class extends Plugin<Options> {
 				const node = $(cardNode);
 				const card = this.editor.card.find(node) as CodeBlockComponent;
 				const value = card?.getValue();
-				if (value && value.code) {
+				if (value) {
 					node.empty();
 					const codeEditor = new CodeBlockEditor(this.editor, {});
 

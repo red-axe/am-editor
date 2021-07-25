@@ -38,12 +38,12 @@ class List implements ListModelInterface {
 			const enter = new Enter(this.editor);
 			this.editor.typing
 				.getHandleListener('enter', 'keydown')
-				?.on(event => enter.trigger(event));
+				?.on((event) => enter.trigger(event));
 			//删除事件
 			const backspace = new Backspace(this.editor);
 			this.editor.typing
 				.getHandleListener('backspace', 'keydown')
-				?.on(event => backspace.trigger(event));
+				?.on((event) => backspace.trigger(event));
 		}
 	}
 
@@ -103,7 +103,7 @@ class List implements ListModelInterface {
 	) {
 		const { node } = this.editor;
 		let isSame = true;
-		blocks.forEach(block => {
+		blocks.forEach((block) => {
 			//如果节点内包含了列表节点，则跳过此节点
 			if (
 				['li', 'p'].indexOf(block.name) === -1 &&
@@ -115,11 +115,13 @@ class List implements ListModelInterface {
 				case 'li':
 					//有指定卡片，判断是否是自定义列表项的卡片相同
 					if (card) {
+						let firstChild = block.first();
+						if (firstChild?.isCursor())
+							firstChild = firstChild.next();
 						isSame =
 							isSame &&
 							node.isCustomize(block) &&
-							(block.first()?.attributes(CARD_KEY) || '') ===
-								card;
+							(firstChild?.attributes(CARD_KEY) || '') === card;
 					} else {
 						isSame = isSame && !node.isCustomize(block);
 					}
@@ -139,7 +141,7 @@ class List implements ListModelInterface {
 
 	getPlugins() {
 		const plugins: Array<ListInterface> = [];
-		Object.keys(this.editor.plugin.components).forEach(name => {
+		Object.keys(this.editor.plugin.components).forEach((name) => {
 			const plugin = this.editor.plugin.components[name];
 			if (!!(plugin as ListInterface).isCurrent) {
 				plugins.push(plugin as ListInterface);
@@ -156,7 +158,7 @@ class List implements ListModelInterface {
 		let name = block.name;
 		const getName = (node: NodeInterface) => {
 			let name = '';
-			this.getPlugins().some(plugin => {
+			this.getPlugins().some((plugin) => {
 				if (plugin.isCurrent(node)) {
 					name = (plugin.constructor as PluginEntry).pluginName;
 					return true;
@@ -242,7 +244,7 @@ class List implements ListModelInterface {
 		let indent = 0;
 		const { node } = this.editor;
 		const normalBlock = $('<p />');
-		blocks.forEach(block => {
+		blocks.forEach((block) => {
 			this.unwrapCustomize(block);
 			if (node.isList(block)) {
 				indent = parseInt(block.attributes(this.INDENT_KEY), 10) || 0;
@@ -313,7 +315,7 @@ class List implements ListModelInterface {
 		const lastBlock = range.endNode.closest('li');
 
 		if (
-			!listNodes.some(block => {
+			!listNodes.some((block) => {
 				return block[0] === lastBlock[0];
 			})
 		) {
@@ -325,10 +327,10 @@ class List implements ListModelInterface {
 	/**
 	 * 将选中列表项列表分割出来单独作为一个列表
 	 */
-	split() {
+	split(range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
 		const { change, node } = this.editor;
-		const range = change.getSafeRange();
+		range = range || change.getSafeRange();
 		const blocks = this.normalize();
 		if (
 			blocks.length > 0 &&
@@ -371,7 +373,7 @@ class List implements ListModelInterface {
 
 			if (rightList.length > 0 && afterListElement) {
 				afterListElementClone = node.clone(afterListElement, false);
-				rightList.forEach(li => {
+				rightList.forEach((li) => {
 					afterListElementClone?.append(li[0]);
 				});
 				afterListElement.after(afterListElementClone);
@@ -381,7 +383,7 @@ class List implements ListModelInterface {
 			//将 middleList 集合添加到前方列表节点内
 			if (middleList.length > 0 && beforeListElement) {
 				beforeListElementClone = node.clone(beforeListElement, false);
-				middleList.forEach(li => {
+				middleList.forEach((li) => {
 					beforeListElementClone?.append(li[0]);
 				});
 				beforeListElement.after(beforeListElementClone);
@@ -400,7 +402,7 @@ class List implements ListModelInterface {
 			}
 			selection.move();
 		}
-		change.apply(range);
+		if (!range) change.apply(range);
 	}
 
 	merge(blocks?: Array<NodeInterface>, range?: RangeInterface) {
@@ -408,7 +410,7 @@ class List implements ListModelInterface {
 		const { change, block, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		blocks = blocks || block.getBlocks(safeRange);
-		blocks.forEach(block => {
+		blocks.forEach((block) => {
 			block = block.closest('ul,ol');
 			if (!node.isList(block)) {
 				return;
@@ -603,7 +605,7 @@ class List implements ListModelInterface {
 	addBr(node: NodeInterface) {
 		const nodeApi = this.editor.node;
 		if (nodeApi.isList(node)) {
-			node.find('li').each(node => {
+			node.find('li').each((node) => {
 				this.addBr($(node));
 			});
 		} else if (node.name === 'li') {
@@ -656,7 +658,7 @@ class List implements ListModelInterface {
 		const { node } = this.editor;
 		if (Array.isArray(blocks)) {
 			let nodes: Array<NodeInterface> = [];
-			blocks.forEach(block => {
+			blocks.forEach((block) => {
 				if (!node.isCustomize(block)) {
 					const node = this.toCustomize(block, cardName, value);
 					nodes = nodes.concat(node);
@@ -717,7 +719,7 @@ class List implements ListModelInterface {
 		const { node } = this.editor;
 		if (Array.isArray(blocks)) {
 			let nodes: Array<NodeInterface> = [];
-			blocks.forEach(block => {
+			blocks.forEach((block) => {
 				const node = this.toNormal(block, tagName, start);
 				nodes = nodes.concat(node);
 			});
