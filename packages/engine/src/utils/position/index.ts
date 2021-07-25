@@ -33,10 +33,10 @@ class Position {
 		this.#root.append(this.#container);
 		this.#editor.root.append(this.#root);
 		this.#onUpdate = onUpdate;
-		window.addEventListener('scroll', this.update);
-		window.addEventListener('resize', this.update);
+		window.addEventListener('scroll', this.updateListener);
+		window.addEventListener('resize', this.updateListener);
 		if (isEngine(this.#editor)) {
-			this.#editor.scrollNode?.on('scroll', this.update);
+			this.#editor.scrollNode?.on('scroll', this.updateListener);
 		}
 		this.update();
 	}
@@ -44,6 +44,10 @@ class Position {
 	setOffset(offset: Array<number>) {
 		this.#offset = offset;
 	}
+
+	updateListener = () => {
+		this.update();
+	};
 
 	update = (triggerUpdate: boolean = true) => {
 		if (
@@ -75,10 +79,10 @@ class Position {
 
 	destroy() {
 		this.#onUpdate = undefined;
-		window.removeEventListener('scroll', this.update);
-		window.removeEventListener('resize', this.update);
+		window.removeEventListener('scroll', this.updateListener);
+		window.removeEventListener('resize', this.updateListener);
 		if (isEngine(this.#editor)) {
-			this.#editor.scrollNode?.off('scroll', this.update);
+			this.#editor.scrollNode?.off('scroll', this.updateListener);
 		}
 		this.#root?.remove();
 	}
