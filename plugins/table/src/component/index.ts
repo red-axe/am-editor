@@ -237,16 +237,25 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		const backgroundRect = node.get<HTMLElement>()!.getBoundingClientRect();
 		const domRect = new DOMRect(backgroundRect.x, backgroundRect.y, 0, 0);
 		const { startNode, endNode } = range;
-		if (startNode.name !== 'td' || endNode.name !== 'td') return [range];
+		const startElement = startNode.closest('td');
+		const endElement = endNode.closest('td');
+		if (
+			startElement.name !== 'td' ||
+			endElement.name !== 'td' ||
+			startElement.equal(endElement)
+		)
+			return [range];
 
-		const startRect = startNode.get<HTMLElement>()!.getBoundingClientRect();
+		const startRect = startElement
+			.get<HTMLElement>()!
+			.getBoundingClientRect();
 
 		domRect.x = startRect.left - backgroundRect.left;
 		domRect.y = startRect.top - backgroundRect.top;
 		domRect.width = startRect.right - startRect.left;
 		domRect.height = startRect.bottom - startRect.top;
 
-		const rect = endNode.get<HTMLElement>()!.getBoundingClientRect();
+		const rect = endElement.get<HTMLElement>()!.getBoundingClientRect();
 		domRect.width = rect.right - startRect.left;
 		domRect.height = rect.bottom - startRect.top;
 		return domRect;
