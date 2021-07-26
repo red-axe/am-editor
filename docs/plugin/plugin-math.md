@@ -83,15 +83,15 @@ parse?: (
 
 ### Drawing interface
 
-You can use the `https://g.aomao.com/latex` address to generate the `SVG` code corresponding to the formula. This project uses [mathjax](https://www.mathjax.org/) to generate `SVG` code
+You can use the `https://g.yanmao.cc/latex` address to generate the `SVG` code corresponding to the formula. This project uses [mathjax](https://www.mathjax.org/) to generate `SVG` code
 
-Demo site: [https://drawing.aomao.com/](https://drawing.aomao.com/)
+Demo site: [https://drawing.yanmao.cc/](https://drawing.yanmao.cc/)
 
 Configuration:
 
 ```ts
 [Math.pluginName]: {
-    action: `https://g.aomao.com/latex`,
+    action: `https://g.yanmao.cc/latex`,
     parse: (res: any) => {
         if(res.success) return {result: true, data: res.svg}
         return {result: false}

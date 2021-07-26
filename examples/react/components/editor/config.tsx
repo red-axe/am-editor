@@ -129,7 +129,7 @@ export const pluginConfig: PluginOptions = {
 		action: `${DOMAIN}/upload/video`,
 	},
 	[Math.pluginName]: {
-		action: `https://g.aomao.com/latex`,
+		action: `https://g.yanmao.cc/latex`,
 		parse: (res: any) => {
 			if (res.success) return { result: true, data: res.svg };
 			return { result: false };

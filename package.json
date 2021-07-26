@@ -21,7 +21,7 @@
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
-    "author": "me@aomao.com",
+    "author": "me@yanmao.cc",
     "homepage": "https://github.com/itellyou-com/am-editor#readme",
     "repository": {
         "type": "git",

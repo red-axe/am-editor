@@ -234,8 +234,8 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 
 export default defineConfig({
 	title: 'AoMao Editor',
-	favicon: 'https://cdn-object.aomao.com/icon/shortcut.png',
-	logo: 'https://cdn-object.aomao.com/icon/icon.svg',
+	favicon: 'https://cdn-object.yanmao.cc/icon/shortcut.png',
+	logo: 'https://cdn-object.yanmao.cc/icon/icon.svg',
 	outputPath: 'docs-dist',
 	hash: true,
 	mode: 'site',
@@ -275,7 +275,7 @@ export default defineConfig({
 			},
 			{
 				title: 'AoMao',
-				path: 'https://www.aomao.com',
+				path: 'https://www.yanmao.cc',
 			},
 			{
 				title: 'Github',
@@ -309,7 +309,7 @@ export default defineConfig({
 			},
 			{
 				title: 'AoMao',
-				path: 'https://www.aomao.com',
+				path: 'https://www.yanmao.cc',
 			},
 			{
 				title: 'Github',

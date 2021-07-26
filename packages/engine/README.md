@@ -6,8 +6,8 @@
 
 <p align="center">
   <a href="https://github.com/itellyou-com/am-editor/blob/master/README.md"><strong>English</strong></a> ·
-  <a href="https://editor.aomao.com"><strong>Demo</strong></a> ·
-  <a href="https://editor.aomao.com/docs"><strong>文档</strong></a> ·
+  <a href="https://editor.yanmao.cc"><strong>Demo</strong></a> ·
+  <a href="https://editor.yanmao.cc/docs"><strong>文档</strong></a> ·
   <a href="#plugins"><strong>插件</strong></a> ·
   <a href="https://qm.qq.com/cgi-bin/qm/qr?k=Gva5NtZ2USlHSLbFOeMroysk8Uwo7fCS&jump_from=webapi"><strong>QQ群 907664876</strong></a> ·
 </p>
@@ -235,7 +235,7 @@ return (
 )
 ```
 
-更复杂的工具栏配置请查看文档 [https://editor.aomao.com/zh-CN/config/toolbar](https://editor.aomao.com/zh-CN/config/toolbar)
+更复杂的工具栏配置请查看文档 [https://editor.yanmao.cc/zh-CN/config/toolbar](https://editor.yanmao.cc/zh-CN/config/toolbar)
 
 ### 协同编辑
 
@@ -317,11 +317,11 @@ yarn serve
 
 ### 支付宝
 
-![alipay](https://cdn-object.aomao.com/contribution/alipay.png?x-oss-process=image/resize,w_200)
+![alipay](https://cdn-object.yanmao.cc/contribution/alipay.png?x-oss-process=image/resize,w_200)
 
 ### 微信支付
 
-![wechat](https://cdn-object.aomao.com/contribution/weichat.png?x-oss-process=image/resize,w_200)
+![wechat](https://cdn-object.yanmao.cc/contribution/weichat.png?x-oss-process=image/resize,w_200)
 
 ### PayPal
 

@@ -48,7 +48,7 @@ Inline nodes have all the characteristics of style nodes, but inline nodes canno
 
 ```html
 <p>
-	This is <a href="https://www.aomao.com">a <strong>link</strong></a>
+	This is <a href="https://www.yanmao.cc">a <strong>link</strong></a>
 </p>
 ```
 

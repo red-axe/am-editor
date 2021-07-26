@@ -7,7 +7,7 @@ export const DOMAIN = IS_DEV
 				? window.location.host
 				: 'localhost:7001'
 	  }`
-	: 'https://editor.aomao.com';
+	: 'https://editor.yanmao.cc';
 
 export const lang = (
 	!isServer ? window.location.href.indexOf('zh-CN') > 0 : false

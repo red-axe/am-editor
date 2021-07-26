@@ -123,7 +123,7 @@ const cards = [
 ];
 
 const isDev = process.env.NODE_ENV !== 'production';
-const domain = isDev ? 'http://localhost:7001' : 'https://editor.aomao.com';
+const domain = isDev ? 'http://localhost:7001' : 'https://editor.yanmao.cc';
 
 export default defineComponent({
     name:"engine-demo",
@@ -244,7 +244,7 @@ export default defineComponent({
                             action: `${domain}/upload/video`,
                         },
                         [Math.pluginName]: {
-                            action: `https://g.aomao.com/latex`,
+                            action: `https://g.yanmao.cc/latex`,
                             parse: (res: any) => {
                                 if (res.success) return { result: true, data: res.svg };
                                 return { result: false };
@@ -281,7 +281,7 @@ export default defineComponent({
                                 {
                                     key: '1',
                                     name: '输入1-3查询',
-                                    avatar: 'https://cdn-image.aomao.com/10012/avatar/2020/04/11/1586596344-3b71be94-c861-428d-a8c3-9a1ebfb82a26.png?x-oss-process=image/resize,w_20',
+                                    avatar: 'https://cdn-image.yanmao.cc/10012/avatar/2020/04/11/1586596344-3b71be94-c861-428d-a8c3-9a1ebfb82a26.png?x-oss-process=image/resize,w_20',
                                 },
                             ],
                             onClick: (key: string, name: string) => {
@@ -320,7 +320,7 @@ export default defineComponent({
                         //实例化协作编辑客户端
                         const otClient = new OTClient(engineInstance);
                         //连接到协作服务端，demo文档
-                        const ws = isDev ? 'ws://127.0.0.1:8080' : 'wss://collab.aomao.com';
+                        const ws = isDev ? 'ws://127.0.0.1:8080' : 'wss://collab.yanmao.cc';
                         otClient.connect(
                             `${ws}${currentMember ? '?uid=' + currentMember.id : ''}`,
                             'demo',

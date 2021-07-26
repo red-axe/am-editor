@@ -85,11 +85,11 @@ am-editor 使用 [dumi](https://d.umijs.org/) 作为文档站点工具，
 
 ### 支付宝
 
-![alipay](https://cdn-object.aomao.com/contribution/alipay.png?x-oss-process=image/resize,w_200)
+![alipay](https://cdn-object.yanmao.cc/contribution/alipay.png?x-oss-process=image/resize,w_200)
 
 ### 微信支付
 
-![wechat](https://cdn-object.aomao.com/contribution/weichat.png?x-oss-process=image/resize,w_200)
+![wechat](https://cdn-object.yanmao.cc/contribution/weichat.png?x-oss-process=image/resize,w_200)
 
 ### PayPal
 
