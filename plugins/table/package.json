@@ -3,7 +3,7 @@
   "version": "2.3.2",
   "description": "table plugin",
   "author": "AoMao <me@yanmao.cc>",
-  "homepage": "https://github.com/itellyou-com/am-editor/tree/master/plugins/plugin-table#readme",
+  "homepage": "https://github.com/yanmao-cc/am-editor/tree/master/plugins/plugin-table#readme",
   "license": "MIT",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
@@ -15,10 +15,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/itellyou-com/am-editor.git"
+    "url": "git+https://github.com/yanmao-cc/am-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/itellyou-com/am-editor/issues"
+    "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
     "@aomao/engine": "^2.3.2",

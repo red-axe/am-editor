@@ -6,7 +6,7 @@
     "Math"
   ],
   "author": "ITELLYOU <me@yanmao.cc>",
-  "homepage": "https://github.com/itellyou-com/am-editor/tree/main/plugins/plugin-math#readme",
+  "homepage": "https://github.com/yanmao-cc/am-editor/tree/main/plugins/plugin-math#readme",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -18,10 +18,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/itellyou-com/am-editor.git"
+    "url": "git+https://github.com/yanmao-cc/am-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/itellyou-com/am-editor/issues"
+    "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
     "@aomao/engine": "^2.3.2",

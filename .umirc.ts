@@ -279,7 +279,7 @@ export default defineConfig({
 			},
 			{
 				title: 'Github',
-				path: 'https://github.com/itellyou-com/am-editor',
+				path: 'https://github.com/yanmao-cc/am-editor',
 			},
 		],
 		'zh-CN': [
@@ -313,7 +313,7 @@ export default defineConfig({
 			},
 			{
 				title: 'Github',
-				path: 'https://github.com/itellyou-com/am-editor',
+				path: 'https://github.com/yanmao-cc/am-editor',
 			},
 		],
 	},
@@ -326,7 +326,7 @@ export default defineConfig({
 		'/api': getMenus({ base: '/api' }),
 	},
 	analytics: {
-		baidu: '91a0c5558015c5af2d5259d2bf4aa6eb',
+		baidu: 'c2e2e4254b6e4388806848d06be68a69',
 	},
 	manifest: {
 		fileName: 'manifest.json',

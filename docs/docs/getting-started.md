@@ -14,9 +14,9 @@ The following three plugins are different
 
 -   `@aomao/plugin-link` link input, text input, using the existing UI of the front-end library is a better choice
 
-[React case](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
+[React case](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/engine.tsx)
 
-[Vue case](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
+[Vue case](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
 
 ### Installation
 
@@ -281,9 +281,9 @@ export default EngineDemo;
 
 ### Collaborative editing
 
-Collaborative editing is based on [ShareDB](https://github.com/share/sharedb). Each editor acts as [client](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/ot-client.ts) through `WebSocket` and [server](https://github.com/itellyou-com/am-editor/tree/master/ot-server) to exchange data. The editor processes and renders data.
+Collaborative editing is based on [ShareDB](https://github.com/share/sharedb). Each editor acts as [client](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/ot-client.ts) through `WebSocket` and [server](https://github.com/yanmao-cc/am-editor/tree/master/ot-server) to exchange data. The editor processes and renders data.
 
-We need to set up the server and then configure the client. [View full example](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
+We need to set up the server and then configure the client. [View full example](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/engine.tsx)
 
 ```tsx | pure
 //Instantiate the collaborative editing client and pass in the current editor engine instance

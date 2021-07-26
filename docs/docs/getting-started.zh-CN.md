@@ -14,9 +14,9 @@ title: 快速上手
 
 -   `@aomao/plugin-link` 链接输入、文本输入，使用前端库现有的 UI 是比较好的选择
 
-[React 案例](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
+[React 案例](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/engine.tsx)
 
-[Vue 案例](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
+[Vue 案例](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
 
 ### 安装
 
@@ -281,9 +281,9 @@ export default EngineDemo;
 
 ### 协同编辑
 
-协同编辑基于[ShareDB](https://github.com/share/sharedb)实现。每位编辑者作为[客户端](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/ot-client.ts)通过`WebSocket`与[服务端](https://github.com/itellyou-com/am-editor/tree/master/ot-server)通信交换数据。编辑器处理数据、渲染数据。
+协同编辑基于[ShareDB](https://github.com/share/sharedb)实现。每位编辑者作为[客户端](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/ot-client.ts)通过`WebSocket`与[服务端](https://github.com/yanmao-cc/am-editor/tree/master/ot-server)通信交换数据。编辑器处理数据、渲染数据。
 
-我们需要把服务端搭建好，然后配置客户端。[查看完整示例](https://github.com/itellyou-com/am-editor/blob/master/docs/demo/engine.tsx)
+我们需要把服务端搭建好，然后配置客户端。[查看完整示例](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/engine.tsx)
 
 ```tsx | pure
 //实例化协作编辑客户端，传入当前编辑器引擎实例

@@ -11,13 +11,13 @@
   ],
   "author": "me@yanmao.cc",
   "license": "MIT",
-  "homepage": "https://github.com/itellyou-com/am-editor#readme",
+  "homepage": "https://github.com/yanmao-cc/am-editor#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/itellyou-com/am-editor.git"
+    "url": "git+https://github.com/yanmao-cc/am-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/itellyou-com/am-editor/issues"
+    "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
     "@aomao/engine": "^2.3.2",

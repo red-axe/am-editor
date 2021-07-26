@@ -61,4 +61,4 @@ If the default configuration is found through the `name` attribute, the `type` a
 
 ## default allocation
 
-[https://github.com/itellyou-com/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx](https://github.com/itellyou-com/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx)
+[https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx](https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx)

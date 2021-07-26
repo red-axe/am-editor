@@ -31,7 +31,7 @@ const view = new View(render node, {
 -   Default value: `zh-CN`
 -   Detailed: Configure additional language packs
 
-Language pack, default language pack [https://github.com/itellyou-com/am-editor/blob/master/locale](https://github.com/itellyou-com/am-editor/blob/master/locale)
+Language pack, default language pack [https://github.com/yanmao-cc/am-editor/blob/master/locale](https://github.com/yanmao-cc/am-editor/blob/master/locale)
 
 ```ts
 const view = new View(render node, {
@@ -81,7 +81,7 @@ console.log(view.language.get<string>('test'));
 
 -   Type: `{ [key: string]: PluginOptions }`
 -   Default value: `{}`
--   Detailed: the configuration item of each plug-in, the key is the name of the plug-in, please refer to the description of each plug-in for detailed configuration. [Configuration example](https://github.com/itellyou-com/am-editor/blob/master/examples/react/components/editor/config.tsx)
+-   Detailed: the configuration item of each plug-in, the key is the name of the plug-in, please refer to the description of each plug-in for detailed configuration. [Configuration example](https://github.com/yanmao-cc/am-editor/blob/master/examples/react/components/editor/config.tsx)
 
 ### placeholder
 

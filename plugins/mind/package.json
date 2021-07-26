@@ -7,7 +7,7 @@
     "脑图"
   ],
   "author": "ITELLYOU <me@yanmao.cc>",
-  "homepage": "https://github.com/itellyou-com/am-editor/tree/main/plugins/plugin-mind#readme",
+  "homepage": "https://github.com/yanmao-cc/am-editor/tree/main/plugins/plugin-mind#readme",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -19,10 +19,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/itellyou-com/am-editor.git"
+    "url": "git+https://github.com/yanmao-cc/am-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/itellyou-com/am-editor/issues"
+    "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
     "@antv/hierarchy": "^0.6.7",

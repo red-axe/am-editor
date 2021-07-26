@@ -22,13 +22,13 @@
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
     "author": "me@yanmao.cc",
-    "homepage": "https://github.com/itellyou-com/am-editor#readme",
+    "homepage": "https://github.com/yanmao-cc/am-editor#readme",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/itellyou-com/am-editor.git"
+        "url": "git+https://github.com/yanmao-cc/am-editor.git"
     },
     "bugs": {
-        "url": "https://github.com/itellyou-com/am-editor/issues"
+        "url": "https://github.com/yanmao-cc/am-editor/issues"
     },
     "gitHooks": {
         "pre-commit": "lint-staged"

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/itellyou-com/am-editor/blob/master/README.md"><strong>English</strong></a> ·
+  <a href="https://github.com/yanmao-cc/am-editor/blob/master/README.md"><strong>English</strong></a> ·
   <a href="https://editor.yanmao.cc"><strong>Demo</strong></a> ·
   <a href="https://editor.yanmao.cc/docs"><strong>文档</strong></a> ·
   <a href="#plugins"><strong>插件</strong></a> ·
@@ -42,9 +42,9 @@
 
 通过 `MutationObserver` 监听编辑区域内的 `DOM` 树的改变，并生成 `json0` 类型的数据格式与 [ShareDB](https://github.com/share/sharedb) 库进行交互，从而达到协同编辑的需要。
 
-**`Vue3`** 案例 [https://github.com/itellyou-com/am-editor/tree/master/examples/vue](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
+**`Vue3`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/vue](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
 
-**`React`** 案例 [https://github.com/itellyou-com/am-editor/tree/master/examples/react](https://github.com/itellyou-com/am-editor/tree/master/examples/react)
+**`React`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
 ## 特性
 
@@ -243,11 +243,11 @@ return (
 
 #### 交互模式
 
-每位编辑者作为 [客户端](https://github.com/itellyou-com/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 通过 `WebSocket` 与 [服务端](https://github.com/itellyou-com/am-editor/tree/master/ot-server) 通信交换由编辑器生成的 `json0` 格式的数据。
+每位编辑者作为 [客户端](https://github.com/yanmao-cc/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 通过 `WebSocket` 与 [服务端](https://github.com/yanmao-cc/am-editor/tree/master/ot-server) 通信交换由编辑器生成的 `json0` 格式的数据。
 
 服务端会保留一份 `json` 格式的 `html` 结构数据，接收到来自客户端的指令后，再去修改这份数据，最后再转发到每个客户端。
 
-在启用协同编辑前，我们需要配置好 [客户端](https://github.com/itellyou-com/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 和 [服务端](https://github.com/itellyou-com/am-editor/tree/master/ot-server)
+在启用协同编辑前，我们需要配置好 [客户端](https://github.com/yanmao-cc/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 和 [服务端](https://github.com/yanmao-cc/am-editor/tree/master/ot-server)
 
 服务端是 `NodeJs` 环境，使用 `express` + `WebSocket` 搭建的网络服务。
 
@@ -255,9 +255,9 @@ return (
 
 案例中我们已经一份比较基础的客户端代码
 
-[查看 React 完整案例](https://github.com/itellyou-com/am-editor/tree/master/examples/react)
+[查看 React 完整案例](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
-[查看 Vue3 完整案例](https://github.com/itellyou-com/am-editor/tree/master/examples/vue)
+[查看 Vue3 完整案例](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
 
 ```tsx
 //实例化协作编辑客户端，传入当前编辑器引擎实例
