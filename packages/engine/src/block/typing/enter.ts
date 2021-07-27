@@ -9,7 +9,10 @@ class Enter {
 
 	trigger(event: KeyboardEvent) {
 		const { change, node, list } = this.engine;
-		const range = change.getRange();
+		const range = change
+			.getRange()
+			.shrinkToElementNode()
+			.shrinkToTextNode();
 		// 选区选中最后的节点
 		const blockApi = this.engine.block;
 		let block = blockApi.closest(range.endNode);

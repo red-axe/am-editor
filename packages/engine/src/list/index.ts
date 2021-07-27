@@ -568,12 +568,21 @@ class List implements ListModelInterface {
 		const component = card.create(cardName, {
 			value,
 		});
+		// 获取子节点，插入卡片后再追加到后面，否则会覆盖掉之前的节点
+		const children = node.children().clone(true);
+		// 清空原节点
+		node.empty();
 		//设置光标选中
 		const range = Range.create(this.editor);
-		range.select(node, true);
-		range.collapse(true);
+		range.select(node, true).collapse(true);
 		//插入卡片
 		card.insertNode(range, component);
+		const lastNode = node.last();
+		if (lastNode?.name === 'br') {
+			lastNode.remove();
+		}
+		// 还原子节点
+		node.append(children);
 		return component;
 	}
 	/**
@@ -844,6 +853,22 @@ class List implements ListModelInterface {
 		if (
 			1 === contents.childNodes.length &&
 			'br' === $(contents.firstChild).name
+		)
+			return true;
+		//如果选区中只有一个节点，并且是自定义列表并且第一个是Card
+		if (
+			1 === contents.childNodes.length &&
+			node.hasClass('data-list-item') &&
+			$(contents.firstChild).isCard()
+		)
+			return true;
+		const nodeApi = this.editor.node;
+		//如果选区中只有两个节点，并且是自定义列表并且第一个是Card，最后一个为空节点
+		if (
+			2 === contents.childNodes.length &&
+			node.hasClass('data-list-item') &&
+			$(contents.firstChild).isCard() &&
+			nodeApi.isEmpty($(contents.lastChild || []))
 		)
 			return true;
 		//判断选区内容是否是空节点

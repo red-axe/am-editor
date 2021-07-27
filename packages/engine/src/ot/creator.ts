@@ -126,7 +126,14 @@ class Creator extends EventEmitter2 {
 				isTransientElement(targetNode, transientElements))
 		);
 	}
-
+	/**
+	 * 从DOM变更记录中生产 ops （json格式的操作集合）
+	 * @param records DOM变更记录集合
+	 * @param path 路径
+	 * @param oldPath
+	 * @param node 开始遍历的节点，默认为编辑器根节点
+	 * @returns
+	 */
 	makeOpsFromMutations(
 		records: MutationRecord[],
 		path: Path = [],
@@ -138,8 +145,9 @@ class Creator extends EventEmitter2 {
 		const attrOps: Array<any> = [];
 		const cacheNodes: Array<Node> = [];
 		const mutationsNodes: Array<Node> = [];
-
+		// 文本数据变更标记
 		let isDataString = false;
+		// 记录节点的 MutationRecord 对象
 		const setNodeMutations = (root: Node, record: MutationRecord) => {
 			if (!cacheNodes.includes(root)) {
 				if (!mutationsNodes.includes(root)) mutationsNodes.push(root);
@@ -147,22 +155,30 @@ class Creator extends EventEmitter2 {
 				root['mutations'].push(record);
 			}
 		};
+		// 循环记录集合
 		for (let i = 0; records[i]; ) {
 			const record = records[i];
 			const { target, addedNodes, removedNodes, type } = record;
+			// 当前节点在需要增加的节点记录集合中就跳过
 			const inCache = this.inAddedCache(target);
 			if (inCache) {
 				i++;
 				continue;
 			}
+			// 子节点变更
 			if (type === 'childList') {
+				// 当前遍历节点是 MutationRecord 对象中的记录节点就处理
 				if (node.equal(target)) {
+					// DOM中变更为移除
 					if (removedNodes[0]) {
+						// 获取移除节点在编辑器中的索引
 						const removeIndex = this.getRemoveNodeIndex(
 							record,
 							records,
 						);
+						// 循环要移除的节点
 						Array.from(removedNodes).forEach((removedNode) => {
+							// 要移除的节点同时又在增加的就不处理
 							if (!addNodes.find((n) => n === removedNode)) {
 								let p: Path = [];
 								p = p.concat([...path], [removeIndex + 2]);
@@ -316,13 +332,19 @@ class Creator extends EventEmitter2 {
 		});
 		return allOps;
 	}
-
+	/**
+	 * 获取要移除节点的索引
+	 * @param record 当前记录
+	 * @param records 记录集合
+	 * @returns
+	 */
 	getRemoveNodeIndex(
 		record: MutationRecord,
 		records: MutationRecord[],
 	): number {
 		const { target, nextSibling, previousSibling, addedNodes } = record;
 		const targetElement = target as Element;
+		// 获取目标节点的过滤后非协同节点后的所有子节点
 		const childNodes =
 			target.nodeType === getDocument().ELEMENT_NODE &&
 			targetElement.getAttribute(DATA_ELEMENT) === ROOT
@@ -374,8 +396,12 @@ class Creator extends EventEmitter2 {
 		}
 		return 0;
 	}
-
+	/**
+	 * 处理DOM节点变更记录
+	 * @param records 记录集合
+	 */
 	handleMutations(records: MutationRecord[]) {
+		//需要先过滤标记为非协同节点的变更，包括 data-element=ui、data-transient-element 等标记的节点，可以在 isTransientMutation 中查看逻辑
 		//记录大于300的时候，先获取所有的不需要参与协同交互的节点，以提高效率
 		if (records.length > 299) {
 			this.cacheTransientElements = [];
@@ -463,7 +489,6 @@ class Creator extends EventEmitter2 {
 
 	readyToEmitOps(ops: any[]) {
 		let emitOps: Op[] = [];
-		let removeCount = 0;
 		ops.forEach((op) => {
 			if ('path' in op && op.newValue !== undefined) {
 				const pathValue = getPathValue(this.doc?.data, op.oldPath);

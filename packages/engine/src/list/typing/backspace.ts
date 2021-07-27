@@ -17,6 +17,8 @@ class Backspace {
 		if (range.collapsed) {
 			const block = blockApi.closest(range.startNode);
 			if ('li' === block.name && list.isFirst(range)) {
+				// 内容已经删除过了
+				if (event['isDelete']) return false;
 				event.preventDefault();
 				command.execute(list.getPluginNameByNode(block));
 				return false;

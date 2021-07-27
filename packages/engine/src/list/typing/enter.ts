@@ -33,13 +33,13 @@ class Enter {
 			} else {
 				this.engine.block.split();
 				range = change.getRange();
-				const selection = range.createSelection();
+				//const selection = range.createSelection();
 				const block = this.engine.block.closest(range.endNode);
 
 				const plugin = list
 					.getPlugins()
 					.find(
-						plugin =>
+						(plugin) =>
 							pluginName ===
 							(plugin.constructor as PluginEntry).pluginName,
 					);
@@ -58,11 +58,15 @@ class Enter {
 						list.addBr(next);
 					}
 				}
-				selection.move();
-				range.collapse(false);
-				change.select(range);
-				list.merge();
+				list.merge(undefined, range);
 				list.addBr(range.startNode.closest('ul'));
+				range
+					.select(block, true)
+					.collapse(false)
+					.shrinkToElementNode()
+					.shrinkToTextNode()
+					.collapse(false);
+				change.apply(range);
 			}
 			range.scrollIntoView();
 			return false;
