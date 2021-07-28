@@ -91,6 +91,10 @@ class Template implements TemplateInterface {
 		{ rows, cols, html, noBorder }: TableValue,
 		menus: TableMenu,
 	): string {
+		cols = cols === -Infinity ? 1 : cols;
+		rows = rows === -Infinity ? 1 : rows;
+		cols = cols === Infinity ? 10 : cols;
+		rows = rows === Infinity ? 10 : rows;
 		const tds =
 			`<td ${DATA_TRANSIENT_ATTRIBUTES}="table-cell-selection">${Template.EmptyCell}</td>`.repeat(
 				cols,
