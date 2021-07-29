@@ -6,6 +6,7 @@ import {
 	escape,
 	getFileSize,
 	isEngine,
+	isMobile,
 	NodeInterface,
 	sanitizeUrl,
 	ToolbarItemOptions,
@@ -415,7 +416,7 @@ class VideoComponent extends Card<VideoValue> {
 
 	didRender() {
 		super.didRender();
-		this.container?.on('click', () => {
+		this.container?.on(isMobile ? 'touchstart' : 'click', () => {
 			if (isEngine(this.editor) && !this.activated) {
 				this.editor.card.activate(this.root);
 			}

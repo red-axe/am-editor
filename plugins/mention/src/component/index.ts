@@ -302,7 +302,7 @@ class Mention extends Card<MentionValue> {
 			this.#keyword?.on('input', () => {
 				this.resetPlaceHolder();
 				// 在 Windows 上使用中文输入法，在 keydown 事件里无法阻止用户的输入，所以在这里删除用户的输入
-				if (Date.now() - renderTime < 100) {
+				if (Date.now() - renderTime < 200) {
 					const textNode = this.#keyword?.first();
 					if (
 						textNode &&

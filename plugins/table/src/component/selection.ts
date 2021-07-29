@@ -16,6 +16,7 @@ import {
 	isEngine,
 	EDITABLE_SELECTOR,
 	isNode,
+	isMobile,
 } from '@aomao/engine';
 import Template from './template';
 
@@ -137,7 +138,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		document.addEventListener('keydown', this.onShiftKeydown);
 		document.addEventListener('keyup', this.onShiftKeyup);
 		this.table.wrapper
-			?.on('mousedown', this.onTdMouseDown)
+			?.on(isMobile ? 'touchstart' : 'mousedown', this.onTdMouseDown)
 			.on('keydown', this.onKeydown);
 	}
 
@@ -145,7 +146,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		document.removeEventListener('keydown', this.onShiftKeydown);
 		document.removeEventListener('keyup', this.onShiftKeyup);
 		this.table.wrapper
-			?.off('mousedown', this.onTdMouseDown)
+			?.off(isMobile ? 'touchstart' : 'mousedown', this.onTdMouseDown)
 			.off('keydown', this.onKeydown);
 	}
 
@@ -435,8 +436,11 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			range
 				.select(editableElement, true)
 				.shrinkToElementNode()
+				.shrinkToTextNode()
 				.collapse(false);
-			change.select(range);
+			setTimeout(() => {
+				change.select(range);
+			}, 20);
 			editableElement.get<HTMLElement>()?.focus();
 			this.prevMouseDownTd = cell;
 			this.selectCell(cell, cell);
@@ -465,7 +469,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		this.selectCell(cell, cell);
 	}
 
-	onTdMouseDown = (event: MouseEvent) => {
+	onTdMouseDown = (event: MouseEvent | TouchEvent) => {
 		this.selectRange = undefined;
 		if (!event.target || !isEngine(this.editor)) return;
 		const { change } = this.editor;
@@ -497,7 +501,8 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			return;
 		} else {
 			this.prevMouseDownTd = td;
-			if (event.button !== 2) this.select({ row, col }, { row, col });
+			if (event instanceof MouseEvent && event.button !== 2)
+				this.select({ row, col }, { row, col });
 		}
 		//点击单元格空白处，聚焦内部编辑区域
 		if (
@@ -507,6 +512,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				!range.endNode.closest('td').equal(td))
 		) {
 			if (
+				event instanceof MouseEvent &&
 				event.button === 2 &&
 				!!target.attributes('table-cell-selection')
 			) {
@@ -517,8 +523,9 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		} else if (target.name === 'td') {
 			event.preventDefault();
 		}
+		this.select({ row, col }, { row, col });
 		// 右键不触发拖选
-		if (event.button === 2) {
+		if (event instanceof MouseEvent && event.button === 2) {
 			if (!!target.attributes('table-cell-selection')) {
 				event.preventDefault();
 			}
@@ -535,20 +542,20 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	addDragEvent() {
 		this.tableRoot?.addClass('drag-select');
 		this.table.wrapper
-			?.on('mouseup', this.removeDragEvent)
-			.on('mousemove', this.onDragMove);
+			?.on(isMobile ? 'touchend' : 'mouseup', this.removeDragEvent)
+			.on(isMobile ? 'touchmove' : 'mousemove', this.onDragMove);
 	}
 
 	removeDragEvent = () => {
 		this.tableRoot?.removeClass('drag-select');
 		this.tableRoot?.removeClass('drag-selecting');
 		this.table.wrapper
-			?.off('mouseup', this.removeDragEvent)
-			.off('mousemove', this.onDragMove);
+			?.off(isMobile ? 'touchend' : 'mouseup', this.removeDragEvent)
+			.off(isMobile ? 'touchmove' : 'mousemove', this.onDragMove);
 		this.dragging = undefined;
 	};
 
-	onDragMove = (event: MouseEvent) => {
+	onDragMove = (event: MouseEvent | TouchEvent) => {
 		if (!this.dragging || !event.target) return;
 		const dragoverTd = $(event.target).closest('td');
 		if (

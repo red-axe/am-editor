@@ -1,7 +1,7 @@
 import { isNodeEntry, NodeInterface } from './types/node';
 import { isRange, isSelection, RangeInterface } from './types/range';
 import { getWindow, isMobile } from './utils';
-import { CARD_SELECTOR } from './constants/card';
+import { CARD_ELEMENT_KEY, CARD_SELECTOR } from './constants/card';
 import { ANCHOR, CURSOR, FOCUS } from './constants/selection';
 import {
 	DATA_ELEMENT,
@@ -33,6 +33,7 @@ class Range implements RangeInterface {
 		editor: EditorInterface,
 		path: Path[],
 		context?: NodeInterface,
+		includeCardCursor?: boolean,
 	) => RangeInterface;
 
 	base: globalThis.Range;
@@ -745,7 +746,7 @@ class Range implements RangeInterface {
 		return node;
 	}
 
-	toPath() {
+	toPath(includeCardCursor: boolean = false) {
 		const range = this.cloneRange();
 		const node = range.commonAncestorNode;
 		if (!node.isRoot() && !node.inEditor()) return [];
@@ -753,20 +754,44 @@ class Range implements RangeInterface {
 
 		const getPath = (node: NodeInterface, offset: number): Path => {
 			let domNode: NodeInterface | undefined = node;
-			const path = [];
+			let path = [];
 			while (domNode && domNode.length > 0 && !domNode.isRoot()) {
 				let prev = domNode.prev();
 				let i = 0;
 				while (prev && prev.length > 0) {
+					// 非协同节点跳过，如果有指定需要包含卡片两侧光标则不跳过
 					if (
-						!prev.attributes(DATA_TRANSIENT_ELEMENT) &&
-						prev.attributes(DATA_ELEMENT) !== UI
+						(!prev.attributes(DATA_TRANSIENT_ELEMENT) &&
+							prev.attributes(DATA_ELEMENT) !== UI) ||
+						(includeCardCursor &&
+							['left', 'right'].includes(
+								prev.attributes(CARD_ELEMENT_KEY),
+							))
 					)
 						i++;
 					prev = prev.prev();
 				}
+				// 路径索引加入数组
 				path.unshift(i);
+				// 获取父级节点
 				domNode = domNode.parent();
+				// 有指定需要包含卡片两侧光标则不跳过
+				if (
+					domNode &&
+					includeCardCursor &&
+					['left', 'right'].includes(
+						domNode.attributes(CARD_ELEMENT_KEY),
+					)
+				) {
+					continue;
+				}
+				// 如果父级是非协同节点，清空之前的索引
+				if (
+					domNode?.attributes(DATA_TRANSIENT_ELEMENT) ||
+					domNode?.attributes(DATA_ELEMENT) === UI
+				) {
+					path = [];
+				}
 			}
 			path.push(offset);
 			return path;
@@ -806,6 +831,7 @@ Range.fromPath = (
 	editor: EditorInterface,
 	path: Path[],
 	context: NodeInterface = editor.container,
+	includeCardCursor: boolean = false,
 ) => {
 	const startPath = path.length === 0 ? [] : path[0].slice();
 	const endPath = path.length < 2 ? [] : path[1].slice();
@@ -824,16 +850,20 @@ Range.fromPath = (
 			let offset = 0;
 			while (domChild && domChild.length > 0) {
 				if (
-					!!domChild.attributes(DATA_TRANSIENT_ELEMENT) ||
-					domChild.attributes(DATA_ELEMENT) === UI
+					(!domChild.attributes(DATA_TRANSIENT_ELEMENT) &&
+						domChild.attributes(DATA_ELEMENT) !== UI) ||
+					(includeCardCursor &&
+						['left', 'right'].includes(
+							domChild.attributes(CARD_ELEMENT_KEY),
+						))
 				) {
-					domChild = domChild.next();
-				} else {
 					if (offset === p || !domChild.next()) {
 						needNode = domChild;
 						break;
 					}
 					offset++;
+					domChild = domChild.next();
+				} else {
 					domChild = domChild.next();
 				}
 			}

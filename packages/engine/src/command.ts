@@ -14,7 +14,9 @@ class Command implements CommandInterface {
 		if (!plugin || plugin.disabled) return false;
 		// 只读状态下，如果插件没有指定为非禁用，一律禁用
 		if (
-			(!isEngine(this.editor) || this.editor.readonly) &&
+			(!isEngine(this.editor) ||
+				this.editor.readonly ||
+				!this.editor.isFocus()) &&
 			plugin.disabled !== false
 		)
 			return false;

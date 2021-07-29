@@ -2,7 +2,7 @@ import { EventEmitter2 } from 'eventemitter2';
 import { DATA_ELEMENT, UI } from '../constants';
 import { isNode, NodeInterface } from '../types';
 import { $ } from '../node';
-import { isFirefox, removeUnit } from '../utils';
+import { isFirefox, isMobile, removeUnit } from '../utils';
 import './index.css';
 
 export type ScrollbarDragging = {
@@ -31,6 +31,7 @@ class Scrollbar extends EventEmitter2 {
 	private yHeight: number = 0;
 	private maxScrollLeft: number = 0;
 	#observer?: MutationObserver;
+	#reverse?: boolean;
 	shadowTimer?: NodeJS.Timeout;
 	/**
 	 * @param {nativeNode} container 需要添加滚动条的容器元素
@@ -186,12 +187,49 @@ class Scrollbar extends EventEmitter2 {
 		}
 	};
 
+	/**
+	 * 在节点上左右滑动手指
+	 * @param event
+	 * @returns
+	 */
+	bindContainerTouchX = (event: TouchEvent) => {
+		if (!event.target) return;
+		if ($(event.target).hasClass('data-scrollbar-trigger')) return;
+		// 设置滚动方向相反
+		this.#reverse = true;
+		this.scrollXStart(event);
+	};
+	/**
+	 * 在节点上上下滑动手指
+	 * @param event
+	 * @returns
+	 */
+	bindContainerTouchY = (event: TouchEvent) => {
+		if (!event.target) return;
+		if ($(event.target).hasClass('data-scrollbar-trigger')) return;
+		// 设置滚动方向相反
+		this.#reverse = true;
+		this.scrollYStart(event);
+	};
+
 	bindEvents() {
+		if (isMobile) {
+			// 在节点上滑动手指
+			if (this.x) {
+				this.container.on('touchstart', this.bindContainerTouchX);
+			}
+			if (this.y) {
+				this.container.on('touchstart', this.bindContainerTouchY);
+			}
+		} else {
+			// 在节点上滚动鼠标滚轮
+
+			this.container.on(
+				isFirefox ? 'DOMMouseScroll' : 'mousewheel',
+				this.bindWheelScroll,
+			);
+		}
 		this.container.on('scroll', this.scroll);
-		this.container.on(
-			isFirefox ? 'DOMMouseScroll' : 'mousewheel',
-			this.bindWheelScroll,
-		);
 		const containerElement = this.container.get<HTMLElement>();
 		if (!containerElement) return;
 		let size = {
@@ -215,15 +253,38 @@ class Scrollbar extends EventEmitter2 {
 			childList: true,
 			subtree: true,
 		});
-
+		// 绑定滚动条事件
 		this.bindXScrollEvent();
 		this.bindYScrollEvent();
 	}
-
-	scrollX = (event: MouseEvent) => {
+	/**
+	 * 获取鼠标事件或者触摸事件的 clientX clientY
+	 * @param event
+	 * @returns
+	 */
+	getEventClientOffset = (event: MouseEvent | TouchEvent) => {
+		if (event instanceof MouseEvent) {
+			return {
+				x: event.clientX,
+				y: event.clientY,
+			};
+		}
+		return {
+			x: event.touches[0].clientX,
+			y: event.touches[0].clientY,
+		};
+	};
+	/**
+	 * 横向滚动
+	 * @param event
+	 */
+	scrollX = (event: MouseEvent | TouchEvent) => {
 		if (this.slideXDragging) {
 			const { point, position } = this.slideXDragging;
-			let left = position + (event.clientX - point);
+			const offset = this.getEventClientOffset(event);
+			let left = this.#reverse
+				? position - (offset.x - point)
+				: position + (offset.x - point);
 			left = Math.max(0, Math.min(left, this.oWidth - this.xWidth));
 			this.slideX?.css('left', left + 'px');
 			let min = left / (this.oWidth - this.xWidth);
@@ -233,10 +294,13 @@ class Scrollbar extends EventEmitter2 {
 		}
 	};
 
-	scrollY = (event: MouseEvent) => {
+	scrollY = (event: MouseEvent | TouchEvent) => {
 		if (this.slideYDragging) {
 			const { point, position } = this.slideYDragging;
-			let top = position + (event.clientY - point);
+			const offset = this.getEventClientOffset(event);
+			let top = this.#reverse
+				? position - (offset.y - point)
+				: position + (offset.y - point);
 			top = Math.max(0, Math.min(top, this.oHeight - this.yHeight));
 			this.slideY?.css('top', top + 'px');
 			let min = top / (this.oHeight - this.yHeight);
@@ -248,47 +312,80 @@ class Scrollbar extends EventEmitter2 {
 
 	scrollXEnd = () => {
 		this.slideXDragging = undefined;
-		document.body.removeEventListener('mousemove', this.scrollX);
-		document.body.removeEventListener('mouseup', this.scrollXEnd);
+		this.#reverse = false;
+		document.body.removeEventListener(
+			isMobile ? 'touchmove' : 'mousemove',
+			this.scrollX,
+		);
+		document.body.removeEventListener(
+			isMobile ? 'touchend' : 'mouseup',
+			this.scrollXEnd,
+		);
 		this.container.removeClass('scrolling');
 	};
 
 	scrollYEnd = () => {
 		this.slideYDragging = undefined;
-		document.body.removeEventListener('mousemove', this.scrollY);
-		document.body.removeEventListener('mouseup', this.scrollYEnd);
+		document.body.removeEventListener(
+			isMobile ? 'touchmove' : 'mousemove',
+			this.scrollY,
+		);
+		document.body.removeEventListener(
+			isMobile ? 'touchend' : 'mouseup',
+			this.scrollYEnd,
+		);
 		this.container.removeClass('scrolling');
 	};
 
-	scrollXStart = (event: MouseEvent) => {
+	scrollXStart = (event: MouseEvent | TouchEvent) => {
+		const offset = this.getEventClientOffset(event);
 		this.container.addClass('scrolling');
 		this.slideXDragging = {
-			point: event.clientX,
+			point: offset.x,
 			position: parseInt(this.slideX?.css('left') || '0'),
 		};
-		document.body.addEventListener('mousemove', this.scrollX);
-		document.body.addEventListener('mouseup', this.scrollXEnd);
+		document.body.addEventListener(
+			isMobile ? 'touchmove' : 'mousemove',
+			this.scrollX,
+		);
+		document.body.addEventListener(
+			isMobile ? 'touchend' : 'mouseup',
+			this.scrollXEnd,
+		);
 	};
 
-	scrollYStart = (event: MouseEvent) => {
+	scrollYStart = (event: MouseEvent | TouchEvent) => {
+		const offset = this.getEventClientOffset(event);
 		this.container.addClass('scrolling');
 		this.slideYDragging = {
-			point: event.clientY,
+			point: offset.y,
 			position: parseInt(this.slideY?.css('top') || '0'),
 		};
-		document.body.addEventListener('mousemove', this.scrollY);
-		document.body.addEventListener('mouseup', this.scrollYEnd);
+		document.body.addEventListener(
+			isMobile ? 'touchmove' : 'mousemove',
+			this.scrollY,
+		);
+		document.body.addEventListener(
+			isMobile ? 'touchend' : 'mouseup',
+			this.scrollYEnd,
+		);
 	};
 
 	bindXScrollEvent = () => {
 		if (this.x) {
-			this.slideX?.on('mousedown', this.scrollXStart);
+			this.slideX?.on(
+				isMobile ? 'touchstart' : 'mousedown',
+				this.scrollXStart,
+			);
 		}
 	};
 
 	bindYScrollEvent = () => {
 		if (this.y) {
-			this.slideY?.on('mousedown', this.scrollYStart);
+			this.slideY?.on(
+				isMobile ? 'touchstart' : 'mousedown',
+				this.scrollYStart,
+			);
 		}
 	};
 
@@ -330,13 +427,26 @@ class Scrollbar extends EventEmitter2 {
 	};
 
 	destroy() {
-		this.container.off('scroll', this.scroll);
-		this.slideX?.off('mousedown', this.scrollXStart);
-		this.slideY?.off('mousedown', this.scrollYStart);
-		this.container.off(
-			isFirefox ? 'DOMMouseScroll' : 'mousewheel',
-			this.bindWheelScroll,
+		this.slideX?.off(
+			isMobile ? 'touchstart' : 'mousedown',
+			this.scrollXStart,
 		);
+		this.slideY?.off(
+			isMobile ? 'touchstart' : 'mousedown',
+			this.scrollYStart,
+		);
+		if (isMobile) {
+			if (this.x)
+				this.container.off('touchstart', this.bindContainerTouchX);
+			if (this.y)
+				this.container.off('touchstart', this.bindContainerTouchY);
+		} else {
+			this.container.off(
+				isFirefox ? 'DOMMouseScroll' : 'mousewheel',
+				this.bindWheelScroll,
+			);
+		}
+		this.container.off('scroll', this.scroll);
 		this.container.removeClass('data-scrollable');
 		if (this.x) {
 			this.scrollBarX?.remove();

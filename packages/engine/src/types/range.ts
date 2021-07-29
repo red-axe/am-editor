@@ -24,9 +24,14 @@ export interface Range {
 	/**
 	 * 从路径转换为光标
 	 * @param path
-	 * @param 上下文，默认编辑器节点
+	 * @param context 上下文，默认编辑器节点
+	 * @param includeCardCursor 是否还原到卡片两侧光标处，必须保证 参数 path 中包含光标位置信息
 	 */
-	fromPath(path: Path[], context?: NodeInterface): RangeInterface;
+	fromPath(
+		path: Path[],
+		context?: NodeInterface,
+		includeCardCursor?: boolean,
+	): RangeInterface;
 }
 
 export interface RangeInterface {
@@ -173,8 +178,9 @@ export interface RangeInterface {
 	getRootBlock(): NodeInterface | undefined;
 	/**
 	 * 获取光标路径
+	 * @param includeCardCursor 是否包含卡片两侧光标
 	 */
-	toPath(): Path[];
+	toPath(includeCardCursor?: boolean): Path[];
 }
 
 export const isSelection = (

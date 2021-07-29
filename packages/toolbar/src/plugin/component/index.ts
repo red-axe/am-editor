@@ -46,7 +46,7 @@ class ToolbarComponent extends Card {
 		if (collapseConfig)
 			collapseGroups = (collapseConfig as CollapseProps).groups;
 		const collapseItems: Array<Omit<CollapseItemProps, 'engine'>> = [];
-		collapseGroups.forEach(group => {
+		collapseGroups.forEach((group) => {
 			collapseItems.push(...group.items);
 		});
 		const value = this.getValue();
@@ -59,7 +59,7 @@ class ToolbarComponent extends Card {
 				let name = item;
 				if (typeof item !== 'string') name = item.name;
 				const collapseItem = collapseItems.find(
-					item => item.name === name,
+					(item) => item.name === name,
 				);
 				if (collapseItem) {
 					items.push({
@@ -93,8 +93,8 @@ class ToolbarComponent extends Card {
 		// search with case insensitive
 		if (typeof keyword === 'string') keyword = keyword.toLowerCase();
 
-		this.data.forEach(group => {
-			group.items.forEach(item => {
+		this.data.forEach((group) => {
+			group.items.forEach((item) => {
 				if (item.search.toLowerCase().indexOf(keyword) >= 0) {
 					if (!items.find(({ name }) => name === item.name)) {
 						items.push({ ...item });
@@ -195,7 +195,7 @@ class ToolbarComponent extends Card {
 		this.keyword = center.find('.data-toolbar-component-keyword');
 		this.placeholder = center.find('.data-toolbar-component-placeholder');
 		// 监听输入事件
-		this.keyword?.on('keydown', e => {
+		this.keyword?.on('keydown', (e) => {
 			if (isHotkey('enter', e)) {
 				e.preventDefault();
 			}
@@ -204,7 +204,7 @@ class ToolbarComponent extends Card {
 		this.keyword?.on('input', () => {
 			this.resetPlaceHolder();
 			// 在 Windows 上使用中文输入法，在 keydown 事件里无法阻止用户的输入，所以在这里删除用户的输入
-			if (Date.now() - renderTime < 100) {
+			if (Date.now() - renderTime < 200) {
 				const textNode = this.keyword?.first();
 				if (
 					(textNode &&

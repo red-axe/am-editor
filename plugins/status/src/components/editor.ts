@@ -81,9 +81,13 @@ class StatusEditor {
 			this.change();
 		});
 
-		input.on('mousedown', () => {
-			input.get<HTMLInputElement>()?.focus();
-		});
+		input.on(
+			isMobile ? 'touchstart' : 'mousedown',
+			(event: MouseEvent | TouchEvent) => {
+				event.preventDefault();
+				input.get<HTMLInputElement>()?.focus();
+			},
+		);
 		if (onOk) {
 			input.on('keydown', (event) => {
 				if (-1 !== [13, 27].indexOf(event.keyCode)) {

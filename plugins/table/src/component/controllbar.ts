@@ -13,6 +13,7 @@ import {
 	EditorInterface,
 	isEngine,
 	isHotkey,
+	isMobile,
 	NodeInterface,
 	removeUnit,
 } from '@aomao/engine';
@@ -213,11 +214,15 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 */
 	bindEvents() {
 		this.colsHeader
-			?.on('mousedown', (event) => this.onMouseDownColsHeader(event))
+			?.on(isMobile ? 'touchstart' : 'mousedown', (event) =>
+				this.onMouseDownColsHeader(event),
+			)
 			.on('click', (event) => this.onClickColsHeader(event))
 			.on('dragstart', (event) => this.onDragStartColsHeader(event));
 		this.rowsHeader
-			?.on('mousedown', (event) => this.onMouseDownRowsHeader(event))
+			?.on(isMobile ? 'touchstart' : 'mousedown', (event) =>
+				this.onMouseDownRowsHeader(event),
+			)
 			.on('click', (event) => this.onClickRowsHeader(event))
 			.on('dragstart', (event) => this.onDragStartRowsHeader(event));
 		this.tableHeader?.on('click', (event) =>
@@ -236,26 +241,29 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.menuBar?.on('mouseover', (event) => this.handleHoverMenu(event));
 		this.menuBar?.on('mouseleave', (event) => this.hideHighlight(event));
 		//列头部 padding 区域单击让其选中表格卡片上方的blcok
-		this.viewport?.on('mousedown', (event: MouseEvent) => {
-			if (!event.target) return;
-			const targetNode = $(event.target);
-			if (
-				!isEngine(this.editor) ||
-				!event.target ||
-				!this.viewport?.equal(targetNode)
-			)
-				return;
-			event.preventDefault();
-			event.stopPropagation();
-			const { change } = this.editor;
-			const range = change.getRange();
-			this.table.focusPrevBlock(range, true);
-			this.editor.card.activate(
-				range.startNode,
-				ActiveTrigger.MOUSE_DOWN,
-			);
-			this.editor.focus();
-		});
+		this.viewport?.on(
+			isMobile ? 'touchstart' : 'mousedown',
+			(event: MouseEvent) => {
+				if (!event.target) return;
+				const targetNode = $(event.target);
+				if (
+					!isEngine(this.editor) ||
+					!event.target ||
+					!this.viewport?.equal(targetNode)
+				)
+					return;
+				event.preventDefault();
+				event.stopPropagation();
+				const { change } = this.editor;
+				const range = change.getRange();
+				this.table.focusPrevBlock(range, true);
+				this.editor.card.activate(
+					range.startNode,
+					ActiveTrigger.MOUSE_DOWN,
+				);
+				this.editor.focus();
+			},
+		);
 		//行删除按钮
 		this.rowDeleteButton
 			?.on('mouseover', (event) => this.handleHighlightRow())
@@ -422,14 +430,14 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @param event 事件
 	 * @returns
 	 */
-	onMouseDownColsHeader(event: MouseEvent) {
+	onMouseDownColsHeader(event: MouseEvent | TouchEvent) {
 		const trigger = $(event.target || []).closest(
 			Template.COLS_HEADER_TRIGGER_CLASS,
 		);
 		//不可移动状态
 		if (trigger.length === 0) {
 			//右键显示菜单
-			if (event.button === 2) {
+			if (event instanceof MouseEvent && event.button === 2) {
 				this.showContextMenu(event);
 			}
 			return;
@@ -442,14 +450,14 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @param event 事件
 	 * @returns
 	 */
-	onMouseDownRowsHeader(event: MouseEvent) {
+	onMouseDownRowsHeader(event: MouseEvent | TouchEvent) {
 		const trigger = $(event.target || []).closest(
 			Template.ROWS_HEADER_TRIGGER_CLASS,
 		);
 		//不可移动状态
 		if (trigger.length === 0) {
 			//右键显示菜单
-			if (event.button === 2) {
+			if (event instanceof MouseEvent && event.button === 2) {
 				this.showContextMenu(event);
 			}
 			return;
@@ -599,14 +607,17 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @param col 列节点
 	 * @param event 事件
 	 */
-	startChangeCol(trigger: NodeInterface, event: MouseEvent) {
+	startChangeCol(trigger: NodeInterface, event: MouseEvent | TouchEvent) {
 		event.stopPropagation();
 		event.preventDefault();
 		const col = trigger.parent()!;
 		const colElement = col.get<HTMLTableColElement>()!;
 		this.table.selection.clearSelect();
 		this.dragging = {
-			x: event.clientX,
+			x:
+				event instanceof MouseEvent
+					? event.clientX
+					: event.touches[0].clientX,
 			y: -1,
 		};
 		const index =
@@ -636,7 +647,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @param col 列节点
 	 * @param event 事件
 	 */
-	startChangeRow(trigger: NodeInterface, event: MouseEvent) {
+	startChangeRow(trigger: NodeInterface, event: MouseEvent | TouchEvent) {
 		event.stopPropagation();
 		event.preventDefault();
 		const row = trigger.parent()!;
@@ -644,7 +655,10 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.table.selection.clearSelect();
 		this.dragging = {
 			x: -1,
-			y: event.clientY,
+			y:
+				event instanceof MouseEvent
+					? event.clientY
+					: event.touches[0].clientY,
 		};
 		const index =
 			this.rowsHeader
@@ -675,9 +689,16 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		//添加鼠标样式
 		this.colsHeader?.addClass('resize');
 		this.rowsHeader?.addClass('resize');
-		document.addEventListener('mousemove', this.onChangeSize);
-		document.addEventListener('mouseup', this.onChangeSizeEnd);
-		document.addEventListener('mouseleave', this.onChangeSizeEnd);
+		document.addEventListener(
+			isMobile ? 'touchmove' : 'mousemove',
+			this.onChangeSize,
+		);
+		document.addEventListener(
+			isMobile ? 'touchend' : 'mouseup',
+			this.onChangeSizeEnd,
+		);
+		if (!isMobile)
+			document.addEventListener('mouseleave', this.onChangeSizeEnd);
 	}
 	/**
 	 * 移除绑定改变不大小事件
@@ -686,12 +707,19 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		//添加鼠标样式
 		this.colsHeader?.removeClass('resize');
 		this.rowsHeader?.removeClass('resize');
-		document.removeEventListener('mousemove', this.onChangeSize);
-		document.removeEventListener('mouseup', this.onChangeSizeEnd);
-		document.removeEventListener('mouseleave', this.onChangeSizeEnd);
+		document.removeEventListener(
+			isMobile ? 'touchmove' : 'mousemove',
+			this.onChangeSize,
+		);
+		document.removeEventListener(
+			isMobile ? 'touchend' : 'mouseup',
+			this.onChangeSizeEnd,
+		);
+		if (!isMobile)
+			document.removeEventListener('mouseleave', this.onChangeSizeEnd);
 	}
 
-	onChangeSize = (event: MouseEvent) => {
+	onChangeSize = (event: MouseEvent | TouchEvent) => {
 		if (!this.dragging) return;
 		if (this.dragging.y > -1) {
 			this.onChangeRowHeight(event);
@@ -704,10 +732,13 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @param event 事件
 	 * @returns
 	 */
-	onChangeColWidth(event: MouseEvent) {
+	onChangeColWidth(event: MouseEvent | TouchEvent) {
 		if (!this.dragging || !this.changeSize) return;
 		//鼠标移动宽度
-		let width = event.clientX - this.dragging.x;
+		let width =
+			(event instanceof MouseEvent
+				? event.clientX
+				: event.touches[0].clientX) - this.dragging.x;
 		//获取合法的宽度
 		const colWidth = Math.max(
 			this.COL_MIN_WIDTH,
@@ -757,9 +788,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.tableRoot?.css('width', `${tableWidth}px`);
 	}
 
-	onChangeRowHeight(event: MouseEvent) {
+	onChangeRowHeight(event: MouseEvent | TouchEvent) {
 		if (!this.dragging || !this.changeSize) return;
-		let height = event.clientY - this.dragging.y;
+		let height =
+			(event instanceof MouseEvent
+				? event.clientY
+				: event.touches[0].clientY) - this.dragging.y;
 		const rowHeight = Math.max(
 			this.ROW_MIN_HEIGHT,
 			this.changeSize.height + height,
@@ -792,7 +826,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		trigger.addClass('dragging').css('width', `${width + row.width()}px`);
 	}
 
-	onChangeSizeEnd = (event: MouseEvent) => {
+	onChangeSizeEnd = (event: MouseEvent | TouchEvent) => {
 		if (
 			event.type === 'mouseleave' &&
 			this.table.getCenter().contains(event['toElement'])

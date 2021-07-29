@@ -91,12 +91,17 @@ export default defineComponent({
 
         //移动端浏览器视图信息
         const toolbarRef = ref<HTMLDivElement | null>(null)
+        const caluTimeoutRef = ref<NodeJS.Timeout | null>(null);
         const mobileView = reactive({ top: 0 })
         //计算移动浏览器的视图变化
         const calcuMobileView = () => {
+          if(!props.engine.isFocus() || props.engine.readonly) return
+          if(caluTimeoutRef.value) clearTimeout(caluTimeoutRef.value);
+          caluTimeoutRef.value = setTimeout(() => {
             const rect = toolbarRef.value?.getBoundingClientRect()
             const height = rect?.height || 0
             mobileView.top = global.Math.max(document.body.scrollTop, document.documentElement.scrollTop) + (window.visualViewport.height || 0) - height
+          }, 100);
         }
 
         let scrollTimer:NodeJS.Timeout;
@@ -109,16 +114,28 @@ export default defineComponent({
             }, 200);
         }
 
+        const handleReadonly = () => {
+          if(props.engine.readonly) {
+            hideMobileToolbar()
+          } else {
+            calcuMobileView()
+          }
+        }
+
         onMounted(() => {
             props.engine.language.add(locales)
             props.engine.on("select",update)
             props.engine.on("change",update)
-            props.engine.on('readonly', update);
            
-            if(isMobile) {
-                document.addEventListener("scroll",hideMobileToolbar)
-                visualViewport.addEventListener('resize', calcuMobileView);
-                visualViewport.addEventListener('scroll', calcuMobileView);
+            if (isMobile) {
+              props.engine.on('readonly', handleReadonly)
+              props.engine.on('blur', hideMobileToolbar)
+              document.addEventListener('scroll', hideMobileToolbar);
+              props.engine.on('focus', calcuMobileView)
+              visualViewport.addEventListener('resize', calcuMobileView);
+              visualViewport.addEventListener('scroll', calcuMobileView);
+            } else {
+              props.engine.on('readonly', update);
             }
             update()
         })
@@ -127,10 +144,15 @@ export default defineComponent({
             props.engine.off("select",update)
             props.engine.off("change",update)
             props.engine.off('readonly', update);
-            if(isMobile){
-                document.removeEventListener("scroll",hideMobileToolbar)
-                visualViewport.removeEventListener('resize', calcuMobileView);
-                visualViewport.removeEventListener('scroll', calcuMobileView);
+            if (isMobile) {
+              props.engine.off('readonly', handleReadonly)
+              props.engine.off('blur', hideMobileToolbar)
+              document.removeEventListener('scroll', hideMobileToolbar);
+              props.engine.off('focus', calcuMobileView)
+              visualViewport.removeEventListener('resize', calcuMobileView);
+              visualViewport.removeEventListener('scroll', calcuMobileView);
+            } else {
+              props.engine.off('readonly', update);
             }
         })
 
@@ -231,5 +253,9 @@ export {
 
 .editor-toolbar-popover .ant-popover-inner-content {
     padding: 2px;
+}
+
+.am-engine-mobile {
+  margin-bottom: 40px;
 }
 </style>

@@ -682,7 +682,7 @@ class RangeColoring implements RangeColoringInterface {
 			const member = members.find((m) => m.uuid === uuid);
 			if (member && (idDraw || active)) {
 				if (path.length !== 0) {
-					const range = Range.fromPath(engine, path);
+					const range = Range.fromPath(engine, path, undefined, true);
 					this.drawRange(range, member);
 				} else {
 					info[uuid] = true;

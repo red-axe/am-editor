@@ -18,7 +18,8 @@
 }
 
 .data-link-container-mobile .data-link-editor {
-    min-width: calc(100vw - 20px);;
+    min-width: calc(100vw - 40px);
+    padding: 8px 6px;
 }
 
 .data-link-container p {

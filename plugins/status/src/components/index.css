@@ -39,7 +39,7 @@
 }
 
 .data-card-status-editor-mobile {
-    width: calc(100vw - 20px);
+    width: calc(100vw - 40px);
 }
   
 .data-card-status-editor input {

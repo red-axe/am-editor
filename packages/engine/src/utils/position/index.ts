@@ -2,6 +2,7 @@ import domAlign from 'dom-align';
 import { EditorInterface, isEngine, NodeInterface } from '../../types';
 import { $ } from '../../node';
 import placements from './placements';
+import { isMobile } from '../user-agent';
 
 class Position {
 	#editor: EditorInterface;
@@ -11,6 +12,7 @@ class Position {
 	#offset: Array<number> = [0, 0];
 	#root?: NodeInterface;
 	#onUpdate?: (rect: any) => void;
+	#updateTimeout?: NodeJS.Timeout;
 
 	constructor(editor: EditorInterface) {
 		this.#editor = editor;
@@ -33,9 +35,9 @@ class Position {
 		this.#root.append(this.#container);
 		this.#editor.root.append(this.#root);
 		this.#onUpdate = onUpdate;
-		window.addEventListener('scroll', this.updateListener);
+		if (!isMobile) window.addEventListener('scroll', this.updateListener);
 		window.addEventListener('resize', this.updateListener);
-		if (isEngine(this.#editor)) {
+		if (isEngine(this.#editor) && !isMobile) {
 			this.#editor.scrollNode?.on('scroll', this.updateListener);
 		}
 		this.update();
@@ -46,7 +48,10 @@ class Position {
 	}
 
 	updateListener = () => {
-		this.update();
+		if (this.#updateTimeout) clearTimeout(this.#updateTimeout);
+		this.#updateTimeout = setTimeout(() => {
+			this.update();
+		}, 50);
 	};
 
 	update = (triggerUpdate: boolean = true) => {
@@ -79,9 +84,10 @@ class Position {
 
 	destroy() {
 		this.#onUpdate = undefined;
-		window.removeEventListener('scroll', this.updateListener);
+		if (!isMobile)
+			window.removeEventListener('scroll', this.updateListener);
 		window.removeEventListener('resize', this.updateListener);
-		if (isEngine(this.#editor)) {
+		if (isEngine(this.#editor) && !isMobile) {
 			this.#editor.scrollNode?.off('scroll', this.updateListener);
 		}
 		this.#root?.remove();

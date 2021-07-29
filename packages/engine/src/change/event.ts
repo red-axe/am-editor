@@ -10,6 +10,7 @@ import { CARD_ELEMENT_KEY } from '../constants/card';
 import { ClipboardData } from '../types/clipboard';
 import { DATA_ELEMENT, UI } from '../constants';
 import { $ } from '../node';
+import { isMobile } from '../utils';
 
 class ChangeEvent implements ChangeEventInterface {
 	private events: Array<{
@@ -111,13 +112,16 @@ class ChangeEvent implements ChangeEventInterface {
 		const { bindSelect } = this.options;
 		if (bindSelect && !bindSelect()) return;
 		// 模拟 selection change 事件
-		this.onContainer('mousedown', (e) => {
-			if (this.isCardInput(e)) {
-				return;
-			}
-			this.isSelecting = true;
-		});
-		this.onDocument('mouseup', (e) => {
+		this.onContainer(
+			isMobile ? 'touchstart' : 'mousedown',
+			(event: MouseEvent | TouchEvent) => {
+				if (this.isCardInput(event)) {
+					return;
+				}
+				this.isSelecting = true;
+			},
+		);
+		this.onDocument(isMobile ? 'touchend' : 'mouseup', (e) => {
 			if (!this.isSelecting) {
 				return;
 			}

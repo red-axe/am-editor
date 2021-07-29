@@ -7,6 +7,7 @@ import {
 	PluginEntry,
 	RangeInterface,
 	isNode,
+	CardEntry,
 } from '../types';
 import { ListInterface, ListModelInterface } from '../types/list';
 import { getWindow, removeUnit } from '../utils';
@@ -223,8 +224,11 @@ class List implements ListModelInterface {
 		if (this.editor.node.isCustomize(node)) {
 			switch (node.name) {
 				case 'li':
+					if (this.editor.node.isCustomize(node)) {
+						const first = node.first();
+						if (first?.isCard()) first.remove();
+					}
 					node.removeAttributes('class');
-					node.find(CARD_SELECTOR).remove();
 					return node;
 				case 'ul':
 					node.removeAttributes('class');
@@ -561,28 +565,34 @@ class List implements ListModelInterface {
 		if (isNode(node)) node = $(node);
 		//必须是li标签
 		if (node.name !== 'li') return;
-		//第一个子节点必须不是卡片
-		if (node.first()?.isCard()) return;
+		//第一个子节点必须不是相同卡片
+		const first = node.first();
+		if (
+			first?.isBlockCard() ||
+			(first?.isCard() &&
+				(first.constructor as CardEntry).cardName === cardName)
+		)
+			return;
 		//创建卡片
 		const { card } = this.editor;
 		const component = card.create(cardName, {
 			value,
 		});
-		// 获取子节点，插入卡片后再追加到后面，否则会覆盖掉之前的节点
-		const children = node.children().clone(true);
-		// 清空原节点
-		node.empty();
-		//设置光标选中
 		const range = Range.create(this.editor);
-		range.select(node, true).collapse(true);
+		//设置光标选中空的标签，在这个位置插入卡片
+		const br = $('<br />');
+		if (node.children().length > 0) {
+			node.first()?.before(br);
+		} else {
+			node.append(br);
+		}
+		range.select(br, true);
 		//插入卡片
 		card.insertNode(range, component);
 		const lastNode = node.last();
 		if (lastNode?.name === 'br') {
 			lastNode.remove();
 		}
-		// 还原子节点
-		node.append(children);
 		return component;
 	}
 	/**
@@ -600,7 +610,13 @@ class List implements ListModelInterface {
 		//必须是li标签
 		if (node.name !== 'li') return;
 		//第一个子节点必须不是卡片
-		if (node.first()?.isCard()) return;
+		const first = node.first();
+		if (
+			first?.isBlockCard() ||
+			(first?.isCard() &&
+				(first.constructor as CardEntry).cardName === cardName)
+		)
+			return;
 		const cardRoot = $('<span />');
 		node.prepend(cardRoot);
 		this.editor.card.replaceNode(cardRoot, cardName, value);

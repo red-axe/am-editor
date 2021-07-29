@@ -63,3 +63,7 @@
 .editor-toolbar-popover .ant-popover-inner-content {
     padding: 2px;
 }
+
+.am-engine-mobile {
+  margin-bottom: 40px;
+}

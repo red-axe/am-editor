@@ -869,8 +869,10 @@ export const getToolbarDefaultConfig = (
 			onDisabled: () => {
 				const { change, card } = engine;
 				const range = change.getRange();
+				const cardComponent = card.find(range.startNode);
 				return (
-					!!card.find(range.startNode) ||
+					(!!cardComponent &&
+						!cardComponent.isCursor(range.startNode)) ||
 					range.commonAncestorNode.find(CARD_SELECTOR).length > 0 ||
 					!engine.command.queryEnabled('link')
 				);

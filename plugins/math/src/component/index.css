@@ -32,7 +32,7 @@
     text-indent: 0;
   }
 .data-card-math-editor-mobile {
-    width: calc(100vw - 20px);
+    width: calc(100vw - 40px);
 }
   .data-card-math-editor textarea {
     width: 100%;

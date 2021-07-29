@@ -12,6 +12,7 @@ import {
 	formatEngineValue,
 	getDocument,
 	getWindow,
+	isMobile,
 } from '../utils';
 import { Path } from 'sharedb';
 import {
@@ -25,6 +26,7 @@ import {
 	EDITABLE,
 	EDITABLE_SELECTOR,
 	ROOT,
+	ROOT_SELECTOR,
 	UI_SELECTOR,
 } from '../constants/root';
 import Paste from './paste';
@@ -157,8 +159,8 @@ class ChangeModel implements ChangeInterface {
 						startNode.first()?.isCard())) &&
 				'br' === startNode.last()?.name
 			) {
-				range.setStart(startNode, startOffset - 1);
-				range.collapse(true);
+				//range.setStart(startNode, startOffset - 1);
+				//range.collapse(true);
 			}
 		}
 		//修复inline光标
@@ -729,7 +731,7 @@ class ChangeModel implements ChangeInterface {
 			this.change();
 		});
 
-		this.event.onDocument('selectionchange', () => {
+		this.event.onDocument('selectionchange', (event: Event) => {
 			const { window } = container;
 			const selection = window?.getSelection();
 			if (selection && selection.anchorNode) {
@@ -773,6 +775,7 @@ class ChangeModel implements ChangeInterface {
 		});
 		this.event.onSelect(() => {
 			const range = this.getRange();
+			if (range.startNode.closest(ROOT_SELECTOR).length === 0) return;
 			if (range.collapsed && range.containsCard()) {
 				this.getSafeRange(range);
 			}
@@ -802,41 +805,44 @@ class ChangeModel implements ChangeInterface {
 			}
 		});
 
-		this.event.onDocument('mousedown', (e: MouseEvent) => {
-			if (!e.target) return;
-			const targetNode = $(e.target);
-			const cardComponent = card.find(targetNode);
-			if (
-				cardComponent &&
-				(cardComponent.constructor as CardEntry).cardType ===
-					CardType.INLINE
-			) {
-				return;
-			}
-			// 点击元素已被移除
-			if (targetNode.closest('body').length === 0) {
-				return;
-			}
-			// 阅读模式节点
-			if (targetNode.closest('.am-view').length > 0) {
-				return;
-			}
-			// 工具栏、侧边栏、内嵌工具栏的点击
-			let node: NodeInterface | undefined = targetNode;
-			while (node) {
-				const attrValue = node.attributes(DATA_ELEMENT);
-				if (attrValue && [ROOT, EDITABLE].indexOf(attrValue) < 0) {
+		this.event.onDocument(
+			isMobile ? 'touchstart' : 'mousedown',
+			(e: MouseEvent | TouchEvent) => {
+				if (!e.target) return;
+				const targetNode = $(e.target);
+				const cardComponent = card.find(targetNode);
+				if (
+					cardComponent &&
+					(cardComponent.constructor as CardEntry).cardType ===
+						CardType.INLINE
+				) {
 					return;
 				}
-				node = node.parent();
-			}
-			//如果当前target是卡片，但是光标不在卡片上，让其选中
-			const { startNode } = this.getRange();
-			if (cardComponent && !card.find(startNode, true)) {
-				card.select(cardComponent);
-			}
-			card.activate(targetNode, ActiveTrigger.MOUSE_DOWN);
-		});
+				// 点击元素已被移除
+				if (targetNode.closest('body').length === 0) {
+					return;
+				}
+				// 阅读模式节点
+				if (targetNode.closest('.am-view').length > 0) {
+					return;
+				}
+				// 工具栏、侧边栏、内嵌工具栏的点击
+				let node: NodeInterface | undefined = targetNode;
+				while (node) {
+					const attrValue = node.attributes(DATA_ELEMENT);
+					if (attrValue && [ROOT, EDITABLE].indexOf(attrValue) < 0) {
+						return;
+					}
+					node = node.parent();
+				}
+				//如果当前target是卡片，但是光标不在卡片上，让其选中
+				const { startNode } = this.getRange();
+				if (cardComponent && !card.find(startNode, true)) {
+					card.select(cardComponent);
+				}
+				card.activate(targetNode, ActiveTrigger.MOUSE_DOWN);
+			},
+		);
 
 		this.event.onDocument('copy', (event) => {
 			clipboard.write(event);

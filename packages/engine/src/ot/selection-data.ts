@@ -33,7 +33,7 @@ class SelectionData implements SelectionDataInterface {
 	setAll(data: Array<Attribute>) {
 		const { container } = this.engine;
 		const dataState: { [key: string]: boolean } = {};
-		data.forEach(item => {
+		data.forEach((item) => {
 			if (item) {
 				const name = 'data-selection-'.concat(item.uuid);
 				dataState[name] = true;
@@ -92,13 +92,13 @@ class SelectionData implements SelectionDataInterface {
 				range.setEnd(endCard.getCenter().parent()!, 1);
 			}
 		}
-		const path = range.toPath();
+		const path = range.toPath(true);
 		this.currentRangePath = path;
 		const pathString = JSON.stringify(path);
 		let data: Array<Attribute | null> = this.getAll();
 		let isMember = false;
 		let isUpdate = false;
-		data = data.map(attr => {
+		data = data.map((attr) => {
 			if (!attr) {
 				isUpdate = true;
 				return null;
@@ -113,7 +113,7 @@ class SelectionData implements SelectionDataInterface {
 				}
 				return attr;
 			} else {
-				if (members.find(member => member.uuid === attr.uuid)) {
+				if (members.find((member) => member.uuid === attr.uuid)) {
 					attr.active = false;
 					return attr;
 				} else {
@@ -124,7 +124,7 @@ class SelectionData implements SelectionDataInterface {
 		});
 
 		const newData: Array<Attribute> = [];
-		data.forEach(attr => {
+		data.forEach((attr) => {
 			if (!!attr) newData.push(attr);
 		});
 

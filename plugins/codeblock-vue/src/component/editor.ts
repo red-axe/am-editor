@@ -4,6 +4,7 @@ import {
 	$,
 	EditorInterface,
 	isEngine,
+	isMobile,
 	isServer,
 	NodeInterface,
 } from '@aomao/engine';
@@ -111,14 +112,17 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			const { onBlur } = this.options;
 			if (onBlur) onBlur();
 		});
-		this.codeMirror.on('mousedown', (_, event) => {
-			const { onMouseDown } = this.options;
-			if (onMouseDown) onMouseDown(event);
-		});
-		this.codeMirror.on('touchstart', (_, event) => {
-			const { onMouseDown } = this.options;
-			if (onMouseDown) onMouseDown(event);
-		});
+		if (isMobile) {
+			this.codeMirror.on('touchstart', (_, event) => {
+				const { onMouseDown } = this.options;
+				if (onMouseDown) onMouseDown(event);
+			});
+		} else {
+			this.codeMirror.on('mousedown', (_, event) => {
+				const { onMouseDown } = this.options;
+				if (onMouseDown) onMouseDown(event);
+			});
+		}
 		this.codeMirror.on(
 			'change',
 			debounce(() => {

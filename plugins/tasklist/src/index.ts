@@ -120,7 +120,7 @@ export default class extends ListPlugin<Options> {
 				range.select(brNode);
 				range.collapse(false);
 			}
-			change.select(range);
+			change.apply(range);
 			list.merge();
 		}
 	}

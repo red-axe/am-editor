@@ -145,6 +145,7 @@ class Status extends Card<StatusValue> {
 		if (!this.#statusEditor) return;
 		const value = this.getValue();
 		if (!value) return;
+		this.#position?.destroy();
 		this.#editorContainer = this.#statusEditor.render(
 			value.id,
 			value.text || '',
@@ -171,6 +172,7 @@ class Status extends Card<StatusValue> {
 
 	destroy() {
 		this.#statusEditor?.destroy();
+		this.#position?.destroy();
 	}
 }
 

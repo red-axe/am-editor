@@ -48,19 +48,24 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 	//移动端浏览器视图信息
 	const toolbarRef = useRef<HTMLDivElement | null>(null);
 	const [mobileView, setMobileView] = useState({ top: 0 });
+	const caluTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	//计算移动浏览器的视图变化
 	const calcuMobileView = () => {
-		const rect = toolbarRef.current?.getBoundingClientRect();
-		const height = rect?.height || 0;
-		setMobileView({
-			top:
-				global.Math.max(
-					document.body.scrollTop,
-					document.documentElement.scrollTop,
-				) +
-				(window.visualViewport.height || 0) -
-				height,
-		});
+		if (!engine.isFocus() || engine.readonly) return;
+		if (caluTimeoutRef.current) clearTimeout(caluTimeoutRef.current);
+		caluTimeoutRef.current = setTimeout(() => {
+			const rect = toolbarRef.current?.getBoundingClientRect();
+			const height = rect?.height || 0;
+			setMobileView({
+				top:
+					global.Math.max(
+						document.body.scrollTop,
+						document.documentElement.scrollTop,
+					) +
+					(window.visualViewport.height || 0) -
+					height,
+			});
+		}, 100);
 	};
 	/**
 	 * 更新状态
@@ -146,7 +151,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 		engine.language.add(locales);
 		engine.on('select', updateState);
 		engine.on('change', updateState);
-		engine.on('readonly', updateState);
 
 		let scrollTimer: NodeJS.Timeout;
 
@@ -160,20 +164,38 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 			}, 200);
 		};
 
+		const handleReadonly = () => {
+			if (engine.readonly) {
+				hideMobileToolbar();
+			} else {
+				calcuMobileView();
+			}
+		};
+
 		if (isMobile) {
+			engine.on('readonly', handleReadonly);
+			engine.on('blur', hideMobileToolbar);
 			document.addEventListener('scroll', hideMobileToolbar);
+			engine.on('focus', calcuMobileView);
 			visualViewport.addEventListener('resize', calcuMobileView);
 			visualViewport.addEventListener('scroll', calcuMobileView);
+		} else {
+			engine.on('readonly', updateState);
 		}
 
 		return () => {
 			engine.off('select', updateState);
 			engine.off('change', updateState);
-			engine.off('readonly', updateState);
+
 			if (isMobile) {
+				engine.off('readonly', handleReadonly);
+				engine.off('blur', hideMobileToolbar);
 				document.removeEventListener('scroll', hideMobileToolbar);
+				engine.off('focus', calcuMobileView);
 				visualViewport.removeEventListener('resize', calcuMobileView);
 				visualViewport.removeEventListener('scroll', calcuMobileView);
+			} else {
+				engine.off('readonly', updateState);
 			}
 		};
 	}, [engine]);

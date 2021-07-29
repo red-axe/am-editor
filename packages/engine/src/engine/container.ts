@@ -94,14 +94,27 @@ class Container {
 				engine.change.apply(range);
 			}
 		});
-
+		let isMousedown = false;
+		this.node.on(isMobile ? 'touchstart' : 'mousedown', () => {
+			isMousedown = true;
+			setTimeout(() => {
+				if (!this._focused) {
+					this._focused = true;
+					engine.trigger('focus');
+				}
+				isMousedown = false;
+			}, 10);
+		});
 		this.node.on('focus', () => {
+			isMousedown = false;
 			this._focused = true;
-			return engine.trigger('focus');
+			engine.trigger('focus');
 		});
 		this.node.on('blur', () => {
+			if (isMousedown) return;
+			isMousedown = false;
 			this._focused = false;
-			return engine.trigger('blur');
+			engine.trigger('blur');
 		});
 	}
 
