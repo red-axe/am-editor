@@ -186,7 +186,7 @@ class MentionPlugin extends Plugin<Options> {
 				this.editor.card.each((card) => {
 					const Component = card.constructor as CardEntry;
 					if (Component.cardName === MentionComponent.cardName) {
-						const { id, key, name, ...value } =
+						const { key, name, ...value } =
 							(card as MentionComponent).getValue() || {};
 						if (name && key)
 							values.push({
