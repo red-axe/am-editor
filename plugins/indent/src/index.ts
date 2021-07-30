@@ -148,9 +148,16 @@ export default class extends Plugin<Options> {
 		const { change, list } = this.editor;
 		let range = change.getRange();
 		const block = this.editor.block.closest(range.startNode);
-		if (range.collapsed && 'li' === block.name && !list.isFirst(range)) {
+		if ('li' === block.name) {
+			if (range.collapsed && !list.isFirst(range)) {
+				return;
+			} else if (!range.collapsed) return;
+		} else if (
+			range.collapsed &&
+			!this.editor.block.isFirstOffset(range, 'start')
+		)
 			return;
-		}
+		else if (!range.collapsed) return;
 		if (this.queryState()) {
 			event.preventDefault();
 			this.editor.command.execute(

@@ -569,8 +569,7 @@ class List implements ListModelInterface {
 		const first = node.first();
 		if (
 			first?.isBlockCard() ||
-			(first?.isCard() &&
-				(first.constructor as CardEntry).cardName === cardName)
+			(first?.isCard() && first.attributes(CARD_KEY) === cardName)
 		)
 			return;
 		//创建卡片
@@ -613,8 +612,7 @@ class List implements ListModelInterface {
 		const first = node.first();
 		if (
 			first?.isBlockCard() ||
-			(first?.isCard() &&
-				(first.constructor as CardEntry).cardName === cardName)
+			(first?.isCard() && first.attributes(CARD_KEY) === cardName)
 		)
 			return;
 		const cardRoot = $('<span />');

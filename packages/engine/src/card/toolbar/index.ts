@@ -12,7 +12,8 @@ import {
 import { EditorInterface, isEngine } from '../../types/engine';
 import { DATA_ELEMENT, UI } from '../../constants';
 import { $ } from '../../node';
-import { isMobile, Position } from '../../utils';
+import { isMobile } from '../../utils';
+import Position from '../../position';
 import './index.css';
 
 export const isCardToolbarItemOptions = (

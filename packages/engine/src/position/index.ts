@@ -1,8 +1,8 @@
 import domAlign from 'dom-align';
-import { EditorInterface, isEngine, NodeInterface } from '../../types';
-import { $ } from '../../node';
+import { EditorInterface, isEngine, NodeInterface } from '../types';
+import { $ } from '../node';
 import placements from './placements';
-import { isMobile } from '../user-agent';
+import { isMobile } from '../utils/user-agent';
 
 class Position {
 	#editor: EditorInterface;

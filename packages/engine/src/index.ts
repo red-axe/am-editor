@@ -22,6 +22,7 @@ import Request, {
 	getFileSize,
 } from './request';
 import Scrollbar from './scrollbar';
+import Position from './position';
 import { $, getHashId } from './node';
 
 export * from './types';
@@ -53,5 +54,6 @@ export {
 	getExtensionName,
 	getFileSize,
 	Scrollbar,
+	Position,
 	Path,
 };
