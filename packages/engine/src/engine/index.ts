@@ -330,8 +330,8 @@ class Engine implements EngineInterface {
 			anchorParent = selection.anchor.parent();
 			focusParent = selection.focus.parent();
 		}
-		if (anchorNext) selection.anchor?.remove();
-		if (focusPrev) selection.focus?.remove();
+		//if (anchorNext) selection.anchor?.remove();
+		//if (focusPrev) selection.focus?.remove();
 		// 保证所有行内元素都在段落内
 		this.container.children().each((child) => {
 			const node = $(child);

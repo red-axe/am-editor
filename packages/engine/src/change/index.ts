@@ -146,9 +146,10 @@ class ChangeModel implements ChangeInterface {
 		const { container, mark, block, inline, node } = this.engine;
 		const { window } = container;
 		const selection = window?.getSelection();
+		if (this.isComposing()) return this;
 		//折叠状态
 		if (range.collapsed) {
-			const { startNode, startOffset } = range;
+			const { startNode, startOffset, endNode, endOffset } = range;
 			//如果节点下只要一个br标签，并且是<p><br /><cursor /></p>,那么选择让光标选择在 <p><cursor /><br /></p>
 			if (
 				((startNode.isElement() &&
@@ -159,8 +160,8 @@ class ChangeModel implements ChangeInterface {
 						startNode.first()?.isCard())) &&
 				'br' === startNode.last()?.name
 			) {
-				//range.setStart(startNode, startOffset - 1);
-				//range.collapse(true);
+				range.setStart(startNode, startOffset - 1);
+				range.collapse(true);
 			}
 		}
 		//修复inline光标
@@ -466,7 +467,6 @@ class ChangeModel implements ChangeInterface {
 			) {
 				let markParent: NodeInterface | undefined = parent;
 				let markTops: Array<NodeInterface> = [];
-
 				//循环查找
 				while (markParent && node.isMark(markParent)) {
 					const markPlugin = mark.findPlugin(markParent);
@@ -548,7 +548,6 @@ class ChangeModel implements ChangeInterface {
 			) {
 				let markParent: NodeInterface | undefined = parent;
 				let markTops: Array<NodeInterface> = [];
-
 				//循环查找
 				while (markParent && node.isMark(markParent)) {
 					const markPlugin = mark.findPlugin(markParent);
@@ -732,6 +731,7 @@ class ChangeModel implements ChangeInterface {
 		});
 
 		this.event.onDocument('selectionchange', (event: Event) => {
+			if (this.isComposing()) return;
 			const { window } = container;
 			const selection = window?.getSelection();
 			if (selection && selection.anchorNode) {

@@ -103,6 +103,14 @@ class Mutation extends EventEmitter2 implements MutationInterface {
 		}
 	}
 
+	/**
+	 * 获取缓存的记录
+	 * @returns
+	 */
+	getCaches(): MutationRecord[] {
+		return this.cache;
+	}
+
 	onOpsReady(ops: Op[]) {
 		if (!this.isStopped) this.emit('ops', ops);
 	}

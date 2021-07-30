@@ -451,7 +451,8 @@ class Creator extends EventEmitter2 {
 				typeof ops[0].li === 'string'
 			) {
 				this.lineStart = true;
-				ops[0].li = '';
+				ops.splice(0, 1);
+				//ops[0].li = '';
 				this.readyToEmitOps(ops);
 				return;
 			}

@@ -155,6 +155,11 @@ export interface MutationInterface extends EventEmitter2 {
 	 */
 	destroyCache(): void;
 	/**
+	 * 获取缓存的记录
+	 * @returns
+	 */
+	getCaches(): MutationRecord[];
+	/**
 	 * 操作读取
 	 * @param ops 操作
 	 */
@@ -212,6 +217,11 @@ export interface OTInterface extends EventEmitter2 {
 	 * 将缓存遗弃，并停止缓存
 	 */
 	destroyMutationCache(): void;
+	/**
+	 * 获取缓存的记录
+	 * @returns
+	 */
+	getCaches(): MutationRecord[];
 	setMemberIdToUuid(member: Member): void;
 	setMemberUuidToId(member: Member): void;
 	setMemberColor(member: Member): void;

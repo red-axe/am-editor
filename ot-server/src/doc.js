@@ -5,6 +5,7 @@ class Doc {
 		this.id = id.toString();
 		this.members = [];
 		this.sockets = {};
+		this.timeouts = {};
 		this.destroy = destroy;
 		this.backend = backend;
 		this.indexCount = 0;
@@ -116,6 +117,11 @@ class Doc {
 						}
 						//心跳检测
 						else if (action === 'heartbeat') {
+							const timeout = this.timeouts[member.uuid];
+							if (timeout) clearTimeout(timeout);
+							this.timeouts[member.uuid] = setTimeout(() => {
+								this.removeMember(member.uuid);
+							}, 60000);
 							this.sendMessage(
 								member.uuid,
 								'heartbeat',

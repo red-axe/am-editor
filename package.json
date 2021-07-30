@@ -52,7 +52,7 @@
         "lint-staged": "^10.0.7",
         "prettier": "2.3.1",
         "reconnecting-websocket": "^4.4.0",
-        "sharedb": "^1.8.1",
+        "sharedb": "^1.9.1",
         "yorkie": "^2.0.0"
     }
 }

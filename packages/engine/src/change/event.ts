@@ -67,6 +67,8 @@ class ChangeEvent implements ChangeEventInterface {
 			if (this.engine.readonly) {
 				return;
 			}
+			// 组合输入法缓存协同
+			this.engine.ot.startMutationCache();
 			this.isComposing = true;
 		});
 		this.onContainer('compositionend', () => {
@@ -99,10 +101,11 @@ class ChangeEvent implements ChangeEventInterface {
 			if (this.isCardInput(e)) {
 				return;
 			}
-
 			window.setTimeout(() => {
 				if (!this.isComposing) {
 					callback(e);
+					// 组合输入法结束后提交协同
+					this.engine.ot.submitMutationCache();
 				}
 			}, 10);
 		});
