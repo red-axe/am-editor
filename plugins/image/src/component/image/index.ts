@@ -129,7 +129,9 @@ class Image {
 		const { link, percent, className, onBeforeRender } = this.options;
 
 		if (this.status === 'error') {
-			return `<span class="data-image-error"><span class="data-icon data-icon-error"></span>${
+			return `<span class="data-image-error" style="max-width:${
+				this.maxWidth
+			}px"><span class="data-icon data-icon-error"></span>${
 				message || this.options.message
 			}<span class="data-icon data-icon-copy"></span></span>`;
 		}
@@ -555,7 +557,7 @@ class Image {
 			}
 			// 图片比编辑器大
 			const { width, height } = this.size;
-			if (width > this.maxWidth) {
+			if (!width || width > this.maxWidth) {
 				this.detail.css('width', `${this.maxWidth}px`);
 				// 图片比编辑器小
 			} else {

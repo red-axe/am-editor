@@ -233,8 +233,15 @@ export default class Paste {
 				nodeApi.unwrap(node);
 				return;
 			}
-			if (nodeApi.isInline(node)) {
-				if (nodeApi.isEmptyWithTrim(node)) node.remove();
+			if (
+				nodeApi.isInline(node) &&
+				!node.isCard() &&
+				!nodeApi.isVoid(node, this.schema)
+			) {
+				const isVoid = node
+					.allChildren()
+					.some((node) => nodeApi.isVoid(node, this.schema));
+				if (nodeApi.isEmptyWithTrim(node) && !isVoid) node.remove();
 				else inline.repairCursor(node);
 			}
 			// 移除两边的 BR
@@ -276,6 +283,16 @@ export default class Paste {
 		nodes.forEach((child) => {
 			const node = $(child);
 			this.engine.trigger('paste:each-after', node);
+			if (node.isText()) {
+				const text = node.text();
+				const match = /((\n)+)/.exec(text);
+				if (match && !text.endsWith('\n') && !text.startsWith('\n')) {
+					const nextReg = node.get<Text>()!.splitText(match.index);
+					const endReg = nextReg.splitText(match[0].length);
+					node.after(nextReg);
+					node.after(endReg);
+				}
+			}
 			// 删除包含Card的 pre 标签
 			if (
 				node.name === 'pre' &&

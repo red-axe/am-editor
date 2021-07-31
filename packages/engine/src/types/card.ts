@@ -154,6 +154,10 @@ export interface CardInterface {
 	 */
 	readonly contenteditable: Array<string>;
 	/**
+	 * 卡片类型
+	 */
+	readonly type: CardType;
+	/**
 	 * 是否最大化
 	 */
 	isMaximize: boolean;

@@ -925,11 +925,13 @@ class Inline implements InlineModelInterface {
 			const selection = node.shrinkToElementNode().createSelection();
 			const inlines = this.findInlines(node);
 			inlines.forEach((inline) => {
+				if (inline.isCard()) return;
 				this.normal(inline);
 			});
 			selection.move();
 			return;
 		}
+		if (node.isCard()) return;
 		const nodeApi = this.editor.node;
 		const markApi = this.editor.mark;
 		//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点

@@ -65,6 +65,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	colorTool?: ColorTool;
 	noBorderToolButton?: NodeInterface;
 	alignToolButton?: NodeInterface;
+	#changeTimeout?: NodeJS.Timeout;
 
 	init() {
 		super.init();
@@ -274,17 +275,20 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 
 	onChange = () => {
 		if (!isEngine(this.editor)) return;
-		this.conltrollBar.refresh();
-		this.selection.render('change');
-		const value = this.getTableValue();
-		const oldValue = this.getValue();
-		if (value && value !== oldValue) {
-			if (oldValue?.noBorder) {
-				this.noBorderToolButton?.addClass('active');
-			} else this.noBorderToolButton?.removeClass('active');
-			this.setValue(value);
-			this.scrollbar?.refresh();
-		}
+		if (this.#changeTimeout) clearTimeout(this.#changeTimeout);
+		this.#changeTimeout = setTimeout(() => {
+			this.conltrollBar.refresh();
+			this.selection.render('change');
+			const value = this.getTableValue();
+			const oldValue = this.getValue();
+			if (value && value !== oldValue) {
+				if (oldValue?.noBorder) {
+					this.noBorderToolButton?.addClass('active');
+				} else this.noBorderToolButton?.removeClass('active');
+				this.setValue(value);
+				this.scrollbar?.refresh();
+			}
+		}, 100);
 	};
 
 	maximize() {

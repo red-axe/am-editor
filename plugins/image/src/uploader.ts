@@ -10,6 +10,9 @@ import {
 	getExtensionName,
 	SchemaInterface,
 	PluginOptions,
+	CARD_VALUE_KEY,
+	decodeCardValue,
+	encodeCardValue,
 } from '@aomao/engine';
 import ImageComponent from './component';
 
@@ -326,8 +329,12 @@ export default class extends Plugin<Options> {
 		schema.add({
 			type: 'inline',
 			name: 'img',
+			isVoid: true,
 			attributes: {
-				src: '@url',
+				src: {
+					required: true,
+					value: '@url',
+				},
 				width: '@number',
 				height: '@number',
 				style: {
@@ -357,9 +364,8 @@ export default class extends Plugin<Options> {
 		const { isRemote } = this.options;
 		//是卡片，并且还没渲染
 		if (node.isCard() && node.attributes(READY_CARD_KEY)) {
-			const card = this.editor.card.find(node) as ImageComponent;
-			if (!card || node.attributes(READY_CARD_KEY) !== 'image') return;
-			const value = card.getValue();
+			if (node.attributes(READY_CARD_KEY) !== 'image') return;
+			const value = decodeCardValue(node.attributes(CARD_VALUE_KEY));
 			if (!value || !value.src) {
 				node.remove();
 				return;
@@ -372,7 +378,10 @@ export default class extends Plugin<Options> {
 			} else if (value.status === 'uploading') {
 				//如果是上传状态，设置为正常状态
 				value.percent = 0;
-				card.setValue({ ...value, status: 'done' });
+				node.attributes(
+					CARD_VALUE_KEY,
+					encodeCardValue({ ...value, status: 'done' }),
+				);
 			}
 			return;
 		}
@@ -416,6 +425,7 @@ export default class extends Plugin<Options> {
 				alt,
 				percent: 0,
 			});
+			node.remove();
 		}
 	}
 
@@ -545,9 +555,7 @@ export default class extends Plugin<Options> {
 		}
 
 		const chars = blockApi.getLeftText(block);
-		const match = /^!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)$/.exec(
-			chars,
-		);
+		const match = /!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)/.exec(chars);
 		if (match) {
 			event.preventDefault();
 			const splits = match[1].split('|');
@@ -569,18 +577,17 @@ export default class extends Plugin<Options> {
 		if (!text) return;
 		// 带跳转链接的图片
 		let reg =
-			/(\[!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)\]\(([\S]+?)\))/;
+			/(\[!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)\]\(([\S]+?)\))|(!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\))/;
 		let match = reg.exec(text);
-		let isLink = true;
+
 		if (!match) {
 			// 无跳转链接的图片
+			//![aomao-preview](https://user-images.githubusercontent.com/55792257/125074830-62d79300-e0f0-11eb-8d0f-bb96a7775568.png)
 			reg = /(!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\))/;
 			match = reg.exec(text);
-			isLink = false;
 		}
 
 		if (!match) return;
-
 		let newText = '';
 		let textNode = node.clone(true).get<Text>()!;
 		const { card } = this.editor;
@@ -593,9 +600,9 @@ export default class extends Plugin<Options> {
 			newText += textNode.textContent;
 			//从匹配结束位置分割
 			textNode = regNode.splitText(match[0].length);
-
-			const alt = match[2];
-			const src = match[3];
+			const isLink = match[0].startsWith('[');
+			const alt = isLink ? match[2] : match[6];
+			const src = isLink ? match[3] : match[7];
 			const link = isLink ? match[4] : '';
 
 			const cardNode = card.replaceNode($(regNode), 'image', {
@@ -615,7 +622,7 @@ export default class extends Plugin<Options> {
 			});
 			regNode.remove();
 
-			newText += cardNode.get<Element>()?.outerHTML + '\n';
+			newText += cardNode.get<Element>()?.outerHTML;
 		}
 		newText += textNode.textContent;
 		node.text(newText);

@@ -60,6 +60,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 	 */
 	const save = useCallback(() => {
 		if (!engine.current || !props.onSave) return;
+		console.log('save', new Date().getTime());
 		const filterValue: Content = props.comment
 			? engine.current.command.execute(
 					'mark-range',

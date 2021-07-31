@@ -152,9 +152,15 @@ class CardModel implements CardModelInterface {
 			const value = node.attributes(CARD_VALUE_KEY);
 			return value ? decodeCardValue(value) : {};
 		};
-
 		const cards = this.components.filter((item) => {
 			if (typeof selector === 'string') return item.id === selector;
+			if (
+				item.root.name !==
+				(isNode(selector)
+					? selector.nodeName.toString()
+					: selector.name)
+			)
+				return false;
 			return (
 				item.root.equal(selector) || item.id === getValue(selector).id
 			);

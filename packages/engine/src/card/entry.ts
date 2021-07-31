@@ -4,6 +4,7 @@ import {
 	CARD_KEY,
 	CARD_LEFT_SELECTOR,
 	CARD_RIGHT_SELECTOR,
+	CARD_TYPE_KEY,
 	CARD_VALUE_KEY,
 } from '../constants/card';
 import {
@@ -84,6 +85,10 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		return this.root.attributes(CARD_KEY);
 	}
 
+	get type() {
+		return this.root.attributes(CARD_TYPE_KEY) as CardType;
+	}
+
 	constructor({ editor, value, root }: CardOptions) {
 		this.editor = editor;
 		const type = (this.constructor as CardEntryType).cardType;
@@ -143,20 +148,17 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	 * @param selector
 	 */
 	find(selector: string) {
-		const { card } = this.editor;
-		const nodes = this.root.find(selector);
-		const children: Array<Node> = [];
-		nodes.each((item) => {
-			const cardComponent = card.find(item);
-			if (cardComponent && cardComponent.root.equal(this.root)) {
-				children.push(item);
-			}
-		});
-		return $(children);
+		return this.root.find(selector);
 	}
 
 	findByKey(key: string) {
-		return this.find('['.concat(CARD_ELEMENT_KEY, '=').concat(key, ']'));
+		const body = this.root.first() || $([]);
+		if (key === 'body' || body.length === 0) return body;
+		if (key === 'center') return body.children().eq(1) || $([]);
+		if (key === 'left') return body.children().eq(0) || $([]);
+		if (key === 'right') return body.children().eq(2) || $([]);
+		const tag = this.type === CardType.BLOCK ? 'div' : 'span';
+		return this.find(`${tag}[${CARD_ELEMENT_KEY}=${key}]`);
 	}
 
 	activate(activated: boolean) {
@@ -187,14 +189,16 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	}
 
 	getCenter() {
-		return this.find(CARD_CENTER_SELECTOR);
+		return this.findByKey('center');
 	}
 
 	isCenter(node: NodeInterface) {
-		const center = node.closest(CARD_CENTER_SELECTOR);
-		return (
-			center.length > 0 && center.equal(this.find(CARD_CENTER_SELECTOR))
+		const center = node.closest(
+			this.type === CardType.BLOCK
+				? `div[${CARD_ELEMENT_KEY}=center]`
+				: `span[${CARD_ELEMENT_KEY}=center]`,
 		);
+		return center.length > 0 && center.equal(this.findByKey('center'));
 	}
 
 	isCursor(node: NodeInterface) {
@@ -202,15 +206,17 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	}
 
 	isLeftCursor(node: NodeInterface) {
+		if (node.isElement() && node.attributes(CARD_ELEMENT_KEY) !== 'left')
+			return false;
 		const cursor = node.closest(CARD_LEFT_SELECTOR);
-		return cursor.length > 0 && cursor.equal(this.find(CARD_LEFT_SELECTOR));
+		return cursor.length > 0 && cursor.equal(this.findByKey('left'));
 	}
 
 	isRightCursor(node: NodeInterface) {
+		if (node.isElement() && node.attributes(CARD_ELEMENT_KEY) !== 'right')
+			return false;
 		const cursor = node.closest(CARD_RIGHT_SELECTOR);
-		return (
-			cursor.length > 0 && cursor.equal(this.find(CARD_RIGHT_SELECTOR))
-		);
+		return cursor.length > 0 && cursor.equal(this.findByKey('right'));
 	}
 
 	focus(range: RangeInterface, toStart?: boolean) {

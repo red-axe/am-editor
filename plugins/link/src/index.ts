@@ -29,7 +29,10 @@ export default class extends InlinePlugin<Options> {
 
 	variable = {
 		'@var0': ['_blank', '_parent', '_top', '_self'],
-		'@var1': '*',
+		'@var1': {
+			required: true,
+			value: '*',
+		},
 	};
 
 	tagName = 'a';

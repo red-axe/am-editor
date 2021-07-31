@@ -7,6 +7,9 @@ import {
 	READY_CARD_KEY,
 	getExtensionName,
 	PluginOptions,
+	CARD_VALUE_KEY,
+	decodeCardValue,
+	encodeCardValue,
 } from '@aomao/engine';
 
 import VideoComponent from './component';
@@ -345,9 +348,8 @@ export default class extends Plugin<Options> {
 	pasteEach(node: NodeInterface) {
 		//是卡片，并且还没渲染
 		if (node.isCard() && node.attributes(READY_CARD_KEY)) {
-			const card = this.editor.card.find(node) as VideoComponent;
-			if (!card || node.attributes(READY_CARD_KEY) !== 'video') return;
-			const value = card.getValue();
+			if (node.attributes(READY_CARD_KEY) !== 'video') return;
+			const value = decodeCardValue(node.attributes(CARD_VALUE_KEY));
 			if (!value || !value.url) {
 				node.remove();
 				return;
@@ -355,7 +357,10 @@ export default class extends Plugin<Options> {
 			if (value.status === 'uploading') {
 				//如果是上传状态，设置为正常状态
 				value.percent = 0;
-				card.setValue({ ...value, status: 'done' });
+				node.attributes(
+					CARD_VALUE_KEY,
+					encodeCardValue({ ...value, status: 'done' }),
+				);
 			}
 			return;
 		}

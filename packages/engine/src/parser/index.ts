@@ -419,20 +419,14 @@ class Parser implements ParserInterface {
 		});
 		this.editor.trigger('paser:value-after', result);
 		//移除前后的换行符
-		result.some((value, index) => {
-			if (/^\n+/g.test(value)) {
-				result[index] = value.replace(/^\n+/g, '');
-				return;
-			}
-			return true;
-		});
-		for (let i = result.length - 1; i >= 0; i--) {
-			const value = result[i];
-			if (/^\n+/g.test(value)) {
-				result[i] = value.replace(/^\n+/g, '');
-				continue;
-			}
-			break;
+		if (result.length > 0 && /^\n+/g.test(result[0])) {
+			result[0] = result[0].replace(/^\n+/g, '');
+		}
+		if (result.length > 0 && /^\n+/g.test(result[result.length - 1])) {
+			result[result.length - 1] = result[result.length - 1].replace(
+				/^\n+/g,
+				'',
+			);
 		}
 		const value = result.join('');
 		return customTags ? transformCustomTags(value) : value;

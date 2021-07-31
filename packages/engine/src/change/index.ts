@@ -272,7 +272,9 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	initValue() {
-		const node = $('<p><br /></p>');
+		const emptyHtml = '<p><br /></p>';
+		if (this.engine.container.html() === emptyHtml) return;
+		const node = $(emptyHtml);
 		this.engine.container.empty().append(node);
 		const range = this.getRange();
 		range.select(node, true).collapse(false);
@@ -730,7 +732,7 @@ class ChangeModel implements ChangeInterface {
 			this.change();
 		});
 
-		this.event.onDocument('selectionchange', (event: Event) => {
+		this.event.onDocument('selectionchange', () => {
 			if (this.isComposing()) return;
 			const { window } = container;
 			const selection = window?.getSelection();
@@ -990,13 +992,12 @@ class ChangeModel implements ChangeInterface {
 						if (options?.callback) {
 							options.callback(count);
 						}
+						this.engine.trigger('paste:after');
 					},
 				});
 			},
 			followActiveMark,
 		);
-
-		this.engine.trigger('paste:after');
 	}
 
 	combinTextNode() {
@@ -1063,20 +1064,34 @@ class ChangeModel implements ChangeInterface {
 		// 第一个子节点不是block节点就追加到当前节点下
 		let startRange: { node: NodeInterface; offset: number } | undefined =
 			undefined;
-		if (!nodeApi.isBlock(firstNode) && !firstNode.isCard()) {
-			range.shrinkToElementNode().insertNode(firstNode);
-			if (childNodes.length === 0) {
-				apply(range);
-				return;
-			} else {
+		if (!nodeApi.isBlock(firstNode)) {
+			range.shrinkToElementNode();
+			if (childNodes.length > 0) {
 				startRange = {
 					node: range.startNode,
 					offset: range.startOffset,
 				};
-				range.collapse(false);
 			}
+			range.insertNode(firstNode);
+			while (childNodes.length > 0 && !nodeApi.isBlock(childNodes[0])) {
+				range.enlargeToElementNode().collapse(false);
+				range.insertNode(childNodes[0]);
+			}
+			if (childNodes.length === 0) {
+				if (startRange && startRange.node.parent()) {
+					range
+						.shrinkToElementNode()
+						.setStart(startRange.node, startRange.offset);
+					range.enlargeToElementNode();
+				}
+				apply(range);
+				return;
+			} else {
+				range.enlargeToElementNode(true).collapse(false);
+			}
+		} else {
+			range.enlargeToElementNode(true);
 		}
-		range.deepCut();
 		const startNode =
 			range.startContainer.childNodes[range.startOffset - 1];
 		const endNode = range.startContainer.childNodes[range.startOffset];
@@ -1207,8 +1222,11 @@ class ChangeModel implements ChangeInterface {
 				removeEmptyNode(nextNode);
 			}
 		}
-		if (startRange) {
-			range.setStart(startRange.node, startRange.offset);
+		if (startRange && startRange.node.parent()) {
+			range
+				.shrinkToElementNode()
+				.setStart(startRange.node, startRange.offset);
+			range.enlargeToElementNode();
 		}
 		apply(range);
 	}
