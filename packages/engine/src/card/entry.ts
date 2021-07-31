@@ -1,5 +1,4 @@
 import {
-	CARD_CENTER_SELECTOR,
 	CARD_ELEMENT_KEY,
 	CARD_KEY,
 	CARD_LEFT_SELECTOR,
@@ -154,9 +153,15 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	findByKey(key: string) {
 		const body = this.root.first() || $([]);
 		if (key === 'body' || body.length === 0) return body;
-		if (key === 'center') return body.children().eq(1) || $([]);
-		if (key === 'left') return body.children().eq(0) || $([]);
-		if (key === 'right') return body.children().eq(2) || $([]);
+		const children = body.children();
+		if (['center', 'left', 'right'].includes(key))
+			return (
+				children
+					.toArray()
+					.find(
+						(child) => child.attributes(CARD_ELEMENT_KEY) === key,
+					) || $([])
+			);
 		const tag = this.type === CardType.BLOCK ? 'div' : 'span';
 		return this.find(`${tag}[${CARD_ELEMENT_KEY}=${key}]`);
 	}
