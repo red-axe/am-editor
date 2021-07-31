@@ -112,7 +112,7 @@ export const cards: Array<CardEntry> = [
 	//MindComponent
 ];
 
-export const pluginConfig: PluginOptions = {
+export const pluginConfig: { [key: string]: PluginOptions } = {
 	[ImageUploader.pluginName]: {
 		file: {
 			action: `${DOMAIN}/upload/image`,
