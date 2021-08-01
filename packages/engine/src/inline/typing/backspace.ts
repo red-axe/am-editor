@@ -161,6 +161,7 @@ class Backspace {
 					const last = inlineNode.last();
 					const text = last?.text();
 					if (last && last.isText() && text && /\u200b$/.test(text)) {
+						event.preventDefault();
 						range.setStart(last, text.length - 1);
 						range.collapse(true);
 						change.select(range);

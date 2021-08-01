@@ -523,7 +523,6 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		} else if (target.name === 'td') {
 			event.preventDefault();
 		}
-		this.select({ row, col }, { row, col });
 		// 右键不触发拖选
 		if (event instanceof MouseEvent && event.button === 2) {
 			if (!!target.attributes('table-cell-selection')) {
@@ -531,6 +530,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			}
 			return;
 		}
+		this.select({ row, col }, { row, col });
 		this.dragging = {
 			trigger: {
 				element: td,
