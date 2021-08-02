@@ -39,7 +39,7 @@
     background-color: #f4f4f4;
 }
 
-.editor-toolbar .toolbar-collapse-item-disabled, .editor-toolbar:not(.editor-toolbar-mobile) .toolbar-collapse-item-disabled:hover {
+.editor-toolbar .toolbar-collapse-item-disabled, .data-toolbar-component-list .toolbar-collapse-item-disabled, .editor-toolbar:not(.editor-toolbar-mobile) .toolbar-collapse-item-disabled:hover,  .data-toolbar-component-list .toolbar-collapse-item-disabled:hover {
   background-color: transparent;
   border: 1px solid transparent;
   box-shadow: none;

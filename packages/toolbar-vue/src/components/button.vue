@@ -60,9 +60,6 @@ export default defineComponent({
             event.preventDefault();
             if (this.disabled) return;
             if (this.onMouseDown) this.onMouseDown(event);
-            else {
-                event.stopPropagation();
-            }
             this.visible = false
         },
         triggerMouseEnter(event:MouseEvent){
@@ -98,8 +95,9 @@ export default defineComponent({
 </script>
 <style css>
 .editor-toolbar .toolbar-button {
-    display: inline-block;
-    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: auto;
     min-width: 32px;
     margin: 0;

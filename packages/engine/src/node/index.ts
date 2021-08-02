@@ -290,10 +290,10 @@ class NodeModel implements NodeModelInterface {
 			this.removeSide(source);
 			return;
 		}
-		const { node, block, mark } = this.editor;
+		const { node, block, mark, list } = this.editor;
 		let mergedNode = target;
-		const toIsList = ['ul', 'ol'].includes(source.name);
-		const fromIsList = ['ul', 'ol'].includes(target.name);
+		const toIsList = this.isList(source);
+		const fromIsList = this.isList(target.name);
 		// p 与列表合并时需要做特殊处理
 		if (toIsList && !fromIsList) {
 			const liBlocks = source.find('li');
@@ -314,6 +314,35 @@ class NodeModel implements NodeModelInterface {
 			}
 			if (liBlocks[1]) {
 				mergedNode = $(liBlocks[0]);
+			}
+		}
+		// 自定义列表合并
+		if (this.isCustomize(source)) {
+			// 源节点如果还有card节点，
+			let sourceFirst = source.first();
+			if (!sourceFirst?.isCard()) {
+				// 源节点没有卡片节点就添加
+				const plugins = list.getPlugins();
+				const pluginName = list.getPluginNameByNode(source);
+				const plugin = plugins.find(
+					(p) =>
+						(p.constructor as PluginEntry).pluginName ===
+						pluginName,
+				);
+				if (plugin?.cardName) {
+					list.addCardToCustomize(source, plugin.cardName);
+					sourceFirst = source.first();
+				}
+			}
+			// 源节点卡片名称与目标节点卡片一样就删除目标节点的第一个卡片节点
+			if (this.isCustomize(target)) {
+				const targetFirst = target.first();
+				if (
+					targetFirst?.isCard() &&
+					sourceFirst!.attributes(CARD_KEY) ===
+						targetFirst.attributes(CARD_KEY)
+				)
+					targetFirst.remove();
 			}
 		}
 		//被合并的节点最后一个子节点为br，则移除

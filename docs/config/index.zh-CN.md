@@ -98,5 +98,5 @@ console.log(view.language.get<string>('test'));
 ### scrollNode
 
 -   类型: `Node | (() => Node | null)`
--   默认值：`null`
+-   默认值：查找父级样式 `overflow` 或者 `overflow-y` 为 `auto` 或者 `scroll` 的节点，如果没有就取 `document.body`
 -   详细：编辑器滚动条节点，主要用于监听 `scroll` 事件设置弹层浮动位置和主动设置滚动到编辑器目标位置

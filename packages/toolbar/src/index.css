@@ -25,6 +25,9 @@
     background: transparent;
     text-align: center;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .editor-toolbar.editor-toolbar-mobile,.editor-toolbar.editor-toolbar-popover {

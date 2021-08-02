@@ -18,12 +18,12 @@
 import { defineComponent, onMounted, onUnmounted, ref, reactive } from 'vue'
 import { merge, omit } from 'lodash-es';
 import { isMobile } from '@aomao/engine'
+import { ToolbarButtonProps, CollapseItemProps, ToolbarColorProps, ToolbarDropdownProps, GroupDataProps, ToolbarCollapseGroupProps, toolbarProps } from '../types'
 import AmGroup from './group.vue'
 import locales from '../locales';
 import { getToolbarDefaultConfig,
 	fontFamilyDefaultData,
 	fontfamily, } from '../config'
-import { GroupDataProps, toolbarProps } from '../types'
 
 export default defineComponent({
     name:"am-toolbar",
@@ -46,17 +46,45 @@ export default defineComponent({
                     group = group.items
                 }
                 group.forEach(item => {
-                    let customItem = undefined;
+                    let customItem:ToolbarButtonProps | ToolbarDropdownProps | ToolbarColorProps | ToolbarCollapseGroupProps | undefined = undefined;
                     if (typeof item === 'string') {
                         const defaultItem = defaultConfig.find(config =>
                             item === 'collapse' ? config.type === item : config.type !== 'collapse' && config.name === item,
                         );
                         if (defaultItem) customItem = defaultItem;
                     } else {
-                        const defaultItem = defaultConfig.find(config =>
-                            item.type === 'collapse' ? config.type === item.type : config.type !== 'collapse' && config.name === item.name,
+                      const defaultItem = defaultConfig.find(config =>
+                          item.type === 'collapse' ? config.type === item.type : config.type !== 'collapse' && config.name === item.name,
+                      );
+                      // 解析collapse item 为字符串时
+                      if(item.type === 'collapse')
+                      {
+                        const customCollapse: ToolbarCollapseGroupProps = {...(merge(omit({...item}, "groups"), omit({...defaultItem}, "groups"))), groups:[]}
+                        item.groups.forEach(group => {
+                          const items: Array<Omit<CollapseItemProps, 'engine'>> = []
+                          group.items.forEach(cItem => {
+                            let targetItem = undefined;
+                            (defaultItem as ToolbarCollapseGroupProps).groups.some(g => g.items.some(i => {
+                              const isEqual = i.name === (typeof cItem === "string" ? cItem : cItem.name)
+                              if(isEqual)
+                              {
+                                targetItem = {...i, ...(typeof cItem === "string" ? {} : cItem)}
+                              }
+                              return isEqual
+                            }))
+                            if(targetItem) items.push(targetItem)
+                          })
+                          if(items.length > 0) {
+                            customCollapse.groups.push({...omit(group, "itmes"), items})
+                          }
+                        })
+                        customItem = customCollapse.groups.length > 0 ? customCollapse : undefined
+                      } else {
+                        customItem = merge(
+                          defaultItem ? omit({...item}, 'type') : {...item},
+                          defaultItem,
                         );
-                        customItem = merge(defaultItem ? omit(item, 'type') : item, defaultItem);
+                      }
                     }
                     if (customItem) {
                         if (customItem.type === 'button') {
@@ -216,6 +244,9 @@ export {
     background: transparent;
     text-align: center;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .editor-toolbar.editor-toolbar-mobile,.editor-toolbar.editor-toolbar-popover {

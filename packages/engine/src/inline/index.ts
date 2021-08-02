@@ -880,7 +880,7 @@ class Inline implements InlineModelInterface {
 				!/\u200B$/g.test(prevText) ||
 				(prevPrev &&
 					nodeApi.isInline(prevPrev) &&
-					!/\u200B\u200B$/g.test(prevText))
+					!/\u200B.*\u200B$/g.test(prevText))
 			) {
 				if (prev && prev.isText()) {
 					prev.text(prevText + '\u200b');

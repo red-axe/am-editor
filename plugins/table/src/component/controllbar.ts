@@ -312,7 +312,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			?.on('mouseenter', () => {
 				if (this.hideRowAddButtonTimeount)
 					clearTimeout(this.hideRowAddButtonTimeount);
-				this.rowsHeader?.css('z-index', 2);
+				this.rowsHeader?.css('z-index', 126);
 			})
 			.on('mouseleave', () => {
 				this.hideRowAddButtonTimeount = setTimeout(() => {
@@ -332,7 +332,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			})
 			.on('mousemove', (event: MouseEvent) => {
 				this.onMouseMoveRowsHeader(event);
-				this.rowsHeader?.css('z-index', 2);
+				this.rowsHeader?.css('z-index', 126);
 			})
 			.on('mouseleave', () => {
 				this.hideRowAddButtonTimeount = setTimeout(() => {
@@ -381,6 +381,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.moveColIndex = index + (isEnd ? 1 : 0);
 		this.colAddButton?.show('flex');
 		this.colAddButton.css('left', `${left}px`);
+		this.colAddButton.css('z-index', 126);
 		const splitHeight =
 			(this.table.selection.tableModel?.height || 0) +
 			itemNode.height() +

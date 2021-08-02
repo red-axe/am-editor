@@ -48,7 +48,6 @@ const Dropdown: React.FC<DropdownProps> = ({
 
 	const toggle = (event: React.MouseEvent) => {
 		event.preventDefault();
-		event.stopPropagation();
 		if (disabled) {
 			return;
 		}

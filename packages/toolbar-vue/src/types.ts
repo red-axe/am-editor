@@ -326,8 +326,20 @@ export type GroupItemDataProps = {
 	items: Array<ToolbarItemProps | string>;
 };
 
-export type GroupItemProps =
-	| Array<ToolbarItemProps | string>
+type GroupItemProps =
+	| Array<
+			| ToolbarItemProps
+			| string
+			| (Omit<ToolbarCollapseGroupProps, 'groups'> & {
+					groups: Array<
+						Omit<CollapseGroupProps, 'items'> & {
+							items: Array<
+								Omit<CollapseItemProps, 'engine'> | 'string'
+							>;
+						}
+					>;
+			  })
+	  >
 	| GroupItemDataProps;
 
 export type GroupDataProps = Omit<GroupItemDataProps, 'items'> & {

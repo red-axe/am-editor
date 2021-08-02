@@ -135,6 +135,7 @@ export interface ChangeInterface {
 	 */
 	insertFragment(
 		fragment: DocumentFragment,
+		range?: RangeInterface,
 		callback?: (range: RangeInterface) => void,
 		followActiveMark?: boolean,
 	): void;

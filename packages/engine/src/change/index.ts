@@ -50,6 +50,7 @@ class ChangeModel implements ChangeInterface {
 	blocks: Array<NodeInterface> = [];
 	inlines: Array<NodeInterface> = [];
 	changeTrigger: Array<string> = [];
+	#lastePasteRange?: RangeInterface;
 
 	constructor(engine: EngineInterface, options: ChangeOptions = {}) {
 		this.options = options;
@@ -367,7 +368,7 @@ class ChangeModel implements ChangeInterface {
 			callback?: (count: number) => void;
 		},
 	) {
-		this.paste(html, options);
+		this.paste(html, undefined, options);
 	}
 
 	getOriginValue() {
@@ -889,7 +890,12 @@ class ChangeModel implements ChangeInterface {
 					)
 					.then(() => {
 						textNode.get<Text>()?.normalize();
-						this.paste(textNode.text(), undefined, false);
+						this.paste(
+							textNode.text(),
+							this.#lastePasteRange,
+							undefined,
+							false,
+						);
 					})
 					.catch(() => {});
 			}
@@ -962,6 +968,7 @@ class ChangeModel implements ChangeInterface {
 
 	paste(
 		source: string,
+		range?: RangeInterface,
 		options?: {
 			enableAsync?: boolean;
 			triggerOT?: boolean;
@@ -973,8 +980,11 @@ class ChangeModel implements ChangeInterface {
 		this.engine.trigger('paste:before', fragment);
 		this.insertFragment(
 			fragment,
+			range,
 			(range) => {
 				this.engine.trigger('paste:insert', range);
+				this.#lastePasteRange = range.cloneRange();
+				range.collapse(false);
 				const selection = range.createSelection();
 				this.engine.card.render(undefined, {
 					enableAsync:
@@ -988,7 +998,7 @@ class ChangeModel implements ChangeInterface {
 					callback: (count) => {
 						selection.move();
 						range.scrollRangeIntoView();
-						this.apply(range);
+						this.select(range);
 						if (options?.callback) {
 							options.callback(count);
 						}
@@ -1020,17 +1030,19 @@ class ChangeModel implements ChangeInterface {
 	/**
 	 * 插入片段
 	 * @param fragment 片段
+	 * @param range 指定光标区域
 	 * @param callback 插入后的回调函数
 	 * @param followActiveMark 删除后空标签是否跟随当前激活的mark样式
 	 */
 	insertFragment(
 		fragment: DocumentFragment,
+		range?: RangeInterface,
 		callback: (range: RangeInterface) => void = () => {},
 		followActiveMark: boolean = true,
 	) {
 		const { block, list, card, schema, mark, inline } = this.engine;
 		const nodeApi = this.engine.node;
-		const range = this.getSafeRange();
+		range = range || this.getSafeRange();
 		const firstBlock = block.closest(range.startNode);
 		const lastBlock = block.closest(range.endNode);
 		const onlyOne = lastBlock[0] === firstBlock[0];
@@ -1289,10 +1301,10 @@ class ChangeModel implements ChangeInterface {
 		const nextNode = startNode;
 		let isEmptyNode = startNode.children().length === 0;
 		if (!isEmptyNode) {
-			const firstChild = startNode[0].firstChild!;
 			if (
 				startNode[0].childNodes.length === 1 &&
-				firstChild.nodeType === getWindow().Node.ELEMENT_NODE &&
+				startNode[0].firstChild?.nodeType ===
+					getWindow().Node.ELEMENT_NODE &&
 				nodeApi.isCustomize(startNode) &&
 				startNode.first()?.isCard()
 			)
@@ -1462,6 +1474,11 @@ class ChangeModel implements ChangeInterface {
 		const { block } = this.engine;
 		const range = this.getRange();
 		node = node || block.closest(range.startNode);
+		if (node.children().length === 0) {
+			node.append($('<br />'));
+			this.apply(range);
+			return;
+		}
 		// <p><br />foo</p>，先删除 BR
 		if (node.children().length > 1 && node.first()?.name === 'br') {
 			node.first()?.remove();

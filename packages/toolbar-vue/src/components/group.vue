@@ -65,7 +65,6 @@ export default defineComponent({
 .editor-toolbar-group {
     padding: 4px 8px;
     width: auto;
-    display: inline-block;
     border-left: 1px solid #e8e8e8;
 }
 

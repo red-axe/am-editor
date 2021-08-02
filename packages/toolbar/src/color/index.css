@@ -9,6 +9,7 @@
 .colorpicker-button-group .colorpicker-button-text {
     margin-right: 0;
     min-width: 26px;
+    height: 32px;
     border-radius: 3px 0 0 3px;
 }
 
@@ -19,6 +20,7 @@
 .colorpicker-button-group .colorpicker-button-dropdown {
     margin-left: -1px;
     min-width: 17px;
+    height: 32px;
     text-align: center;
     padding: 0 0;
     border-radius: 0 3px 3px 0;

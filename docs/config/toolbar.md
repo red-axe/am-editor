@@ -4,7 +4,7 @@ toc: menu
 
 # Toolbar configuration
 
-Introducing the toolbar
+Introduce the toolbar
 
 ```ts
 //vue please use @aomao/toolbar-vue
@@ -30,8 +30,7 @@ There are now four ways to display the toolbar
 
 The attributes that the Toolbar component needs to pass in:
 
--   An instance of the `editor` editor, which can be used to automatically invoke the plug-in execution
--   `items` plugin display configuration list
+-An instance of the `editor` editor, which can be used to automatically invoke the plug-in execution -`items` plugin display configuration list
 
 ## Items
 
@@ -58,6 +57,60 @@ items: [
 ```
 
 If the default configuration is found through the `name` attribute, the `type` attribute will not be overwritten. If the configured `name` is not part of the default configuration, it can also be displayed, which is equivalent to adding a custom button to the toolbar, and you can also add event custom processing for it
+
+### Drop-down panel
+
+Usually used to configure cards
+
+#### Group
+
+The `groups` property can be set to classify cards for different purposes as needed
+
+If `title` is not filled in, the grouping style will not appear
+
+```ts
+items: [
+  {
+    type:'collapse',
+    groups: [{
+      title: "File",
+      // modify the title
+      items: ["image-uploader", "image-file"]
+    }]
+  }
+```
+
+#### Custom list items
+
+Some attributes of `item` can be modified. For example, `title` and `icon` will be merged with the default configuration
+
+More attributes can be viewed [React](https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx) [Vue](https: //github.com/yanmao-cc/am-editor/blob/master/packages/toolbar-vue/src/config/index.ts)
+
+```ts
+items: [
+  {
+    type:'collapse',
+    groups: [{
+      // modify the title
+      items: [{ name:"image-uploader", title: "Upload file"}]
+    }]
+  }
+```
+
+## More complete configuration
+
+```ts
+[
+	['collapse'],
+	['undo', 'redo', 'paintformat', 'removeformat'],
+	['heading', 'fontfamily', 'fontsize'],
+	['bold', 'italic', 'strikethrough', 'underline', 'moremark'],
+	['fontcolor', 'backcolor'],
+	['alignment'],
+	['unorderedlist', 'orderedlist', 'tasklist', 'indent', 'line-height'],
+	['link', 'quote', 'hr'],
+];
+```
 
 ## default allocation
 

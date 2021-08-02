@@ -162,7 +162,6 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 				</div>,
 				layout.get<HTMLElement>()!,
 			);
-			//layout.html(`<p>This is name:${name}</p>`)
 		},
 	},
 	[Fontsize.pluginName]: {
@@ -212,6 +211,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 			if (lineHeight === '28px') return '2';
 			if (lineHeight === '35px') return '2.5';
 			if (lineHeight === '42px') return '3';
+			// 不满足条件就移除掉
 			return (
 				['1', '1.15', '1.5', '2', '2.5', '3'].indexOf(lineHeight) > -1
 			);

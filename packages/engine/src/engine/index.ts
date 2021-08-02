@@ -101,13 +101,30 @@ class Engine implements EngineInterface {
 	}
 
 	get scrollNode(): NodeInterface | null {
+		if (this.#_scrollNode) return this.#_scrollNode;
 		const { scrollNode } = this.options;
-		const sn = scrollNode
+		let sn = scrollNode
 			? typeof scrollNode === 'function'
 				? scrollNode()
 				: scrollNode
 			: null;
-		return this.#_scrollNode ? this.#_scrollNode : sn ? $(sn) : null;
+		// 查找父级样式 overflow 或者 overflow-y 为 auto 或者 scroll 的节点
+		const targetValues = ['auto', 'scroll'];
+		let parent = this.container.parent();
+		while (parent) {
+			if (
+				targetValues.includes(parent.css('overflow')) ||
+				targetValues.includes(parent.css('overflow-y'))
+			) {
+				sn = parent.get<HTMLElement>();
+				break;
+			} else {
+				parent = parent.parent();
+			}
+		}
+		if (sn === null) sn === document.body;
+		this.#_scrollNode = sn ? $(sn) : null;
+		return this.#_scrollNode;
 	}
 
 	set readonly(readonly: boolean) {
@@ -127,28 +144,44 @@ class Engine implements EngineInterface {
 
 	constructor(selector: Selector, options?: EngineOptions) {
 		this.options = { ...this.options, ...options };
+		// 多语言
 		this.language = new Language(
 			this.options.lang || 'zh-CN',
 			merge(language, options?.locale),
 		);
+		// 事件管理
 		this.event = new Event();
+		// 命令
 		this.command = new Command(this);
+		// 节点规则
 		this.schema = new Schema();
 		this.schema.add(schemaDefaultData);
+		// 节点转换规则
 		this.conversion = new Conversion(this);
 		conversionDefault.forEach((rule) =>
 			this.conversion.add(rule.from, rule.to),
 		);
+		// 历史
 		this.history = new History(this);
+		// 卡片
 		this.card = new CardModel(this);
+		// 剪贴板
 		this.clipboard = new Clipboard(this);
+		// 请求
 		this.request = new Request();
+		// 插件
 		this.plugin = new Plugin(this);
+		// 节点管理
 		this.node = new NodeModel(this);
+		// 列表
 		this.list = new List(this);
+		// 样式标记
 		this.mark = new Mark(this);
+		// 行内样式
 		this.inline = new Inline(this);
+		// 块级节点
 		this.block = new Block(this);
+		// 编辑器容器
 		this._container = new Container(selector, {
 			engine: this,
 			lang: this.options.lang,
@@ -156,11 +189,15 @@ class Engine implements EngineInterface {
 			tabIndex: this.options.tabIndex,
 			placeholder: this.options.placeholder,
 		});
-
+		// 编辑器父节点
 		this.root = $(
 			this.options.root || this.container.parent() || getDocument().body,
 		);
+		const rootPosition = this.root.css('position');
+		if (!rootPosition) this.root.css('position', 'relative');
+		// 实例化容器
 		this._container.init();
+		// 编辑器改变时
 		this.change = new Change(this, {
 			onChange: (value, trigger) =>
 				this.trigger('change', value, trigger),
@@ -175,18 +212,22 @@ class Engine implements EngineInterface {
 			},
 			onSetValue: () => this.trigger('afterSetValue'),
 		});
+		// 事件处理
 		this.typing = new Typing(this);
+		// 只读
 		this._readonly =
 			this.options.readonly === undefined ? false : this.options.readonly;
 		this._container.setReadonly(this._readonly);
+		// 实例化插件
 		this.mark.init();
 		this.inline.init();
 		this.block.init();
 		this.list.init();
-
+		// 快捷键
 		this.hotkey = new Hotkey(this);
 		this.card.init(this.options.cards || []);
 		this.plugin.init(this.options.plugins || [], this.options.config || {});
+		// 协同
 		this.ot = new OT(this);
 
 		if (this.isEmpty()) {

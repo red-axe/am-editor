@@ -16,6 +16,8 @@ import {
 } from './config/toolbar';
 import { ButtonProps, DropdownProps, ColorProps, CollapseProps } from './types';
 import ToolbarPlugin, { ToolbarComponent } from './plugin';
+import { CollapseGroupProps } from './collapse/group';
+import { CollapseItemProps } from './collapse/item';
 import locales from './locales';
 import './index.css';
 
@@ -26,12 +28,29 @@ type ToolbarItemProps =
 	| CollapseProps;
 
 type GroupItemDataProps = {
+	// 分组图标-mobile
 	icon?: React.ReactNode;
+	// 分组内容-mobile
 	content?: React.ReactNode | (() => React.ReactNode);
+	// 子项
 	items: Array<ToolbarItemProps | string>;
 };
 
-type GroupItemProps = Array<ToolbarItemProps | string> | GroupItemDataProps;
+type GroupItemProps =
+	| Array<
+			| ToolbarItemProps
+			| string
+			| (Omit<CollapseProps, 'groups'> & {
+					groups: Array<
+						Omit<CollapseGroupProps, 'items'> & {
+							items: Array<
+								Omit<CollapseItemProps, 'engine'> | 'string'
+							>;
+						}
+					>;
+			  })
+	  >
+	| GroupItemDataProps;
 
 type GroupProps = Omit<GroupItemDataProps, 'items'> & {
 	items: Array<ToolbarItemProps>;
@@ -83,7 +102,12 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 				group = group.items;
 			}
 			group.forEach((item) => {
-				let customItem = undefined;
+				let customItem:
+					| ButtonProps
+					| DropdownProps
+					| ColorProps
+					| CollapseProps
+					| undefined = undefined;
 				if (typeof item === 'string') {
 					const defaultItem = defaultConfig.find((config) =>
 						item === 'collapse'
@@ -99,10 +123,62 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 							: config.type !== 'collapse' &&
 							  config.name === item.name,
 					);
-					customItem = merge(
-						defaultItem ? omit(item, 'type') : item,
-						defaultItem,
-					);
+					// 解析collapse item 为字符串时
+					if (item.type === 'collapse') {
+						const customCollapse: CollapseProps = {
+							...merge(
+								omit({ ...item }, 'groups'),
+								omit({ ...defaultItem }, 'groups'),
+							),
+							groups: [],
+						};
+						item.groups.forEach((group) => {
+							const items: Array<
+								Omit<CollapseItemProps, 'engine'>
+							> = [];
+							group.items.forEach((cItem) => {
+								let targetItem = undefined;
+								(defaultItem as CollapseProps).groups.some(
+									(g) =>
+										g.items.some((i) => {
+											const isEqual =
+												i.name ===
+												(typeof cItem === 'string'
+													? cItem
+													: cItem.name);
+											if (isEqual) {
+												targetItem = {
+													...i,
+													...(typeof cItem ===
+													'string'
+														? {}
+														: cItem),
+												};
+											}
+											return isEqual;
+										}),
+								);
+								if (targetItem) items.push(targetItem);
+							});
+							if (items.length > 0) {
+								customCollapse.groups.push({
+									...omit(group, 'itmes'),
+									items,
+								});
+							}
+						});
+						customItem =
+							customCollapse.groups.length > 0
+								? customCollapse
+								: undefined;
+					} else {
+						customItem = merge(
+							defaultItem
+								? omit({ ...item }, 'type')
+								: { ...item },
+							defaultItem,
+						);
+					}
 				}
 				if (customItem) {
 					if (customItem.type === 'button') {

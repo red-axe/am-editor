@@ -98,5 +98,5 @@ console.log(view.language.get<string>('test'));
 ### scrollNode
 
 -   Type: `Node | (() => Node | null)`
--   Default value: `null`
+-   Default value: Find the node whose parent style `overflow` or `overflow-y` is `auto` or `scroll`, if not, take `document.body`
 -   Detailed: The editor scroll bar node is mainly used to monitor the `scroll` event to set the floating position of the bomb layer and actively set the scroll to the editor target position

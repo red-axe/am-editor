@@ -1,5 +1,4 @@
 import {
-	decodeCardValue,
 	EditorInterface,
 	isEngine,
 	isSafari,

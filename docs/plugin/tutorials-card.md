@@ -16,7 +16,7 @@ export default class extends Card {
 }
 ```
 
-## Case
+## Example
 
 ### `Rendering`
 
@@ -27,11 +27,11 @@ import { $, Card } from '@aomao/engine';
 
 export default class extends Card {
 	static get cardName() {
-		return 'Card Name';
+		return 'CardName';
 	}
 
 	static get cardType() {
-		return CardType.Block;
+		return CardType.BLOCK;
 	}
 
 	render() {
@@ -53,34 +53,52 @@ import React from 'react';
 export default () => <div>React Commponent</div>;
 ```
 
-Card component
+Card components
 
 ```ts
-import { ReactDOM } from 'react';
-import { $, Card } from '@aomao/engine';
+import ReactDOM from 'react-dom';
+import { $, Card, CardType } from '@aomao/engine';
+// Introduce custom react components
+import ReactCommponent from 'ReactCommponent';
 
 export default class extends Card {
 	container?: NodeInterface;
 
 	static get cardName() {
-		return 'Card Name';
+		return 'CardName';
 	}
 
 	static get cardType() {
-		return CardType.Block;
+		return CardType.BLOCK;
 	}
 
-	//After the card is rendered successfully, the node has been loaded in the editor
+	/**
+	 * After the card is rendered successfully, the empty div node has been loaded in the editor
+	 * */
 	didRender() {
 		if (!this.container) return;
+		// Get a node of type HTMLElement
 		const element = this.container.get<HTMLElement>()!;
-		//Use ReactDOM to render components
+		//Use ReactDOM to render React components onto empty div nodes on the container
 		ReactDOM.render(<ReactCommponent />, element);
 	}
 
+	/**
+	 * Render the card
+	 * */
 	render() {
+		// Render an empty div node
 		this.container = $('<div></div>');
 		return this.container;
+	}
+
+	/**
+	 * Uninstall components
+	 * */
+	destroy() {
+		super.destory();
+		const element = this.container.get<HTMLElement>();
+		if (element) ReactDOM.unmountComponentAtNode(elment);
 	}
 }
 ```
@@ -102,38 +120,57 @@ export default defineComponent({
 </script>
 ```
 
-Card component
+Card components
 
 ```ts
-import { createApp } from 'vue';
-import { $, Card } from '@aomao/engine';
+import { createApp, App } from 'vue';
+import { $, Card, CardType } from '@aomao/engine';
+// Introduce custom vue components
+import VueCommponent from 'VueCommponent';
 
 export default class extends Card {
 	container?: NodeInterface;
+	private vm?: App;
 
 	static get cardName() {
-		return 'Card Name';
+		return 'CardName';
 	}
 
 	static get cardType() {
-		return CardType.Block;
+		return CardType.BLOCK;
 	}
 
-	//After the card is rendered successfully, the node has been loaded in the editor
+	/**
+	 * After the card is rendered successfully, the empty div node has been loaded in the editor
+	 * */
 	didRender() {
 		if (!this.container) return;
+		// Get a node of type HTMLElement
 		const element = this.container.get<HTMLElement>()!;
-		//Use createApp to render components
+		//Use createApp to render the Vue component to the empty div node on the container
 		//Add a delay, otherwise it may not be rendered successfully
 		setTimeout(() => {
-			const vm = createApp(VueComponent);
-			vm.mount(container);
+			this.vm = createApp(VueComponent);
+			this.vm.mount(element);
 		}, 20);
 	}
 
+	/**
+	 * Render the card
+	 * */
 	render() {
+		// Render an empty div node
 		this.container = $('<div></div>');
 		return this.container;
+	}
+
+	/**
+	 * Uninstall components
+	 * */
+	destroy() {
+		super.destory();
+		this.vm?.unmount();
+		this.vm = undefined;
 	}
 }
 ```
@@ -173,35 +210,45 @@ import {
 
 export default class extends Card {
 	static get cardName() {
-		return 'Card Name';
+		return 'CardName';
 	}
 
 	static get cardType() {
-		return CardType.Block;
+		return CardType.BLOCK;
 	}
 
+	// Card Toolbar
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
 		return [
+			// Drag the button on the left
 			{
 				type: 'dnd',
 			},
+			// copy
 			{
 				type: 'copy',
 			},
+			// delete
 			{
 				type: 'delete',
 			},
+			// split line
+			{
+				type: 'separator',
+			},
+			// Custom node
 			{
 				type: 'node',
 				node: $('<div />'),
 				didMount: (node) => {
-					//After loading, you can use the front-end framework to render components to the node node
+					//After loading, you can use the front-end framework to render components to the node node. Vue needs to add delay to use createApp
 					console.log(`The button is loaded, ${node}`);
 				},
 			},
 		];
 	}
 
+	// render div
 	render() {
 		return $('<div>Card</div>');
 	}
@@ -211,50 +258,62 @@ export default class extends Card {
 ### Set card value
 
 ```ts
-import { $, Card } from'@aomao/engine'
+import {$, Card, CardType} from'@aomao/engine'
 
 export default class extends Card {
 
-    container?: NodeInterface
+  container?: NodeInterface
 
-    static get cardName() {
-        return'Card Name';
-    }
+  static get cardName() {
+    return'CardName';
+  }
 
-    static get cardType() {
-        return CardType.Block;
-    }
+  static get cardType() {
+    return CardType.BLOCK;
+  }
 
-    onClick = () => {
-        const value = this.getValue() || {count: 0}
-                const count = value.count + 1
-        this.setValue({
-            count,
-        });
-        this.container?.html(count)
-    };
+  // click on the div
+  onClick = () => {
+    // Get card value
+    const value = this.getValue() || {count: 0}
+    // give count + 1
+    const count = value.count + 1
+    // Reset the card value, it will be saved to the data-card-value attribute on the root node of the card
+    this.setValue({
+      count,
+    });
+    // Set the content of the div
+    this.container?.html(count)
+  };
 
-    render() {
-        const value = this.getValue() || {count: 0}
-        this.container = $(`<div>${value.count}</div>`)
-        this.container.on("click" => this.)
-        return this.container
-    }
+  // Render the div node
+  render() {
+    // Get the value of the card
+    const value = this.getValue() || {count: 0}
+    // Create a div node
+    this.container = $(`<div>${value.count}</div>`)
+    // bind the click event
+    this.container.on("click" => this.onClick)
+    // Return the node to load the container
+    return this.container
+  }
 }
 ```
 
 ### Combine with plugins
 
 ```ts
-import { Plugin } from '@aomao/engine';
+import { Plugin, isEngine } from '@aomao/engine';
+// Introduce cards
 import CardComponent from './component';
 
 export default class extends Plugin<Options> {
 	static get pluginName() {
 		return 'card-plugin';
 	}
-
+	// The plugin executes the command, call engine.command.excute("card-plugin") to execute the current command
 	execute() {
+		// Reader does not execute
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
 		//Insert card
@@ -268,17 +327,17 @@ export { CardComponent };
 
 ### `cardName`
 
-Card name, read-only static attribute, required
+CardName, read-only static attribute, required
 
 Type: `string`
 
-The card name is unique and cannot be repeated with all the card names passed into the engine
+The CardName is unique and cannot be repeated with all the CardNames passed into the engine
 
 ```ts
 export default class extends Plugin {
-	//Define the card name, it is required
+	//Define the CardName, it is required
 	static get cardName() {
-		return 'Card Name';
+		return 'CardName';
 	}
 }
 ```
@@ -295,7 +354,7 @@ There are two types of `CardType`, `inline` and `block`
 export default class extends Plugin {
 	//Define the card type, it is required
 	static get cardType() {
-		return CardType.Block;
+		return CardType.BLOCK;
 	}
 }
 ```

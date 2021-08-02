@@ -71,7 +71,6 @@ export default defineComponent({
 
         const toggleDropdown = (event: MouseEvent) => {
             event.preventDefault();
-            event.stopPropagation();
 
             if (visible.value) {
                 hideDropdown();
@@ -86,7 +85,7 @@ export default defineComponent({
         };
 
         const hideDropdown = (event?: MouseEvent) => {
-            if (event && (event.target as Element).closest('[data-element="ui"]'))
+            if (event && (event.target as Element).closest('.toolbar-dropdown-list'))
                 return;
             document.removeEventListener('click', hideDropdown);
             visible.value = false
@@ -144,6 +143,7 @@ export default defineComponent({
 }
 
 .colorpicker-button-group .colorpicker-button-text {
+    height: 32px;
     margin-right: 0;
     min-width: 26px;
     border-radius: 3px 0 0 3px;
@@ -154,6 +154,7 @@ export default defineComponent({
 }
 
 .colorpicker-button-group .colorpicker-button-dropdown {
+    height: 32px;
     margin-left: -1px;
     min-width: 17px;
     text-align: center;

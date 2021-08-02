@@ -92,8 +92,10 @@ class SelectionData implements SelectionDataInterface {
 				range.setEnd(endCard.getCenter().parent()!, 1);
 			}
 		}
+		// 显示协作信息时包含左右光标位置
 		const path = range.toPath(true);
-		this.currentRangePath = path;
+		// 用作历史记录的不包含卡片左右光标位置
+		this.currentRangePath = range.toPath();
 		const pathString = JSON.stringify(path);
 		let data: Array<Attribute | null> = this.getAll();
 		let isMember = false;

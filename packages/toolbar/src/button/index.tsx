@@ -37,7 +37,7 @@ export type ButtonProps = {
 	onMouseLeave?: (event: React.MouseEvent) => void;
 };
 
-const ToolbarButton: React.FC<ButtonProps> = props => {
+const ToolbarButton: React.FC<ButtonProps> = (props) => {
 	const { name, engine, command } = props;
 
 	const [tooltipVisible, setTooltipVisible] = useState(false);
@@ -71,9 +71,6 @@ const ToolbarButton: React.FC<ButtonProps> = props => {
 		const { onMouseDown, disabled } = props;
 		if (disabled) return;
 		if (onMouseDown) onMouseDown(event);
-		else {
-			event.stopPropagation();
-		}
 
 		setTooltipVisible(false);
 	};

@@ -70,7 +70,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 			  )
 			: { value, paths: [] };
 		props.onSave(filterValue);
-	}, [value]);
+	}, [props.onSave, value]);
 	/**
 	 * 60秒内无更改自动保存
 	 */
@@ -106,7 +106,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 				);
 				//console.log('html:', engine.getHtml());
 			},
-			[loading, autoSave],
+			[loading, autoSave, props.onChange],
 		),
 	};
 
@@ -257,7 +257,6 @@ const EditorComponent: React.FC<EditorProps> = ({
 								<EngineComponent
 									ref={engine}
 									{...engineProps}
-									scrollNode={() => scrollNode.current}
 									defaultValue=""
 								/>
 							}

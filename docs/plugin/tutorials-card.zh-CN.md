@@ -31,7 +31,7 @@ export default class extends Card {
 	}
 
 	static get cardType() {
-		return CardType.Block;
+		return CardType.BLOCK;
 	}
 
 	render() {
@@ -56,8 +56,10 @@ export default () => <div>React Commponent</div>;
 卡片组件
 
 ```ts
-import { ReactDOM } from 'react';
-import { $, Card } from '@aomao/engine';
+import ReactDOM from 'react-dom';
+import { $, Card, CardType } from '@aomao/engine';
+// 引入自定义的 react 组件
+import ReactCommponent from 'ReactCommponent';
 
 export default class extends Card {
 	container?: NodeInterface;
@@ -67,20 +69,36 @@ export default class extends Card {
 	}
 
 	static get cardType() {
-		return CardType.Block;
+		return CardType.BLOCK;
 	}
 
-	//卡片渲染成功后，节点已在编辑器中加载
+	/**
+	 * 卡片渲染成功后，空的 div 节点已在编辑器中加载
+	 * */
 	didRender() {
 		if (!this.container) return;
+		// 获取 HTMLElement 类型的节点
 		const element = this.container.get<HTMLElement>()!;
-		//使用 ReactDOM 渲染组件
+		//使用 ReactDOM 把 React 组件渲染到 container 上的空 div 节点上
 		ReactDOM.render(<ReactCommponent />, element);
 	}
 
+	/**
+	 * 渲染卡片
+	 * */
 	render() {
+		// 渲染一个空的div节点
 		this.container = $('<div></div>');
 		return this.container;
+	}
+
+	/**
+	 * 卸载组件
+	 * */
+	destory() {
+		super.destory();
+		const element = this.container.get<HTMLElement>();
+		if (element) ReactDOM.unmountComponentAtNode(elment);
 	}
 }
 ```
@@ -105,35 +123,54 @@ export default defineComponent({
 卡片组件
 
 ```ts
-import { createApp } from 'vue';
-import { $, Card } from '@aomao/engine';
+import { createApp, App } from 'vue';
+import { $, Card, CardType } from '@aomao/engine';
+// 引入自定义的 vue 组件
+import VueCommponent from 'VueCommponent';
 
 export default class extends Card {
 	container?: NodeInterface;
+	private vm?: App;
 
 	static get cardName() {
 		return '卡片名称';
 	}
 
 	static get cardType() {
-		return CardType.Block;
+		return CardType.BLOCK;
 	}
 
-	//卡片渲染成功后，节点已在编辑器中加载
+	/**
+	 * 卡片渲染成功后，空的 div 节点已在编辑器中加载
+	 * */
 	didRender() {
 		if (!this.container) return;
+		// 获取 HTMLElement 类型的节点
 		const element = this.container.get<HTMLElement>()!;
-		//使用 createApp 渲染组件
+		//使用 createApp 把 Vue 组件渲染到 container 上的空 div 节点上
 		//加个延时，不然可能无法渲染成功
 		setTimeout(() => {
-			const vm = createApp(VueComponent);
-			vm.mount(container);
+			this.vm = createApp(VueComponent);
+			this.vm.mount(element);
 		}, 20);
 	}
 
+	/**
+	 * 渲染卡片
+	 * */
 	render() {
+		// 渲染一个空的div节点
 		this.container = $('<div></div>');
 		return this.container;
+	}
+
+	/**
+	 * 卸载组件
+	 * */
+	destory() {
+		super.destory();
+		this.vm?.unmount();
+		this.vm = undefined;
 	}
 }
 ```
@@ -177,31 +214,41 @@ export default class extends Card {
 	}
 
 	static get cardType() {
-		return CardType.Block;
+		return CardType.BLOCK;
 	}
 
+	// 卡片工具栏
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
 		return [
+			// 左边拖动按钮
 			{
 				type: 'dnd',
 			},
+			// 复制
 			{
 				type: 'copy',
 			},
+			// 删除
 			{
 				type: 'delete',
 			},
+			// 分割线
+			{
+				type: 'separator',
+			},
+			// 自定义节点
 			{
 				type: 'node',
 				node: $('<div />'),
 				didMount: (node) => {
-					//加载完成后，可以使用前端框架渲染组件到 node 节点上
+					//加载完成后，可以使用前端框架渲染组件到 node 节点上。vue 使用 createApp 需要加延时
 					console.log(`按钮加载好了，${node}`);
 				},
 			},
 		];
 	}
 
+	// 渲染 div
 	render() {
 		return $('<div>Card</div>');
 	}
@@ -211,50 +258,62 @@ export default class extends Card {
 ### 设置卡片值
 
 ```ts
-import { $, Card } from '@aomao/engine'
+import { $, Card, CardType } from '@aomao/engine'
 
 export default class extends Card {
 
-    container?: NodeInterface
+  container?: NodeInterface
 
 	static get cardName() {
 		return '卡片名称';
 	}
 
-    static get cardType() {
-		return CardType.Block;
+  static get cardType() {
+		return CardType.BLOCK;
 	}
 
-    onClick = () => {
-	    const value = this.getValue() || { count: 0}
-        const count = value.count + 1
+  // 在 div 上面单击
+  onClick = () => {
+    // 获取卡片值
+	  const value = this.getValue() || { count: 0}
+    // 给 count + 1
+    const count = value.count + 1
+    // 重新设置卡片值，会保存到卡片根节点上的 data-card-value 属性上面
 		this.setValue({
 			count,
 		});
-        this.container?.html(count)
+    // 设置 div 的内容
+    this.container?.html(count)
 	};
 
-    render() {
-        const value = this.getValue() || { count: 0}
-        this.container = $(`<div>${value.count}</div>`)
-        this.container.on("click" => this.)
-        return this.container
-    }
+  // 渲染 div 节点
+  render() {
+    // 获取卡片的值
+    const value = this.getValue() || { count: 0}
+    // 创建 div 节点
+    this.container = $(`<div>${value.count}</div>`)
+    // 绑定 click 事件
+    this.container.on("click" => this.onClick)
+    // 返回节点给容器加载
+    return this.container
+  }
 }
 ```
 
 ### 与插件结合
 
 ```ts
-import { Plugin } from '@aomao/engine';
+import { Plugin, isEngine } from '@aomao/engine';
+// 引入卡片
 import CardComponent from './component';
 
 export default class extends Plugin<Options> {
 	static get pluginName() {
 		return 'card-plugin';
 	}
-
+	// 插件执行命令，调用 engine.command.excute("card-plugin") 执行当前命令
 	execute() {
+		// 阅读器不执行
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
 		//插入卡片
@@ -295,7 +354,7 @@ export default class extends Plugin {
 export default class extends Plugin {
 	//定义卡片类型，它是必须的
 	static get cardType() {
-		return CardType.Block;
+		return CardType.BLOCK;
 	}
 }
 ```

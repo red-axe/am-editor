@@ -1,6 +1,7 @@
 .editor-toolbar .toolbar-button {
-    display: inline-block;
-    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: auto;
     min-width: 32px;
     margin: 0;

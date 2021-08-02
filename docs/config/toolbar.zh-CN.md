@@ -59,6 +59,60 @@ items: [
 
 如果通过 `name` 属性找到了默认配置，那么 `type` 属性是不会被覆盖的。如果配置的`name`不属于默认配置的一部分，也是可以展现出来，相当于在 toolbar 上加了一个自定义按钮，也可以为其添加事件自定义处理
 
+### 下拉面板
+
+通常用于配置卡片
+
+#### 分组
+
+通过 `groups` 属性可以设置按需要把不同用途的卡片分类
+
+不填写 `title` 将不会出现分组样式
+
+```ts
+items: [
+  {
+    type:'collapse',
+    groups: [{
+      title: "文件",
+      // 修改标题
+      items: ["image-uploader", "image-file"]
+    }]
+  }
+```
+
+#### 自定义列表项
+
+可以修改 `item` 部分属性，比如 `title` 、`icon` 会与默认配置合并
+
+更多的属性可以查看 [React](https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx) [Vue](https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar-vue/src/config/index.ts)
+
+```ts
+items: [
+  {
+    type:'collapse',
+    groups: [{
+      // 修改标题
+      items: [{ name:"image-uploader", title: "上传文件"}]
+    }]
+  }
+```
+
+## 比较完整的配置
+
+```ts
+[
+	['collapse'],
+	['undo', 'redo', 'paintformat', 'removeformat'],
+	['heading', 'fontfamily', 'fontsize'],
+	['bold', 'italic', 'strikethrough', 'underline', 'moremark'],
+	['fontcolor', 'backcolor'],
+	['alignment'],
+	['unorderedlist', 'orderedlist', 'tasklist', 'indent', 'line-height'],
+	['link', 'quote', 'hr'],
+];
+```
+
 ## 默认配置
 
 [https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx](https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx)

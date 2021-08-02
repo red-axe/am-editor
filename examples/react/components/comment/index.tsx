@@ -91,11 +91,11 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 		const [list, setList] = useState<Array<DataItem>>([]);
 
 		const dispatch = useDispatch();
-		const load = () => {
+		const load = useCallback(() => {
 			dispatch({
 				type: 'comment/fetch',
 			});
-		};
+		}, [dispatch]);
 
 		const { dataSource } = useSelector((state) => state.comment);
 		const loading = useSelector((state) => state.loading['comment/fetch']);

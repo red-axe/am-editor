@@ -19,7 +19,6 @@ export type Data = Array<CollapseGroupProps>;
 class ToolbarComponent extends Card {
 	private keyword?: NodeInterface;
 	private placeholder?: NodeInterface;
-	private data: Data = [];
 	private component?: CollapseComponentInterface;
 
 	static get cardName() {
@@ -38,6 +37,24 @@ class ToolbarComponent extends Card {
 		if (!isEngine(this.editor) || isServer) {
 			return;
 		}
+
+		this.component = new CollapseComponent(this.editor, {
+			onCancel: () => {
+				this.changeToText();
+			},
+			onSelect: () => {
+				this.remove();
+			},
+		});
+	}
+
+	getData(): Data {
+		if (!isEngine(this.editor)) {
+			return [];
+		}
+		const data:
+			| Data
+			| { title: any; items: Omit<CollapseItemProps, 'engine'>[] }[] = [];
 		const defaultConfig = getToolbarDefaultConfig(this.editor);
 		const collapseConfig = defaultConfig.find(
 			({ type }) => type === 'collapse',
@@ -50,7 +67,7 @@ class ToolbarComponent extends Card {
 			collapseItems.push(...group.items);
 		});
 		const value = this.getValue();
-		if (!value || !value['data']) return;
+		if (!value || !value['data']) return [];
 
 		value['data'].forEach((group: any) => {
 			const title = group.title;
@@ -65,22 +82,18 @@ class ToolbarComponent extends Card {
 					items.push({
 						...collapseItem,
 						...(typeof item !== 'string' ? item : {}),
+						disabled: collapseItem.onDisabled
+							? collapseItem.onDisabled()
+							: !this.editor.command.queryEnabled(name),
 					});
 				}
 			});
-			this.data.push({
+			data.push({
 				title,
 				items,
 			});
 		});
-		this.component = new CollapseComponent(this.editor, {
-			onCancel: () => {
-				this.changeToText();
-			},
-			onSelect: () => {
-				this.remove();
-			},
-		});
+		return data;
 	}
 
 	/**
@@ -93,7 +106,7 @@ class ToolbarComponent extends Card {
 		// search with case insensitive
 		if (typeof keyword === 'string') keyword = keyword.toLowerCase();
 
-		this.data.forEach((group) => {
+		this.getData().forEach((group) => {
 			group.items.forEach((item) => {
 				if (item.search.toLowerCase().indexOf(keyword) >= 0) {
 					if (!items.find(({ name }) => name === item.name)) {
@@ -161,7 +174,7 @@ class ToolbarComponent extends Card {
 		const keyword = content.substr(1);
 		// 搜索关键词为空
 		if (keyword === '') {
-			this.component?.render(this.editor.root, this.root, this.data);
+			this.component?.render(this.editor.root, this.root, this.getData());
 			return;
 		}
 		const data = this.search(keyword);
@@ -222,7 +235,7 @@ class ToolbarComponent extends Card {
 			}, 10);
 		});
 		// 显示下拉列表
-		this.component?.render(this.editor.root, this.root, this.data);
+		this.component?.render(this.editor.root, this.root, this.getData());
 	}
 }
 

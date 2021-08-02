@@ -35,7 +35,6 @@ class Enter {
 				range = change.getRange();
 				//const selection = range.createSelection();
 				const block = this.engine.block.closest(range.endNode);
-
 				const plugin = list
 					.getPlugins()
 					.find(
@@ -60,12 +59,11 @@ class Enter {
 				}
 				list.merge(undefined, range);
 				list.addBr(range.startNode.closest('ul'));
-				range
-					.select(block, true)
-					.collapse(false)
-					.shrinkToElementNode()
-					.shrinkToTextNode()
-					.collapse(false);
+				range.setStart(
+					block,
+					this.engine.node.isCustomize(block) ? 1 : 0,
+				);
+				range.collapse(true).shrinkToTextNode();
 				change.apply(range);
 			}
 			range.scrollIntoView();
