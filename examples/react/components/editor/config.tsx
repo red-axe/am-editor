@@ -39,7 +39,7 @@ import Video, { VideoComponent, VideoUploader } from '@aomao/plugin-video';
 import Math, { MathComponent } from '@aomao/plugin-math';
 import Fontfamily from '@aomao/plugin-fontfamily';
 import Status, { StatusComponent } from '@aomao/plugin-status';
-import LineHeihgt from '@aomao/plugin-line-height';
+import LineHeight from '@aomao/plugin-line-height';
 import Mention, { MentionComponent } from '@aomao/plugin-mention';
 //import Mind, { MindComponent } from '@aomao/plugin-mind';
 import {
@@ -92,7 +92,7 @@ export const plugins: Array<PluginEntry> = [
 	ToolbarPlugin,
 	Fontfamily,
 	Status,
-	LineHeihgt,
+	LineHeight,
 	Mention,
 	//Mind
 ];
@@ -203,7 +203,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 			return item ? item.value : false;
 		},
 	},
-	[LineHeihgt.pluginName]: {
+	[LineHeight.pluginName]: {
 		//配置粘贴后需要过滤的行高
 		filter: (lineHeight: string) => {
 			if (lineHeight === '14px') return '1';
