@@ -44,7 +44,7 @@
     "@aomao/plugin-status": "^1.1.9",
     "@aomao/plugin-video": "^2.2.9",
     "@aomao/plugin-line-height": "^1.1.9",
-    "@aomao/toolbar-vue": "^2.3.9",
+    "@aomao/toolbar-vue": "^2.3.10",
     "ant-design-vue": "^2.1.2",
     "core-js": "^3.6.5",
     "reconnecting-websocket": "^4.4.0",
