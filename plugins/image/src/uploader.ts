@@ -42,6 +42,14 @@ export interface Options extends PluginOptions {
 		 */
 		accept?: string | Array<string>;
 		/**
+		 * 是否跨域
+		 */
+		crossOrigin?: boolean;
+		/**
+		 * 请求头
+		 */
+		headers?: { [key: string]: string };
+		/**
 		 * 文件选择限制数量
 		 */
 		multiple?: boolean | number;
@@ -51,6 +59,14 @@ export interface Options extends PluginOptions {
 		limitSize?: number;
 	};
 	remote: {
+		/**
+		 * 是否跨域
+		 */
+		crossOrigin?: boolean;
+		/**
+		 * 请求头
+		 */
+		headers?: { [key: string]: string };
 		/**
 		 * 上传地址
 		 */
@@ -209,7 +225,15 @@ export default class extends Plugin<Options> {
 	async execute(files?: Array<File> | string | MouseEvent) {
 		if (!isEngine(this.editor)) return;
 		const { request, card, language } = this.editor;
-		const { action, data, type, contentType, multiple } = this.options.file;
+		const {
+			action,
+			data,
+			type,
+			contentType,
+			multiple,
+			crossOrigin,
+			headers,
+		} = this.options.file;
 		const { parse } = this.options;
 		const limitSize = this.options.file.limitSize || 5 * 1024 * 1024;
 		if (!Array.isArray(files) && typeof files !== 'string') {
@@ -230,6 +254,8 @@ export default class extends Plugin<Options> {
 		request.upload(
 			{
 				url: action,
+				crossOrigin,
+				headers,
 				data,
 				type,
 				contentType,
@@ -431,13 +457,16 @@ export default class extends Plugin<Options> {
 
 	uploadAddress(src: string, component: ImageComponent) {
 		if (!isEngine(this.editor)) return;
-		const { action, type, data, contentType } = this.options.remote;
+		const { action, type, data, contentType, crossOrigin, headers } =
+			this.options.remote;
 		const { parse } = this.options;
 		this.editor.request.ajax({
 			url: action,
 			method: 'POST',
 			contentType: contentType || 'application/json',
 			type: type === undefined ? 'json' : type,
+			crossOrigin,
+			headers,
 			data: {
 				...data,
 				url: src,

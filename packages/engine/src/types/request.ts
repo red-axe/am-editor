@@ -42,6 +42,8 @@ export type UploaderOptions = {
 	type?: string;
 	contentType?: string;
 	data?: {};
+	crossOrigin?: boolean;
+	headers?: { [key: string]: string };
 	onBefore?: (file: File) => boolean | void;
 	onReady?: (fileInfo: FileInfo, file: File) => void;
 	onUploading?: (file: File, progress: { percent: number }) => void;

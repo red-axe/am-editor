@@ -40,6 +40,10 @@ new Engine(...,{
 
 `action`: 上传地址，始终使用 `POST` 请求
 
+`crossOrigin`: 是否跨域
+
+`headers`: 请求头
+
 `contentType`: 文件上传默认以 `multipart/form-data;` 类型上传
 
 `accept`: 限制用户文件选择框选择的文件类型，默认 `mp4` 格式
@@ -55,6 +59,14 @@ new Engine(...,{
  * 文件上传地址
  */
 action:string
+/**
+ * 是否跨域
+ */
+crossOrigin?: boolean;
+/**
+* 请求头
+*/
+headers?: { [key: string]: string };
 /**
  * 数据返回类型，默认 json
  */

@@ -80,7 +80,9 @@ export default defineComponent({
         };
 
         const showDropdown = () => {
-            document.addEventListener('click', hideDropdown);
+            setTimeout(() => {
+              document.addEventListener('click', hideDropdown);
+            }, 10);
             visible.value = true
         };
 

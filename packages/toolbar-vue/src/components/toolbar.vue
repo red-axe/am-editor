@@ -73,6 +73,7 @@ export default defineComponent({
                               return isEqual
                             }))
                             if(targetItem) items.push(targetItem)
+                            else if(typeof cItem === "object") items.push(cItem);
                           })
                           if(items.length > 0) {
                             customCollapse.groups.push({...omit(group, "itmes"), items})

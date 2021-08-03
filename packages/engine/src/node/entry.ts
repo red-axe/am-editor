@@ -646,7 +646,8 @@ class NodeEntry implements NodeInterface {
 			if (this.length === 0 || this.isText()) {
 				return '';
 			}
-			const element = this.get<HTMLElement>()!;
+			const element = this.get<HTMLElement>();
+			if (!element) return '';
 			return (
 				element.style[toCamelCase(key)] ||
 				getComputedStyle(<Element>this[0], key) ||

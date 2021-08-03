@@ -60,7 +60,9 @@ const Dropdown: React.FC<DropdownProps> = ({
 	};
 
 	const show = () => {
-		document.addEventListener('click', hide);
+		setTimeout(() => {
+			document.addEventListener('click', hide);
+		}, 10);
 		setVisible(true);
 	};
 

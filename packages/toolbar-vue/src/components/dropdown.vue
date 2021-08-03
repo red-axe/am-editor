@@ -116,7 +116,9 @@ export default defineComponent({
             }
         },
 	    show(){
-            document.addEventListener('click', this.hide);
+            setTimeout(() => {
+              document.addEventListener('click', this.hide);
+            }, 10);
             this.visible = true
         },
         hide(){

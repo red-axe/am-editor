@@ -70,7 +70,9 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 	};
 
 	const showDropdown = () => {
-		document.addEventListener('click', hideDropdown);
+		setTimeout(() => {
+			document.addEventListener('click', hideDropdown);
+		}, 10);
 		setPickerVisible(true);
 	};
 

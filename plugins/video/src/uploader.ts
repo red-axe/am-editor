@@ -32,6 +32,14 @@ export interface Options extends PluginOptions {
 	 */
 	contentType?: string;
 	/**
+	 * 是否跨域
+	 */
+	crossOrigin?: boolean;
+	/**
+	 * 请求头
+	 */
+	headers?: { [key: string]: string };
+	/**
 	 * 文件接收的格式，默认 "*"
 	 */
 	accept?: string | Array<string>;
@@ -146,7 +154,15 @@ export default class extends Plugin<Options> {
 			return;
 		}
 		const { request, card, language } = this.editor;
-		const { action, data, type, contentType, multiple } = this.options;
+		const {
+			action,
+			data,
+			type,
+			contentType,
+			multiple,
+			crossOrigin,
+			headers,
+		} = this.options;
 		const { parse } = this.options;
 		const limitSize = this.options.limitSize || 5 * 1024 * 1024;
 		if (!Array.isArray(files)) {
@@ -167,6 +183,8 @@ export default class extends Plugin<Options> {
 				data,
 				type,
 				contentType,
+				crossOrigin,
+				headers,
 				onBefore: (file) => {
 					if (file.size > limitSize) {
 						this.editor.messageError(

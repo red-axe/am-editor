@@ -159,6 +159,8 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 										}),
 								);
 								if (targetItem) items.push(targetItem);
+								else if (typeof cItem === 'object')
+									items.push(cItem);
 							});
 							if (items.length > 0) {
 								customCollapse.groups.push({

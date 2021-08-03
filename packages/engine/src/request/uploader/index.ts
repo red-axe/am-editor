@@ -30,17 +30,25 @@ class Uploader implements UploaderInterface {
 	}
 
 	private async upload(files: Array<File>) {
-		files.forEach(async file => {
+		files.forEach(async (file) => {
 			const formData = new FormData();
 			formData.append('file', file, file.name);
 			if (file.data) {
-				Object.keys(file.data).forEach(key => {
+				Object.keys(file.data).forEach((key) => {
 					formData.append(key, file.data![key]);
 				});
 			}
-			const { url, data, onUploading, onSuccess, onError } = this.options;
+			const {
+				url,
+				data,
+				onUploading,
+				onSuccess,
+				onError,
+				crossOrigin,
+				headers,
+			} = this.options;
 			if (data) {
-				Object.keys(data).forEach(key => {
+				Object.keys(data).forEach((key) => {
 					formData.append(key, data![key]);
 				});
 			}
@@ -49,7 +57,7 @@ class Uploader implements UploaderInterface {
 					const xhr = new window.XMLHttpRequest();
 					xhr.upload.addEventListener(
 						'progress',
-						evt => {
+						(evt) => {
 							if (evt.lengthComputable) {
 								if (onUploading)
 									onUploading(file, {
@@ -71,10 +79,12 @@ class Uploader implements UploaderInterface {
 				data: formData,
 				contentType: this.options.contentType,
 				type: this.options.type || 'json',
+				crossOrigin: crossOrigin,
+				headers: headers,
 				success: (response: any) => {
 					if (onSuccess) onSuccess(response, file);
 				},
-				error: err => {
+				error: (err) => {
 					if (onError) onError(err, file);
 				},
 				method: 'POST',
@@ -104,8 +114,10 @@ class Uploader implements UploaderInterface {
 						ext,
 					};
 					//全部图片读取完成后再插入编辑器
-					if (files.every(file => !!this.uploadingFiles[file.uid!])) {
-						files.forEach(file => {
+					if (
+						files.every((file) => !!this.uploadingFiles[file.uid!])
+					) {
+						files.forEach((file) => {
 							if (this.options.onReady) {
 								this.options.onReady(
 									this.uploadingFiles[file.uid!],

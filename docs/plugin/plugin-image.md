@@ -40,6 +40,10 @@ new Engine(...,{
 
 `action`: upload address, always use `POST` request
 
+`crossOrigin`: Whether to cross-origin
+
+`headers`: request header
+
 `contentType`: Image file upload is uploaded in `multipart/form-data;` type by default
 
 `accept`: Restrict the file type selected by the user's file selection box, the default is `svg`, `png`,`bmp`, `jpg`, `jpeg`,`gif`,`tif`,`tiff`,`emf` ,`webp`
@@ -59,6 +63,14 @@ file:{
      * File upload address
      */
     action:string
+    /**
+    * Whether cross-domain
+    */
+    crossOrigin?: boolean;
+    /**
+    * Request header
+    */
+    headers?: {[key: string]: string };
     /**
      * Data return type, default json
      */
@@ -109,6 +121,14 @@ remote:{
      * Upload address
      */
     action:string
+    /**
+    * Whether cross-domain
+    */
+    crossOrigin?: boolean;
+    /**
+    * Request header
+    */
+    headers?: {[key: string]: string };
     /**
      * Data return type, default json
      */
