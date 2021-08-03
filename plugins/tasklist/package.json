@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-tasklist",
-  "version": "2.3.7",
+  "version": "2.3.8",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.3.7",
+    "@aomao/engine": "^2.3.8",
     "@babel/runtime": "^7.13.10"
   }
 }
