@@ -127,8 +127,8 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 					if (item.type === 'collapse') {
 						const customCollapse: CollapseProps = {
 							...merge(
-								omit({ ...item }, 'groups'),
 								omit({ ...defaultItem }, 'groups'),
+								omit({ ...item }, 'groups'),
 							),
 							groups: [],
 						};
@@ -174,12 +174,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 								? customCollapse
 								: undefined;
 					} else {
-						customItem = merge(
-							defaultItem
-								? omit({ ...item }, 'type')
-								: { ...item },
-							defaultItem,
-						);
+						customItem = defaultItem
+							? merge(defaultItem, omit({ ...item }, 'type'))
+							: { ...item };
 					}
 				}
 				if (customItem) {

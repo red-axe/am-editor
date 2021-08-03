@@ -59,7 +59,7 @@ export default defineComponent({
                       // 解析collapse item 为字符串时
                       if(item.type === 'collapse')
                       {
-                        const customCollapse: ToolbarCollapseGroupProps = {...(merge(omit({...item}, "groups"), omit({...defaultItem}, "groups"))), groups:[]}
+                        const customCollapse: ToolbarCollapseGroupProps = {...(merge(omit({...defaultItem}, "groups"), omit({...item}, "groups"))), groups:[]}
                         item.groups.forEach(group => {
                           const items: Array<Omit<CollapseItemProps, 'engine'>> = []
                           group.items.forEach(cItem => {
@@ -81,10 +81,7 @@ export default defineComponent({
                         })
                         customItem = customCollapse.groups.length > 0 ? customCollapse : undefined
                       } else {
-                        customItem = merge(
-                          defaultItem ? omit({...item}, 'type') : {...item},
-                          defaultItem,
-                        );
+                        customItem = defaultItem ? merge(defaultItem, omit({ ...item }, 'type')) : { ...item };
                       }
                     }
                     if (customItem) {
