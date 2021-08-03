@@ -108,7 +108,10 @@ class ToolbarComponent extends Card {
 
 		this.getData().forEach((group) => {
 			group.items.forEach((item) => {
-				if (item.search.toLowerCase().indexOf(keyword) >= 0) {
+				if (
+					item.search &&
+					item.search.toLowerCase().indexOf(keyword) >= 0
+				) {
 					if (!items.find(({ name }) => name === item.name)) {
 						items.push({ ...item });
 					}

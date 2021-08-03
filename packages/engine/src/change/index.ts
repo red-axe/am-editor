@@ -309,27 +309,28 @@ class ChangeModel implements ChangeInterface {
 		} else {
 			const parser = new Parser(value, this.engine, (root) => {
 				mark.removeEmptyMarks(root);
-				root.allChildren().forEach((child) => {
-					if (node.isInline(child)) {
-						inline.repairCursor(child);
-					} else if (node.isMark(child)) {
-						mark.repairCursor(child);
-					}
+				root.allChildren(true).forEach((child) => {
 					if (onParse) {
 						onParse(child);
 					}
 				});
 			});
 			container.html(parser.toValue(schema, conversion, false, true));
-			container.allChildren().forEach((child) => {
-				if (node.isInline(child)) {
-					inline.repairCursor(child);
-				} else if (node.isMark(child)) {
-					mark.repairCursor(child);
-				}
-			});
+
 			block.generateDataIDForDescendant(container.get<Element>()!);
-			card.render(undefined, options);
+			card.render(undefined, {
+				...options,
+				callback: (count) => {
+					container.allChildren(true).forEach((child) => {
+						if (node.isInline(child)) {
+							inline.repairCursor(child);
+						} else if (node.isMark(child)) {
+							mark.repairCursor(child);
+						}
+					});
+					if (options?.callback) options.callback(count);
+				},
+			});
 			const cursor = container.find(CURSOR_SELECTOR);
 			const selection: SelectionInterface = new Selection(
 				this.engine,

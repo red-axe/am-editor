@@ -48,7 +48,10 @@ export interface Options extends PluginOptions {
 		/**
 		 * 请求头
 		 */
-		headers?: { [key: string]: string };
+		headers?:
+			| { [key: string]: string }
+			| (() => { [key: string]: string })
+			| (() => { [key: string]: string });
 		/**
 		 * 文件选择限制数量
 		 */
@@ -66,7 +69,7 @@ export interface Options extends PluginOptions {
 		/**
 		 * 请求头
 		 */
-		headers?: { [key: string]: string };
+		headers?: { [key: string]: string } | (() => { [key: string]: string });
 		/**
 		 * 上传地址
 		 */
@@ -255,7 +258,7 @@ export default class extends Plugin<Options> {
 			{
 				url: action,
 				crossOrigin,
-				headers,
+				headers: typeof headers === 'function' ? headers() : headers,
 				data,
 				type,
 				contentType,
@@ -466,7 +469,7 @@ export default class extends Plugin<Options> {
 			contentType: contentType || 'application/json',
 			type: type === undefined ? 'json' : type,
 			crossOrigin,
-			headers,
+			headers: typeof headers === 'function' ? headers() : headers,
 			data: {
 				...data,
 				url: src,

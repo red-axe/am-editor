@@ -227,13 +227,12 @@ export const collapseItemProps = {
 	engine: buttonProps.engine,
 	icon: buttonProps.icon,
 	title: buttonProps.title,
-	search: {
-		type: String,
-		required: true,
-	} as const,
+	search: String,
 	description: buttonProps.content,
 	disabled: buttonProps.disabled,
-	prompt: buttonProps.content,
+	prompt: [String, Function, Object] as PropType<
+		string | (() => string) | VNode
+	>,
 	command: buttonProps.command,
 	autoExecute: buttonProps.autoExecute,
 	className: buttonProps.className,
@@ -266,6 +265,7 @@ export const collapseProps = {
 		type: Array as PropType<Array<CollapseGroupProps>>,
 		required: true,
 	} as const,
+	disabled: buttonProps.disabled,
 	className: collapseItemProps.className,
 	icon: collapseItemProps.icon,
 	content: buttonProps.content,

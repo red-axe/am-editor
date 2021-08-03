@@ -94,8 +94,7 @@ export default defineComponent({
             collapse,
             isRight,
             triggerClick,
-            triggerSelect,
-            disabled:!props.groups.some(g => g.items.some(item => !item.disabled))
+            triggerSelect
         }
     }
 })

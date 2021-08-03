@@ -116,6 +116,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 	[ImageUploader.pluginName]: {
 		file: {
 			action: `${DOMAIN}/upload/image`,
+			headers: { Authorization: 213434 },
 		},
 		remote: {
 			action: `${DOMAIN}/upload/image`,

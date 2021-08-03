@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import debounce from 'lodash-es/debounce';
 //引入编辑器引擎
 import { $, EngineInterface, isHotkey, Path, isMobile } from '@aomao/engine';
 import EngineComponent, { EngineProps } from '../engine';
@@ -54,7 +53,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 	const [members, setMembers] = useState<Array<Member>>([]);
 	const [member, setMember] = useState<Member | null>(null);
 	const scrollNode = useRef<HTMLDivElement | null>();
-
+	const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 	/**
 	 * 保存到服务器
 	 */
@@ -74,7 +73,12 @@ const EditorComponent: React.FC<EditorProps> = ({
 	/**
 	 * 60秒内无更改自动保存
 	 */
-	const autoSave = useCallback(debounce(save, 60000), [save]);
+	const autoSave = useCallback(() => {
+		if (saveTimeout.current) clearTimeout(saveTimeout.current);
+		saveTimeout.current = setTimeout(() => {
+			save();
+		}, 60000);
+	}, [save]);
 
 	useEffect(() => {
 		window.addEventListener('beforeunload', save);

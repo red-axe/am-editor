@@ -504,8 +504,9 @@ export interface NodeInterface {
 
 	/**
 	 * 获取节点下的所有子节点
+	 * @param includeEditableCard 是否包含可编辑卡片的节点
 	 */
-	allChildren(): Array<Node>;
+	allChildren(includeEditableCard?: boolean): Array<Node>;
 
 	/**
 	 * 返回当前节点或者传入的节点所在当前节点的顶级window对象的视图边界

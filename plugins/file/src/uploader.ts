@@ -38,7 +38,7 @@ export interface Options extends PluginOptions {
 	/**
 	 * 请求头
 	 */
-	headers?: { [key: string]: string };
+	headers?: { [key: string]: string } | (() => { [key: string]: string });
 	/**
 	 * 文件接收的格式，默认 "*"
 	 */
@@ -154,7 +154,7 @@ export default class extends Plugin<Options> {
 				type,
 				contentType,
 				crossOrigin,
-				headers,
+				headers: typeof headers === 'function' ? headers() : headers,
 				onBefore: (file) => {
 					if (file.size > limitSize) {
 						this.editor.messageError(

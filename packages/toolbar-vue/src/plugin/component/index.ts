@@ -18,7 +18,7 @@ import './index.css';
 
 export type Data = Array<CollapseGroupProps>;
 
-class ToolbarComponent extends Card {
+class ToolbarComponent extends Card<{ data: Data }> {
 	private keyword?: NodeInterface;
 	private placeholder?: NodeInterface;
 	private component?: CollapseComponentInterface;
@@ -69,9 +69,9 @@ class ToolbarComponent extends Card {
 			collapseItems.push(...group.items);
 		});
 		const value = this.getValue();
-		if (!value || !value['data']) return [];
+		if (!value || !value.data) return [];
 
-		value['data'].forEach((group: any) => {
+		value.data.forEach((group: any) => {
 			const title = group.title;
 			const items: Array<Omit<CollapseItemProps, 'engine'>> = [];
 			group.items.forEach((item: any) => {
@@ -110,7 +110,10 @@ class ToolbarComponent extends Card {
 
 		this.getData().forEach((group) => {
 			group.items.forEach((item) => {
-				if (item.search.toLowerCase().indexOf(keyword) >= 0) {
+				if (
+					item.search &&
+					item.search.toLowerCase().indexOf(keyword) >= 0
+				) {
 					if (!items.find(({ name }) => name === item.name)) {
 						items.push({ ...item });
 					}

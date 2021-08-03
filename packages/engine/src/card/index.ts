@@ -695,6 +695,7 @@ class CardModel implements CardModelInterface {
 					});
 				}, 50);
 			}
+			if (options?.callback) options.callback(renderedCards.length);
 			return;
 		}
 		if (isEngine(this.editor) && options.triggerOT) {

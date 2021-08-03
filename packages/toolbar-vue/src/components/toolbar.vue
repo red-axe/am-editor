@@ -109,6 +109,7 @@ export default defineComponent({
                           customItem.groups.forEach(group => group.items.forEach((item) => {
                             item.disabled = item.onDisabled ? item.onDisabled() : !props.engine.command.queryEnabled(item.name);
                           }))
+                          customItem.disabled = !customItem.groups.some(g => g.items.some(item => !item.disabled))
                         }
                         dataGroup.items.push(customItem);
                     }

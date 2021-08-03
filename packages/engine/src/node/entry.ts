@@ -981,11 +981,15 @@ class NodeEntry implements NodeInterface {
 		return node;
 	}
 
-	allChildren() {
+	allChildren(includeEditableCard: boolean = false) {
 		const childNodes: Array<Node> = [];
-		this.traverse((node) => {
-			childNodes.push(node[0]);
-		});
+		this.traverse(
+			(node) => {
+				childNodes.push(node[0]);
+			},
+			undefined,
+			includeEditableCard,
+		);
 		childNodes.shift();
 		return childNodes;
 	}

@@ -66,7 +66,7 @@ crossOrigin?: boolean;
 /**
 * 请求头
 */
-headers?: { [key: string]: string };
+headers?: { [key: string]: string } | (() => { [key: string]: string });
 /**
  * 数据返回类型，默认 json
  */

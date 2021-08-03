@@ -9,7 +9,7 @@ export type CollapseItemProps = {
 	engine?: EngineInterface;
 	icon?: React.ReactNode;
 	title?: React.ReactNode | (() => React.ReactNode);
-	search: string;
+	search?: string;
 	description?: React.ReactNode | (() => React.ReactNode);
 	prompt?: React.ReactNode | (() => React.ReactNode);
 	command?: { name: string; args: Array<any> } | Array<any>;
