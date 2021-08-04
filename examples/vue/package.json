@@ -23,7 +23,7 @@
     "@aomao/plugin-image": "^2.3.9",
     "@aomao/plugin-indent": "^2.3.9",
     "@aomao/plugin-italic": "^2.3.9",
-    "@aomao/plugin-link-vue": "^2.3.9",
+    "@aomao/plugin-link-vue": "^2.3.10",
     "@aomao/plugin-mark": "^2.3.9",
     "@aomao/plugin-mention": "^1.1.10",
     "@aomao/plugin-orderedlist": "^2.3.9",
