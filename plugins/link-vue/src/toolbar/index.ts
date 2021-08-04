@@ -15,12 +15,12 @@ class Toolbar {
 	private target?: NodeInterface;
 	private mouseInContainer: boolean = false;
 	private vm?: App;
-	#position: Position;
+	position: Position;
 
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
 		const { change } = this.engine;
-		this.#position = new Position(this.engine);
+		this.position = new Position(this.engine);
 		change.event.onWindow('mousedown', (event: MouseEvent) => {
 			if (!event.target) return;
 			const target = $(event.target);
@@ -165,21 +165,24 @@ class Toolbar {
 		const name = !href || forceEdit ? 'am-link-editor' : 'am-link-preview';
 		if (this.vm && this.vm._component.name === name) {
 			if (!this.root || !this.target) return;
-			this.#position?.bind(this.root, this.target);
+			this.position?.bind(this.root, this.target);
 			return;
 		} else if (this.vm) {
 			this.vm.unmount();
 			this.vm = undefined;
-			this.#position?.destroy();
+			this.position?.destroy();
 		}
+
 		setTimeout(() => {
+			console.log(this.root, this.target);
+			this.position?.bind(this.root!, this.target!);
 			this.vm =
 				!href || forceEdit
 					? this.editor(text, href, () => {
-							this.#position?.update();
+							this.position?.update();
 					  })
 					: this.preview(href, () => {
-							this.#position?.update();
+							this.position?.update();
 					  });
 			this.vm.mount(container);
 		}, 20);
@@ -192,9 +195,8 @@ class Toolbar {
 			if (this.vm) {
 				this.vm.unmount();
 				this.vm = undefined;
-				this.#position?.destroy();
+				this.position?.destroy();
 			}
-			document.body.removeChild(elment);
 			this.root = undefined;
 			if (this.target && !this.target.attributes('href')) {
 				const { change, inline } = this.engine;
