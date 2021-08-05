@@ -376,7 +376,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	): NodeInterface | void {
 		this.onSelectByOther(activated, value);
 	}
-	onChange?(node: NodeInterface): void;
+	onChange?(trigger: 'remote' | 'local', node: NodeInterface): void;
 	destroy() {
 		this.toolbarModel?.hide();
 		this.toolbarModel?.destroy();
