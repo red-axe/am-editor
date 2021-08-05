@@ -273,21 +273,21 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.scrollbar?.refresh();
 	}
 
-	onChange = () => {
+	onChange = (trigger: 'remote' | 'local' = 'local') => {
 		if (!isEngine(this.editor)) return;
 		if (this.#changeTimeout) clearTimeout(this.#changeTimeout);
 		this.#changeTimeout = setTimeout(() => {
 			this.conltrollBar.refresh();
 			this.selection.render('change');
-			const value = this.getTableValue();
 			const oldValue = this.getValue();
-			if (value && value !== oldValue) {
-				if (oldValue?.noBorder) {
-					this.noBorderToolButton?.addClass('active');
-				} else this.noBorderToolButton?.removeClass('active');
-				this.setValue(value);
-				this.scrollbar?.refresh();
+			if (oldValue?.noBorder) {
+				this.noBorderToolButton?.addClass('active');
+			} else this.noBorderToolButton?.removeClass('active');
+			if (trigger === 'local') {
+				const value = this.getTableValue();
+				if (value) this.setValue(value);
 			}
+			this.scrollbar?.refresh();
 		}, 100);
 	};
 

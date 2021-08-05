@@ -279,9 +279,10 @@ export interface CardInterface {
 	): NodeInterface | void;
 	/**
 	 * 可编辑器区域值改变时触发
+	 * @param trigger 是否远程触发
 	 * @param node 可编辑器区域节点
 	 */
-	onChange?(node: NodeInterface): void;
+	onChange?(trigger: 'remote' | 'local', node: NodeInterface): void;
 	/**
 	 * 设置卡片值
 	 * @param value 值

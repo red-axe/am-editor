@@ -86,6 +86,7 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	change(isRemote?: boolean, applyNodes?: Array<NodeInterface>) {
+		const trigger = isRemote ? 'remote' : 'local';
 		//动态触发可编辑卡片的onChange事件
 		let editableElement: NodeInterface | undefined = undefined;
 		if (isRemote) {
@@ -93,7 +94,8 @@ class ChangeModel implements ChangeInterface {
 				editableElement = node.closest(EDITABLE_SELECTOR);
 				if (editableElement && editableElement.length > 0) {
 					const card = this.engine.card.find(editableElement, true);
-					if (card?.onChange) card?.onChange(editableElement);
+					if (card?.onChange)
+						card?.onChange(trigger, editableElement);
 				}
 			});
 		} else {
@@ -113,10 +115,10 @@ class ChangeModel implements ChangeInterface {
 			}
 			if (editableElement && editableElement.length > 0) {
 				const card = this.engine.card.find(editableElement, true);
-				if (card?.onChange) card?.onChange(editableElement);
+				if (card?.onChange) card?.onChange(trigger, editableElement);
 			}
 		}
-		const trigger = isRemote ? 'remote' : 'local';
+
 		this.onRealtimeChange(trigger);
 		if (this.changeTrigger.indexOf(trigger) < 0)
 			this.changeTrigger.push(trigger);
