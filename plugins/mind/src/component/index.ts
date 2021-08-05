@@ -27,7 +27,7 @@ export default class MindCard extends Card<MindValue> {
 
 	contenteditable = ['div.mind-content'];
 
-	onChange(node: NodeInterface) {
+	onChange(_: 'local' | 'remote', node: NodeInterface) {
 		const height = node.height();
 		const width = node.width();
 		console.log(width, height);

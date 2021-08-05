@@ -134,7 +134,7 @@ class Applier implements ApplierInterface {
 		return;
 	}
 
-	setAttribute(path: Path, attr: string, value: string) {
+	setAttribute(path: Path, attr: string, value: string, isRemote?: boolean) {
 		const { engine } = this;
 		const { card } = this.engine;
 		const [node] = this.elementAtPath(engine.container[0], path);
@@ -152,7 +152,7 @@ class Applier implements ApplierInterface {
 				if (!component.isEditable) {
 					card.reRender(component);
 				} else if (component.isEditable && component.onChange)
-					component.onChange(domNode);
+					component.onChange(isRemote ? 'remote' : 'local', domNode);
 			}
 		}
 		return domNode;
