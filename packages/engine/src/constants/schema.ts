@@ -9,6 +9,12 @@ import { ANCHOR, CURSOR, FOCUS } from './selection';
 
 const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 	{
+		type: 'block',
+		attributes: {
+			'data-id': '*',
+		},
+	},
+	{
 		name: 'p',
 		type: 'block',
 	},

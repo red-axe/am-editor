@@ -125,7 +125,6 @@ export default defineComponent({
             buttonRef,
             isRight,
             visible,
-            disabled: props.disabled,
             buttonContent,
             currentColor,
             triggerSelect,

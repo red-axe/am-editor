@@ -18,7 +18,7 @@
     <div :class="['editor-wrapper',{'editor-mobile': isMobile}]">
         <div class="editor-container">
             <div class="editor-content">
-                <div ref="container">This is Container</div>
+                <div ref="container"></div>
             </div>
         </div>
     </div>
