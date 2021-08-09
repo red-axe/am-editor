@@ -680,7 +680,7 @@ export const getToolbarDefaultConfig = (
 			title: language['line-height']['title'],
 			items: [
 				{
-					key: '',
+					key: 'default',
 					content: language['line-height']['default'],
 				},
 				{

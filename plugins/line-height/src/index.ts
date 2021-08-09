@@ -27,6 +27,7 @@ export default class extends Plugin<Options> {
 
 	execute(lineHeight?: string) {
 		if (!isEngine(this.editor)) return;
+		if (lineHeight === 'default') lineHeight = '';
 		const { change, block } = this.editor;
 		const range = change.getRange();
 		const blocks = block.findBlocks(range);
@@ -50,13 +51,23 @@ export default class extends Plugin<Options> {
 		const values: Array<string> = [];
 		blocks.forEach((block) => {
 			if (node.isSimpleBlock(block)) {
-				const lineHeight =
+				const lineHeightSource =
 					block.get<HTMLElement>()?.style.lineHeight || '';
-				values.push(lineHeight);
+				if (!lineHeightSource) return;
+				const lineHeight = this.convertToPX(lineHeightSource);
+
+				const { filter } = this.options;
+				if (filter) {
+					const result = filter(lineHeight);
+					if (result === false) {
+						return;
+					} else if (typeof result === 'string') {
+						values.push(result);
+					} else values.push(lineHeight);
+				}
 			}
 		});
-
-		return values;
+		return values.length === 0 ? ['default'] : values;
 	}
 	/**
 	 * 给 Block 节点增加行高

@@ -323,6 +323,8 @@ class ChangeModel implements ChangeInterface {
 			card.render(undefined, {
 				...options,
 				callback: (count) => {
+					if (options?.triggerOT === false)
+						this.engine.history.startCache();
 					container.allChildren(true).forEach((child) => {
 						if (node.isInline(child)) {
 							inline.repairCursor(child);
@@ -330,6 +332,8 @@ class ChangeModel implements ChangeInterface {
 							mark.repairCursor(child);
 						}
 					});
+					if (options?.triggerOT === false)
+						this.engine.history.destroyCache();
 					if (options?.callback) options.callback(count);
 				},
 			});

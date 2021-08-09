@@ -192,7 +192,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 							customItem.values = customItem.onActive(
 								customItem.items,
 							);
-						else if (engine.command.queryEnabled(customItem.name))
+						else
 							customItem.values = engine.command.queryState(
 								customItem.name,
 							);
