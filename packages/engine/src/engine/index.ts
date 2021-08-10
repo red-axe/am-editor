@@ -122,7 +122,7 @@ class Engine implements EngineInterface {
 				parent = parent.parent();
 			}
 		}
-		if (sn === null) sn === document.body;
+		if (sn === null) sn = document.documentElement;
 		this.#_scrollNode = sn ? $(sn) : null;
 		return this.#_scrollNode;
 	}
