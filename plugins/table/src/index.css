@@ -626,7 +626,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 2;
+    z-index: 128;
     margin-bottom: 4px;
     width: 24px;
     height: 24px;

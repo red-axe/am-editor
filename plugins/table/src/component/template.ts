@@ -79,6 +79,40 @@ class Template implements TemplateInterface {
 		this.table = table;
 	}
 
+	renderRowsHeader(rows: number) {
+		return (
+			`<div ${DATA_ELEMENT}="${UI}" class="${ROWS_HEADER_CLASS_NAME}">` +
+			`<div class="${ROW_DELETE_BUTTON_CLASS_NAME}"><span class="data-icon data-icon-delete"></span></div>` +
+			`<div class="${ROW_ADD_BUTTON_CLASS_NAME}"><span class="data-icon data-icon-plus"></span><div class="${ROW_ADD_BUTTON_SPLIT_CLASS_NAME}"></div></div>` +
+			`<div class="${ROWS_HEADER_ITEM_CLASS_NAME}" draggable="true">
+                <div class="row-dragger">
+                    <span class="data-icon data-icon-drag"></span>
+                    <span class="drag-info"></span>
+                </div>
+                <div class="${ROWS_HEADER_TRIGGER_CLASS_NAME}"></div>
+            </div>`.repeat(rows) +
+			`
+        </div>`
+		);
+	}
+
+	renderColsHeader(cols: number) {
+		return (
+			`<div ${DATA_ELEMENT}="${UI}" class="${COLS_HEADER_CLASS_NAME}">` +
+			`<div class="${COL_DELETE_BUTTON_CLASS_NAME}"><span class="data-icon data-icon-delete"></span></div>` +
+			`<div class="${COL_ADD_BUTTON_CLASS_NAME}"><span class="data-icon data-icon-plus"></span><div class="${COL_ADD_BUTTON_SPLIT_CLASS_NAME}"></div></div>` +
+			`<div class="${COLS_HEADER_ITEM_CLASS_NAME}" draggable="true">
+            <div class="col-dragger">
+                <span class="data-icon data-icon-drag"></span>
+                <p class="drag-info"></p>
+            </div>
+            <div class="${COLS_HEADER_TRIGGER_CLASS_NAME}"></div>
+        </div>`.repeat(cols) +
+			`
+    </div>`
+		);
+	}
+
 	/**
 	 * 用于Card渲染
 	 * @param {object} value 参数
@@ -102,33 +136,6 @@ class Template implements TemplateInterface {
 		const trs = `<tr>${tds}</tr>`.repeat(rows);
 		const col = `<col />`.repeat(cols);
 		const colgroup = `<colgroup>${col}</colgroup>`;
-		const colsHeader =
-			`<div ${DATA_ELEMENT}="${UI}" class="${COLS_HEADER_CLASS_NAME}">` +
-			`<div class="${COL_DELETE_BUTTON_CLASS_NAME}"><span class="data-icon data-icon-delete"></span></div>` +
-			`<div class="${COL_ADD_BUTTON_CLASS_NAME}"><span class="data-icon data-icon-plus"></span><div class="${COL_ADD_BUTTON_SPLIT_CLASS_NAME}"></div></div>` +
-			`<div class="${COLS_HEADER_ITEM_CLASS_NAME}" draggable="true">
-                <div class="col-dragger">
-                    <span class="data-icon data-icon-drag"></span>
-                    <p class="drag-info"></p>
-                </div>
-                <div class="${COLS_HEADER_TRIGGER_CLASS_NAME}"></div>
-            </div>`.repeat(cols) +
-			`
-        </div>`;
-
-		const rowsHeader =
-			`<div ${DATA_ELEMENT}="${UI}" class="${ROWS_HEADER_CLASS_NAME}">` +
-			`<div class="${ROW_DELETE_BUTTON_CLASS_NAME}"><span class="data-icon data-icon-delete"></span></div>` +
-			`<div class="${ROW_ADD_BUTTON_CLASS_NAME}"><span class="data-icon data-icon-plus"></span><div class="${ROW_ADD_BUTTON_SPLIT_CLASS_NAME}"></div></div>` +
-			`<div class="${ROWS_HEADER_ITEM_CLASS_NAME}" draggable="true">
-                <div class="row-dragger">
-                    <span class="data-icon data-icon-drag"></span>
-                    <span class="drag-info"></span>
-                </div>
-                <div class="${ROWS_HEADER_TRIGGER_CLASS_NAME}"></div>
-            </div>`.repeat(rows) +
-			`
-        </div>`;
 
 		const tableHighlight = `<div ${DATA_ELEMENT}="${UI}" class="${TABLE_HIGHLIGHT}"></div>`;
 
@@ -183,12 +190,12 @@ class Template implements TemplateInterface {
 		return `<div class="${TABLE_WRAPPER_CLASS_NAME}" ${DATA_TRANSIENT_ATTRIBUTES}="*">
                 ${tableHeader}
                 <div class="${VIEWPORT}">
-                    ${colsHeader}
+                    ${this.renderColsHeader(cols)}
                     ${table}
                     ${placeholder}
                     ${tableHighlight}
                 </div>
-                ${rowsHeader}
+                ${this.renderRowsHeader(rows)}
                 ${menuBar}
             </div>`;
 	}

@@ -94,6 +94,9 @@ export interface TemplateInterface {
 	htmlEdit(value: TableValue, menus: TableMenu): string;
 
 	htmlView(value: TableValue): string;
+
+	renderRowsHeader(rows: number): string;
+	renderColsHeader(rows: number): string;
 }
 
 export type TableValue = {

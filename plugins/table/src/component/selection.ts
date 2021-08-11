@@ -1021,11 +1021,14 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		}
 
 		const firstCell = tableModel.table[begin.row][begin.col];
-		let top = 28;
-		let left = 13;
+		let top = 0;
+		let left = 0;
 		if (!helper.isEmptyModelCol(firstCell) && firstCell.element) {
-			top += firstCell.element.offsetTop;
-			left += firstCell.element.offsetLeft;
+			const viewport = this.tableRoot?.parent();
+			const vRect = viewport?.getBoundingClientRect();
+			const rect = firstCell.element.getBoundingClientRect();
+			top += rect.top - (vRect?.top || 0) - 13;
+			left += rect.left - (vRect?.left || 0);
 		}
 
 		const headerHeight =

@@ -414,6 +414,7 @@ class Scrollbar extends EventEmitter2 {
 			min = Math.min(1, min);
 			this.slideX?.css('left', (this.oWidth - this.xWidth) * min + 'px');
 			this.reRenderShadow(left);
+			this.emit('change');
 		}
 	};
 
@@ -423,6 +424,7 @@ class Scrollbar extends EventEmitter2 {
 			let min = top / (this.sHeight - this.oHeight);
 			min = Math.min(1, min);
 			this.slideY?.css('top', (this.oHeight - this.yHeight) * min + 'px');
+			this.emit('change');
 		}
 	};
 

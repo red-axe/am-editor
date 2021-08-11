@@ -149,9 +149,8 @@ class Applier implements ApplierInterface {
 			if (domNode.isCard()) {
 				const component = card.find(domNode);
 				if (!component) return;
-				if (!component.isEditable) {
-					card.reRender(component);
-				} else if (component.isEditable && component.onChange)
+				card.reRender(component);
+				if (component.isEditable && component.onChange)
 					component.onChange(isRemote ? 'remote' : 'local', domNode);
 			}
 		}

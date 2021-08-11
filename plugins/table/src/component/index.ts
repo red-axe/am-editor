@@ -250,14 +250,23 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		const startRect = startElement
 			.get<HTMLElement>()!
 			.getBoundingClientRect();
-
-		domRect.x = startRect.left - backgroundRect.left;
+		const vLeft =
+			(this.viewport?.getBoundingClientRect()?.left || 0) +
+			(this.activated ? 13 : 0);
+		domRect.x = Math.max(
+			startRect.left - backgroundRect.left,
+			vLeft - (this.editor.root.getBoundingClientRect()?.left || 0),
+		);
 		domRect.y = startRect.top - backgroundRect.top;
 		domRect.width = startRect.right - startRect.left;
 		domRect.height = startRect.bottom - startRect.top;
 
 		const rect = endElement.get<HTMLElement>()!.getBoundingClientRect();
-		domRect.width = rect.right - startRect.left;
+		domRect.width = Math.min(
+			rect.right - (startRect.left < vLeft ? vLeft : startRect.left),
+			(this.viewport?.width() || 0) - (this.activated ? 13 : 0),
+		);
+		if (domRect.width < 0) domRect.width = 0;
 		domRect.height = rect.bottom - startRect.top;
 		return domRect;
 	}
@@ -322,6 +331,9 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 					this.wrapper?.removeClass('scrollbar-show');
 				}
 			});
+			this.scrollbar.on('change', () => {
+				if (isEngine(this.editor)) this.editor.ot.initSelection();
+			});
 		}
 		this.scrollbar?.refresh();
 		this.selection.on('select', () => {
@@ -359,8 +371,21 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 
 	render() {
 		Template.isReadonly = !isEngine(this.editor) || this.editor.readonly;
-		if (this.wrapper) return;
 		const value = this.getValue();
+		// 重新渲染
+		if (this.wrapper) {
+			// 重新绘制列头部和行头部
+			const colsHeader = this.wrapper.find(Template.COLS_HEADER_CLASS);
+			colsHeader.replaceWith(
+				$(this.template.renderColsHeader(value?.cols || 0)),
+			);
+			const rowsHeader = this.wrapper.find(Template.ROWS_HEADER_CLASS);
+			rowsHeader.replaceWith(
+				$(this.template.renderRowsHeader(value?.rows || 0)),
+			);
+			return;
+		}
+		// 第一次渲染
 		if (!value) return 'Error value';
 		if (value.html) {
 			const model = this.helper.getTableModel($(value.html));
