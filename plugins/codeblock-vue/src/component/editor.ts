@@ -137,7 +137,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				Object.keys(config).forEach((key) => {
 					return mirror.setOption(
 						key as keyof EditorConfiguration,
-						config[key],
+						config[key as keyof EditorConfiguration],
 					);
 				});
 				mirror.execCommand('newlineAndIndent');
@@ -203,7 +203,8 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		const ie = /MSIE \d/.test(navigator.userAgent);
 		const ie_lt9 =
 			ie &&
-			(document['documentMode'] == null || document['documentMode'] < 9);
+			((document as any)['documentMode'] == null ||
+				(document as any)['documentMode'] < 9);
 
 		if (callback.appendChild) {
 			const tabSize =

@@ -51,10 +51,12 @@ class CodeBlcok extends Card<CodeBlockValue> {
 			},
 			onMouseDown: (event) => {
 				if (!this.activated)
-					this.editor.card.activate(
-						this.root,
-						ActiveTrigger.MOUSE_DOWN,
-					);
+					setTimeout(() => {
+						this.editor.card.activate(
+							this.root,
+							ActiveTrigger.MOUSE_DOWN,
+						);
+					}, 10);
 			},
 		});
 	}
