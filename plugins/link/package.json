@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-link",
-  "version": "2.3.12",
+  "version": "2.3.13",
   "description": "> TODO: description",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
@@ -24,7 +24,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.3.12",
+    "@aomao/engine": "^2.3.13",
     "@babel/runtime": "^7.13.10",
     "antd": "^4.12.3",
     "classnames-es-ts": "^2.2.7",
