@@ -282,7 +282,7 @@ class Applier implements ApplierInterface {
 				path = path.slice(0, -1);
 			}
 			if ('oi' in op) {
-				return this.setAttribute(path, attr!, op.oi);
+				return this.setAttribute(path, attr!, op.oi, isRemote);
 			} else if ('od' in op) {
 				return this.removeAttribute(path, attr!);
 			} else if ('sd' in op) {
