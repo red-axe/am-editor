@@ -12,7 +12,7 @@ export default class extends Plugin {
 
 	init() {
 		this.editor.language.add(locales);
-		this.editor.on('paser:html', node => this.parseHtml(node));
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
 	}
 
 	execute(
@@ -50,7 +50,7 @@ export default class extends Plugin {
 		};
 		return check()
 			? Promise.resolve()
-			: new Promise(resolve => {
+			: new Promise((resolve) => {
 					let time = 0;
 					const wait = () => {
 						setTimeout(() => {
@@ -64,18 +64,20 @@ export default class extends Plugin {
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${ImageComponent.cardName}`).each(cardNode => {
-			const node = $(cardNode);
-			const card = this.editor.card.find(node) as ImageComponent;
-			const value = card?.getValue();
-			if (value?.src) {
-				const img = node.find('.data-image-meta > img');
-				node.empty();
-				img.attributes('src', value.src);
-				img.css('visibility', 'visible');
-				node.replaceWith(img);
-			} else node.remove();
-		});
+		root.find(`[${CARD_KEY}=${ImageComponent.cardName}`).each(
+			(cardNode) => {
+				const node = $(cardNode);
+				const card = this.editor.card.find(node) as ImageComponent;
+				const value = card?.getValue();
+				if (value?.src && value.status === 'done') {
+					const img = node.find('.data-image-meta > img');
+					node.empty();
+					img.attributes('src', value.src);
+					img.css('visibility', 'visible');
+					if (img.length > 0) node.replaceWith(img);
+				} else node.remove();
+			},
+		);
 	}
 }
 
