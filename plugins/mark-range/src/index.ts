@@ -468,8 +468,6 @@ export default class extends MarkPlugin<Options> {
 				return reuslt;
 			case 'apply':
 				if (!id) return;
-				//锁住30毫秒不产生历史记录
-				history?.lock(30);
 				this.apply(key, id);
 				//提交操作缓存，这里会在20毫秒后执行
 				history?.submitCache();
@@ -483,7 +481,6 @@ export default class extends MarkPlugin<Options> {
 				return this.findElements(key, id);
 			case 'remove':
 				if (!id) return;
-				history?.lock();
 				this.remove(key, id);
 				break;
 			case 'filter':
