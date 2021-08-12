@@ -85,6 +85,37 @@ You can disable the mark plug-in effect under the title, ['fontsize','bold'] is 
 disableMark?: Array<string> //mark plugin name collection
 ```
 
+### Type to be enabled (h1 h2 h3 h4 h5 h6)
+
+Can define the node types required by h1-h6, if not defined, all are supported
+
+Markdown will also be invalid after setting
+
+```ts
+enableTypes?: Array<string>
+```
+
+In addition, you may also need to configure the heading plugin of the items attribute in the toolbar
+
+```ts
+{
+     type:'dropdown',
+     name:'heading',
+     items: [
+         {
+             key: "p",
+             className:'heading-item-p',
+             content: "Body"
+         },
+         {
+             key: "h1",
+             className:'heading-item-h1',
+             content: "Title 1"
+         }
+     ]
+     }
+```
+
 ## Command
 
 When `p` is passed in or the current heading style is consistent with the current passed value, the heading will be canceled
@@ -184,7 +215,7 @@ const Toc: React.FC<Props> = ({ editor }) => {
 		// Extract the title Dom node that meets the structural requirements
 		let nodes: Array<Element> = [];
 		const { card } = editor;
-		editor.container.find('h1,h2,h3,h4,h5,h6').each(child => {
+		editor.container.find('h1,h2,h3,h4,h5,h6').each((child) => {
 			const node = $(child);
 			// The title in the Card is not included in the outline
 			if (card.closest(node)) {

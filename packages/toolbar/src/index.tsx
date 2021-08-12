@@ -173,6 +173,14 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 							customCollapse.groups.length > 0
 								? customCollapse
 								: undefined;
+					} else if (item.type === 'dropdown') {
+						customItem = defaultItem
+							? merge(
+									defaultItem,
+									omit({ ...item }, 'type', 'items'),
+							  )
+							: { ...item };
+						(customItem as DropdownProps).items = item.items;
 					} else {
 						customItem = defaultItem
 							? merge(defaultItem, omit({ ...item }, 'type'))

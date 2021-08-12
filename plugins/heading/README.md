@@ -85,6 +85,37 @@ new Engine(...,{
 disableMark?: Array<string> //mark插件名称集合
 ```
 
+### 要启用的类型（h1 h2 h3 h4 h5 h6）
+
+可以定义 h1 - h6 所需要的节点类型，如果不定义则支持全部
+
+设置后 markdown 也会失效
+
+```ts
+enableTypes?: Array<string>
+```
+
+另外可能还需要配置 toolbar 中 items 属性的 heading 插件
+
+```ts
+{
+    type: 'dropdown',
+    name: 'heading',
+    items: [
+        {
+            key: "p",
+            className: 'heading-item-p',
+            content: "正文"
+        },
+        {
+            key: "h1",
+            className: 'heading-item-h1',
+            content: "标题1"
+        }
+    ]
+    }
+```
+
 ## 命令
 
 传入 `p` 或当前标题样式与当前传入值一致 时将取消标题

@@ -24,6 +24,7 @@ export interface Options extends PluginOptions {
 	showAnchor?: boolean;
 	anchorCopy?: (id: string) => string;
 	markdown?: boolean;
+	enableTypes?: Array<string>;
 	disableMark?: Array<string>;
 }
 export default class extends BlockPlugin<Options> {
@@ -33,7 +34,11 @@ export default class extends BlockPlugin<Options> {
 	variable = {
 		'@var0': /^[\w\.\-]+$/,
 	};
-	tagName = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+	tagName = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].filter(
+		(name) =>
+			!this.options.enableTypes ||
+			this.options.enableTypes.indexOf(name) > -1,
+	);
 
 	allowIn = ['blockquote', '$root'];
 
@@ -51,6 +56,7 @@ export default class extends BlockPlugin<Options> {
 		if (!isEngine(this.editor) && this.options.showAnchor !== false) {
 			this.editor.on('render', (root: Node) => {
 				const container = $(root);
+				if (this.tagName.length === 0) return;
 				container.find(this.tagName.join(',')).each((heading) => {
 					const node = $(heading);
 					const id = node.attributes('id');
@@ -127,6 +133,7 @@ export default class extends BlockPlugin<Options> {
 	}
 
 	updateId() {
+		if (this.tagName.length === 0) return;
 		this.editor.container.find(this.tagName.join(',')).each((titleNode) => {
 			const node = $(titleNode);
 
@@ -179,7 +186,7 @@ export default class extends BlockPlugin<Options> {
 	}
 
 	showAnchor() {
-		if (!isEngine(this.editor)) return;
+		if (!isEngine(this.editor) || this.tagName.length === 0) return;
 		const { change, root, clipboard, language, card } = this.editor;
 		const range = change.getRange();
 		let button = root.find('.data-anchor-button');
@@ -265,6 +272,10 @@ export default class extends BlockPlugin<Options> {
 	execute(type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p') {
 		if (!isEngine(this.editor)) return;
 		if (type === this.queryState()) type = 'p';
+		const { enableTypes } = this.options;
+		// 未启用
+		if (type !== 'p' && enableTypes && enableTypes.indexOf(type) < 0)
+			return;
 		const { list, block } = this.editor;
 		list.split();
 		block.setBlocks(`<${type} />`);
@@ -290,6 +301,7 @@ export default class extends BlockPlugin<Options> {
 		const h4Hotkey = this.options.hotkey?.h4 || 'mod+opt+4';
 		const h5Hotkey = this.options.hotkey?.h5 || 'mod+opt+5';
 		const h6Hotkey = this.options.hotkey?.h6 || 'mod+opt+6';
+		const { enableTypes } = this.options;
 		return [
 			{ key: h1Hotkey, args: 'h1' },
 			{ key: h2Hotkey, args: 'h2' },
@@ -297,7 +309,7 @@ export default class extends BlockPlugin<Options> {
 			{ key: h4Hotkey, args: 'h4' },
 			{ key: h5Hotkey, args: 'h5' },
 			{ key: h6Hotkey, args: 'h6' },
-		];
+		].filter((item) => !enableTypes || enableTypes.indexOf(item.key) > -1);
 	}
 
 	//设置markdown
@@ -326,6 +338,10 @@ export default class extends BlockPlugin<Options> {
 				break;
 		}
 		if (!type) return true;
+		const { enableTypes } = this.options;
+		// 未启用
+		if (enableTypes && enableTypes.indexOf(type) < 0) return true;
+
 		event.preventDefault();
 		this.editor.block.removeLeftText(block);
 		if (this.editor.node.isEmpty(block)) {
@@ -350,6 +366,8 @@ export default class extends BlockPlugin<Options> {
 		let newText = '';
 		let textNode = node.clone(true).get<Text>()!;
 
+		const { enableTypes } = this.options;
+
 		while (
 			textNode.textContent &&
 			(match = reg.exec(textNode.textContent))
@@ -360,8 +378,11 @@ export default class extends BlockPlugin<Options> {
 			newText += textNode.textContent;
 			//从匹配结束位置分割
 			textNode = regNode.splitText(match[0].length);
-
-			newText += `<h${codeLength}>${match[3].trim()}</h${codeLength}>\n`;
+			// 过滤不支持的节点
+			if (enableTypes && enableTypes.indexOf(`h${codeLength}`) < 0) {
+				newText += match[2] + match[3];
+			} else
+				newText += `<h${codeLength}>${match[3].trim()}</h${codeLength}>\n`;
 		}
 		newText += textNode.textContent;
 
