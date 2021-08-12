@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-heading",
-  "version": "2.3.13",
+  "version": "2.3.14",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
