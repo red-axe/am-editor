@@ -234,7 +234,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 		engine.language.add(locales);
 		engine.on('select', updateState);
 		engine.on('change', updateState);
-
+		engine.on('blur', updateState);
 		let scrollTimer: NodeJS.Timeout;
 
 		const hideMobileToolbar = () => {
@@ -269,7 +269,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 		return () => {
 			engine.off('select', updateState);
 			engine.off('change', updateState);
-
+			engine.off('blur', updateState);
 			if (isMobile) {
 				engine.off('readonly', handleReadonly);
 				engine.off('blur', hideMobileToolbar);

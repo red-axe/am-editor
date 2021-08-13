@@ -155,7 +155,7 @@ export default defineComponent({
             props.engine.language.add(locales)
             props.engine.on("select",update)
             props.engine.on("change",update)
-           
+            props.engine.on("blur",update)
             if (isMobile) {
               props.engine.on('readonly', handleReadonly)
               props.engine.on('blur', hideMobileToolbar)
@@ -173,6 +173,7 @@ export default defineComponent({
             props.engine.off("select",update)
             props.engine.off("change",update)
             props.engine.off('readonly', update);
+            props.engine.off("blur",update)
             if (isMobile) {
               props.engine.off('readonly', handleReadonly)
               props.engine.off('blur', hideMobileToolbar)
