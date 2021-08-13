@@ -1,22 +1,14 @@
-const WebSocketJSONStream = require('@teamwork/websocket-json-stream');
-
 class Doc {
-	constructor(id, backend, destroy = function () {}) {
+	constructor(id, destroy = function () {}) {
 		this.id = id.toString();
 		this.members = [];
 		this.sockets = {};
-		this.timeouts = {};
 		this.destroy = destroy;
-		this.backend = backend;
 		this.indexCount = 0;
 		this.doc = undefined;
 	}
 
-	create(
-		connection = this.backend.connect(),
-		collectionName = 'aomao',
-		callback = function () {},
-	) {
+	create(connection, collectionName = 'yanmao', callback = function () {}) {
 		const doc = connection.get(collectionName, this.id);
 		doc.fetch(function (err) {
 			if (err) {
@@ -99,48 +91,6 @@ class Doc {
 		this.broadcast('join', member, (m) => m.uuid !== member.uuid);
 		// 通知用户当前文档的所有用户
 		this.sendMessage(member.uuid, 'members', this.members);
-		try {
-			// 建立协作 socket 连接
-			const stream = new WebSocketJSONStream(ws);
-			// 监听消息
-			this.backend.listen(stream);
-			// 中间件处理 action 消息
-			this.backend.use(
-				Object.keys(this.backend.MIDDLEWARE_ACTIONS),
-				(context, next) => {
-					const { action, data } = context.data || {};
-					// 自定义消息
-					if (!!action) {
-						//广播消息
-						if (action === 'broadcast') {
-							this.broadcast('broadcast', data);
-						}
-						//心跳检测
-						else if (action === 'heartbeat') {
-							const timeout = this.timeouts[member.uuid];
-							if (timeout) clearTimeout(timeout);
-							this.timeouts[member.uuid] = setTimeout(() => {
-								this.removeMember(member.uuid);
-							}, 60000);
-							this.sendMessage(
-								member.uuid,
-								'heartbeat',
-								new Date().getTime(),
-							);
-						}
-						return;
-					}
-					// sharedb消息
-					try {
-						next();
-					} catch (error) {
-						console.error(error);
-					}
-				},
-			);
-		} catch (error) {
-			console.error(error);
-		}
 		// 通知用户准备好了
 		this.sendMessage(member.uuid, 'ready', member);
 	}

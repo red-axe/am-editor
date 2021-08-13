@@ -7,6 +7,7 @@ import { Socket } from 'sharedb/lib/sharedb';
 
 export type Member = {
 	id: number;
+	avatar: string;
 	name: string;
 	iid: number;
 	uuid: string;
@@ -72,38 +73,40 @@ class OTClient extends EventEmitter {
 	}
 	/**
 	 * 每隔指定毫秒发送心跳检测
-	 * @param millisecond 毫秒 默认 30000
-	 * @returns
+	 * @param {number} millisecond 毫秒 默认 30000
+	 * @return {void}
 	 */
-	checkHeartbeat(millisecond: number = 30000) {
+	checkHeartbeat(millisecond: number = 30000): void {
 		if (!this.socket) return;
+		if (this.heartbeat?.timeout) clearTimeout(this.heartbeat.timeout);
 		const timeout = setTimeout(() => {
 			const now = new Date();
 			if (
 				!this.heartbeat ||
 				now.getTime() - this.heartbeat.datetime.getTime() >= millisecond
 			) {
-				this.socket?.send(
-					JSON.stringify({
-						action: 'heartbeat',
-						data: now.getTime(),
-					}),
-				);
+				this.sendMessage('heartbeat', { time: now.getTime() });
 				this.heartbeat = {
 					timeout,
 					datetime: now,
 				};
-				this.checkHeartbeat();
+			} else {
+				this.heartbeat.timeout = timeout;
 			}
+			this.checkHeartbeat(millisecond);
 		}, 1000);
 	}
 
-	connect(url: string, documentID: string, collectionName: string = 'aomao') {
+	connect(
+		url: string,
+		documentID: string,
+		collectionName: string = 'yanmao',
+	) {
 		const socket = new ReconnectingWebSocket(url, [], {
 			maxReconnectionDelay: 30000,
 			minReconnectionDelay: 10000,
 			reconnectionDelayGrowFactor: 10000,
-			maxRetries: 60,
+			maxRetries: 10,
 		});
 		socket.addEventListener('open', () => {
 			console.log('collab server connected');
@@ -127,12 +130,13 @@ class OTClient extends EventEmitter {
 				}
 				if ('ready' === action) {
 					this.current = data;
+					console.log('current member->', data);
 					this.engine.ot.setCurrentMember(data);
 					this.load(documentID, collectionName);
 				}
 				if ('broadcast' === action) {
-					const { body, type } = data;
-					if (body.user.uuid !== this.current?.uuid) {
+					const { sender, body, type } = data;
+					if (sender.uuid !== this.current?.uuid) {
 						this.emit(EVENT.message, {
 							type,
 							body,
@@ -170,7 +174,7 @@ class OTClient extends EventEmitter {
 	load(documentID: string, collectionName: string) {
 		const connection = new sharedb.Connection(this.socket as Socket);
 		const doc = connection.get(collectionName, documentID);
-
+		this.doc = doc;
 		doc.subscribe((error) => {
 			if (error) {
 				console.log('collab doc subscribe error', error);
@@ -202,10 +206,7 @@ class OTClient extends EventEmitter {
 		});
 
 		doc.on('error', (error) => {
-			console.log('collab doc error', {
-				error,
-				origin_code: error.code,
-			});
+			console.error(error);
 		});
 	}
 
@@ -222,10 +223,28 @@ class OTClient extends EventEmitter {
 		this.transmit(STATUS.init);
 	}
 
-	addMembers(member: Array<Member>) {
-		member.forEach((member) => {
-			if (!this.members.find((m) => member.id === m.id))
+	broadcast(type: string, body: any = {}) {
+		this.sendMessage('broadcast', { type, body });
+	}
+
+	sendMessage(action: string, data?: any) {
+		this.socket?.send(
+			JSON.stringify({
+				action,
+				data: {
+					...data,
+					doc_id: this.doc?.id,
+					uuid: this.current?.uuid,
+				},
+			}),
+		);
+	}
+
+	addMembers(memberList: Array<Member>) {
+		memberList.forEach((member) => {
+			if (!this.members.find((m) => member.id === m.id)) {
 				this.members.push(member);
+			}
 		});
 		setTimeout(() => {
 			this.emit(EVENT.membersChange, this.normalizeMembers());
@@ -291,32 +310,33 @@ class OTClient extends EventEmitter {
 					ERROR_CODE.STATUS_CODE.FORCE_DISCONNECTED,
 					'FORCE_DISCONNECTED',
 				);
+				if (this.heartbeat?.timeout) {
+					clearTimeout(this.heartbeat!.timeout);
+				}
 			} catch (e) {
 				console.log(e);
 			}
 		}
 	}
 
-	onPageClose = () => {
-		this.exit();
-	};
-
-	onVisibilityChange = () => {
-		if ('hidden' === document.visibilityState) {
-			this.emit(EVENT.inactive);
-		}
-	};
-
 	bindEvents() {
-		window.addEventListener('beforeunload', this.onPageClose);
-		window.addEventListener('visibilitychange', this.onVisibilityChange);
-		window.addEventListener('pagehide', this.onPageClose);
+		window.addEventListener('beforeunload', () => this.exit());
+		window.addEventListener('visibilitychange', () => {
+			if ('hidden' === document.visibilityState) {
+				this.emit(EVENT.inactive);
+			}
+		});
+		window.addEventListener('pagehide', () => this.exit());
 	}
 
 	unbindEvents() {
-		window.removeEventListener('beforeunload', this.onPageClose);
-		window.removeEventListener('visibilitychange', this.onVisibilityChange);
-		window.removeEventListener('pagehide', this.onPageClose);
+		window.removeEventListener('beforeunload', () => this.exit());
+		window.removeEventListener('visibilitychange', () => {
+			if ('hidden' === document.visibilityState) {
+				this.emit(EVENT.inactive);
+			}
+		});
+		window.removeEventListener('pagehide', () => this.exit());
 	}
 }
 
