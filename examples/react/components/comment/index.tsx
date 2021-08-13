@@ -563,6 +563,7 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 					<div className="doc-comment-title">
 						{lang === 'zh-CN' ? '评论' : 'Comments'}
 					</div>
+					{loading && <Loading />}
 					{list.map((item) => (
 						<CommentItem
 							key={item.id}
@@ -592,7 +593,7 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 			);
 		};
 
-		return loading ? <Loading /> : renderList();
+		return renderList();
 	},
 );
 
