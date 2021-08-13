@@ -113,6 +113,10 @@ export const cards: Array<CardEntry> = [
 ];
 
 export const pluginConfig: { [key: string]: PluginOptions } = {
+	[Italic.pluginName]: {
+		// 默认为 _ 下划线，这里修改为单个 * 号
+		markdown: '*',
+	},
 	[ImageUploader.pluginName]: {
 		file: {
 			action: `${DOMAIN}/upload/image`,

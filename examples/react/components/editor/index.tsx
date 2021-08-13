@@ -52,7 +52,6 @@ const EditorComponent: React.FC<EditorProps> = ({
 	const [loading, setLoading] = useState(true);
 	const [members, setMembers] = useState<Array<Member>>([]);
 	const [member, setMember] = useState<Member | null>(null);
-	const scrollNode = useRef<HTMLDivElement | null>();
 	const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 	/**
 	 * 保存到服务器
@@ -247,6 +246,34 @@ const EditorComponent: React.FC<EditorProps> = ({
 		otClient.current?.broadcast('updateCommentList');
 	};
 
+	// 点击编辑区域外的空白位置继续聚焦编辑器
+	const wrapperMouseDown = (event: React.MouseEvent) => {
+		const { target } = event;
+		if (
+			!target ||
+			['TEXTAREA', 'INPUT'].indexOf((target as Node).nodeName) > -1
+		)
+			return;
+		if (
+			engine.current &&
+			engine.current.isFocus() &&
+			$(target).closest('.editor-content').length === 0
+		) {
+			event.preventDefault();
+		}
+	};
+	// 编辑器区域单击在没有元素的位置，聚焦到编辑器
+	const editorAreaClick = (event: React.MouseEvent) => {
+		const { target } = event;
+		if (!target) return;
+		if (
+			engine.current &&
+			!engine.current.isFocus() &&
+			$(target).hasClass('editor-content')
+		)
+			engine.current.focus(false);
+	};
+
 	return (
 		<Loading loading={loading}>
 			<>
@@ -254,9 +281,12 @@ const EditorComponent: React.FC<EditorProps> = ({
 				{engine.current && (
 					<Toolbar engine={engine.current} items={props.toolbar} />
 				)}
-				<div className="editor-wrapper">
-					<div className="editor-container" ref={scrollNode}>
-						<div className="editor-content">
+				<div className="editor-wrapper" onMouseDown={wrapperMouseDown}>
+					<div className="editor-container">
+						<div
+							className="editor-content"
+							onClick={editorAreaClick}
+						>
 							{
 								<EngineComponent
 									ref={engine}
