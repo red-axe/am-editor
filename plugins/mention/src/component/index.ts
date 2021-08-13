@@ -123,11 +123,11 @@ class Mention extends Card<MentionValue> {
 	}
 
 	init() {
+		if (!this.#position) this.#position = new Position(this.editor);
 		if (!isEngine(this.editor) || isServer) {
 			return;
 		}
 		super.init();
-		if (!this.#position) this.#position = new Position(this.editor);
 		if (this.component) return;
 		this.component = new CollapseComponent(this.editor, {
 			onCancel: () => {
