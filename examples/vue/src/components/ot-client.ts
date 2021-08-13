@@ -135,8 +135,8 @@ class OTClient extends EventEmitter {
 					this.load(documentID, collectionName);
 				}
 				if ('broadcast' === action) {
-					const { sender, body, type } = data;
-					if (sender.uuid !== this.current?.uuid) {
+					const { uuid, body, type } = data;
+					if (uuid !== this.current?.uuid) {
 						this.emit(EVENT.message, {
 							type,
 							body,
