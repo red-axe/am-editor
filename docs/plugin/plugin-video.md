@@ -54,10 +54,12 @@ new Engine(...,{
 
 `data`: POST these data to the server at the same time when the file is uploaded
 
+`name`: When file upload request, the name of the request parameter in `FormData`, the default is `file`
+
 ```ts
 /**
- * File upload address
- */
+  * File upload address
+  */
 action:string
 /**
   * Whether cross-domain
@@ -66,11 +68,15 @@ crossOrigin?: boolean;
 /**
 * Request header
 */
-headers?: {[key: string]: string };
+headers?: {[key: string]: string} | (() => {[key: string]: string });
 /**
- * Data return type, default json
- */
+  * Data return type, default json
+  */
 type?:'*' |'json' |'xml' |'html' |'text' |'js';
+/**
+  * The name of the FormData when the video file is uploaded, the default is file
+  */
+name?: string
 /**
  * Additional data upload
  */

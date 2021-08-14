@@ -24,6 +24,10 @@ export interface Options extends PluginOptions {
 	 */
 	type?: '*' | 'json' | 'xml' | 'html' | 'text' | 'js';
 	/**
+	 * 文件上传时 FormData 的名称，默认 file
+	 */
+	name?: string;
+	/**
 	 * 额外携带数据上传
 	 */
 	data?: {};
@@ -131,6 +135,7 @@ export default class extends Plugin<Options> {
 			multiple,
 			crossOrigin,
 			headers,
+			name,
 		} = this.options;
 		const { parse } = this.options;
 		const limitSize = this.options.limitSize || 5 * 1024 * 1024;
@@ -235,6 +240,7 @@ export default class extends Plugin<Options> {
 				},
 			},
 			files,
+			name,
 		);
 		return;
 	}

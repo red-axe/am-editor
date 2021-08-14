@@ -54,6 +54,8 @@ new Engine(...,{
 
 `data`: 文件上传时同时将这些数据一起`POST`到服务端
 
+`name`: 文件上传请求时，请求参数在 `FormData` 中的名称，默认 `file`
+
 ```ts
 /**
  * 文件上传地址
@@ -71,6 +73,10 @@ headers?: { [key: string]: string } | (() => { [key: string]: string });
  * 数据返回类型，默认 json
  */
 type?: '*' | 'json' | 'xml' | 'html' | 'text' | 'js';
+/**
+ * 文件上传时 FormData 的名称，默认 file
+ */
+name?: string
 /**
  * 额外携带数据上传
  */

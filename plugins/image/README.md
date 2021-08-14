@@ -54,6 +54,8 @@ new Engine(...,{
 
 `data`: 文件上传或第三方图片地址上传时同时将这些数据一起`POST`到服务端
 
+`name`: 文件上传请求时，请求参数在 `FormData` 中的名称，默认 `file`
+
 ```ts
 /**
  * 文件上传配置
@@ -79,6 +81,10 @@ file:{
      * 额外携带数据上传
      */
     data?: {};
+    /**
+     * 图片文件上传时 FormData 的名称，默认 file
+     */
+    name?: string
     /**
      * 请求类型，默认 multipart/form-data;
      */
@@ -137,6 +143,10 @@ remote:{
      * 额外携带数据上传
      */
     data?: {};
+    /**
+     * 图片文件丢之上传时请求参数的名称，默认 url
+     */
+    name?: string
     /**
      * 请求类型，默认 application/json
      */

@@ -19,20 +19,20 @@ class Uploader implements UploaderInterface {
 		return Date.now() + '-' + text;
 	}
 
-	async request(files: Array<File>) {
+	async request(files: Array<File>, name?: string) {
 		files.forEach(async (file, index) => {
 			if (!file.uid) file.uid = this.createUid(index);
 			if ((await this.handleBefore(file, files)) === false) {
 				files.splice(index, 1);
 			}
 		});
-		this.upload(files);
+		this.upload(files, name);
 	}
 
-	private async upload(files: Array<File>) {
+	private async upload(files: Array<File>, name: string = 'file') {
 		files.forEach(async (file) => {
 			const formData = new FormData();
-			formData.append('file', file, file.name);
+			formData.append(name, file, file.name);
 			if (file.data) {
 				Object.keys(file.data).forEach((key) => {
 					formData.append(key, file.data![key]);

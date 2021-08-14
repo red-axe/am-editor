@@ -63,7 +63,7 @@ export type FileInfo = {
 };
 
 export interface UploaderInterface {
-	request(files: Array<File>): Promise<void>;
+	request(files: Array<File>, name?: string): Promise<void>;
 }
 
 export type OpenDialogOptions = {
@@ -74,6 +74,10 @@ export type OpenDialogOptions = {
 
 export interface RequestInterface {
 	ajax(options: AjaxOptions | string): AjaxInterface;
-	upload(options: UploaderOptions, files: Array<File>): Promise<void>;
+	upload(
+		options: UploaderOptions,
+		files: Array<File>,
+		name?: string,
+	): Promise<void>;
 	getFiles(options?: OpenDialogOptions): Promise<Array<globalThis.File>>;
 }

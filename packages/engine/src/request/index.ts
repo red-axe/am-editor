@@ -12,8 +12,8 @@ class Request implements RequestInterface {
 		return new Ajax(options);
 	}
 
-	upload(options: UploaderOptions, files: Array<File>) {
-		return new Uploader(options).request(files);
+	upload(options: UploaderOptions, files: Array<File>, name?: string) {
+		return new Uploader(options).request(files, name);
 	}
 
 	getFiles(options?: OpenDialogOptions) {
@@ -31,7 +31,7 @@ class Request implements RequestInterface {
 			document.removeEventListener('mousedown', remove);
 		};
 
-		return new Promise<Array<File>>(resolve => {
+		return new Promise<Array<File>>((resolve) => {
 			const change = () => {
 				const files = [];
 				for (let i = 0; i < (input.files?.length || 0); i++) {

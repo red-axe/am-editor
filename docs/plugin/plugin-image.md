@@ -54,6 +54,8 @@ new Engine(...,{
 
 `data`: When files are uploaded or third-party image addresses are uploaded, these data will be `POST` to the server at the same time
 
+`name`: When file upload request, the name of the request parameter in `FormData`, the default is `file`
+
 ```ts
 /**
  * File upload configuration
@@ -64,13 +66,13 @@ file:{
      */
     action:string
     /**
-    * Whether cross-domain
-    */
+     * Whether cross-domain
+     */
     crossOrigin?: boolean;
     /**
     * Request header
     */
-    headers?: {[key: string]: string };
+    headers?: {[key: string]: string} | (() => {[key: string]: string });
     /**
      * Data return type, default json
      */
@@ -79,6 +81,10 @@ file:{
      * Additional data upload
      */
     data?: {};
+    /**
+     * The name of the FormData when the image file is uploaded, the default file
+     */
+    name?: string
     /**
      * Request type, default multipart/form-data;
      */
@@ -122,13 +128,13 @@ remote:{
      */
     action:string
     /**
-    * Whether cross-domain
-    */
+     * Whether cross-domain
+     */
     crossOrigin?: boolean;
     /**
     * Request header
     */
-    headers?: {[key: string]: string };
+    headers?: {[key: string]: string} | (() => {[key: string]: string });
     /**
      * Data return type, default json
      */
@@ -137,6 +143,10 @@ remote:{
      * Additional data upload
      */
     data?: {};
+    /**
+     * The name of the request parameter when the image file is lost when uploading, the default url
+     */
+    name?: string
     /**
      * Request type, default application/json
      */

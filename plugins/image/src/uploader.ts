@@ -30,6 +30,10 @@ export interface Options extends PluginOptions {
 		 */
 		type?: '*' | 'json' | 'xml' | 'html' | 'text' | 'js';
 		/**
+		 * 图片文件上传时 FormData 的名称，默认 file
+		 */
+		name?: string;
+		/**
 		 * 额外携带数据上传
 		 */
 		data?: {};
@@ -82,6 +86,10 @@ export interface Options extends PluginOptions {
 		 * 额外携带数据上传
 		 */
 		data?: {};
+		/**
+		 * 图片地址上传时请求参数的名称，默认 url
+		 */
+		name?: string;
 		/**
 		 * 请求类型，默认 multipart/form-data;
 		 */
@@ -236,6 +244,7 @@ export default class extends Plugin<Options> {
 			multiple,
 			crossOrigin,
 			headers,
+			name,
 		} = this.options.file;
 		const { parse } = this.options;
 		const limitSize = this.options.file.limitSize || 5 * 1024 * 1024;
@@ -342,6 +351,7 @@ export default class extends Plugin<Options> {
 				},
 			},
 			files,
+			name,
 		);
 		return;
 	}
@@ -460,9 +470,10 @@ export default class extends Plugin<Options> {
 
 	uploadAddress(src: string, component: ImageComponent) {
 		if (!isEngine(this.editor)) return;
-		const { action, type, data, contentType, crossOrigin, headers } =
+		const { action, type, data, contentType, crossOrigin, headers, name } =
 			this.options.remote;
 		const { parse } = this.options;
+		const addressName = name || 'url';
 		this.editor.request.ajax({
 			url: action,
 			method: 'POST',
@@ -472,7 +483,7 @@ export default class extends Plugin<Options> {
 			headers: typeof headers === 'function' ? headers() : headers,
 			data: {
 				...data,
-				url: src,
+				[addressName]: src,
 			},
 			success: (response) => {
 				let src =
