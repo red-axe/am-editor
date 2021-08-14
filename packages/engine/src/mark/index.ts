@@ -705,19 +705,44 @@ class Mark implements MarkModelInterface {
 			mark = $(mark, doc);
 		} else mark = mark;
 		if (!node.isMark(mark)) return;
-
+		const nodeApi = node;
 		if (safeRange.collapsed) {
 			if (mark.children().length === 0)
 				mark.append(doc.createTextNode('\u200b'));
 			//在相通插件下，值不同，插入到同级，不做嵌套
-			const { startNode } = safeRange;
-			const parent = startNode.parent();
-			if (parent && startNode.isText() && node.isMark(parent)) {
-				if (this.compare(parent, mark)) {
-					this.split(safeRange, parent.clone());
+			const { startNode } = safeRange.shrinkToTextNode();
+			let parent = startNode.parent();
+			if (startNode.isText()) {
+				const plugin = this.findPlugin(mark);
+				let result = false;
+				while (parent && nodeApi.isMark(parent)) {
+					if (this.compare(parent.clone(), mark, true)) {
+						result = true;
+						break;
+					} else if (parent.children().length === 1) {
+						const curPlugin = this.findPlugin(parent);
+						//插件一样，并且并表明要合并值
+						if (
+							plugin &&
+							plugin === curPlugin &&
+							plugin.combineValueByWrap === true
+						) {
+							nodeApi.wrap(parent, mark, true);
+							result = true;
+							break;
+						}
+						//插件一样，不合并，直接移除
+						else if (plugin && plugin === curPlugin) {
+							nodeApi.unwrap(parent);
+							result = false;
+							break;
+						}
+					}
+					parent = parent.parent();
 				}
+				if (result) return;
 			}
-			node.insert(mark, safeRange);
+			nodeApi.insert(mark, safeRange);
 			this.merge(safeRange);
 			safeRange.addOrRemoveBr();
 			if (!range) change?.apply(safeRange);
@@ -738,7 +763,7 @@ class Mark implements MarkModelInterface {
 		}
 		// 遍历范围内的节点，添加 Mark
 		let started = false;
-		const nodeApi = node;
+
 		commonAncestorNode.traverse(
 			(node) => {
 				let child = $(node);
