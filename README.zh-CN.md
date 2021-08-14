@@ -167,7 +167,7 @@ import Bold from '@aomao/plugin-bold';
 ```tsx
 //实例化引擎
 const engine = new Engine(ref.current, {
-	plugin: [Bold],
+	plugins: [Bold],
 });
 ```
 
