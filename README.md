@@ -165,7 +165,7 @@ Add the `Bold` plugin to the engine
 ```tsx
 //Instantiate the engine
 const engine = new Engine(ref.current, {
-	plugin: [Bold],
+	plugins: [Bold],
 });
 ```
 
