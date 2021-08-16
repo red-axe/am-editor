@@ -18,7 +18,7 @@
     "@aomao/plugin-math": "^2.2.14",
     "@aomao/plugin-fontcolor": "^2.3.14",
     "@aomao/plugin-fontsize": "^2.3.14",
-    "@aomao/plugin-heading": "^2.3.14",
+    "@aomao/plugin-heading": "^2.3.15",
     "@aomao/plugin-hr": "^2.3.14",
     "@aomao/plugin-image": "^2.3.15",
     "@aomao/plugin-indent": "^2.3.14",
