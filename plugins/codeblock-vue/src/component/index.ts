@@ -114,6 +114,8 @@ class CodeBlcok extends Card<CodeBlockValue> {
 			}
 			setTimeout(() => {
 				this.mirror = this.codeEditor?.create(mode, code);
+				this.toolbarModel?.destroy();
+				this.toolbarModel?.showCardToolbar();
 			}, 50);
 		} else {
 			this.codeEditor.render(mode, code);
