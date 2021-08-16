@@ -13,7 +13,7 @@
     "@aomao/plugin-backcolor": "^2.3.14",
     "@aomao/plugin-bold": "^2.3.14",
     "@aomao/plugin-code": "^2.3.14",
-    "@aomao/plugin-codeblock-vue": "^2.3.14",
+    "@aomao/plugin-codeblock-vue": "^2.3.15",
     "@aomao/plugin-file": "^2.2.14",
     "@aomao/plugin-math": "^2.2.14",
     "@aomao/plugin-fontcolor": "^2.3.14",
