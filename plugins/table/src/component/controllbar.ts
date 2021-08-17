@@ -43,11 +43,13 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	colDeleteButton?: NodeInterface;
 	//列增加按钮相关
 	colAddButton?: NodeInterface;
+	colAddAlign?: 'right' | 'left';
 	colAddButtonSplit?: NodeInterface;
 	moveColIndex: number = -1;
 	hideColAddButtonTimeount?: NodeJS.Timeout;
 	//行增加按钮相关
 	rowAddButton?: NodeInterface;
+	rowAddAlign?: 'up' | 'down';
 	rowAddButtonSplit?: NodeInterface;
 	moveRowIndex: number = -1;
 	hideRowAddButtonTimeount?: NodeJS.Timeout;
@@ -292,7 +294,11 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			})
 			.on('click', () => {
 				if (this.moveColIndex > -1)
-					this.table.command.insertColAt(this.moveColIndex, 1);
+					this.table.command.insertColAt(
+						this.moveColIndex,
+						1,
+						this.colAddAlign === 'right' ? false : true,
+					);
 			});
 		this.colsHeader
 			?.on('mouseenter', () => {
@@ -322,7 +328,11 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				}, 200);
 			})
 			.on('click', () => {
-				this.table.command.insertRowAt(this.moveRowIndex, 1, true);
+				this.table.command.insertRowAt(
+					this.moveRowIndex,
+					1,
+					this.rowAddAlign === 'down' ? false : true,
+				);
 			});
 
 		this.rowsHeader
@@ -378,7 +388,8 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		if (isEnd) {
 			left += isLast ? width - buttonWidth / 2 : width;
 		}
-		this.moveColIndex = index + (isEnd ? 1 : 0);
+		this.colAddAlign = isEnd ? 'left' : 'right';
+		this.moveColIndex = index; //+ (isEnd ? 1 : 0);
 		this.colAddButton?.show('flex');
 		this.colAddButton.css('left', `${left}px`);
 		this.colAddButton.css('z-index', 126);
@@ -415,10 +426,10 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		if (isEnd) {
 			top += height;
 		}
-		this.moveRowIndex =
-			index + (isEnd ? (index === items.length - 1 ? 0 : 1) : 0);
+		this.moveRowIndex = index; //+ (isEnd ? (index === items.length - 1 ? 0 : 1) : 0);
 		this.rowAddButton.show('flex');
 		this.rowAddButton.css('top', `${top}px`);
+		this.rowAddAlign = isEnd ? 'down' : 'up';
 		const splitWidth =
 			(this.table.selection.tableModel?.width || 0) +
 			itemNode.width() +
@@ -951,17 +962,18 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		wrapper?.off('dragend', this.onDragRowEnd);
 	}
 
-	showPlaceHolder(dropIndex: number) {
+	showPlaceHolder(dropIndex: number, isNext?: boolean) {
 		if (!this.draggingHeader) return;
 		const { element, minIndex, maxIndex } = this.draggingHeader;
 		if (element.closest(Template.COLS_HEADER_CLASS).length > 0) {
 			if (dropIndex === this.draggingHeader.index) return;
 			if (minIndex <= dropIndex && dropIndex <= maxIndex + 1) {
 				delete this.draggingHeader.index;
+				delete this.draggingHeader.isNext;
 				this.placeholder?.css('display', 'none');
 				return;
 			}
-
+			this.draggingHeader.isNext = isNext;
 			this.draggingHeader.index = dropIndex;
 			const colBars = this.colsHeader?.find(
 				Template.COLS_HEADER_ITEM_CLASS,
@@ -992,7 +1004,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				colBars.height();
 			const paddingTop = this.viewport?.css('padding-top');
 			const paddingLeft = this.viewport?.css('padding-left') || '0';
-			this.placeholder?.css('width', '3px');
+			this.placeholder?.css('width', '2px');
 			this.placeholder?.css('height', `${height}px`);
 			this.placeholder?.css(
 				'left',
@@ -1004,10 +1016,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			if (dropIndex === this.draggingHeader.index) return;
 			if (minIndex <= dropIndex && dropIndex <= maxIndex + 1) {
 				delete this.draggingHeader.index;
+				delete this.draggingHeader.isNext;
 				this.placeholder?.css('display', 'none');
 				return;
 			}
 			this.draggingHeader.index = dropIndex;
+			this.draggingHeader.isNext = isNext;
 			const rowBars = this.rowsHeader?.find(
 				Template.ROWS_HEADER_ITEM_CLASS,
 			);
@@ -1029,7 +1043,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			const colBars = this.colsHeader?.find(
 				Template.COLS_HEADER_ITEM_CLASS,
 			);
-			this.placeholder?.css('height', '3px');
+			this.placeholder?.css('height', '2px');
 			this.placeholder?.css('width', `${width}px`);
 			this.placeholder?.css('left', paddingLeft);
 			this.placeholder?.css(
@@ -1053,6 +1067,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				y: event.offsetY,
 			};
 		}
+		if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
 		// dragover会不断的触发事件，这里做一个截流，鼠标在3像素以内不去计算
 		if (Math.abs(this.dragging.x - event.offsetX) < 3) return;
 		this.dragging.x = event.offsetX;
@@ -1072,7 +1087,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				event.offsetX > colBar.get<HTMLElement>()!.offsetWidth / 2
 					? currentCol + 1
 					: currentCol;
-			this.showPlaceHolder(_dropCol);
+			this.showPlaceHolder(_dropCol, _dropCol !== currentCol);
 			return;
 		}
 		const colBars = this.colsHeader?.find(Template.COLS_HEADER_ITEM_CLASS);
@@ -1095,12 +1110,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			}
 			_passWidth += colElement.offsetWidth;
 		}
-		this.showPlaceHolder(dropCol);
+		this.showPlaceHolder(dropCol, dropCol !== col);
 	};
 
 	onDragColEnd = () => {
 		this.unbindDragColEvent();
-		const { index, count } = this.draggingHeader || {};
+		const { index, count, isNext } = this.draggingHeader || {};
 		if (!this.draggingHeader || index === undefined || count === undefined)
 			return;
 		const { command, selection } = this.table;
@@ -1117,7 +1132,13 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		command.mockCopy();
 		//if (isEngine(this.editor)) this.editor.history.startCache(12);
 		if (selectArea.begin.col > index) {
-			command.insertColAt(index, count, false, widths, true);
+			command.insertColAt(
+				isNext ? index - 1 : index,
+				count,
+				isNext,
+				widths,
+				true,
+			);
 			selection.selectCol(index, index + count - 1);
 			setTimeout(() => {
 				command.mockPaste(true);
@@ -1129,7 +1150,13 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				selection.selectCol(index, index + count - 1);
 			}, 10);
 		} else {
-			command.insertColAt(index, count, false, widths, true);
+			command.insertColAt(
+				isNext ? index - 1 : index,
+				count,
+				isNext,
+				widths,
+				true,
+			);
 			selection.selectCol(index, index + count - 1);
 			setTimeout(() => {
 				command.mockPaste(true);
@@ -1172,7 +1199,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				event.offsetY > rowBar.get<HTMLElement>()!.offsetHeight / 2
 					? currentRow + 1
 					: currentRow;
-			this.showPlaceHolder(_dropRow);
+			this.showPlaceHolder(_dropRow, _dropRow !== currentRow);
 			return;
 		}
 		const rowBars = this.rowsHeader?.find(Template.ROWS_HEADER_ITEM_CLASS);
@@ -1194,12 +1221,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			}
 			_passHeight += rowElement.offsetHeight;
 		}
-		this.showPlaceHolder(dropRow);
+		this.showPlaceHolder(dropRow, dropRow !== row);
 	};
 
 	onDragRowEnd = () => {
 		this.unbindDragRowEvent();
-		const { index, count } = this.draggingHeader || {};
+		const { index, count, isNext } = this.draggingHeader || {};
 		if (!this.draggingHeader || index === undefined || count === undefined)
 			return;
 		const { command, selection } = this.table;
@@ -1208,7 +1235,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		command.mockCopy();
 		//if (isEngine(this.editor)) this.editor.history.startCache(12);
 		if (begin.row > index) {
-			command.insertRowAt(index, count, false, true);
+			command.insertRowAt(
+				isNext ? index - 1 : index,
+				count,
+				!isNext,
+				true,
+			);
 			selection.selectRow(index, index + count - 1);
 			setTimeout(() => {
 				command.mockPaste(true);
@@ -1217,7 +1249,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				selection.selectRow(index, index + count - 1);
 			}, 10);
 		} else {
-			command.insertRowAt(index, count, false, true);
+			command.insertRowAt(
+				isNext ? index - 1 : index,
+				count,
+				!isNext,
+				true,
+			);
 			selection.selectRow(index, index + count - 1);
 			setTimeout(() => {
 				command.mockPaste(true);

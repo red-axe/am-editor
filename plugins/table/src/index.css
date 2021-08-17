@@ -158,7 +158,6 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 .table-wrapper .table-cols-header .table-cols-header-item.selected {
     background: #fff;
-    border-color: #fff;
     z-index: 1;
     border-radius: 0;
     height: 14px;
@@ -171,9 +170,8 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     left: -1px;
     top: -1px;
     right: -1px;
-    bottom: 0;
+    bottom: -1px;
     background: #4daaff;
-    border: 1px solid #dfdfdf;
     border-radius: 0;
     z-index: 1;
 }
@@ -192,7 +190,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 .table-wrapper .table-cols-header .table-cols-header-item.dragging .col-dragger .drag-info {
     display: block;
-    background: #fff;
+    color: #fff;
 }
 .table-wrapper .table-cols-header .table-cols-header-item .cols-trigger {
     position: absolute;
@@ -288,7 +286,6 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 .table-wrapper .table-rows-header .table-rows-header-item.selected {
     width: 14px;
     background: #fff;
-    border-color: #fff;
     cursor: move;
 }
 .table-wrapper .table-rows-header .table-rows-header-item.selected .row-dragger {
@@ -303,7 +300,6 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     bottom: -1px;
     right: -1px;
     background: #4daaff;
-    border: 1px solid #dfdfdf;
     border-radius: 0;
     z-index: 1;
 }
@@ -323,7 +319,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     margin-left: 5px;
     display: flex;
     padding: 10px;
-    background: #fff;
+    color: #fff;
 }
 .table-wrapper .table-rows-header .table-rows-header-item .rows-trigger {
     position: absolute;
@@ -412,6 +408,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     border: 1px solid #008dff;
     background: #008dff;
     display: none;
+    z-index: 126;
 }
 .table-wrapper .table-menubar {
     position: absolute;

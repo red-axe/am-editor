@@ -892,3 +892,12 @@ drawBackground?(
      targetCanvas: TinyCanvasInterface,
 ): DOMRect | RangeInterface[] | void | false;
 ```
+
+### `getSelectionNodes`
+
+```ts
+/**
+  * Get all nodes selected in the editable area
+  */
+getSelectionNodes?(): Array<NodeInterface>
+```

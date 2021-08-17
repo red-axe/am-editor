@@ -40,6 +40,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	prevMouseDownTd?: NodeInterface;
 	prevOverTd?: NodeInterface;
 	highlight?: NodeInterface;
+	// 第一次选中一行的行号
+	beginAllRow?: number;
+	// 第一次选中一列的列号
+	beginAllCol?: number;
 
 	constructor(editor: EditorInterface, table: TableInterface) {
 		super();
@@ -259,9 +263,17 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	selectCol(begin: number, end: number = begin) {
 		if (!this.tableModel) return;
 		if (this.isShift) {
-			if (this.prevMouseDownTd) {
+			// 有全选的列
+			if (this.beginAllCol) {
+				if (begin < this.beginAllCol) {
+					end = this.beginAllCol;
+				} else {
+					begin = this.beginAllCol;
+				}
+			} else if (this.prevMouseDownTd) {
 				const [row, col] = this.getCellPoint(this.prevMouseDownTd);
 				begin = col;
+				this.beginAllCol = col;
 			} else if (this.selectArea) {
 				begin = this.selectArea.begin.col;
 				if (this.tableModel) {
@@ -286,9 +298,17 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	selectRow(begin: number, end: number = begin) {
 		if (!this.tableModel) return;
 		if (this.isShift) {
-			if (this.prevMouseDownTd) {
+			// 有全选的行
+			if (this.beginAllRow) {
+				if (begin < this.beginAllRow) {
+					end = this.beginAllRow;
+				} else {
+					begin = this.beginAllRow;
+				}
+			} else if (this.prevMouseDownTd) {
 				const [row, col] = this.getCellPoint(this.prevMouseDownTd);
 				begin = row;
+				this.beginAllRow = row;
 			} else if (this.selectArea) {
 				begin = this.selectArea.begin.row;
 				if (this.tableModel) {
@@ -412,6 +432,17 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		}
 		const allCol = beginCol === 0 && endCol === this.tableModel.cols - 1;
 		const allRow = beginRow === 0 && endRow === this.tableModel.rows - 1;
+		if (allCol && !this.beginAllRow) {
+			this.beginAllRow = beginRow;
+		} else if (!allCol && this.beginAllRow) {
+			this.beginAllRow = undefined;
+		}
+
+		if (allRow && !this.beginAllCol) {
+			this.beginAllCol = beginCol;
+		} else if (!allRow && this.beginAllCol) {
+			this.beginAllCol = undefined;
+		}
 
 		this.selectArea =
 			count === 0 || isSame
@@ -607,7 +638,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				this.isShift = false;
 				this.selectRange = undefined;
 			}
-			this.clearSelect();
+			// 等待删除键删除后再清除选择
+			setTimeout(() => {
+				this.clearSelect();
+			}, 50);
 		}
 	};
 

@@ -13,6 +13,8 @@ export default {
 		cut: 'Cut',
 		paste: 'Paste',
 		clear: 'Clear',
+		draggingCol: 'Moving $data column',
+		draggingRow: 'Moving $data row',
 		color: {
 			title: 'Cell background color',
 			nonFillText: 'No fill color',

@@ -127,6 +127,9 @@ class Table extends Plugin<Options> {
 	pasteHtml(node: NodeInterface) {
 		if (!isEngine(this.editor)) return;
 		if (node.name === 'table') {
+			node.find('td').each((td) => {
+				this.editor.node.normalize($(td));
+			});
 			this.editor.card.replaceNode(node, TableComponent.cardName, {
 				html: node
 					.get<HTMLElement>()!

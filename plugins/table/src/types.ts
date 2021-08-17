@@ -173,6 +173,7 @@ export type ControllDraggingHeader = {
 	maxIndex: number;
 	count: number;
 	index?: number;
+	isNext?: boolean;
 };
 
 export type ControllChangeSize = {

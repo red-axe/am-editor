@@ -790,36 +790,50 @@ class Inline implements InlineModelInterface {
 		};
 
 		const nodes = findNodes($(startNode));
-		if (!range.collapsed) {
+		const { commonAncestorNode } = range;
+		const card = this.editor.card.find(commonAncestorNode, true);
+		let isEditable = card?.isEditable;
+		const selectionNodes = isEditable
+			? card?.getSelectionNodes
+				? card.getSelectionNodes()
+				: []
+			: [commonAncestorNode];
+		if (selectionNodes.length === 0) {
+			isEditable = false;
+			selectionNodes.push(commonAncestorNode);
+		}
+		if (!range.collapsed || isEditable) {
 			findNodes($(endNode)).forEach((nodeB) => {
 				return addNode(nodes, nodeB);
 			});
-			if (sc !== ec) {
+			if (sc !== ec || isEditable) {
 				let isBegin = false;
 				let isEnd = false;
-				range.commonAncestorNode.traverse((child) => {
-					if (isEnd) return false;
-					//节点不是开始节点
-					if (!child.equal(sc)) {
-						if (isBegin) {
-							//节点是结束节点，标记为结束
-							if (child.equal(ec)) {
-								isEnd = true;
-								return false;
+				selectionNodes.forEach((commonAncestorNode) => {
+					commonAncestorNode.traverse((child) => {
+						if (isEnd) return false;
+						//节点不是开始节点
+						if (!child.equal(sc)) {
+							if (isBegin) {
+								//节点是结束节点，标记为结束
+								if (child.equal(ec)) {
+									isEnd = true;
+									return false;
+								}
+								if (
+									nodeApi.isInline(child) &&
+									!child.attributes(CARD_KEY) &&
+									!child.attributes(CARD_ELEMENT_KEY)
+								) {
+									addNode(nodes, child);
+								}
 							}
-							if (
-								nodeApi.isInline(child) &&
-								!child.attributes(CARD_KEY) &&
-								!child.attributes(CARD_ELEMENT_KEY)
-							) {
-								addNode(nodes, child);
-							}
+						} else {
+							//如果是开始节点，标记为开始
+							isBegin = true;
 						}
-					} else {
-						//如果是开始节点，标记为开始
-						isBegin = true;
-					}
-					return;
+						return;
+					});
 				});
 			}
 		}

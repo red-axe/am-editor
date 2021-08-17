@@ -391,6 +391,9 @@ class Helper implements HelperInterface {
 	fixDragEvent(event: DragEvent) {
 		event.dataTransfer?.clearData();
 		event.dataTransfer?.setData('aomao', '');
+		if (event.dataTransfer) {
+			event.dataTransfer.effectAllowed = 'all';
+		}
 	}
 
 	/**

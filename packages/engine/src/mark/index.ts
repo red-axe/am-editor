@@ -705,8 +705,27 @@ class Mark implements MarkModelInterface {
 			mark = $(mark, doc);
 		} else mark = mark;
 		if (!node.isMark(mark)) return;
+		let { commonAncestorNode } = safeRange;
+
+		if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
+			commonAncestorNode = commonAncestorNode.parent()!;
+		}
+		const card = this.editor.card.find(commonAncestorNode, true);
+		let isEditable = card?.isEditable;
+		const nodes = isEditable
+			? card?.getSelectionNodes
+				? card.getSelectionNodes()
+				: []
+			: [commonAncestorNode];
+		if (nodes.length === 0) {
+			isEditable = false;
+			nodes.push(commonAncestorNode);
+		}
 		const nodeApi = node;
-		if (safeRange.collapsed) {
+		if (
+			safeRange.collapsed &&
+			(!isEditable || !card?.getSelectionNodes || nodes.length === 1)
+		) {
 			if (mark.children().length === 0)
 				mark.append(doc.createTextNode('\u200b'));
 			//在相通插件下，值不同，插入到同级，不做嵌套
@@ -748,142 +767,157 @@ class Mark implements MarkModelInterface {
 			if (!range) change?.apply(safeRange);
 			return;
 		}
-		this.split(safeRange);
-		let { commonAncestorNode } = safeRange;
-
-		if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
-			commonAncestorNode = commonAncestorNode.parent()!;
+		// 不是选中可编辑器卡片内部就分割
+		if (!isEditable) {
+			this.split(safeRange);
+			commonAncestorNode = safeRange.commonAncestorNode;
+			if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
+				commonAncestorNode = commonAncestorNode.parent()!;
+			}
+			nodes[0] = commonAncestorNode;
 		}
-		// 插入范围的开始和结束标记
-		const selection = safeRange.createSelection();
 
-		if (!selection.anchor && !selection.focus) {
+		// 插入范围的开始和结束标记
+		const selection = !isEditable ? safeRange.createSelection() : undefined;
+
+		if (selection && !selection.anchor && !selection.focus) {
 			if (!range) change?.apply(safeRange);
 			return;
 		}
 		// 遍历范围内的节点，添加 Mark
-		let started = false;
+		let started = isEditable ? true : false;
 
-		commonAncestorNode.traverse(
-			(node) => {
-				let child = $(node);
-				mark = mark as NodeInterface;
-				if (!child.equal(selection.anchor!)) {
-					if (started) {
-						if (child.equal(selection.focus!)) {
-							started = false;
-							return false;
-						}
-						if (nodeApi.isMark(child)) {
-							if (!nodeApi.isEmpty(child)) {
-								//找到最底层mark标签添加包裹，<strong><span style="font-size:16px">abc</span></strong> ，在 span 节点中的text再添加包裹，不在strong外添加包裹
-								let targetNode = child;
-								let targetChildrens = targetNode.children();
-								while (
-									nodeApi.isMark(targetNode) &&
-									targetChildrens.length === 1
-								) {
-									const targetChild = targetChildrens.eq(0)!;
-									if (nodeApi.isMark(targetChild)) {
-										targetNode = targetChild;
-										targetChildrens = targetNode.children();
-									} else if (targetChild.isText()) {
-										targetNode = targetChild;
-									} else break;
-								}
-								nodeApi.removeZeroWidthSpace(targetNode);
-								let parent = targetNode.parent();
-								//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
-								if (targetNode.isText()) {
-									const plugin = this.findPlugin(mark);
-									let result = false;
-									while (parent && nodeApi.isMark(parent)) {
-										if (
-											this.compare(
-												parent.clone(),
-												mark,
-												true,
-											)
+		nodes.forEach((commonAncestorNode) => {
+			commonAncestorNode.traverse(
+				(node) => {
+					let child = $(node);
+					mark = mark as NodeInterface;
+					if (isEditable || !child.equal(selection?.anchor!)) {
+						if (started) {
+							if (!isEditable && child.equal(selection?.focus!)) {
+								started = false;
+								return false;
+							}
+							if (nodeApi.isMark(child)) {
+								if (!nodeApi.isEmpty(child)) {
+									//找到最底层mark标签添加包裹，<strong><span style="font-size:16px">abc</span></strong> ，在 span 节点中的text再添加包裹，不在strong外添加包裹
+									let targetNode = child;
+									let targetChildrens = targetNode.children();
+									while (
+										nodeApi.isMark(targetNode) &&
+										targetChildrens.length === 1
+									) {
+										const targetChild =
+											targetChildrens.eq(0)!;
+										if (nodeApi.isMark(targetChild)) {
+											targetNode = targetChild;
+											targetChildrens =
+												targetNode.children();
+										} else if (targetChild.isText()) {
+											targetNode = targetChild;
+										} else break;
+									}
+									nodeApi.removeZeroWidthSpace(targetNode);
+									let parent = targetNode.parent();
+									//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
+									if (targetNode.isText()) {
+										const plugin = this.findPlugin(mark);
+										let result = false;
+										while (
+											parent &&
+											nodeApi.isMark(parent)
 										) {
-											result = true;
-											break;
-										} else if (
-											parent.children().length === 1
-										) {
-											const curPlugin =
-												this.findPlugin(parent);
-											//插件一样，并且并表明要合并值
 											if (
-												plugin &&
-												plugin === curPlugin &&
-												plugin.combineValueByWrap ===
-													true
-											) {
-												nodeApi.wrap(
-													parent,
+												this.compare(
+													parent.clone(),
 													mark,
 													true,
-												);
+												)
+											) {
 												result = true;
 												break;
-											}
-											//插件一样，不合并，直接移除
-											else if (
-												plugin &&
-												plugin === curPlugin
+											} else if (
+												parent.children().length === 1
 											) {
-												nodeApi.unwrap(parent);
-												result = false;
-												break;
+												const curPlugin =
+													this.findPlugin(parent);
+												//插件一样，并且并表明要合并值
+												if (
+													plugin &&
+													plugin === curPlugin &&
+													plugin.combineValueByWrap ===
+														true
+												) {
+													nodeApi.wrap(
+														parent,
+														mark,
+														true,
+													);
+													result = true;
+													break;
+												}
+												//插件一样，不合并，直接移除
+												else if (
+													plugin &&
+													plugin === curPlugin
+												) {
+													nodeApi.unwrap(parent);
+													result = false;
+													break;
+												}
 											}
+											parent = parent.parent();
 										}
-										parent = parent.parent();
+										if (result) return true;
 									}
-									if (result) return true;
-								}
-								nodeApi.wrap(targetNode, mark);
-								return true;
-							} else if (child.name !== mark.name) {
-								child.remove();
-							}
-						}
-
-						if (child.isText() && !nodeApi.isEmpty(child)) {
-							nodeApi.removeZeroWidthSpace(child);
-							const parent = child.parent();
-							//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
-							if (parent && nodeApi.isMark(parent)) {
-								if (this.compare(parent.clone(), mark, true))
+									nodeApi.wrap(targetNode, mark);
 									return true;
-								if (parent.children().length === 1) {
-									const plugin = this.findPlugin(mark);
-									const curPlugin = this.findPlugin(parent);
-									//插件一样，并且并表明要合并值
-									if (
-										plugin &&
-										plugin === curPlugin &&
-										plugin.combineValueByWrap === true
-									) {
-										nodeApi.wrap(parent, mark, true);
-										return true;
-									}
-									//插件一样，不合并，直接移除
-									else if (plugin && plugin === curPlugin)
-										nodeApi.unwrap(parent);
+								} else if (child.name !== mark.name) {
+									child.remove();
 								}
 							}
-							nodeApi.wrap(child, mark);
+
+							if (child.isText() && !nodeApi.isEmpty(child)) {
+								nodeApi.removeZeroWidthSpace(child);
+								const parent = child.parent();
+								//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
+								if (parent && nodeApi.isMark(parent)) {
+									if (
+										this.compare(parent.clone(), mark, true)
+									)
+										return true;
+									if (parent.children().length === 1) {
+										const plugin = this.findPlugin(mark);
+										const curPlugin =
+											this.findPlugin(parent);
+										//插件一样，并且并表明要合并值
+										if (
+											plugin &&
+											plugin === curPlugin &&
+											plugin.combineValueByWrap === true
+										) {
+											nodeApi.wrap(parent, mark, true);
+											return true;
+										}
+										//插件一样，不合并，直接移除
+										else if (plugin && plugin === curPlugin)
+											nodeApi.unwrap(parent);
+									}
+								}
+								nodeApi.wrap(child, mark);
+							}
 						}
+					} else {
+						started = true;
 					}
-				} else {
-					started = true;
-				}
-				return;
-			},
-			true,
-			true,
-		);
-		selection.move();
+					return;
+				},
+				true,
+				true,
+			);
+		});
+
+		selection?.move();
 		this.merge(safeRange);
 		if (!range) change?.apply(safeRange);
 	}
@@ -975,51 +1009,76 @@ class Mark implements MarkModelInterface {
 		) {
 			removeMark = $(removeMark, doc);
 		}
+		let { commonAncestorNode } = safeRange;
 
-		this.split(safeRange, removeMark);
-		if (safeRange.collapsed) {
+		if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
+			commonAncestorNode = commonAncestorNode.parent()!;
+		}
+		const card = this.editor.card.find(commonAncestorNode, true);
+		let isEditable = card?.isEditable;
+		const nodes = isEditable
+			? card?.getSelectionNodes
+				? card.getSelectionNodes()
+				: []
+			: [commonAncestorNode];
+		if (nodes.length === 0) {
+			isEditable = false;
+			nodes.push(commonAncestorNode);
+		}
+		// 不是选中可编辑器卡片内部就分割
+		if (!isEditable) {
+			this.split(safeRange);
+			commonAncestorNode = safeRange.commonAncestorNode;
+			if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
+				commonAncestorNode = commonAncestorNode.parent()!;
+			}
+			nodes[0] = commonAncestorNode;
+		}
+
+		if (
+			safeRange.collapsed &&
+			(!isEditable || !card?.getSelectionNodes || nodes.length === 1)
+		) {
 			this.merge(safeRange);
 			if (!range) change.apply(safeRange);
 			return;
 		}
 
-		let ancestor = safeRange.commonAncestorNode;
-		if (ancestor.type === getWindow().Node.TEXT_NODE) {
-			ancestor = ancestor.parent()!;
-		}
-
 		// 插入范围的开始和结束标记
-		const selection = safeRange.createSelection();
-		if (!selection.has()) {
+		const selection = !isEditable ? safeRange.createSelection() : undefined;
+		if (selection && !selection.has()) {
 			this.merge(safeRange);
 			if (!range) change.apply(safeRange);
 			return;
 		}
 		// 遍历范围内的节点，获取目标 Mark
 		const markNodes: Array<NodeInterface> = [];
-		let started = false;
-		ancestor.traverse(
-			(childNode) => {
-				const child = $(childNode);
-				if (!child.equal(selection.anchor!)) {
-					if (started) {
-						if (!child.equal(selection.focus!)) {
-							if (
-								node.isMark(child) &&
-								!child.isCard() &&
-								safeRange.isPointInRange(child, 0)
-							) {
-								markNodes.push(child);
+		let started = isEditable ? true : false;
+		nodes.forEach((ancestor) => {
+			ancestor.traverse(
+				(childNode) => {
+					const child = $(childNode);
+					if (isEditable || !child.equal(selection?.anchor!)) {
+						if (started) {
+							if (isEditable || !child.equal(selection?.focus!)) {
+								if (
+									node.isMark(child) &&
+									!child.isCard() &&
+									(isEditable ||
+										safeRange.isPointInRange(child, 0))
+								) {
+									markNodes.push(child);
+								}
 							}
 						}
+					} else if (!isEditable) {
+						started = true;
 					}
-				} else {
-					started = true;
-				}
-			},
-			true,
-			true,
-		);
+				},
+				true,
+				true,
+			);
+		});
 		// 清除 Mark
 		const nodeApi = node;
 		markNodes.forEach((node) => {
@@ -1066,7 +1125,7 @@ class Mark implements MarkModelInterface {
 				node.removeAttributes('style');
 			}
 		});
-		selection.move();
+		selection?.move();
 		this.merge(safeRange);
 		if (!range) change.apply(safeRange);
 	}
@@ -1255,41 +1314,55 @@ class Mark implements MarkModelInterface {
 		};
 
 		const nodes = findNodes($(startNode));
-		if (!range.collapsed) {
+		const { commonAncestorNode } = range;
+		const card = this.editor.card.find(commonAncestorNode, true);
+		let isEditable = card?.isEditable;
+		const selectionNodes = isEditable
+			? card?.getSelectionNodes
+				? card.getSelectionNodes()
+				: []
+			: [commonAncestorNode];
+		if (selectionNodes.length === 0) {
+			isEditable = false;
+			selectionNodes.push(commonAncestorNode);
+		}
+		if (!range.collapsed || isEditable) {
 			findNodes($(endNode)).forEach((nodeB) => {
 				return addNode(nodes, nodeB);
 			});
-			if (sc !== ec) {
+			if (sc !== ec || isEditable) {
 				let isBegin = false;
 				let isEnd = false;
-				range.commonAncestorNode.traverse(
-					(child) => {
-						if (isEnd) return false;
-						//节点不是开始节点
-						if (!child.equal(sc)) {
-							if (isBegin) {
-								//节点是结束节点，标记为结束
-								if (child.equal(ec)) {
-									isEnd = true;
-									return false;
+				selectionNodes.forEach((commonAncestorNode) => {
+					commonAncestorNode.traverse(
+						(child) => {
+							if (isEnd) return false;
+							//节点不是开始节点
+							if (!child.equal(sc)) {
+								if (isBegin) {
+									//节点是结束节点，标记为结束
+									if (child.equal(ec)) {
+										isEnd = true;
+										return false;
+									}
+									if (
+										nodeApi.isMark(child) &&
+										!child.attributes(CARD_KEY) &&
+										!child.attributes(CARD_ELEMENT_KEY)
+									) {
+										addNode(nodes, child);
+									}
 								}
-								if (
-									nodeApi.isMark(child) &&
-									!child.attributes(CARD_KEY) &&
-									!child.attributes(CARD_ELEMENT_KEY)
-								) {
-									addNode(nodes, child);
-								}
+							} else {
+								//如果是开始节点，标记为开始
+								isBegin = true;
 							}
-						} else {
-							//如果是开始节点，标记为开始
-							isBegin = true;
-						}
-						return;
-					},
-					true,
-					true,
-				);
+							return;
+						},
+						true,
+						true,
+					);
+				});
 			}
 		}
 		return nodes;

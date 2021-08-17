@@ -310,6 +310,22 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.scrollbar?.refresh();
 	}
 
+	getSelectionNodes() {
+		const nodes: Array<NodeInterface> = [];
+		this.selection.each((cell) => {
+			if (!this.helper.isEmptyModelCol(cell) && cell.element) {
+				nodes.push($(cell.element).find(EDITABLE_SELECTOR));
+			}
+		});
+		// 如果值选中了一个单元格，并且不是拖蓝方式选中就返回空的
+		if (
+			nodes.length === 1 &&
+			nodes[0].closest('[table-cell-selection=true]').length === 0
+		)
+			return [];
+		return nodes;
+	}
+
 	didRender() {
 		super.didRender();
 		this.viewport = isEngine(this.editor)
@@ -349,7 +365,6 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 
 		this.conltrollBar.on('sizeChanged', () => {
 			this.selection.refreshModel();
-			this.scrollbar?.refresh();
 			this.onChange();
 		});
 		this.command.on('actioned', (action, silence) => {
@@ -357,9 +372,11 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 				this.editor.card.render(this.wrapper);
 			}
 			this.selection.render(action);
-			this.scrollbar?.refresh();
+			this.toolbarModel?.showCardToolbar();
 			if (!silence) {
 				this.onChange();
+			} else {
+				this.scrollbar?.refresh();
 			}
 		});
 

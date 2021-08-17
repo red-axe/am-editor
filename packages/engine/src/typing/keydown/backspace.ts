@@ -29,7 +29,7 @@ class Backspace implements TypingHandleInterface {
 	}
 
 	trigger(event: KeyboardEvent) {
-		const { change, container } = this.engine;
+		const { change } = this.engine;
 		const range = change.getRange();
 		change.cacheRangeBeforeCommand();
 		// 编辑器没有内容
@@ -38,7 +38,26 @@ class Backspace implements TypingHandleInterface {
 			change.initValue();
 			return;
 		}
-
+		// 可编辑卡片多选时清空内容
+		const { commonAncestorNode } = range;
+		const cardComponent = this.engine.card.find(commonAncestorNode, true);
+		const selectionNodes = cardComponent?.isEditable
+			? cardComponent?.getSelectionNodes
+				? cardComponent.getSelectionNodes()
+				: []
+			: [];
+		if (selectionNodes.length > 0) {
+			selectionNodes.forEach((selectionNode) => {
+				selectionNode.html('<p></br ></p>');
+			});
+			change.apply(
+				range
+					.cloneRange()
+					.select(selectionNodes[0], true)
+					.collapse(true),
+			);
+			return;
+		}
 		// 处理 BR
 		const { startNode, startOffset } = range;
 		if (startNode.isEditable()) {

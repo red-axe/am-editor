@@ -343,6 +343,10 @@ export interface CardInterface {
 		range: RangeInterface,
 		targetCanvas: TinyCanvasInterface,
 	): DOMRect | RangeInterface[] | void | false;
+	/**
+	 * 获取可编辑区域选中的所有节点
+	 */
+	getSelectionNodes?(): Array<NodeInterface>;
 }
 
 export interface CardModel {

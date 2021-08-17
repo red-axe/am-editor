@@ -46,15 +46,15 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		widths?: number | Array<number>,
 		...args: any
 	) {
-		const { selection, wrapper, helper } = this.table;
+		const { selection, wrapper } = this.table;
 		const { tableModel } = selection;
 		if (!wrapper || !tableModel || !this.tableRoot) return;
 		// 第一行插在前面，其他行插在后面
-		isLeft = index === 0 || isLeft;
-		const colBase = isLeft ? index : index - 1;
+		const colBase = index;
 		const insertMethod = isLeft ? 'after' : 'before';
 		const colsHeader = wrapper.find(Template.COLS_HEADER_ITEM_CLASS);
 		const baseColHeader = colsHeader.eq(colBase)?.get<HTMLElement>()!;
+		const insertCol = isLeft ? colBase + 1 : colBase;
 		const head = wrapper.find(Template.COLS_HEADER_CLASS);
 		let totalWidth = 0;
 
@@ -85,11 +85,12 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			// 插入头 和 col
 			const cloneColHeader = $(baseColHeader.outerHTML);
 			$(baseColHeader)[insertMethod](cloneColHeader);
+			const width = Array.isArray(widths)
+				? widths[count - counter]
+				: widths;
+			cloneColHeader.css({ width: `${width}px` });
 			const insertCloneCol = cloneNode?.clone();
-			insertCloneCol.attributes(
-				'width',
-				Array.isArray(widths) ? widths[count - counter] : widths,
-			);
+			insertCloneCol.attributes('width', width);
 			insertCloneCol.attributes(
 				DATA_TRANSIENT_ATTRIBUTES,
 				'table-cell-selection',
@@ -103,7 +104,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		}
 		// 插入 td
 		trs.each((tr, r) => {
-			const insertIndex = selection.getCellIndex(r, index);
+			const insertIndex = selection.getCellIndex(r, insertCol);
 			for (let r = 0; r < count; r++) {
 				const td = (tr as HTMLTableRowElement).insertCell(insertIndex);
 				td.innerHTML = Template.EmptyCell;
@@ -252,9 +253,8 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const { tableModel } = selection;
 		if (!wrapper || !tableModel) return;
 
-		isUp = index === 0 || isUp;
 		const insertMethod = isUp ? 'after' : 'before';
-		const baseRow = isUp ? index : index - 1;
+		const baseRow = index;
 		const rowBars = wrapper.find(Template.ROWS_HEADER_ITEM_CLASS);
 		const baseRowBar = rowBars[baseRow];
 		const insertRow = isUp ? baseRow : baseRow + 1;

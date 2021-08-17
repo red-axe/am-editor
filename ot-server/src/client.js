@@ -88,12 +88,16 @@ class Client {
 			// 如果用户之前有连接到，那么就会移除之前的连接
 			doc.removeMember(member.uuid);
 		}
-		// 建立协作 socket 连接
-		const stream = new WebSocketJSONStream(ws);
-		// 监听消息
-		this.backend.listen(stream);
-		// 增加用户到文档中
-		doc.addMember(ws, member);
+		try {
+			// 建立协作 socket 连接
+			const stream = new WebSocketJSONStream(ws);
+			// 监听消息
+			this.backend.listen(stream);
+			// 增加用户到文档中
+			doc.addMember(ws, member);
+		} catch (error) {
+			console.log(error);
+		}
 	}
 }
 

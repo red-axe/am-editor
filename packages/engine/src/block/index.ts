@@ -814,10 +814,35 @@ class Block implements BlockModelInterface {
 		findNodes($(startNode)).forEach((node) => {
 			return addNode(nodes, node, true);
 		});
-
-		if (!range.collapsed) {
+		const { commonAncestorNode } = range;
+		const card = this.editor.card.find(commonAncestorNode, true);
+		let isEditable = card?.isEditable;
+		const selectionNodes = isEditable
+			? card?.getSelectionNodes
+				? card.getSelectionNodes()
+				: []
+			: [];
+		if (selectionNodes.length === 0) {
+			isEditable = false;
+		}
+		if (!range.collapsed || isEditable) {
 			findNodes($(endNode)).forEach((node) => {
 				return addNode(nodes, node);
+			});
+			selectionNodes.forEach((commonAncestorNode) => {
+				commonAncestorNode.traverse(
+					(child) => {
+						if (
+							child.isElement() &&
+							!child.isCard() &&
+							this.editor.node.isBlock(child)
+						) {
+							addNode(nodes, child);
+						}
+					},
+					true,
+					true,
+				);
 			});
 		}
 		return nodes;
@@ -902,30 +927,44 @@ class Block implements BlockModelInterface {
 		const closest = this.closest(range.commonAncestorNode);
 		const blocks: Array<NodeInterface> = [];
 		let started = false;
+		const { commonAncestorNode } = range;
+		const card = this.editor.card.find(commonAncestorNode, true);
+		let isEditable = card?.isEditable;
+		const selectionNodes = isEditable
+			? card?.getSelectionNodes
+				? card.getSelectionNodes()
+				: []
+			: [closest];
+		if (selectionNodes.length === 0) {
+			isEditable = false;
+			selectionNodes.push(closest);
+		}
+		selectionNodes.forEach((selectionNode) => {
+			selectionNode.traverse(
+				(node) => {
+					const child = $(node);
+					if (child.equal(startBlock)) {
+						started = true;
+					}
+					if (
+						(started || isEditable) &&
+						this.editor.node.isBlock(child) &&
+						!child.isCard() &&
+						child.inEditor()
+					) {
+						blocks.push(child);
+					}
+					if (child.equal(endBlock)) {
+						started = false;
+						return false;
+					}
+					return;
+				},
+				true,
+				true,
+			);
+		});
 
-		closest.traverse(
-			(node) => {
-				const child = $(node);
-				if (child.equal(startBlock)) {
-					started = true;
-				}
-				if (
-					started &&
-					this.editor.node.isBlock(child) &&
-					!child.isCard() &&
-					child.inEditor()
-				) {
-					blocks.push(child);
-				}
-				if (child.equal(endBlock)) {
-					started = false;
-					return false;
-				}
-				return;
-			},
-			true,
-			true,
-		);
 		// 未选中文本时忽略该 Block
 		// 示例：<h3><anchor />word</h3><p><focus />another</p>
 		if (
