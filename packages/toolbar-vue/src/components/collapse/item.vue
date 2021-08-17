@@ -40,6 +40,10 @@ export default defineComponent({
     props:collapseItemProps,
     setup(props){
         const active = ref(false);
+        const onMouseDown = (event:MouseEvent) => {
+            event.preventDefault();
+        }
+
         const onClick = (event: MouseEvent) => {
 
             if(props.disabled) return
@@ -78,6 +82,7 @@ export default defineComponent({
             active,
             disabled: props.disabled,
             onClick,
+            onMouseDown,
             triggerMouseEnter,
             triggerMouseLeave
         }
