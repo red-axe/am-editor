@@ -30,15 +30,15 @@
   "dependencies": {
     "@aomao/engine": "^2.3.15",
     "@babel/runtime": "^7.13.10",
-    "ant-design-vue": "^2.1.2",
+    "ant-design-vue": "^2.2.6",
     "codemirror": "^5.60.0",
     "lodash-es": "^4.17.21",
-    "vue": "^3.1.2"
+    "vue": "^3.2.4"
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.0",
     "@types/lodash-es": "^4.17.4",
-    "@vue/compiler-sfc": "^3.1.2",
+    "@vue/compiler-sfc": "^3.2.4",
     "rollup-plugin-vue": "^6.0.0-beta.10"
   }
 }

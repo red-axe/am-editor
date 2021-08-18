@@ -9,6 +9,7 @@
             :class="[{'data-toolbar-table-selector-td': true}, {actived: row - 1 < selectedRows && col - 1 < selectedCols}]"
             :key={col}
             @click="triggerSelect($event,row - 1,col - 1)"
+            @mousedown="triggerMouseDown($event)"
             @mouseover="triggerHover(row - 1,col - 1)"
             />
         </div>
@@ -52,6 +53,9 @@ export default defineComponent({
         }
     },
     methods:{
+        triggerMouseDown(event: MouseEvent){
+            event.preventDefault()
+        },
         triggerSelect(event:MouseEvent, rows: number, cols: number){
             if(this.onSelect) this.onSelect(event, rows + 1, cols + 1);
         },

@@ -125,7 +125,8 @@ export default defineComponent({
         //计算移动浏览器的视图变化
         const calcuMobileView = () => {
           if(!props.engine.isFocus() || props.engine.readonly) return
-          if(caluTimeoutRef.value) clearTimeout(caluTimeoutRef.value);
+        
+          if(caluTimeoutRef.value) clearTimeout(caluTimeoutRef.value as NodeJS.Timeout);
           caluTimeoutRef.value = setTimeout(() => {
             const rect = toolbarRef.value?.getBoundingClientRect()
             const height = rect?.height || 0
