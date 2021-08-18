@@ -83,7 +83,8 @@ class Client {
 			});
 			this.docs.push(doc);
 			//创建
-			doc.create(this.backend.connect());
+			const reuslt = doc.create(this.backend.connect());
+			if (!reuslt) return;
 		} else {
 			// 如果用户之前有连接到，那么就会移除之前的连接
 			doc.removeMember(member.uuid);

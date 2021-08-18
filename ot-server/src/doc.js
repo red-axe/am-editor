@@ -9,20 +9,25 @@ class Doc {
 	}
 
 	create(connection, collectionName = 'yanmao', callback = function () {}) {
-		const doc = connection.get(collectionName, this.id);
-		doc.fetch(function (err) {
-			if (err) {
-				console.error(err);
-				return;
-			}
-			if (doc.type === null) {
-				doc.create([], callback);
-				return;
-			}
-			callback();
-		});
-		this.doc = doc;
-		return doc;
+		try {
+			const doc = connection.get(collectionName, this.id);
+			doc.fetch(function (err) {
+				if (err) {
+					console.error(err);
+					return;
+				}
+				if (doc.type === null) {
+					doc.create([], callback);
+					return;
+				}
+				callback();
+			});
+			this.doc = doc;
+			return doc;
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
 	}
 
 	getMembers() {
@@ -77,16 +82,22 @@ class Doc {
 		this.members.push(member);
 		this.sockets[member.uuid] = ws;
 		//连接关闭
-		ws.on('close', () => {
-			const index = this.members.findIndex((m) => m.uuid === member.uuid);
-			if (index > -1) {
-				const leaveMember = this.members[index];
-				this.members.splice(index, 1);
-				this.broadcast('leave', leaveMember);
-				delete this.sockets[member.uuid];
-			}
-			if (Object.keys(this.sockets).length === 0) this.destroy();
-		});
+		try {
+			ws.on('close', () => {
+				const index = this.members.findIndex(
+					(m) => m.uuid === member.uuid,
+				);
+				if (index > -1) {
+					const leaveMember = this.members[index];
+					this.members.splice(index, 1);
+					this.broadcast('leave', leaveMember);
+					delete this.sockets[member.uuid];
+				}
+				if (Object.keys(this.sockets).length === 0) this.destroy();
+			});
+		} catch (error) {
+			console.error(error);
+		}
 		// 广播通知用户加入了
 		this.broadcast('join', member, (m) => m.uuid !== member.uuid);
 		// 通知用户当前文档的所有用户
