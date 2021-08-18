@@ -328,10 +328,34 @@ class Mark implements MarkModelInterface {
 				return isUnwrap;
 			});
 			// 清空原父容器，用新的内容代替
-			parent.empty();
+			const children = parent.children();
+			children.each((_, index) => {
+				if (!children.eq(index)?.isCard()) {
+					children.eq(index)?.remove();
+				}
+			});
+			let appendChild: NodeInterface | undefined | null = undefined;
+			const appendToParent = (childrenNodes: NodeInterface) => {
+				childrenNodes.each((child, index) => {
+					if (childrenNodes.eq(index)?.isCard()) {
+						appendChild = appendChild
+							? appendChild.next()
+							: parent.first();
+						if (appendChild) childrenNodes[index] = appendChild[0];
+						return;
+					}
+					if (appendChild) {
+						appendChild.after(child);
+						appendChild = childrenNodes.eq(index);
+					} else {
+						appendChild = childrenNodes.eq(index);
+						parent.prepend(child);
+					}
+				});
+			};
 			const leftChildren = left.children();
 			const leftNodes = leftChildren.toArray();
-			parent.append(leftChildren);
+			appendToParent(leftChildren);
 			const rightChildren = right.children();
 			const rightNodes = rightChildren.toArray();
 			// 根据跟踪节点的root节点和path获取其在rightNodes中的新节点
@@ -339,14 +363,8 @@ class Mark implements MarkModelInterface {
 				keelpNode = rightNodes
 					.find((node) => node.equal(keelpRoot!))
 					?.getChildByPath(keelpPath);
-			parent.append(rightChildren);
-			// 找到卡片，重新设置卡片根节点的引用
-			parent.find(CARD_SELECTOR).each((cardNode) => {
-				const cardComponent = this.editor.card.find(cardNode);
-				if (cardComponent && !cardComponent.root.equal(cardNode)) {
-					cardComponent.root[0] = cardNode;
-				}
-			});
+			appendToParent(rightChildren);
+
 			let zeroWidthNode = $('\u200b', null);
 
 			// 重新设置范围
@@ -645,19 +663,38 @@ class Mark implements MarkModelInterface {
 			this.unwrapEmptyMarks(left);
 			this.unwrapEmptyMarks(right);
 			// 清空原父容器，用新的内容代替
-			parent.empty();
-			parent.append(left.children());
-			const centerChildren = center.children();
-			const centerNodes = centerChildren.toArray();
-			parent.append(centerChildren);
-			parent.append(right.children());
-			// 找到卡片，重新设置卡片根节点的引用
-			parent.find(CARD_SELECTOR).each((cardNode) => {
-				const cardComponent = this.editor.card.find(cardNode);
-				if (cardComponent && !cardComponent.root.equal(cardNode)) {
-					cardComponent.root[0] = cardNode;
+			const children = parent.children();
+			children.each((_, index) => {
+				if (!children.eq(index)?.isCard()) {
+					children.eq(index)?.remove();
 				}
 			});
+			let appendChild: NodeInterface | undefined | null = undefined;
+			const appendToParent = (childrenNodes: NodeInterface) => {
+				childrenNodes.each((child, index) => {
+					if (childrenNodes.eq(index)?.isCard()) {
+						appendChild = appendChild
+							? appendChild.next()
+							: parent.first();
+						if (appendChild) childrenNodes[index] = appendChild[0];
+						return;
+					}
+					if (appendChild) {
+						appendChild.after(child);
+						appendChild = childrenNodes.eq(index);
+					} else {
+						appendChild = childrenNodes.eq(index);
+						parent.prepend(child);
+					}
+				});
+			};
+			const leftChildren = left.children();
+			appendToParent(leftChildren);
+			const centerChildren = center.children();
+			const centerNodes = centerChildren.toArray();
+			appendToParent(centerChildren);
+			const rightChildren = right.children();
+			appendToParent(rightChildren);
 			// 重新设置范围
 			range.setStartBefore(centerNodes[0][0]);
 			range.setEndAfter(centerNodes[centerNodes.length - 1][0]);

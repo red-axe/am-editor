@@ -8,8 +8,8 @@
         :class="['toolbar-collapse-item', { 'toolbar-collapse-item-active': active }, { 'toolbar-collapse-item-disabled': disabled }, className]"
         @mouseenter="triggerMouseEnter"
         @mouseleave="triggerMouseLeave"
-        @click="onClick"
-        @mousedown="onMouseDown"
+        @click="handleClick"
+        @mousedown="handleMouseDown"
         >
             <slot name="icon">
                 <span v-if="iconIsHtml" v-html="icon"></span>
@@ -40,11 +40,12 @@ export default defineComponent({
     props:collapseItemProps,
     setup(props){
         const active = ref(false);
-        const onMouseDown = (event:MouseEvent) => {
+        const handleMouseDown = (event:MouseEvent) => {
             event.preventDefault();
+            if(props.onMouseDown) props.onMouseDown(event)
         }
 
-        const onClick = (event: MouseEvent) => {
+        const handleClick = (event: MouseEvent) => {
 
             if(props.disabled) return
 
@@ -81,8 +82,8 @@ export default defineComponent({
             iconIsHtml:/^<.*>/.test(props.icon?.trim() || ""),
             active,
             disabled: props.disabled,
-            onClick,
-            onMouseDown,
+            handleClick,
+            handleMouseDown,
             triggerMouseEnter,
             triggerMouseLeave
         }

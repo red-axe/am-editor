@@ -112,7 +112,7 @@ export const isTransientElement = (
 };
 
 export const isTransientAttribute = (node: NodeInterface, attr: string) => {
-	if (attr === CARD_ASYNC_RENDER) return true;
+	if ([CARD_ASYNC_RENDER].indexOf(attr) > -1) return true;
 	if (node.isRoot() && !/^data-selection-/.test(attr)) return true;
 	if (
 		node.isCard() &&

@@ -92,6 +92,9 @@ class Client {
 		try {
 			// 建立协作 socket 连接
 			const stream = new WebSocketJSONStream(ws);
+			stream.on('error', (error) => {
+				console.log(error);
+			});
 			// 监听消息
 			this.backend.listen(stream);
 			// 增加用户到文档中

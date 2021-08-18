@@ -18,6 +18,8 @@ export type CheckboxValue = {
 };
 
 class Checkbox extends Card<CheckboxValue> {
+	#container?: NodeInterface;
+
 	static get cardName() {
 		return 'checkbox';
 	}
@@ -38,23 +40,34 @@ class Checkbox extends Card<CheckboxValue> {
 		return false;
 	}
 
-	onClick = (container: NodeInterface) => {
-		const checked = container.hasClass(CHECKBOX_CHECKED_CLASS);
+	update = (isChecked?: boolean) => {
+		const checked = isChecked === undefined ? this.isChecked() : isChecked;
 		if (checked) {
-			container.removeClass(CHECKBOX_CHECKED_CLASS);
+			this.#container?.removeClass(CHECKBOX_CHECKED_CLASS);
 			this.root
 				.find(`.${CHECKBOX_INPUT_CLASS}`)
 				.removeAttributes('checked');
 		} else {
-			container.addClass(CHECKBOX_CHECKED_CLASS);
+			this.#container?.addClass(CHECKBOX_CHECKED_CLASS);
 			this.root
 				.find(`.${CHECKBOX_INPUT_CLASS}`)
 				.attributes('checked', 'checked');
 		}
+		return checked;
+	};
+
+	isChecked = () => {
+		return !!this.#container?.hasClass(CHECKBOX_CHECKED_CLASS);
+	};
+
+	onClick = () => {
+		const checked = this.update();
 		this.setValue({
 			checked: !checked,
 		});
 	};
+
+	onActivateByOther() {}
 
 	render() {
 		const html = `
@@ -64,22 +77,23 @@ class Checkbox extends Card<CheckboxValue> {
                 <input type="checkbox" class="${CHECKBOX_INPUT_CLASS}" value="">
                 <span class="${CHECKBOX_INNER_CLASS}"></span>
             </span>`;
-		const container = $(html);
 		const value = this.getValue();
-		if (value && value.checked) {
-			container.addClass(CHECKBOX_CHECKED_CLASS);
-			container
-				.find(`.${CHECKBOX_INPUT_CLASS}`)
-				.attributes('checked', 'checked');
+		if (!this.#container) {
+			this.#container = $(html);
+			this.getCenter().append(this.#container);
+		} else {
+			this.#container = this.getCenter().first()!;
 		}
+		this.update(!value?.checked);
 		if (!isEngine(this.editor) || this.editor.readonly) {
-			return container;
+			return;
 		}
 
-		container.on('click', () => {
-			return this.onClick(container);
-		});
-		return container;
+		this.#container.on('click', this.onClick);
+	}
+
+	destroy() {
+		this.#container?.off('click', this.onClick);
 	}
 }
 export default Checkbox;

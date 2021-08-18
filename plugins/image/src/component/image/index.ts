@@ -9,6 +9,7 @@ import {
 	sanitizeUrl,
 	Tooltip,
 	isMobile,
+	CARD_CENTER_SELECTOR,
 } from '@aomao/engine';
 import Pswp from '../pswp';
 import Resizer from '../resizer';
@@ -497,6 +498,7 @@ class Image {
 		}
 		if (this.status === 'uploading') {
 			this.progress.show();
+			container.empty().append(this.root);
 		} else {
 			this.progress.remove();
 		}
@@ -504,6 +506,9 @@ class Image {
 			const contentNode = this.root.find('.data-image-content');
 			contentNode.addClass('data-image-loaded');
 			contentNode.removeClass('data-image-loading');
+		}
+		if (this.status === 'done') {
+			if (!this.root.inEditor()) container.empty().append(this.root);
 		}
 		this.maxWidth = this.getMaxWidth();
 		let { width, height } = this.size;
@@ -527,7 +532,7 @@ class Image {
 
 		this.image.on('load', () => this.imageLoadCallback());
 		this.image.on('error', () => this.imageLoadError());
-		container.append(this.root);
+
 		if (isEngine(this.editor) || !this.root.inEditor()) {
 			if (!isMobile) {
 				this.root.on('mouseenter', () => {

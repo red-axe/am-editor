@@ -106,17 +106,20 @@ class Creator extends EventEmitter2 {
 			record;
 		const targetNode = $(target);
 		if (type === 'childList') {
+			const childs: Array<NodeInterface> = [];
+			if (addedNodes[0]) {
+				childs.push($(addedNodes[0]));
+			}
+			if (removedNodes[0]) {
+				childs.push($(removedNodes[0]));
+			}
+			childs.push(targetNode);
 			if (
-				addedNodes[0] &&
-				isTransientElement($(addedNodes[0]), transientElements)
+				childs.some((child) =>
+					isTransientElement(child, transientElements),
+				)
 			)
 				return true;
-			if (
-				removedNodes[0] &&
-				isTransientElement($(removedNodes[0]), transientElements)
-			)
-				return true;
-			if (isTransientElement(targetNode, transientElements)) return true;
 		}
 		return (
 			(type === 'attributes' &&

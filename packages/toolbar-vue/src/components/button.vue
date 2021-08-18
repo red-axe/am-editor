@@ -10,7 +10,10 @@
         @mousedown="triggerMouseDown" 
         @mouseenter="triggerMouseEnter" 
         @mouseleave="triggerMouseLeave">
-            <slot name="icon"><span v-if="icon" :class="['data-icon',`data-icon-${icon}`]" /></slot>
+            <slot name="icon">
+                <span v-if="iconIsHtml" v-html="icon"></span>
+                <span v-if="!iconIsHtml && icon" :class="`data-icon data-icon-${icon}`" />
+            </slot>
             <slot>{{typeof content === 'function' ? content() : content}}</slot>
         </button>
     </a-tooltip>
@@ -45,6 +48,7 @@ export default defineComponent({
         const visible = ref(false)
 
         return {
+            iconIsHtml:/^<.*>/.test(props.icon?.trim() || ""),
             isMobile,
             visible,
             hotkeyText:hotkey

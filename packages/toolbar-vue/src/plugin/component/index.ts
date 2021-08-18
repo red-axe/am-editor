@@ -212,7 +212,7 @@ class ToolbarComponent extends Card<{ data: Data }> {
 			`<span class="data-toolbar-component-keyword" contenteditable="true">/</span><span class="data-toolbar-component-placeholder">${language['placeholder']}</span>`,
 		);
 		const center = this.getCenter();
-		center.append(container);
+		center.empty().append(container);
 		this.keyword = center.find('.data-toolbar-component-keyword');
 		this.placeholder = center.find('.data-toolbar-component-placeholder');
 		// 监听输入事件

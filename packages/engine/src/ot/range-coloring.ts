@@ -353,7 +353,9 @@ class RangeColoring implements RangeColoringInterface {
 			this.root.append(childCursor);
 		}
 		if (childCursor && childCursor[0]) {
-			childCursor[0]['__target'] = selector;
+			childCursor[0]['__target'] = isRangeInterface(selector)
+				? selector.toPath(true)
+				: selector;
 			this.showCursorInfo(childCursor, member);
 			if (this.hideCursorInfoTimeoutIdMap[uuid]) {
 				clearTimeout(this.hideCursorInfoTimeoutIdMap[uuid]);
@@ -533,12 +535,13 @@ class RangeColoring implements RangeColoringInterface {
 		if (cardInfo && !cardInfo.isEditable) {
 			const root =
 				this.setCardActivatedByOther(cardInfo, member) || cardInfo.root;
-			const cursor = this.drawCursor(root, member);
+
 			const collab = (cardInfo.constructor as CardEntry).collab;
-			if ((collab === undefined || collab === true) && cursor) {
-				this.drawCardMask(root, cursor, member);
+			if (collab === undefined || collab === true) {
+				const cursor = this.drawCursor(root, member);
+				if (cursor) this.drawCardMask(root, cursor, member);
+				this.drawBackground(range, member);
 			}
-			this.drawBackground(range, member);
 		} else {
 			//可编辑卡片
 			if (cardInfo) {
@@ -619,7 +622,9 @@ class RangeColoring implements RangeColoringInterface {
 	updateCursorPosition() {
 		this.root.children(`.${USER_CURSOR_CLASS}`).each((child) => {
 			const node = $(child);
-			const target = child['__target'];
+			let target = child['__target'];
+			if (!target.name)
+				target = Range.fromPath(this.engine, target, undefined, true);
 			if (
 				target.startContainer ||
 				0 !== $(target).closest('body').length

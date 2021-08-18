@@ -419,7 +419,13 @@ class Block implements BlockModelInterface {
 		}
 		const cloneRange = safeRange.cloneRange();
 		cloneRange.shrinkToElementNode().shrinkToTextNode().collapse(true);
-		const activeMarks = mark.findMarks(cloneRange);
+		const activeMarks = mark.findMarks(cloneRange).filter((mark) => {
+			// 回车后，默认是否复制makr样式
+			const plugin = this.editor.mark.findPlugin(mark);
+			return (
+				plugin?.copyOnEnter !== false && plugin?.followStyle !== false
+			);
+		});
 
 		const sideBlock = this.createSide({
 			block: block[0],
@@ -545,7 +551,7 @@ class Block implements BlockModelInterface {
 		}
 		container = splitNode ? splitNode(container) : container;
 		// 切割 Block
-		const leftNodes = selection.getNode(container, 'left');
+		let leftNodes = selection.getNode(container, 'left');
 		leftNodes.allChildren().forEach((child) => {
 			const leftNode = $(child);
 			if (
@@ -555,7 +561,7 @@ class Block implements BlockModelInterface {
 				leftNode.remove();
 			}
 		});
-		const rightNodes = selection.getNode(
+		let rightNodes = selection.getNode(
 			container,
 			'right',
 			true,
@@ -583,23 +589,54 @@ class Block implements BlockModelInterface {
 			rightNodes.length > 0 &&
 			!node.isEmpty(rightNodes) &&
 			!list.isEmptyItem(rightNodes)
-		)
-			container.after(rightNodes);
+		) {
+			const right = rightNodes.clone(false);
+			const rightChildren = rightNodes.children();
+			rightChildren.each((child, index) => {
+				if (rightChildren.eq(index)?.isCard()) {
+					const card = this.editor.card.find(child);
+					if (card) right.append(card.root);
+				} else right.append(child);
+			});
+			rightNodes = right;
+			container.after(right);
+		}
 		if (
 			leftNodes.length > 0 &&
 			!node.isEmpty(leftNodes) &&
 			!list.isEmptyItem(leftNodes)
-		)
-			container.after(leftNodes);
-		if (!node.isEmpty(container) && !list.isEmptyItem(container))
-			container.remove();
-		// 移除原 Block
-		const last =
-			node.isEmpty(leftNodes) || list.isEmptyItem(leftNodes)
-				? container
-				: leftNodes.eq(leftNodes.length - 1);
-		if (last && last.length > 0) {
-			safeRange.setStartAfter(last);
+		) {
+			// 清空原父容器，用新的内容代替
+			const children = container.children();
+			children.each((_, index) => {
+				if (!children.eq(index)?.isCard()) {
+					children.eq(index)?.remove();
+				}
+			});
+			let appendChild: NodeInterface | undefined | null = undefined;
+			const appendToParent = (childrenNodes: NodeInterface) => {
+				childrenNodes.each((child, index) => {
+					if (childrenNodes.eq(index)?.isCard()) {
+						appendChild = appendChild
+							? appendChild.next()
+							: container.first();
+						if (appendChild) childrenNodes[index] = appendChild[0];
+						return;
+					}
+					if (appendChild) {
+						appendChild.after(child);
+						appendChild = childrenNodes.eq(index);
+					} else {
+						appendChild = childrenNodes.eq(index);
+						container.prepend(child);
+					}
+				});
+			};
+			appendToParent(leftNodes.children());
+		}
+
+		if (container && container.length > 0) {
+			safeRange.setStartAfter(container);
 			safeRange.collapse(true);
 		}
 		if (selection.focus) selection.focus.remove();

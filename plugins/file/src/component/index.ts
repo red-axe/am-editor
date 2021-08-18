@@ -199,8 +199,12 @@ export default class FileCard extends Card<FileValue> {
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
-		this.container = $(this.renderTemplate(value));
-		this.getCenter().empty().append(this.container);
+		if (!this.container) {
+			this.container = $(this.renderTemplate(value));
+			this.getCenter().empty().append(this.container);
+		} else {
+			this.container = this.getCenter().first()!;
+		}
 
 		if (isEngine(this.editor)) {
 			this.container.attributes('draggable', 'true');
@@ -210,7 +214,6 @@ export default class FileCard extends Card<FileValue> {
 
 		this.maxWidth = this.getMaxWidth();
 		this.updateMaxWidth();
-		window.removeEventListener('resize', this.onWindowResize);
 		window.addEventListener('resize', this.onWindowResize);
 	}
 
