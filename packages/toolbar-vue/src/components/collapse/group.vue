@@ -5,13 +5,14 @@
         v-for="item in items"
         :key="item.name"
         :engine="engine"
-        v-bind="item"
+        v-bind="{...omit(item, 'onClick')}"
         @click="onClick"
         />
     </div>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { omit } from 'lodash-es';
 import { collapseGroupProps } from '../../types'
 import AmCollapseItem from './item.vue'
 
@@ -31,6 +32,7 @@ export default defineComponent({
             return result;
         }
         return {
+            omit,
             onClick
         }
     }
