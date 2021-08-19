@@ -964,7 +964,7 @@ class NodeEntry implements NodeInterface {
 			filter
 				? Array.from(parent.childNodes).filter(filter)
 				: Array.from(parent.childNodes)
-		).indexOf(this.get()!);
+		).indexOf(this.get() as ChildNode);
 		return index < 0 ? 0 : index;
 	}
 

@@ -1,4 +1,5 @@
 import {
+	$,
 	addUnit,
 	isEngine,
 	NodeInterface,
@@ -7,6 +8,8 @@ import {
 	removeUnit,
 	SchemaGlobal,
 	PluginOptions,
+	ConversionFromValue,
+	ConversionToValue,
 } from '@aomao/engine';
 
 export interface Options extends PluginOptions {
@@ -17,6 +20,8 @@ export interface Options extends PluginOptions {
 	maxPadding?: number;
 }
 
+const TEXT_INENT_KEY = 'text-indent';
+
 export default class extends Plugin<Options> {
 	static get pluginName() {
 		return 'indent';
@@ -24,6 +29,9 @@ export default class extends Plugin<Options> {
 
 	init() {
 		this.editor.schema.add(this.schema());
+		this.conversion().forEach(({ from, to }) => {
+			this.editor.conversion.add(from, to);
+		});
 		this.editor.on('keydown:backspace', (event) => this.onBackspace(event));
 		this.editor.on('keydown:tab', (event) => this.onTab(event));
 		this.editor.on('keydown:shift-tab', (event) => this.onShiftTab(event));
@@ -61,11 +69,7 @@ export default class extends Plugin<Options> {
 		}
 
 		if (node.isRootBlock(block) || node.isSimpleBlock(block)) {
-			const padding = removeUnit(block.css('padding-left'));
-			const textIndent = removeUnit(
-				block.get<HTMLElement>()?.style.textIndent || '',
-			);
-			return padding || textIndent;
+			return removeUnit(block.css(TEXT_INENT_KEY));
 		}
 		return 0;
 	}
@@ -82,42 +86,46 @@ export default class extends Plugin<Options> {
 			list.addIndent(block, padding, maxPadding);
 		} else if (node.isRootBlock(block) || node.isSimpleBlock(block)) {
 			if (padding > 0) {
-				if (removeUnit(block.css('text-indent')) || isTab !== true) {
-					const currentValue = block.css('padding-left');
+				if (removeUnit(block.css(TEXT_INENT_KEY)) || isTab !== true) {
+					const currentValue = block.css(TEXT_INENT_KEY);
 					let newValue = removeUnit(currentValue) + padding;
-					newValue = Math.min(newValue, maxPadding);
-					node.setAttributes(block, {
-						style: {
-							'padding-left': addUnit(
-								newValue > 0 ? newValue : 0,
-								'em',
-							),
-						},
-					});
+					// 获取自身宽度计算最大的indent
+					const width = block.width();
+					// 获取字体大小用作计算em
+					let fontSize = block.css('font-size');
+					// 如果本身没有字体大小就，获取编辑器根节点默认字体大小
+					fontSize =
+						!fontSize || fontSize.endsWith('em')
+							? this.editor.root.css('font-size')
+							: fontSize;
+					if (fontSize.endsWith('em')) {
+						fontSize = $(document.body).css('font-size');
+					}
+					if (!fontSize.endsWith('px')) fontSize = '16px';
+					const widthMax =
+						width > 0 ? width / removeUnit(fontSize) : maxPadding;
+
+					newValue = Math.min(newValue, maxPadding, widthMax);
+					if (newValue <= 0) block.css(TEXT_INENT_KEY, '');
+					else {
+						block.css(
+							TEXT_INENT_KEY,
+							addUnit(newValue > 0 ? newValue : 0, 'em'),
+						);
+					}
 				} else {
-					node.setAttributes(block, {
-						style: {
-							'text-indent': '2em',
-						},
-					});
+					block.css(TEXT_INENT_KEY, `${padding}em`);
 				}
-			} else if (removeUnit(block.css('text-indent'))) {
-				node.setAttributes(block, {
-					style: {
-						'text-indent': '',
-					},
-				});
 			} else {
-				const currentValue = block.css('padding-left');
+				const currentValue = block.css(TEXT_INENT_KEY);
 				const newValue = removeUnit(currentValue) + padding;
-				node.setAttributes(block, {
-					style: {
-						'padding-left': addUnit(
-							newValue > 0 ? newValue : 0,
-							'em',
-						),
-					},
-				});
+				if (newValue <= 0) block.css(TEXT_INENT_KEY, '');
+				else {
+					block.css(
+						TEXT_INENT_KEY,
+						addUnit(newValue > 0 ? newValue : 0, 'em'),
+					);
+				}
 			}
 		}
 	}
@@ -136,11 +144,58 @@ export default class extends Plugin<Options> {
 			type: 'block',
 			attributes: {
 				style: {
-					'text-indent': '@length',
-					'padding-left': '@length',
+					[TEXT_INENT_KEY]: '@length',
 				},
 			},
 		};
+	}
+
+	conversion(): Array<{ from: ConversionFromValue; to: ConversionToValue }> {
+		return [
+			{
+				from: (_, styles, attributes) => {
+					return (
+						!!styles['padding-left'] || !!attributes[TEXT_INENT_KEY]
+					);
+				},
+				to: (name, styles, attributes) => {
+					const node = $(`<${name} />`);
+					let valueStr =
+						styles['padding-left'] || attributes[TEXT_INENT_KEY];
+
+					// 转换为px
+					if (valueStr.endsWith('pt')) {
+						valueStr = this.convertToPX(valueStr);
+					}
+					// 转换为em
+					if (valueStr.endsWith('px')) {
+						// 获取自身的字体大小
+						let fontSize = styles['font-size'];
+						// 如果本身没有字体大小就，获取编辑器根节点默认字体大小
+						fontSize =
+							!fontSize || fontSize.endsWith('em')
+								? this.editor.root.css('font-size')
+								: fontSize;
+						if (fontSize.endsWith('em')) {
+							fontSize = $(document.body).css('font-size');
+						}
+						if (!fontSize.endsWith('px')) fontSize = '16px';
+						const value =
+							removeUnit(valueStr) / removeUnit(fontSize);
+						styles[TEXT_INENT_KEY] = `${value}em`;
+					} else if (valueStr.endsWith('em')) {
+						styles[TEXT_INENT_KEY] = valueStr;
+					}
+					delete styles['padding-left'];
+					delete attributes[TEXT_INENT_KEY];
+					node.css(styles);
+					Object.keys(attributes).forEach((name) => {
+						node.attributes(name, attributes[name]);
+					});
+					return node;
+				},
+			},
+		];
 	}
 
 	onBackspace(event: KeyboardEvent) {
@@ -218,16 +273,10 @@ export default class extends Plugin<Options> {
 	pasteEach(node: NodeInterface) {
 		//pt 转为px
 		if (!node.isCard() && this.editor.node.isBlock(node)) {
-			const textIndentSource = node.css('text-indent');
+			const textIndentSource = node.css(TEXT_INENT_KEY);
 			if (!!textIndentSource && textIndentSource.endsWith('pt')) {
 				const textIndent = this.convertToPX(textIndentSource);
-				if (!!textIndent) node.css('text-indent', textIndent);
-			}
-
-			const paddingLeftSource = node.css('padding-left');
-			if (!!paddingLeftSource && paddingLeftSource.endsWith('pt')) {
-				const paddingLeft = this.convertToPX(paddingLeftSource);
-				if (!!paddingLeft) node.css('padding-left', paddingLeft);
+				if (!!textIndent) node.css(TEXT_INENT_KEY, textIndent);
 			}
 		}
 	}

@@ -258,7 +258,7 @@ class List implements ListModelInterface {
 			if (block.name === 'li') {
 				const toBlock = node.clone(normalBlock, false);
 				if (indent !== 0) {
-					toBlock.css('padding-left', indent * 2 + 'em');
+					toBlock.css('text-indent', indent * 2 + 'em');
 				}
 				node.replace(block, toBlock);
 			}
@@ -334,13 +334,13 @@ class List implements ListModelInterface {
 	split(range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
 		const { change, node } = this.editor;
-		range = range || change.getSafeRange();
+		const safeRange = range || change.getSafeRange();
 		const blocks = this.normalize();
 		if (
 			blocks.length > 0 &&
 			(blocks[0].name === 'li' || blocks[blocks.length - 1].name === 'li')
 		) {
-			const selection = range.createSelection();
+			const selection = safeRange.createSelection();
 			const firstBlock = blocks[0];
 			const lastBlock = blocks[blocks.length - 1];
 			const middleList = [];
@@ -406,7 +406,7 @@ class List implements ListModelInterface {
 			}
 			selection.move();
 		}
-		if (!range) change.apply(range);
+		if (!range) change.apply(safeRange);
 	}
 
 	merge(blocks?: Array<NodeInterface>, range?: RangeInterface) {
@@ -708,7 +708,7 @@ class List implements ListModelInterface {
 					return blocks;
 
 				case 'p':
-					indent = removeUnit(blocks.css('padding-left')) / 2;
+					indent = removeUnit(blocks.css('text-indent')) / 2;
 					blocks = node.replace(blocks, customizeItem);
 					this.addCardToCustomize(blocks, cardName, value);
 
@@ -772,7 +772,7 @@ class List implements ListModelInterface {
 						return blocks;
 					}
 
-					indent = removeUnit(blocks.css('padding-left')) / 2;
+					indent = removeUnit(blocks.css('text-indent')) / 2;
 					blocks = node.replace(blocks, itemNode);
 
 					if (indent) {

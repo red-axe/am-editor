@@ -1356,7 +1356,16 @@ class ChangeModel implements ChangeInterface {
 					.shrinkToElementNode()
 					.shrinkToTextNode()
 					.createSelection();
+				let parent = nextNode.parent();
 				nodeApi.merge(prevNode, nextNode);
+				while (
+					parent &&
+					nodeApi.isBlock(parent) &&
+					nodeApi.isEmpty(parent)
+				) {
+					parent.remove();
+					parent = parent.parent();
+				}
 				selection.move();
 				range.enlargeToElementNode(true);
 				const prev = range.getPrevNode();

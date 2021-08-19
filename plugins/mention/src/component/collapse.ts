@@ -290,7 +290,7 @@ class CollapseComponent implements CollapseComponentInterface {
 					: this.renderTemplate(data);
 				if (!result) return;
 
-				body?.append(this.bindItem($(result), data));
+				body?.append(this.bindItem($(result), data as any));
 			});
 			this.scroll('down');
 		}

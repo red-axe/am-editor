@@ -638,6 +638,18 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				this.isShift = false;
 				this.selectRange = undefined;
 			}
+			if (
+				isHotkey('tab', event) ||
+				isHotkey('mod', event) ||
+				isHotkey('opt', event) ||
+				isHotkey('shift', event) ||
+				event.ctrlKey ||
+				event.metaKey ||
+				event.shiftKey ||
+				event.altKey
+			)
+				return;
+
 			// 等待删除键删除后再清除选择
 			setTimeout(() => {
 				this.clearSelect();
