@@ -2,6 +2,13 @@
 
 Redo history plugin
 
+If you need to enable history, we need to call the following method after the engine is initialized
+
+```ts
+//Initialize local collaboration to record history
+engine.ot.initLockMode();
+```
+
 ## Installation
 
 ```bash
