@@ -56,7 +56,7 @@ new Engine(...,{
 ```ts
 //List data displayed by default
 defaultData?: Array<{ key: string, name: string, avatar?: string}>
-//The method of query, or configure action, choose one of the two
+//Method for query, or configure action, choose one of the two
 onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar?: string}>>
 //Call back after selecting an item in the list, here you can return a custom value combined with key and name to form a new value and store it in cardValue. And it will return together after executing the getList command
 onSelect?: (data: {[key:string]: string}) => void | {[key: string]: string}
@@ -116,11 +116,11 @@ parse?: (
 };
 ```
 
-## Order
+## Plug-in method
 
 Get all mentions in the document
 
 ```ts
 //Return Array<{ key: string, name: string}>
-engine.command.execute('mention', 'getList');
+engine.command.executeMethod('mention', 'getList');
 ```

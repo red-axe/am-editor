@@ -81,6 +81,9 @@ class ChangeEvent implements ChangeEventInterface {
 		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
 		this.onContainer('beforeinput', (event: InputEvent) => {
 			if (this.engine.readonly) return;
+			const { change } = this.engine;
+			if (!change.rangePathBeforeCommand)
+				change.cacheRangeBeforeCommand();
 			const { inputType } = event;
 			const commandTypes = ['format', 'history'];
 			commandTypes.forEach((type) => {
@@ -93,6 +96,7 @@ class ChangeEvent implements ChangeEventInterface {
 				}
 			});
 		});
+		let inputTimeout: NodeJS.Timeout | null = null;
 		this.onContainer('input', (e: Event) => {
 			if (this.engine.readonly) {
 				return;
@@ -101,7 +105,8 @@ class ChangeEvent implements ChangeEventInterface {
 			if (this.isCardInput(e)) {
 				return;
 			}
-			window.setTimeout(() => {
+			if (inputTimeout) clearTimeout(inputTimeout);
+			inputTimeout = setTimeout(() => {
 				if (!this.isComposing) {
 					callback(e);
 					// 组合输入法结束后提交协同

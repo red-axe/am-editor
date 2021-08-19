@@ -35,3 +35,11 @@ Execute plugin commands
 ```ts
 execute(name: string, ...args: any): any;
 ```
+
+### `executeMethod`
+
+To simply execute the plug-in method, you need to ensure that there are methods defined in the plug-in that need to be called. The difference with `execute`: the `execute` method mainly changes the editor
+
+```ts
+executeMethod(name: string, method: string, ...args: any): any;
+```

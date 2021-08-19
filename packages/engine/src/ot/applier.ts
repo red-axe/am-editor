@@ -389,7 +389,7 @@ class Applier implements ApplierInterface {
 			}
 			this.engine.change.select(range);
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 
@@ -414,12 +414,19 @@ class Applier implements ApplierInterface {
 				);
 				try {
 					const range = change.getRange();
-					range.setStart(startChild, beginOffset);
-					range.setEnd(endChild, endOffset);
+					if (
+						startChild.nodeName === 'BR' ||
+						this.engine.node.isVoid(startChild)
+					) {
+						range.select(startChild).collapse(false);
+					} else {
+						range.setStart(startChild, beginOffset);
+						range.setEnd(endChild, endOffset);
+					}
 					change.select(range);
 					range.scrollRangeIntoView();
 				} catch (error) {
-					console.log(error);
+					console.error(error);
 				}
 			}
 		}

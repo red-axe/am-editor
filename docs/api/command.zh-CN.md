@@ -35,3 +35,11 @@ queryState(name: string, ...args: any): any;
 ```ts
 execute(name: string, ...args: any): any;
 ```
+
+### `executeMethod`
+
+单纯的执行插件方法，需要保证插件中有定义需要调用的方法。与 `execute` 的区别：`execute` 方法主要对编辑器有所更改
+
+```ts
+executeMethod(name: string, method: string, ...args: any): any;
+```

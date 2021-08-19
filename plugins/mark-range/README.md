@@ -78,12 +78,12 @@ onSelect? : (range: RangeInterface, selectInfo?: { key: string, id: string}) => 
 hotkey?:string | {key:string,args:Array<string>};//默认无
 ```
 
-## 命令
+## 插件方法
 
 所有命令都需要指定在可选项中 `keys` 中传入的指定 key
 
 ```ts
-engine.command.execute('mark-range', '标记key');
+engine.command.executeMethod('mark-range', 'action', '标记key');
 ```
 
 ### 预览
@@ -101,7 +101,7 @@ engine.command.execute('mark-range', '标记key');
 如果是对光标进行效果预览，命令将返回光标选中区域的所有文本拼接。卡片将使用 [card:卡片名称,卡片编号] 这种格式拼接，需要转换则要自行处理
 
 ```ts
-engine.command.execute('mark-range', key: string, 'preview', id?:string): string | undefined;
+engine.command.executeMethod('mark-range', 'action', key: string, 'preview', id?:string): string | undefined;
 ```
 
 ### 将预览效果应用到编辑器
@@ -113,7 +113,7 @@ engine.command.execute('mark-range', key: string, 'preview', id?:string): string
 必须传入一个标记编号，可以是字符串。编号相对于 key 应是唯一的
 
 ```ts
-engine.command.execute('mark-range', key: string, 'apply', id:string);
+engine.command.executeMethod('mark-range', 'action', key: string, 'apply', id:string);
 ```
 
 ### 取消预览效果
@@ -121,7 +121,7 @@ engine.command.execute('mark-range', key: string, 'apply', id:string);
 如果不传入标记编号，则取消所有的当前正在进行的预览项
 
 ```ts
-engine.command.execute('mark-range', key: string, 'revoke', id?:string);
+engine.command.executeMethod('mark-range', 'action', key: string, 'revoke', id?:string);
 ```
 
 ### 查找节点
@@ -129,7 +129,7 @@ engine.command.execute('mark-range', key: string, 'revoke', id?:string);
 根据标记编号找出其在编辑器中所有相对应的 dom 节点对象
 
 ```ts
-engine.command.execute('mark-range', key: string, 'find', id: string): Array<NodeInterface>;
+engine.command.executeMethod('mark-range', 'action', key: string, 'find', id: string): Array<NodeInterface>;
 ```
 
 ### 移除标记效果
@@ -139,7 +139,7 @@ engine.command.execute('mark-range', key: string, 'find', id: string): Array<Nod
 此操作不会产生历史记录，无法做 撤销 和 重做 操作
 
 ```ts
-engine.command.execute('mark-range', key: string, 'remove', id: string)
+engine.command.executeMethod('mark-range', 'action', key: string, 'remove', id: string)
 ```
 
 ### 过滤标记
@@ -151,7 +151,7 @@ value 默认获取当前编辑器根节点中的 html 作为值
 在我们需要将标记和编辑器值分开存储或有条件展现标记时很有用
 
 ```ts
-engine.command.execute('mark-range', key: string, 'filter', value?: string): { value: string, paths: Array<{ id: Array<string>, path: Array<Path>}>}
+engine.command.executeMethod('mark-range', 'action', key: string, 'filter', value?: string): { value: string, paths: Array<{ id: Array<string>, path: Array<Path>}>}
 ```
 
 ### 还原标记
@@ -161,7 +161,7 @@ engine.command.execute('mark-range', key: string, 'filter', value?: string): { v
 value 默认获取当前编辑器根节点中的 html 作为值
 
 ```ts
-engine.command.execute('mark-range', key: string, 'wrap', paths: Array<{ id: Array<string>, path: Array<Path>}>, value?: string): string
+engine.command.executeMethod('mark-range', 'action', key: string, 'wrap', paths: Array<{ id: Array<string>, path: Array<Path>}>, value?: string): string
 ```
 
 ## 样式定义

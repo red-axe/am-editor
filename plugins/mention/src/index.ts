@@ -179,27 +179,25 @@ class MentionPlugin extends Plugin<Options> {
 		}
 	}
 
-	execute(action: string) {
-		switch (action) {
-			case 'getList':
-				const values: Array<{ [key: string]: string }> = [];
-				this.editor.card.each((card) => {
-					const Component = card.constructor as CardEntry;
-					if (Component.cardName === MentionComponent.cardName) {
-						const { key, name, ...value } =
-							(card as MentionComponent).getValue() || {};
-						if (name && key)
-							values.push({
-								key: unescape(key),
-								name: unescape(name),
-								...value,
-							});
-					}
-				});
-				return values;
-		}
-		return;
+	getList() {
+		const values: Array<{ [key: string]: string }> = [];
+		this.editor.card.each((card) => {
+			const Component = card.constructor as CardEntry;
+			if (Component.cardName === MentionComponent.cardName) {
+				const { key, name, ...value } =
+					(card as MentionComponent).getValue() || {};
+				if (name && key)
+					values.push({
+						key: unescape(key),
+						name: unescape(name),
+						...value,
+					});
+			}
+		});
+		return values;
 	}
+
+	execute() {}
 }
 export { MentionComponent };
 export default MentionPlugin;

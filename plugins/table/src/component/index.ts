@@ -70,8 +70,8 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	init() {
 		super.init();
 		if (isEngine(this.editor)) {
-			this.editor.on('undo', this.onChange);
-			this.editor.on('redo', this.onChange);
+			this.editor.on('undo', this.doChange);
+			this.editor.on('redo', this.doChange);
 		}
 		if (this.colorTool) return;
 		this.colorTool = new ColorTool(this.editor, this.id, {
@@ -85,6 +85,10 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			},
 		});
 	}
+
+	doChange = () => {
+		this.onChange('remote');
+	};
 
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
 		if (!isEngine(this.editor) || this.editor.readonly)
@@ -437,8 +441,8 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.selection.destroy();
 		this.conltrollBar.removeAllListeners();
 		this.conltrollBar.destroy();
-		this.editor.off('undo', this.onChange);
-		this.editor.off('redo', this.onChange);
+		this.editor.off('undo', this.doChange);
+		this.editor.off('redo', this.doChange);
 	}
 }
 

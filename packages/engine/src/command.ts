@@ -58,6 +58,17 @@ class Command implements CommandInterface {
 			}
 		}
 	}
+
+	executeMethod(name: string, method: string, ...args: any) {
+		const plugin = this.editor.plugin.components[name];
+		if (plugin && plugin[method]) {
+			try {
+				return plugin[method](...args);
+			} catch (error) {
+				console.log(error);
+			}
+		}
+	}
 }
 
 export default Command;

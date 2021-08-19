@@ -449,7 +449,9 @@ export default class extends MarkPlugin<Options> {
 		return this.options.hotkey || '';
 	}
 
-	execute(key: string, action: string, ...args: any): any {
+	execute() {}
+
+	action(key: string, action: string, ...args: any): any {
 		const history = isEngine(this.editor) ? this.editor.history : undefined;
 		const id = args[0];
 		switch (action) {

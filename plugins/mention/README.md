@@ -116,11 +116,11 @@ parse?: (
 };
 ```
 
-## 命令
+## 插件方法
 
 获取文档中所有的提及
 
 ```ts
 //返回 Array<{ key: string, name: string}>
-engine.command.execute('mention', 'getList');
+engine.command.executeMethod('mention', 'getList');
 ```

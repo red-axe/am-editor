@@ -60,8 +60,9 @@ const EditorComponent: React.FC<EditorProps> = ({
 		if (!engine.current || !props.onSave) return;
 		console.log('save', new Date().getTime());
 		const filterValue: Content = props.comment
-			? engine.current.command.execute(
+			? engine.current.command.executeMethod(
 					'mark-range',
+					'action',
 					'comment',
 					'filter',
 					value,
@@ -105,7 +106,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 				console.log(`value ${trigger} update:`, value);
 				console.log(
 					'mention:',
-					engine.current?.command.execute('mention', 'getList'),
+					engine.current?.command.executeMethod('mention', 'getList'),
 				);
 				//console.log('html:', engine.getHtml());
 			},
@@ -137,8 +138,9 @@ const EditorComponent: React.FC<EditorProps> = ({
 		if (defaultValue) {
 			const value =
 				defaultValue.paths.length > 0
-					? engine.current.command.execute(
+					? engine.current.command.executeMethod(
 							'mark-range',
+							'action',
 							'comment',
 							'wrap',
 							defaultValue.paths,
@@ -148,7 +150,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 			//设置编辑器值，并异步渲染卡片
 			engine.current.setValue(value, {
 				enableAsync: true,
-				triggerOT: false, //对于异步渲染后的卡片节点不提交到协同服务端，否则会冲突
+				triggerOT: props.ot ? false : true, //对于异步渲染后的卡片节点不提交到协同服务端，否则会冲突
 				callback: () => {
 					//卡片异步渲染完成后
 					if (!props.ot) {
@@ -270,8 +272,10 @@ const EditorComponent: React.FC<EditorProps> = ({
 			engine.current &&
 			!engine.current.isFocus() &&
 			$(target).hasClass('editor-content')
-		)
+		) {
+			event.preventDefault();
 			engine.current.focus(false);
+		}
 	};
 
 	return (

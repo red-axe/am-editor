@@ -66,8 +66,9 @@ const getConfig = (
 			comment.current?.showButton(range);
 			comment.current?.select(key === 'comment' ? id : undefined);
 			if (comment && key === 'comment' && id) {
-				editor.current?.command.execute(
+				editor.current?.command.executeMethod(
 					'mark-range',
+					'action',
 					key,
 					'preview',
 					id,
@@ -104,12 +105,14 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 			const list: Array<DataItem> = [];
 			dataSource.forEach((item: DataSourceItem) => {
 				//获取评论编号对应在编辑器中的所有节点
-				const elements: Array<NodeInterface> = editor.command.execute(
-					'mark-range', //插件名称
-					'comment', //标记类型
-					'find', //调用的方法
-					item.id,
-				);
+				const elements: Array<NodeInterface> =
+					editor.command.executeMethod(
+						'mark-range',
+						'action', //插件名称
+						'comment', //标记类型
+						'find', //调用的方法
+						item.id,
+					);
 				if (elements.length === 0) return;
 				//获取目标评论在编辑器中的 top
 				const top = getRectTop(elements[0]);
@@ -142,8 +145,9 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 					if (childIndex > -1) item.children.splice(childIndex, 1);
 					if (item.children.length === 0) {
 						data.splice(itemIndex, 1);
-						editor.command.execute(
+						editor.command.executeMethod(
 							'mark-range',
+							'action',
 							'comment',
 							'remove',
 							item.id,
@@ -208,8 +212,9 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 				if (editItem) return;
 				event.stopPropagation();
 				if (isEngine(editor)) {
-					const text = editor.command.execute(
+					const text = editor.command.executeMethod(
 						'mark-range',
+						'action',
 						'comment',
 						'preview',
 					);
@@ -334,7 +339,12 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 				updateEditItem(undefined);
 			}
 			if (isEngine(editor))
-				editor.command.execute('mark-range', 'comment', 'revoke');
+				editor.command.executeMethod(
+					'mark-range',
+					'action',
+					'comment',
+					'revoke',
+				);
 			//重新设置列表
 			updateList(data);
 		};
@@ -497,14 +507,16 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 								!editItem.editId &&
 								item.children.length === 1
 							) {
-								editor.command.execute(
+								editor.command.executeMethod(
 									'mark-range',
+									'action',
 									'comment',
 									'apply',
 									item.id,
 								);
-								editor.command.execute(
+								editor.command.executeMethod(
 									'mark-range',
+									'action',
 									'comment',
 									'preview',
 									item.id,
@@ -527,8 +539,9 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 						message.error(error);
 						//回调增加失败，将评论预览标识从编辑器中移除
 						if (isEngine(editor))
-							editor.command.execute(
+							editor.command.executeMethod(
 								'mark-range',
+								'action',
 								'comment',
 								'revoke',
 							);
@@ -540,13 +553,25 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 
 		const itemMouseEnter = (id: string) => {
 			if (isEngine(editor) && editItem?.id !== id) {
-				editor.command.execute('mark-range', 'comment', 'preview', id);
+				editor.command.executeMethod(
+					'mark-range',
+					'action',
+					'comment',
+					'preview',
+					id,
+				);
 			}
 		};
 
 		const itemMouseLeave = (id: string) => {
 			if (isEngine(editor) && editItem?.id !== id) {
-				editor.command.execute('mark-range', 'comment', 'revoke', id);
+				editor.command.executeMethod(
+					'mark-range',
+					'action',
+					'comment',
+					'revoke',
+					id,
+				);
 			}
 		};
 
