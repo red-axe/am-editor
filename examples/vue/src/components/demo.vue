@@ -312,7 +312,7 @@ export default defineComponent({
                 //设置编辑器值，并使用异步的方式渲染卡片
                 engineInstance.setValue("<strong>我在这里哟～</strong>", {
                     enableAsync: true,
-                    // 如果是非协同编辑，triggerOT 设置为 true
+                    // 如果是非协同编辑（本地编辑），triggerOT 设置为 true
                     triggerOT:  false, //对于异步渲染后的卡片节点不提交到协同服务端，否则会冲突
                     callback: () => {
                         //获取当前保存的用户信息
