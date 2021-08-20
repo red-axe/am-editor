@@ -273,7 +273,6 @@ const EditorComponent: React.FC<EditorProps> = ({
 			!engine.current.isFocus() &&
 			$(target).hasClass('editor-content')
 		) {
-			event.preventDefault();
 			engine.current.focus(false);
 		}
 	};
