@@ -69,7 +69,9 @@
 		"uploadLimitError": "上傳圖片大小限製為 $size",
 		"toolbarReductionTitle": "還原",
 		"toolbarWidthTitle": "寬度",
-		"toolbarHeightTitle": "寬度"
+		"toolbarHeightTitle": "寬度",
+		"displayBlockTitle": "獨占一行",
+		"displayInlineTitle": "嵌入行內"
 	},
 	"table": {
 		"insertColLeft": "左邊插入 $data 列",

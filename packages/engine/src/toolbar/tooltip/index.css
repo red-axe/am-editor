@@ -12,8 +12,8 @@
 	z-index: 1060;
 	display: block;
 	visibility: visible;
-	max-width: 250px;
-	white-space: nowrap;
+	max-width: 320px;
+	word-wrap:break-word;
     top: 0;
 }
 

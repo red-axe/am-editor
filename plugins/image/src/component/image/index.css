@@ -12,6 +12,12 @@
             user-select: none;
 }
 
+.data-image-blcok {
+    display: flex;
+    margin: 0 auto;
+    width: max-content;
+}
+
 .data-image-detail {
   display: inline-block;
 }

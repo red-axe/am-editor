@@ -42,9 +42,7 @@ class Default {
 		const range = change.getRange();
 		const card = this.engine.card.getSingleCard(range);
 		if (!card) return true;
-		const cardEntry = card.constructor as CardEntry;
-		if (cardEntry.cardType === CardType.BLOCK)
-			return this.block(card, event);
+		if (card.type === CardType.BLOCK) return this.block(card, event);
 		return true;
 	}
 }

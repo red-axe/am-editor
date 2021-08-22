@@ -180,15 +180,31 @@ class ImageComponent extends Card<ImageValue> {
 			{
 				type: 'button',
 				content: '<span class="data-icon data-icon-huanyuan"></span>',
-				title: language
-					.get('image', 'toolbbarReductionTitle')
-					.toString(),
+				title: language.get<string>('image', 'toolbarReductionTitle'),
 				onClick: () => {
 					value = this.getValue();
 					this.onInputChange(
 						value?.size?.naturalWidth || 0,
 						value?.size?.naturalHeight || 0,
 					);
+				},
+			},
+			{
+				type: 'button',
+				content:
+					'<span class="data-icon data-icon-block-image"></span>',
+				title: language.get<string>('image', 'displayBlockTitle'),
+				onClick: () => {
+					this.type = CardType.BLOCK;
+				},
+			},
+			{
+				type: 'button',
+				content:
+					'<span class="data-icon data-icon-inline-image"></span>',
+				title: language.get<string>('image', 'displayInlineTitle'),
+				onClick: () => {
+					this.type = CardType.INLINE;
 				},
 			},
 		]);
@@ -217,10 +233,23 @@ class ImageComponent extends Card<ImageValue> {
 				size: value.size,
 				alt: value.alt,
 				link: value.link,
+				display: this.type,
 				percent: value.percent,
 				message: value.message,
 				onChange: (size) => {
 					if (size) this.setSize(size);
+					if (this.type === CardType.BLOCK && this.image) {
+						const maxWidth = this.image.getMaxWidth();
+						const offset = (maxWidth - this.image.root.width()) / 2;
+						this.toolbarModel?.setOffset([
+							-offset - 12,
+							0,
+							-offset - 12,
+							0,
+						]);
+						if (this.activated)
+							this.toolbarModel?.showCardToolbar();
+					}
 				},
 				onError: () => {
 					this.isLocalError = true;
@@ -239,6 +268,12 @@ class ImageComponent extends Card<ImageValue> {
 	didUpdate() {
 		this.toolbarModel?.getContainer()?.remove();
 		this.toolbarModel?.create();
+	}
+
+	didRender() {
+		if (this.type === CardType.INLINE) {
+			this.toolbarModel?.setOffset([-12, 0, -12, 0]);
+		}
 	}
 }
 

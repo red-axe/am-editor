@@ -50,7 +50,7 @@ class Enter {
 		const card = this.engine.card.find(range.startNode);
 		if (!card) return true;
 
-		if ((card.constructor as CardEntry).cardType === CardType.INLINE) {
+		if (card.type === CardType.INLINE) {
 			// 左侧光标
 			const cardLeft = range.startNode.closest(CARD_LEFT_SELECTOR);
 			if (cardLeft.length > 0) {

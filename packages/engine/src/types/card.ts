@@ -19,7 +19,11 @@ export type CardOptions = {
 	root?: NodeInterface;
 };
 
-export type CardValue = {};
+export type CardValue = {
+	id?: string;
+	type?: CardType;
+	[key: string]: any;
+};
 
 export interface CardToolbarInterface {
 	/**
@@ -154,9 +158,9 @@ export interface CardInterface {
 	 */
 	readonly contenteditable: Array<string>;
 	/**
-	 * 卡片类型
+	 * 卡片类型，设置卡片类型会触发card重新渲染
 	 */
-	readonly type: CardType;
+	type: CardType;
 	/**
 	 * 是否最大化
 	 */
@@ -291,7 +295,7 @@ export interface CardInterface {
 	/**
 	 * 获取卡片值
 	 */
-	getValue(): (CardValue & { id: string }) | undefined;
+	getValue(): CardValue | undefined;
 	/**
 	 * 工具栏配置项
 	 */
@@ -475,6 +479,17 @@ export interface CardModelInterface {
 	 * @param value 要更新的卡片值
 	 */
 	update(selector: NodeInterface | Node | string, value: CardValue): void;
+	/**
+	 * 替换卡片
+	 * @param source 源卡片
+	 * @param name 新卡片名称
+	 * @param value 新卡片值
+	 */
+	replace(
+		source: CardInterface,
+		name: string,
+		value?: CardValue,
+	): CardInterface;
 	/**
 	 * 移除卡片
 	 * @param selector 卡片选择器

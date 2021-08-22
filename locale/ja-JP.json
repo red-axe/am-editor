@@ -69,7 +69,9 @@
 		"uploadLimitError": "アップロード画像のサイズは $size に制限されています。",
 		"toolbarReductionTitle": "復元",
 		"toolbarWidthTitle": "幅",
-		"toolbarHeightTitle": "幅"
+		"toolbarHeightTitle": "幅",
+		"displayBlockTitle": "ラインを所有する",
+		"displayInlineTitle": "埋め込まれたインライン"
 	},
 	"table": {
 		"insertColLeft": "左側に $data 列を挿入",

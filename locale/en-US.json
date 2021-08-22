@@ -69,7 +69,9 @@
 		"uploadLimitError": "Upload image size is limited to $size",
 		"toolbarReductionTitle": "Reduction size",
 		"toolbarWidthTitle": "Width",
-		"toolbarHeightTitle": "Height"
+		"toolbarHeightTitle": "Height",
+		"displayBlockTitle": "Block",
+		"displayInlineTitle": "In line"
 	},
 	"table": {
 		"insertColLeft": "Insert column(s) $data left",

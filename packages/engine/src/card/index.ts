@@ -177,8 +177,7 @@ class CardModel implements CardModelInterface {
 		if (!parent) return;
 		const card = this.find(parent);
 		if (!card) return;
-		if ((card.constructor as CardEntry).cardType === CardType.BLOCK)
-			return card;
+		if (card.type === CardType.BLOCK) return card;
 		return this.findBlock(card.root);
 	}
 
@@ -202,7 +201,7 @@ class CardModel implements CardModelInterface {
 
 	// 插入Card
 	insertNode(range: RangeInterface, card: CardInterface) {
-		const isInline = (card.constructor as CardEntry).cardType === 'inline';
+		const isInline = card.type === 'inline';
 		const editor = this.editor;
 		// 范围为折叠状态时先删除内容
 		if (!range.collapsed && isEngine(editor)) {
@@ -293,9 +292,11 @@ class CardModel implements CardModelInterface {
 	replaceNode(node: NodeInterface, name: string, value?: CardValue) {
 		const clazz = this.classes[name];
 		if (!clazz) throw ''.concat(name, ': This card does not exist');
-		value = encodeCardValue(value);
+		const type = value?.type || clazz.cardType;
 		const cardNode = transformCustomTags(
-			`<card type="${clazz.cardType}" name="${name}" value="${value}"></card>`,
+			`<card type="${type}" name="${name}" value="${encodeCardValue(
+				value,
+			)}"></card>`,
 		);
 		const readyCard = $(cardNode);
 		node.before(readyCard);
@@ -347,8 +348,7 @@ class CardModel implements CardModelInterface {
 				if (!isCurrentActiveCard) {
 					card!.toolbarModel?.show(event);
 					if (
-						(card.constructor as CardEntry).cardType ===
-							CardType.INLINE &&
+						card.type === CardType.INLINE &&
 						(card.constructor as CardEntry).autoSelected !==
 							false &&
 						(trigger !== ActiveTrigger.CLICK ||
@@ -358,9 +358,7 @@ class CardModel implements CardModelInterface {
 					}
 					card.activate(true);
 				}
-				if (
-					(card.constructor as CardEntry).cardType === CardType.BLOCK
-				) {
+				if (card.type === CardType.BLOCK) {
 					card.select(false);
 				}
 				if (
@@ -379,8 +377,7 @@ class CardModel implements CardModelInterface {
 		if (!isEngine(editor)) return;
 		if (
 			(card.constructor as CardEntry).singleSelectable !== false &&
-			((card.constructor as CardEntry).cardType !== CardType.BLOCK ||
-				!card.activated)
+			(card.type !== CardType.BLOCK || !card.activated)
 		) {
 			const range = editor.change.getRange();
 			const root = card.root;
@@ -415,7 +412,7 @@ class CardModel implements CardModelInterface {
 		const { change } = this.editor;
 		const range = change.getSafeRange();
 		const card = this.insertNode(range, component);
-		const type = (component.constructor as CardEntry).cardType;
+		const type = component.type;
 		if (type === 'inline') {
 			card.focus(range, false);
 		}
@@ -442,13 +439,18 @@ class CardModel implements CardModelInterface {
 		}
 	}
 
+	replace(source: CardInterface, name: string, value?: CardValue) {
+		this.remove(source.root);
+		return this.insert(name, value);
+	}
+
 	remove(selector: NodeInterface | Node | string) {
 		if (!isEngine(this.editor)) return;
 		const { change, list, node } = this.editor;
 		const range = change.getRange();
 		const card = this.find(selector);
 		if (!card) return;
-		if ((card.constructor as CardEntry).cardType === CardType.INLINE) {
+		if (card.type === CardType.INLINE) {
 			range.setEndAfter(card.root[0]);
 			range.collapse(false);
 		} else {
@@ -499,7 +501,8 @@ class CardModel implements CardModelInterface {
 	): CardInterface {
 		const clazz = this.classes[name];
 		if (!clazz) throw ''.concat(name, ': This card does not exist');
-		if (['inline', 'block'].indexOf(clazz.cardType) < 0) {
+		const type = options?.value?.type || clazz.cardType;
+		if (['inline', 'block'].indexOf(type) < 0) {
 			throw ''.concat(
 				name,
 				': the type of card must be "inline", "block"',
@@ -512,14 +515,14 @@ class CardModel implements CardModelInterface {
 			root: options?.root,
 		});
 
-		component.root.attributes(CARD_TYPE_KEY, clazz.cardType);
+		component.root.attributes(CARD_TYPE_KEY, type);
 		component.root.attributes(CARD_KEY, name);
 		//如果没有指定是否能聚集，那么当card不是只读的时候就可以聚焦
 		const hasFocus =
 			clazz.focus !== undefined
 				? clazz.focus
 				: isEngine(this.editor) && !this.editor.readonly;
-		const tagName = clazz.cardType === CardType.INLINE ? 'span' : 'div';
+		const tagName = type === CardType.INLINE ? 'span' : 'div';
 		//center
 		const center = $(
 			`<${tagName} ${

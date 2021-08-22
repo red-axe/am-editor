@@ -269,7 +269,7 @@ otClient.connect(
 
 ### Project icon
 
-[Iconfont](https://at.alicdn.com/t/project/1456030/91ee9824-8591-463d-ad0b-6f26044781f6.html?spm=a313x.7781069.1998910419.63)
+[Iconfont](https://at.alicdn.com/t/project/1456030/0cbd04d3-3ca1-4898-b345-e0a9150fcc80.html?spm=a313x.7781069.1998910419.35)
 
 ## Development
 

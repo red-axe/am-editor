@@ -78,17 +78,11 @@ class SelectionData implements SelectionDataInterface {
 		}
 		if (!activeCard && !range.collapsed) {
 			const startCard = this.engine.card.find(range.startNode, true);
-			if (
-				startCard &&
-				(startCard.constructor as CardEntry).cardType === CardType.BLOCK
-			) {
+			if (startCard && startCard.type === CardType.BLOCK) {
 				range.setStart(startCard.getCenter().parent()!, 1);
 			}
 			const endCard = this.engine.card.find(range.endNode, true);
-			if (
-				endCard &&
-				(endCard.constructor as CardEntry).cardType === CardType.BLOCK
-			) {
+			if (endCard && endCard.type === CardType.BLOCK) {
 				range.setEnd(endCard.getCenter().parent()!, 1);
 			}
 		}

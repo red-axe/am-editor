@@ -257,10 +257,17 @@ export default class extends Card {
 
 ### Set card value
 
+The default type of card value `CardValue`
+
+Two values of `id` and `type` are provided by default, and the custom value cannot be the same as the default value
+
+-   `id` unique card number
+-   `type` card type
+
 ```ts
 import {$, Card, CardType} from'@aomao/engine'
 
-export default class extends Card {
+export default class extends Card<{ count: number }> {
 
   container?: NodeInterface
 
@@ -307,6 +314,10 @@ import { Plugin, isEngine } from '@aomao/engine';
 // Introduce cards
 import CardComponent from './component';
 
+type Options = {
+	defaultValue?: number;
+};
+
 export default class extends Plugin<Options> {
 	static get pluginName() {
 		return 'card-plugin';
@@ -316,8 +327,10 @@ export default class extends Plugin<Options> {
 		// Reader does not execute
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
-		//Insert card
-		card.insert(CardComponent.cardName);
+		//Insert the card and pass in the count initialization parameter
+		card.insert(CardComponent.cardName, {
+			count: this.otpions.defaultValue || 0,
+		});
 	}
 }
 export { CardComponent };
@@ -420,6 +433,14 @@ Type: `string`
 
 Card id, each card has a unique ID, we can use this ID to find instances of card components
 
+### `type`
+
+The card type, the static property `cardType` of the card class is obtained by default. If there is a `type` value in `getValue()`, this value will be used as the `type`
+
+When setting a new `type` value to the card, the current card will be removed and the new `type` will be used to re-render the card at the current card position
+
+Type: `CardType`
+
 ### `isEditable`
 
 Read only
@@ -445,7 +466,7 @@ export default class extends Card<Options> {
     contenteditable = ["div.card-editor-container"]
 
 render(){
-        return "<div><div>Thi is Card</div><div class=\"card-editor-container\"></div></div>"
+        return "<div><div>Thi is Card</div><div class=\"card-editor-container\">Editable here</div></div>"
     }
 }
 ```

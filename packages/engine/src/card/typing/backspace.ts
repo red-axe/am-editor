@@ -31,7 +31,7 @@ class Backspace {
 			return true;
 		}
 		// inline 卡片
-		if ((card.constructor as CardEntry).cardType === CardType.INLINE) {
+		if (card.type === CardType.INLINE) {
 			// 左侧光标
 			const cardLeft = range.startNode.closest(CARD_LEFT_SELECTOR);
 			if (cardLeft.length > 0) {

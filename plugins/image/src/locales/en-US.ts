@@ -13,5 +13,7 @@ export default {
 		toolbarReductionTitle: 'Reduction size',
 		toolbarWidthTitle: 'Width',
 		toolbarHeightTitle: 'Height',
+		displayBlockTitle: 'Block',
+		displayInlineTitle: 'In line',
 	},
 };

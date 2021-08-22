@@ -78,8 +78,7 @@ class Right {
 		const range = change.getRange();
 		const card = this.engine.card.getSingleCard(range);
 		if (!card) return true;
-		const cardEntry = card.constructor as CardEntry;
-		return cardEntry.cardType === CardType.INLINE
+		return card.type === CardType.INLINE
 			? this.inline(card, event)
 			: this.block(card, event);
 	}

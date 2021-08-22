@@ -431,10 +431,7 @@ class ChangeModel implements ChangeInterface {
 		const { commonAncestorNode } = range;
 		const card = this.engine.card.find(commonAncestorNode);
 		const { node, mark, change } = this.engine;
-		if (
-			card &&
-			(card.constructor as CardEntry).cardType === CardType.INLINE
-		) {
+		if (card && card.type === CardType.INLINE) {
 			if (card.isLeftCursor(commonAncestorNode)) {
 				const cardLeft = commonAncestorNode.closest(CARD_LEFT_SELECTOR);
 				let cardLeftText = cardLeft.text().replace(/\u200B/g, '');
@@ -714,7 +711,7 @@ class ChangeModel implements ChangeInterface {
 					return doc_rang.comparePoint(startNode, startOffset) < 0;
 				};
 
-				if ('inline' === (card.constructor as CardEntry).cardType) {
+				if ('inline' === card.type) {
 					range.select(card.root);
 					range.collapse(comparePoint());
 					return;
@@ -802,7 +799,7 @@ class ChangeModel implements ChangeInterface {
 			const cardComponent = card.find($(e.target));
 			if (cardComponent) {
 				const cardEntry = cardComponent.constructor as CardEntry;
-				if (cardEntry.cardType === CardType.INLINE) {
+				if (cardComponent.type === CardType.INLINE) {
 					card.activate(
 						cardComponent.root,
 						ActiveTrigger.CLICK,
@@ -821,11 +818,7 @@ class ChangeModel implements ChangeInterface {
 				if (!e.target) return;
 				const targetNode = $(e.target);
 				const cardComponent = card.find(targetNode);
-				if (
-					cardComponent &&
-					(cardComponent.constructor as CardEntry).cardType ===
-						CardType.INLINE
-				) {
+				if (cardComponent && cardComponent.type === CardType.INLINE) {
 					return;
 				}
 				// 点击元素已被移除

@@ -257,10 +257,17 @@ export default class extends Card {
 
 ### 设置卡片值
 
+卡片值默认类型 `CardValue`
+
+默认提供 `id` `type` 两个值，自定义值不能与默认值相同
+
+-   `id` 卡片唯一编号
+-   `type` 卡片类型
+
 ```ts
 import { $, Card, CardType } from '@aomao/engine'
 
-export default class extends Card {
+export default class extends Card<{ count: number }> {
 
   container?: NodeInterface
 
@@ -268,35 +275,35 @@ export default class extends Card {
 		return '卡片名称';
 	}
 
-  static get cardType() {
+    static get cardType() {
 		return CardType.BLOCK;
 	}
 
-  // 在 div 上面单击
-  onClick = () => {
-    // 获取卡片值
-	  const value = this.getValue() || { count: 0}
-    // 给 count + 1
-    const count = value.count + 1
-    // 重新设置卡片值，会保存到卡片根节点上的 data-card-value 属性上面
-		this.setValue({
-			count,
-		});
-    // 设置 div 的内容
-    this.container?.html(count)
+    // 在 div 上面单击
+    onClick = () => {
+        // 获取卡片值
+        const value = this.getValue() || { count: 0}
+        // 给 count + 1
+        const count = value.count + 1
+        // 重新设置卡片值，会保存到卡片根节点上的 data-card-value 属性上面
+        this.setValue({
+            count,
+        });
+        // 设置 div 的内容
+        this.container?.html(count)
 	};
 
-  // 渲染 div 节点
-  render() {
-    // 获取卡片的值
-    const value = this.getValue() || { count: 0}
-    // 创建 div 节点
-    this.container = $(`<div>${value.count}</div>`)
-    // 绑定 click 事件
-    this.container.on("click" => this.onClick)
-    // 返回节点给容器加载
-    return this.container
-  }
+    // 渲染 div 节点
+    render() {
+        // 获取卡片的值
+        const value = this.getValue() || { count: 0}
+        // 创建 div 节点
+        this.container = $(`<div>${value.count}</div>`)
+        // 绑定 click 事件
+        this.container.on("click" => this.onClick)
+        // 返回节点给容器加载
+        return this.container
+    }
 }
 ```
 
@@ -307,6 +314,10 @@ import { Plugin, isEngine } from '@aomao/engine';
 // 引入卡片
 import CardComponent from './component';
 
+type Options = {
+	defaultValue?: number;
+};
+
 export default class extends Plugin<Options> {
 	static get pluginName() {
 		return 'card-plugin';
@@ -316,8 +327,10 @@ export default class extends Plugin<Options> {
 		// 阅读器不执行
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
-		//插入卡片
-		card.insert(CardComponent.cardName);
+		//插入卡片，并且传入 count 初始化参数
+		card.insert(CardComponent.cardName, {
+			count: this.otpions.defaultValue || 0,
+		});
 	}
 }
 export { CardComponent };
@@ -420,6 +433,14 @@ export default class extends Card<Options> {
 
 卡片 id，每个卡片都有一个唯一 ID，我们可以用此 ID 来查找卡片组件实例
 
+### `type`
+
+卡片类型，默认获取卡片类的静态属性 `cardType`，如果 `getValue()` 中有 `type` 值，将会使用这个值作为 `type`
+
+在给卡片设置新的 `type` 值时，会移除当前卡片并且使用新的 `type` 在当前卡片位置重新渲染卡片
+
+类型：`CardType`
+
 ### `isEditable`
 
 只读
@@ -445,7 +466,7 @@ export default class extends Card<Options> {
     contenteditable = ["div.card-editor-container"]
 
 	render(){
-        return "<div><div>Thi is Card</div><div class=\"card-editor-container\"></div></div>"
+        return "<div><div>Thi is Card</div><div class=\"card-editor-container\">这里可以编辑</div></div>"
     }
 }
 ```

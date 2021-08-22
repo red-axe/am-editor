@@ -244,12 +244,16 @@ class Mention extends Card<MentionValue> {
 				if (this.#hideTimeout) clearTimeout(this.#hideTimeout);
 			});
 			this.#enterLayout.on('mouseleave', this.hideEnter);
-			this.#position?.bind(this.#enterLayout, this.#container);
+
 			Mention.mouseEnter!(this.#enterLayout, {
 				key: unescape(key || ''),
 				name: unescape(name),
 				...info,
 			});
+
+			setTimeout(() => {
+				this.#position?.bind(this.#enterLayout!, this.#container!);
+			}, 10);
 		}, 200);
 	};
 

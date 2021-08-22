@@ -256,6 +256,24 @@ Update card
 update(selector: NodeInterface | Node | string, value: CardValue): void;
 ```
 
+### `replace`
+
+Replace the location of a card with another specified card to be rendered
+
+### `replace`
+
+Replace the location of a card with another specified card to be rendered
+
+```ts
+/**
+  * Replace card
+  * @param source The card to be replaced
+  * @param name new card name
+  * @param value New card value
+  */
+replace(source: CardInterface, name: string, value?: CardValue)
+```
+
 ### `remove`
 
 Remove card

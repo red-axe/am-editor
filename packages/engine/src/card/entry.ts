@@ -85,18 +85,36 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	}
 
 	get type() {
-		return this.root.attributes(CARD_TYPE_KEY) as CardType;
+		return (
+			this.getValue()?.type ||
+			(this.root.attributes(CARD_TYPE_KEY) as CardType)
+		);
+	}
+
+	set type(type: CardType) {
+		if (!this.name || type === this.type) return;
+		// 替换后重新渲染
+		const { card } = this.editor;
+		const component = card.replace(this, this.name, {
+			...this.getValue(),
+			type,
+		});
+		card.render(component.root);
+		component.activate(false);
+		card.activate(component.root);
 	}
 
 	constructor({ editor, value, root }: CardOptions) {
 		this.editor = editor;
-		const type = (this.constructor as CardEntryType).cardType;
+		const type =
+			value?.type || (this.constructor as CardEntryType).cardType;
 		const tagName = type === 'inline' ? 'span' : 'div';
 		this.root = root ? root : $('<'.concat(tagName, ' />'));
 		if (typeof value === 'string') value = decodeCardValue(value);
 
 		value = value || {};
-		value['id'] = this.getId(value['id']);
+		value.id = this.getId(value.id);
+		value.type = type;
 		this.setValue(value as T);
 		this.defaultMaximize = new Maximize(this.editor, this);
 	}
@@ -130,7 +148,11 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		}
 		const currentValue = this.getValue();
 		if (!!currentValue?.id) delete value['id'];
-		value = { ...this.getValue(), ...value } as T;
+		const oldValue = this.getValue();
+		value = { ...oldValue, ...value } as T;
+		if (value.type && oldValue?.type !== value.type) {
+			this.type = value.type;
+		}
 
 		this.root.attributes(CARD_VALUE_KEY, encodeCardValue(value));
 	}
@@ -241,7 +263,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	focusPrevBlock(range: RangeInterface, hasModify: boolean) {
 		if (!isEngine(this.editor)) throw 'Engine not initialized';
 		let prevBlock;
-		if ((this.constructor as CardEntryType).cardType === 'inline') {
+		if (this.type === 'inline') {
 			const block = this.editor.block.closest(this.root);
 			if (block.isEditable()) {
 				prevBlock = this.root.prevElement();
@@ -277,7 +299,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	focusNextBlock(range: RangeInterface, hasModify: boolean) {
 		if (!isEngine(this.editor)) throw 'Engine not initialized';
 		let nextBlock;
-		if ((this.constructor as CardEntryType).cardType === 'inline') {
+		if (this.type === 'inline') {
 			const block = this.editor.block.closest(this.root);
 
 			if (block.isEditable()) {

@@ -9,7 +9,7 @@ import {
 	sanitizeUrl,
 	Tooltip,
 	isMobile,
-	CARD_CENTER_SELECTOR,
+	CardType,
 } from '@aomao/engine';
 import Pswp from '../pswp';
 import Resizer from '../resizer';
@@ -55,6 +55,7 @@ export type Options = {
 		href: string;
 		target?: string;
 	};
+	display?: CardType;
 	/**
 	 * 错误消息
 	 */
@@ -87,7 +88,7 @@ let pswp: PswpInterface | undefined = undefined;
 class Image {
 	private editor: EditorInterface;
 	private options: Options;
-	private root: NodeInterface;
+	root: NodeInterface;
 	private progress: NodeInterface;
 	private image: NodeInterface;
 	private detail: NodeInterface;
@@ -480,7 +481,10 @@ class Image {
 
 	render() {
 		//阅读模式不展示错误
-		const { container } = this.options;
+		const { container, display } = this.options;
+		if (display === CardType.BLOCK) {
+			this.root.addClass('data-image-blcok');
+		}
 		if (this.status === 'error' && isEngine(this.editor)) {
 			this.root = $(
 				this.renderTemplate(

@@ -13,5 +13,7 @@ export default {
 		toolbarReductionTitle: '还原',
 		toolbarWidthTitle: '宽度',
 		toolbarHeightTitle: '宽度',
+		displayBlockTitle: '独占一行',
+		displayInlineTitle: '嵌入行内',
 	},
 };

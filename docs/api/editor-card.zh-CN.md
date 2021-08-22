@@ -256,6 +256,20 @@ insert(name: string, value?: CardValue): CardInterface;
 update(selector: NodeInterface | Node | string, value: CardValue): void;
 ```
 
+### `replace`
+
+把一个卡片所在位置替换成另一个指定的待渲染卡片
+
+```ts
+/**
+ * 替换卡片
+ * @param source 需要替换的卡片
+ * @param name 新的卡片名称
+ * @param value 新的卡片值
+ */
+replace(source: CardInterface, name: string, value?: CardValue)
+```
+
 ### `remove`
 
 移除卡片
