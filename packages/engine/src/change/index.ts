@@ -307,6 +307,7 @@ class ChangeModel implements ChangeInterface {
 		} = this.engine;
 		if (value === '') {
 			this.initValue();
+			if (options?.callback) options.callback(0);
 			return;
 		} else {
 			const parser = new Parser(value, this.engine, (root) => {
