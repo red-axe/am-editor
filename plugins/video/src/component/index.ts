@@ -267,7 +267,7 @@ class VideoComponent extends Card<VideoValue> {
 		const center = this.getCenter();
 		//先清空卡片内容容器
 		center.empty();
-		const { command } = this.editor;
+		const { command, plugin } = this.editor;
 		const { video_id, status } = value;
 		const locales = this.getLocales();
 		//阅读模式
@@ -277,42 +277,54 @@ class VideoComponent extends Card<VideoValue> {
 				this.container = $(
 					this.renderTemplate({ ...value, status: undefined }),
 				);
-				command.execute(
-					'video-uploader',
-					'query',
-					video_id,
-					(data?: {
-						url: string;
-						name?: string;
-						cover?: string;
-						download?: string;
-					}) => {
-						const newValue: VideoValue = {
-							...value,
-							url: !!data?.url ? data.url : value.url,
-							name: !!data?.name ? data.name : value.name,
-							cover: !!data?.cover ? data.cover : value.cover,
-							download: !!data?.download
-								? data.download
-								: value.download,
-						};
-						this.container = $(this.renderTemplate(newValue));
-						center.empty();
-						center.append(this.container);
-						this.initPlayer();
-					},
-					(error: string) => {
-						this.container = $(
-							this.renderTemplate({
-								...value,
-								status: 'error',
-								message: error || locales['loadError'],
-							}),
-						);
-						center.empty();
-						center.append(this.container);
-					},
-				);
+				const updateValue = (data?: {
+					url: string;
+					name?: string;
+					cover?: string;
+					download?: string;
+				}) => {
+					const newValue: VideoValue = {
+						...value,
+						url: !!data?.url ? data.url : value.url,
+						name: !!data?.name ? data.name : value.name,
+						cover: !!data?.cover ? data.cover : value.cover,
+						download: !!data?.download
+							? data.download
+							: value.download,
+					};
+					this.container = $(this.renderTemplate(newValue));
+					center.empty();
+					center.append(this.container);
+					this.initPlayer();
+				};
+				if (plugin.components[this.name]) {
+					command.execute(
+						this.name,
+						'query',
+						video_id,
+						(data?: {
+							url: string;
+							name?: string;
+							cover?: string;
+							download?: string;
+						}) => {
+							updateValue(data);
+						},
+						(error: string) => {
+							this.container = $(
+								this.renderTemplate({
+									...value,
+									status: 'error',
+									message: error || locales['loadError'],
+								}),
+							);
+							center.empty();
+							center.append(this.container);
+						},
+					);
+				} else {
+					updateValue();
+				}
 				return this.container;
 			} else if (status === 'error') {
 				return $(
