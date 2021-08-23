@@ -313,7 +313,7 @@ yarn serve
 
 ## 贡献
 
-感谢 [Nirongxu](https://github.com/Nirongxu) 的捐赠
+感谢 [pleasedmi](https://github.com/pleasedmi) 的捐赠
 
 ### 支付宝
 

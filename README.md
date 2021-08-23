@@ -311,7 +311,7 @@ There is no backend API configured in the `Vue` case. For details, please refer 
 
 ## Contribution
 
-Thanks [Nirongxu](https://github.com/Nirongxu) for donation
+Thanks [pleasedmi](https://github.com/pleasedmi) for donation
 
 ### Alipay
 
