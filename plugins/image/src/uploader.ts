@@ -149,7 +149,7 @@ export default class extends Plugin<Options> {
 				this.pasteMarkdown(child),
 			);
 		}
-		let { accept } = this.options.file;
+		let { accept } = this.options.file||{};
 		const names: Array<string> = [];
 		if (typeof accept === 'string') accept = accept.split(',');
 
