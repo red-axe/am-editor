@@ -132,7 +132,7 @@ export const getComputedStyle = (element: Element, attrName: string) => {
  * @param value 需要编码的字符串
  */
 export const escape = (value: string) => {
-	return value
+	return (value || '')
 		.replace(/&/g, '&amp;')
 		.replace(/</g, '&lt;')
 		.replace(/>/g, '&gt;')
@@ -144,7 +144,7 @@ export const escape = (value: string) => {
  * @param value 需要解码的字符串
  */
 export const unescape = (value: string) => {
-	return value
+	return (value || '')
 		.replace(/&lt;/g, '<')
 		.replace(/&gt;/g, '>')
 		.replace(/&quot;/g, '"')
