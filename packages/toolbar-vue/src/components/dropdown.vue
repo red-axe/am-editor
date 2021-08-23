@@ -95,7 +95,7 @@ export default defineComponent({
 						(props.icon || props.content ? '' : defaultItem?.key || '')
         }
         update(props.values)
-        watch(() => props.values,(values) => update(values))
+        watch(props,(newProps) => update(newProps.values))
         return {
             buttonRef,
             isRight,

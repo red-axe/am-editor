@@ -124,7 +124,7 @@ export default defineComponent({
 
         onUnmounted(() => document.removeEventListener('click', hideDropdown))
 
-        watch(() => props.disabled, () => buttonContent.value = getContent())
+        watch(props, () => buttonContent.value = getContent())
 
         return {
             buttonRef,
