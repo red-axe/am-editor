@@ -9,10 +9,7 @@ class Left {
 
 	trigger(event: KeyboardEvent) {
 		const { change, inline, node } = this.engine;
-		const range = change
-			.getRange()
-			.cloneRange()
-			.shrinkToTextNode();
+		const range = change.getRange().cloneRange().shrinkToTextNode();
 		const { startNode, startOffset } = range;
 		const card = this.engine.card.getSingleCard(range);
 		if (!card && startNode.type === Node.TEXT_NODE) {

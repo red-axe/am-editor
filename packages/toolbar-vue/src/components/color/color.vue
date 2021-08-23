@@ -40,7 +40,7 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, onUnmounted, ref } from 'vue'
+import { defineComponent, onUnmounted, ref, watch } from 'vue'
 import { colorProps } from '../../types'
 import { useRight } from '../../hooks';
 import AmButton from '../button.vue'
@@ -56,13 +56,16 @@ export default defineComponent({
     props:colorProps,
     setup(props){
         const visible = ref(false)
-        const buttonContent = ref(typeof props.content === 'string'
+        const getContent = () => {
+            return typeof props.content === 'string'
                 ? props.content
                 : props.content(
                         props.defaultActiveColor,
                         Palette.getStroke(props.defaultActiveColor),
                         props.disabled,
-                ))
+                )
+        }
+        const buttonContent = ref(getContent())
 
         const buttonRef = ref<HTMLDivElement | null>(null)
         const isRight = useRight(buttonRef)
@@ -120,6 +123,8 @@ export default defineComponent({
         };
 
         onUnmounted(() => document.removeEventListener('click', hideDropdown))
+
+        watch(() => props.disabled, () => buttonContent.value = getContent())
 
         return {
             buttonRef,

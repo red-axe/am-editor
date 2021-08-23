@@ -81,9 +81,29 @@ class ChangeEvent implements ChangeEventInterface {
 		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
 		this.onContainer('beforeinput', (event: InputEvent) => {
 			if (this.engine.readonly) return;
-			const { change } = this.engine;
+			const { change, card } = this.engine;
 			if (!change.rangePathBeforeCommand)
 				change.cacheRangeBeforeCommand();
+			// 单独选中卡片或者selection处于卡片边缘，手动删除卡片
+			const range = change
+				.getRange()
+				.cloneRange()
+				.shrinkToTextNode()
+				.enlargeToElementNode();
+			if (!range.collapsed) {
+				if (
+					range.commonAncestorNode.attributes(CARD_ELEMENT_KEY) ===
+					'body'
+				)
+					card.remove(range.commonAncestorNode);
+				else {
+					if (range.startNode.attributes(CARD_ELEMENT_KEY) === 'body')
+						card.remove(range.startNode);
+					if (range.endNode.attributes(CARD_ELEMENT_KEY) === 'body')
+						card.remove(range.endNode);
+				}
+			}
+
 			const { inputType } = event;
 			const commandTypes = ['format', 'history'];
 			commandTypes.forEach((type) => {

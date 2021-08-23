@@ -3,6 +3,7 @@
     :class="['toolbar-dropdown', {'toolbar-dropdown-right': isRight}, className]"
     ref="buttonRef"
     @click="triggerClick"
+    @mousedown="triggerMouseDown"
     >
         <div
         :class="['toolbar-dropdown-trigger', {
@@ -74,8 +75,12 @@ export default defineComponent({
             if(item){
                 if(cxt.slots.default){
                     buttonContent.value =  item
-                }else if(Array.isArray(values) && values.length > 1){
-                    buttonContent.value = {icon:props.icon,content:typeof props.content === "function" ? props.content() : props.content}
+                }
+                else if(typeof props.content === "function") {
+                    buttonContent.value = {icon:props.icon,content:props.content()}
+                }
+                else if(Array.isArray(values) && values.length > 1){
+                    buttonContent.value = {icon:props.icon,content: props.content}
                 }else{
                     buttonContent.value = {icon:item.icon,content:typeof item.content === "function" ? item.content() : item.content}
                 }
@@ -90,7 +95,7 @@ export default defineComponent({
 						(props.icon || props.content ? '' : defaultItem?.key || '')
         }
         update(props.values)
-        watch(() => props.values,update)
+        watch(() => props.values,(values) => update(values))
         return {
             buttonRef,
             isRight,
@@ -104,6 +109,9 @@ export default defineComponent({
         }
     },
     methods:{
+        triggerMouseDown(event: MouseEvent){
+            event.preventDefault();
+        },
         triggerClick(event: MouseEvent){
             event.preventDefault();
             if (this.disabled) {
@@ -201,7 +209,7 @@ export default defineComponent({
     color: #595959;
     text-align: left;
     position: relative;
-    display: block;
+    display: flex;
     white-space: nowrap;
 }
 

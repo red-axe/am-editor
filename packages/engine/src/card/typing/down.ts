@@ -1,10 +1,5 @@
-import { CARD_LEFT_SELECTOR, CARD_RIGHT_SELECTOR } from '../../constants';
-import {
-	CardEntry,
-	CardInterface,
-	CardType,
-	EngineInterface,
-} from '../../types';
+import isHotkey from 'is-hotkey';
+import { CardInterface, CardType, EngineInterface } from '../../types';
 
 class Down {
 	private engine: EngineInterface;
@@ -36,6 +31,9 @@ class Down {
 		const range = change.getRange();
 		const card = this.engine.card.getSingleCard(range);
 		if (!card) return true;
+		if (isHotkey('shift+down', event)) {
+			return true;
+		}
 		return card.type === CardType.INLINE
 			? this.inline(card, event)
 			: this.block(card, event);

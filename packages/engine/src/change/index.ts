@@ -34,6 +34,7 @@ import { SelectionInterface } from '../types/selection';
 import Selection from '../selection';
 import { escape } from '../utils';
 import { $ } from '../node';
+import isHotkey from 'is-hotkey';
 
 class ChangeModel implements ChangeInterface {
 	private engine: EngineInterface;
@@ -781,17 +782,25 @@ class ChangeModel implements ChangeInterface {
 				card.each((card) => card.select(false));
 			}
 		});
-		this.event.onSelect(() => {
+		this.event.onSelect((event) => {
 			const range = this.getRange();
 			if (range.startNode.closest(ROOT_SELECTOR).length === 0) return;
 			if (range.collapsed && range.containsCard()) {
 				this.getSafeRange(range);
 			}
 			this.select(range);
-			card.activate(
-				range.commonAncestorNode,
-				ActiveTrigger.CUSTOM_SELECT,
-			);
+			// 方向键选择不触发 card 激活
+			if (
+				!isHotkey('shift+left', event) &&
+				!isHotkey('shift+right', event) &&
+				!isHotkey('shift+up', event) &&
+				!isHotkey('shift+down', event)
+			) {
+				card.activate(
+					range.commonAncestorNode,
+					ActiveTrigger.CUSTOM_SELECT,
+				);
+			}
 			this.onSelect();
 		});
 
