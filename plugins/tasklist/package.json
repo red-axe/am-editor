@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-tasklist",
-  "version": "2.3.20",
+  "version": "2.3.21",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
