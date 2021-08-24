@@ -36,7 +36,7 @@
     "@aomao/plugin-sub": "^2.3.20",
     "@aomao/plugin-sup": "^2.3.20",
     "@aomao/plugin-table": "^2.3.21",
-    "@aomao/plugin-tasklist": "^2.3.20",
+    "@aomao/plugin-tasklist": "^2.3.21",
     "@aomao/plugin-underline": "^2.3.20",
     "@aomao/plugin-undo": "^2.3.20",
     "@aomao/plugin-unorderedlist": "^2.3.20",
