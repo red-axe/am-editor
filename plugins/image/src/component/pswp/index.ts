@@ -140,13 +140,8 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 				this.close();
 			}
 		};
-		if (isMobile) {
-			this.closeUI.on('touchstart', this.close);
-			this.root.on('touchstart', onClick);
-		} else {
-			this.root.on('click', onClick);
-			this.closeUI.on('click', this.close);
-		}
+		this.root.on('click', onClick);
+		this.closeUI.on('click', this.close);
 	}
 
 	prev() {
