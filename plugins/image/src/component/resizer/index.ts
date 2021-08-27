@@ -1,4 +1,4 @@
-import { $, NodeInterface, EventListener } from '@aomao/engine';
+import { $, NodeInterface, EventListener, isMobile } from '@aomao/engine';
 import './index.css';
 
 export type Options = {
@@ -65,7 +65,7 @@ class Resizer {
         </div>`;
 	}
 
-	onMouseDown(event: MouseEvent, position: Position) {
+	onMouseDown(event: MouseEvent | TouchEvent, position: Position) {
 		if (this.resizing) return;
 		event.preventDefault();
 		event.stopPropagation();
@@ -86,8 +86,14 @@ class Resizer {
 			['right-top', 'right-bottom'].indexOf(position) > -1 ? 'auto' : 0,
 		);
 		this.point = {
-			x: event.clientX,
-			y: event.clientY,
+			x:
+				event instanceof TouchEvent
+					? event.touches[0].clientX
+					: event.clientX,
+			y:
+				event instanceof TouchEvent
+					? event.touches[0].clientY
+					: event.clientY,
 		};
 		this.position = position;
 		this.resizing = true;
@@ -96,14 +102,21 @@ class Resizer {
 		);
 		this.resizerNumber.addClass('data-image-resizer-number-active');
 		this.image.show();
-		document.addEventListener('mousemove', this.onMouseMove);
-		document.addEventListener('mouseup', this.onMouseUp);
+		document.addEventListener(
+			isMobile ? 'touchmove' : 'mousemove',
+			this.onMouseMove,
+		);
+		document.addEventListener(
+			isMobile ? 'touchend' : 'mouseup',
+			this.onMouseUp,
+		);
 	}
 
-	onMouseMove = (event: MouseEvent) => {
+	onMouseMove = (event: MouseEvent | TouchEvent) => {
 		event.preventDefault();
 		event.stopPropagation();
-		const { clientX, clientY } = event;
+		const { clientX, clientY } =
+			event instanceof TouchEvent ? event.touches[0] : event;
 
 		if (clientX !== this.point.x || clientY !== this.point.y) {
 			//移动后的宽度
@@ -115,7 +128,7 @@ class Resizer {
 		this.resizing = true;
 	};
 
-	onMouseUp = (event: MouseEvent) => {
+	onMouseUp = (event: MouseEvent | TouchEvent) => {
 		event.preventDefault();
 		event.stopPropagation();
 		const root = this.root.get<HTMLElement>();
@@ -132,10 +145,14 @@ class Resizer {
 		this.position = undefined;
 		this.resizing = false;
 
-		document.removeEventListener('mousemove', event =>
-			this.onMouseMove(event),
+		document.removeEventListener(
+			isMobile ? 'touchmove' : 'mousemove',
+			this.onMouseMove,
 		);
-		document.removeEventListener('mouseup', this.onMouseUp);
+		document.removeEventListener(
+			isMobile ? 'touchend' : 'mouseup',
+			this.onMouseUp,
+		);
 		const { onChange } = this.options;
 		if (onChange) onChange(this.size);
 		this.image.hide();
@@ -190,22 +207,22 @@ class Resizer {
 
 		this.root
 			.find('.data-image-resizer-holder-right-top')
-			.on('mousedown', event => {
+			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'right-top');
 			});
 		this.root
 			.find('.data-image-resizer-holder-right-bottom')
-			.on('mousedown', event => {
+			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'right-bottom');
 			});
 		this.root
 			.find('.data-image-resizer-holder-left-bottom')
-			.on('mousedown', event => {
+			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'left-bottom');
 			});
 		this.root
 			.find('.data-image-resizer-holder-left-top')
-			.on('mousedown', event => {
+			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'left-top');
 			});
 		return this.root;

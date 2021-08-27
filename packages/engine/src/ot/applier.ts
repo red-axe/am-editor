@@ -204,7 +204,7 @@ class Applier implements ApplierInterface {
 			if (domBegine.isCard()) {
 				if (isRemote) engine.card.removeRemote(domBegine);
 				else {
-					engine.card.remove(domBegine);
+					engine.card.remove(domBegine, false);
 				}
 			} else domBegine.remove();
 			return parent?.isRoot() ? undefined : parent;

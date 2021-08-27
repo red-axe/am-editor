@@ -58,9 +58,9 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 		this.zoomUI.render();
 		if (!isMobile) {
 			this.bindKeyboardEvnet();
-			this.bindClickEvent();
 			this.hoverControllerFadeInAndOut();
 		}
+		this.bindClickEvent();
 	}
 
 	renderTemplate() {
@@ -122,8 +122,11 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 	}
 
 	bindClickEvent() {
-		this.root.on('click', ({ target }: MouseEvent) => {
-			const node = $(target || []);
+		const onClick = (event: MouseEvent | TouchEvent) => {
+			const node =
+				event instanceof TouchEvent
+					? $(event.touches[0].target)
+					: $(event.target || []);
 			if (node.hasClass('pswp__img')) {
 				setTimeout(() => {
 					this.zoom = undefined;
@@ -132,14 +135,18 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 			}
 			if (
 				node.hasClass('pswp__bg') ||
-				node.hasClass('itellyou-pswp-tool-bar')
+				node.hasClass('data-pswp-tool-bar')
 			) {
 				this.close();
 			}
-		});
-		this.closeUI.on('click', () => {
-			this.close();
-		});
+		};
+		if (isMobile) {
+			this.closeUI.on('touchstart', this.close);
+			this.root.on('touchstart', onClick);
+		} else {
+			this.root.on('click', onClick);
+			this.closeUI.on('click', this.close);
+		}
 	}
 
 	prev() {
@@ -154,8 +161,9 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 		this.barUI
 			.find('.data-pswp-counter')
 			.html(
-				`${(this.pswpUI?.getCurrentIndex() || 0) + 1} / ${this.pswpUI
-					?.items.length || ''}`,
+				`${(this.pswpUI?.getCurrentIndex() || 0) + 1} / ${
+					this.pswpUI?.items.length || ''
+				}`,
 			);
 	}
 
@@ -202,7 +210,7 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 	}
 
 	bindKeyboardEvnet() {
-		this.root.on('keydown', event => {
+		this.root.on('keydown', (event) => {
 			if ((event.metaKey || event.ctrlKey) && 187 === event.keyCode) {
 				event.preventDefault();
 				this.zoomIn();
@@ -279,7 +287,7 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 	}
 
 	setWhiteBackground() {
-		this.root.find('.pswp__img').each(img => {
+		this.root.find('.pswp__img').each((img) => {
 			const node = img as HTMLImageElement;
 			if (node.complete) {
 				node.style.background = 'white';
@@ -322,9 +330,9 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 		}
 	}
 
-	close() {
+	close = () => {
 		this.pswpUI?.close();
-	}
+	};
 
 	destroy() {
 		this.close();

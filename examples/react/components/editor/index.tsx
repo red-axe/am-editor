@@ -108,7 +108,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 					'mention:',
 					engine.current?.command.executeMethod('mention', 'getList'),
 				);
-				//console.log('html:', engine.getHtml());
+				//console.log('html:', engine.current?.getHtml());
 			},
 			[loading, autoSave, props.onChange],
 		),

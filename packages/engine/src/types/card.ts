@@ -494,7 +494,7 @@ export interface CardModelInterface {
 	 * 移除卡片
 	 * @param selector 卡片选择器
 	 */
-	remove(selector: NodeInterface | Node | string): void;
+	remove(selector: NodeInterface | Node | string, hasModify?: boolean): void;
 	/**
 	 * 协作者移除卡片
 	 * @param selector 卡片选择器

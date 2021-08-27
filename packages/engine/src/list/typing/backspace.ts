@@ -94,8 +94,9 @@ class Backspace {
 				range.collapse(true);
 				list.merge();
 				if (change.isEmpty()) {
-					change.initValue();
-				} else change.apply(range);
+					change.initValue(range);
+				}
+				change.apply(range);
 				return false;
 			}
 		}

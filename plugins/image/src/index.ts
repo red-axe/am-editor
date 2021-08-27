@@ -1,4 +1,4 @@
-import { $, CARD_KEY, NodeInterface, Plugin } from '@aomao/engine';
+import { $, CardType, CARD_KEY, NodeInterface, Plugin } from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 import ImageUploader from './uploader';
 import locales from './locales';
@@ -74,7 +74,17 @@ export default class extends Plugin {
 					node.empty();
 					img.attributes('src', value.src);
 					img.css('visibility', 'visible');
-					if (img.length > 0) node.replaceWith(img);
+					img.removeAttributes('class');
+
+					if (img.length > 0) {
+						node.replaceWith(img);
+						if (card.type === CardType.BLOCK) {
+							this.editor.node.wrap(
+								img,
+								$(`<p style="text-align:center;"></p>`),
+							);
+						}
+					}
 				} else node.remove();
 			},
 		);

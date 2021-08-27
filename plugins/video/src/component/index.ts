@@ -297,9 +297,9 @@ class VideoComponent extends Card<VideoValue> {
 					center.append(this.container);
 					this.initPlayer();
 				};
-				if (plugin.components[this.name]) {
+				if (plugin.components['video-uploader']) {
 					command.execute(
-						this.name,
+						'video-uploader',
 						'query',
 						video_id,
 						(data?: {

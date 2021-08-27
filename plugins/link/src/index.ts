@@ -172,12 +172,8 @@ export default class extends InlinePlugin<Options> {
 
 	parseHtml(root: NodeInterface) {
 		root.find(this.tagName).css({
-			'font-family': 'monospace',
 			'font-size': 'inherit',
-			'background-color': 'rgba(0,0,0,.06)',
 			padding: '0 2px',
-			border: '1px solid rgba(0,0,0,.08)',
-			'border-radius': '2px 2px',
 			'line-height': 'inherit',
 			'overflow-wrap': 'break-word',
 			'text-indent': '0',

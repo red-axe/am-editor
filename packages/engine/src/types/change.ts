@@ -98,7 +98,7 @@ export interface ChangeInterface {
 	combinTextNode(): void;
 	isComposing(): boolean;
 	isSelecting(): boolean;
-	initValue(): void;
+	initValue(range?: RangeInterface): void;
 	setValue(
 		value: string,
 		onParse?: (node: Node) => void,

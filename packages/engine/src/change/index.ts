@@ -275,14 +275,17 @@ class ChangeModel implements ChangeInterface {
 		return this.event.isSelecting;
 	}
 
-	initValue() {
+	initValue(range?: RangeInterface) {
 		const emptyHtml = '<p><br /></p>';
 		if (this.engine.container.html() === emptyHtml) return;
 		const node = $(emptyHtml);
 		this.engine.container.empty().append(node);
-		const range = this.getRange();
-		range.select(node, true).collapse(false);
-		this.apply(range);
+		const safeRange = range || this.getRange();
+
+		if (!range) {
+			safeRange.select(node, true).collapse(false);
+			this.apply(safeRange);
+		}
 	}
 
 	setValue(
@@ -944,7 +947,8 @@ class ChangeModel implements ChangeInterface {
 				return;
 			if (files.length === 0) {
 				setTimeout(() => {
-					pasteMarkdown(source);
+					// 如果 text 和 html 都有，就解析 text
+					pasteMarkdown(html && text ? text : source);
 				}, 200);
 				this.paste(source);
 			}
@@ -1266,10 +1270,11 @@ class ChangeModel implements ChangeInterface {
 	) {
 		const safeRange = range || this.getSafeRange();
 		if (safeRange.collapsed) {
-			if (this.isEmpty()) this.initValue();
+			if (this.isEmpty()) this.initValue(safeRange);
+			if (!range) this.apply(safeRange);
 			return;
 		}
-		const { mark, inline } = this.engine;
+		const { mark, inline, card } = this.engine;
 		const nodeApi = this.engine.node;
 		const blockApi = this.engine.block;
 		let cloneRange = safeRange.cloneRange();
@@ -1279,7 +1284,7 @@ class ChangeModel implements ChangeInterface {
 			safeRange.commonAncestorNode.isText() ? false : true,
 		);
 		// 获取上面第一个 Block
-		const block = blockApi.closest(
+		let block = blockApi.closest(
 			safeRange
 				.cloneRange()
 				.shrinkToElementNode()
@@ -1287,10 +1292,34 @@ class ChangeModel implements ChangeInterface {
 				.enlargeToElementNode().startNode,
 		);
 		// 获取的 block 超出编辑范围
-		if (!block.inEditor()) {
-			if (this.isEmpty()) this.initValue();
-			else if (!range) this.apply(safeRange);
+		if (!block.inEditor() && !block.isRoot()) {
+			if (this.isEmpty()) this.initValue(safeRange);
+			if (!range) this.apply(safeRange);
 			return;
+		}
+		// 选中开始节点是卡片，并且光标位置在根节点，就先删除卡片
+		if (block.isRoot()) {
+			let child = block.children().eq(safeRange.startOffset);
+			while (child?.isCard()) {
+				const isBreak =
+					child.equal(safeRange.endNode) ||
+					child.contains(safeRange.endNode);
+				const next = child.next() || undefined;
+				const component = card.find(child);
+				if (component) card.removeNode(component);
+				else child.remove();
+				if (isBreak) {
+					child = undefined;
+					return;
+				}
+				child = next;
+			}
+			if (!child) {
+				if (this.isEmpty()) this.initValue(safeRange);
+				if (!range) this.apply(safeRange);
+				return;
+			}
+			block = child;
 		}
 		// 先删除范围内的所有内容
 		safeRange.extractContents();
@@ -1302,8 +1331,8 @@ class ChangeModel implements ChangeInterface {
 			.enlargeToElementNode();
 		// 只删除了文本，不做处理
 		if (startNode.isText() || !block.inEditor()) {
-			if (this.isEmpty()) this.initValue();
-			else if (!range) this.apply(safeRange);
+			if (this.isEmpty()) this.initValue(safeRange);
+			if (!range) this.apply(safeRange);
 			return;
 		}
 
@@ -1336,8 +1365,8 @@ class ChangeModel implements ChangeInterface {
 				.shrinkToElementNode()
 				.shrinkToTextNode();
 			safeRange.collapse(false);
-			if (this.isEmpty()) this.initValue();
-			else if (!range) this.apply(safeRange);
+			if (this.isEmpty()) this.initValue(safeRange);
+			if (!range) this.apply(safeRange);
 			return;
 		}
 		//深度合并
@@ -1440,8 +1469,8 @@ class ChangeModel implements ChangeInterface {
 				safeRange.collapse(false);
 			}
 		}
-		if (this.isEmpty()) this.initValue();
-		else if (!range) this.apply(safeRange);
+		if (this.isEmpty()) this.initValue(safeRange);
+		if (!range) this.apply(safeRange);
 	}
 
 	/**

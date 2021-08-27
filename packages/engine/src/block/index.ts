@@ -573,7 +573,13 @@ class Block implements BlockModelInterface {
 				return true;
 			},
 		);
-
+		// 清空原父容器，用新的内容代替
+		const children = container.children();
+		children.each((_, index) => {
+			if (!children.eq(index)?.isCard()) {
+				children.eq(index)?.remove();
+			}
+		});
 		rightNodes.allChildren().forEach((child) => {
 			const rightNode = $(child);
 			if (
@@ -606,13 +612,6 @@ class Block implements BlockModelInterface {
 			!node.isEmpty(leftNodes) &&
 			!list.isEmptyItem(leftNodes)
 		) {
-			// 清空原父容器，用新的内容代替
-			const children = container.children();
-			children.each((_, index) => {
-				if (!children.eq(index)?.isCard()) {
-					children.eq(index)?.remove();
-				}
-			});
 			let appendChild: NodeInterface | undefined | null = undefined;
 			const appendToParent = (childrenNodes: NodeInterface) => {
 				childrenNodes.each((child, index) => {

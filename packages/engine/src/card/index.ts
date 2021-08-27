@@ -444,7 +444,7 @@ class CardModel implements CardModelInterface {
 		return this.insert(name, value);
 	}
 
-	remove(selector: NodeInterface | Node | string) {
+	remove(selector: NodeInterface | Node | string, hasModify: boolean = true) {
 		if (!isEngine(this.editor)) return;
 		const { change, list, node } = this.editor;
 		const range = change.getRange();
@@ -454,7 +454,7 @@ class CardModel implements CardModelInterface {
 			range.setEndAfter(card.root[0]);
 			range.collapse(false);
 		} else {
-			card.focusPrevBlock(range, true);
+			card.focusPrevBlock(range, hasModify);
 		}
 		const parent = card.root.parent();
 		this.removeNode(card);

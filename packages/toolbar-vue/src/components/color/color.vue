@@ -56,21 +56,23 @@ export default defineComponent({
     props:colorProps,
     setup(props){
         const visible = ref(false)
-        const getContent = () => {
-            return typeof props.content === 'string'
-                ? props.content
-                : props.content(
-                        props.defaultActiveColor,
-                        Palette.getStroke(props.defaultActiveColor),
-                        props.disabled,
-                )
-        }
-        const buttonContent = ref(getContent())
 
         const buttonRef = ref<HTMLDivElement | null>(null)
         const isRight = useRight(buttonRef)
   
         const currentColor = ref(props.defaultActiveColor);
+
+        const getContent = () => {
+            return typeof props.content === 'string'
+                ? props.content
+                : props.content(
+                        currentColor.value,
+                        Palette.getStroke(currentColor.value),
+                        props.disabled,
+                )
+        }
+
+        const buttonContent = ref(getContent())
 
         const toggleDropdown = (event: MouseEvent) => {
             event.preventDefault();

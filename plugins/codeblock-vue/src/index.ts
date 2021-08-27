@@ -130,7 +130,11 @@ export default class extends Plugin<Options> {
 
 	pasteHtml(node: NodeInterface) {
 		if (!isEngine(this.editor)) return;
-		if (node.attributes('data-syntax') || node.first()?.name === 'code') {
+		if (
+			(!node.isText() &&
+				node.get<HTMLElement>()?.hasAttribute('data-syntax')) ||
+			node.first()?.name === 'code'
+		) {
 			let code = new Parser(node, this.editor).toText();
 			code = unescape(code);
 			this.editor.card.replaceNode(node, 'codeblock', {
