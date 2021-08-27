@@ -193,20 +193,15 @@ class Image {
 		copyNode.on('mouseleave', () => {
 			Tooltip.hide();
 		});
-		copyNode.on(
-			isMobile ? 'touchstart' : 'mousedown',
-			(event: MouseEvent) => {
-				event.stopPropagation();
-				event.preventDefault();
-				Tooltip.hide();
-				this.editor.clipboard.copy(
-					this.options.message || 'Error message',
-				);
-				this.editor.messageSuccess(
-					this.editor.language.get('copy', 'success').toString(),
-				);
-			},
-		);
+		copyNode.on('click', (event: MouseEvent) => {
+			event.stopPropagation();
+			event.preventDefault();
+			Tooltip.hide();
+			this.editor.clipboard.copy(this.options.message || 'Error message');
+			this.editor.messageSuccess(
+				this.editor.language.get('copy', 'success').toString(),
+			);
+		});
 	}
 
 	setProgressPercent(percent: number) {
@@ -554,16 +549,12 @@ class Image {
 			if (!isEngine(this.editor)) {
 				const link = this.image.closest('a');
 				if (link.length === 0) {
-					this.image.on(isMobile ? 'touchstart' : 'click', (event) =>
-						this.openZoom(event),
-					);
+					this.image.on('click', (event) => this.openZoom(event));
 				}
 			}
 			// 无链接
 			this.image.on('dblclick', (event) => this.openZoom(event));
-			this.maximize.on(isMobile ? 'touchstart' : 'click', (event) =>
-				this.openZoom(event),
-			);
+			this.maximize.on('click', (event) => this.openZoom(event));
 		}
 
 		// 避免图片抖动，让加载过程比较好看
