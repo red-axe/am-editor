@@ -127,8 +127,14 @@ class Table extends Plugin<Options> {
 	pasteHtml(node: NodeInterface) {
 		if (!isEngine(this.editor)) return;
 		if (node.name === 'table') {
-			node.find('td').each((td) => {
-				this.editor.node.normalize($(td));
+			const tds = node.find('td');
+			const wrapNode = $('<div></div>');
+			tds.each((td) => {
+				const tdElement = td as Element;
+				wrapNode.html(tdElement.innerHTML);
+				// 对单元格内的内容标准化
+				this.editor.node.normalize(wrapNode);
+				tdElement.innerHTML = wrapNode.html();
 			});
 			this.editor.card.replaceNode(node, TableComponent.cardName, {
 				html: node

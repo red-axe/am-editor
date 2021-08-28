@@ -575,11 +575,15 @@ class Block implements BlockModelInterface {
 		);
 		// 清空原父容器，用新的内容代替
 		const children = container.children();
-		children.each((_, index) => {
-			if (!children.eq(index)?.isCard()) {
-				children.eq(index)?.remove();
-			}
-		});
+		if (!node.isEmpty(container)) {
+			children.each((_, index) => {
+				const child = children.eq(index);
+				if (!child?.isCard()) {
+					children.eq(index)?.remove();
+				}
+			});
+		}
+
 		rightNodes.allChildren().forEach((child) => {
 			const rightNode = $(child);
 			if (
