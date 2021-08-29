@@ -59,6 +59,18 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 		};
 	}, []);
 
+	useEffect(() => {
+		setButtonContent(
+			typeof content === 'string'
+				? content
+				: content(
+						currentColor,
+						Palette.getStroke(currentColor),
+						disabled,
+				  ),
+		);
+	}, [content, disabled, currentColor]);
+
 	const toggleDropdown = (event: React.MouseEvent) => {
 		event.preventDefault();
 
@@ -88,11 +100,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 
 	const triggerSelect = (color: string, event: React.MouseEvent) => {
 		setCurrentColor(color);
-		setButtonContent(
-			typeof content === 'string'
-				? content
-				: content(color, Palette.getStroke(color), disabled),
-		);
+
 		if (autoExecute !== false) {
 			let commandName = name;
 			let commandArgs = [color, defaultColor];

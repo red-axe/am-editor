@@ -552,7 +552,8 @@ class NodeEntry implements NodeInterface {
 
 		this.each((node) => {
 			const element = node as Element;
-			element.setAttribute(key, val.toString());
+			if (key === 'style' && val === '') element.removeAttribute('style');
+			else element.setAttribute(key, val.toString());
 		});
 		return this;
 	}
@@ -658,6 +659,7 @@ class NodeEntry implements NodeInterface {
 		this.each((node) => {
 			const element = <HTMLElement>node;
 			element.style[toCamelCase(key)] = val.toString();
+			if (element.style.length === 0) element.removeAttribute('style');
 		});
 		return this;
 	}

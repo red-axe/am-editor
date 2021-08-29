@@ -1,4 +1,4 @@
-import { CARD_KEY, CARD_SELECTOR } from '../constants';
+import { CARD_KEY } from '../constants';
 import Range from '../range';
 import {
 	EditorInterface,
@@ -7,7 +7,6 @@ import {
 	PluginEntry,
 	RangeInterface,
 	isNode,
-	CardEntry,
 } from '../types';
 import { ListInterface, ListModelInterface } from '../types/list';
 import { getWindow, removeUnit } from '../utils';
@@ -28,6 +27,11 @@ class List implements ListModelInterface {
 	 * 列表缩进key
 	 */
 	readonly INDENT_KEY = 'data-indent';
+	/**
+	 * 列表项point位置
+	 */
+	readonly STYLE_POSITION_NAME = 'list-style-position';
+	readonly STYLE_POSITION_VALUE = 'inside';
 
 	constructor(editor: EditorInterface) {
 		this.editor = editor;
@@ -243,11 +247,16 @@ class List implements ListModelInterface {
 	/**
 	 * 取消节点的列表
 	 * @param blocks 节点集合
+	 * @param normalBlock 要转换的block默认为 <p />
 	 */
-	unwrap(blocks: Array<NodeInterface>) {
+	unwrap(
+		blocks: Array<NodeInterface>,
+		normalBlock: NodeInterface = $('<p />'),
+	) {
 		let indent = 0;
-		const { node } = this.editor;
-		const normalBlock = $('<p />');
+		const { node, schema } = this.editor;
+		const globals = schema.data.globals['block'] || {};
+		const globalStyles = globals.style || {};
 		blocks.forEach((block) => {
 			this.unwrapCustomize(block);
 			if (node.isList(block)) {
@@ -260,6 +269,24 @@ class List implements ListModelInterface {
 				if (indent !== 0) {
 					toBlock.css('text-indent', indent * 2 + 'em');
 				}
+				block.removeAttributes(this.INDENT_KEY);
+				const attributes = block.attributes();
+				Object.keys(attributes).forEach((name) => {
+					if (name !== 'data-id' && name !== 'id' && globals[name]) {
+						toBlock.attributes(name, attributes[name]);
+					}
+				});
+				const styles = block.css();
+				if (styles['text-align'])
+					this.addAlign(toBlock, styles['text-align'] as any);
+				delete styles['text-align'];
+				// 移除align样式
+				styles[this.STYLE_POSITION_NAME] = '';
+				// 移除不符合全局条件的样式
+				Object.keys(styles).forEach((name) => {
+					if (!globalStyles[name]) styles[name] = '';
+				});
+				toBlock.css(styles);
 				node.replace(block, toBlock);
 			}
 		});
@@ -552,6 +579,28 @@ class List implements ListModelInterface {
 		return 0;
 	}
 	/**
+	 * 给列表节点增加文字方向
+	 * @param block 列表项节点
+	 * @param align 方向
+	 * @returns
+	 */
+	addAlign(
+		block: NodeInterface,
+		align?: 'left' | 'center' | 'right' | 'justify',
+	) {
+		if (block.name !== 'li') return;
+		if (align && align !== 'left') {
+			if (['center', 'right'].indexOf(align) > -1) {
+				block.css({
+					[this.STYLE_POSITION_NAME]: this.STYLE_POSITION_VALUE,
+				});
+			}
+			block.css({ 'text-align': align });
+		} else {
+			block.css({ [this.STYLE_POSITION_NAME]: '', 'text-align': '' });
+		}
+	}
+	/**
 	 * 为自定义列表项添加卡片节点
 	 * @param node 列表节点项
 	 * @param cardName 卡片名称，必须是支持inline卡片类型
@@ -668,6 +717,59 @@ class List implements ListModelInterface {
 		}
 	}
 	/**
+	 * block 节点转换为列表项节点
+	 * @param block block 节点
+	 * @param root 列表根节点
+	 * @param cardName 可选，自定义列表项卡片名称
+	 * @param value 可选，自定义列表项卡片值
+	 * @returns
+	 */
+	blockToItem(
+		block: NodeInterface,
+		root: NodeInterface,
+		cardName?: string,
+		value?: string,
+	) {
+		const item = $('<li></li>');
+		const { node, schema } = this.editor;
+		if (!node.isList(root)) return root;
+		// 获取缩进
+		const indent = removeUnit(block.css('text-indent')) / 2;
+		// 复制全局属性
+		const globals = schema.data.globals['block'] || {};
+		const attributes = block.attributes();
+		Object.keys(attributes).forEach((name) => {
+			if (name !== 'data-id' && name !== 'id' && globals['name']) {
+				item.attributes(name, attributes[name]);
+			}
+		});
+		// 复制全局样式，及生成 text-align
+		const globalStyles = globals.style || {};
+		const styles = block.css();
+		if (styles['text-align'])
+			this.addAlign(item, styles['text-align'] as any);
+		delete styles['text-align'];
+		delete styles[this.STYLE_POSITION_NAME];
+		Object.keys(styles).forEach((name) => {
+			if (!globalStyles[name]) delete styles[name];
+		});
+		item.css(styles);
+		// 替换
+		block = node.replace(block, item);
+		// 如果是自定义列表，增加卡片
+		if (cardName) {
+			block.addClass(this.CUSTOMZIE_LI_CLASS);
+			this.addCardToCustomize(block, cardName, value);
+		}
+		// 如果有设置缩进，就设置缩进属性
+		if (indent) {
+			root.attributes(this.INDENT_KEY, indent);
+		}
+
+		return node.wrap(block, root);
+	}
+
+	/**
 	 * 将节点转换为自定义节点
 	 * @param blocks 节点
 	 * @param cardName 卡片名称
@@ -689,9 +791,7 @@ class List implements ListModelInterface {
 			});
 			return nodes;
 		} else {
-			let indent;
 			const customizeRoot = $(`<ul class="${this.CUSTOMZIE_UL_CLASS}"/>`);
-			const customizeItem = $(`<li class="${this.CUSTOMZIE_LI_CLASS}"/>`);
 			switch (blocks.name) {
 				case 'li':
 					blocks.addClass(this.CUSTOMZIE_LI_CLASS);
@@ -706,23 +806,21 @@ class List implements ListModelInterface {
 					customizeRoot.attributes(blocks.attributes());
 					blocks = node.replace(blocks, customizeRoot);
 					return blocks;
-
-				case 'p':
-					indent = removeUnit(blocks.css('text-indent')) / 2;
-					blocks = node.replace(blocks, customizeItem);
-					this.addCardToCustomize(blocks, cardName, value);
-
-					if (indent) {
-						customizeRoot.attributes(this.INDENT_KEY, indent);
-					}
-
-					blocks = node.wrap(blocks, customizeRoot);
-					return blocks;
 				default:
-					if (node.isSimpleBlock(blocks) && !blocks.isBlockCard()) {
-						blocks = node.replace(blocks, customizeItem);
-						this.addCardToCustomize(blocks, cardName, value);
-						blocks = node.wrap(blocks, customizeRoot);
+					if (
+						blocks.name === 'p' ||
+						(node.isSimpleBlock(blocks) && !blocks.isBlockCard())
+					) {
+						if (blocks.parent()?.name === 'li') {
+							node.unwrap(blocks);
+							return blocks;
+						}
+						blocks = this.blockToItem(
+							blocks,
+							customizeRoot,
+							cardName,
+							value,
+						);
 					}
 					return blocks;
 			}
@@ -749,9 +847,7 @@ class List implements ListModelInterface {
 			return nodes;
 		} else {
 			this.unwrapCustomize(blocks);
-			let indent;
 			const targetNode = $('<'.concat(tagName, ' />'));
-			const itemNode = $('<li />');
 
 			switch (blocks.name) {
 				case 'li':
@@ -765,29 +861,19 @@ class List implements ListModelInterface {
 						targetNode.removeAttributes('start');
 					blocks = node.replace(blocks, targetNode);
 					return blocks;
-
-				case 'p':
-					if (blocks.parent()?.name === 'li') {
-						node.unwrap(blocks);
-						return blocks;
-					}
-
-					indent = removeUnit(blocks.css('text-indent')) / 2;
-					blocks = node.replace(blocks, itemNode);
-
-					if (indent) {
-						targetNode.attributes(this.INDENT_KEY, indent);
-					}
-
-					if (start) {
-						targetNode.attributes('start', start);
-					}
-					blocks = node.wrap(blocks, targetNode);
-					return blocks;
 				default:
-					if (node.isSimpleBlock(blocks) && !blocks.isBlockCard()) {
-						blocks = node.replace(blocks, itemNode);
-						blocks = node.wrap(blocks, targetNode);
+					if (
+						blocks.name === 'p' ||
+						(node.isSimpleBlock(blocks) && !blocks.isBlockCard())
+					) {
+						if (blocks.parent()?.name === 'li') {
+							node.unwrap(blocks);
+							return blocks;
+						}
+						blocks = this.blockToItem(blocks, targetNode);
+						if (start) {
+							targetNode.attributes('start', start);
+						}
 					}
 					return blocks;
 			}

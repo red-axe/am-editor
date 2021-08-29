@@ -19,10 +19,13 @@ export default class extends ElementPlugin<Options> {
 
 	style = {
 		'text-align': '@var0',
+		// 列表节点前的符号位置
+		'list-style-position': '@var1',
 	};
 
 	variable = {
 		'@var0': ['left', 'center', 'right', 'justify'],
+		'@var1': ['outside', 'inside'],
 	};
 
 	static get pluginName() {
@@ -33,31 +36,21 @@ export default class extends ElementPlugin<Options> {
 		super.init();
 		this.editor.on('keydown:backspace', (event) => this.onBackspace(event));
 	}
-	repairListStylePosition(blocks: Array<NodeInterface>, align: string) {
-		if (!blocks || blocks.length === 0) {
-			return;
-		}
 
-		blocks.forEach((block) => {
-			if (block.name === 'li') {
-				if (align === 'left') {
-					block.css('list-style-position', 'outside');
-				} else {
-					block.css('list-style-position', 'inside');
-				}
-			}
-		});
-	}
-
-	execute(align: 'left' | 'center' | 'right' | 'justify') {
+	execute(align?: 'left' | 'center' | 'right' | 'justify') {
 		if (!isEngine(this.editor) || this.editor.readonly) return;
 		const { change, block } = this.editor;
 		block.setBlocks({
 			style: {
-				'text-align': align,
+				'text-align':
+					!align || ['left'].indexOf(align) > -1 ? '' : align,
 			},
 		});
-		this.repairListStylePosition(change.blocks, align);
+		change.blocks.forEach((block) => {
+			if (block.name === 'li') {
+				this.editor.list.addAlign(block, align);
+			}
+		});
 	}
 
 	queryState() {

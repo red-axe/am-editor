@@ -38,6 +38,7 @@
 
 .am-engine li,.am-engine-view li {
 	margin-left: 23px;
+    position: relative;
 }
 
 .am-engine ol,.am-engine-view ol,.am-engine ol[data-indent="3"],.am-engine-view ol[data-indent="3"],.am-engine ol[data-indent="6"],.am-engine-view ol[data-indent="6"] {

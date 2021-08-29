@@ -489,7 +489,9 @@ class NodeModel implements NodeModelInterface {
 		});
 		if (typeof style === 'number') style = {};
 		if (typeof style === 'string') style = getStyleMap(style);
-		Object.keys(style || {}).forEach((key) => {
+		style = style || {};
+		const keys = Object.keys(style);
+		keys.forEach((key) => {
 			let val = (<{ [k: string]: string | number }>style)[key];
 			if (/^0(px|em)?$/.test(val.toString())) {
 				val = '';
@@ -497,6 +499,10 @@ class NodeModel implements NodeModelInterface {
 
 			node.css(key, val.toString());
 		});
+
+		if (keys.length === 0 || Object.keys(node.css()).length === 0) {
+			node.removeAttributes('style');
+		}
 
 		return node;
 	}

@@ -76,8 +76,9 @@ export interface ListModelInterface {
 	/**
 	 * 取消节点的列表
 	 * @param blocks 节点集合
+	 * @param normalBlock 要转换的block默认为 <p />
 	 */
-	unwrap(blocks: Array<NodeInterface>): void;
+	unwrap(blocks: Array<NodeInterface>, normalBlock?: NodeInterface): void;
 	/**
 	 * 获取当前选区的修复列表后的节点集合
 	 */
@@ -102,6 +103,16 @@ export interface ListModelInterface {
 	 * @param value 缩进值
 	 */
 	addIndent(block: NodeInterface, value: number, maxValue?: number): void;
+	/**
+	 * 给列表节点增加文字方向
+	 * @param block 列表项节点
+	 * @param align 方向
+	 * @returns
+	 */
+	addAlign(
+		block: NodeInterface,
+		align?: 'left' | 'center' | 'right' | 'justify',
+	): void;
 
 	/**
 	 * 获取列表节点 indent 值
@@ -137,6 +148,20 @@ export interface ListModelInterface {
 	 * @param node 列表节点项
 	 */
 	addBr(node: NodeInterface): void;
+	/**
+	 * block 节点转换为列表项节点
+	 * @param block block 节点
+	 * @param root 列表根节点
+	 * @param cardName 可选，自定义列表项卡片名称
+	 * @param value 可选，自定义列表项卡片值
+	 * @returns root 根节点
+	 */
+	blockToItem(
+		block: NodeInterface,
+		root: NodeInterface,
+		cardName?: string,
+		value?: string,
+	): NodeInterface;
 	/**
 	 * 将节点转换为自定义节点
 	 * @param blocks 节点
