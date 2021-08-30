@@ -404,6 +404,18 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			rowsHeader.replaceWith(
 				$(this.template.renderRowsHeader(value?.rows || 0)),
 			);
+			setTimeout(() => {
+				// 找到所有可编辑节点，对没有 contenteditable 属性的节点添加contenteditable一下
+				this.wrapper?.find(EDITABLE_SELECTOR).each((editableNode) => {
+					const editableElement = editableNode as Element;
+					if (!editableElement.hasAttribute('contenteditable')) {
+						editableElement.setAttribute(
+							'contenteditable',
+							Template.isReadonly ? 'false' : 'true',
+						);
+					}
+				});
+			}, 10);
 			return;
 		}
 		// 第一次渲染

@@ -759,6 +759,7 @@ class Mark implements MarkModelInterface {
 			nodes.push(commonAncestorNode);
 		}
 		const nodeApi = node;
+		const plugin = this.findPlugin(mark);
 		if (
 			safeRange.collapsed &&
 			(!isEditable || !card?.getSelectionNodes || nodes.length === 1)
@@ -768,15 +769,17 @@ class Mark implements MarkModelInterface {
 			//在相通插件下，值不同，插入到同级，不做嵌套
 			const { startNode } = safeRange.shrinkToTextNode();
 			let parent = startNode.parent();
+			const levalNodes: NodeInterface[] = [];
+			let isPushMark = false;
 			if (startNode.isText()) {
-				const plugin = this.findPlugin(mark);
 				let result = false;
 				while (parent && nodeApi.isMark(parent)) {
 					if (this.compare(parent.clone(), mark, true)) {
 						result = true;
 						break;
-					} else if (parent.children().length === 1) {
-						const curPlugin = this.findPlugin(parent);
+					}
+					const curPlugin = this.findPlugin(parent);
+					if (parent.children().length === 1) {
 						//插件一样，并且并表明要合并值
 						if (
 							plugin &&
@@ -794,9 +797,28 @@ class Mark implements MarkModelInterface {
 							break;
 						}
 					}
+					// 要插入的mark节点大于当前节点
+					if (
+						plugin &&
+						(!curPlugin || plugin.mergeLeval > curPlugin.mergeLeval)
+					) {
+						levalNodes.push(parent.clone(false));
+					} else if (!isPushMark && levalNodes.length > 0) {
+						levalNodes.push(mark.clone(false));
+						isPushMark = true;
+					}
 					parent = parent.parent();
 				}
 				if (result) return;
+			}
+			if (levalNodes.length > 0) {
+				let newMark = levalNodes[0];
+				newMark.append(mark.children());
+				for (let i = 1; i < levalNodes.length; i++) {
+					newMark = nodeApi.wrap(newMark, levalNodes[i]);
+				}
+				mark = isPushMark ? newMark : nodeApi.wrap(newMark, mark);
+				this.split(safeRange);
 			}
 			nodeApi.insert(mark, safeRange);
 			this.merge(safeRange);
@@ -835,14 +857,21 @@ class Mark implements MarkModelInterface {
 								started = false;
 								return false;
 							}
+							// 要包裹的节点是mark
 							if (nodeApi.isMark(child)) {
 								if (!nodeApi.isEmpty(child)) {
 									//找到最底层mark标签添加包裹，<strong><span style="font-size:16px">abc</span></strong> ，在 span 节点中的text再添加包裹，不在strong外添加包裹
 									let targetNode = child;
 									let targetChildrens = targetNode.children();
+									const curPlugin =
+										this.findPlugin(targetNode);
 									while (
 										nodeApi.isMark(targetNode) &&
-										targetChildrens.length === 1
+										targetChildrens.length === 1 &&
+										plugin &&
+										curPlugin &&
+										plugin.mergeLeval <=
+											curPlugin.mergeLeval
 									) {
 										const targetChild =
 											targetChildrens.eq(0)!;
@@ -858,7 +887,6 @@ class Mark implements MarkModelInterface {
 									let parent = targetNode.parent();
 									//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
 									if (targetNode.isText()) {
-										const plugin = this.findPlugin(mark);
 										let result = false;
 										while (
 											parent &&

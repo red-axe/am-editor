@@ -16,6 +16,8 @@ export default class extends MarkPlugin<Options> {
 		return 'fontsize';
 	}
 
+	readonly mergeLeval = 2;
+
 	tagName = 'span';
 
 	style = {

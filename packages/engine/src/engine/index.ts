@@ -319,6 +319,8 @@ class Engine implements EngineInterface {
 			callback?: (count: number) => void;
 		},
 	) {
+		const range = this.change.getRange();
+		if (!range.commonAncestorNode.inEditor()) this.focus();
 		this.change.setHtml(html, options);
 		return this;
 	}

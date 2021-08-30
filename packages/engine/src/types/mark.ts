@@ -123,6 +123,10 @@ export interface MarkInterface extends ElementPluginInterface {
 	 * 如果合并值，就是 <span a="1,2">abc</span> 否则就是 <span a="2">abc</span>
 	 */
 	readonly combineValueByWrap?: boolean;
+	/**
+	 * 合并级别，值越大就合并在越外围，默认为1
+	 */
+	readonly mergeLeval: number;
 
 	init(): void;
 

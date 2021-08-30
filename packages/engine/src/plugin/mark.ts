@@ -8,8 +8,10 @@ import {
 } from '../types';
 import { $ } from '../node';
 
-abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
-	implements MarkInterface {
+abstract class MarkEntry<T extends {} = {}>
+	extends ElementPluginEntry<T>
+	implements MarkInterface
+{
 	readonly kind: string = 'mark';
 	/**
 	 * 标签名称
@@ -41,12 +43,16 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	 * 如果合并值，就是 <span a="1,2">abc</span> 否则就是 <span a="2">abc</span>
 	 */
 	readonly combineValueByWrap: boolean = false;
+	/**
+	 * 合并级别，值越大就合并在越外围
+	 */
+	readonly mergeLeval: number = 1;
 
 	init() {
 		super.init();
 		const editor = this.editor;
 		if (isEngine(editor) && this.markdown) {
-			editor.on('paste:markdown', node => this.pasteMarkdown(node));
+			editor.on('paste:markdown', (node) => this.pasteMarkdown(node));
 		}
 	}
 
@@ -75,10 +81,10 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 		const { change } = this.editor;
 		//如果没有属性和样式限制，直接查询是否包含当前标签名称
 		if (!this.style && !this.attributes)
-			return change.marks.some(node => node.name === this.tagName);
+			return change.marks.some((node) => node.name === this.tagName);
 		//获取属性和样式限制内的值集合
 		const values: Array<string> = [];
-		change.marks.forEach(node => {
+		change.marks.forEach((node) => {
 			values.push(...Object.values(this.getStyle(node)));
 			values.push(...Object.values(this.getAttributes(node)));
 		});
@@ -88,7 +94,7 @@ abstract class MarkEntry<T extends {} = {}> extends ElementPluginEntry<T>
 	schema(): SchemaMark | Array<SchemaMark> {
 		const schema = super.schema();
 		if (Array.isArray(schema)) {
-			return schema.map(schema => {
+			return schema.map((schema) => {
 				return {
 					...schema,
 				} as SchemaMark;

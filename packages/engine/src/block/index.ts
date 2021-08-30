@@ -723,10 +723,11 @@ class Block implements BlockModelInterface {
 						const markPlugin = mark.findPlugin(markNode);
 						if (!markPlugin) return;
 						if (
-							targetPlugin.disableMark?.indexOf(
+							targetPlugin.disableMark &&
+							targetPlugin.disableMark.indexOf(
 								(markPlugin.constructor as PluginEntry)
 									.pluginName,
-							)
+							) > -1
 						) {
 							node.unwrap(markNode);
 						}
