@@ -6,7 +6,7 @@ import { EngineInterface } from '../types/engine';
 import { Op, Path, StringInsertOp } from 'sharedb';
 import { ApplierInterface, RemoteAttr, RemotePath } from '../types/ot';
 import { isNodeEntry, NodeInterface } from '../types/node';
-import { getWindow } from '../utils';
+import { getDocument, getWindow } from '../utils';
 import { isTransientElement } from './utils';
 import { $ } from '../node';
 
@@ -412,6 +412,17 @@ class Applier implements ApplierInterface {
 					endClone,
 					(child) => !isTransientElement($(child)),
 				);
+				const getMaxOffset = (node: Node, offset: number) => {
+					if (node.nodeType === getDocument().TEXT_NODE) {
+						const text = node.textContent || '';
+						return text.length < offset ? text.length : offset;
+					} else {
+						const childNodes = node.childNodes;
+						return childNodes.length < offset
+							? childNodes.length
+							: offset;
+					}
+				};
 				try {
 					const range = change.getRange();
 					if (
@@ -420,8 +431,14 @@ class Applier implements ApplierInterface {
 					) {
 						range.select(startChild).collapse(false);
 					} else {
-						range.setStart(startChild, beginOffset);
-						range.setEnd(endChild, endOffset);
+						range.setStart(
+							startChild,
+							getMaxOffset(startChild, beginOffset),
+						);
+						range.setEnd(
+							endChild,
+							getMaxOffset(endChild, endOffset),
+						);
 					}
 					change.select(range);
 					range.scrollRangeIntoView();

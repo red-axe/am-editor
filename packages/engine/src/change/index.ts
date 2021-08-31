@@ -1236,10 +1236,6 @@ class ChangeModel implements ChangeInterface {
 				clearList(_lastNode, _firstNode);
 				nodeApi.merge(_lastNode, _firstNode, false);
 				removeEmptyNode(_firstNode);
-			} else {
-				if (nodeApi.isEmpty(_lastNode) || list.isEmptyItem(_lastNode)) {
-					removeEmptyNode(_lastNode);
-				}
 			}
 		}
 		if (endNode) {

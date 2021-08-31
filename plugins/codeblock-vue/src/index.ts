@@ -156,7 +156,7 @@ export default class extends Plugin<Options> {
 		const { card } = this.editor;
 
 		let newText = '';
-		const nameMaps = {};
+		const nameMaps: { [key: string]: string } = {};
 		CodeBlockComponent.getModes().forEach((item) => {
 			nameMaps[item.value] = item.name;
 		});
@@ -231,7 +231,7 @@ export default class extends Plugin<Options> {
 				const value = card?.getValue();
 				if (value && value.code) {
 					node.empty();
-					const synatxMap = {};
+					const synatxMap: { [key: string]: string } = {};
 					CodeBlockComponent.getModes().forEach((item) => {
 						synatxMap[item.value] = item.syntax;
 					});

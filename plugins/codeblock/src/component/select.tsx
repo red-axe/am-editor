@@ -41,7 +41,7 @@ const LanguageSelect: React.FC<Options> = ({
 				return (
 					<Select.Option
 						name={item.name}
-						value={item.value}
+						value={item.syntax}
 						key={item.value}
 					>
 						{item.name}

@@ -94,14 +94,15 @@ class CodeBlcok extends Card<CodeBlockValue> {
 				didMount: (node) => {
 					// 等待编辑插件渲染成功后才能去到mode
 					setTimeout(() => {
+						console.log(32435);
 						renderSelect(
 							node.get<HTMLElement>()!,
 							(this.constructor as typeof CodeBlcok).getModes(),
 							this.codeEditor?.mode || 'plain',
 							(mode) => {
-								this.codeEditor?.update(mode);
 								setTimeout(() => {
-									this.codeEditor?.focus();
+									this.focusEditor();
+									this.codeEditor?.update(mode);
 								}, 10);
 							},
 						);
@@ -129,6 +130,8 @@ class CodeBlcok extends Card<CodeBlockValue> {
 			}
 			setTimeout(() => {
 				this.mirror = this.codeEditor?.create(mode, code);
+				// 创建后更新一下toolbar，不然无法选择语言
+				if (this.activated) this.toolbarModel?.show();
 			}, 50);
 		} else {
 			this.codeEditor.render(mode, code);
