@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-alignment",
-  "version": "2.3.24",
+  "version": "2.3.25",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.3.24",
+    "@aomao/engine": "^2.3.25",
     "@babel/runtime": "^7.13.10"
   }
 }
