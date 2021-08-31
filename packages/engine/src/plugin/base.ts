@@ -1,3 +1,4 @@
+import { CardInterface } from '../types/card';
 import { EditorInterface } from '../types/engine';
 import { PluginOptions, PluginInterface } from '../types/plugin';
 
@@ -42,8 +43,17 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 		| { key: string; args: any }
 		| Array<{ key: string; args: any }>
 		| Array<string>;
-
-	async waiting?(): Promise<void>;
+	/**
+	 * 插件等待动作
+	 * @param callback 有待等待的动作时回调
+	 */
+	async waiting?(
+		callback?: (
+			name: string,
+			card?: CardInterface,
+			...args: any
+		) => boolean | number | void,
+	): Promise<void>;
 }
 
 export default PluginEntry;

@@ -118,10 +118,19 @@ const EditorComponent: React.FC<EditorProps> = ({
 	const userSave = useCallback(() => {
 		if (!engine.current) return;
 		//获取异步的值，有些组件可能还在处理中，比如正在上传
-		engine.current.getValueAsync().then((value) => {
-			setValue(value);
-			save();
-		});
+		console.time('value-async');
+		engine.current
+			.getValueAsync(false, (pluginName, card) => {
+				console.log(`${pluginName} 正在等待...`, card?.getValue());
+			})
+			.then((value) => {
+				console.timeEnd('value-async');
+				setValue(value);
+				save();
+			})
+			.catch((data) => {
+				console.log('终止保存：', data.name, data.card?.getValue());
+			});
 	}, [engine, save]);
 
 	useEffect(() => {

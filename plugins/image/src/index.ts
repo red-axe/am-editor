@@ -1,4 +1,13 @@
-import { $, CardType, CARD_KEY, NodeInterface, Plugin } from '@aomao/engine';
+import {
+	$,
+	CardEntry,
+	CardInterface,
+	CardType,
+	CARD_KEY,
+	NodeInterface,
+	Plugin,
+	PluginEntry,
+} from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 import ImageUploader from './uploader';
 import locales from './locales';
@@ -7,8 +16,6 @@ export default class extends Plugin {
 	static get pluginName() {
 		return 'image';
 	}
-
-	private components: Array<ImageComponent> = [];
 
 	init() {
 		this.editor.language.add(locales);
@@ -29,38 +36,73 @@ export default class extends Plugin {
 			value.src = '';
 			value.message = src;
 		}
-		const component = this.editor.card.insert(
-			'image',
-			value,
-		) as ImageComponent;
-		this.components.push(component);
+		this.editor.card.insert('image', value);
 	}
 
-	async waiting(): Promise<void> {
-		const check = () => {
-			return this.components.every((component, index) => {
-				const value = component.getValue();
-				if (value?.status !== 'uploading') return true;
-
-				const isDestroy = !component.root.inEditor();
-				if (isDestroy) this.components.splice(index, 1);
-
-				return isDestroy;
+	async waiting(
+		callback?: (
+			name: string,
+			card?: CardInterface,
+			...args: any
+		) => boolean | number | void,
+	): Promise<void> {
+		const { card } = this.editor;
+		// 检测单个组件
+		const check = (component: CardInterface) => {
+			return (
+				component.root.inEditor() &&
+				(component.constructor as CardEntry).cardName ===
+					ImageComponent.cardName &&
+				(component as ImageComponent).getValue()?.status === 'uploading'
+			);
+		};
+		// 找到不合格的组件
+		const find = (): CardInterface | undefined => {
+			return card.components.find(check);
+		};
+		const waitCheck = (component: CardInterface): Promise<void> => {
+			let time = 60000;
+			return new Promise((resolve, reject) => {
+				if (callback) {
+					const result = callback(
+						(this.constructor as PluginEntry).pluginName,
+						component,
+					);
+					if (result === false) {
+						return reject({
+							name: (this.constructor as PluginEntry).pluginName,
+							card: component,
+						});
+					} else if (typeof result === 'number') {
+						time = result;
+					}
+				}
+				const beginTime = new Date().getTime();
+				const now = new Date().getTime();
+				const timeout = () => {
+					if (now - beginTime >= time) return resolve();
+					setTimeout(() => {
+						if (check(component)) timeout();
+						else resolve();
+					}, 10);
+				};
+				timeout();
 			});
 		};
-		return check()
-			? Promise.resolve()
-			: new Promise((resolve) => {
-					let time = 0;
-					const wait = () => {
-						setTimeout(() => {
-							if (check() || time > 100) resolve();
-							else wait();
-							time += 1;
-						}, 50);
-					};
-					wait();
-			  });
+		return new Promise(async (resolve, reject) => {
+			const component = find();
+			const wait = (component: CardInterface) => {
+				waitCheck(component)
+					.then(() => {
+						const next = find();
+						if (next) wait(next);
+						else resolve();
+					})
+					.catch(reject);
+			};
+			if (component) wait(component);
+			else resolve();
+		});
 	}
 
 	parseHtml(root: NodeInterface) {

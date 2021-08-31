@@ -365,6 +365,10 @@ export interface CardModelInterface {
 	 */
 	readonly active: CardInterface | undefined;
 	/**
+	 * 当前卡片实例集合
+	 */
+	readonly components: Array<CardInterface>;
+	/**
 	 * 当前卡片实例长度
 	 */
 	readonly length: number;

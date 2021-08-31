@@ -149,7 +149,7 @@ export default class extends Plugin<Options> {
 				this.pasteMarkdown(child),
 			);
 		}
-		let { accept } = this.options.file||{};
+		let { accept } = this.options.file || {};
 		const names: Array<string> = [];
 		if (typeof accept === 'string') accept = accept.split(',');
 
@@ -208,29 +208,6 @@ export default class extends Plugin<Options> {
 				this.editor.card.update(id, value);
 			}
 		};
-	}
-
-	async waiting(): Promise<void> {
-		const check = () => {
-			return Object.keys(this.cardComponents).every((key) => {
-				const component = this.cardComponents[key];
-				const value = component.getValue();
-				return value?.status !== 'uploading';
-			});
-		};
-		return check()
-			? Promise.resolve()
-			: new Promise((resolve) => {
-					let time = 0;
-					const wait = () => {
-						setTimeout(() => {
-							if (check() || time > 100) resolve();
-							else wait();
-							time += 1;
-						}, 50);
-					};
-					wait();
-			  });
 	}
 
 	async execute(files?: Array<File> | string | MouseEvent) {

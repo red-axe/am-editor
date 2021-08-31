@@ -121,29 +121,6 @@ export default class extends Plugin<Options> {
 		if (names.length > 0) this.extensionNames = names;
 	}
 
-	async waiting(): Promise<void> {
-		const check = () => {
-			return Object.keys(this.cardComponents).every((key) => {
-				const component = this.cardComponents[key];
-				const value = component.getValue();
-				return value?.status !== 'uploading';
-			});
-		};
-		return check()
-			? Promise.resolve()
-			: new Promise((resolve) => {
-					let time = 0;
-					const wait = () => {
-						setTimeout(() => {
-							if (check() || time > 100) resolve();
-							else wait();
-							time += 1;
-						}, 50);
-					};
-					wait();
-			  });
-	}
-
 	isVideo(file: File) {
 		const name = getExtensionName(file);
 		return this.extensionNames.indexOf(name) >= 0;

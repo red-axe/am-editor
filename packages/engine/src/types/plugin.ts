@@ -1,3 +1,4 @@
+import { CardInterface } from './card';
 import { ConversionData } from './conversion';
 import { EditorInterface } from './engine';
 import { NodeInterface } from './node';
@@ -58,8 +59,15 @@ export interface PluginInterface {
 		| Array<string>;
 	/**
 	 * 插件是否在等待处理中
+	 * @param callback 插件有等待动作时回调
 	 */
-	waiting?(): Promise<void>;
+	waiting?(
+		callback?: (
+			name: string,
+			card?: CardInterface,
+			...args: any
+		) => boolean | number | void,
+	): Promise<void>;
 }
 
 export interface ElementPluginInterface extends PluginInterface {

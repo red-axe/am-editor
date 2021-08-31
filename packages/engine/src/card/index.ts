@@ -37,7 +37,7 @@ class CardModel implements CardModelInterface {
 	classes: {
 		[k: string]: CardEntry;
 	};
-	private components: Array<CardInterface>;
+	components: Array<CardInterface>;
 	private editor: EditorInterface;
 
 	constructor(editor: EditorInterface) {

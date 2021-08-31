@@ -27,7 +27,7 @@ import { ConversionInterface } from '../types/conversion';
 import { CommandInterface } from '../types/command';
 import { PluginModelInterface } from '../types/plugin';
 import { HotkeyInterface } from '../types/hotkey';
-import { CardModelInterface } from '../types/card';
+import { CardInterface, CardModelInterface } from '../types/card';
 import { ClipboardInterface } from '../types/clipboard';
 import { LanguageInterface } from '../types/language';
 import { MarkModelInterface } from '../types/mark';
@@ -275,12 +275,31 @@ class Engine implements EngineInterface {
 		return ignoreCursor ? Selection.removeTags(value) : value;
 	}
 
-	async getValueAsync(ignoreCursor: boolean = false): Promise<string> {
-		return new Promise((resolve) => {
-			Object.keys(this.plugin.components).forEach(async (pluginName) => {
-				const plugin = this.plugin.components[pluginName];
-				if (plugin.waiting) await plugin.waiting();
-			});
+	async getValueAsync(
+		ignoreCursor: boolean = false,
+		callback?: (
+			name: string,
+			card?: CardInterface,
+			...args: any
+		) => boolean | number | void,
+	): Promise<string> {
+		return new Promise(async (resolve, reject) => {
+			const pluginNames = Object.keys(this.plugin.components);
+			for (let i = 0; i < pluginNames.length; i++) {
+				const plugin = this.plugin.components[pluginNames[i]];
+				const result = await new Promise((resolve) => {
+					if (plugin.waiting) {
+						plugin
+							.waiting(callback)
+							.then(() => resolve(true))
+							.catch(resolve);
+					} else resolve(true);
+				});
+				if (typeof result === 'object') {
+					reject(result);
+					return;
+				}
+			}
 			resolve(this.getValue(ignoreCursor));
 		});
 	}

@@ -5,6 +5,8 @@ import {
 	Plugin,
 	CardEntry,
 	PluginOptions,
+	CardInterface,
+	PluginEntry,
 } from '@aomao/engine';
 import MathComponent from './component';
 import locales from './locales';
@@ -141,35 +143,71 @@ export default class Math extends Plugin<Options> {
 		return svg;
 	}
 
-	async waiting(): Promise<void> {
+	async waiting(
+		callback?: (
+			name: string,
+			card?: CardInterface,
+			...args: any
+		) => boolean | number | void,
+	): Promise<void> {
 		const { card } = this.editor;
-		const check = () => {
-			let isSaving = false;
-			card.each((component) => {
-				if (isSaving) return;
-				if (
-					component.root.inEditor() &&
-					(component.constructor as CardEntry).cardName ===
-						MathComponent.cardName
-				) {
-					isSaving = (component as MathComponent).isSaving;
-				}
-			});
-			return isSaving;
+		// 检测单个组件
+		const check = (component: CardInterface) => {
+			return (
+				component.root.inEditor() &&
+				(component.constructor as CardEntry).cardName ===
+					MathComponent.cardName &&
+				(component as MathComponent).isSaving
+			);
 		};
-		return check()
-			? Promise.resolve()
-			: new Promise((resolve) => {
-					let time = 0;
-					const wait = () => {
-						setTimeout(() => {
-							if (check() || time > 100) resolve();
-							else wait();
-							time += 1;
-						}, 50);
-					};
-					wait();
-			  });
+		// 找到不合格的组件
+		const find = (): CardInterface | undefined => {
+			return card.components.find(check);
+		};
+
+		const waitCheck = (component: CardInterface): Promise<void> => {
+			let time = 60000;
+			return new Promise((resolve, reject) => {
+				if (callback) {
+					const result = callback(
+						(this.constructor as PluginEntry).pluginName,
+						component,
+					);
+					if (result === false) {
+						return reject({
+							name: (this.constructor as PluginEntry).pluginName,
+							card: component,
+						});
+					} else if (typeof result === 'number') {
+						time = result;
+					}
+				}
+				const beginTime = new Date().getTime();
+				const now = new Date().getTime();
+				const timeout = () => {
+					if (now - beginTime >= time) return resolve();
+					setTimeout(() => {
+						if (check(component)) timeout();
+						else resolve();
+					}, 10);
+				};
+				timeout();
+			});
+		};
+		return new Promise(async (resolve, reject) => {
+			const component = find();
+			const wait = (component: CardInterface) => {
+				waitCheck(component)
+					.then(() => {
+						const next = find();
+						if (next) wait(next);
+						else resolve();
+					})
+					.catch(reject);
+			};
+			if (component) wait(component);
+			else resolve();
+		});
 	}
 
 	parseHtml(root: NodeInterface) {

@@ -492,9 +492,17 @@ export interface EngineInterface extends EditorInterface {
 	/**
 	 * 异步获取编辑器值，将等候插件处理完成后再获取值
 	 * 比如插件上传等待中，将等待上传完成后再获取值
-	 * @param ignoreCursor 是否包含光标位置信息
+	 * @param ignoreCursor 是否包含光标位置信息，默认不包含
+	 * @param callback 有插件还有动作未执行完时回调，返回 false 终止获取值，返回 number 设置当前动作等待时间，毫秒
 	 */
-	getValueAsync(ignoreCursor?: boolean): Promise<string>;
+	getValueAsync(
+		ignoreCursor?: boolean,
+		callback?: (
+			name: string,
+			card?: CardInterface,
+			...args: any
+		) => boolean | number | void,
+	): Promise<string>;
 	/**
 	 * 获取编辑器的html
 	 */
