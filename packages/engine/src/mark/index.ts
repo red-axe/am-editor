@@ -1092,7 +1092,7 @@ class Mark implements MarkModelInterface {
 		}
 		// 不是选中可编辑器卡片内部就分割
 		if (!isEditable) {
-			this.split(safeRange);
+			this.split(safeRange, safeRange.collapsed ? removeMark : undefined);
 			commonAncestorNode = safeRange.commonAncestorNode;
 			if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
 				commonAncestorNode = commonAncestorNode.parent()!;
