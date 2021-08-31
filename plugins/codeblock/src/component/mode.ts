@@ -238,12 +238,4 @@ const datas = [
 	},
 ];
 
-const NAME_MAP: { [key: string]: string } = {};
-const SYNTAX_MAP: { [key: string]: string } = {};
-datas.forEach(item => {
-	NAME_MAP[item.value] = item.name;
-	SYNTAX_MAP[item.value] = item.syntax;
-});
-
 export default datas;
-export { NAME_MAP, SYNTAX_MAP };

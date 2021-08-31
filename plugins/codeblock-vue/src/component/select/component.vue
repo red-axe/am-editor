@@ -10,7 +10,7 @@
     :filter-option="filter"
     >
         <a-select-option
-        v-for="item in data"
+        v-for="item in modeDatas"
         :name="item.name"
         :value="item.value"
         :key="item.value"
@@ -20,9 +20,8 @@
     </a-select>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import ASelect from 'ant-design-vue/es/select'
-import modeData from '../mode';
 import 'ant-design-vue/es/select/style'
 const ASelectOption = ASelect.Option
 
@@ -33,14 +32,10 @@ export default defineComponent({
         ASelectOption
     },
     props:{
+        modeDatas: Array as PropType<Array<{value: string, syntax: string, name: string,}>>,
         defaultValue:String,
         getContainer:Function,
         onSelect:Function
-    },
-    data(){
-        return {
-            data:modeData
-        }
     },
     methods:{
         filter(input: string, option: any){

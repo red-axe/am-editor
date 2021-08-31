@@ -1,19 +1,20 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 import Select from 'antd/es/select';
-import modeData from './mode';
 import 'antd/es/select/style';
 
 type Options = {
 	defaultValue?: string;
 	container?: HTMLElement;
 	onSelect?: (value: string) => void;
+	modeDatas: { value: string; syntax: string; name: string }[];
 };
 
 const LanguageSelect: React.FC<Options> = ({
 	defaultValue,
 	container,
 	onSelect,
+	modeDatas,
 }) => {
 	const filter = (input: string, option: any) => {
 		input = input.toLowerCase();
@@ -36,7 +37,7 @@ const LanguageSelect: React.FC<Options> = ({
 			onSelect={onSelect}
 			filterOption={filter}
 		>
-			{modeData.map(item => {
+			{modeDatas.map((item) => {
 				return (
 					<Select.Option
 						name={item.name}
@@ -55,6 +56,7 @@ export { LanguageSelect };
 
 export default (
 	container: HTMLElement,
+	modeDatas: { value: string; syntax: string; name: string }[],
 	mode: string,
 	onSelect?: (value: string) => void,
 ) => {
@@ -63,6 +65,7 @@ export default (
 			container={container}
 			defaultValue={mode}
 			onSelect={onSelect}
+			modeDatas={modeDatas}
 		/>,
 		container,
 	);

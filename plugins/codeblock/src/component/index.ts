@@ -11,7 +11,7 @@ import {
 } from '@aomao/engine';
 import CodeBlockEditor from './editor';
 import renderSelect from './select';
-import { NAME_MAP, SYNTAX_MAP } from './mode';
+import modeDatas from './mode';
 import { CodeBlockEditorInterface } from './types';
 import './index.css';
 
@@ -30,17 +30,29 @@ class CodeBlcok extends Card<CodeBlockValue> {
 		return CardType.BLOCK;
 	}
 
+	static getModes() {
+		return modeDatas;
+	}
+
 	resize = () => {
 		return this.codeEditor?.container.find('.data-codeblock-content');
 	};
 
 	codeEditor?: CodeBlockEditorInterface;
 
+	#modeNameMap: { [key: string]: string } = {};
+	#modeSynatxMap: { [key: string]: string } = {};
+
 	init() {
 		if (isServer) return;
 		super.init();
 		if (this.codeEditor) return;
+		modeDatas.forEach((item) => {
+			this.#modeNameMap[item.value] = item.name;
+			this.#modeSynatxMap[item.value] = item.syntax;
+		});
 		this.codeEditor = new CodeBlockEditor(this.editor, {
+			synatxMap: this.#modeSynatxMap,
 			onSave: (mode, value) => {
 				const oldValue = this.getValue();
 				if (mode === oldValue?.mode && value === oldValue.code) return;
@@ -81,6 +93,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 					setTimeout(() => {
 						renderSelect(
 							node.get<HTMLElement>()!,
+							(this.constructor as typeof CodeBlcok).getModes(),
 							this.codeEditor?.mode || 'plain',
 							(mode) => {
 								this.codeEditor?.update(mode);
@@ -121,4 +134,4 @@ class CodeBlcok extends Card<CodeBlockValue> {
 }
 
 export default CodeBlcok;
-export { CodeBlockEditor, NAME_MAP, SYNTAX_MAP };
+export { CodeBlockEditor };

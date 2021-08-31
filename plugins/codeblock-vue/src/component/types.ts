@@ -7,6 +7,7 @@ export type Options = {
 	onBlur?: () => void;
 	onMouseDown?: (event: MouseEvent | TouchEvent) => void;
 	container?: NodeInterface;
+	synatxMap: { [key: string]: string };
 };
 
 export interface CodeBlockEditor {

@@ -5,11 +5,13 @@ export { Select };
 
 export default (
 	container: HTMLElement,
-	mode: string,
+	modeDatas: { value: string; syntax: string; name: string }[],
+	defaultValue: string,
 	onSelect?: (value: string) => void,
 ) => {
 	const vm = createApp(Select, {
-		defaultValue: mode,
+		modeDatas,
+		defaultValue,
 		getContainer: container ? () => container : undefined,
 		onSelect,
 	});

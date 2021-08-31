@@ -13,7 +13,7 @@ import {
 	CARD_TYPE_KEY,
 	PluginOptions,
 } from '@aomao/engine';
-import CodeBlockComponent, { CodeBlockEditor, NAME_MAP } from './component';
+import CodeBlockComponent, { CodeBlockEditor } from './component';
 
 export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
@@ -156,7 +156,11 @@ export default class extends Plugin<Options> {
 		const { card } = this.editor;
 
 		let newText = '';
-		const langs = Object.keys(NAME_MAP)
+		const nameMaps = {};
+		CodeBlockComponent.getModes().forEach((item) => {
+			nameMaps[item.value] = item.name;
+		});
+		const langs = Object.keys(nameMaps)
 			.concat(Object.keys(MODE_ALIAS))
 			.sort((a, b) => (a.length > b.length ? -1 : 1));
 
@@ -227,7 +231,13 @@ export default class extends Plugin<Options> {
 				const value = card?.getValue();
 				if (value && value.code) {
 					node.empty();
-					const codeEditor = new CodeBlockEditor(this.editor, {});
+					const synatxMap = {};
+					CodeBlockComponent.getModes().forEach((item) => {
+						synatxMap[item.value] = item.syntax;
+					});
+					const codeEditor = new CodeBlockEditor(this.editor, {
+						synatxMap,
+					});
 
 					const content = codeEditor.container.find(
 						'.data-codeblock-content',

@@ -8,7 +8,6 @@ import {
 	isServer,
 	NodeInterface,
 } from '@aomao/engine';
-import { SYNTAX_MAP } from './mode';
 import { CodeBlockEditorInterface, Options } from './types';
 const qa = [
 	'c',
@@ -75,7 +74,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 	}
 
 	getSyntax(mode: string) {
-		return SYNTAX_MAP[mode] || mode;
+		return this.options.synatxMap[mode];
 	}
 
 	create(mode: string, value: string, options?: EditorConfiguration) {
