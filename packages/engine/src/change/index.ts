@@ -52,6 +52,7 @@ class ChangeModel implements ChangeInterface {
 	inlines: Array<NodeInterface> = [];
 	changeTrigger: Array<string> = [];
 	#lastePasteRange?: RangeInterface;
+	#lastBlurRange?: RangeInterface;
 
 	constructor(engine: EngineInterface, options: ChangeOptions = {}) {
 		this.options = options;
@@ -250,7 +251,7 @@ class ChangeModel implements ChangeInterface {
 	 * @param toStart true:开始位置,false:结束位置，默认为之前操作位置
 	 */
 	focus(toStart?: boolean) {
-		const range = this.getRange();
+		const range = this.#lastBlurRange || this.getRange();
 		if (toStart !== undefined) {
 			range
 				.select(this.engine.container, true)
@@ -977,6 +978,16 @@ class ChangeModel implements ChangeInterface {
 				this.select(range!);
 				this.engine.trigger('drop:files', files);
 			}
+		});
+
+		this.engine.on('foucs', () => {
+			this.#lastBlurRange = undefined;
+		});
+
+		this.engine.on('blur', () => {
+			const range = this.getRange();
+			if (range.commonAncestorNode.inEditor())
+				this.#lastBlurRange = range;
 		});
 	}
 
