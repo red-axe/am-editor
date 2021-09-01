@@ -12,7 +12,7 @@
         <a-select-option
         v-for="item in modeDatas"
         :name="item.name"
-        :value="item.syntax"
+        :value="item.value"
         :key="item.value"
         >
             {{item.name}}

@@ -150,7 +150,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		if (code) {
 			this.codeMirror?.setValue(code);
 		}
-		this.codeMirror?.setOption('mode', mode);
+		this.codeMirror?.setOption('mode', this.getSyntax(mode));
 		this.codeMirror?.setOption(
 			'readOnly',
 			!isEngine(this.editor) || this.editor.readonly ? true : false,
