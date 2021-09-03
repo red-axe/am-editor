@@ -792,9 +792,20 @@ class Mark implements MarkModelInterface {
 						}
 						//插件一样，不合并，直接移除
 						else if (plugin && plugin === curPlugin) {
-							nodeApi.unwrap(parent);
-							result = false;
-							break;
+							// 如果是字号 字体颜色 字体背景颜色就不移除
+							const style = plugin.style;
+							if (
+								style &&
+								!(
+									style['font-size'] ||
+									style['color'] ||
+									style['background-color']
+								)
+							) {
+								nodeApi.unwrap(parent);
+								result = false;
+								break;
+							}
 						}
 					}
 					// 要插入的mark节点大于当前节点
