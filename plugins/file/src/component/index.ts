@@ -90,18 +90,27 @@ export default class FileCard extends Card<FileValue> {
 			.css('max-width', this.maxWidth - 100 + 'px');
 	};
 
+	onBeforeRender = (action: 'preview' | 'download', url: string) => {
+		const filePlugin = this.editor.plugin.components['file'];
+		if (filePlugin) {
+			const { onBeforeRender } = filePlugin['options'] || {};
+			if (onBeforeRender) return onBeforeRender(action, url);
+		}
+		return url;
+	};
+
 	previewFile = () => {
 		const value = this.getValue();
 		if (!value?.preview) return;
 		const { preview } = value;
-		window.open(sanitizeUrl(preview));
+		window.open(sanitizeUrl(this.onBeforeRender('preview', preview)));
 	};
 
 	downloadFile = () => {
 		const value = this.getValue();
 		if (!value?.download) return;
 		const { download } = value;
-		window.open(sanitizeUrl(download));
+		window.open(sanitizeUrl(this.onBeforeRender('download', download)));
 	};
 
 	toolbar() {

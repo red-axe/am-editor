@@ -21,7 +21,11 @@ new Engine(...,{ plugins:[ File, FileUploader], cards:[ FileComponent ]})
 
 ## `File` optional
 
-No option
+`onBeforeRender` can modify the address when previewing nearby or downloading attachments
+
+```ts
+onBeforeRender?: (action:'download' |'preview', url: string) => string;
+```
 
 ## `FileUploader` optional
 

@@ -21,7 +21,11 @@ The main functions of the `VideoUploader` plug-in: select video files, upload vi
 
 ## `Video` optional
 
-No options
+`onBeforeRender` can modify the address before setting the video address or when downloading the video. In addition, you can modify the address of the main image of the video.
+
+```ts
+onBeforeRender?: (action:'download' |'query' |'cover', url: string) => string;
+```
 
 ## `VideoUploader` optional
 

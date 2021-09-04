@@ -21,7 +21,11 @@ new Engine(...,{ plugins:[ Video , VideoUploader ] , cards:[ VideoComponent ]})
 
 ## `Video` 可选项
 
-无可选项
+`onBeforeRender` 设置视频地址前可或者下载视频时可对地址修改。另外还可以对视频的主图修改地址。
+
+```ts
+onBeforeRender?: (action: 'download' | 'query' | 'cover', url: string) => string;
+```
 
 ## `VideoUploader` 可选项
 

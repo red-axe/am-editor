@@ -146,10 +146,20 @@ class VideoComponent extends Card<VideoValue> {
         `;
 	}
 
+	onBeforeRender = (action: 'query' | 'download' | 'cover', url: string) => {
+		const videoPlugin = this.editor.plugin.components['video'];
+		if (videoPlugin) {
+			const { onBeforeRender } = videoPlugin['options'] || {};
+			if (onBeforeRender) return onBeforeRender(action, url);
+		}
+		return url;
+	};
+
 	initPlayer() {
 		const value = this.getValue();
 		if (!value) return;
-		const url = sanitizeUrl(value.url);
+
+		const url = sanitizeUrl(this.onBeforeRender('query', value.url));
 		const video = document.createElement('video');
 		video.preload = 'none';
 		video.setAttribute('src', url);
@@ -159,7 +169,7 @@ class VideoComponent extends Card<VideoValue> {
 		const { cover } = value;
 
 		if (cover) {
-			video.poster = cover;
+			video.poster = sanitizeUrl(this.onBeforeRender('cover', cover));
 		}
 
 		this.container?.find('.data-video-content').append(video);
@@ -179,7 +189,7 @@ class VideoComponent extends Card<VideoValue> {
 		const value = this.getValue();
 		if (!value?.download) return;
 		const { download } = value;
-		window.open(sanitizeUrl(download));
+		window.open(sanitizeUrl(this.onBeforeRender('download', value.url)));
 	};
 
 	toolbar() {
