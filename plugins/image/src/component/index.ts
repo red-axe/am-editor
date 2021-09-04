@@ -236,6 +236,14 @@ class ImageComponent extends Card<ImageValue> {
 				display: this.type,
 				percent: value.percent,
 				message: value.message,
+				onBeforeRender: (status, src) => {
+					const imagePlugin = this.editor.plugin.components['image'];
+					if (imagePlugin) {
+						const { onBeforeRender } = imagePlugin['options'] || {};
+						if (onBeforeRender) return onBeforeRender(status, src);
+					}
+					return src;
+				},
 				onChange: (size) => {
 					if (size) this.setSize(size);
 					if (this.type === CardType.BLOCK && this.image) {

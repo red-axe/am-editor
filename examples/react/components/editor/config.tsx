@@ -117,6 +117,11 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 		// 默认为 _ 下划线，这里修改为单个 * 号
 		markdown: '*',
 	},
+	[Image.pluginName]: {
+		onBeforeRender: (status: string, url: string) => {
+			return url + `?token=12323`;
+		},
+	},
 	[ImageUploader.pluginName]: {
 		file: {
 			action: `${DOMAIN}/upload/image`,

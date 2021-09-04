@@ -374,13 +374,20 @@ class Image {
 	changeUrl(url: string) {
 		if (this.src !== url) {
 			this.src = url;
-			this.image.attributes('src', url);
+			this.image.attributes('src', this.getSrc());
 		}
 	}
 
+	getSrc = () => {
+		const { onBeforeRender } = this.options;
+		return onBeforeRender && this.status !== 'error'
+			? onBeforeRender(this.status, this.src)
+			: this.src;
+	};
+
 	isSvg() {
 		return (
-			this.src.endsWith('.svg') ||
+			this.src.split('?')[0].endsWith('.svg') ||
 			this.src.startsWith('data:image/svg+xml')
 		);
 	}
@@ -443,7 +450,7 @@ class Image {
 		if (isMobile || !isEngine(this.editor) || this.editor.readonly) return;
 		// 拖动调整图片大小
 		const resizer = new Resizer({
-			src: this.src,
+			src: this.getSrc(),
 			width: clientWidth,
 			height: clientHeight,
 			rate: this.rate,

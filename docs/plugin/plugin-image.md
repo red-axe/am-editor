@@ -21,7 +21,11 @@ The main functions of the `ImageUploader` plugin: select images, upload images, 
 
 ## `Image` optional
 
-No option
+`onBeforeRender` Modify the image address before the image is rendered
+
+```ts
+onBeforeRender?: (status:'uploading' |'done', src: string) => string;
+```
 
 ## `ImageUploader` optional
 

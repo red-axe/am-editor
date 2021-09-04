@@ -21,6 +21,12 @@ new Engine(...,{ plugins:[ Image , ImageUploader ] , cards:[ ImageComponent ]})
 
 ## `Image` 可选项
 
+`onBeforeRender` 图片渲染前对图片地址进行修改
+
+```ts
+onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
+```
+
 无可选项
 
 ## `ImageUploader` 可选项
