@@ -138,6 +138,10 @@ export interface CardInterface {
 	 */
 	readonly id: string;
 	/**
+	 * 卡片名称
+	 */
+	readonly name: string;
+	/**
 	 * 卡片是否可编辑
 	 */
 	readonly isEditable: boolean;

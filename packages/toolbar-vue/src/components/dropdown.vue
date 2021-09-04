@@ -145,7 +145,6 @@ export default defineComponent({
 .toolbar-dropdown {
     position: relative;
     display: inline-flex;
-    z-index: 10;
 }
 
 .toolbar-dropdown .toolbar-dropdown-trigger {

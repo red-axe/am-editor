@@ -90,7 +90,8 @@ export default class extends Plugin<Options> {
 					const currentValue = block.css(TEXT_INENT_KEY);
 					let newValue = removeUnit(currentValue) + padding;
 					// 获取自身宽度计算最大的indent
-					const width = block.width();
+					let width = block.width();
+					width = width === 0 ? this.editor.root.width() : width;
 					// 获取字体大小用作计算em
 					let fontSize = block.css('font-size');
 					// 如果本身没有字体大小就，获取编辑器根节点默认字体大小
@@ -105,7 +106,13 @@ export default class extends Plugin<Options> {
 					const widthMax =
 						width > 0 ? width / removeUnit(fontSize) : maxPadding;
 
-					newValue = Math.min(newValue, maxPadding, widthMax);
+					newValue = Math.min(
+						currentValue.endsWith('px')
+							? newValue / removeUnit(fontSize)
+							: newValue,
+						maxPadding,
+						widthMax,
+					);
 					if (newValue <= 0) block.css(TEXT_INENT_KEY, '');
 					else {
 						block.css(
@@ -201,6 +208,7 @@ export default class extends Plugin<Options> {
 	onBackspace(event: KeyboardEvent) {
 		if (!isEngine(this.editor)) return;
 		const { change, list } = this.editor;
+		const blockApi = this.editor.block;
 		let range = change.getRange();
 		const block = this.editor.block.closest(range.startNode);
 		if ('li' === block.name) {
@@ -208,8 +216,9 @@ export default class extends Plugin<Options> {
 				return;
 			} else if (!range.collapsed) return;
 		} else if (
-			range.collapsed &&
-			!this.editor.block.isFirstOffset(range, 'start')
+			(range.collapsed && blockApi.isLastOffset(range, 'end')) ||
+			!blockApi.isFirstOffset(range, 'start') ||
+			change.blocks.length > 1
 		)
 			return;
 		else if (!range.collapsed) return;
@@ -276,7 +285,41 @@ export default class extends Plugin<Options> {
 			const textIndentSource = node.css(TEXT_INENT_KEY);
 			if (!!textIndentSource && textIndentSource.endsWith('pt')) {
 				const textIndent = this.convertToPX(textIndentSource);
-				if (!!textIndent) node.css(TEXT_INENT_KEY, textIndent);
+				if (!!textIndent) {
+					const maxPadding = this.options.maxPadding || 50;
+					let newValue = removeUnit(textIndent);
+					// 获取自身宽度计算最大的indent
+					let width = node.width();
+					width = width === 0 ? this.editor.root.width() : width;
+					// 获取字体大小用作计算em
+					let fontSize = node.css('font-size');
+					// 如果本身没有字体大小就，获取编辑器根节点默认字体大小
+					fontSize =
+						!fontSize || fontSize.endsWith('em')
+							? this.editor.root.css('font-size')
+							: fontSize;
+					if (fontSize.endsWith('em')) {
+						fontSize = $(document.body).css('font-size');
+					}
+					if (!fontSize.endsWith('px')) fontSize = '16px';
+					const widthMax =
+						width > 0 ? width / removeUnit(fontSize) : maxPadding;
+
+					newValue = Math.min(
+						textIndent.endsWith('px')
+							? newValue / removeUnit(fontSize)
+							: newValue,
+						maxPadding,
+						widthMax,
+					);
+					if (newValue <= 0) node.css(TEXT_INENT_KEY, '');
+					else {
+						node.css(
+							TEXT_INENT_KEY,
+							addUnit(newValue > 0 ? newValue : 0, 'em'),
+						);
+					}
+				}
 			}
 		}
 	}

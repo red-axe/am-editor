@@ -24,9 +24,6 @@ import TextParser from './text';
 import { $ } from '../node';
 
 const style = {
-	'font-size': '14px',
-	color: '#262626',
-	'line-height': '24px',
 	'letter-spacing': '.05em',
 	'outline-style': 'none',
 	'overflow-wrap': 'break-word',
@@ -124,7 +121,6 @@ class Parser implements ParserInterface {
 	) {
 		const nodeApi = this.editor.node;
 		const inlineApi = this.editor.inline;
-		const markApi = this.editor.mark;
 		//转换标签和分割 mark 和 inline 标签
 		root.allChildren().forEach((child) => {
 			let node = $(child);

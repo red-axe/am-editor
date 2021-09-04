@@ -352,7 +352,7 @@ class NodeModel implements NodeModelInterface {
 		//循环追加
 		while (child) {
 			const next = child.next();
-			const markPlugin = mark.findPlugin(child!);
+			const markPlugin = mark.findPlugin(child);
 			if (
 				plugin &&
 				markPlugin &&
@@ -363,6 +363,41 @@ class NodeModel implements NodeModelInterface {
 			) {
 				node.unwrap(child!);
 			}
+			// 孤立的零宽字符删除
+			else if (child.isText() && /\u200b/.test(child.text())) {
+				const parent = child.parent();
+				const prev = child.prev();
+				const next = child.next();
+				// 不在mark里面，或者没有父级节点，它的上级节点或者下级节点不是inline
+				if (
+					!parent ||
+					(!node.isMark(parent) &&
+						((prev && !node.isInline(prev)) ||
+							(next && !node.isInline(next))))
+				) {
+					child.remove();
+					child = next;
+					continue;
+				}
+			}
+			// 移除mark插件下面的所有零宽字符
+			else if (markPlugin && child.children().length === 1) {
+				const prev = child.prev();
+				if (!prev || prev.isText()) {
+					child.allChildren().forEach((child) => {
+						if (
+							child.nodeType === getDocument().TEXT_NODE &&
+							child.textContent
+						) {
+							child.textContent = child.textContent.replace(
+								/\u200b/,
+								'',
+							);
+						}
+					});
+				}
+			}
+
 			//追加到要合并的列表中
 			source.append(child);
 			child = next;

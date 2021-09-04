@@ -790,9 +790,9 @@ class Mark implements MarkModelInterface {
 							result = true;
 							break;
 						}
-						//插件一样，不合并，直接移除
+						//插件一样，不合并，分割后插入
 						else if (plugin && plugin === curPlugin) {
-							nodeApi.unwrap(parent);
+							this.split(safeRange);
 							result = false;
 							break;
 						}
@@ -883,6 +883,7 @@ class Mark implements MarkModelInterface {
 											targetNode = targetChild;
 										} else break;
 									}
+
 									nodeApi.removeZeroWidthSpace(targetNode);
 									let parent = targetNode.parent();
 									//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
@@ -935,6 +936,26 @@ class Mark implements MarkModelInterface {
 										}
 										if (result) return true;
 									}
+									// 移除目标子级内相同的插件
+									const allChildren =
+										targetNode.allChildren();
+									allChildren.forEach((_, index) => {
+										if (
+											allChildren[index].nodeType ===
+											getDocument().TEXT_NODE
+										)
+											return;
+										const children = $(allChildren[index]);
+										if (nodeApi.isMark(children)) {
+											const childPlugin =
+												this.findPlugin(children);
+											if (
+												childPlugin === plugin &&
+												!plugin?.combineValueByWrap
+											)
+												nodeApi.unwrap(children);
+										}
+									});
 									nodeApi.wrap(targetNode, mark);
 									return true;
 								} else if (child.name !== mark.name) {

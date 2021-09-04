@@ -97,19 +97,18 @@ export default class Paste {
 			if (nodeApi.isBlock(node, this.schema)) {
 				this.engine.block.brToBlock(node);
 			}
+			// 删除非block节点的换行 \r\n\r\n<span
 			if (node.isText()) {
-				/**const text = node.text();
+				const text = node.text();
 				if (/(\r|\n)+/.test(text)) {
-					if (/^(\r|\n)+$/.test(text)) {
-						node.text('\n');
-						return;
-					}
-					text.split(/(\r|\n)+/).forEach((text) => {
-						if (text === '') return;
-						node.before(document.createTextNode(`${text}`));
-					});
-					node.remove();
-				}**/
+					const prev = node.prev();
+					const next = node.next();
+					if (
+						(prev && !nodeApi.isBlock(prev)) ||
+						(next && !nodeApi.isBlock(next))
+					)
+						node.remove();
+				}
 			}
 		});
 		// 第二轮处理
@@ -309,9 +308,12 @@ export default class Paste {
 		const first = fragmentNode.first();
 		//如果光标在文本节点，并且父级节点不是根节点，移除粘贴数据的第一个节点块级节点，让其内容接在光标所在行
 		const { startNode } = range.cloneRange().shrinkToTextNode();
+		const startParent = startNode.parent();
 		if (
-			startNode.isText() &&
-			!startNode.parent()?.isEditable() &&
+			((startNode.isText() && !startNode.parent()?.isEditable()) ||
+				(startNode.name === 'li' &&
+					startParent &&
+					this.engine.node.isList(startParent))) &&
 			first &&
 			first.name === 'p'
 		) {

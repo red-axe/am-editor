@@ -3,9 +3,10 @@ import Parser from './parser';
 import { ClipboardInterface } from './types/clipboard';
 import { EditorInterface, EngineInterface } from './types/engine';
 import { RangeInterface } from './types/range';
-import { getWindow, isSafari } from './utils';
+import { getDocument, getWindow, isSafari } from './utils';
 import { $ } from './node';
 import Range from './range';
+import { NodeInterface } from './types';
 
 export const isDragEvent = (
 	event: DragEvent | ClipboardEvent,
@@ -153,6 +154,7 @@ export default class Clipboard implements ClipboardInterface {
 			}
 			return node.parentNode || undefined;
 		});
+		const { node, block } = this.editor;
 		const hasChildEngine =
 			root.find('.am-engine-view').length > 0 ||
 			root.find('.am-engine').length > 0;
@@ -165,7 +167,44 @@ export default class Clipboard implements ClipboardInterface {
 				event.clipboardData?.setData('text/html', '');
 				event.clipboardData?.setData('text', '');
 			} else {
+				// 修复自定义列表选择范围
+				if (range.startNode.isText()) {
+					const li = range.startNode.closest('li');
+
+					if (li && node.isCustomize(li)) {
+						const endLi = range.endNode.closest('li');
+						console.log(
+							!li.equal(endLi),
+							block.isLastOffset(range, 'end'),
+						);
+						if (
+							!li.equal(endLi) ||
+							block.isLastOffset(range, 'end')
+						) {
+							const ul = li.parent();
+							if (ul) range.setStart(ul, li.getIndex());
+						}
+					}
+				}
 				const contents = range.cloneContents();
+				const listMergeBlocks: NodeInterface[] = [];
+				contents.childNodes.forEach((child) => {
+					let childElement = $(child);
+					if (childElement.name !== 'li') return;
+
+					const dataId = childElement.attributes('data-id');
+					if (!dataId) return;
+					let parent: NodeInterface | Node | null | undefined =
+						document.querySelector(
+							`[data-id=${dataId}]`,
+						)?.parentElement;
+					parent = parent ? $(parent.cloneNode(false)) : null;
+					if (parent && node.isList(parent)) {
+						parent.removeAttributes('start');
+						node.wrap(child, parent);
+						listMergeBlocks.push(parent);
+					}
+				});
 				const { inner, outter } = this.setNodes(nodes);
 				const parser = new Parser(contents, this.editor);
 				let { html, text } = parser.toHTML(inner, outter);

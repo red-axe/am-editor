@@ -257,6 +257,7 @@ class ImageComponent extends Card<ImageValue> {
 				},
 			});
 		} else {
+			this.image.changeUrl(value.src);
 			this.image.status = value.status || 'done';
 			this.image.message = value.message;
 			this.image.size.width = value.size?.width || 0;

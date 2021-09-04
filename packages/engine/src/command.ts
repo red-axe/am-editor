@@ -45,7 +45,11 @@ class Command implements CommandInterface {
 			if (isEngine(this.editor)) {
 				change = this.editor.change;
 				const range = change.getRange();
-				if (!range.commonAncestorNode.inEditor()) change.focus();
+				if (
+					!range.commonAncestorNode.isRoot() &&
+					!range.commonAncestorNode.inEditor()
+				)
+					change.focus();
 				change.cacheRangeBeforeCommand();
 			}
 			this.editor.trigger('beforeCommandExecute', name, ...args);

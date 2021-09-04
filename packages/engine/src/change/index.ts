@@ -1094,6 +1094,14 @@ class ChangeModel implements ChangeInterface {
 			if (callback) callback(range);
 			this.apply(range);
 		};
+		if (
+			nodeApi.isList(range.startNode) ||
+			range.startNode.closest('li').length > 0
+		) {
+			list.insert(fragment, range);
+			apply(range);
+			return;
+		}
 		if (!firstNode[0]) {
 			apply(range);
 			return;
@@ -1133,13 +1141,6 @@ class ChangeModel implements ChangeInterface {
 			range.startContainer.childNodes[range.startOffset - 1];
 		const endNode = range.startContainer.childNodes[range.startOffset];
 
-		if (mergeNode[0]) {
-			childNodes.forEach((node) => {
-				if (mergeTags.indexOf($(node).name) < 0) {
-					nodeApi.wrap($(node), nodeApi.clone(mergeNode, false));
-				}
-			});
-		}
 		if (childNodes.length !== 0) {
 			const doc = getDocument(range.startContainer);
 			let lastNode = $(childNodes[childNodes.length - 1]);
@@ -1149,16 +1150,30 @@ class ChangeModel implements ChangeInterface {
 			}
 			const fragment = doc.createDocumentFragment();
 			let node: NodeInterface | null = $(childNodes[0]);
+			const appendNodes = [];
 			while (node && node.length > 0) {
 				nodeApi.removeSide(node);
 				const next: NodeInterface | null = node.next();
 				if (!next) {
 					lastNode = node;
 				}
+
+				appendNodes.push(node);
 				fragment.appendChild(node[0]);
 				node = next;
 			}
+
 			range.insertNode(fragment);
+			if (mergeNode[0]) {
+				appendNodes.forEach((element) => {
+					if (
+						mergeTags.indexOf(element.name) < 0 &&
+						element.closest(mergeNode.name).length === 0
+					) {
+						nodeApi.wrap(element, nodeApi.clone(mergeNode, false));
+					}
+				});
+			}
 			//range.shrinkToElementNode().collapse(false);
 			const component = card.find(range.startNode);
 			if (component) component.focus(range, false);

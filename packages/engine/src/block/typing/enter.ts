@@ -73,7 +73,9 @@ class Enter {
 					blockApi.setBlocks('<p />');
 				} else {
 					const li = $('<li><br /></li>');
-					li.attributes(block.attributes());
+					const attributes = block.attributes();
+					delete attributes['data-id'];
+					li.attributes(attributes);
 					blockApi.insertEmptyBlock(range, li);
 				}
 			} else {

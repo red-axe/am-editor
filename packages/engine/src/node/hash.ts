@@ -21,15 +21,18 @@ export default (
 			styles || {},
 		).join(',')}_${Object.values(styles || {}).join(',')}`;
 	}
-
-	let hash = prefix + md5(value).substr(0, 8);
+	const md5Value = md5(value);
+	let hash =
+		prefix + md5Value.substr(0, 4) + md5Value.substr(md5Value.length - 4);
 	if (unique) {
 		const counter = _counters[hash] || 0;
 		_counters[hash] = counter + 1;
 		const time = new Date().getTime().toString();
 		const text =
 			time.substr(2) +
-			md5(`${_counters[hash]}-${time.substr(6)}`).substr(5, 10);
+			md5(
+				`${_counters[hash]}-${time.substr(6)}-${md5Value.substr(8, 4)}`,
+			).substr(5, 10);
 		hash = `${hash}-${text}`;
 	}
 

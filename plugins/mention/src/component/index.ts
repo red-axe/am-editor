@@ -144,13 +144,10 @@ class Mention extends Card<MentionValue> {
 				this.component = undefined;
 				this.#keyword?.remove();
 				card.focus(this, false);
-				const newCard = card.insert(Mention.cardName, {
+				card.insert(Mention.cardName, {
 					...data,
 					...newValue,
 				});
-				setTimeout(() => {
-					card.focus(newCard, false);
-				}, 20);
 				card.removeNode(this);
 			},
 		});

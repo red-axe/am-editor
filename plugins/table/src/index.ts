@@ -7,6 +7,8 @@ import {
 	Plugin,
 	SchemaBlock,
 	PluginOptions,
+	SchemaInterface,
+	getDocument,
 } from '@aomao/engine';
 import TableComponent, { Template } from './component';
 import locales from './locale';
@@ -29,6 +31,9 @@ class Table extends Plugin<Options> {
 		editor.conversion.add('th', 'td');
 		editor.on('paser:html', (node) => this.parseHtml(node));
 		editor.on('paste:each-after', (child) => this.pasteHtml(child));
+		editor.on('paste:schema', (schema: SchemaInterface) =>
+			this.pasteSchema(schema),
+		);
 		editor.on('paste:markdown-after', (child) => this.pasteMarkdown(child));
 	}
 
@@ -111,6 +116,43 @@ class Table extends Plugin<Options> {
 		];
 	}
 
+	pasteSchema(schema: SchemaInterface) {
+		schema.find((r) => r.name === 'table')[0].attributes = {
+			class: ['data-table'],
+			'data-table-no-border': '*',
+			style: {
+				width: '@length',
+				background: '@color',
+				'background-color': '@color',
+			},
+		};
+		schema.find((r) => r.name === 'tr')[0].attributes = {
+			class: ['data-table'],
+			'data-table-no-border': '*',
+			style: {
+				width: '@length',
+				background: '@color',
+				'background-color': '@color',
+			},
+		};
+		schema.find((r) => r.name === 'td')[0].attributes = {
+			colspan: '@number',
+			rowspan: '@number',
+			class: [
+				'table-last-column',
+				'table-last-row',
+				'table-last-column',
+				'table-cell-selection',
+			],
+			style: {
+				'background-color': '@color',
+				background: '@color',
+				'vertical-align': ['top', 'middle', 'bottom'],
+				valign: ['top', 'middle', 'bottom'],
+			},
+		};
+	}
+
 	execute(rows?: number, cols?: number): void {
 		if (!isEngine(this.editor)) return;
 		//可编辑子区域内不插入表格
@@ -128,13 +170,37 @@ class Table extends Plugin<Options> {
 		if (!isEngine(this.editor)) return;
 		if (node.name === 'table') {
 			const tds = node.find('td');
-			const wrapNode = $('<div></div>');
-			tds.each((td) => {
-				const tdElement = td as Element;
-				wrapNode.html(tdElement.innerHTML);
+			let fragment = getDocument().createDocumentFragment();
+			tds.each((td, index) => {
+				fragment = getDocument().createDocumentFragment();
+				const element = tds.eq(index);
+				const tdElement = td as HTMLElement;
+				const background = element?.css('background');
+				if (background) element?.css('background-color', background);
+				const valign = element?.attributes('valign');
+				if (valign) element?.attributes('vertical-align', valign);
+				const children = (tdElement.cloneNode(true) as HTMLElement)
+					.children;
+				for (let i = 0; i < children.length; i++) {
+					fragment.appendChild(children[i]);
+				}
 				// 对单元格内的内容标准化
-				this.editor.node.normalize(wrapNode);
-				tdElement.innerHTML = wrapNode.html();
+				const fragmentNode = $(fragment);
+				this.editor.node.normalize(fragmentNode);
+				element?.empty().append(fragmentNode);
+			});
+			const background =
+				node?.css('background') || node?.css('background-color');
+			if (background) tds.css('background', background);
+
+			const trs = node.find('tr');
+			trs.each((_, index) => {
+				const element = trs.eq(index);
+				const background =
+					element?.css('background') ||
+					element?.css('background-color');
+				if (background)
+					element?.find('td').css('background', background);
 			});
 			this.editor.card.replaceNode(node, TableComponent.cardName, {
 				html: node
@@ -158,17 +224,22 @@ class Table extends Plugin<Options> {
 					outline: 'none',
 					'border-collapse': 'collapse',
 				});
-				table.find('td').css({
-					'min-width': '90px',
-					'font-size': '14px',
-					'white-space': 'normal',
-					'word-wrap': 'break-word',
-					margin: '4px 8px',
-					border: !!table.attributes('data-table-no-border')
-						? '0 none'
-						: '1px solid #d9d9d9',
-					padding: '4px 8px',
-					cursor: 'default',
+				const tds = table.find('td');
+				tds.each((_, index) => {
+					const tdElement = tds.eq(index);
+					tdElement?.css({
+						'min-width': '90px',
+						'white-space': 'normal',
+						'word-wrap': 'break-word',
+						margin: '4px 8px',
+						border: !!table.attributes('data-table-no-border')
+							? '0 none'
+							: '1px solid #d9d9d9',
+						padding: '4px 8px',
+						cursor: 'default',
+						'vertical-align':
+							tdElement.css('vertical-align') || 'top',
+					});
 				});
 				table.find(Template.TABLE_TD_BG_CLASS).remove();
 				table.find(Template.TABLE_TD_CONTENT_CLASS).each((content) => {

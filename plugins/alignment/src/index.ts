@@ -24,7 +24,7 @@ export default class extends ElementPlugin<Options> {
 	};
 
 	variable = {
-		'@var0': ['left', 'center', 'right', 'justify'],
+		'@var0': ['center', 'right', 'justify'],
 		'@var1': ['outside', 'inside'],
 	};
 
@@ -97,7 +97,12 @@ export default class extends ElementPlugin<Options> {
 		if (!isEngine(this.editor)) return;
 		const { change, block } = this.editor;
 		const range = change.getRange();
-		if (!block.isFirstOffset(range, 'start')) return;
+		if (
+			block.isLastOffset(range, 'end') ||
+			!block.isFirstOffset(range, 'start') ||
+			change.blocks.length > 1
+		)
+			return;
 		// 改变对齐
 		const align = this.queryState();
 		if (align === 'center') {

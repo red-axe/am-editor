@@ -43,6 +43,22 @@ const defaultConversion: ConversionData = [
 			return card;
 		},
 	},
+	{
+		from: (_name, _styles, attributes) => {
+			return (
+				_name === 'div' &&
+				(!attributes[CARD_KEY] || !attributes[READY_CARD_KEY])
+			);
+		},
+		to: (_, style, attributes) => {
+			const p = $('<p />');
+			p.css(style);
+			Object.keys(attributes).forEach((name) => {
+				p.attributes(name, attributes[name]);
+			});
+			return p;
+		},
+	},
 ];
 
 export default defaultConversion;

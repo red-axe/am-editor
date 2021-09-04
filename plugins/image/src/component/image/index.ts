@@ -267,6 +267,7 @@ class Image {
 	};
 
 	imageLoadError() {
+		if (this.status === 'uploading') return;
 		this.status = 'error';
 		const { container } = this.options;
 		container.empty();
@@ -368,6 +369,13 @@ class Image {
 
 		this.destroyEditor();
 		this.renderEditor();
+	}
+
+	changeUrl(url: string) {
+		if (this.src !== url) {
+			this.src = url;
+			this.image.attributes('src', url);
+		}
 	}
 
 	isSvg() {

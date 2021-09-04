@@ -52,6 +52,7 @@ class Backspace {
 				change.deleteContent(cloneRange, isDeepMerge);
 				// 光标在列表的最后一行，并且开始光标不在最后一行
 				if (
+					startBlock.inEditor() &&
 					!startBlock.equal(endBlock) &&
 					endBlock.inEditor() &&
 					'li' === endBlock.name

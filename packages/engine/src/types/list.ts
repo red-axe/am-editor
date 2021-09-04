@@ -149,6 +149,12 @@ export interface ListModelInterface {
 	 */
 	addBr(node: NodeInterface): void;
 	/**
+	 * 在列表处插入节点
+	 * @param nodes 节点集合
+	 * @param range 光标
+	 */
+	insert(fragment: DocumentFragment, range?: RangeInterface): void;
+	/**
 	 * block 节点转换为列表项节点
 	 * @param block block 节点
 	 * @param root 列表根节点

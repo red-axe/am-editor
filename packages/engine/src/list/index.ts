@@ -9,9 +9,10 @@ import {
 	isNode,
 } from '../types';
 import { ListInterface, ListModelInterface } from '../types/list';
-import { getWindow, removeUnit } from '../utils';
+import { getDocument, getWindow, removeUnit } from '../utils';
 import { Enter, Backspace } from './typing';
 import { $ } from '../node';
+import { SelectionInterface } from '../types/selection';
 
 class List implements ListModelInterface {
 	private editor: EditorInterface;
@@ -440,6 +441,7 @@ class List implements ListModelInterface {
 		if (!isEngine(this.editor)) return;
 		const { change, block, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
+		const selection = safeRange.shrinkToElementNode().createSelection();
 		blocks = blocks || block.getBlocks(safeRange);
 		blocks.forEach((block) => {
 			block = block.closest('ul,ol');
@@ -450,17 +452,13 @@ class List implements ListModelInterface {
 			const nextBlock = block.next();
 
 			if (prevBlock && this.isSame(prevBlock, block)) {
-				const selection = safeRange.createSelection();
 				node.merge(prevBlock, block);
-				selection.move();
 				// 原来 block 已经被移除，重新指向
 				block = prevBlock;
 			}
 
 			if (nextBlock && this.isSame(nextBlock, block)) {
-				const selection = safeRange.createSelection();
 				node.merge(block, nextBlock);
-				selection.move();
 			}
 		});
 		blocks = block.getBlocks(safeRange);
@@ -468,6 +466,7 @@ class List implements ListModelInterface {
 			const block = blocks[0].closest('ul,ol');
 			this.addStart(block);
 		}
+		selection.move();
 		if (!range) change.apply(safeRange);
 	}
 	/**
@@ -716,6 +715,274 @@ class List implements ListModelInterface {
 			} else node.append($('<br />'));
 		}
 	}
+
+	insert(fragment: DocumentFragment, range?: RangeInterface) {
+		if (!isEngine(this.editor) || fragment.childNodes.length === 0) return;
+		const { change, node, block } = this.editor;
+		const safeRange = range || change.getSafeRange();
+		// 光标展开，先删除内容
+		if (!safeRange.collapsed) change.deleteContent(safeRange, true, true);
+		const cloneRange = safeRange.cloneRange().shrinkToElementNode();
+		let { startNode, startOffset } = cloneRange;
+		let startElement: NodeInterface | undefined = startNode;
+		// 如果是列表，取 offset 的li
+		if (node.isList(startNode)) {
+			startElement = startNode.children().eq(startOffset);
+		}
+		startElement = startElement?.closest('li', (n) =>
+			node.isBlock(n) && n.nodeName !== 'LI'
+				? undefined
+				: n.parentElement || undefined,
+		);
+		// 非li不操作
+		if (startElement?.length === 0 || startElement?.name !== 'li') return;
+
+		// 缩小范围到文本节点
+		safeRange.shrinkToElementNode().shrinkToTextNode();
+		let selection: SelectionInterface | null = null;
+		let selectionRange: RangeInterface | null = null;
+		const apply = (newRange: RangeInterface) => {
+			block.merge(newRange);
+			this.merge(undefined, newRange);
+			selection?.move();
+			if (!range) {
+				change.apply(selectionRange || newRange);
+			} else {
+				if (selectionRange)
+					range.setOffset(
+						selectionRange.startNode,
+						selectionRange.startOffset,
+						selectionRange.endOffset,
+					);
+			}
+		};
+		// 把列表分割扣出来
+		this.split(range);
+		// 从光标处分割
+		block.split(range);
+		// 把列表分割扣出来
+		this.split(range);
+		selectionRange = safeRange.cloneRange().shrinkToTextNode();
+		selection = selectionRange.createSelection();
+		// 第一个节点嵌入到分割节点位置
+		let beginNode = $(fragment.childNodes[0]);
+		// 要插入的是列表
+		const listElement = safeRange.startNode.closest('ul,ol');
+		if (!listElement || !node.isList(listElement)) {
+			apply(safeRange);
+			return;
+		}
+		const startLi = safeRange.startNode.closest('li');
+		// 自定义列表节点，补充被切割后的li里面的卡片
+		if (node.isCustomize(listElement)) {
+			const cardElement = listElement.prev()?.first()?.first();
+			if (cardElement) {
+				const cardComponent = this.editor.card.find(cardElement);
+				if (cardComponent)
+					this.addCardToCustomize(
+						startLi,
+						cardComponent.name,
+						cardComponent.getValue(),
+					);
+			}
+		}
+		// 要插入的不是一个列表，或者是相同的列表，就把第一个节点内容追加到分割后的li后面
+		const startIsMerge =
+			!node.isList(beginNode) || this.isSame(listElement, beginNode);
+		if (startIsMerge) {
+			while (node.isBlock(beginNode)) {
+				// 如果第一个子节点还是block节点就取这个节点作为第一个节点
+				const first = beginNode.first();
+				if (first && node.isBlock(first)) {
+					beginNode = first;
+					continue;
+				}
+				// 如果不是就跳出
+				break;
+			}
+			// 删除多余的br标签
+			const beforeELement = startLi.parent()?.prev()?.last();
+			if (beforeELement?.name === 'li') {
+				const beforeChildren = beforeELement?.children();
+				beforeChildren?.each((child, index) => {
+					if (child.nodeName === 'BR')
+						beforeChildren.eq(index)?.remove();
+				});
+				// 自定义列表，删除第一个卡片
+				if (node.isCustomize(beginNode)) {
+					beginNode.first()?.remove();
+				}
+				beforeELement?.append(
+					node.isBlock(beginNode) ? beginNode.children() : beginNode,
+				);
+				if (beforeELement) this.addBr(beforeELement);
+				if (node.isBlock(beginNode)) {
+					beginNode.remove();
+				}
+			}
+		} else {
+			// 如果开头位置不用拼接，判断是否是空节点，空节点就移除
+			const beforeELement = startLi.parent()?.prev()?.last();
+			if (
+				beforeELement &&
+				(node.isEmpty(beforeELement) || this.isEmptyItem(beforeELement))
+			) {
+				beforeELement.remove();
+				if (beforeELement.parent()?.children().length === 0)
+					beforeELement.parent()?.remove();
+			}
+		}
+		// 只有一行
+		if (fragment.childNodes.length === 0) {
+			startLi.parent()?.prev()?.last()?.append(startLi.children());
+			startLi.parent()?.remove();
+			apply(safeRange);
+			return;
+		}
+
+		let startListElment = safeRange.startNode.closest('li').parent();
+		if (!startListElment) {
+			apply(safeRange);
+			return;
+		}
+		const fragmentLength = fragment.childNodes.length;
+		let endNode = $(fragment.childNodes[fragmentLength - 1]);
+		const endIsMerge =
+			!node.isList(endNode) || this.isSame(listElement, endNode);
+		// 如果集合中有列表，使用原节点，如果没有，其它节点都转换为列表
+		let hasList = false;
+		for (let i = 0; i < fragment.childNodes.length; i++) {
+			if (node.isList(fragment.childNodes[i])) {
+				hasList = true;
+				break;
+			}
+		}
+		const prevListElement = startListElment.prev();
+		const mergeLists: NodeInterface[] = prevListElement
+			? [prevListElement]
+			: [];
+		// 需要判断最后一个是否交给最后一个节点做合并，如果集合总含有列表就不合并
+		for (
+			let i = 0;
+			i < (endIsMerge && !hasList ? fragmentLength - 1 : fragmentLength);
+			i++
+		) {
+			// 每处理一个fragment中的集合就少一个，所以这里始终使用0做为索引
+			const childElement = $(fragment.childNodes[0]);
+			// 如果是列表
+			if (node.isList(childElement)) {
+				if (childElement.children().length === 0) {
+					childElement.remove();
+					continue;
+				}
+				startListElment.before(childElement);
+				mergeLists.push(childElement);
+			} else {
+				// 追加为普通节点
+				if (hasList) {
+					startListElment?.before(childElement);
+					continue;
+				}
+				// 如果是block节点，要把它的所有子block节点都unwrap
+				if (node.isBlock(childElement)) {
+					childElement.allChildren().forEach((child) => {
+						if (child.nodeType === getDocument().TEXT_NODE) return;
+						const element = $(child);
+						if (node.isBlock(element)) node.unwrap(element);
+					});
+				}
+				// 自定义列表
+				if (node.isCustomize(startListElment)) {
+					const firstCard = startListElment.first()?.first();
+					if (firstCard && firstCard.isCard()) {
+						const cardName =
+							firstCard.attributes(CARD_KEY) ||
+							firstCard.attributes('name');
+						const customizeList = this.toCustomize(
+							childElement,
+							cardName,
+						);
+						if (customizeList) {
+							(Array.isArray(customizeList)
+								? customizeList
+								: [customizeList]
+							).forEach((child) => {
+								startListElment?.before(child);
+							});
+						}
+					}
+				} else {
+					// 非自定义列表
+					const listElements = this.toNormal(
+						childElement,
+						startListElment.name as any,
+					);
+					(Array.isArray(listElements)
+						? listElements
+						: [listElements]
+					).forEach((child) => {
+						startListElment?.before(child);
+					});
+				}
+			}
+		}
+		if (mergeLists.length > 0) this.merge(mergeLists);
+		// 后续不需要拼接到最后节点
+		if (fragment.childNodes.length === 0) {
+			// 删除由于分割造成的空行
+			if (node.isEmpty(startLi) || this.isEmptyItem(startLi)) {
+				const prevElement = startLi.parent()?.prev();
+				if (node.isCustomize(startLi)) startLi.first()?.remove();
+				if (prevElement && node.isList(prevElement))
+					prevElement.last()?.append(startLi.children());
+				// 把光标位置放到前面的li里面
+				else if (prevElement) prevElement.append(startLi.children());
+				startLi.parent()?.remove();
+			}
+			apply(safeRange);
+			return;
+		}
+		// 最后一个节点嵌入到分割后的最后一个节点内容前面
+		while (node.isBlock(endNode)) {
+			// 如果最后一个子节点还是block节点就取这个节点作为最后一个节点
+			const last = endNode.last();
+			if (last && node.isBlock(last)) {
+				endNode = last;
+				continue;
+			}
+			// 如果不是就跳出
+			break;
+		}
+		const lasetELement = startLi;
+		if (lasetELement) {
+			// 删除多余的br标签
+			if (endNode.name === 'br') endNode.remove();
+			else {
+				const endChildren = endNode.children();
+				endChildren.each((child, index) => {
+					if (child.nodeName === 'BR')
+						endChildren.eq(index)?.remove();
+				});
+				if (node.isCustomize(lasetELement)) {
+					lasetELement
+						.first()
+						?.after(
+							node.isBlock(endNode)
+								? endNode.children()
+								: endNode,
+						);
+				} else {
+					lasetELement.prepend(
+						node.isBlock(endNode) ? endNode.children() : endNode,
+					);
+				}
+				this.addBr(lasetELement);
+				if (node.isBlock(endNode)) endNode.remove();
+			}
+		}
+		apply(safeRange);
+	}
+
 	/**
 	 * block 节点转换为列表项节点
 	 * @param block block 节点
