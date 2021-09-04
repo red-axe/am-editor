@@ -166,23 +166,45 @@ class Table extends Plugin<Options> {
 		});
 	}
 
+	convertToPX(value: string) {
+		const match = /([\d\.]+)(pt|px)$/i.exec(value);
+		if (match && match[2] === 'pt') {
+			return (
+				String(Math.round((parseInt(match[1], 10) * 96) / 72)) + 'px'
+			);
+		}
+		return value;
+	}
+
 	pasteHtml(node: NodeInterface) {
 		if (!isEngine(this.editor)) return;
+		const clearWH = (
+			node: NodeInterface,
+			type: 'width' | 'height' = 'width',
+		) => {
+			const width = node.css(type);
+			if (width.endsWith('%')) node.css(type, '');
+			if (width.endsWith('pt')) node.css(type, this.convertToPX(width));
+		};
 		if (node.name === 'table') {
+			clearWH(node);
+			clearWH(node, 'height');
 			const tds = node.find('td');
 			let fragment = getDocument().createDocumentFragment();
-			tds.each((td, index) => {
+			tds.each((_, index) => {
 				fragment = getDocument().createDocumentFragment();
 				const element = tds.eq(index);
-				const tdElement = td as HTMLElement;
-				const background = element?.css('background');
-				if (background) element?.css('background-color', background);
-				const valign = element?.attributes('valign');
-				if (valign) element?.attributes('vertical-align', valign);
-				const children = (tdElement.cloneNode(true) as HTMLElement)
-					.children;
+				if (!element) return;
+				clearWH(element);
+				clearWH(element, 'height');
+				const background = element.css('background');
+				if (background) element.css('background-color', background);
+				const valign = element.attributes('valign');
+				if (valign) element.attributes('vertical-align', valign);
+				const children = element.children();
 				for (let i = 0; i < children.length; i++) {
-					fragment.appendChild(children[i]);
+					const child = children.eq(i);
+					if (child) fragment.appendChild(child[0]);
 				}
 				// 对单元格内的内容标准化
 				const fragmentNode = $(fragment);
@@ -196,6 +218,10 @@ class Table extends Plugin<Options> {
 			const trs = node.find('tr');
 			trs.each((_, index) => {
 				const element = trs.eq(index);
+				if (element) {
+					clearWH(element);
+					clearWH(element, 'height');
+				}
 				const background =
 					element?.css('background') ||
 					element?.css('background-color');
