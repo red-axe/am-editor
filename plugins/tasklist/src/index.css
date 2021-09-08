@@ -11,9 +11,8 @@
     position: relative;
     margin-left: -22px;
     height: 100%;
-    margin-right: 5px;
-    display: inline;
+    display: inline-block;
+    width: 22px;
     top: -2px;
-    align-items: center;
     vertical-align: top;
 }

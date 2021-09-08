@@ -104,8 +104,7 @@
 
 .am-engine .data-list-item,.am-engine-view .data-list-item {
     line-height: inherit;
-    position: inherit;
+    position: relative;
     list-style: none;
     text-indent: 0;
-    display: flex;
 }
