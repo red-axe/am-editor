@@ -127,6 +127,8 @@ class Schema implements SchemaInterface {
 	 */
 	clone() {
 		const schema = new Schema();
+		schema._all = cloneDeep(this._all);
+		schema._typeMap = cloneDeep(this._typeMap);
 		schema.data = cloneDeep(this.data);
 		return schema;
 	}
