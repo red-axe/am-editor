@@ -235,6 +235,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 		engine.on('select', updateState);
 		engine.on('change', updateState);
 		engine.on('blur', updateState);
+		engine.on('focus', updateState);
 		let scrollTimer: NodeJS.Timeout;
 
 		const hideMobileToolbar = () => {
@@ -259,7 +260,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 			engine.on('readonly', handleReadonly);
 			engine.on('blur', hideMobileToolbar);
 			document.addEventListener('scroll', hideMobileToolbar);
-			engine.on('focus', calcuMobileView);
 			visualViewport.addEventListener('resize', calcuMobileView);
 			visualViewport.addEventListener('scroll', calcuMobileView);
 		} else {
@@ -270,11 +270,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 			engine.off('select', updateState);
 			engine.off('change', updateState);
 			engine.off('blur', updateState);
+			engine.off('focus', updateState);
 			if (isMobile) {
 				engine.off('readonly', handleReadonly);
 				engine.off('blur', hideMobileToolbar);
 				document.removeEventListener('scroll', hideMobileToolbar);
-				engine.off('focus', calcuMobileView);
 				visualViewport.removeEventListener('resize', calcuMobileView);
 				visualViewport.removeEventListener('scroll', calcuMobileView);
 			} else {

@@ -488,7 +488,11 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     border-top: 1px solid rgb(217, 217, 217);
 }
 
-.table-wrapper [data-table-no-border="true"] .table-main-bg .table-main-border-top {
+.table-wrapper:not(.active) [data-table-no-border="true"] .table-main-bg .table-main-border-top {
+    border-top-color: transparent;
+}
+
+.table-wrapper.active [data-table-no-border="true"] .table-main-bg .table-main-border-top {
     border-top-style: dashed;
 }
 
@@ -503,7 +507,11 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     border-right: 1px solid rgb(217, 217, 217);
 }
 
-.table-wrapper [data-table-no-border="true"] .table-main-bg .table-main-border-right {
+.table-wrapper:not(.active) [data-table-no-border="true"] .table-main-bg .table-main-border-right {
+    border-right-style: dashed;
+}
+
+.table-wrapper.active [data-table-no-border="true"] .table-main-bg .table-main-border-right {
     border-right-style: dashed;
 }
 
@@ -523,7 +531,11 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     border-bottom: 1px solid rgb(217, 217, 217);
 }
 
-.table-wrapper [data-table-no-border="true"] .table-main-bg .table-main-border-bottom {
+.table-wrapper:not(.active) [data-table-no-border="true"] .table-main-bg .table-main-border-bottom {
+    border-bottom-color: transparent;
+}
+
+.table-wrapper.active [data-table-no-border="true"] .table-main-bg .table-main-border-bottom {
     border-bottom-style: dashed;
 }
 
@@ -542,7 +554,11 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     border-left: 1px solid rgb(217, 217, 217);
 }
 
-.table-wrapper [data-table-no-border="true"] .table-main-bg .table-main-border-left {
+.table-wrapper:not(.active) [data-table-no-border="true"] .table-main-bg .table-main-border-left {
+    border-left-color: transparent;
+}
+
+.table-wrapper.active [data-table-no-border="true"] .table-main-bg .table-main-border-left {
     border-left-style: dashed;
 }
 

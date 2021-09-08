@@ -131,7 +131,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const { tableModel } = selection;
 		if (!wrapper || !tableModel) return;
 		const selectArea = selection.getSelectArea();
-		const isLeft = position === 'left';
+		let isLeft = position === 'left';
 		const isEnd = position === 'end' || !position;
 
 		const colBars = wrapper.find(Template.COLS_HEADER_ITEM_CLASS);
@@ -141,7 +141,12 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			colBase = isLeft ? selectArea.begin.col : selectArea.end.col;
 		}
 
-		const insertCol = isLeft ? colBase : colBase + 1;
+		let insertCol = isLeft ? colBase - 1 : colBase + 1;
+		// 插入的列索引小于0，
+		if (insertCol < 0) {
+			insertCol = 0;
+			isLeft = false;
+		}
 		const width = colBars.eq(colBase)?.get<HTMLElement>()!.offsetWidth;
 
 		this.insertColAt(insertCol, count, isLeft, width, ...args);

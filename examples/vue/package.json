@@ -49,7 +49,7 @@
     "core-js": "^3.6.5",
     "reconnecting-websocket": "^4.4.0",
     "sharedb": "^1.9.2",
-    "vue": "^3.2.4",
+    "vue": "^3.2.9",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.0-0"
   },
@@ -59,7 +59,7 @@
     "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-plugin-typescript": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.2.4",
+    "@vue/compiler-sfc": "^3.2.9",
     "less": "^3.0.4",
     "less-loader": "6.0.0",
     "typescript": "~4.1.5"

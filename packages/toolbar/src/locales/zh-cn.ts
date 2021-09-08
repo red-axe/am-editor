@@ -225,5 +225,8 @@ export default {
 		commonlyUsed: {
 			title: '常用',
 		},
+		searchEmtpy: {
+			title: '无匹配卡片',
+		},
 	},
 };

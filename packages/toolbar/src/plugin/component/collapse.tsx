@@ -2,7 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Keymaster from 'keymaster';
 import { omit } from 'lodash-es';
-import { $, EngineInterface, isServer, NodeInterface } from '@aomao/engine';
+import {
+	$,
+	EngineInterface,
+	isServer,
+	NodeInterface,
+	Position,
+} from '@aomao/engine';
 import Collapse from '../../collapse';
 import { CollapseGroupProps } from '../../collapse/group';
 
@@ -36,7 +42,7 @@ let keymasterMoudle:
 	  }
 	| undefined = undefined;
 if (!isServer) {
-	import('keymaster').then(moudle => {
+	import('keymaster').then((moudle) => {
 		keymasterMoudle = {
 			keymaster: moudle.default,
 			...omit(moudle, 'default'),
@@ -48,11 +54,13 @@ class CollapseComponent implements CollapseComponentInterface {
 	private engine: EngineInterface;
 	private root?: NodeInterface;
 	private otpions: Options;
+	#position?: Position;
 	private readonly SCOPE_NAME = 'data-toolbar-component';
 
 	constructor(engine: EngineInterface, options: Options) {
 		this.otpions = options;
 		this.engine = engine;
+		this.#position = new Position(engine);
 	}
 
 	handlePreventDefault = (event: Event) => {
@@ -78,7 +86,7 @@ class CollapseComponent implements CollapseComponentInterface {
 		if (!this.root) return;
 		const items = this.root.find('.toolbar-collapse-item').toArray();
 		let activeNode = this.root.find('.toolbar-collapse-item-active');
-		const activeIndex = items.findIndex(item => item.equal(activeNode));
+		const activeIndex = items.findIndex((item) => item.equal(activeNode));
 
 		let index = direction === 'up' ? activeIndex - 1 : activeIndex + 1;
 		if (index < 0) {
@@ -90,7 +98,7 @@ class CollapseComponent implements CollapseComponentInterface {
 		let offset = 0;
 		this.root
 			.find('.toolbar-collapse-group-title,.toolbar-collapse-item')
-			.each(node => {
+			.each((node) => {
 				if (activeNode.equal(node)) return false;
 				offset += (node as Element).clientHeight;
 				return;
@@ -116,7 +124,7 @@ class CollapseComponent implements CollapseComponentInterface {
 		const { setScope, keymaster } = keymasterMoudle;
 		setScope(this.SCOPE_NAME);
 		//回车
-		keymaster('enter', this.SCOPE_NAME, event => {
+		keymaster('enter', this.SCOPE_NAME, (event) => {
 			// Card 已被删除
 			if (this.root?.closest('body').length === 0) {
 				return;
@@ -126,7 +134,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			active?.get<HTMLElement>()?.click();
 		});
 
-		keymaster('up', this.SCOPE_NAME, event => {
+		keymaster('up', this.SCOPE_NAME, (event) => {
 			// Card 已被删除
 			if (this.root?.closest('body').length === 0) {
 				return;
@@ -134,7 +142,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			event.preventDefault();
 			this.scroll('up');
 		});
-		keymaster('down', this.SCOPE_NAME, e => {
+		keymaster('down', this.SCOPE_NAME, (e) => {
 			// Card 已被删除
 			if (this.root?.closest('body').length === 0) {
 				return;
@@ -142,7 +150,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			e.preventDefault();
 			this.scroll('down');
 		});
-		keymaster('esc', this.SCOPE_NAME, event => {
+		keymaster('esc', this.SCOPE_NAME, (event) => {
 			event.preventDefault();
 			this.unbindEvents();
 			const { onCancel } = this.otpions;
@@ -153,6 +161,7 @@ class CollapseComponent implements CollapseComponentInterface {
 
 	remove() {
 		if (!this.root || this.root.length === 0) return;
+		this.#position?.destroy();
 		ReactDOM.unmountComponentAtNode(this.root.get<Element>()!);
 		this.root.remove();
 		this.root = undefined;
@@ -169,35 +178,24 @@ class CollapseComponent implements CollapseComponentInterface {
 		container.append(this.root);
 		const rootElement = this.root.get<HTMLElement>()!;
 		ReactDOM.render(
-			<Collapse
-				engine={this.engine}
-				groups={data}
-				onSelect={this.otpions.onSelect}
-			/>,
+			data.length === 0 ? (
+				<div className="data-toolbar-component-list-empty">
+					{this.engine.language.get(
+						'toolbar',
+						'searchEmtpy',
+						'title',
+					)}
+				</div>
+			) : (
+				<Collapse
+					engine={this.engine}
+					groups={data}
+					onSelect={this.otpions.onSelect}
+				/>
+			),
 			rootElement,
 			() => {
-				let [top, left] = [0, 0];
-				let rectNode: NodeInterface | undefined = target;
-				while (rectNode) {
-					const targetRect = rectNode.getBoundingClientRect() || {
-						left: 0,
-						top: 0,
-					};
-
-					const parent: NodeInterface | undefined = rectNode.parent();
-					if (!parent) break;
-					const parentRect = parent.getBoundingClientRect() || {
-						left: 0,
-						top: 0,
-					};
-					top += targetRect.top - parentRect.top;
-					left += targetRect.left - parentRect.left;
-					if (parent.equal(container)) break;
-					rectNode = parent;
-				}
-
-				rootElement.style.top = `${top + target.height() / 2}px`;
-				rootElement.style.left = `${left}px`;
+				this.#position?.bind(this.root!, target);
 			},
 		);
 		this.select(0);

@@ -157,11 +157,11 @@ export default defineComponent({
             props.engine.on("select",update)
             props.engine.on("change",update)
             props.engine.on("blur",update)
+            props.engine.on('focus', update)
             if (isMobile) {
               props.engine.on('readonly', handleReadonly)
               props.engine.on('blur', hideMobileToolbar)
               document.addEventListener('scroll', hideMobileToolbar);
-              props.engine.on('focus', calcuMobileView)
               visualViewport.addEventListener('resize', calcuMobileView);
               visualViewport.addEventListener('scroll', calcuMobileView);
             } else {
@@ -175,11 +175,11 @@ export default defineComponent({
             props.engine.off("change",update)
             props.engine.off('readonly', update);
             props.engine.off("blur",update)
+            props.engine.off('focus', update)
             if (isMobile) {
               props.engine.off('readonly', handleReadonly)
               props.engine.off('blur', hideMobileToolbar)
               document.removeEventListener('scroll', hideMobileToolbar);
-              props.engine.off('focus', calcuMobileView)
               visualViewport.removeEventListener('resize', calcuMobileView);
               visualViewport.removeEventListener('scroll', calcuMobileView);
             } else {

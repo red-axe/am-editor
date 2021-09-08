@@ -27,7 +27,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { Avatar, message, Modal, Space } from 'ant-design-vue'
-import Engine, { EngineInterface, isMobile } from "@aomao/engine"
+import Engine, { $, EngineInterface, isMobile } from "@aomao/engine"
 import Redo from '@aomao/plugin-redo';
 import Undo from '@aomao/plugin-undo';
 import Bold from '@aomao/plugin-bold';
@@ -306,6 +306,13 @@ export default defineComponent({
                         });
                     });
                 };
+                //卡片最大化时设置编辑页面样式
+                engineInstance.on('card:maximize', () => {
+                    $('.editor-toolbar').css('z-index', '9999').css('top', '55px');
+                });
+                engineInstance.on('card:minimize', () => {
+                    $('.editor-toolbar').css('z-index', '').css('top', '');
+                });
                 //初始化本地协作，用作记录历史
                 engineInstance.ot.initLockMode();
 

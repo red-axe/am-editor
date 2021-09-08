@@ -20,6 +20,7 @@ class ToolbarComponent extends Card {
 	private keyword?: NodeInterface;
 	private placeholder?: NodeInterface;
 	private component?: CollapseComponentInterface;
+	#collapseData?: Data;
 
 	static get cardName() {
 		return 'toolbar';
@@ -105,8 +106,10 @@ class ToolbarComponent extends Card {
 		const items: Array<Omit<CollapseItemProps, 'engine'>> = [];
 		// search with case insensitive
 		if (typeof keyword === 'string') keyword = keyword.toLowerCase();
+		// 已经有值了就不用赋值了，不然会影响禁用状态
 
-		this.getData().forEach((group) => {
+		if (!this.#collapseData) this.#collapseData = [];
+		this.#collapseData.forEach((group) => {
 			group.items.forEach((item) => {
 				if (
 					item.search &&
@@ -177,17 +180,15 @@ class ToolbarComponent extends Card {
 		const keyword = content.substr(1);
 		// 搜索关键词为空
 		if (keyword === '') {
-			this.component?.render(this.editor.root, this.root, this.getData());
+			this.component?.render(
+				this.editor.root,
+				this.root,
+				this.#collapseData || [],
+			);
 			return;
 		}
 		const data = this.search(keyword);
-		// 有搜索结果
-		if (data.length > 0) {
-			this.component?.render(this.editor.root, this.root, data);
-			return;
-		}
-		// 搜索结果为空
-		this.changeToText();
+		this.component?.render(this.editor.root, this.root, data);
 	}
 
 	resetPlaceHolder() {
@@ -237,8 +238,9 @@ class ToolbarComponent extends Card {
 				this.handleInput();
 			}, 10);
 		});
+		if (!this.#collapseData) this.#collapseData = this.getData();
 		// 显示下拉列表
-		this.component?.render(this.editor.root, this.root, this.getData());
+		this.component?.render(this.editor.root, this.root, this.#collapseData);
 	}
 }
 

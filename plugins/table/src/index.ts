@@ -61,6 +61,7 @@ class Table extends Plugin<Options> {
 			{
 				name: 'col',
 				type: 'block',
+				isVoid: true,
 				attributes: {
 					width: '@number',
 					span: '@number',
@@ -208,8 +209,9 @@ class Table extends Plugin<Options> {
 				}
 				// 对单元格内的内容标准化
 				const fragmentNode = $(fragment);
-				this.editor.node.normalize(fragmentNode);
-				element?.empty().append(fragmentNode);
+				element
+					?.empty()
+					.append(this.editor.node.normalize(fragmentNode));
 			});
 			const background =
 				node?.css('background') || node?.css('background-color');

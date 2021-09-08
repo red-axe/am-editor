@@ -27,10 +27,10 @@
     "@aomao/engine": "^2.3.29",
     "@babel/runtime": "^7.13.10",
     "ant-design-vue": "^2.2.6",
-    "vue": "^3.2.4"
+    "vue": "^3.2.9"
   },
   "devDependencies": {
-    "@vue/compiler-sfc": "^3.2.4",
+    "@vue/compiler-sfc": "^3.2.9",
     "rollup-plugin-vue": "^6.0.0-beta.10"
   }
 }

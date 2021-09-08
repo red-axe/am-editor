@@ -225,5 +225,8 @@ export default {
 		commonlyUsed: {
 			title: 'Commonly used',
 		},
+		searchEmtpy: {
+			title: 'No matching card',
+		},
 	},
 };
