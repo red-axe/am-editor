@@ -6,7 +6,7 @@ export default class extends Plugin {
 	}
 
 	init() {
-		this.editor.on('keydown:all', event => this.onSelectAll(event));
+		this.editor.on('keydown:all', (event) => this.onSelectAll(event));
 	}
 
 	execute() {
@@ -19,7 +19,10 @@ export default class extends Plugin {
 		} else {
 			range.select(this.editor.container, true);
 		}
-		change.select(range);
+
+		//range.setStart(range.startNode.children().eq(0)?.first()?.last()!, 0)
+		console.log(range.startNode);
+		change.select(range.shrinkToElementNode());
 		this.editor.trigger('select');
 	}
 

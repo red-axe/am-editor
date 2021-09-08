@@ -333,8 +333,8 @@ class Parser implements ParserInterface {
 				) {
 					text = text.trim();
 				}
-				// 删除 zero width space
-				text = text.replace(/\u200B/g, '');
+				// 删除 zero width space，删除后会导致空行中如果有mark节点，那么空行会没有高度
+				// text = text.replace(/\u200B/g, '');
 				if (callbacks.onText) {
 					callbacks.onText(child, text);
 				}

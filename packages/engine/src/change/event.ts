@@ -10,7 +10,7 @@ import { CARD_ELEMENT_KEY } from '../constants/card';
 import { ClipboardData } from '../types/clipboard';
 import { DATA_ELEMENT, UI } from '../constants';
 import { $ } from '../node';
-import { isMobile } from '../utils';
+import { isMobile, isSafari } from '../utils';
 
 class ChangeEvent implements ChangeEventInterface {
 	private events: Array<{
@@ -81,7 +81,7 @@ class ChangeEvent implements ChangeEventInterface {
 		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
 		this.onContainer('beforeinput', (event: InputEvent) => {
 			if (this.engine.readonly) return;
-			const { change, card } = this.engine;
+			const { change, card, node } = this.engine;
 			if (!change.rangePathBeforeCommand)
 				change.cacheRangeBeforeCommand();
 			// 单独选中卡片或者selection处于卡片边缘，手动删除卡片
@@ -90,6 +90,16 @@ class ChangeEvent implements ChangeEventInterface {
 				.cloneRange()
 				.shrinkToTextNode()
 				.enlargeToElementNode();
+			// 修复 safari 浏览器在列表首次输入组合输入法时会删除li节点
+			const { startNode } = range;
+			if (
+				isSafari &&
+				startNode.name === 'li' &&
+				!node.isCustomize(startNode)
+			) {
+				if (startNode.first()?.name !== 'br')
+					startNode.prepend('<br />');
+			}
 			if (!range.collapsed) {
 				if (
 					range.commonAncestorNode.attributes(CARD_ELEMENT_KEY) ===
@@ -105,6 +115,7 @@ class ChangeEvent implements ChangeEventInterface {
 			}
 
 			const { inputType } = event;
+			console.log(inputType);
 			const commandTypes = ['format', 'history'];
 			commandTypes.forEach((type) => {
 				if (inputType.indexOf(type) === 0) {

@@ -3,17 +3,17 @@
 }
 
 .am-engine .data-list-task,.am-engine-view .data-list-task {
-	position: relative;
 	list-style: none;
 	text-indent: 0;
 }
 
 .am-engine .data-list-task [data-card-key="checkbox"],.am-engine-view .data-list-task [data-card-key="checkbox"] {
-    vertical-align: middle;
-    line-height: inherit;
-    position: absolute;
-    margin-left: -20px;
+    position: relative;
+    margin-left: -22px;
     height: 100%;
-    display: inline-flex;
+    margin-right: 5px;
+    display: inline;
     top: -2px;
+    align-items: center;
+    vertical-align: top;
 }

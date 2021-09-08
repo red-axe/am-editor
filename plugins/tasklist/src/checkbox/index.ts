@@ -40,6 +40,8 @@ class Checkbox extends Card<CheckboxValue> {
 		return false;
 	}
 
+	onSelectByOther() {}
+
 	update = (isChecked?: boolean) => {
 		const checked = isChecked === undefined ? this.isChecked() : isChecked;
 		const parent = this.root.parent();
@@ -74,10 +76,10 @@ class Checkbox extends Card<CheckboxValue> {
 
 	render() {
 		const html = `
-            <span class="${CHECKBOX_CLASS}${
+        <span class="${CHECKBOX_CLASS}${
 			isMobile ? ` ${CHECKBOX_CLASS}-mobile` : ''
 		}">
-                <input type="checkbox" class="${CHECKBOX_INPUT_CLASS}" value="">
+            <input type="checkbox" class="${CHECKBOX_INPUT_CLASS}" value="">
                 <span class="${CHECKBOX_INNER_CLASS}"></span>
             </span>`;
 		const value = this.getValue();

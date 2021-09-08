@@ -78,7 +78,7 @@ class NodeEntry implements NodeInterface {
 	 * @param selector 选择器
 	 */
 	isMatchesSelector(element: ElementInterface, selector: string) {
-		if (element.nodeType !== getWindow().Node.ELEMENT_NODE) {
+		if (element.nodeType !== getWindow().Node.ELEMENT_NODE || !selector) {
 			return false;
 		}
 		const defaultMatches = (element: Element, selector: string) => {
