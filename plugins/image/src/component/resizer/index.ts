@@ -95,11 +95,11 @@ class Resizer {
 			x:
 				getWindow().TouchEvent && event instanceof TouchEvent
 					? event.touches[0].clientX
-					: event.clientX,
+					: (event as MouseEvent).clientX,
 			y:
 				getWindow().TouchEvent && event instanceof TouchEvent
 					? event.touches[0].clientY
-					: event.clientY,
+					: (event as MouseEvent).clientY,
 		};
 		this.position = position;
 		this.resizing = true;
