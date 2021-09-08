@@ -60,7 +60,14 @@ export interface Options extends PluginOptions {
 	 */
 	parse?: (response: any) => {
 		result: boolean;
-		data: string;
+		data:
+			| {
+					url: string;
+					preview?: string;
+					download?: string;
+					status?: string;
+			  }
+			| string;
 	};
 }
 
@@ -181,11 +188,67 @@ export default class extends Plugin<Options> {
 					const download =
 						response.download ||
 						(response.data && response.data.download);
-					const result = parse
-						? parse(response)
-						: !!url
-						? { result: true, data: url }
-						: { result: false, data: response.data };
+					let result: {
+						result: boolean;
+						data:
+							| {
+									url: string;
+									preview?: string;
+									download?: string;
+									status?: string;
+							  }
+							| string;
+					} = {
+						result: true,
+						data: {
+							status: 'done',
+							url,
+							preview,
+							download,
+						},
+					};
+					if (parse) {
+						const customizeResult = parse(response);
+						if (customizeResult.result) {
+							let data = result.data as {
+								url: string;
+								preview?: string;
+								download?: string;
+								status?: string;
+							};
+							if (typeof customizeResult.data === 'string')
+								result.data = {
+									...data,
+									url: customizeResult.data,
+								};
+							else {
+								data.url = customizeResult.data.url;
+								if (customizeResult.data.status !== undefined)
+									data = {
+										...data,
+										status: customizeResult.data.status,
+									};
+								if (customizeResult.data.preview !== undefined)
+									data = {
+										...data,
+										preview: customizeResult.data.preview,
+									};
+								if (customizeResult.data.download !== undefined)
+									data = {
+										...data,
+										download: customizeResult.data.download,
+									};
+								result.data = { ...data };
+							}
+						} else {
+							result = {
+								result: false,
+								data: customizeResult.data.toString(),
+							};
+						}
+					} else if (!url) {
+						result = { result: false, data: response.data };
+					}
 					if (!result.result) {
 						card.update(component.id, {
 							status: 'error',
@@ -194,12 +257,12 @@ export default class extends Plugin<Options> {
 								this.editor.language.get('file', 'uploadError'),
 						});
 					} else {
-						const value: any = {
-							status: 'done',
-							url: result.data,
-							preview,
-							download,
-						};
+						const value: any =
+							typeof result.data === 'string'
+								? { url: result.data }
+								: {
+										...result.data,
+								  };
 						this.editor.card.update(component.id, value);
 					}
 					delete this.cardComponents[file.uid || ''];

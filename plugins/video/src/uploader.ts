@@ -268,7 +268,7 @@ export default class extends Plugin<Options> {
 								if (customizeResult.data.cover !== undefined)
 									data = {
 										...data,
-										status: customizeResult.data.cover,
+										cover: customizeResult.data.cover,
 									};
 								result.data = { ...data };
 							}
