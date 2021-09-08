@@ -684,7 +684,21 @@ class Block implements BlockModelInterface {
 			startNode.children().each((node) => {
 				newBlock.append(node);
 			});
-
+			// 复制全局属性
+			const globals = schema.data.globals['block'] || {};
+			const oldAttributes = startNode.attributes();
+			Object.keys(oldAttributes).forEach((name) => {
+				if (name !== 'data-id' && name !== 'id' && globals['name']) {
+					newBlock.attributes(name, oldAttributes[name]);
+				}
+			});
+			// 复制全局样式，及生成 text-align
+			const globalStyles = globals.style || {};
+			const styles = startNode.css();
+			Object.keys(styles).forEach((name) => {
+				if (!globalStyles[name]) delete styles[name];
+			});
+			newBlock.css(styles);
 			startNode.append(newBlock);
 			selection.move();
 			if (!range) change.apply(safeRange);
@@ -699,12 +713,34 @@ class Block implements BlockModelInterface {
 			if (child.attributes(CARD_KEY)) {
 				return;
 			}
+			if (targetNode) {
+				// 复制全局属性
+				const globals = schema.data.globals['block'] || {};
+				const oldAttributes = child.attributes();
+				Object.keys(oldAttributes).forEach((name) => {
+					if (
+						name !== 'data-id' &&
+						name !== 'id' &&
+						globals['name']
+					) {
+						targetNode?.attributes(name, oldAttributes[name]);
+					}
+				});
+				// 复制全局样式，及生成 text-align
+				const globalStyles = globals.style || {};
+				const styles = child.css();
+				Object.keys(styles).forEach((name) => {
+					if (!globalStyles[name]) delete styles[name];
+				});
+				targetNode.css(styles);
+			}
 			// 相同标签，或者只传入样式属性
 			if (
 				!targetNode ||
 				(this.findPlugin(child) === targetPlugin &&
 					child.name === targetNode.name)
 			) {
+				if (targetNode) attributes = targetNode.attributes();
 				node.setAttributes(child, attributes);
 				return;
 			}
@@ -734,6 +770,7 @@ class Block implements BlockModelInterface {
 					}
 				});
 			}
+
 			const newNode = node.replace(child, targetNode);
 			const parent = newNode.parent();
 			if (
@@ -1358,7 +1395,7 @@ class Block implements BlockModelInterface {
 		if (parent && nodeApi.isMark(parent)) {
 			node = nodeApi.replace(node, $('\u200b', null));
 		}
-		range.select(node);
+		range.select(node).shrinkToTextNode();
 		range.collapse(false);
 		range.scrollIntoView();
 		change.select(range);

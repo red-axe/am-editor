@@ -217,20 +217,70 @@ export default class extends Plugin<Options> {
 						response.status ||
 						(response.data && response.data.status);
 					status = status === 'transcoding' ? 'transcoding' : 'done';
-					const result = parse
-						? parse(response)
-						: !!url
-						? {
-								result: true,
-								data: {
-									video_id: id,
-									url,
-									cover,
-									download,
-									status,
-								},
-						  }
-						: { result: false, data: response.data };
+					let result: {
+						result: boolean;
+						data:
+							| {
+									url: string;
+									video_id?: string;
+									cover?: string;
+									download?: string;
+									status?: string;
+							  }
+							| string;
+					} = {
+						result: true,
+						data: {
+							video_id: id,
+							url,
+							cover,
+							download,
+							status,
+						},
+					};
+					if (parse) {
+						const customizeResult = parse(response);
+						if (customizeResult.result) {
+							let data = result.data as {
+								url: string;
+								video_id?: string;
+								cover?: string;
+								download?: string;
+								status?: string;
+							};
+							if (typeof customizeResult.data === 'string')
+								result.data = {
+									...data,
+									url: customizeResult.data,
+								};
+							else {
+								data.url = customizeResult.data.url;
+								if (customizeResult.data.status !== undefined)
+									data = {
+										...data,
+										status: customizeResult.data.status,
+									};
+								if (customizeResult.data.id !== undefined)
+									data = {
+										...data,
+										video_id: customizeResult.data.id,
+									};
+								if (customizeResult.data.cover !== undefined)
+									data = {
+										...data,
+										status: customizeResult.data.cover,
+									};
+								result.data = { ...data };
+							}
+						} else {
+							result = {
+								result: false,
+								data: customizeResult.data.toString(),
+							};
+						}
+					} else if (!url) {
+						result = { result: false, data: response.data };
+					}
 					//失败
 					if (!result.result) {
 						card.update(component.id, {
@@ -245,9 +295,14 @@ export default class extends Plugin<Options> {
 					}
 					//成功
 					else {
-						this.editor.card.update(component.id, {
-							...result.data,
-						});
+						this.editor.card.update(
+							component.id,
+							typeof result.data === 'string'
+								? { url: result.data }
+								: {
+										...result.data,
+								  },
+						);
 					}
 					delete this.cardComponents[file.uid || ''];
 				},

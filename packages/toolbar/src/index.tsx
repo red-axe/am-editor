@@ -66,6 +66,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 	const [data, setData] = useState<Array<GroupProps>>([]);
 	//移动端浏览器视图信息
 	const toolbarRef = useRef<HTMLDivElement | null>(null);
+	const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const [mobileView, setMobileView] = useState({ top: 0 });
 	const caluTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	//计算移动浏览器的视图变化
@@ -86,6 +87,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 			});
 		}, 100);
 	};
+
 	/**
 	 * 更新状态
 	 */
@@ -230,12 +232,19 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 		updateState();
 	}, [engine, items]);
 
+	const update = () => {
+		if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current);
+		updateTimeoutRef.current = setTimeout(() => {
+			updateState();
+		}, 100);
+	};
+
 	useEffect(() => {
 		engine.language.add(locales);
-		engine.on('select', updateState);
-		engine.on('change', updateState);
-		engine.on('blur', updateState);
-		engine.on('focus', updateState);
+		engine.on('select', update);
+		engine.on('change', update);
+		engine.on('blur', update);
+		engine.on('focus', update);
 		let scrollTimer: NodeJS.Timeout;
 
 		const hideMobileToolbar = () => {
@@ -263,14 +272,14 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 			visualViewport.addEventListener('resize', calcuMobileView);
 			visualViewport.addEventListener('scroll', calcuMobileView);
 		} else {
-			engine.on('readonly', updateState);
+			engine.on('readonly', update);
 		}
 
 		return () => {
-			engine.off('select', updateState);
-			engine.off('change', updateState);
-			engine.off('blur', updateState);
-			engine.off('focus', updateState);
+			engine.off('select', update);
+			engine.off('change', update);
+			engine.off('blur', update);
+			engine.off('focus', update);
 			if (isMobile) {
 				engine.off('readonly', handleReadonly);
 				engine.off('blur', hideMobileToolbar);
@@ -278,7 +287,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ engine, className, items = [] }) => {
 				visualViewport.removeEventListener('resize', calcuMobileView);
 				visualViewport.removeEventListener('scroll', calcuMobileView);
 			} else {
-				engine.off('readonly', updateState);
+				engine.off('readonly', update);
 			}
 		};
 	}, [engine]);

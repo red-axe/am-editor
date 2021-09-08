@@ -205,6 +205,7 @@ export default class extends Plugin<Options> {
 				}, 500);
 			} else {
 				delete this.loadCounts[id];
+				value.status = 'error';
 				this.editor.card.update(id, value);
 			}
 		};

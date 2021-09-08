@@ -1,4 +1,10 @@
-import { $, NodeInterface, EventListener, isMobile } from '@aomao/engine';
+import {
+	$,
+	NodeInterface,
+	EventListener,
+	isMobile,
+	getWindow,
+} from '@aomao/engine';
 import './index.css';
 
 export type Options = {
@@ -87,11 +93,11 @@ class Resizer {
 		);
 		this.point = {
 			x:
-				event instanceof TouchEvent
+				getWindow().TouchEvent && event instanceof TouchEvent
 					? event.touches[0].clientX
 					: event.clientX,
 			y:
-				event instanceof TouchEvent
+				getWindow().TouchEvent && event instanceof TouchEvent
 					? event.touches[0].clientY
 					: event.clientY,
 		};
@@ -116,7 +122,9 @@ class Resizer {
 		event.preventDefault();
 		event.stopPropagation();
 		const { clientX, clientY } =
-			event instanceof TouchEvent ? event.touches[0] : event;
+			getWindow().TouchEvent && event instanceof TouchEvent
+				? event.touches[0]
+				: (event as MouseEvent);
 
 		if (clientX !== this.point.x || clientY !== this.point.y) {
 			//移动后的宽度

@@ -531,9 +531,7 @@ class Image {
 		}
 		this.maxWidth = this.getMaxWidth();
 		let { width, height } = this.size;
-		if (isEngine(this.editor) && !this.isLoad) {
-			this.image.css('visibility', 'hidden');
-		} else if (width && height) {
+		if (width && height) {
 			if (width > this.maxWidth) {
 				width = this.maxWidth;
 				height = Math.round((width * height) / this.size.width);
@@ -570,33 +568,6 @@ class Image {
 			// 无链接
 			this.image.on('dblclick', (event) => this.openZoom(event));
 			this.maximize.on('click', (event) => this.openZoom(event));
-		}
-
-		// 避免图片抖动，让加载过程比较好看
-		if (!/^data:image\//i.test(this.src)) {
-			const isLoaded = !!this.image.get<HTMLElement>()?.clientHeight;
-			// 只有在上传过程中加背景
-			if (this.status === 'uploading' && !isLoaded) {
-				this.detail.css('background-color', '#F5F5F5');
-			}
-			// 图片比编辑器大
-			const { width, height } = this.size;
-			if (!width || width > this.maxWidth) {
-				this.detail.css('width', `${this.maxWidth}px`);
-				// 图片比编辑器小
-			} else {
-				if (width) {
-					this.detail.css('width', `${width}px`);
-				} else if (!isLoaded) {
-					this.detail.css('width', '300px');
-				}
-
-				if (height) {
-					this.detail.css('height', `${height}px`);
-				} else if (!isLoaded) {
-					this.detail.css('height', '200px');
-				}
-			}
 		}
 	}
 }

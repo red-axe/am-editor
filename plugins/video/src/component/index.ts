@@ -109,7 +109,7 @@ class VideoComponent extends Card<VideoValue> {
                         </div>
                         <div class="data-video-progress">
                             ${icons.spin}
-                            <span class="percent">${percent}%<span>
+                            <span class="percent">${percent || 0}%<span>
                         </div>
                     </div>
                 </div>

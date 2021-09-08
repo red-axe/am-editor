@@ -138,7 +138,10 @@ export default class FileCard extends Card<FileValue> {
 				});
 			}
 
-			if (!(!isEngine(this.editor) || this.editor.readonly)) {
+			if (
+				!(!isEngine(this.editor) || this.editor.readonly) &&
+				items.length > 0
+			) {
 				items.push({
 					type: 'separator',
 				});
@@ -238,6 +241,7 @@ export default class FileCard extends Card<FileValue> {
 
 	destroy = () => {
 		super.destroy();
+		this.container = undefined;
 		window.removeEventListener('resize', this.onWindowResize);
 	};
 }

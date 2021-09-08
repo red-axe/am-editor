@@ -6,12 +6,18 @@ import {
 	NodeInterface,
 	Plugin,
 	PluginEntry,
+	sanitizeUrl,
 } from '@aomao/engine';
 import VideoComponent, { VideoValue } from './component';
 import VideoUploader from './uploader';
 import locales from './locales';
 
-export default class VideoPlugin extends Plugin {
+export default class VideoPlugin extends Plugin<{
+	onBeforeRender?: (
+		action: 'download' | 'query' | 'cover',
+		url: string,
+	) => string;
+}> {
 	static get pluginName() {
 		return 'video';
 	}
@@ -119,8 +125,19 @@ export default class VideoPlugin extends Plugin {
 				const card = this.editor.card.find(node) as VideoComponent;
 				const value = card?.getValue();
 				if (value?.url && value.status === 'done') {
-					const html = `<a href="${value.url}#${value.id}" style="word-wrap: break-word;color: #096DD9;touch-action: manipulation;background-color: rgba(0,0,0,0);text-decoration: none;outline: none;cursor: pointer;transition: color .3s;">
-                ${value.name}</a>`;
+					const { onBeforeRender } = this.options;
+					const { cover, url } = value;
+					const html = `<video controls src="${sanitizeUrl(
+						onBeforeRender ? onBeforeRender('query', url) : url,
+					)}" poster="${
+						!cover
+							? 'none'
+							: sanitizeUrl(
+									onBeforeRender
+										? onBeforeRender('cover', cover)
+										: cover,
+							  )
+					}" webkit-playsinline="webkit-playsinline" playsinline="playsinline" />`;
 					node.empty();
 					node.replaceWith($(html));
 				} else node.remove();

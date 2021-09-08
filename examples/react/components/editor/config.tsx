@@ -119,6 +119,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 	},
 	[Image.pluginName]: {
 		onBeforeRender: (status: string, url: string) => {
+			if (url.startsWith('data:image/')) return url;
 			return url + `?token=12323`;
 		},
 	},
@@ -137,6 +138,12 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 	},
 	[VideoUploader.pluginName]: {
 		action: `${DOMAIN}/upload/video`,
+		limitSize: 1024 * 1024 * 50,
+	},
+	[Video.pluginName]: {
+		onBeforeRender: (status: string, url: string) => {
+			return url + `?token=12323`;
+		},
 	},
 	[Math.pluginName]: {
 		action: `https://g.yanmao.cc/latex`,

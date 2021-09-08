@@ -152,12 +152,21 @@ export default defineComponent({
           }
         }
 
+        let updateTimer: NodeJS.Timeout;
+
+        const updateByTimeout = () => {
+            clearTimeout(updateTimer);
+            updateTimer = setTimeout(() => {
+                update()
+            }, 100);
+        }
+
         onMounted(() => {
             props.engine.language.add(locales)
-            props.engine.on("select",update)
-            props.engine.on("change",update)
-            props.engine.on("blur",update)
-            props.engine.on('focus', update)
+            props.engine.on("select",updateByTimeout)
+            props.engine.on("change",updateByTimeout)
+            props.engine.on("blur",updateByTimeout)
+            props.engine.on('focus', updateByTimeout)
             if (isMobile) {
               props.engine.on('readonly', handleReadonly)
               props.engine.on('blur', hideMobileToolbar)
@@ -165,17 +174,17 @@ export default defineComponent({
               visualViewport.addEventListener('resize', calcuMobileView);
               visualViewport.addEventListener('scroll', calcuMobileView);
             } else {
-              props.engine.on('readonly', update);
+              props.engine.on('readonly', updateByTimeout);
             }
-            update()
+            updateByTimeout()
         })
 
         onUnmounted(() => {
-            props.engine.off("select",update)
-            props.engine.off("change",update)
-            props.engine.off('readonly', update);
-            props.engine.off("blur",update)
-            props.engine.off('focus', update)
+            props.engine.off("select",updateByTimeout)
+            props.engine.off("change",updateByTimeout)
+            props.engine.off('readonly', updateByTimeout);
+            props.engine.off("blur",updateByTimeout)
+            props.engine.off('focus', updateByTimeout)
             if (isMobile) {
               props.engine.off('readonly', handleReadonly)
               props.engine.off('blur', hideMobileToolbar)
@@ -183,7 +192,7 @@ export default defineComponent({
               visualViewport.removeEventListener('resize', calcuMobileView);
               visualViewport.removeEventListener('scroll', calcuMobileView);
             } else {
-              props.engine.off('readonly', update);
+              props.engine.off('readonly', updateByTimeout);
             }
         })
 

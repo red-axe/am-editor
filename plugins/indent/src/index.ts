@@ -40,7 +40,7 @@ export default class extends Plugin<Options> {
 		}
 	}
 
-	execute(type: 'in' | 'out' = 'in', isTab: boolean = false) {
+	execute(type: 'in' | 'out' = 'in') {
 		if (!isEngine(this.editor)) return;
 		const { change, list, block } = this.editor;
 		list.split();
@@ -53,7 +53,7 @@ export default class extends Plugin<Options> {
 		const maxPadding = this.options.maxPadding || 50;
 		// 其它情况
 		blocks.forEach((block) => {
-			this.addPadding(block, type === 'in' ? 2 : -2, isTab, maxPadding);
+			this.addPadding(block, type === 'in' ? 2 : -2, maxPadding);
 		});
 		list.merge();
 	}
@@ -74,19 +74,14 @@ export default class extends Plugin<Options> {
 		return 0;
 	}
 
-	addPadding(
-		block: NodeInterface,
-		padding: number,
-		isTab: boolean,
-		maxPadding: number,
-	) {
+	addPadding(block: NodeInterface, padding: number, maxPadding: number) {
 		const { list, node } = this.editor;
 		if (block.name === 'li') return;
 		if (node.isList(block)) {
 			list.addIndent(block, padding, maxPadding);
 		} else if (node.isRootBlock(block) || node.isSimpleBlock(block)) {
 			if (padding > 0) {
-				if (removeUnit(block.css(TEXT_INENT_KEY)) || isTab !== true) {
+				if (removeUnit(block.css(TEXT_INENT_KEY))) {
 					const currentValue = block.css(TEXT_INENT_KEY);
 					let newValue = removeUnit(currentValue) + padding;
 					// 获取自身宽度计算最大的indent

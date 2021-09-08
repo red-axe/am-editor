@@ -6,10 +6,9 @@ import {
 	SchemaBlock,
 	isEngine,
 	PluginEntry,
-	READY_CARD_KEY,
 	PluginOptions,
 } from '@aomao/engine';
-import CheckboxComponent from './checkbox';
+import CheckboxComponent, { CheckboxValue } from './checkbox';
 import './index.css';
 
 export interface Options extends PluginOptions {
@@ -49,12 +48,25 @@ export default class extends ListPlugin<Options> {
 			this.editor.on('paste:each-after', (child) => {
 				if (
 					child.name === 'li' &&
-					child.hasClass(this.editor.list.CUSTOMZIE_LI_CLASS) &&
-					(child.first()?.attributes(CARD_KEY) === 'checkbox' ||
-						child.first()?.attributes(READY_CARD_KEY) ===
-							'checkbox')
+					child.hasClass(this.editor.list.CUSTOMZIE_LI_CLASS)
 				) {
-					child.parent()?.addClass('data-list-task');
+					const firstChild = child.first();
+					if (
+						firstChild &&
+						firstChild.name === CheckboxComponent.cardName
+					) {
+						const card = this.editor.card.find(firstChild);
+						if (card) {
+							const parent = child.parent();
+							parent?.addClass('data-list-task');
+							const value = card.getValue() as CheckboxValue;
+							if (value && value.checked) {
+								parent?.attributes('checked', 'true');
+							} else {
+								parent?.removeAttributes('checked');
+							}
+						}
+					}
 				}
 			});
 		}
@@ -69,6 +81,7 @@ export default class extends ListPlugin<Options> {
 				type: 'block',
 				attributes: {
 					class: this.editor.list.CUSTOMZIE_LI_CLASS,
+					checked: ['true', 'false'],
 				},
 				allowIn: ['ul'],
 			},

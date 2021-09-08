@@ -116,6 +116,11 @@ export default class extends Plugin {
 					node.empty();
 					img.attributes('src', value.src);
 					img.css('visibility', 'visible');
+					img.css('background', '');
+					img.css('background-color', '');
+					img.css('background-repeat', '');
+					img.css('background-position', '');
+					img.css('background-image', '');
 					img.removeAttributes('class');
 
 					if (img.length > 0) {

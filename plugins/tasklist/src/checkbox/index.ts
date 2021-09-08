@@ -42,16 +42,19 @@ class Checkbox extends Card<CheckboxValue> {
 
 	update = (isChecked?: boolean) => {
 		const checked = isChecked === undefined ? this.isChecked() : isChecked;
+		const parent = this.root.parent();
 		if (checked) {
 			this.#container?.removeClass(CHECKBOX_CHECKED_CLASS);
 			this.root
 				.find(`.${CHECKBOX_INPUT_CLASS}`)
 				.removeAttributes('checked');
+			parent?.removeAttributes('checked');
 		} else {
 			this.#container?.addClass(CHECKBOX_CHECKED_CLASS);
 			this.root
 				.find(`.${CHECKBOX_INPUT_CLASS}`)
 				.attributes('checked', 'checked');
+			parent?.attributes('checked', 'true');
 		}
 		return checked;
 	};
