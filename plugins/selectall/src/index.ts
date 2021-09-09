@@ -1,4 +1,10 @@
-import { isEngine, Plugin, EDITABLE_SELECTOR } from '@aomao/engine';
+import {
+	$,
+	isEngine,
+	Plugin,
+	EDITABLE_SELECTOR,
+	NodeInterface,
+} from '@aomao/engine';
 
 export default class extends Plugin {
 	static get pluginName() {
@@ -19,8 +25,7 @@ export default class extends Plugin {
 		} else {
 			range.select(this.editor.container, true);
 		}
-
-		change.select(range.shrinkToElementNode());
+		change.select(range);
 		this.editor.trigger('select');
 	}
 

@@ -231,11 +231,11 @@ class ChangeModel implements ChangeInterface {
 			}
 		}
 		// 自定义列表节点选中卡片前面就让光标到卡片后面去
-		if (node.isCustomize(startNode) && startOffset === 0) {
-			range.setStart(startNode, 1);
+		if (node.isCustomize(range.startNode) && startOffset === 0) {
+			range.setStart(range.startNode, 1);
 		}
-		if (node.isCustomize(endNode) && endOffset === 0) {
-			range.setEnd(endNode, 1);
+		if (node.isCustomize(range.endNode) && endOffset === 0) {
+			range.setEnd(range.endNode, 1);
 		}
 		//在非折叠，或者当前range对象和selection中的对象不一致的时候重新设置range
 		if (

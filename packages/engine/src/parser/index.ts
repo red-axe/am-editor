@@ -170,6 +170,11 @@ class Parser implements ParserInterface {
 					const attributes = node.attributes();
 					const style = node.css();
 					delete attributes.style;
+					if (
+						Object.keys(attributes).length === 0 &&
+						Object.keys(style).length === 0
+					)
+						return;
 					//过滤不符合当前节点规则的属性样式
 					schema.filter(node, attributes, style);
 					//复制一个节点
@@ -201,11 +206,12 @@ class Parser implements ParserInterface {
 					if (rule) {
 						oldRules.push(rule);
 						let newNode = filter(node);
+						if (!newNode) return;
 						//获取这个新的节点所属类型，并且不能是之前节点一样的规则
 						let type = schema.getType(
 							newNode,
 							(rule) =>
-								rule.name === newNode.name &&
+								rule.name === newNode!.name &&
 								rule.type === 'mark' &&
 								oldRules.indexOf(rule) < 0,
 						);
@@ -214,11 +220,12 @@ class Parser implements ParserInterface {
 							newNode.append(node.children());
 							node.append(newNode);
 							newNode = filter(newNode);
+							if (!newNode) break;
 							//获取这个新的节点所属类型，并且不能是之前节点一样的规则
 							type = schema.getType(
 								newNode,
 								(rule) =>
-									rule.name === newNode.name &&
+									rule.name === newNode!.name &&
 									rule.type === 'mark' &&
 									oldRules.indexOf(rule) < 0,
 							);

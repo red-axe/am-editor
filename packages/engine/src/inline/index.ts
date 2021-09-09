@@ -682,8 +682,8 @@ class Inline implements InlineModelInterface {
 	 * @param range 光标
 	 */
 	findInlines(range: RangeInterface) {
-		if (range.startNode.isRoot()) range.shrinkToElementNode();
 		const cloneRange = range.cloneRange();
+		if (cloneRange.startNode.isRoot()) cloneRange.shrinkToElementNode();
 		if (!cloneRange.startNode.inEditor()) return [];
 		const nodeApi = this.editor.node;
 		const handleRange = (
@@ -765,9 +765,9 @@ class Inline implements InlineModelInterface {
 		// <anchor /><strong>foo</strong><focus />bar
 		// 改成
 		// <anchor /><strong>foo<focus /></strong>bar
-		if (!range.collapsed) {
-			const leftRange = range.cloneRange();
-			const rightRange = range.cloneRange();
+		if (!cloneRange.collapsed) {
+			const leftRange = cloneRange.cloneRange();
+			const rightRange = cloneRange.cloneRange();
 			leftRange.collapse(true);
 			rightRange.collapse(false);
 			handleRange(true, leftRange, true);
@@ -801,7 +801,7 @@ class Inline implements InlineModelInterface {
 			}
 		}
 		// 折叠状态时，按右侧位置的方式处理
-		if (range.collapsed) {
+		if (cloneRange.collapsed) {
 			startNode = endNode;
 		}
 		// 不存在时添加
@@ -824,7 +824,7 @@ class Inline implements InlineModelInterface {
 		};
 
 		const nodes = findNodes($(startNode));
-		const { commonAncestorNode } = range;
+		const { commonAncestorNode } = cloneRange;
 		const card = this.editor.card.find(commonAncestorNode, true);
 		let isEditable = card?.isEditable;
 		const selectionNodes = isEditable
@@ -836,7 +836,7 @@ class Inline implements InlineModelInterface {
 			isEditable = false;
 			selectionNodes.push(commonAncestorNode);
 		}
-		if (!range.collapsed || isEditable) {
+		if (!cloneRange.collapsed || isEditable) {
 			findNodes($(endNode)).forEach((nodeB) => {
 				return addNode(nodes, nodeB);
 			});
