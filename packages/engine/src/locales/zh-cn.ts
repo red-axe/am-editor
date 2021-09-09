@@ -49,4 +49,7 @@ export default {
 	checkMarkdown: {
 		title: '检测到粘贴内容符合 Markdown 语法，是否需要转换？',
 	},
+	searchEmtpy: {
+		title: '无匹配卡片',
+	},
 };

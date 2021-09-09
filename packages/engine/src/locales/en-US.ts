@@ -49,4 +49,7 @@ export default {
 	checkMarkdown: {
 		title: 'It is detected that the paste content conforms to the Markdown syntax. Do you need to do style conversion?',
 	},
+	searchEmtpy: {
+		title: 'No matching card',
+	},
 };
