@@ -75,7 +75,7 @@ export default class MathCard extends Card<MathValue> {
 		failed?: (message: string) => void,
 	) {
 		const { command } = this.editor;
-		command.execute('math', 'query', code, success, failed);
+		command.executeMethod('math', 'action', 'query', code, success, failed);
 	}
 
 	getMaxWidth() {

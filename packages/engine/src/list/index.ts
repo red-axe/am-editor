@@ -34,6 +34,8 @@ class List implements ListModelInterface {
 	readonly STYLE_POSITION_NAME = 'list-style-position';
 	readonly STYLE_POSITION_VALUE = 'inside';
 
+	backspaceEvent?: Backspace;
+
 	constructor(editor: EditorInterface) {
 		this.editor = editor;
 	}
@@ -46,10 +48,10 @@ class List implements ListModelInterface {
 				.getHandleListener('enter', 'keydown')
 				?.on((event) => enter.trigger(event));
 			//删除事件
-			const backspace = new Backspace(this.editor);
+			this.backspaceEvent = new Backspace(this.editor);
 			this.editor.typing
 				.getHandleListener('backspace', 'keydown')
-				?.on((event) => backspace.trigger(event));
+				?.on((event) => this.backspaceEvent?.trigger(event));
 		}
 	}
 

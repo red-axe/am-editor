@@ -67,8 +67,27 @@ class ChangeEvent implements ChangeEventInterface {
 			if (this.engine.readonly) {
 				return;
 			}
+
 			// 组合输入法缓存协同
 			this.engine.ot.startMutationCache();
+			const { change, node, block, list } = this.engine;
+			const range = change
+				.getRange()
+				.cloneRange()
+				.shrinkToTextNode()
+				.enlargeToElementNode();
+			// 如果光标在自定义列表项节点前输入先自定义删除，不然排版不对
+			if (!range.collapsed) {
+				const startBlock = block.closest(range.startNode);
+				const endBlock = block.closest(range.endNode);
+				if (
+					(node.isCustomize(startBlock) ||
+						node.isCustomize(endBlock)) &&
+					!startBlock.equal(endBlock)
+				) {
+					list.backspaceEvent?.trigger(new KeyboardEvent(''));
+				}
+			}
 			this.isComposing = true;
 		});
 		this.onContainer('compositionend', () => {
@@ -81,7 +100,7 @@ class ChangeEvent implements ChangeEventInterface {
 		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
 		this.onContainer('beforeinput', (event: InputEvent) => {
 			if (this.engine.readonly) return;
-			const { change, card, node } = this.engine;
+			const { change, card, node, block, list } = this.engine;
 			if (!change.rangePathBeforeCommand)
 				change.cacheRangeBeforeCommand();
 			// 单独选中卡片或者selection处于卡片边缘，手动删除卡片
@@ -100,6 +119,7 @@ class ChangeEvent implements ChangeEventInterface {
 				if (startNode.first()?.name !== 'br')
 					startNode.prepend('<br />');
 			}
+
 			if (!range.collapsed) {
 				if (
 					range.commonAncestorNode.attributes(CARD_ELEMENT_KEY) ===
@@ -113,9 +133,24 @@ class ChangeEvent implements ChangeEventInterface {
 						card.remove(range.endNode);
 				}
 			}
-
+			// 如果光标在自定义列表项节点前输入先自定义删除，不然排版不对
+			if (!range.collapsed && !this.isComposing) {
+				const startBlock = block.closest(range.startNode);
+				const endBlock = block.closest(range.endNode);
+				if (
+					(node.isCustomize(startBlock) ||
+						node.isCustomize(endBlock)) &&
+					!startBlock.equal(endBlock)
+				) {
+					list.backspaceEvent?.trigger(new KeyboardEvent(''));
+					node.insertText(event.data || '');
+				}
+			}
 			const { inputType } = event;
-			console.log(inputType);
+			// 在组合输入法未正常执行结束命令插入就先提交协同
+			if (this.isComposing && !inputType.includes('Composition')) {
+				this.engine.ot.submitMutationCache();
+			}
 			const commandTypes = ['format', 'history'];
 			commandTypes.forEach((type) => {
 				if (inputType.indexOf(type) === 0) {
@@ -136,6 +171,7 @@ class ChangeEvent implements ChangeEventInterface {
 			if (this.isCardInput(e)) {
 				return;
 			}
+
 			if (inputTimeout) clearTimeout(inputTimeout);
 			inputTimeout = setTimeout(() => {
 				if (!this.isComposing) {

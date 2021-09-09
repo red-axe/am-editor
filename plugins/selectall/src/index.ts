@@ -20,8 +20,6 @@ export default class extends Plugin {
 			range.select(this.editor.container, true);
 		}
 
-		//range.setStart(range.startNode.children().eq(0)?.first()?.last()!, 0)
-		console.log(range.startNode);
 		change.select(range.shrinkToElementNode());
 		this.editor.trigger('select');
 	}

@@ -3,6 +3,10 @@ import { NodeInterface } from './node';
 import { BlockInterface } from './block';
 import { RangeInterface } from './range';
 
+export interface BackspaceInterface {
+	trigger(event: KeyboardEvent, isDeepMerge?: boolean): boolean | undefined;
+}
+
 export interface ListInterface extends BlockInterface {
 	/**
 	 * 自定义列表卡片名称
@@ -28,6 +32,7 @@ export interface ListModelInterface {
 	 * 列表缩进key
 	 */
 	readonly INDENT_KEY: string;
+	backspaceEvent?: BackspaceInterface;
 	/**
 	 * 初始化
 	 */

@@ -47,22 +47,22 @@ export default class Math extends Plugin<Options> {
 	}
 
 	execute(...args: any): void {
-		const action = args[0];
 		const { card } = this.editor;
+		const cardComponent = card.insert(MathComponent.cardName, {
+			code: args[0] || '',
+			url: args[1] || '',
+		});
+		card.activate(cardComponent.root);
+		window.setTimeout(() => {
+			(cardComponent as MathComponent).focusTextarea();
+		}, 10);
+	}
+
+	action(action: string, ...args: any) {
 		switch (action) {
 			case 'query':
-				const [_, code, success, failed] = args;
+				const [code, success, failed] = args;
 				return this.query(code, success, failed);
-			default:
-				const cardComponent = card.insert(MathComponent.cardName, {
-					code: args[0] || '',
-					url: args[1] || '',
-				});
-				card.activate(cardComponent.root);
-				window.setTimeout(() => {
-					(cardComponent as MathComponent).focusTextarea();
-				}, 10);
-				break;
 		}
 	}
 

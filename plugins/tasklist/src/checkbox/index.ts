@@ -42,6 +42,8 @@ class Checkbox extends Card<CheckboxValue> {
 
 	onSelectByOther() {}
 
+	onSelect() {}
+
 	update = (isChecked?: boolean) => {
 		const checked = isChecked === undefined ? this.isChecked() : isChecked;
 		const parent = this.root.parent();
@@ -79,7 +81,6 @@ class Checkbox extends Card<CheckboxValue> {
         <span class="${CHECKBOX_CLASS}${
 			isMobile ? ` ${CHECKBOX_CLASS}-mobile` : ''
 		}">
-            <input type="checkbox" class="${CHECKBOX_INPUT_CLASS}" value="">
                 <span class="${CHECKBOX_INNER_CLASS}"></span>
             </span>`;
 		const value = this.getValue();
@@ -93,7 +94,6 @@ class Checkbox extends Card<CheckboxValue> {
 		if (!isEngine(this.editor) || this.editor.readonly) {
 			return;
 		}
-
 		this.#container.on('click', this.onClick);
 	}
 
