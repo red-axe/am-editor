@@ -836,6 +836,9 @@ class List implements ListModelInterface {
 		}
 		// 只有一行
 		if (fragment.childNodes.length === 0) {
+			if (node.isCustomize(startLi)) {
+				startLi.first()?.remove();
+			}
 			startLi.parent()?.prev()?.last()?.append(startLi.children());
 			startLi.parent()?.remove();
 			apply(safeRange);
