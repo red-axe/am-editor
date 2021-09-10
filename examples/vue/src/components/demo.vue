@@ -8,7 +8,7 @@
             v-for="member in members"
             :key="member['id']"
             size="30"
-            :style="`background-color:${member['color']}`"
+            :style="`backgroundColor:${member['color']}`"
             >
                 {{member['name']}}
             </avatar>
