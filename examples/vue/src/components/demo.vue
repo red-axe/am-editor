@@ -338,8 +338,8 @@ export default defineComponent({
                         //     if (member) localStorage.setItem('member', JSON.stringify(member));
                         // });
                         // //用户加入或退出改变
-                        // otClient.on('membersChange', members => {
-                        //     members.value = members;
+                        // otClient.on('membersChange', currentMembers => {
+                        //     members.value = currentMembers;
                         // });
                     },
                 })
