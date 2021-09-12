@@ -156,13 +156,9 @@ isSelecting(): boolean;
 /**
  * @param value 值
  * @param onParse 在转换为符合标准的编辑器值前使用根节点解析过滤
- * @param options 异步渲染卡片配置
+ * @param options 异步渲染卡片回调
  * */
-setValue(value: string, onParse?: (node: Node) => void, options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		}): void;
+setValue(value: string, onParse?: (node: Node) => void, callback?: (count: number) => void): void;
 ```
 
 ### `setHtml`
@@ -173,13 +169,9 @@ setValue(value: string, onParse?: (node: Node) => void, options?: {
 /**
  * 设置html，会格式化为合法的编辑器值
  * @param html html
- * @param options 异步渲染卡片配置
+ * @param options 异步渲染卡片回调
  */
-setHtml(html: string, options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		}): void
+setHtml(html: string, callback?: (count: number) => void): void
 ```
 
 ### `getOriginValue`

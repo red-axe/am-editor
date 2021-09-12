@@ -66,6 +66,19 @@ new Engine(...,{
  })
 ```
 
+### onConfirm
+
+可对要修改的 url 或者 文本 进行修改
+
+在编辑文本和 url 后确认执行
+
+```ts
+onConfirm?: (
+    text: string,
+    link: string,
+) => Promise<{ text: string; link: string }>;
+```
+
 ## 命令
 
 可传入三个参数[target?:string,href?:string,text?:string] 打开模式：可选，默认链接：可选，默认文本：可选

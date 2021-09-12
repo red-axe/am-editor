@@ -66,6 +66,19 @@ new Engine(...,{
  })
 ```
 
+### onConfirm
+
+The url or text to be modified can be modified
+
+Confirm execution after editing text and url
+
+```ts
+onConfirm?: (
+     text: string,
+     link: string,
+) => Promise<{ text: string; link: string }>;
+```
+
 ## Command
 
 Three parameters can be passed in [target?:string,href?:string,text?:string] Open mode: optional, default link: optional, default text: optional

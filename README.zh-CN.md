@@ -136,8 +136,6 @@ const EngineDemo = () => {
 		if (!ref.current) return;
 		//实例化引擎
 		const engine = new Engine(ref.current);
-		//初始化本地协作，用作记录历史
-		engine.ot.initLockMode();
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件

@@ -12,6 +12,7 @@
 /docs-dist
 /logs
 /run
+/config/prod.json
 
 # misc
 .DS_Store

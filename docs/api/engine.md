@@ -129,6 +129,17 @@ Get the html of the editor
 getHtml(): string;
 ```
 
+### `getJsonValue`
+
+Get the value in JSON format
+
+```ts
+/**
+  * Get the value in JSON format
+  */
+getJsonValue(): string | undefined | (string | {})[];
+```
+
 ### `setValue`
 
 Set editor value
@@ -137,13 +148,9 @@ Set editor value
 /**
   * Set editor value
   * @param value
-  * @param options Asynchronous rendering card configuration
+  * @param options Card asynchronous rendering callback
   */
-setValue(value: string, options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		}): EngineInterface;
+setValue(value: string, callback?: (count: number) => void): EngineInterface;
 ```
 
 ### `setHtml`
@@ -154,13 +161,9 @@ Set html as editor value
 /**
 * Set html, it will be formatted as a legal editor value
 * @param html html
-* @param options Asynchronous rendering card configuration
+* @param options Card asynchronous rendering callback
 */
-setHtml(html: string, options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		}): EngineInterface
+setHtml(html: string, callback?: (count: number) => void): EngineInterface
 ```
 
 ### `setJsonValue`

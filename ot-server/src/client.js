@@ -1,11 +1,23 @@
+const { NODE_ENV } = process.env;
 const WebSocketJSONStream = require('@teamwork/websocket-json-stream');
 const MongoClient = require('mongodb').MongoClient;
-const db = require('sharedb-mongo')({
+
+const fs = require('fs');
+const { join } = require('path');
+const isDev = NODE_ENV !== 'production';
+const configPath = join(__dirname, `../config/${isDev ? 'dev' : 'prod'}.json`);
+const configString = fs.readFileSync(`${configPath}`, 'utf-8');
+let config = {};
+try {
+	config = JSON.parse(configString).mongodb;
+} catch (error) {
+	console.log(error);
+}
+
+const { user, pwd, db, url } = config;
+const mongodb = require('sharedb-mongo')({
 	mongo: function (callback) {
-		MongoClient.connect(
-			'mongodb://yanmao:yanmao123456@localhost:27017/yanmao',
-			callback,
-		);
+		MongoClient.connect(`mongodb://${user}:${pwd}@${url}/${db}`, callback);
 	},
 });
 const ShareDB = require('sharedb');
@@ -13,7 +25,7 @@ const { v3 } = require('uuid');
 const Doc = require('./doc');
 
 class Client {
-	constructor(backend = new ShareDB({ db })) {
+	constructor(backend = new ShareDB({ db: mongodb })) {
 		this.docs = [];
 		this.timeouts = {};
 		this.backend = backend;

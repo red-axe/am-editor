@@ -51,8 +51,6 @@ const EngineDemo = () => {
 		if (!ref.current) return;
 		//Instantiate the engine
 		const engine = new Engine(ref.current);
-		//Initialize local collaboration to record history
-		engine.ot.initLockMode();
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
@@ -109,8 +107,6 @@ const EngineDemo = () => {
 		const engine = new Engine(ref.current, {
 			plugins: [Bold],
 		});
-		//Initialize local collaboration to record history
-		engine.ot.initLockMode();
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
@@ -171,8 +167,6 @@ const EngineDemo = () => {
 			plugins: [CodeBlock],
 			cards: [CodeBlockComponent],
 		});
-		//Initialize local collaboration to record history
-		engine.ot.initLockMode();
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
@@ -256,8 +250,6 @@ const EngineDemo = () => {
 			plugins: [CodeBlock, Bold, ToolbarPlugin],
 			cards: [CodeBlockComponent, ToolbarComponent],
 		});
-		//Initialize local collaboration to record history
-		engine.ot.initLockMode();
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event

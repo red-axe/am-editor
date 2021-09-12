@@ -4,14 +4,17 @@
   "description": "AoMao编辑器协作服务",
   "private": true,
   "scripts": {
-    "start": "node src/index.js"
+    "dev": "nodemon src/index.js",
+    "start": "cross-env NODE_ENV=production nodemon src/index.js"
   },
   "engines": {
     "node": ">=10.0.0"
   },
   "dependencies": {
     "@teamwork/websocket-json-stream": "^2.0.0",
+    "cross-env": "^7.0.3",
     "express": "^4.17.1",
+    "nodemon": "^2.0.12",
     "sharedb": "^1.9.2",
     "sharedb-mongo": "^1.0.0-beta.20",
     "url": "^0.11.0",

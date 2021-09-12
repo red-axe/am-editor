@@ -129,6 +129,17 @@ getValueAsync(ignoreCursor?: boolean): Promise<string>;
 getHtml(): string;
 ```
 
+### `getJsonValue`
+
+获取 JSON 格式的值
+
+```ts
+/**
+ * 获取JSON格式的值
+ */
+getJsonValue(): string | undefined | (string | {})[];
+```
+
 ### `setValue`
 
 设置编辑器值
@@ -137,13 +148,9 @@ getHtml(): string;
 /**
  * 设置编辑器值
  * @param value 值
- * @param options 异步渲染卡片配置
+ * @param options 异步渲染卡片回调
  */
-setValue(value: string, options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		}): EngineInterface;
+setValue(value: string, callback?: (count: number) => void): EngineInterface;
 ```
 
 ### `setHtml`
@@ -154,13 +161,9 @@ setValue(value: string, options?: {
 /**
 * 设置html，会格式化为合法的编辑器值
 * @param html html
-* @param options 异步渲染卡片配置
+* @param options 异步渲染卡片回调
 */
-setHtml(html: string, options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		}): EngineInterface
+setHtml(html: string, callback?: (count: number) => void): EngineInterface
 ```
 
 ### `setJsonValue`

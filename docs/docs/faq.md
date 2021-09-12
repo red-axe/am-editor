@@ -30,12 +30,3 @@ global.__amWindow = window;
 ```
 
 2. Introduce third-party packages dynamically or use `isServer` to determine whether there is a window object. This can solve the problem of no errors when running, but the content cannot be completely rendered on the server side. You can output html on the server to meet the needs of seo. Re-render the view reader after loading into the browser
-
-## Undo and redo plugins are always disabled
-
-If you need to enable history, we need to call the following method after the engine is initialized
-
-```ts
-//Initialize local collaboration to record history
-engine.ot.initLockMode();
-```

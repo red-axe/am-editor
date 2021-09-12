@@ -134,8 +134,6 @@ const EngineDemo = () => {
 		if (!ref.current) return;
 		//Instantiate the engine
 		const engine = new Engine(ref.current);
-		//Initialize local collaboration to record history
-		engine.ot.initLockMode();
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
