@@ -187,17 +187,11 @@ class Template implements TemplateInterface {
 				noBorder === true ? " data-table-no-border='true'" : ''
 			} ${DATA_TRANSIENT_ATTRIBUTES}="class">${colgroup}${trs}</table>`;
 
-		return `<div class="${TABLE_WRAPPER_CLASS_NAME}" ${DATA_TRANSIENT_ATTRIBUTES}="*">
-                ${tableHeader}
-                <div class="${VIEWPORT}">
-                    ${this.renderColsHeader(cols)}
-                    ${table}
-                    ${placeholder}
-                    ${tableHighlight}
-                </div>
-                ${this.renderRowsHeader(rows)}
-                ${menuBar}
-            </div>`;
+		return `<div class="${TABLE_WRAPPER_CLASS_NAME}" ${DATA_TRANSIENT_ATTRIBUTES}="*">${tableHeader}<div class="${VIEWPORT}">${this.renderColsHeader(
+			cols,
+		)}${table}${placeholder}${tableHighlight}</div>${this.renderRowsHeader(
+			rows,
+		)}${menuBar}</div>`;
 	}
 
 	htmlView({ html, noBorder }: TableValue) {

@@ -38,6 +38,10 @@ export default class extends ListPlugin<Options> {
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
+			this.editor.on(
+				'paste:markdown-check',
+				(child) => !this.checkMarkdown(child),
+			);
 		}
 	}
 
@@ -107,14 +111,24 @@ export default class extends ListPlugin<Options> {
 		return false;
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	checkMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
 		const text = node.text();
 		if (!text) return;
 
 		const reg = /(^|\r\n|\n)(\d{1,9}\.)/;
-		let match = reg.exec(text);
+		const match = reg.exec(text);
+		return {
+			reg,
+			match,
+		};
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		const result = this.checkMarkdown(node);
+		if (!result) return;
+		const { match } = result;
 		if (!match) return;
 
 		const { list } = this.editor;
@@ -128,7 +142,7 @@ export default class extends ListPlugin<Options> {
 			list.addBr(listNode);
 			return listNode.get<Element>()?.outerHTML;
 		};
-
+		const text = node.text();
 		let newText = '';
 		const rows = text.split(/\n|\r\n/);
 		let nodes: Array<string> = [];

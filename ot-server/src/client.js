@@ -1,10 +1,19 @@
 const WebSocketJSONStream = require('@teamwork/websocket-json-stream');
+const MongoClient = require('mongodb').MongoClient;
+const db = require('sharedb-mongo')({
+	mongo: function (callback) {
+		MongoClient.connect(
+			'mongodb://yanmao:yanmao123456@localhost:27017/yanmao',
+			callback,
+		);
+	},
+});
 const ShareDB = require('sharedb');
 const { v3 } = require('uuid');
 const Doc = require('./doc');
 
 class Client {
-	constructor(backend = new ShareDB()) {
+	constructor(backend = new ShareDB({ db })) {
 		this.docs = [];
 		this.timeouts = {};
 		this.backend = backend;
@@ -32,7 +41,7 @@ class Client {
 						if (timeout) clearTimeout(timeout);
 						this.timeouts[key] = setTimeout(() => {
 							doc.removeMember(uuid);
-						}, 60000);
+						}, 300000);
 						doc.sendMessage(
 							uuid,
 							'heartbeat',

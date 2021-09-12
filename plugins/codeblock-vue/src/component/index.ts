@@ -94,7 +94,6 @@ class CodeBlcok extends Card<CodeBlockValue> {
 				didMount: (node) => {
 					// 等待编辑插件渲染成功后才能去到mode
 					setTimeout(() => {
-						console.log(32435);
 						renderSelect(
 							node.get<HTMLElement>()!,
 							(this.constructor as typeof CodeBlcok).getModes(),

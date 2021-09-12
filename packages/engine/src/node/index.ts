@@ -254,8 +254,7 @@ class NodeModel implements NodeModelInterface {
 			}
 
 			const children = outer.allChildren();
-			children.forEach((node) => {
-				const child = $(node);
+			children.forEach((child) => {
 				if (
 					!child.isText() &&
 					this.isMark(child) &&
@@ -385,14 +384,9 @@ class NodeModel implements NodeModelInterface {
 				const prev = child.prev();
 				if (!prev || prev.isText()) {
 					child.allChildren().forEach((child) => {
-						if (
-							child.nodeType === getDocument().TEXT_NODE &&
-							child.textContent
-						) {
-							child.textContent = child.textContent.replace(
-								/\u200b/,
-								'',
-							);
+						const text = child.text();
+						if (child.type === getDocument().TEXT_NODE && !!text) {
+							child.text(text.replace(/\u200b/, ''));
 						}
 					});
 				}

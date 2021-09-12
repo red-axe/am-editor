@@ -394,8 +394,7 @@ class Inline implements InlineModelInterface {
 	) {
 		const { node } = this.editor;
 		const children = root.allChildren();
-		children.forEach((childNode) => {
-			const child = $(childNode);
+		children.forEach((child) => {
 			if (
 				node.isEmpty(child) &&
 				node.isInline(child) &&

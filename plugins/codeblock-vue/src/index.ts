@@ -45,6 +45,10 @@ export default class extends Plugin<Options> {
 		this.editor.on('paste:each', (child) => this.pasteHtml(child));
 		if (isEngine(this.editor) && this.markdown) {
 			this.editor.on('keydown:enter', (event) => this.markdown(event));
+			this.editor.on(
+				'paste:markdown-check',
+				(child) => !this.checkMarkdown(child),
+			);
 			this.editor.on('paste:markdown-before', (child) =>
 				this.pasteMarkdown(child),
 			);
@@ -145,13 +149,22 @@ export default class extends Plugin<Options> {
 		}
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	checkMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
-
-		let text = node.text();
+		const text = node.text();
 		if (!text) return;
 		const reg = /```/;
-		let match = reg.exec(text);
+		const match = reg.exec(text);
+		return {
+			reg,
+			match,
+		};
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		const result = this.checkMarkdown(node);
+		if (!result) return;
+		let { match } = result;
 		if (!match) return;
 		const { card } = this.editor;
 
@@ -183,7 +196,7 @@ export default class extends Plugin<Options> {
 			return carNode.get<Element>()?.outerHTML;
 		};
 
-		const rows = text.split(/\n|\r\n/);
+		const rows = node.text().split(/\n|\r\n/);
 		let nodes: Array<string> = [];
 		let isCode: boolean = false;
 		let mode = 'text';

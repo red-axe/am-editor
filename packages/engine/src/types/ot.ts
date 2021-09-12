@@ -191,7 +191,12 @@ export interface OTInterface extends EventEmitter2 {
 	selectionData: SelectionDataInterface;
 	destroy(): void;
 	initLockMode(): void;
-	init(doc: Doc): void;
+	/**
+	 * 初始化协同服务
+	 * @param doc 文档对象
+	 * @param defaultValue 如果文档不存在，则使用 defaultValue 初始化默认值
+	 */
+	init(doc: Doc, defaultValue?: string): void;
 	handleOps(ops: Op[]): void;
 	submitOps(ops: Op[]): void;
 	applyAll(ops: Op[]): void;

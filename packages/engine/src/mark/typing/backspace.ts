@@ -11,13 +11,9 @@ class Backspace {
 	trigger(event: KeyboardEvent) {
 		const { change, node } = this.engine;
 		const range = change.getRange();
-		const {
-			collapsed,
-			endNode,
-			startNode,
-			startOffset,
-			endOffset,
-		} = range.cloneRange().shrinkToTextNode();
+		const { collapsed, endNode, startNode, startOffset, endOffset } = range
+			.cloneRange()
+			.shrinkToTextNode();
 		if (
 			endNode.type === Node.TEXT_NODE ||
 			startNode.type === Node.TEXT_NODE
@@ -96,7 +92,10 @@ class Backspace {
 						.collapse(false);
 					range.setStart(startNode, startOffset - 1);
 				} else {
-					range.setStart(startNode, startOffset - 1);
+					range.setStart(
+						startNode,
+						startOffset > 0 ? startOffset - 1 : 0,
+					);
 				}
 			}
 		}

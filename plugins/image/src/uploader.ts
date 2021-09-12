@@ -13,6 +13,7 @@ import {
 	CARD_VALUE_KEY,
 	decodeCardValue,
 	encodeCardValue,
+	removeUnit,
 } from '@aomao/engine';
 import ImageComponent from './component';
 
@@ -145,6 +146,10 @@ export default class extends Plugin<Options> {
 			);
 			this.editor.on('paste:each', (node) => this.pasteEach(node));
 			this.editor.on('paste:after', () => this.pasteAfter());
+			this.editor.on(
+				'paste:markdown-check',
+				(child) => !this.checkMarkdown(child),
+			);
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
@@ -433,6 +438,8 @@ export default class extends Plugin<Options> {
 				node.remove();
 				return;
 			}
+			const width = node.css('width');
+			const height = node.css('height');
 			this.editor.card.replaceNode(node, 'image', {
 				src,
 				status:
@@ -441,6 +448,10 @@ export default class extends Plugin<Options> {
 						: 'done',
 				alt,
 				percent: 0,
+				size: {
+					width: removeUnit(width),
+					height: removeUnit(height),
+				},
 			});
 			node.remove();
 		}
@@ -590,10 +601,9 @@ export default class extends Plugin<Options> {
 		}
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	checkMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
-		const { isRemote } = this.options;
 		const text = node.text();
 		if (!text) return;
 		// 带跳转链接的图片
@@ -607,7 +617,18 @@ export default class extends Plugin<Options> {
 			reg = /(!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\))/;
 			match = reg.exec(text);
 		}
+		return {
+			reg,
+			match,
+		};
+	}
 
+	pasteMarkdown(node: NodeInterface) {
+		const result = this.checkMarkdown(node);
+		if (!result) return;
+
+		const { isRemote } = this.options;
+		let { reg, match } = result;
 		if (!match) return;
 		let newText = '';
 		let textNode = node.clone(true).get<Text>()!;

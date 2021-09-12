@@ -416,8 +416,8 @@ class Creator extends EventEmitter2 {
 					!!card.root.attributes(CARD_ASYNC_RENDER)
 				) {
 					card.root.allChildren().forEach((child) => {
-						if (child.nodeType === getDocument().ELEMENT_NODE)
-							this.cacheTransientElements?.push(child);
+						if (child.type === getDocument().ELEMENT_NODE)
+							this.cacheTransientElements?.push(child[0]);
 					});
 				}
 			});
@@ -426,8 +426,8 @@ class Creator extends EventEmitter2 {
 				.find(`${UI_SELECTOR}`)
 				.allChildren()
 				.forEach((child) => {
-					if (child.nodeType === getDocument().ELEMENT_NODE)
-						this.cacheTransientElements?.push(child);
+					if (child.type === getDocument().ELEMENT_NODE)
+						this.cacheTransientElements?.push(child[0]);
 				});
 		}
 		records = records.filter(

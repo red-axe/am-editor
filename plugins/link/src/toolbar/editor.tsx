@@ -36,7 +36,10 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 	}, []);
 
 	return (
-		<div className={classnames('data-link-editor', className)}>
+		<div
+			data-element="ui"
+			className={classnames('data-link-editor', className)}
+		>
 			<p>{language.get('link', 'text')}</p>
 			<p>
 				<Input

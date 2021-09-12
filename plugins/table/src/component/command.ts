@@ -346,7 +346,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const { tableModel } = selection;
 		if (!tableModel) return;
 		const selectArea = selection.getSelectArea();
-		const isUp = position === 'up';
+		let isUp = position === 'up';
 		const isEnd = position === 'end' || !position;
 		let baseRow = tableModel.rows - 1;
 
@@ -359,7 +359,8 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			});
 			baseRow = isUp ? selectArea.begin.row : rows;
 		}
-		const insertRow = isUp ? baseRow : baseRow + 1;
+		let insertRow = isUp ? baseRow : baseRow;
+
 		this.insertRowAt(insertRow, count, isUp, ...args);
 	}
 

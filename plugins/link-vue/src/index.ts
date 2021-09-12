@@ -44,7 +44,9 @@ export default class extends InlinePlugin<Options> {
 		super.init();
 		const editor = this.editor;
 		if (isEngine(editor)) {
-			this.toolbar = new Toolbar(editor);
+			this.toolbar = new Toolbar(editor, {
+				onConfirm: this.options.onConfirm,
+			});
 		}
 		editor.on('paser:html', (node) => this.parseHtml(node));
 		editor.on('select', () => {
@@ -126,14 +128,24 @@ export default class extends InlinePlugin<Options> {
 		return;
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	checkMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
 		const text = node.text();
 		if (!text) return;
 
-		const reg = /([^!]\[(.+?)\]\(([\S]+?)\))/;
-		let match = reg.exec(text);
+		const reg = /(\[(.+?)\]\(([\S]+?)\))/;
+		const match = reg.exec(text);
+		return {
+			reg,
+			match,
+		};
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		const result = this.checkMarkdown(node);
+		if (!result) return;
+		let { reg, match } = result;
 		if (!match) return;
 
 		let newText = '';

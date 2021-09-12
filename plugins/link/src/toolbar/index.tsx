@@ -11,16 +11,25 @@ import {
 import Editor from './editor';
 import Preview from './preview';
 
+export type ToolbarOptions = {
+	onConfirm?: (
+		text: string,
+		link: string,
+	) => Promise<{ text: string; link: string }>;
+};
+
 class Toolbar {
 	private engine: EngineInterface;
 	private root?: NodeInterface;
 	private target?: NodeInterface;
+	private options?: ToolbarOptions;
 	private mouseInContainer: boolean = false;
 	#position: Position;
 
-	constructor(engine: EngineInterface) {
+	constructor(engine: EngineInterface, options?: ToolbarOptions) {
 		this.engine = engine;
 		const { change } = this.engine;
+		this.options = options;
 		this.#position = new Position(this.engine);
 		change.event.onWindow('mousedown', (event: MouseEvent) => {
 			if (!event.target) return;
@@ -52,7 +61,7 @@ class Toolbar {
 		});
 	}
 
-	private onOk(text: string, link: string) {
+	private async onOk(text: string, link: string) {
 		if (!this.target) return;
 		const { change, history } = this.engine;
 		const range = change.getRange();
@@ -63,7 +72,12 @@ class Toolbar {
 			}
 			change.cacheRangeBeforeCommand();
 		}
-
+		const { onConfirm } = this.options || {};
+		if (onConfirm) {
+			const result = await onConfirm(text, link);
+			text = result.text;
+			link = result.link;
+		}
 		this.target.attributes('href', link);
 		text = text.trim() === '' ? link : text;
 		const oldText = this.target.text();

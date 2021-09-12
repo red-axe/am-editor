@@ -510,40 +510,30 @@ export interface EngineInterface extends EditorInterface {
 	/**
 	 * 设置编辑器值
 	 * @param value 值
+	 * @param callback 异步渲染卡片后的回调
 	 */
 	setValue(
 		value: string,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
+		callback?: (count: number) => void,
 	): EngineInterface;
 	/**
 	 * 设置html，会格式化为合法的编辑器值
 	 * @param html html
-	 * @param options 异步渲染卡片配置
+	 * @param callback 异步渲染卡片后的回调
 	 */
-	setHtml(
-		html: string,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
-	): EngineInterface;
+	setHtml(html: string, callback?: (count: number) => void): EngineInterface;
 	/**
 	 * 设置json格式值，主要用于协同
-	 * @param value 值
+	 * @param callback 异步渲染卡片后的回调
 	 */
 	setJsonValue(
 		value: Array<any>,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
+		callback?: (count: number) => void,
 	): EngineInterface;
+	/**
+	 * 获取JSON格式的值
+	 */
+	getJsonValue(): string | undefined | (string | {})[];
 	/**
 	 * 绑定事件
 	 * @param eventType 事件类型

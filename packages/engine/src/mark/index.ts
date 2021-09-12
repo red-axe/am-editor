@@ -255,8 +255,7 @@ class Mark implements MarkModelInterface {
 	) {
 		const { node } = this.editor;
 		const children = root.allChildren();
-		children.forEach((childNode) => {
-			const child = $(childNode);
+		children.forEach((child) => {
 			if (
 				node.isEmpty(child) &&
 				node.isMark(child) &&
@@ -939,13 +938,12 @@ class Mark implements MarkModelInterface {
 									// 移除目标子级内相同的插件
 									const allChildren =
 										targetNode.allChildren();
-									allChildren.forEach((_, index) => {
+									allChildren.forEach((children) => {
 										if (
-											allChildren[index].nodeType ===
+											children.type ===
 											getDocument().TEXT_NODE
 										)
 											return;
-										const children = $(allChildren[index]);
 										if (nodeApi.isMark(children)) {
 											const childPlugin =
 												this.findPlugin(children);

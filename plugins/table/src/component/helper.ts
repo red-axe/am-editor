@@ -421,7 +421,13 @@ class Helper implements HelperInterface {
 	copyTo(from: NodeInterface | Node, to: NodeInterface | Node) {
 		if (isNode(from)) from = $(from);
 		if (isNode(to)) to = $(to);
-		to.html(transformCustomTags(from.html()));
+
+		let editableElement = to.find(EDITABLE_SELECTOR);
+		if (editableElement.length === 0) {
+			to.html(Template.EmptyCell);
+			editableElement = to.find(EDITABLE_SELECTOR);
+		}
+		editableElement.html(transformCustomTags(from.html()));
 		if (
 			to.name === 'td' &&
 			to.find(Template.TABLE_TD_BG_CLASS).length === 0

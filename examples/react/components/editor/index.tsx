@@ -96,6 +96,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 			...pluginConfig,
 			'mark-range': getConfig(engine, comment),
 		},
+		// 编辑器值改变事件
 		onChange: useCallback(
 			(value: string, trigger: 'remote' | 'local' | 'both') => {
 				if (loading) return;
@@ -103,11 +104,14 @@ const EditorComponent: React.FC<EditorProps> = ({
 				//自动保存，非远程更改，触发保存
 				if (trigger !== 'remote') autoSave();
 				if (props.onChange) props.onChange(value, trigger);
+				// 获取编辑器的值
 				console.log(`value ${trigger} update:`, value);
+				// 获取当前所有at插件中的名单
 				console.log(
 					'mention:',
 					engine.current?.command.executeMethod('mention', 'getList'),
 				);
+				// 获取编辑器的html
 				console.log('html:', engine.current?.getHtml());
 			},
 			[loading, autoSave, props.onChange],
@@ -156,30 +160,29 @@ const EditorComponent: React.FC<EditorProps> = ({
 							defaultValue.value,
 					  )
 					: defaultValue.value;
-			//设置编辑器值，并异步渲染卡片
-			engine.current.setValue(value, {
-				enableAsync: true,
-				triggerOT: props.ot ? false : true, //对于异步渲染后的卡片节点不提交到协同服务端，否则会冲突
-				callback: () => {
-					//卡片异步渲染完成后
-					if (!props.ot) {
-						if (onLoad) onLoad(engine.current!);
-						return setLoading(false);
-					}
-					//实例化协作编辑客户端
-					const ot = new OTClient(engine.current!);
-					//连接到协作服务端，demo文档
-					const { url, docId, onReady } = props.ot;
-					ot.connect(url, docId);
-					ot.on('ready', (member) => {
-						if (onLoad) onLoad(engine.current!);
-						if (onReady) onReady(member);
-						setMember(member);
-						setLoading(false);
-					});
-					otClient.current = ot;
-				},
-			});
+
+			//连接到协作服务端，demo文档
+			if (props.ot) {
+				//实例化协作编辑客户端
+				const ot = new OTClient(engine.current);
+				const { url, docId, onReady } = props.ot;
+				// 连接协同服务端，如果服务端没有对应docId的文档，将使用 defaultValue 初始化
+				ot.connect(url, docId, value);
+				ot.on('ready', (member) => {
+					if (onLoad) onLoad(engine.current!);
+					if (onReady) onReady(member);
+					setMember(member);
+					setLoading(false);
+				});
+				otClient.current = ot;
+			} else {
+				// 非协同编辑，设置编辑器值，异步渲染后回调
+				engine.current.setValue(value, (count) => {
+					console.log(count);
+					if (onLoad) onLoad(engine.current!);
+					return setLoading(false);
+				});
+			}
 			setValue(value);
 		}
 

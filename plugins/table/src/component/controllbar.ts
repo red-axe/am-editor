@@ -1008,7 +1008,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			this.placeholder?.css('height', `${height}px`);
 			this.placeholder?.css(
 				'left',
-				left - 2 + removeUnit(paddingLeft) + 'px',
+				left - 4 + removeUnit(paddingLeft) + 'px',
 			);
 			this.placeholder?.css('top', paddingTop);
 			this.placeholder?.css('display', 'block');
@@ -1140,8 +1140,8 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				true,
 			);
 			selection.selectCol(index, index + count - 1);
+			command.mockPaste(true);
 			setTimeout(() => {
-				command.mockPaste(true);
 				selection.selectCol(
 					selectArea.begin.col + count,
 					selectArea.end.col + count,
@@ -1158,8 +1158,8 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				true,
 			);
 			selection.selectCol(index, index + count - 1);
+			command.mockPaste(true);
 			setTimeout(() => {
-				command.mockPaste(true);
 				selection.selectCol(selectArea.begin.col, selectArea.end.col);
 				command.removeCol();
 				selection.selectCol(index - count, index - 1);

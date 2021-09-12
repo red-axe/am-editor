@@ -284,8 +284,10 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	initValue(range?: RangeInterface) {
-		const emptyHtml = '<p><br /></p>';
-		if (this.engine.container.html() === emptyHtml) return;
+		const html = this.engine.container.html();
+		const defaultHtml = '<p><br /></p>';
+		if (html === defaultHtml) return;
+		const emptyHtml = html || defaultHtml;
 		const node = $(emptyHtml);
 		this.engine.container.empty().append(node);
 		const safeRange = range || this.getRange();
@@ -298,12 +300,8 @@ class ChangeModel implements ChangeInterface {
 
 	setValue(
 		value: string,
-		onParse?: (node: Node) => void,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
+		onParse?: (node: NodeInterface) => void,
+		callback?: (count: number) => void,
 	) {
 		const range = this.getRange();
 		const {
@@ -318,8 +316,8 @@ class ChangeModel implements ChangeInterface {
 			card,
 		} = this.engine;
 		if (value === '') {
+			this.engine.container.html(value);
 			this.initValue();
-			if (options?.callback) options.callback(0);
 			return;
 		} else {
 			const parser = new Parser(value, this.engine, (root) => {
@@ -333,22 +331,15 @@ class ChangeModel implements ChangeInterface {
 			container.html(parser.toValue(schema, conversion, false, true));
 
 			block.generateDataIDForDescendant(container.get<Element>()!);
-			card.render(undefined, {
-				...options,
-				callback: (count) => {
-					if (options?.triggerOT === false)
-						this.engine.history.startCache();
-					container.allChildren(true).forEach((child) => {
-						if (node.isInline(child)) {
-							inline.repairCursor(child);
-						} else if (node.isMark(child)) {
-							mark.repairCursor(child);
-						}
-					});
-					if (options?.triggerOT === false)
-						this.engine.history.destroyCache();
-					if (options?.callback) options.callback(count);
-				},
+			card.render(undefined, (count) => {
+				container.allChildren(true).forEach((child) => {
+					if (node.isInline(child)) {
+						inline.repairCursor(child);
+					} else if (node.isMark(child)) {
+						mark.repairCursor(child);
+					}
+				});
+				if (callback) callback(count);
 			});
 			const cursor = container.find(CURSOR_SELECTOR);
 			const selection: SelectionInterface = new Selection(
@@ -380,15 +371,8 @@ class ChangeModel implements ChangeInterface {
 		this.change();
 	}
 
-	setHtml(
-		html: string,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
-	) {
-		this.paste(html, undefined, options);
+	setHtml(html: string, callback?: (count: number) => void) {
+		this.paste(html, undefined, callback);
 	}
 
 	getOriginValue() {
@@ -434,9 +418,7 @@ class ChangeModel implements ChangeInterface {
 		const tags = schema.getAllowInTags();
 		return (
 			node.isEmptyWithTrim(container) &&
-			!container
-				.allChildren()
-				.some((child) => tags.includes(child.nodeName.toLowerCase()))
+			!container.allChildren().some((child) => tags.includes(child.name))
 		);
 	}
 
@@ -896,30 +878,31 @@ class ChangeModel implements ChangeInterface {
 			]);
 			const text = parser.toText(schema);
 			const textNode = $(document.createTextNode(text));
-			this.engine.trigger('paste:markdown-before', textNode);
-			this.engine.trigger('paste:markdown', textNode);
-			this.engine.trigger('paste:markdown-after', textNode);
+			// 如果没有符合的语法就返回
+			const result = this.engine.trigger(
+				'paste:markdown-check',
+				textNode,
+			);
+			if (result) return;
+			// 提示是否要转换
+			this.engine
+				.messageConfirm(
+					this.engine.language.get<string>('checkMarkdown', 'title'),
+				)
+				.then(() => {
+					this.engine.trigger('paste:markdown-before', textNode);
+					this.engine.trigger('paste:markdown', textNode);
+					this.engine.trigger('paste:markdown-after', textNode);
 
-			const newText = textNode.text();
-			if (newText !== text) {
-				this.engine
-					.messageConfirm(
-						this.engine.language.get<string>(
-							'checkMarkdown',
-							'title',
-						),
-					)
-					.then(() => {
-						textNode.get<Text>()?.normalize();
-						this.paste(
-							textNode.text(),
-							this.#lastePasteRange,
-							undefined,
-							false,
-						);
-					})
-					.catch(() => {});
-			}
+					textNode.get<Text>()?.normalize();
+					this.paste(
+						textNode.text(),
+						this.#lastePasteRange,
+						undefined,
+						false,
+					);
+				})
+				.catch(() => {});
 		};
 
 		this.event.onPaste((data) => {
@@ -1001,11 +984,7 @@ class ChangeModel implements ChangeInterface {
 	paste(
 		source: string,
 		range?: RangeInterface,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
+		callback?: (count: number) => void,
 		followActiveMark: boolean = true,
 	) {
 		const fragment = new Paste(source, this.engine).normalize();
@@ -1018,24 +997,14 @@ class ChangeModel implements ChangeInterface {
 				this.#lastePasteRange = range.cloneRange();
 				range.collapse(false);
 				const selection = range.createSelection();
-				this.engine.card.render(undefined, {
-					enableAsync:
-						options?.enableAsync === undefined
-							? true
-							: options.enableAsync,
-					triggerOT:
-						options?.triggerOT === undefined
-							? true
-							: options.triggerOT,
-					callback: (count) => {
-						selection.move();
-						range.scrollRangeIntoView();
-						this.select(range);
-						if (options?.callback) {
-							options.callback(count);
-						}
-						this.engine.trigger('paste:after');
-					},
+				this.engine.card.render(undefined, (count) => {
+					selection.move();
+					range.scrollRangeIntoView();
+					this.select(range);
+					if (callback) {
+						callback(count);
+					}
+					this.engine.trigger('paste:after');
 				});
 			},
 			followActiveMark,

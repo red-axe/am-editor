@@ -66,7 +66,9 @@ function fromChildDom(node: NodeInterface, values: Array<{} | string>) {
 	}
 }
 
-export const fromDOM = (node: NodeInterface) => {
+export const fromDOM = (
+	node: NodeInterface,
+): string | undefined | (string | {})[] => {
 	let values: Array<{} | string>;
 	if (!isTransientElement(node)) {
 		const { nodeName, nodeType, attributes, nodeValue } =

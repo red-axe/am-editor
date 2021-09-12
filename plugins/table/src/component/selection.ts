@@ -17,6 +17,7 @@ import {
 	EDITABLE_SELECTOR,
 	isNode,
 	isMobile,
+	removeUnit,
 } from '@aomao/engine';
 import Template from './template';
 
@@ -956,7 +957,20 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 						tdClone.setAttribute('rowspan', `${rowRemain}`);
 					if (colRemain)
 						tdClone.setAttribute('colspan', `${colRemain}`);
-					tdHtml.push(tdClone.outerHTML);
+					const editoableElement = tdClone.firstChild as HTMLElement;
+					if (
+						editoableElement.classList.contains(
+							'table-main-content',
+						)
+					) {
+						const copyNode = tdClone.cloneNode(
+							false,
+						) as HTMLElement;
+						copyNode.innerHTML = editoableElement.innerHTML;
+						tdHtml.push(copyNode.outerHTML);
+					} else {
+						tdHtml.push(tdClone.outerHTML);
+					}
 				}
 			}
 			trHtml.push('<tr>'.concat(tdHtml.join(''), '</tr>'));
@@ -1076,6 +1090,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			top += rect.top - (vRect?.top || 0) - 13;
 			left += rect.left - (vRect?.left || 0);
 		}
+		const sLeft = removeUnit(
+			this.table.wrapper?.find('.data-scrollbar')?.css('left') || '0',
+		);
+		left += sLeft;
 
 		const headerHeight =
 			this.colsHeader

@@ -98,8 +98,10 @@ class Parser implements ParserInterface {
 			);
 			this.root = $(doc.body);
 			const p = $('<p></p>');
-			this.root.find('paragraph').each((child) => {
-				const cNode = $(child);
+			const paragraphs = this.root.find('paragraph');
+			paragraphs.each((_, index) => {
+				const cNode = paragraphs.eq(index);
+				if (!cNode) return;
 				const pNode = p.clone();
 				const attributes = cNode.attributes();
 				Object.keys(attributes).forEach((name) => {
@@ -122,8 +124,7 @@ class Parser implements ParserInterface {
 		const nodeApi = this.editor.node;
 		const inlineApi = this.editor.inline;
 		//转换标签和分割 mark 和 inline 标签
-		root.allChildren().forEach((child) => {
-			let node = $(child);
+		root.allChildren().forEach((node) => {
 			if (node.isElement()) {
 				//转换标签
 				if (conversion) {

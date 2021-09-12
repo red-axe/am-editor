@@ -150,7 +150,12 @@ export interface MarkInterface extends ElementPluginInterface {
 		text: string,
 		node: NodeInterface,
 	): boolean | void;
-
+	/**
+	 * 检测当前粘贴节点是否符合markdown解析规则
+	 */
+	checkMarkdown(
+		node: NodeInterface,
+	): { reg: RegExp; match: RegExpExecArray | null } | undefined;
 	/**
 	 * 解析粘贴markdown
 	 * @param node 节点

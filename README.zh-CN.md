@@ -313,7 +313,9 @@ yarn serve
 
 ## 贡献
 
-感谢 [pleasedmi](https://github.com/pleasedmi) 的捐赠
+感谢 [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.com/Elena211314) 的捐赠
+
+如果您愿意，可以在这里留下你的名字。
 
 ### 支付宝
 

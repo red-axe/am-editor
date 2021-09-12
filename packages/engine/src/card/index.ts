@@ -596,14 +596,7 @@ class CardModel implements CardModelInterface {
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
 	 * @param options 是否异步渲染， 全部异步渲染完成后触发
 	 */
-	render(
-		container?: NodeInterface,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
-	) {
+	render(container?: NodeInterface, callback?: (count: number) => void) {
 		const cards = container
 			? container.isCard()
 				? container
@@ -629,15 +622,12 @@ class CardModel implements CardModelInterface {
 						);
 					child.attributes(DATA_ELEMENT, EDITABLE);
 				});
-				this.render(center, {
-					enableAsync: false,
-					triggerOT: options?.triggerOT,
-				});
+				this.render(center);
 			}
 			card.didRender();
 		};
+
 		const asyncRenderCards: Array<CardInterface> = [];
-		const renderedCards: Array<CardInterface> = [];
 		cards.each((node) => {
 			const cardNode = $(node);
 			const readyKey = cardNode.attributes(READY_CARD_KEY);
@@ -660,9 +650,6 @@ class CardModel implements CardModelInterface {
 					value: decodeCardValue(value),
 					root: key ? cardNode : undefined,
 				});
-				if (options && !options.triggerOT) {
-					card.root.attributes(CARD_ASYNC_RENDER, 'true');
-				}
 				Object.keys(attributes).forEach((attributesName) => {
 					if (
 						attributesName.indexOf('data-') === 0 &&
@@ -678,56 +665,23 @@ class CardModel implements CardModelInterface {
 				this.components.push(card);
 
 				// 重新渲染
-				if (options?.enableAsync === true) {
-					asyncRenderCards.push(card);
-				} else {
-					render(card);
-					renderedCards.push(card);
-				}
+				asyncRenderCards.push(card);
 
 				if (readyKey) {
 					card.root.removeAttributes(READY_CARD_KEY);
 				}
 			}
 		});
-		if (!options?.enableAsync) {
-			if (!options?.triggerOT) {
-				setTimeout(() => {
-					renderedCards.forEach((card) => {
-						card.root.removeAttributes(CARD_ASYNC_RENDER);
-					});
-				}, 50);
+
+		asyncRenderCards.forEach(async (card) => {
+			render(card);
+			setp++;
+			if (setp === asyncRenderCards.length) {
+				if (callback) callback(asyncRenderCards.length);
 			}
-			if (options?.callback) options.callback(renderedCards.length);
-			return;
-		}
-		if (isEngine(this.editor) && options.triggerOT) {
-			this.editor.history.startCache();
-		}
-		asyncRenderCards.forEach((card) => {
-			setTimeout(() => {
-				render(card);
-				//协同记录后移除标记属性
-				if (!options.triggerOT) {
-					setTimeout(() => {
-						card.root.removeAttributes(CARD_ASYNC_RENDER);
-					}, 50);
-				}
-				setp++;
-				if (setp === asyncRenderCards.length) {
-					if (isEngine(this.editor) && options.triggerOT) {
-						this.editor.history.submitCache();
-					}
-					if (options.callback)
-						options.callback(asyncRenderCards.length);
-				}
-			}, 20);
 		});
 		if (asyncRenderCards.length === 0) {
-			if (isEngine(this.editor) && options.triggerOT) {
-				this.editor.history.submitCache();
-			}
-			if (options.callback) options.callback(0);
+			if (callback) callback(0);
 		}
 	}
 

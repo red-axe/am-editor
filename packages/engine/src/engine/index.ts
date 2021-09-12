@@ -44,7 +44,7 @@ import Plugin from '../plugin';
 import CardModel from '../card';
 import { getDocument } from '../utils';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
-import { toDOM } from '../ot/jsonml';
+import { fromDOM, toDOM } from '../ot/jsonml';
 import Clipboard from '../clipboard';
 import Parser from '../parser';
 import Language from '../language';
@@ -234,6 +234,7 @@ class Engine implements EngineInterface {
 		if (this.isEmpty()) {
 			this._container.showPlaceholder();
 		}
+		this.ot.initLockMode();
 	}
 
 	setScrollNode(node?: HTMLElement) {
@@ -316,42 +317,21 @@ class Engine implements EngineInterface {
 		return new Parser(node, this).toHTML().html;
 	}
 
-	setValue(
-		value: string,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
-	) {
+	setValue(value: string, callback?: (count: number) => void) {
 		value = this.trigger('beforeSetValue', value) || value;
-		this.change.setValue(value, undefined, options);
+		this.change.setValue(value, undefined, callback);
 		this.normalizeTree();
 		return this;
 	}
 
-	setHtml(
-		html: string,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
-	) {
+	setHtml(html: string, callback?: (count: number) => void) {
 		const range = this.change.getRange();
 		if (!range.commonAncestorNode.inEditor()) this.focus();
-		this.change.setHtml(html, options);
+		this.change.setHtml(html, callback);
 		return this;
 	}
 
-	setJsonValue(
-		value: Array<any>,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
-	) {
+	setJsonValue(value: Array<any>, callback?: (count: number) => void) {
 		const dom = $(toDOM(value));
 		const attributes = dom.get<Element>()?.attributes;
 		for (let i = 0; attributes && i < attributes.length; i++) {
@@ -364,12 +344,16 @@ class Engine implements EngineInterface {
 			}
 		}
 		const html = this.node.html(dom);
-		this.change.setValue(html, undefined, options);
+		this.change.setValue(html, undefined, callback);
 		const range = this.change.getRange();
 		range.shrinkToElementNode();
 		this.change.select(range);
 		this.normalizeTree();
 		return this;
+	}
+
+	getJsonValue() {
+		return fromDOM(this.container);
 	}
 
 	destroy() {
@@ -396,10 +380,12 @@ class Engine implements EngineInterface {
 		//if (anchorNext) selection.anchor?.remove();
 		//if (focusPrev) selection.focus?.remove();
 		// 保证所有行内元素都在段落内
-		this.container.children().each((child) => {
-			const node = $(child);
+		let childNodes = this.container.children();
+		childNodes.each((_, index) => {
+			const node = childNodes.eq(index);
+			if (!node) return;
 			if (this.node.isBlock(node)) {
-				if (block.children().length > 0) {
+				if (block.get<HTMLElement>()!.childNodes.length > 0) {
 					node.before(block);
 				}
 				block = $('<p />');
@@ -408,7 +394,7 @@ class Engine implements EngineInterface {
 			}
 		});
 
-		if (block.children().length > 0) {
+		if (block.get<HTMLElement>()!.childNodes.length > 0) {
 			this.container.append(block);
 		}
 		if (anchorNext && selection.anchor && selection.anchor.length > 0)
@@ -422,14 +408,18 @@ class Engine implements EngineInterface {
 			if (focusParent?.isEditable()) {
 				block.append(selection.focus!);
 			}
-			if (block.children().length > 0) this.container.append(block);
+			if (block.get<HTMLElement>()!.childNodes.length > 0)
+				this.container.append(block);
 		}
 		// 处理空段落
-		this.container.children().each((child) => {
-			const node = $(child);
+		childNodes = this.container.children();
+		childNodes.each((_, index) => {
+			const node = childNodes.eq(index);
+			if (!node) return;
 			this.node.removeMinusStyle(node, 'text-indent');
 			if (this.node.isRootBlock(node)) {
-				const childrenLength = node.children().length;
+				const childrenLength =
+					node.get<HTMLElement>()!.childNodes.length;
 				if (childrenLength === 0) {
 					node.remove();
 				} else {

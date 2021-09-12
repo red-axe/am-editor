@@ -34,6 +34,10 @@ class Table extends Plugin<Options> {
 		editor.on('paste:schema', (schema: SchemaInterface) =>
 			this.pasteSchema(schema),
 		);
+		editor.on(
+			'paste:markdown-check',
+			(child) => !this.checkMarkdown(child),
+		);
 		editor.on('paste:markdown-after', (child) => this.pasteMarkdown(child));
 	}
 
@@ -278,23 +282,51 @@ class Table extends Plugin<Options> {
 		);
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	getMarkdownCell(match: RegExpExecArray, count?: number) {
+		const cols = match[0].split('|');
+		const headeText = match[0].trim().replace(/\n/, '');
+		if (headeText.endsWith('|')) cols.pop();
+		if (headeText.startsWith('|')) cols.shift();
+		const colNodes: Array<string> = [];
+		cols.some((col) => {
+			if (count !== undefined && colNodes.length === count) return true;
+			colNodes.push(col);
+			return false;
+		});
+		return colNodes;
+	}
+
+	checkMarkdown(node: NodeInterface) {
 		if (
 			!isEngine(this.editor) ||
 			this.options.markdown === false ||
 			!node.isText()
 		)
 			return;
+		const text = node.text();
+		if (!text) return;
+		// 匹配 |-|-| 或者 -|- 或者 |-|- 或者 -|-|
+		const reg = /\n\s*(\|?(\s*:?-+:?\s*)+\|?)+\s*(\n|$)/;
+		const tbMatch = reg.exec(text);
+		if (!tbMatch || tbMatch[0].indexOf('|') < 0) return;
+		return {
+			reg,
+			match: tbMatch,
+		};
+	}
 
+	pasteMarkdown(node: NodeInterface) {
+		const result = this.checkMarkdown(node);
+		if (!result) return;
+		const { reg, match } = result;
+		if (!match) return;
 		const parse = (node: NodeInterface) => {
 			let text = node.text();
 			if (!text) return;
-			// 匹配 |-|-| 或者 -|- 或者 |-|- 或者 -|-|
-			let reg = /\n\s*(\|?(\s*:?-+:?\s*)+\|?)+\s*(\n|$)/;
-			let tbMatch = reg.exec(text);
+			const tbMatch = reg.exec(text);
 			if (!tbMatch || tbMatch[0].indexOf('|') < 0) return;
 			// 文本节点
-			let textNode = node.clone(true).get<Text>()!;
+			const textNode = node.clone(true).get<Text>()!;
 			// 列数
 			const colCount = tbMatch[0]
 				.split('|')
@@ -302,7 +334,7 @@ class Table extends Plugin<Options> {
 					(cell) => cell.trim() !== '' && cell.includes('-'),
 				).length;
 			// 从匹配出分割
-			let tbRegNode = textNode.splitText(tbMatch.index);
+			const tbRegNode = textNode.splitText(tbMatch.index);
 			// 获取表头
 			const thReg = new RegExp(
 				`(\\|?([^\\|\\n]+)\\|?){${colCount},}\\s*$`,
@@ -318,24 +350,10 @@ class Table extends Plugin<Options> {
 			let regNode = tbRegNode.splitText(tbMatch[0].length);
 			let newText = textNode.textContent || '';
 			// 生成头部td
-			const getCell = (match: RegExpExecArray, count?: number) => {
-				const cols = match[0].split('|');
-				const headeText = match[0].trim().replace(/\n/, '');
-				if (headeText.endsWith('|')) cols.pop();
-				if (headeText.startsWith('|')) cols.shift();
-				const colNodes: Array<string> = [];
-				cols.some((col) => {
-					if (count !== undefined && colNodes.length === count)
-						return true;
-					colNodes.push(col);
-					return false;
-				});
-				return colNodes;
-			};
-			const colNodes = getCell(match);
+			const colNodes = this.getMarkdownCell(match);
 			// 表头数量不等于列数，不操作
 			if (colNodes.length !== colCount) return;
-			let nodes: Array<string> = [];
+			const nodes: Array<string> = [];
 			nodes.push(
 				`<tr>${colNodes.map((col) => `<td>${col}</td>`).join('')}</tr>`,
 			);
@@ -351,7 +369,7 @@ class Table extends Plugin<Options> {
 					match[0].startsWith('\n\n')
 				)
 					break;
-				const colNodes = getCell(match, colCount);
+				const colNodes = this.getMarkdownCell(match, colCount);
 				if (colNodes.length === 0) break;
 				if (colNodes.length < colCount) {
 					while (colCount - colNodes.length > 0) {

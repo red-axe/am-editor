@@ -508,7 +508,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 
 .table-wrapper:not(.active) [data-table-no-border="true"] .table-main-bg .table-main-border-right {
-    border-right-style: dashed;
+    border-right-color: transparent;
 }
 
 .table-wrapper.active [data-table-no-border="true"] .table-main-bg .table-main-border-right {

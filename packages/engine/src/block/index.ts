@@ -224,8 +224,7 @@ class Block implements BlockModelInterface {
 			if (child) {
 				//先移除不能放入块级节点的mark标签
 				if (targetPlugin) {
-					child.allChildren().forEach((child) => {
-						const markNode = $(child);
+					child.allChildren().forEach((markNode) => {
 						if (node.isMark(markNode)) {
 							const markPlugin = mark.findPlugin(markNode);
 							if (!markPlugin) return;
@@ -552,8 +551,7 @@ class Block implements BlockModelInterface {
 		container = splitNode ? splitNode(container) : container;
 		// 切割 Block
 		let leftNodes = selection.getNode(container, 'left');
-		leftNodes.allChildren().forEach((child) => {
-			const leftNode = $(child);
+		leftNodes.allChildren().forEach((leftNode) => {
 			if (
 				node.isBlock(leftNode) &&
 				(node.isEmpty(leftNode) || list.isEmptyItem(leftNode))
@@ -584,8 +582,7 @@ class Block implements BlockModelInterface {
 			});
 		}
 
-		rightNodes.allChildren().forEach((child) => {
-			const rightNode = $(child);
+		rightNodes.allChildren().forEach((rightNode) => {
 			if (
 				node.isBlock(rightNode) &&
 				(node.isEmpty(rightNode) || list.isEmptyItem(rightNode))
@@ -753,8 +750,7 @@ class Block implements BlockModelInterface {
 			}
 			//先移除不能放入块级节点的mark标签
 			if (targetPlugin) {
-				child.allChildren().forEach((child) => {
-					const markNode = $(child);
+				child.allChildren().forEach((markNode) => {
 					if (node.isMark(markNode)) {
 						const markPlugin = mark.findPlugin(markNode);
 						if (!markPlugin) return;
@@ -1278,17 +1274,16 @@ class Block implements BlockModelInterface {
 			root.nodeType === getWindow().Node.ELEMENT_NODE ||
 			root.nodeType === getWindow().Node.DOCUMENT_FRAGMENT_NODE
 		) {
-			this.getMarkIdTags().forEach((nodeName) => {
-				const nodes = (
-					root as Element | DocumentFragment
-				).querySelectorAll(nodeName);
-				for (let i = 0; i < nodes.length; i++) {
-					const node = $(nodes[i]);
-					if (node.isCard() || node.attributes(DATA_ELEMENT) === UI)
-						continue;
-					this.generateRandomID(node, isCreate);
-				}
-			});
+			const tags = this.getMarkIdTags().join(',');
+			const nodes = (root as Element | DocumentFragment).querySelectorAll(
+				tags,
+			);
+			for (let i = 0; i < nodes.length; i++) {
+				const node = $(nodes[i]);
+				if (node.isCard() || node.attributes(DATA_ELEMENT) === UI)
+					continue;
+				this.generateRandomID(node, isCreate);
+			}
 		}
 	}
 	/**

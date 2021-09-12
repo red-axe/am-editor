@@ -8,8 +8,10 @@ import {
 } from '../types';
 import { $ } from '../node';
 
-abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
-	implements InlineInterface {
+abstract class InlineEntry<T extends {} = {}>
+	extends ElementPluginEntry<T>
+	implements InlineInterface
+{
 	readonly kind: string = 'inline';
 	/**
 	 * 标签名称
@@ -24,7 +26,11 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 		super.init();
 		const editor = this.editor;
 		if (isEngine(editor) && this.markdown) {
-			editor.on('paste:markdown', child => this.pasteMarkdown(child));
+			editor.on(
+				'paste:markdown-check',
+				(child) => !this.checkMarkdown(child),
+			);
+			editor.on('paste:markdown', (child) => this.pasteMarkdown(child));
 		}
 	}
 
@@ -51,10 +57,10 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 		const { change } = editor;
 		//如果没有属性和样式限制，直接查询是否包含当前标签名称
 		if (!this.style && !this.attributes)
-			return change.inlines.some(node => node.name === this.tagName);
+			return change.inlines.some((node) => node.name === this.tagName);
 		//获取属性和样式限制内的值集合
 		const values: Array<string> = [];
-		change.inlines.forEach(node => {
+		change.inlines.forEach((node) => {
 			values.push(...Object.values(this.getStyle(node)));
 			values.push(...Object.values(this.getAttributes(node)));
 		});
@@ -118,7 +124,7 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 		return;
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	checkMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown) return;
 		if (!node.isText()) return;
 
@@ -128,8 +134,16 @@ abstract class InlineEntry<T extends {} = {}> extends ElementPluginEntry<T>
 		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
 		const reg = new RegExp(`(${key}([^${key}\r\n]+)${key})`);
 
-		let match = reg.exec(text);
+		return {
+			reg,
+			match: reg.exec(text),
+		};
+	}
 
+	pasteMarkdown(node: NodeInterface) {
+		const result = this.checkMarkdown(node);
+		if (!result) return;
+		let { reg, match } = result;
 		if (!match) return;
 		let newText = '';
 		let textNode = node.clone(true).get<Text>()!;

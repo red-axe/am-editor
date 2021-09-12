@@ -101,26 +101,15 @@ export interface ChangeInterface {
 	initValue(range?: RangeInterface): void;
 	setValue(
 		value: string,
-		onParse?: (node: Node) => void,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
+		onParse?: (node: NodeInterface) => void,
+		callback?: (count: number) => void,
 	): void;
 	/**
 	 * 设置html，会格式化为合法的编辑器值
 	 * @param html html
-	 * @param options 异步渲染卡片配置
+	 * @param callback 异步渲染卡片后回调
 	 */
-	setHtml(
-		html: string,
-		options?: {
-			enableAsync?: boolean;
-			triggerOT?: boolean;
-			callback?: (count: number) => void;
-		},
-	): void;
+	setHtml(html: string, callback?: (count: number) => void): void;
 	getOriginValue(): string;
 	getValue(options: { ignoreCursor?: boolean }): string;
 	cacheRangeBeforeCommand(): void;

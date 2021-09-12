@@ -891,9 +891,8 @@ class List implements ListModelInterface {
 				// 如果是block节点，要把它的所有子block节点都unwrap
 				if (node.isBlock(childElement)) {
 					childElement.allChildren().forEach((child) => {
-						if (child.nodeType === getDocument().TEXT_NODE) return;
-						const element = $(child);
-						if (node.isBlock(element)) node.unwrap(element);
+						if (child.type === getDocument().TEXT_NODE) return;
+						if (node.isBlock(child)) node.unwrap(child);
 					});
 				}
 				// 自定义列表

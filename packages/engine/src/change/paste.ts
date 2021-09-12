@@ -46,8 +46,7 @@ export default class Paste {
 		const nodeApi = this.engine.node;
 		// 第一轮预处理，主要处理 span 节点
 		let nodes = $(fragment).allChildren();
-		nodes.forEach((child) => {
-			const node = $(child);
+		nodes.forEach((node) => {
 			// 跳过Card
 			if (node.isCard()) {
 				return;
@@ -69,36 +68,38 @@ export default class Paste {
 				});
 				//处理后如果不是一个有效的节点就移除包裹
 				if (!this.schema.getType(node)) nodeApi.unwrap(node);
-			}
-			nodeApi.removeMinusStyle(node, 'text-indent');
-			if (['ol', 'ul'].includes(node.name)) {
-				node.css('padding-left', '');
-			}
-			// 删除空 style 属性
-			if (node.isElement()) {
+
+				nodeApi.removeMinusStyle(node, 'text-indent');
+				if (['ol', 'ul'].includes(node.name)) {
+					node.css('padding-left', '');
+				}
+				// 删除空 style 属性
 				if (!node.attributes('style')) {
 					node.removeAttributes('style');
 				}
-			}
-			// 删除空 span
-			if (
-				node.name === 'span' &&
-				Object.keys(node.attributes()).length === 0 &&
-				Object.keys(node.css()).length === 0 &&
-				(node.text().trim() === '' ||
-					(node.first() &&
-						(nodeApi.isMark(node.first()!, this.schema) ||
-							nodeApi.isBlock(node.first()!, this.schema))))
-			) {
-				nodeApi.unwrap(node);
-				return;
-			}
-			// br 换行改成正常段落
-			if (nodeApi.isBlock(node, this.schema)) {
-				this.engine.block.brToBlock(node);
+				// 删除空 span
+				let first: NodeInterface | null = null;
+				if (
+					node.name === 'span' &&
+					Object.keys(node.attributes()).length === 0 &&
+					Object.keys(node.css()).length === 0 &&
+					(node.text().trim() === '' ||
+						(first =
+							node.first() &&
+							first &&
+							(nodeApi.isMark(first, this.schema) ||
+								nodeApi.isBlock(first, this.schema))))
+				) {
+					nodeApi.unwrap(node);
+					return;
+				}
+				// br 换行改成正常段落
+				if (nodeApi.isBlock(node, this.schema)) {
+					this.engine.block.brToBlock(node);
+				}
 			}
 			// 删除非block节点的换行 \r\n\r\n<span
-			if (node.isText()) {
+			else if (node.isText()) {
 				const text = node.text();
 				if (/(\r|\n)+/.test(text)) {
 					const prev = node.prev();
@@ -113,8 +114,7 @@ export default class Paste {
 		});
 		// 第二轮处理
 		nodes = $(fragment).allChildren();
-		nodes.forEach((child) => {
-			const node = $(child);
+		nodes.forEach((node) => {
 			// 跳过已被删除的节点
 			if (!node.parent()) {
 				return;
@@ -144,10 +144,11 @@ export default class Paste {
 			if (node.attributes('data-type') === 'p') {
 				node.removeAttributes('data-type');
 			}
+			const parent = node.parent();
 			// 补齐 ul 或 ol
 			if (
 				node.name === 'li' &&
-				['ol', 'ul'].indexOf(node.parent()?.name || '') < 0
+				['ol', 'ul'].indexOf(parent?.name || '') < 0
 			) {
 				const ul = $('<ul />');
 				node.before(ul);
@@ -157,7 +158,7 @@ export default class Paste {
 			// 补齐 li
 			if (
 				['ol', 'ul'].indexOf(node.name) >= 0 &&
-				['ol', 'ul'].indexOf(node.parent()?.name || '') >= 0
+				['ol', 'ul'].indexOf(parent?.name || '') >= 0
 			) {
 				const li = $('<li />');
 				node.before(li);
@@ -167,15 +168,15 @@ export default class Paste {
 			// <li>two<ol><li>three</li></ol>four</li>
 			if (
 				['ol', 'ul'].indexOf(node.name) >= 0 &&
-				node.parent()?.name === 'li' &&
+				parent?.name === 'li' &&
 				(node.prev() || node.next())
 			) {
-				const parent = node.parent();
 				let li: NodeInterface | null;
 				const isCustomizeList = parent?.parent()?.hasClass('data-list');
-				parent?.children().each((child) => {
-					const node = $(child);
-					if (nodeApi.isEmptyWithTrim(node)) {
+				const children = parent?.children();
+				children.each((child, index) => {
+					const node = children.eq(index);
+					if (!node || nodeApi.isEmptyWithTrim(node)) {
 						return;
 					}
 					const isList = ['ol', 'ul'].indexOf(node.name) >= 0;
@@ -196,7 +197,7 @@ export default class Paste {
 			// p 改成 li
 			if (
 				node.name === 'p' &&
-				['ol', 'ul'].indexOf(node.parent()?.name || '') >= 0
+				['ol', 'ul'].indexOf(parent?.name || '') >= 0
 			) {
 				nodeApi.replace(node, $('<li />'));
 				return;
@@ -218,7 +219,7 @@ export default class Paste {
 			// <li><p>foo</p></li>
 			if (
 				nodeApi.isRootBlock(node, this.schema) &&
-				node.parent()?.name === 'li'
+				parent?.name === 'li'
 			) {
 				// <li><p><br /></p></li>
 				if (
@@ -274,13 +275,11 @@ export default class Paste {
 		}
 
 		let nodes = $(fragment).allChildren();
-		nodes.forEach((child) => {
-			const node = $(child);
+		nodes.forEach((node) => {
 			if (node.parent()) this.engine.trigger('paste:each', node);
 		});
 		nodes = $(fragment).allChildren();
-		nodes.forEach((child) => {
-			const node = $(child);
+		nodes.forEach((node) => {
 			this.engine.trigger('paste:each-after', node);
 			if (node.isText()) {
 				const text = node.text();
@@ -321,8 +320,7 @@ export default class Paste {
 		}
 		nodes = $(fragment).allChildren();
 
-		nodes.forEach((child) => {
-			const node = $(child);
+		nodes.forEach((node) => {
 			if (['ol', 'ul'].includes(node.name)) {
 				this.engine.list.addStart(node);
 			}
@@ -333,8 +331,7 @@ export default class Paste {
 
 	removeElementNodes(fragment: NodeInterface) {
 		const nodes = fragment.allChildren();
-		nodes.forEach((child) => {
-			const node = $(child);
+		nodes.forEach((node) => {
 			if (node.isElement()) {
 				this.engine.node.unwrap(node);
 			}

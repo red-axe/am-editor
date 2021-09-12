@@ -84,21 +84,26 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	}
 
 	initLockMode() {
+		if (this.doc) return;
 		this.stopMutation();
 		this.doc = new OTDoc(this.engine);
 		this.mutation?.setDoc(this.doc);
 		this.startMutation();
 	}
 
-	init(doc: Doc) {
+	init(doc: Doc, defaultValue?: string) {
+		// 没有启动协同，或者当前doc对象没有注销，就去注销
 		const isDestroy = !this.doc || this.doc['mode'] === 'lock';
 		this.stopMutation();
 		if (!isDestroy) {
 			this.doc!.destroy();
 		}
+		// 设置文档对象
 		this.doc = doc;
 		this.mutation?.setDoc(doc);
-		this.syncData();
+		// 同步数据
+		this.syncData(defaultValue);
+		// 监听操作
 		doc.on('op', (op, clientId) => {
 			if (this.clientId !== clientId.toString()) {
 				this.waitingOps = this.waitingOps.concat(op);
@@ -134,20 +139,24 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.startMutation();
 	}
 
-	syncData() {
+	syncData(defaultValue?: string) {
 		const { doc, engine } = this;
 		if (!doc) return;
+		// 除了div 和 selection-data 外 还必须有其它节点
 		if (
 			Array.isArray(doc.data) &&
 			doc.data.length > 2 &&
 			doc['mode'] !== 'lock'
 		) {
-			// 除了div 和 selection-data 外 还必须有其它节点
+			// 远端有数据就设置数据到当前编辑器
 			this.setData(doc.data);
 			return;
 		}
-		const data = fromDOM(engine.container);
-		if (doc.data) {
+		// 如果有设置默认值，就设置编辑器的值
+		if (defaultValue) engine.setValue(defaultValue);
+		// 没有数据，就把当前编辑器值提交
+		doc.on('create', () => {
+			const data = fromDOM(engine.container);
 			(doc as Doc).submitOp(
 				[
 					{
@@ -159,18 +168,11 @@ class OTModel extends EventEmitter2 implements OTInterface {
 					source: this.clientId,
 				},
 			);
-		} else {
-			doc.create(data, 'ot-json0', {
-				source: this.clientId,
-			});
-		}
+		});
 	}
 
 	setData(data: Array<any>) {
-		this.engine.setJsonValue(data, {
-			enableAsync: true,
-			triggerOT: false,
-		});
+		this.engine.setJsonValue(data);
 	}
 
 	startMutation() {

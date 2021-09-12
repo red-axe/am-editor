@@ -25,6 +25,10 @@ export default class extends Plugin<Options> {
 		this.editor.on('paste:each', (child) => this.pasteHtml(child));
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:enter', (event) => this.markdown(event));
+			this.editor.on(
+				'paste:markdown-check',
+				(child) => !this.checkMarkdown(child),
+			);
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
@@ -66,12 +70,22 @@ export default class extends Plugin<Options> {
 		return;
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	checkMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
 		const text = node.text();
 		const reg = /(^|\r\n|\n)([-]{3,})\s?(\r\n|\n|$)/;
-		let match = reg.exec(text);
+		const match = reg.exec(text);
+		return {
+			reg,
+			match,
+		};
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		const result = this.checkMarkdown(node);
+		if (!result) return;
+		let { reg, match } = result;
 		if (!match) return;
 
 		let newText = '';

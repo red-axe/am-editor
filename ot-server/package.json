@@ -11,11 +11,12 @@
   },
   "dependencies": {
     "@teamwork/websocket-json-stream": "^2.0.0",
+    "express": "^4.17.1",
     "sharedb": "^1.9.2",
+    "sharedb-mongo": "^1.0.0-beta.20",
     "url": "^0.11.0",
     "uuid": "^8.3.2",
-    "ws": "^7.4.2",
-    "express": "^4.17.1"
+    "ws": "^7.4.2"
   },
   "repository": {
     "type": "git",

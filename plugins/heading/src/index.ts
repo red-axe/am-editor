@@ -106,6 +106,10 @@ export default class extends BlockPlugin<Options> {
 			this.editor.on('keydown:backspace', (event) =>
 				this.onBackspace(event),
 			);
+			this.editor.on(
+				'paste:markdown-check',
+				(child) => !this.checkMarkdown(child),
+			);
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
@@ -360,12 +364,22 @@ export default class extends BlockPlugin<Options> {
 		return false;
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	checkMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
 		const text = node.text();
 		const reg = /(^|\r\n|\n)(#{1,6})(.*)/;
-		let match = reg.exec(text);
+		const match = reg.exec(text);
+		return {
+			reg,
+			match,
+		};
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		const result = this.checkMarkdown(node);
+		if (!result) return;
+		let { reg, match } = result;
 		if (!match) return;
 
 		let newText = '';

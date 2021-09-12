@@ -43,10 +43,6 @@ const EngineComponent: React.FC<EngineProps> = forwardRef<
 				});
 			});
 		};
-		//初始化本地协作，用作记录历史
-		engine.ot.initLockMode();
-
-		engine.setValue(defaultValue || '');
 
 		engineRef.current = engine;
 		return engine;

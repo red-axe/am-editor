@@ -52,6 +52,10 @@ abstract class MarkEntry<T extends {} = {}>
 		super.init();
 		const editor = this.editor;
 		if (isEngine(editor) && this.markdown) {
+			editor.on(
+				'paste:markdown-check',
+				(child) => !this.checkMarkdown(child),
+			);
 			editor.on('paste:markdown', (node) => this.pasteMarkdown(node));
 		}
 	}
@@ -160,7 +164,7 @@ abstract class MarkEntry<T extends {} = {}>
 		return;
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	checkMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown) return;
 		if (!node.isText()) return;
 
@@ -172,6 +176,16 @@ abstract class MarkEntry<T extends {} = {}>
 				? new RegExp(`\\s+(${key}([^${key}\\r\\n]+)${key})\\s+`)
 				: new RegExp(`(${key}([^${key}\\r\\n]+)${key})`);
 		let match = reg.exec(text);
+		return {
+			reg,
+			match,
+		};
+	}
+
+	pasteMarkdown(node: NodeInterface) {
+		const result = this.checkMarkdown(node);
+		if (!result) return;
+		let { reg, match } = result;
 		if (!match) return;
 		let newText = '';
 		let textNode = node.clone(true).get<Text>()!;

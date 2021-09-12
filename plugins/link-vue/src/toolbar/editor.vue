@@ -1,6 +1,6 @@
 <template>
-    <a-config-provider auto-insert-space-in-button="false">
-        <div :class="['data-link-editor', className]">
+    <a-config-provider :auto-insert-space-in-button=false>
+        <div data-element="ui" :class="['data-link-editor', className]">
             <p>{{textTitle}}</p>
             <p>
                 <a-input

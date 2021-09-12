@@ -216,9 +216,8 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				if (text === '\n') {
 					// Emitting LF or CRLF on IE8 or earlier results in an incorrect display.
 					// Emitting a carriage return makes everything ok.
-					node.appendChild(
-						document.createTextNode(ie_lt9 ? '\r' : text),
-					);
+					const lineCode = document.createElement('br');
+					node.appendChild(lineCode);
 					col = 0;
 					return;
 				}

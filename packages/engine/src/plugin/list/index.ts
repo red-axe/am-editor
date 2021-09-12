@@ -6,8 +6,10 @@ import BlockEntry from '../block';
 import { $ } from '../../node';
 import './index.css';
 
-abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
-	implements ListInterface {
+abstract class ListEntry<T extends {} = {}>
+	extends BlockEntry<T>
+	implements ListInterface
+{
 	cardName?: string;
 	private isPasteList: boolean = false;
 
@@ -15,7 +17,7 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 		super.init();
 		const editor = this.editor;
 		if (isEngine(editor)) {
-			editor.on('paste:before', fragment => this.pasteBefore(fragment));
+			editor.on('paste:before', (fragment) => this.pasteBefore(fragment));
 			editor.on('paste:insert', () => this.pasteInsert());
 			editor.on('paste:after', () => this.pasteAfter());
 		}
@@ -41,8 +43,7 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 		const { list } = this.editor;
 		const node = $(documentFragment);
 		const children = node.allChildren();
-		children.forEach(child => {
-			const domChild = $(child);
+		children.forEach((domChild) => {
 			if (
 				domChild.name === 'li' &&
 				domChild.hasClass(list.CUSTOMZIE_LI_CLASS)
@@ -57,9 +58,7 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 				}
 			}
 		});
-		this.isPasteList = children.some(
-			child => child.nodeName.toLowerCase() === 'li',
-		);
+		this.isPasteList = children.some((child) => child.name === 'li');
 	}
 
 	pasteInsert() {
@@ -70,7 +69,7 @@ abstract class ListEntry<T extends {} = {}> extends BlockEntry<T>
 		const nextBlock = rootBlock?.next();
 		const customizeItems = nextBlock?.find(`li.${list.CUSTOMZIE_LI_CLASS}`);
 		if (customizeItems && customizeItems.length > 0) {
-			customizeItems.each(node => {
+			customizeItems.each((node) => {
 				const domNode = $(node);
 				if (
 					0 ===
