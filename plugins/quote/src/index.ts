@@ -25,6 +25,7 @@ export default class extends BlockPlugin<Options> {
 		super.init();
 		this.editor.on('paser:html', (node) => this.parseHtml(node));
 		if (isEngine(this.editor)) {
+			this.editor.on('paste:each', (child) => this.pasteHtml(child));
 			this.editor.on('keydown:backspace', (event) =>
 				this.onBackspace(event),
 			);
@@ -34,7 +35,7 @@ export default class extends BlockPlugin<Options> {
 			);
 			this.editor.on(
 				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child),
+				(child) => !this.checkMarkdown(child)?.match,
 			);
 		}
 	}
@@ -216,5 +217,13 @@ export default class extends BlockPlugin<Options> {
 			'border-left': '3px solid #eee',
 			opacity: '0.6',
 		});
+	}
+
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.name === this.tagName) {
+			node.css('padding-left', '');
+			node.css('text-indent', '');
+		}
 	}
 }

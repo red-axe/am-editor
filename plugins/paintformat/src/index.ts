@@ -133,7 +133,7 @@ export default class extends Plugin<Options> {
 
 	paintBlocks(currentBlock: NodeInterface, activeBlocks: NodeInterface[]) {
 		if (!isEngine(this.editor)) return;
-		const { command, node } = this.editor!;
+		const { node } = this.editor!;
 		const blockApi = this.editor.block;
 		activeBlocks.forEach((block) => {
 			if (this.options.paintBlock) {
@@ -145,16 +145,19 @@ export default class extends Plugin<Options> {
 			}
 			if (block.name !== currentBlock.name) {
 				if (block.name === 'p') {
-					command.execute('heading', block.name);
+					const plugin = blockApi.findPlugin(currentBlock);
+					if (plugin) plugin.execute(block.name);
 				} else if (node.isRootBlock(block)) {
 					const plugin = blockApi.findPlugin(block);
 					if (plugin) plugin.execute(block.name);
-				}
-				if (block.name === 'ol') {
-					command.execute('orderlist');
-				}
-				if (block.name === 'ul') {
-					command.execute('unorderedlist');
+				} else if (node.isList(block) && block.name !== 'li') {
+					const plugin = blockApi.findPlugin(block);
+					const curPlugin = blockApi.findPlugin(
+						currentBlock.name === 'li'
+							? currentBlock.parent()!
+							: currentBlock,
+					);
+					if (plugin && curPlugin !== plugin) plugin.execute();
 				}
 			}
 			const css = block.css();

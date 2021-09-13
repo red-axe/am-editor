@@ -5,6 +5,7 @@ import {
 	CARD_RIGHT_SELECTOR,
 	CARD_SELECTOR,
 	CURSOR,
+	CURSOR_SELECTOR,
 	DATA_ELEMENT,
 	FOCUS,
 	FOCUS_SELECTOR,
@@ -18,6 +19,7 @@ import { $ } from './node';
 class Selection implements SelectionInterface {
 	private range: RangeInterface;
 	private editor: EditorInterface;
+	private key: string = '';
 	anchor: NodeInterface | null = null;
 	focus: NodeInterface | null = null;
 
@@ -32,9 +34,14 @@ class Selection implements SelectionInterface {
 			.replace(/<cursor\s*\/>/gi, '');
 	};
 
-	constructor(editor: EditorInterface, range: RangeInterface) {
+	constructor(
+		editor: EditorInterface,
+		range: RangeInterface,
+		key: string = '',
+	) {
 		this.editor = editor;
 		this.range = range;
+		this.key = key;
 	}
 
 	has() {
@@ -54,9 +61,28 @@ class Selection implements SelectionInterface {
 		if (!document) return;
 		// 为了增加容错性，删除已有的标记
 		const root = commonAncestorNode.closest(ROOT_SELECTOR);
-		root.find(ANCHOR_SELECTOR).remove();
-		root.find(FOCUS_SELECTOR).remove();
-		root.find(FOCUS_SELECTOR).remove();
+		if (this.key) {
+			root.find(`[data-anchor-id="${this.key}"]`).remove();
+			root.find(`[data-focus-id="${this.key}"]`).remove();
+			root.find(`[data-cursor-id="${this.key}"]`).remove();
+		} else {
+			const anchor = root.find(ANCHOR_SELECTOR);
+			anchor.each((_, index) => {
+				const node = anchor.eq(index);
+				if (node && !node.attributes('data-anchor-id')) node.remove();
+			});
+			const focus = root.find(FOCUS_SELECTOR);
+			focus.each((_, index) => {
+				const node = focus.eq(index);
+				if (node && !node.attributes('data-focus-id')) node.remove();
+			});
+			const cursor = root.find(CURSOR_SELECTOR);
+			cursor.each((_, index) => {
+				const node = cursor.eq(index);
+				if (node && !node.attributes('data-cursor-id')) node.remove();
+			});
+		}
+
 		// card 组件
 		const card = startNode.closest(CARD_SELECTOR);
 		if (card.length > 0 && !card.isPseudoBlockCard()) {
@@ -88,6 +114,9 @@ class Selection implements SelectionInterface {
 		if (this.range.collapsed) {
 			const cursor = $(document.createElement('span'));
 			cursor.attributes(DATA_ELEMENT, CURSOR);
+			if (this.key) {
+				cursor.attributes('data-focus-id', this.key);
+			}
 			this.range.insertNode(cursor);
 			this.anchor = cursor;
 			this.focus = cursor;
@@ -98,6 +127,9 @@ class Selection implements SelectionInterface {
 		startRange.collapse(true);
 		const anchor = $(document.createElement('span'));
 		anchor.attributes(DATA_ELEMENT, ANCHOR);
+		if (this.key) {
+			anchor.attributes('data-anchor-id', this.key);
+		}
 		startRange.insertNode(anchor);
 		this.range.setStartAfter(anchor);
 		// focus
@@ -105,6 +137,9 @@ class Selection implements SelectionInterface {
 		endRange.collapse(false);
 		const focus = $(document.createElement('span'));
 		focus.attributes(DATA_ELEMENT, FOCUS);
+		if (this.key) {
+			focus.attributes('data-focus-id', this.key);
+		}
 		endRange.insertNode(focus);
 		this.anchor = anchor;
 		this.focus = focus;

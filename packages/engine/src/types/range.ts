@@ -104,9 +104,10 @@ export interface RangeInterface {
 	 */
 	shrinkToElementNode(): RangeInterface;
 	/**
-	 * 创建 selectionElement，通过插入 span 节点标记位置
+	 * 创建 selection，通过插入 span 节点标记位置
+	 * @param key 可选唯一标识
 	 */
-	createSelection(): SelectionInterface;
+	createSelection(key?: string): SelectionInterface;
 	/**
 	 * 获取子选区集合
 	 * @param includeCard 是否包含卡片

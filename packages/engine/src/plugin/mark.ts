@@ -54,7 +54,7 @@ abstract class MarkEntry<T extends {} = {}>
 		if (isEngine(editor) && this.markdown) {
 			editor.on(
 				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child),
+				(child) => !this.checkMarkdown(child)?.match,
 			);
 			editor.on('paste:markdown', (node) => this.pasteMarkdown(node));
 		}

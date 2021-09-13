@@ -35,7 +35,7 @@ export default class extends ListPlugin<Options> {
 		if (isEngine(this.editor)) {
 			this.editor.on(
 				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child),
+				(child) => !this.checkMarkdown(child)?.match,
 			);
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),

@@ -47,7 +47,7 @@ export default class extends Plugin<Options> {
 			this.editor.on('keydown:enter', (event) => this.markdown(event));
 			this.editor.on(
 				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child),
+				(child) => !this.checkMarkdown(child)?.match,
 			);
 			this.editor.on('paste:markdown-before', (child) =>
 				this.pasteMarkdown(child),

@@ -7,6 +7,10 @@ import {
 	PluginOptions,
 	CardInterface,
 	PluginEntry,
+	isEngine,
+	SchemaInterface,
+	decodeCardValue,
+	encodeCardValue,
 } from '@aomao/engine';
 import MathComponent from './component';
 import locales from './locales';
@@ -44,6 +48,12 @@ export default class Math extends Plugin<Options> {
 
 	init() {
 		this.editor.language.add(locales);
+		if (!isEngine(this.editor)) return;
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+		this.editor.on('paste:schema', (schema: SchemaInterface) =>
+			this.pasteSchema(schema),
+		);
 	}
 
 	execute(...args: any): void {
@@ -210,6 +220,38 @@ export default class Math extends Plugin<Options> {
 		});
 	}
 
+	pasteSchema(schema: SchemaInterface) {
+		schema.add({
+			type: 'mark',
+			name: 'span',
+			attributes: {
+				'data-type': {
+					required: true,
+					value: MathComponent.cardName,
+				},
+				'data-value': '*',
+			},
+		});
+	}
+
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === MathComponent.cardName) {
+				const value = node.attributes('data-value');
+				const cardValue = decodeCardValue(value);
+				if (!cardValue.url) return;
+				this.editor.card.replaceNode(
+					node,
+					MathComponent.cardName,
+					cardValue,
+				);
+				node.remove();
+			}
+		}
+	}
+
 	parseHtml(root: NodeInterface) {
 		root.find(`[${CARD_KEY}=${MathComponent.cardName}`).each((cardNode) => {
 			const node = $(cardNode);
@@ -221,7 +263,13 @@ export default class Math extends Plugin<Options> {
 				img.attributes('src', value.url);
 				img.css('visibility', 'visible');
 				img.css('vertical-align', 'middle');
-				node.replaceWith(img);
+				const span = $(
+					`<span data-type="${
+						MathComponent.cardName
+					}" data-value="${encodeCardValue(value)}"></span>`,
+				);
+				span.append(img);
+				node.replaceWith(span);
 			} else node.remove();
 		});
 	}

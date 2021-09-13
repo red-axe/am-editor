@@ -14,6 +14,7 @@ import {
 } from '../types';
 import {
 	ANCHOR,
+	CARD_ELEMENT_KEY,
 	CARD_KEY,
 	CARD_SELECTOR,
 	CURSOR,
@@ -496,7 +497,18 @@ class NodeModel implements NodeModelInterface {
 					.remove();
 			}
 		}
-
+		// 检测是否位于卡片两边节点
+		const elementType = parent?.attributes(CARD_ELEMENT_KEY);
+		if (parent && elementType && ['left', 'right'].includes(elementType)) {
+			const cardComponent = editor.card.find(parent);
+			if (cardComponent) {
+				if (elementType === 'left') {
+					range.setStartBefore(cardComponent.root);
+				} else {
+					range.setStartAfter(cardComponent.root);
+				}
+			}
+		}
 		range.insertNode(node);
 		return range.select(node, true).shrinkToElementNode().collapse(false);
 	}

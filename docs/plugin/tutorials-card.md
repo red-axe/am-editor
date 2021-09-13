@@ -96,9 +96,9 @@ export default class extends Card {
 	 * Uninstall components
 	 * */
 	destroy() {
-		super.destory();
+		super.destroy();
 		const element = this.container.get<HTMLElement>();
-		if (element) ReactDOM.unmountComponentAtNode(elment);
+		if (element) ReactDOM.unmountComponentAtNode(element);
 	}
 }
 ```
@@ -168,7 +168,7 @@ export default class extends Card {
 	 * Uninstall components
 	 * */
 	destroy() {
-		super.destory();
+		super.destroy();
 		this.vm?.unmount();
 		this.vm = undefined;
 	}

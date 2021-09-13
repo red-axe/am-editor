@@ -3,9 +3,13 @@ import {
 	CardEntry,
 	CardInterface,
 	CARD_KEY,
+	decodeCardValue,
+	encodeCardValue,
+	isEngine,
 	NodeInterface,
 	Plugin,
 	PluginEntry,
+	SchemaInterface,
 } from '@aomao/engine';
 import FileComponent, { FileValue } from './component';
 import FileUploader from './uploader';
@@ -18,7 +22,12 @@ export default class extends Plugin {
 
 	init() {
 		this.editor.language.add(locales);
+		if (!isEngine(this.editor)) return;
 		this.editor.on('paser:html', (node) => this.parseHtml(node));
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+		this.editor.on('paste:schema', (schema: SchemaInterface) =>
+			this.pasteSchema(schema),
+		);
 	}
 
 	execute(
@@ -110,14 +119,51 @@ export default class extends Plugin {
 		});
 	}
 
+	pasteSchema(schema: SchemaInterface) {
+		schema.add({
+			type: 'mark',
+			name: 'a',
+			attributes: {
+				'data-type': {
+					required: true,
+					value: FileComponent.cardName,
+				},
+				'data-value': '*',
+			},
+		});
+	}
+
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === FileComponent.cardName) {
+				const value = node.attributes('data-value');
+				const cardValue = decodeCardValue(value);
+				if (!cardValue.url) return;
+				this.editor.card.replaceNode(
+					node,
+					FileComponent.cardName,
+					cardValue,
+				);
+				node.remove();
+			}
+		}
+	}
+
 	parseHtml(root: NodeInterface) {
 		root.find(`[${CARD_KEY}=${FileComponent.cardName}`).each((cardNode) => {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as FileComponent;
 			const value = card?.getValue();
 			if (value?.url && value.status === 'done') {
-				const html = `<a href="${value.url}" style="word-wrap: break-word;color: #096DD9;touch-action: manipulation;background-color: rgba(0,0,0,0);text-decoration: none;outline: none;cursor: pointer;transition: color .3s;">
-                <span style="font-size: 14px;">\ud83d\udcce</span>${value.name}</a>`;
+				const html = `<a data-type="${
+					FileComponent.cardName
+				}" data-value="${encodeCardValue(value)}" href="${
+					value.url
+				}" style="word-wrap: break-word;color: #096DD9;touch-action: manipulation;background-color: rgba(0,0,0,0);text-decoration: none;outline: none;cursor: pointer;transition: color .3s;"><span style="font-size: 14px;">\ud83d\udcce</span>${
+					value.name
+				}</a>`;
 				node.empty();
 				node.replaceWith($(html));
 			} else node.remove();

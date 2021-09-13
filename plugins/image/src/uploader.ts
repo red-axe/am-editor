@@ -148,7 +148,7 @@ export default class extends Plugin<Options> {
 			this.editor.on('paste:after', () => this.pasteAfter());
 			this.editor.on(
 				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child),
+				(child) => !this.checkMarkdown(child)?.match,
 			);
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),

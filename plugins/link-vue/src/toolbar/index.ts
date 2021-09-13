@@ -203,8 +203,8 @@ class Toolbar {
 
 	hide(target?: NodeInterface, clearTarget?: boolean) {
 		if (target && this.target && target.equal(this.target)) return;
-		const elment = this.root?.get<Element>();
-		if (elment && !this.mouseInContainer) {
+		const element = this.root?.get<Element>();
+		if (element && !this.mouseInContainer) {
 			if (this.vm) {
 				this.vm.unmount();
 				this.vm = undefined;

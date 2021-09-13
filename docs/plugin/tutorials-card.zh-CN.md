@@ -95,10 +95,10 @@ export default class extends Card {
 	/**
 	 * 卸载组件
 	 * */
-	destory() {
-		super.destory();
+	destroy() {
+		super.destroy();
 		const element = this.container.get<HTMLElement>();
-		if (element) ReactDOM.unmountComponentAtNode(elment);
+		if (element) ReactDOM.unmountComponentAtNode(element);
 	}
 }
 ```
@@ -167,8 +167,8 @@ export default class extends Card {
 	/**
 	 * 卸载组件
 	 * */
-	destory() {
-		super.destory();
+	destroy() {
+		super.destroy();
 		this.vm?.unmount();
 		this.vm = undefined;
 	}

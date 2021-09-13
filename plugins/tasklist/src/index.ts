@@ -44,7 +44,7 @@ export default class extends ListPlugin<Options> {
 		if (isEngine(this.editor)) {
 			this.editor.on(
 				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child),
+				(child) => !this.checkMarkdown(child)?.match,
 			);
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
@@ -84,7 +84,10 @@ export default class extends ListPlugin<Options> {
 				name: 'li',
 				type: 'block',
 				attributes: {
-					class: this.editor.list.CUSTOMZIE_LI_CLASS,
+					class: {
+						required: true,
+						value: this.editor.list.CUSTOMZIE_LI_CLASS,
+					},
 					checked: ['true', 'false'],
 				},
 				allowIn: ['ul'],
@@ -147,13 +150,23 @@ export default class extends ListPlugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
+		const getBox = (inner: string = '') => {
+			return `<span style="${
+				inner
+					? 'background:#347eff;position:relative;'
+					: 'background:#fff;'
+			}width: 16px;height: 16px;display: inline-block;border: 1px solid #347eff;border-radius: 2px;transition: all 0.3s;border-collapse: separate;">${inner}</span>`;
+		};
 		root.find(`[${CARD_KEY}=checkbox`).each((checkboxNode) => {
 			const node = $(checkboxNode);
+
 			const checkbox = $(
 				`<span>${
-					'checked' === node.find('input').attributes('checked')
-						? '✅'
-						: '🔲'
+					node.find('.data-checkbox-checked').length > 0
+						? getBox(
+								'<span style="transform: rotate(45deg) scale(1);position: absolute;display: block;border: 2px solid #fff;border-top: 0;border-left: 0;width:5.71428571px;height:9.14285714px;transition: all 0.2s cubic-bezier(0.12, 0.4, 0.29, 1.46) 0.1s;opacity: 1;left:3.57142857px;top:0.14285714px;"></span>',
+						  )
+						: getBox()
 				}</span>`,
 			);
 			checkbox.css({

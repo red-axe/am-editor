@@ -9,7 +9,6 @@ import {
 import './index.css';
 
 const CHECKBOX_CLASS = 'data-checkbox';
-const CHECKBOX_INPUT_CLASS = 'data-checkbox-input';
 const CHECKBOX_INNER_CLASS = 'data-checkbox-inner';
 const CHECKBOX_CHECKED_CLASS = 'data-checkbox-checked';
 
@@ -49,15 +48,9 @@ class Checkbox extends Card<CheckboxValue> {
 		const parent = this.root.parent();
 		if (checked) {
 			this.#container?.removeClass(CHECKBOX_CHECKED_CLASS);
-			this.root
-				.find(`.${CHECKBOX_INPUT_CLASS}`)
-				.removeAttributes('checked');
 			parent?.removeAttributes('checked');
 		} else {
 			this.#container?.addClass(CHECKBOX_CHECKED_CLASS);
-			this.root
-				.find(`.${CHECKBOX_INPUT_CLASS}`)
-				.attributes('checked', 'checked');
 			parent?.attributes('checked', 'true');
 		}
 		return checked;

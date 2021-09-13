@@ -1,14 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Keymaster from 'keymaster';
-import { omit } from 'lodash-es';
-import {
-	$,
-	EngineInterface,
-	isServer,
-	NodeInterface,
-	Position,
-} from '@aomao/engine';
+import Keymaster, { setScope, deleteScope, unbind } from 'keymaster';
+import { $, EngineInterface, NodeInterface, Position } from '@aomao/engine';
 import Collapse from '../../collapse';
 import { CollapseGroupProps } from '../../collapse/group';
 
@@ -28,26 +21,6 @@ export interface CollapseComponentInterface {
 		target: NodeInterface,
 		data: Array<CollapseGroupProps>,
 	): void;
-}
-
-let keymasterMoudle:
-	| {
-			keymaster: Keymaster;
-			setScope(scopeName: string): void;
-			getScope(): string;
-			deleteScope(scopeName: string): void;
-
-			unbind(key: string): void;
-			unbind(key: string, scopeName: string): void;
-	  }
-	| undefined = undefined;
-if (!isServer) {
-	import('keymaster').then((moudle) => {
-		keymasterMoudle = {
-			keymaster: moudle.default,
-			...omit(moudle, 'default'),
-		};
-	});
 }
 
 class CollapseComponent implements CollapseComponentInterface {
@@ -108,8 +81,6 @@ class CollapseComponent implements CollapseComponentInterface {
 	}
 
 	unbindEvents() {
-		if (!keymasterMoudle) return;
-		const { deleteScope, unbind } = keymasterMoudle;
 		deleteScope(this.SCOPE_NAME);
 		unbind('enter', this.SCOPE_NAME);
 		unbind('up', this.SCOPE_NAME);
@@ -120,11 +91,9 @@ class CollapseComponent implements CollapseComponentInterface {
 
 	bindEvents() {
 		this.unbindEvents();
-		if (!keymasterMoudle) return;
-		const { setScope, keymaster } = keymasterMoudle;
 		setScope(this.SCOPE_NAME);
 		//回车
-		keymaster('enter', this.SCOPE_NAME, (event) => {
+		Keymaster('enter', this.SCOPE_NAME, (event) => {
 			// Card 已被删除
 			if (this.root?.closest('body').length === 0) {
 				return;
@@ -134,7 +103,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			active?.get<HTMLElement>()?.click();
 		});
 
-		keymaster('up', this.SCOPE_NAME, (event) => {
+		Keymaster('up', this.SCOPE_NAME, (event) => {
 			// Card 已被删除
 			if (this.root?.closest('body').length === 0) {
 				return;
@@ -142,7 +111,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			event.preventDefault();
 			this.scroll('up');
 		});
-		keymaster('down', this.SCOPE_NAME, (e) => {
+		Keymaster('down', this.SCOPE_NAME, (e) => {
 			// Card 已被删除
 			if (this.root?.closest('body').length === 0) {
 				return;
@@ -150,7 +119,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			e.preventDefault();
 			this.scroll('down');
 		});
-		keymaster('esc', this.SCOPE_NAME, (event) => {
+		Keymaster('esc', this.SCOPE_NAME, (event) => {
 			event.preventDefault();
 			this.unbindEvents();
 			const { onCancel } = this.otpions;

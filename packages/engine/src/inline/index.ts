@@ -1,6 +1,7 @@
 import {
 	CARD_ELEMENT_KEY,
 	CARD_KEY,
+	CARD_RIGHT_SELECTOR,
 	CARD_SELECTOR,
 	CARD_TYPE_KEY,
 } from '../constants';

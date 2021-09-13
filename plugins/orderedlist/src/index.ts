@@ -40,7 +40,7 @@ export default class extends ListPlugin<Options> {
 			);
 			this.editor.on(
 				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child),
+				(child) => !this.checkMarkdown(child)?.match,
 			);
 		}
 	}

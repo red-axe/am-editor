@@ -5,6 +5,8 @@ import {
 	CARD_KEY,
 	isEngine,
 	PluginOptions,
+	PluginEntry,
+	SchemaInterface,
 } from '@aomao/engine';
 import StatusComponent from './components';
 import locales from './locales';
@@ -19,7 +21,12 @@ export default class extends Plugin<Options> {
 
 	init() {
 		this.editor.language.add(locales);
+		if (!isEngine(this.editor)) return;
 		this.editor.on('paser:html', (node) => this.parseHtml(node));
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+		this.editor.on('paste:schema', (schema: SchemaInterface) =>
+			this.pasteSchema(schema),
+		);
 	}
 
 	execute() {
@@ -36,6 +43,46 @@ export default class extends Plugin<Options> {
 
 	hotkey() {
 		return this.options.hotkey || '';
+	}
+
+	pasteSchema(schema: SchemaInterface) {
+		schema.add({
+			type: 'mark',
+			name: 'span',
+			attributes: {
+				'data-type': {
+					required: true,
+					value: StatusComponent.cardName,
+				},
+				style: {
+					background: {
+						required: true,
+						value: '@color',
+					},
+					color: {
+						required: true,
+						value: '@color',
+					},
+				},
+			},
+		});
+	}
+
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === StatusComponent.cardName) {
+				this.editor.card.replaceNode(node, StatusComponent.cardName, {
+					text: node.text(),
+					color: {
+						background: node.css('background'),
+						color: node.css('color'),
+					},
+				});
+				node.remove();
+			}
+		}
 	}
 
 	parseHtml(root: NodeInterface) {
@@ -59,6 +106,7 @@ export default class extends Plugin<Options> {
 					'margin-left': '1px',
 					'margin-right': '1px',
 				});
+				container.attributes('data-type', StatusComponent.cardName);
 				node.replaceWith(container);
 			},
 		);

@@ -300,7 +300,6 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 				const value = this.getTableValue();
 				if (value) this.setValue(value);
 			}
-			this.scrollbar?.refresh();
 		}, 100);
 	};
 
@@ -344,6 +343,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		else this.toolbarModel?.setOffset([0, -28, 0, -6]);
 		if (this.viewport) {
 			this.scrollbar = new Scrollbar(this.viewport, true, false, true);
+			this.scrollbar.setContentNode(this.viewport.find('.data-table')!);
 			this.scrollbar.on('display', (display: 'node' | 'block') => {
 				if (display === 'block') {
 					this.wrapper?.addClass('scrollbar-show');
@@ -370,6 +370,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.conltrollBar.on('sizeChanged', () => {
 			this.selection.refreshModel();
 			this.onChange();
+			this.scrollbar?.refresh();
 		});
 		this.command.on('actioned', (action, silence) => {
 			if (action === 'paste') {
@@ -379,9 +380,8 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			this.toolbarModel?.showCardToolbar();
 			if (!silence) {
 				this.onChange();
-			} else {
-				this.scrollbar?.refresh();
 			}
+			this.scrollbar?.refresh();
 		});
 
 		const tableRoot = this.wrapper?.find(Template.TABLE_CLASS);

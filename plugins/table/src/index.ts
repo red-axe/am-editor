@@ -36,7 +36,7 @@ class Table extends Plugin<Options> {
 		);
 		editor.on(
 			'paste:markdown-check',
-			(child) => !this.checkMarkdown(child),
+			(child) => !this.checkMarkdown(child)?.match,
 		);
 		editor.on('paste:markdown-after', (child) => this.pasteMarkdown(child));
 	}
@@ -125,6 +125,7 @@ class Table extends Plugin<Options> {
 		schema.find((r) => r.name === 'table')[0].attributes = {
 			class: ['data-table'],
 			'data-table-no-border': '*',
+			'data-wdith': '@length',
 			style: {
 				width: '@length',
 				background: '@color',
@@ -187,7 +188,8 @@ class Table extends Plugin<Options> {
 			node: NodeInterface,
 			type: 'width' | 'height' = 'width',
 		) => {
-			const width = node.css(type);
+			const dataWidth = node.attributes('data-width');
+			const width = dataWidth ? dataWidth : node.css(type);
 			if (width.endsWith('%')) node.css(type, '');
 			if (width.endsWith('pt')) node.css(type, this.convertToPX(width));
 		};
@@ -252,15 +254,18 @@ class Table extends Plugin<Options> {
 					node.remove();
 					return;
 				}
+				const width = table.attributes('width') || table.css('width');
 				table.css({
 					outline: 'none',
 					'border-collapse': 'collapse',
+					width: '100%',
 				});
+				table.attributes('data-width', width);
 				const tds = table.find('td');
 				tds.each((_, index) => {
 					const tdElement = tds.eq(index);
 					tdElement?.css({
-						'min-width': '90px',
+						'min-width': 'auto',
 						'white-space': 'normal',
 						'word-wrap': 'break-word',
 						margin: '4px 8px',

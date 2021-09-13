@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+import { isServer } from '@aomao/engine';
 import Context from './context';
 import useDispatch from './hooks/use-dispatch';
 import useSelector from './hooks/use-selector';

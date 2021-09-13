@@ -883,7 +883,7 @@ class ChangeModel implements ChangeInterface {
 				'paste:markdown-check',
 				textNode,
 			);
-			if (result) return;
+			if (result !== false) return;
 			// 提示是否要转换
 			this.engine
 				.messageConfirm(

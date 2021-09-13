@@ -28,7 +28,7 @@ abstract class InlineEntry<T extends {} = {}>
 		if (isEngine(editor) && this.markdown) {
 			editor.on(
 				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child),
+				(child) => !this.checkMarkdown(child)?.match,
 			);
 			editor.on('paste:markdown', (child) => this.pasteMarkdown(child));
 		}

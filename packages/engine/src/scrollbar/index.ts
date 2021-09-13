@@ -32,9 +32,10 @@ class Scrollbar extends EventEmitter2 {
 	private maxScrollLeft: number = 0;
 	#observer?: MutationObserver;
 	#reverse?: boolean;
+	#content?: NodeInterface;
 	shadowTimer?: NodeJS.Timeout;
 	/**
-	 * @param {nativeNode} container 需要添加滚动条的容器元素
+	 * @param {nativeNode} container 需要添加滚动条的元素
 	 * @param {boolean} x 横向滚动条
 	 * @param {boolean} y 竖向滚动条
 	 * @param {boolean} needShadow 是否显示阴影
@@ -51,6 +52,14 @@ class Scrollbar extends EventEmitter2 {
 		this.y = y;
 		this.shadow = shadow;
 		this.init();
+	}
+
+	setContentNode(content?: NodeInterface | Node) {
+		this.#content = content
+			? isNode(content)
+				? $(content)
+				: content
+			: content;
 	}
 
 	init() {
@@ -98,15 +107,20 @@ class Scrollbar extends EventEmitter2 {
 	refresh() {
 		const element = this.container.get<HTMLElement>();
 		if (element) {
-			const {
-				offsetWidth,
-				offsetHeight,
-				scrollWidth,
-				scrollHeight,
-				scrollLeft,
-				scrollTop,
-			} = element;
+			const { offsetWidth, offsetHeight, scrollLeft, scrollTop } =
+				element;
 
+			const contentElement = this.#content?.get<HTMLElement>();
+			const sPLeft = removeUnit(this.container.css('padding-left'));
+			const sPRight = removeUnit(this.container.css('padding-right'));
+			const sPTop = removeUnit(this.container.css('padding-top'));
+			const sPBottom = removeUnit(this.container.css('padding-bottom'));
+			const scrollWidth = contentElement
+				? contentElement.offsetWidth + sPLeft + sPRight
+				: element.scrollWidth;
+			const scrollHeight = contentElement
+				? contentElement.offsetHeight + sPTop + sPBottom
+				: element.scrollHeight;
 			this.oWidth =
 				offsetWidth -
 				removeUnit(this.container.css('border-left-width')) -
@@ -124,16 +138,55 @@ class Scrollbar extends EventEmitter2 {
 			this.maxScrollLeft = scrollWidth - this.oWidth;
 			if (this.x) {
 				this.slideX?.css('width', this.xWidth + 'px');
-				const display = this.oWidth === this.sWidth ? 'none' : 'block';
+				const display =
+					this.oWidth === this.sWidth ||
+					(contentElement &&
+						contentElement.offsetWidth <= this.oWidth)
+						? 'none'
+						: 'block';
 				this.slideX?.css('display', display);
 				this.emit('display', display);
+				this.shadowLeft?.css('display', display);
+				this.shadowRight?.css('display', display);
 			}
 			if (this.y) {
 				this.slideY?.css('height', this.yHeight + 'px');
 				const display =
-					this.oHeight === this.sHeight ? 'none' : 'block';
+					this.oHeight === this.sHeight ||
+					(contentElement &&
+						contentElement.offsetHeight <= this.oHeight)
+						? 'none'
+						: 'block';
 				this.slideY?.css('display', display);
 				this.emit('display', display);
+			}
+			// 实际内容宽度小于容器滚动宽度（有内容删除了）
+			if (
+				this.x &&
+				contentElement &&
+				element.scrollWidth - sPLeft - sPRight !==
+					contentElement.offsetWidth
+			) {
+				element.scrollLeft -=
+					element.scrollWidth -
+					sPLeft -
+					sPRight -
+					contentElement.offsetWidth;
+				return;
+			}
+			// 实际内容高度小于容器滚动高度（有内容删除了）
+			if (
+				this.y &&
+				contentElement &&
+				element.scrollHeight - sPTop - sPBottom !==
+					contentElement.offsetHeight
+			) {
+				element.scrollTop -=
+					element.scrollHeight -
+					sPTop -
+					sPBottom -
+					contentElement.offsetHeight;
+				return;
 			}
 			this.reRenderX(scrollLeft);
 			this.reRenderY(scrollTop);
@@ -393,24 +446,14 @@ class Scrollbar extends EventEmitter2 {
 		if (this.shadow) {
 			this.shadowLeft?.css('left', width + 'px');
 			this.shadowRight?.css('left', width + this.oWidth - 4 + 'px');
-			this.shadowLeft?.css('display', 'none');
-			this.shadowRight?.css('display', 'none');
-			if (this.shadowTimer) clearTimeout(this.shadowTimer);
-			this.shadowTimer = setTimeout(() => {
-				if (0 !== width) {
-					this.shadowLeft?.css('display', 'block');
-				}
-				if (width !== this.maxScrollLeft) {
-					this.shadowRight?.css('display', 'block');
-				}
-			}, 100);
 		}
 	};
 
 	reRenderX = (left: number) => {
 		if (this.x) {
 			this.scrollBarX?.css('left', left + 'px');
-			let min = left / (this.sWidth - this.oWidth);
+			const value = this.sWidth - this.oWidth;
+			let min = value <= 0 ? 0 : left / value;
 			min = Math.min(1, min);
 			this.slideX?.css('left', (this.oWidth - this.xWidth) * min + 'px');
 			this.reRenderShadow(left);
@@ -421,7 +464,8 @@ class Scrollbar extends EventEmitter2 {
 	reRenderY = (top: number) => {
 		if (this.y) {
 			this.scrollBarY?.css('top', top + 'px');
-			let min = top / (this.sHeight - this.oHeight);
+			const value = this.sHeight - this.oHeight;
+			let min = value <= 0 ? 0 : top / value;
 			min = Math.min(1, min);
 			this.slideY?.css('top', (this.oHeight - this.yHeight) * min + 'px');
 			this.emit('change');

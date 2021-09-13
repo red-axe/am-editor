@@ -1,11 +1,10 @@
-import { EditorConfiguration, Editor } from 'codemirror';
+import CodeMirror, { EditorConfiguration, Editor } from 'codemirror';
 import { debounce } from 'lodash-es';
 import {
 	$,
 	EditorInterface,
 	isEngine,
 	isMobile,
-	isServer,
 	NodeInterface,
 } from '@aomao/engine';
 import { CodeBlockEditorInterface, Options } from './types';
@@ -26,17 +25,6 @@ const qa = [
 	'swift',
 	'vbnet',
 ];
-
-let CodeMirrorModule: {
-	CodeMirror: any;
-};
-if (!isServer) {
-	import('codemirror').then((module) => {
-		CodeMirrorModule = {
-			CodeMirror: module.default,
-		};
-	});
-}
 
 class CodeBlockEditor implements CodeBlockEditorInterface {
 	private editor: EditorInterface;
@@ -80,7 +68,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 	create(mode: string, value: string, options?: EditorConfiguration) {
 		this.mode = mode;
 		const syntaxMode = this.getSyntax(mode);
-		this.codeMirror = CodeMirrorModule.CodeMirror(
+		this.codeMirror = CodeMirror(
 			this.container.find('.data-codeblock-content').get<HTMLElement>()!,
 			{
 				value,
@@ -95,7 +83,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				...this.getConfig(value, syntaxMode),
 				...options,
 			},
-		) as Editor;
+		);
 		this.codeMirror.on('mousedown', (_, event) => {
 			if (!isEngine(this.editor) || this.editor.readonly) {
 				event.preventDefault();
@@ -198,7 +186,6 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 	 * - https://codemirror.net/addon/runmode/runmode.js
 	 */
 	runMode(string: string, modespec: string, callback: any, options: any) {
-		const { CodeMirror } = CodeMirrorModule;
 		const mode = CodeMirror.getMode(CodeMirror.defaults, modespec);
 		const ie = /MSIE \d/.test(navigator.userAgent);
 		const ie_lt9 =

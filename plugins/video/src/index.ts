@@ -3,10 +3,14 @@ import {
 	CardEntry,
 	CardInterface,
 	CARD_KEY,
+	decodeCardValue,
+	encodeCardValue,
+	isEngine,
 	NodeInterface,
 	Plugin,
 	PluginEntry,
 	sanitizeUrl,
+	SchemaInterface,
 } from '@aomao/engine';
 import VideoComponent, { VideoValue } from './component';
 import VideoUploader from './uploader';
@@ -24,7 +28,12 @@ export default class VideoPlugin extends Plugin<{
 
 	init() {
 		this.editor.language.add(locales);
+		if (!isEngine(this.editor)) return;
 		this.editor.on('paser:html', (node) => this.parseHtml(node));
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+		this.editor.on('paste:schema', (schema: SchemaInterface) =>
+			this.pasteSchema(schema),
+		);
 	}
 
 	execute(
@@ -118,6 +127,47 @@ export default class VideoPlugin extends Plugin<{
 		});
 	}
 
+	pasteSchema(schema: SchemaInterface) {
+		schema.add({
+			type: 'block',
+			name: 'video',
+			isVoid: true,
+			attributes: {
+				src: {
+					required: true,
+					value: '@url',
+				},
+				'data-value': '*',
+			},
+		});
+	}
+
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement() && node.name === 'video') {
+			const value = node.attributes('data-value');
+			let cardValue = decodeCardValue(value);
+			if (!cardValue.url) {
+				cardValue = {
+					url: node.attributes('src'),
+					name:
+						node.attributes('data-name') ||
+						node.attributes('name') ||
+						node.attributes('title') ||
+						node.attributes('src'),
+					cover: node.attributes('poster'),
+					status: 'done',
+				};
+			}
+			this.editor.card.replaceNode(
+				node,
+				VideoComponent.cardName,
+				cardValue,
+			);
+			node.remove();
+		}
+	}
+
 	parseHtml(root: NodeInterface) {
 		root.find(`[${CARD_KEY}=${VideoComponent.cardName}`).each(
 			(cardNode) => {
@@ -127,7 +177,9 @@ export default class VideoPlugin extends Plugin<{
 				if (value?.url && value.status === 'done') {
 					const { onBeforeRender } = this.options;
 					const { cover, url } = value;
-					const html = `<video controls src="${sanitizeUrl(
+					const html = `<video data-value="${encodeCardValue(
+						value,
+					)}" controls src="${sanitizeUrl(
 						onBeforeRender ? onBeforeRender('query', url) : url,
 					)}" poster="${
 						!cover
@@ -137,7 +189,7 @@ export default class VideoPlugin extends Plugin<{
 										? onBeforeRender('cover', cover)
 										: cover,
 							  )
-					}" webkit-playsinline="webkit-playsinline" playsinline="playsinline" />`;
+					}" webkit-playsinline="webkit-playsinline" playsinline="playsinline" style="outline:none;" />`;
 					node.empty();
 					node.replaceWith($(html));
 				} else node.remove();

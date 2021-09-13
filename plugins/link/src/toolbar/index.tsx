@@ -189,9 +189,9 @@ class Toolbar {
 
 	hide(target?: NodeInterface, clearTarget?: boolean) {
 		if (target && this.target && target.equal(this.target)) return;
-		const elment = this.root?.get<Element>();
-		if (elment && !this.mouseInContainer) {
-			ReactDOM.unmountComponentAtNode(elment);
+		const element = this.root?.get<Element>();
+		if (element && !this.mouseInContainer) {
+			ReactDOM.unmountComponentAtNode(element);
 			this.#position?.destroy();
 			this.root = undefined;
 			if (this.target && !this.target.attributes('href')) {

@@ -9,6 +9,7 @@ import './index.less';
 
 export type ViewProps = {
 	content: string;
+	html: string;
 };
 const viewPlugins = plugins.filter(
 	(plugin) =>
@@ -16,7 +17,7 @@ const viewPlugins = plugins.filter(
 		['mark-range'].indexOf(plugin.pluginName) < 0,
 );
 
-const ViewRender: React.FC<ViewProps> = ({ content }) => {
+const ViewRender: React.FC<ViewProps> = ({ content, html }) => {
 	const view = useRef<ViewInterface>();
 	const viewRef = useRef<HTMLDivElement | null>(null);
 	const [viewLoading, setViewLoading] = useState(true);
@@ -47,28 +48,6 @@ const ViewRender: React.FC<ViewProps> = ({ content }) => {
 		}
 	}, [content, viewLoading]);
 
-	//服务端渲染
-	const renderServer = () => {
-		const view = new View('<div></div>', {
-			lang,
-			plugins: viewPlugins,
-			cards,
-		});
-		//渲染内容到container节点下
-		view.render(content);
-		const { container } = view;
-		return (
-			<div
-				className="editor-wrapper editor-wrapper-view"
-				style={{ position: 'relative' }}
-			>
-				<div
-					className={container.attributes('class')}
-					dangerouslySetInnerHTML={{ __html: container.html() }}
-				></div>
-			</div>
-		);
-	};
 	//普通渲染
 	const render = () => {
 		return (
@@ -80,11 +59,7 @@ const ViewRender: React.FC<ViewProps> = ({ content }) => {
 			</div>
 		);
 	};
-	return (
-		<Loading loading={viewLoading}>
-			{!isServer ? render() : renderServer()}
-		</Loading>
-	);
+	return <Loading loading={viewLoading}>{render()}</Loading>;
 };
 
 export default ViewRender;

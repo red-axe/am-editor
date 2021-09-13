@@ -9,6 +9,9 @@ import {
 	CardEntry,
 	unescape,
 	PluginOptions,
+	SchemaInterface,
+	CARD_KEY,
+	encodeCardValue,
 } from '@aomao/engine';
 import MentionComponent from './component';
 import locales from './locales';
@@ -121,6 +124,11 @@ class MentionPlugin extends Plugin<Options> {
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:at', (event) => this.onAt(event));
 			this.editor.on('paser:value', (node) => this.paserValue(node));
+			this.editor.on('paser:html', (node) => this.parseHtml(node));
+			this.editor.on('paste:each', (child) => this.pasteHtml(child));
+			this.editor.on('paste:schema', (schema: SchemaInterface) =>
+				this.pasteSchema(schema),
+			);
 		}
 		this.editor.language.add(locales);
 	}
@@ -195,6 +203,57 @@ class MentionPlugin extends Plugin<Options> {
 			}
 		});
 		return values;
+	}
+
+	pasteSchema(schema: SchemaInterface) {
+		schema.add({
+			type: 'mark',
+			name: 'span',
+			attributes: {
+				'data-type': {
+					required: true,
+					value: MentionComponent.cardName,
+				},
+				'data-value': '*',
+			},
+		});
+	}
+
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === MentionComponent.cardName) {
+				const value = node.attributes('data-value');
+				const cardValue = decodeCardValue(value);
+				if (!cardValue.name) return;
+				this.editor.card.replaceNode(
+					node,
+					MentionComponent.cardName,
+					cardValue,
+				);
+				node.remove();
+			}
+		}
+	}
+
+	parseHtml(root: NodeInterface) {
+		root.find(`[${CARD_KEY}=${MentionComponent.cardName}`).each(
+			(cardNode) => {
+				const node = $(cardNode);
+				const card = this.editor.card.find(node) as MentionComponent;
+				const value = card?.getValue();
+				if (value?.id && value.name) {
+					const html = `<span data-type="${
+						MentionComponent.cardName
+					}" data-value="${encodeCardValue(
+						value,
+					)}" style="color:#1890ff">@${value.name}</span>`;
+					node.empty();
+					node.replaceWith($(html));
+				} else node.remove();
+			},
+		);
 	}
 
 	execute() {}

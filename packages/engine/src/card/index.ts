@@ -11,7 +11,6 @@ import {
 	EDITABLE_SELECTOR,
 	DATA_TRANSIENT_ELEMENT,
 	DATA_TRANSIENT_ATTRIBUTES,
-	CARD_ASYNC_RENDER,
 } from '../constants';
 import {
 	ActiveTrigger,

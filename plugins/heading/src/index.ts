@@ -108,7 +108,7 @@ export default class extends BlockPlugin<Options> {
 			);
 			this.editor.on(
 				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child),
+				(child) => !this.checkMarkdown(child)?.match,
 			);
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),

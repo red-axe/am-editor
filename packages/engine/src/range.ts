@@ -389,10 +389,10 @@ class Range implements RangeInterface {
 
 	/**
 	 * 创建 selection，通过插入 span 节点标记位置
-	 * @param range
+	 * @param key 唯一标识
 	 */
-	createSelection = (): SelectionInterface => {
-		const selection = new Selection(this.editor, this);
+	createSelection = (key: string = ''): SelectionInterface => {
+		const selection = new Selection(this.editor, this, key);
 		selection.create();
 		return selection;
 	};
@@ -809,7 +809,7 @@ Range.create = (
 	point?: { x: number; y: number },
 ): RangeInterface => {
 	let range: globalThis.Range;
-	if (point) range = doc.caretRangeFromPoint(point.x, point.y);
+	if (point) range = doc.caretRangeFromPoint(point.x, point.y)!;
 	else range = doc.createRange();
 	return Range.from(editor, range)!;
 };
