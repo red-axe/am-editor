@@ -146,6 +146,9 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		if (insertCol < 0) {
 			insertCol = 0;
 			isLeft = false;
+		} else if (!isLeft && colBase === tableModel.cols - 1) {
+			insertCol--;
+			isLeft = true;
 		}
 		const width = colBars.eq(colBase)?.get<HTMLElement>()!.offsetWidth;
 
