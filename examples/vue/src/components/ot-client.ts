@@ -128,12 +128,15 @@ class OTClient extends EventEmitter {
 		// 实例化一个可以自动重连的 ws
 		const socket = new ReconnectingWebSocket(
 			async () => {
-				const token = await new Promise((resolve) => {
+				const token = await new Promise<string>((resolve) => {
 					// 这里可以异步获取一个Token，如果有的话
 					resolve('');
 				});
 				// 组合ws链接
-				return `${url}&id=${docID}&token=${token}`;
+				const uri = new URL(url);
+				uri.searchParams.set('id', docID);
+				uri.searchParams.set('token', token);
+				return uri.toString();
 			},
 			[],
 			{
