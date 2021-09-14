@@ -81,8 +81,10 @@ export default class extends Plugin<Options> {
 					},
 				});
 				node.remove();
+				return false;
 			}
 		}
+		return true;
 	}
 
 	parseHtml(root: NodeInterface) {

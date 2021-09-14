@@ -165,7 +165,9 @@ export default class VideoPlugin extends Plugin<{
 				cardValue,
 			);
 			node.remove();
+			return false;
 		}
+		return true;
 	}
 
 	parseHtml(root: NodeInterface) {

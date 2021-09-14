@@ -124,7 +124,9 @@ export default class extends Plugin<Options> {
 		if (!isEngine(this.editor)) return;
 		if (node.name === 'hr') {
 			this.editor.card.replaceNode(node, HrComponent.cardName);
+			return false;
 		}
+		return true;
 	}
 
 	parseHtml(root: NodeInterface) {

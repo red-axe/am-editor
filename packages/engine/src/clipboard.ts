@@ -241,12 +241,17 @@ export default class Clipboard implements ClipboardInterface {
 		$(document.body).append(block);
 		block.append(editor.node.clone($(data), true));
 		if (trigger) {
-			block.allChildren().forEach((child) => {
+			block.traverse((child) => {
+				if (child.equal(block)) return;
 				editor.trigger('copy', child);
 			});
 		}
 		block.append($('&#8203;', null));
+		const first = block.first()!;
+		const end = block.last()!;
 		range.select(block, true);
+		range.setStartAfter(first);
+		range.setEndBefore(end);
 		selection?.removeAllRanges();
 		selection?.addRange(range.toRange());
 		let success = false;

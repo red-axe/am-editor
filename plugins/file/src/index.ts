@@ -147,8 +147,10 @@ export default class extends Plugin {
 					cardValue,
 				);
 				node.remove();
+				return false;
 			}
 		}
+		return true;
 	}
 
 	parseHtml(root: NodeInterface) {

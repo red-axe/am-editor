@@ -741,31 +741,22 @@ class List implements ListModelInterface {
 
 		// 缩小范围到文本节点
 		safeRange.shrinkToElementNode().shrinkToTextNode();
-		let selection: SelectionInterface | null = null;
-		let selectionRange: RangeInterface | null = null;
+
+		// 把列表分割扣出来
+		this.split(safeRange);
+		// 从光标处分割
+		block.split(safeRange);
+		// 把列表分割扣出来
+		const selection = safeRange.createSelection('list-insert');
+		this.split(safeRange);
 		const apply = (newRange: RangeInterface) => {
 			block.merge(newRange);
 			this.merge(undefined, newRange);
 			selection?.move();
 			if (!range) {
-				change.apply(selectionRange || newRange);
-			} else {
-				if (selectionRange)
-					range.setOffset(
-						selectionRange.startNode,
-						selectionRange.startOffset,
-						selectionRange.endOffset,
-					);
+				change.apply(newRange);
 			}
 		};
-		// 把列表分割扣出来
-		this.split(range);
-		// 从光标处分割
-		block.split(range);
-		// 把列表分割扣出来
-		this.split(range);
-		selectionRange = safeRange.cloneRange().shrinkToTextNode();
-		selection = selectionRange.createSelection();
 		// 第一个节点嵌入到分割节点位置
 		let beginNode = $(fragment.childNodes[0]);
 		// 要插入的是列表
@@ -814,12 +805,18 @@ class List implements ListModelInterface {
 				if (node.isCustomize(beginNode)) {
 					beginNode.first()?.remove();
 				}
-				beforeELement?.append(
-					node.isBlock(beginNode) ? beginNode.children() : beginNode,
-				);
-				if (beforeELement) this.addBr(beforeELement);
-				if (node.isBlock(beginNode)) {
-					beginNode.remove();
+				if (beginNode.isBlockCard()) {
+					beforeELement.parent()?.after(beginNode);
+				} else {
+					beforeELement?.append(
+						node.isBlock(beginNode)
+							? beginNode.children()
+							: beginNode,
+					);
+					if (beforeELement) this.addBr(beforeELement);
+					if (node.isBlock(beginNode)) {
+						beginNode.remove();
+					}
 				}
 			}
 		} else {
@@ -839,8 +836,16 @@ class List implements ListModelInterface {
 			if (node.isCustomize(startLi)) {
 				startLi.first()?.remove();
 			}
-			startLi.parent()?.prev()?.last()?.append(startLi.children());
-			startLi.parent()?.remove();
+			const parent = startLi.parent();
+			if (!beginNode.isBlockCard()) {
+				parent?.prev()?.last()?.append(startLi.children());
+				parent?.remove();
+			} else if (parent) {
+				const mergeNodes = [parent];
+				const prev = beginNode.prev();
+				if (prev && node.isList(prev)) mergeNodes.push(prev);
+				this.merge(mergeNodes);
+			}
 			apply(safeRange);
 			return;
 		}
@@ -853,11 +858,15 @@ class List implements ListModelInterface {
 		const fragmentLength = fragment.childNodes.length;
 		let endNode = $(fragment.childNodes[fragmentLength - 1]);
 		const endIsMerge =
-			!node.isList(endNode) || this.isSame(listElement, endNode);
-		// 如果集合中有列表，使用原节点，如果没有，其它节点都转换为列表
+			(!node.isList(endNode) || this.isSame(listElement, endNode)) &&
+			!endNode.isBlockCard();
+		// 如果集合中有列表或者block card，使用原节点，如果没有，其它节点都转换为列表
 		let hasList = false;
 		for (let i = 0; i < fragment.childNodes.length; i++) {
-			if (node.isList(fragment.childNodes[i])) {
+			if (
+				node.isList(fragment.childNodes[i]) ||
+				$(fragment.childNodes[i]).isBlockCard()
+			) {
 				hasList = true;
 				break;
 			}

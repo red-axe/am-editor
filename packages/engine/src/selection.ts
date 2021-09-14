@@ -115,7 +115,7 @@ class Selection implements SelectionInterface {
 			const cursor = $(document.createElement('span'));
 			cursor.attributes(DATA_ELEMENT, CURSOR);
 			if (this.key) {
-				cursor.attributes('data-focus-id', this.key);
+				cursor.attributes('data-cursor-id', this.key);
 			}
 			this.range.insertNode(cursor);
 			this.anchor = cursor;

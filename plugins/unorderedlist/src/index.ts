@@ -120,7 +120,7 @@ export default class extends ListPlugin<Options> {
 		const text = node.text();
 		if (!text) return;
 
-		const reg = /(\r\n|\n)?([\*\-\+]{1,}\s+)/g;
+		const reg = /(^|\r\n|\n)([\*\-\+]{1,}\s+)/g;
 		const match = reg.exec(text);
 		return {
 			reg,

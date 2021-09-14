@@ -527,12 +527,7 @@ export const getToolbarDefaultConfig = (
 			items: [
 				{ key: '12px', content: '12px', hotkey: false },
 				{ key: '13px', content: '13px', hotkey: false },
-				{
-					key: '14px',
-					content: '14px',
-					isDefault: true,
-					hotkey: false,
-				},
+				{ key: '14px', content: '14px', hotkey: false },
 				{ key: '15px', content: '15px', hotkey: false },
 				{ key: '16px', content: '16px', hotkey: false },
 				{ key: '19px', content: '19px', hotkey: false },
@@ -542,7 +537,11 @@ export const getToolbarDefaultConfig = (
 				{ key: '32px', content: '32px', hotkey: false },
 				{ key: '40px', content: '40px', hotkey: false },
 				{ key: '48px', content: '48px', hotkey: false },
-			],
+			].map((item) =>
+				item.key === engine.container.css('font-size')
+					? { ...item, isDefault: true }
+					: item,
+			),
 			onDisabled: () => {
 				const tag = engine.command.queryState('heading') || 'p';
 				return (

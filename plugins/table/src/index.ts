@@ -246,7 +246,9 @@ class Table extends Plugin<Options> {
 					.outerHTML.replaceAll(/\n|\r\n/g, '')
 					.replaceAll(/>\s+</g, '><'),
 			});
+			return false;
 		}
+		return true;
 	}
 
 	parseHtml(root: NodeInterface) {

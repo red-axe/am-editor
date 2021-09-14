@@ -124,7 +124,8 @@ class Parser implements ParserInterface {
 		const nodeApi = this.editor.node;
 		const inlineApi = this.editor.inline;
 		//转换标签和分割 mark 和 inline 标签
-		root.allChildren().forEach((node) => {
+		root.traverse((node) => {
+			if (node.equal(root)) return;
 			if (node.isElement()) {
 				//转换标签
 				if (conversion) {

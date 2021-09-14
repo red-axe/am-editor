@@ -470,7 +470,12 @@ class CardModel implements CardModelInterface {
 				range.collapse(false);
 			}
 		}
-		change.apply(range);
+		if (hasModify) change.apply(range);
+		else {
+			// 远程移除时，如果调用 change.apply() 会把字符合并在一起，这样就会少一个text节点，后续的ops命令无法找到节点删除
+			change.select(range);
+			change.change();
+		}
 	}
 
 	removeRemote(selector: NodeInterface | Node | string) {

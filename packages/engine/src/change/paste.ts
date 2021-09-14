@@ -45,10 +45,9 @@ export default class Paste {
 		const { inline } = this.engine;
 		const nodeApi = this.engine.node;
 		// 第一轮预处理，主要处理 span 节点
-		let nodes = $(fragment).allChildren();
-		nodes.forEach((node) => {
+		$(fragment).traverse((node) => {
 			// 跳过Card
-			if (node.isCard()) {
+			if (node.isCard() || fragment === node.fragment) {
 				return;
 			}
 			// 删除与默认样式一样的样式
@@ -70,7 +69,7 @@ export default class Paste {
 				if (!this.schema.getType(node)) nodeApi.unwrap(node);
 
 				nodeApi.removeMinusStyle(node, 'text-indent');
-				if (['ol', 'ul'].includes(node.name)) {
+				if (nodeApi.isList(node)) {
 					node.css('padding-left', '');
 				}
 				// 删除空 style 属性
@@ -98,25 +97,11 @@ export default class Paste {
 					this.engine.block.brToBlock(node);
 				}
 			}
-			// 删除非block节点的换行 \r\n\r\n<span
-			else if (node.isText()) {
-				const text = node.text();
-				if (/(\r|\n)+/.test(text)) {
-					const prev = node.prev();
-					const next = node.next();
-					if (
-						(prev && !nodeApi.isBlock(prev)) ||
-						(next && !nodeApi.isBlock(next))
-					)
-						node.remove();
-				}
-			}
 		});
 		// 第二轮处理
-		nodes = $(fragment).allChildren();
-		nodes.forEach((node) => {
+		$(fragment).traverse((node) => {
 			// 跳过已被删除的节点
-			if (!node.parent()) {
+			if (!node.parent() || node.fragment === fragment) {
 				return;
 			}
 			// 删除 google docs 根节点
@@ -146,20 +131,14 @@ export default class Paste {
 			}
 			const parent = node.parent();
 			// 补齐 ul 或 ol
-			if (
-				node.name === 'li' &&
-				['ol', 'ul'].indexOf(parent?.name || '') < 0
-			) {
+			if (node.name === 'li' && parent && !nodeApi.isList(parent)) {
 				const ul = $('<ul />');
 				node.before(ul);
 				ul.append(node);
 				return;
 			}
 			// 补齐 li
-			if (
-				['ol', 'ul'].indexOf(node.name) >= 0 &&
-				['ol', 'ul'].indexOf(parent?.name || '') >= 0
-			) {
+			if (node.name !== 'li' && parent && nodeApi.isList(parent)) {
 				const li = $('<li />');
 				node.before(li);
 				li.append(node);
@@ -167,7 +146,7 @@ export default class Paste {
 			}
 			// <li>two<ol><li>three</li></ol>four</li>
 			if (
-				['ol', 'ul'].indexOf(node.name) >= 0 &&
+				nodeApi.isList(node) &&
 				parent?.name === 'li' &&
 				(node.prev() || node.next())
 			) {
@@ -179,7 +158,7 @@ export default class Paste {
 					if (!node || nodeApi.isEmptyWithTrim(node)) {
 						return;
 					}
-					const isList = ['ol', 'ul'].indexOf(node.name) >= 0;
+					const isList = nodeApi.isList(node);
 					if (!li || isList) {
 						li = isCustomizeList
 							? $('<li class="data-list-item" />')
@@ -195,10 +174,7 @@ export default class Paste {
 				return;
 			}
 			// p 改成 li
-			if (
-				node.name === 'p' &&
-				['ol', 'ul'].indexOf(parent?.name || '') >= 0
-			) {
+			if (node.name === 'p' && parent && nodeApi.isList(parent)) {
 				nodeApi.replace(node, $('<li />'));
 				return;
 			}
@@ -217,10 +193,7 @@ export default class Paste {
 				}
 			}
 			// <li><p>foo</p></li>
-			if (
-				nodeApi.isRootBlock(node, this.schema) &&
-				parent?.name === 'li'
-			) {
+			if (nodeApi.isBlock(node, this.schema) && parent?.name === 'li') {
 				// <li><p><br /></p></li>
 				if (
 					node.children().length === 1 &&
@@ -274,12 +247,26 @@ export default class Paste {
 			}
 		}
 
-		let nodes = $(fragment).allChildren();
-		nodes.forEach((node) => {
-			if (node.parent()) this.engine.trigger('paste:each', node);
+		$(fragment).traverse((node) => {
+			if (node.fragment === fragment) return;
+			if (node.length > 0 && node.parent())
+				this.engine.trigger('paste:each', node);
+			// 删除非block节点的换行 \r\n\r\n<span
+			if (node.isText()) {
+				const text = node.text();
+				if (/^(\r|\n)+$/.test(text)) {
+					const prev = node.prev();
+					const next = node.next();
+					if (
+						(prev && !nodeApi.isBlock(prev)) ||
+						(next && !nodeApi.isBlock(next))
+					)
+						node.remove();
+				}
+			}
 		});
-		nodes = $(fragment).allChildren();
-		nodes.forEach((node) => {
+		$(fragment).traverse((node) => {
+			if (node.fragment === fragment) return;
 			this.engine.trigger('paste:each-after', node);
 			if (node.isText()) {
 				const text = node.text();
@@ -303,7 +290,7 @@ export default class Paste {
 		const node = nodeApi.normalize($(fragment));
 		if (node.fragment) fragment = node.fragment;
 		fragment.normalize();
-		const fragmentNode = $(fragment);
+		let fragmentNode = $(fragment);
 		const first = fragmentNode.first();
 		//如果光标在文本节点，并且父级节点不是根节点，移除粘贴数据的第一个节点块级节点，让其内容接在光标所在行
 		const { startNode } = range.cloneRange().shrinkToTextNode();
@@ -318,12 +305,15 @@ export default class Paste {
 		) {
 			nodeApi.unwrap(first);
 		}
-		nodes = $(fragment).allChildren();
-
-		nodes.forEach((node) => {
-			if (['ol', 'ul'].includes(node.name)) {
-				this.engine.list.addStart(node);
-			}
+		fragmentNode = $(fragment);
+		fragmentNode.each((_, index) => {
+			const children = fragmentNode.eq(index);
+			children?.find('ul,ol').each((_, index) => {
+				const child = children.eq(index);
+				if (child && nodeApi.isList(child)) {
+					this.engine.list.addStart(child);
+				}
+			});
 		});
 		this.engine.block.generateRandomIDForDescendant(fragment, true);
 		return fragment;

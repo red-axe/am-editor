@@ -113,7 +113,36 @@ export default class extends Plugin<Options> {
 				type: 'block',
 				name: 'pre',
 				attributes: {
+					'data-syntax': '*',
+					class: '*',
+					language: '*',
+				},
+			},
+			{
+				type: 'block',
+				name: 'code',
+				attributes: {
 					'data-syntax': {
+						required: true,
+						value: '*',
+					},
+				},
+			},
+			{
+				type: 'block',
+				name: 'code',
+				attributes: {
+					language: {
+						required: true,
+						value: '*',
+					},
+				},
+			},
+			{
+				type: 'block',
+				name: 'code',
+				attributes: {
+					class: {
 						required: true,
 						value: '*',
 					},
@@ -133,20 +162,52 @@ export default class extends Plugin<Options> {
 	}
 
 	pasteHtml(node: NodeInterface) {
-		if (!isEngine(this.editor)) return;
+		if (!isEngine(this.editor) || node.isText()) return;
 		if (
-			(!node.isText() &&
-				node.get<HTMLElement>()?.hasAttribute('data-syntax')) ||
-			node.first()?.name === 'code'
+			node.get<HTMLElement>()?.hasAttribute('data-syntax') ||
+			node.name === 'pre'
 		) {
+			let syntax: string | undefined = node.attributes('data-syntax');
+			if (!syntax) {
+				const getSyntaxForClass = (node: NodeInterface) => {
+					const classList = node?.get<HTMLElement>()?.classList;
+					if (!classList) return;
+					for (let i = 0; i < classList.length; i++) {
+						const className = classList.item(i);
+						if (className && className.startsWith('language-')) {
+							const classArray = className.split('-');
+							classArray.shift();
+							return classArray.join('-');
+						}
+					}
+					return undefined;
+				};
+				if (node.name === 'pre') {
+					syntax = node.attributes('language');
+					if (!syntax) {
+						syntax = getSyntaxForClass(node);
+					}
+				}
+				const code = node.find('code');
+				if (!syntax && code.length > 0) {
+					syntax =
+						code.attributes('data-syntax') ||
+						code.attributes('language');
+					if (!syntax) {
+						syntax = getSyntaxForClass(code);
+					}
+				}
+			}
 			let code = new Parser(node, this.editor).toText();
-			code = unescape(code);
+			code = unescape(code.replaceAll(/\u200b/g, ''));
 			this.editor.card.replaceNode(node, 'codeblock', {
-				mode: node.attributes('data-syntax') || 'plain',
+				mode: syntax || 'plain',
 				code,
 			});
 			node.remove();
+			return false;
 		}
+		return true;
 	}
 
 	checkMarkdown(node: NodeInterface) {

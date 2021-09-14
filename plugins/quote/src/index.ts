@@ -224,6 +224,8 @@ export default class extends BlockPlugin<Options> {
 		if (node.name === this.tagName) {
 			node.css('padding-left', '');
 			node.css('text-indent', '');
+			return false;
 		}
+		return true;
 	}
 }

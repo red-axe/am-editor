@@ -551,7 +551,8 @@ class Block implements BlockModelInterface {
 		container = splitNode ? splitNode(container) : container;
 		// 切割 Block
 		let leftNodes = selection.getNode(container, 'left');
-		leftNodes.allChildren().forEach((leftNode) => {
+		leftNodes.traverse((leftNode) => {
+			if (leftNode.equal(leftNodes)) return;
 			if (
 				node.isBlock(leftNode) &&
 				(node.isEmpty(leftNode) || list.isEmptyItem(leftNode))
@@ -582,7 +583,8 @@ class Block implements BlockModelInterface {
 			});
 		}
 
-		rightNodes.allChildren().forEach((rightNode) => {
+		rightNodes.traverse((rightNode) => {
+			if (!rightNode.equal(rightNodes)) return;
 			if (
 				node.isBlock(rightNode) &&
 				(node.isEmpty(rightNode) || list.isEmptyItem(rightNode))

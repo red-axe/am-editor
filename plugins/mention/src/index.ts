@@ -233,8 +233,10 @@ class MentionPlugin extends Plugin<Options> {
 					cardValue,
 				);
 				node.remove();
+				return false;
 			}
 		}
+		return true;
 	}
 
 	parseHtml(root: NodeInterface) {

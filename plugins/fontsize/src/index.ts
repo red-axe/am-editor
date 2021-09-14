@@ -42,7 +42,9 @@ export default class extends MarkPlugin<Options> {
 
 	isTrigger(
 		size: string,
-		defaultSize: string = this.options.defaultSize || '14px',
+		defaultSize: string = this.options.defaultSize ||
+			this.editor.container.css('font-size') ||
+			'14px',
 	) {
 		return size !== defaultSize;
 	}

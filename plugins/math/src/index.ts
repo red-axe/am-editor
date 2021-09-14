@@ -248,8 +248,10 @@ export default class Math extends Plugin<Options> {
 					cardValue,
 				);
 				node.remove();
+				return false;
 			}
 		}
+		return true;
 	}
 
 	parseHtml(root: NodeInterface) {
