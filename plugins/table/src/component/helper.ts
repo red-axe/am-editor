@@ -174,9 +174,9 @@ class Helper implements HelperInterface {
 		if (cols.length !== 0) {
 			for (let c = cols.length - 1; c >= 0; c--) {
 				const colElement = cols[c] as HTMLTableColElement;
-				const _width = $(cols[c]).attributes('width');
+				const _width = cols.eq(c)?.attributes('width');
 				if (_width) {
-					$(cols[c]).attributes('width', parseInt(_width));
+					cols.eq(c)?.attributes('width', parseInt(_width));
 				}
 
 				if (colElement.span > 1) {
@@ -208,11 +208,13 @@ class Helper implements HelperInterface {
 				const tr = table.find('tr')[0];
 				const tds = $(tr).find('td');
 				const widthArray: Array<number | undefined> = [];
-				tds.each((td) => {
+				tds.each((_, index) => {
+					const $td = tds.eq(index);
+					if (!$td) return;
 					let colWidth: string | Array<string> =
-						$(td).attributes('data-colwidth');
-					let tdWidth: string | number = $(td).attributes('width');
-					const tdColSpan = ($(td)[0] as HTMLTableDataCellElement)
+						$td.attributes('data-colwidth');
+					let tdWidth: string | number = $td.attributes('width');
+					const tdColSpan = ($td[0] as HTMLTableDataCellElement)
 						.colSpan;
 					if (colWidth) {
 						colWidth = colWidth.split(',');
@@ -266,15 +268,19 @@ class Helper implements HelperInterface {
 		});
 		// 修正行高
 		const trs = table.find('tr');
-		trs.each((tr) => {
-			const $tr = $(tr);
-			let height = parseInt($(tr).css('height'));
+		trs.each((_, index) => {
+			const $tr = trs.eq(index);
+			if (!$tr) return;
+			if ($tr.find('td').length === 0) $tr.remove();
+			let height = parseInt($tr.css('height'));
 			height = height || 33;
 			$tr.css('height', height + 'px');
 		});
 		//补充可编辑器区域
-		table.find('td').each((tdElement) => {
-			const tdNode = $(tdElement);
+		const tds = table.find('td');
+		tds.each((_, index) => {
+			const tdNode = tds.eq(index);
+			if (!tdNode) return;
 			tdNode.attributes(
 				DATA_TRANSIENT_ATTRIBUTES,
 				'table-cell-selection',
@@ -519,9 +525,9 @@ class Helper implements HelperInterface {
 		if (cols.length !== 0) {
 			for (let c = cols.length - 1; c >= 0; c--) {
 				const colElement = cols[c] as HTMLTableColElement;
-				const _width = $(cols[c]).attributes('width');
+				const _width = cols.eq(c)?.attributes('width');
 				if (_width) {
-					$(cols[c]).attributes('width', parseInt(_width));
+					cols.eq(c)?.attributes('width', parseInt(_width));
 				}
 
 				if (colElement.span > 1) {
@@ -553,11 +559,13 @@ class Helper implements HelperInterface {
 				const tr = table.find('tr')[0];
 				const tds = $(tr).find('td');
 				const widthArray: Array<number | undefined> = [];
-				tds.each((td) => {
+				tds.each((_, index) => {
+					const tdNode = tds.eq(index);
+					if (!tdNode) return;
 					let colWidth: string | Array<string> =
-						$(td).attributes('data-colwidth');
-					let tdWidth: string | number = $(td).attributes('width');
-					const tdColSpan = ($(td)[0] as HTMLTableDataCellElement)
+						tdNode.attributes('data-colwidth');
+					let tdWidth: string | number = tdNode.attributes('width');
+					const tdColSpan = (tdNode[0] as HTMLTableDataCellElement)
 						.colSpan;
 					if (colWidth) {
 						colWidth = colWidth.split(',');
@@ -611,9 +619,10 @@ class Helper implements HelperInterface {
 		});
 		// 修正行高
 		const trs = table.find('tr');
-		trs.each((tr) => {
-			const $tr = $(tr);
-			let height = parseInt($(tr).css('height'));
+		trs.each((_, index) => {
+			const $tr = trs.eq(index);
+			if (!$tr) return;
+			let height = parseInt($tr.css('height'));
 			height = height || 33;
 			$tr.css('height', height + 'px');
 		});
