@@ -226,15 +226,19 @@ class Table extends Plugin<Options> {
 			const trs = node.find('tr');
 			trs.each((_, index) => {
 				const element = trs.eq(index);
+
+				const tds = element?.find('td');
+				if (tds?.length === 0) element?.remove();
+
 				if (element) {
 					clearWH(element);
 					clearWH(element, 'height');
 				}
+
 				const background =
 					element?.css('background') ||
 					element?.css('background-color');
-				if (background)
-					element?.find('td').css('background', background);
+				if (background) tds?.css('background', background);
 			});
 			this.editor.card.replaceNode(node, TableComponent.cardName, {
 				html: node
