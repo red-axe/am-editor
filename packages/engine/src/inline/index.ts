@@ -76,10 +76,13 @@ class Inline implements InlineModelInterface {
 		}
 
 		const endInline = this.closest(endNode);
+		const last = endInline.last();
 		if (
 			endInline &&
 			node.isInline(endInline) &&
-			endOffset <= endInline.last()!.text().length
+			last &&
+			endNode.equal(last) &&
+			endOffset >= last.text().length - 1
 		) {
 			//检测是否处于inline标签内部右侧
 			let atAfter = true;

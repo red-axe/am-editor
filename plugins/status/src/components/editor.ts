@@ -84,8 +84,8 @@ class StatusEditor {
 		input.on(
 			isMobile ? 'touchstart' : 'mousedown',
 			(event: MouseEvent | TouchEvent) => {
-				event.preventDefault();
-				input.get<HTMLInputElement>()?.focus();
+				//event.preventDefault();
+				//input.get<HTMLInputElement>()?.focus();
 			},
 		);
 		if (onOk) {
