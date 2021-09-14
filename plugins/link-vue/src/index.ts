@@ -79,6 +79,11 @@ export default class extends InlinePlugin<Options> {
 			if (!range.collapsed && change.inlines.length > 0) {
 				this.toolbar?.show(change.inlines[0]);
 			}
+		} else {
+			const inlineNode = change.inlines.find((node) => this.isSelf(node));
+			if (inlineNode && inlineNode.length > 0) {
+				inline.unwrap(inlineNode);
+			}
 		}
 	}
 
