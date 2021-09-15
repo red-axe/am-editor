@@ -862,8 +862,9 @@ class ChangeModel implements ChangeInterface {
 			});
 		});
 
-		const pasteMarkdown = async (source: string) => {
-			const parser = new Parser(source, this.engine);
+		const pasteMarkdown = async (html: string, text: string) => {
+			// 先解析html
+			let parser = new Parser(html, this.engine);
 			const schema = this.engine.schema.clone();
 			//转换Text，没那么严格，加入以下规则，以免被过滤掉，并且 div后面会加换行符
 			schema.add([
@@ -876,8 +877,14 @@ class ChangeModel implements ChangeInterface {
 					type: 'block',
 				},
 			]);
-			const text = parser.toText(schema);
-			const textNode = $(document.createTextNode(text));
+			// 不遍历卡片，不对 ol 节点格式化，以免复制列表就去提示检测到markdown
+			let parserText = parser.toText(schema, false, false);
+			// html中没有解析到文本
+			if (!parserText) {
+				parser = new Parser(text, this.engine);
+				parserText = parser.toText(schema);
+			}
+			const textNode = $(document.createTextNode(parserText));
 			// 如果没有符合的语法就返回
 			const result = this.engine.trigger(
 				'paste:markdown-check',
@@ -939,7 +946,7 @@ class ChangeModel implements ChangeInterface {
 			if (files.length === 0) {
 				setTimeout(() => {
 					// 如果 text 和 html 都有，就解析 text
-					pasteMarkdown(html && text ? text : source);
+					pasteMarkdown(source, text || '');
 				}, 200);
 				this.paste(source);
 			}

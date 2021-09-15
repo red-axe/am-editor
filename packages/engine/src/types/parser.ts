@@ -66,7 +66,13 @@ export interface ParserInterface {
 
 	/**
 	 * 转换为文本
-	 * @param includeCard 是否遍历卡片
+	 * @param schema Schema 规则
+	 * @param includeCard 是否遍历卡片内部，默认不遍历
+	 * @param formatOL 是否格式化有序列表，<ol><li>a</li><li>b</li></ol>  ->  1. a  2. b 默认转换
 	 */
-	toText(schema?: SchemaInterface | null, includeCard?: boolean): string;
+	toText(
+		schema?: SchemaInterface,
+		includeCard?: boolean,
+		formatOL?: boolean,
+	): string;
 }

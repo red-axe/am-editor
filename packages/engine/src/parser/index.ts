@@ -494,9 +494,15 @@ class Parser implements ParserInterface {
 
 	/**
 	 * 转换为文本
-	 * @param includeCard 是遍历卡片内部
+	 * @param schema Schema 规则
+	 * @param includeCard 是否遍历卡片内部
+	 * @param formatOL 是否格式化有序列表，<ol><li>a</li><li>b</li></ol>  ->  1. a  2. b
 	 */
-	toText(schema: SchemaInterface | null = null, includeCard?: boolean) {
+	toText(
+		schema: SchemaInterface | null = null,
+		includeCard?: boolean,
+		formatOL: boolean = true,
+	) {
 		const root = this.root.clone(true);
 		const result: Array<string> = [];
 		this.walkTree(
@@ -508,8 +514,7 @@ class Parser implements ParserInterface {
 					if (name === 'br') {
 						result.push('\n');
 					}
-					const nodeElement = node[0];
-					if (node.name === 'li') {
+					if (formatOL && node.name === 'li') {
 						if (node.hasClass('data-list-item')) {
 							return;
 						}
@@ -518,26 +523,8 @@ class Parser implements ParserInterface {
 						if (parent?.name === 'ol') {
 							const start = parent[0]['start'];
 							const index = start ? start : 1;
-							const childs = parent[0].childNodes;
-							let liCount = -1;
-							for (
-								let i = 0;
-								i < childs.length &&
-								childs[i].nodeName === 'LI' &&
-								liCount++ &&
-								childs[i] !== nodeElement;
-								i++
-							) {
-								result.push(
-									''.concat(
-										getListStyle(
-											styleType,
-											index + liCount,
-										).toString(),
-										'. ',
-									),
-								);
-							}
+							result.push(`${getListStyle(styleType, index)}. `);
+							parent.attributes('start', index + 1);
 						} else if (parent?.name === 'ul') {
 							result.push(getListStyle(styleType) + ' ');
 						}

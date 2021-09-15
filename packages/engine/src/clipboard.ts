@@ -238,18 +238,35 @@ export default class Clipboard implements ClipboardInterface {
 
 					const dataId = childElement.attributes('data-id');
 					if (!dataId) return;
+					const curentElement = document.querySelector(
+						`[data-id=${dataId}]`,
+					);
 					let parent: NodeInterface | Node | null | undefined =
-						document.querySelector(
-							`[data-id=${dataId}]`,
-						)?.parentElement;
+						curentElement?.parentElement;
 					parent = parent ? $(parent.cloneNode(false)) : null;
-					if (parent && node.isList(parent)) {
-						parent.removeAttributes('start');
+					if (curentElement && parent && node.isList(parent)) {
+						if (parent.name === 'ol') {
+							// 设置复制位置的 start 属性，默认不设置
+							// let start = parseInt(parent.attributes('start') || '0', 10)
+							// start = $(curentElement).index() + start
+							// if(start === 0) start = 1
+							// parent.attributes('start', start);
+							parent.removeAttributes('start');
+						}
 						node.wrap(child, parent);
 						listMergeBlocks.push(parent);
 					}
 				});
 				const { inner, outter } = this.setNodes(nodes);
+				const listNodes: NodeInterface[] = [];
+				contents.childNodes.forEach((child) => {
+					const childNode = $(child);
+					if (node.isList(childNode) || childNode.name === 'li') {
+						listNodes.push(childNode);
+					}
+				});
+				// 合并列表
+				this.editor.list.merge(listNodes);
 				const parser = new Parser(contents, this.editor);
 				let { html, text } = parser.toHTML(inner, outter);
 				if (callback) {
