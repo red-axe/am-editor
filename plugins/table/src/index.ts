@@ -317,7 +317,7 @@ class Table extends Plugin<Options> {
 		const text = node.text();
 		if (!text) return;
 		// 匹配 |-|-| 或者 -|- 或者 |-|- 或者 -|-|
-		const reg = /\n\s*(\|?(\s*:?-+:?\s*)+\|?)+\s*(\n|$)/;
+		const reg = /(?:\|)+\n\s*(\|?(\s*:?-+:?\s*)+\|?)+\s*(\n|$)/;
 		const tbMatch = reg.exec(text);
 		if (!tbMatch || tbMatch[0].indexOf('|') < 0) return;
 		return {
