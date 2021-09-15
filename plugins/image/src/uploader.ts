@@ -15,7 +15,7 @@ import {
 	encodeCardValue,
 	removeUnit,
 } from '@aomao/engine';
-import ImageComponent from './component';
+import ImageComponent, { ImageValue } from './component';
 
 export interface Options extends PluginOptions {
 	/**
@@ -121,7 +121,7 @@ export default class extends Plugin<Options> {
 		return 'image-uploader';
 	}
 
-	private extensionNames = [
+	extensionNames = [
 		'svg',
 		'png',
 		'bmp',
@@ -194,7 +194,7 @@ export default class extends Plugin<Options> {
 		});
 	}
 
-	loadImage(id: string, value: { src: string; status: string }) {
+	loadImage(id: string, value: ImageValue) {
 		if (!this.loadCounts[id]) this.loadCounts[id] = 1;
 		const image = new Image();
 		image.src = value.src;

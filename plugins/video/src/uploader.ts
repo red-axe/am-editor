@@ -99,7 +99,7 @@ export default class extends Plugin<Options> {
 		return 'video-uploader';
 	}
 
-	private extensionNames = ['mp4'];
+	extensionNames = ['mp4'];
 
 	init() {
 		if (isEngine(this.editor)) {

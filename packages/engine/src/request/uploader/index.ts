@@ -114,7 +114,7 @@ class Uploader implements UploaderInterface {
 						type,
 						ext,
 					};
-					//全部图片读取完成后再插入编辑器
+					//全部文件读取完成后再插入编辑器
 					if (
 						files.every((file) => !!this.uploadingFiles[file.uid!])
 					) {

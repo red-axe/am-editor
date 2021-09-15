@@ -78,7 +78,7 @@ export default class extends Plugin<Options> {
 		return 'file-uploader';
 	}
 
-	private extensionNames = ['*'];
+	extensionNames = ['*'];
 
 	init() {
 		if (isEngine(this.editor)) {
