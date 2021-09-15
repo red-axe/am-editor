@@ -199,7 +199,7 @@ export default class extends Plugin<Options> {
 				}
 			}
 			let code = new Parser(node, this.editor).toText();
-			code = unescape(code.replaceAll(/\u200b/g, ''));
+			code = unescape(code.replace(/\u200b/g, ''));
 			this.editor.card.replaceNode(node, 'codeblock', {
 				mode: syntax || 'plain',
 				code,

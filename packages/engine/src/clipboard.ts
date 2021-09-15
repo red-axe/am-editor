@@ -1,7 +1,7 @@
 import copyTo from 'copy-to-clipboard';
 import Parser from './parser';
 import { ClipboardInterface } from './types/clipboard';
-import { EditorInterface, EngineInterface } from './types/engine';
+import { EditorInterface, EngineInterface, isEngine } from './types/engine';
 import { RangeInterface } from './types/range';
 import { getDocument, getWindow, isSafari } from './utils';
 import { $ } from './node';
@@ -168,25 +168,69 @@ export default class Clipboard implements ClipboardInterface {
 				event.clipboardData?.setData('text', '');
 			} else {
 				// 修复自定义列表选择范围
+				let customizeStartItem: NodeInterface | undefined;
 				if (range.startNode.isText()) {
 					const li = range.startNode.closest('li');
 
 					if (li && node.isCustomize(li)) {
 						const endLi = range.endNode.closest('li');
-						console.log(
-							!li.equal(endLi),
-							block.isLastOffset(range, 'end'),
-						);
 						if (
 							!li.equal(endLi) ||
 							block.isLastOffset(range, 'end')
 						) {
-							const ul = li.parent();
-							if (ul) range.setStart(ul, li.getIndex());
+							if (range.startOffset === 0) {
+								const ul = li.parent();
+								if (ul) range.setStart(ul, li.getIndex());
+							} else {
+								const ul = li.parent();
+								// 选在列表项靠后的节点，把剩余节点拼接成完成的列表项
+								const selection = range.createSelection();
+								const rightNode = selection.getNode(
+									li,
+									'center',
+									true,
+								);
+								selection.anchor?.remove();
+								selection.focus?.remove();
+								if (isEngine(this.editor))
+									this.editor.change.combinTextNode();
+								if (rightNode.length > 0) {
+									let isRemove = false;
+									rightNode.each((_, index) => {
+										const item = rightNode.eq(index);
+										if (!isRemove && item?.name === 'li') {
+											isRemove = true;
+											return;
+										}
+										if (isRemove) item?.remove();
+									});
+									const card = li.first();
+									const component = card
+										? this.editor.card.find(card)
+										: undefined;
+									if (component) {
+										customizeStartItem = rightNode;
+										this.editor.list.addCardToCustomize(
+											customizeStartItem,
+											component.name,
+											component.getValue(),
+										);
+										if (ul)
+											node.wrap(
+												customizeStartItem,
+												ul?.clone(),
+											);
+									}
+								}
+							}
 						}
 					}
 				}
 				const contents = range.cloneContents();
+				if (customizeStartItem) {
+					contents.removeChild(contents.childNodes[0]);
+					contents.prepend(customizeStartItem[0]);
+				}
 				const listMergeBlocks: NodeInterface[] = [];
 				contents.childNodes.forEach((child) => {
 					let childElement = $(child);

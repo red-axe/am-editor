@@ -743,7 +743,7 @@ class List implements ListModelInterface {
 		safeRange.shrinkToElementNode().shrinkToTextNode();
 
 		// 把列表分割扣出来
-		this.split(safeRange);
+		//this.split(safeRange);
 		// 从光标处分割
 		block.split(safeRange);
 		// 把列表分割扣出来
@@ -833,11 +833,11 @@ class List implements ListModelInterface {
 		}
 		// 只有一行
 		if (fragment.childNodes.length === 0) {
-			if (node.isCustomize(startLi)) {
-				startLi.first()?.remove();
-			}
 			const parent = startLi.parent();
 			if (!beginNode.isBlockCard()) {
+				if (node.isCustomize(startLi)) {
+					startLi.first()?.remove();
+				}
 				parent?.prev()?.last()?.append(startLi.children());
 				parent?.remove();
 			} else if (parent) {
@@ -863,9 +863,11 @@ class List implements ListModelInterface {
 		// 如果集合中有列表或者block card，使用原节点，如果没有，其它节点都转换为列表
 		let hasList = false;
 		for (let i = 0; i < fragment.childNodes.length; i++) {
+			const childnode = $(fragment.childNodes[i]);
 			if (
-				node.isList(fragment.childNodes[i]) ||
-				$(fragment.childNodes[i]).isBlockCard()
+				(node.isList(fragment.childNodes[i]) &&
+					!this.isSame(listElement, childnode)) ||
+				childnode.isBlockCard()
 			) {
 				hasList = true;
 				break;
@@ -977,6 +979,10 @@ class List implements ListModelInterface {
 						endChildren.eq(index)?.remove();
 				});
 				if (node.isCustomize(lasetELement)) {
+					if (node.isCustomize(endNode)) {
+						const endNodeCard = endNode.first();
+						if (endNodeCard?.isCard()) endNodeCard.remove();
+					}
 					lasetELement
 						.first()
 						?.after(

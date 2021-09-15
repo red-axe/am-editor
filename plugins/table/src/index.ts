@@ -243,8 +243,8 @@ class Table extends Plugin<Options> {
 			this.editor.card.replaceNode(node, TableComponent.cardName, {
 				html: node
 					.get<HTMLElement>()!
-					.outerHTML.replaceAll(/\n|\r\n/g, '')
-					.replaceAll(/>\s+</g, '><'),
+					.outerHTML.replace(/\n|\r\n/g, '')
+					.replace(/>\s+</g, '><'),
 			});
 			return false;
 		}

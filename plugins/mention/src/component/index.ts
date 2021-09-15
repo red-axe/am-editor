@@ -187,7 +187,7 @@ class Mention extends Card<MentionValue> {
 		const content =
 			this.#keyword
 				?.get<HTMLElement>()
-				?.innerText.replaceAll(/[\r\n]/g, '') || '';
+				?.innerText.replace(/[\r\n]/g, '') || '';
 		// 内容为空
 		if (content === '') {
 			this.component?.remove();
