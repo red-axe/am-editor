@@ -262,6 +262,10 @@ class Parser implements ParserInterface {
 
 		let child = node.first();
 		while (child) {
+			if (['style', 'script', 'meta'].includes(child.name)) {
+				child = child.next();
+				continue;
+			}
 			if (child.isElement()) {
 				let name = child.name;
 				let attrs = child.attributes();

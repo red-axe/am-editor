@@ -50,7 +50,6 @@ export default class extends BlockPlugin<Options> {
 
 	init() {
 		super.init();
-		this.editor.on('paser:html', (node) => this.parseHtml(node));
 		const { language } = this.editor;
 		//阅读模式处理
 		if (!isEngine(this.editor) && this.options.showAnchor !== false) {
@@ -436,38 +435,6 @@ export default class extends BlockPlugin<Options> {
 			return false;
 		}
 		return;
-	}
-
-	parseHtml(root: NodeInterface) {
-		root.find('h1,h2,h3,h4,h5,h6')
-			.css({
-				padding: '7px 0',
-				margin: '0',
-				'font-weight': '700',
-			})
-			.each((node) => {
-				const element = node as HTMLElement;
-				if ('H1' === element.tagName) {
-					element.style['font-size'] = '28px';
-					element.style['line-height'] = '36px';
-				} else if ('H2' === element.tagName) {
-					element.style['font-size'] = '24px';
-					element.style['line-height'] = '32px';
-				} else if ('H3' === element.tagName) {
-					element.style['font-size'] = '20px';
-					element.style['line-height'] = '28px';
-				} else if ('H4' === element.tagName) {
-					element.style['font-size'] = '16px';
-					element.style['line-height'] = '24px';
-				} else if ('H5' === element.tagName) {
-					element.style['font-size'] = '14px';
-					element.style['line-height'] = '24px';
-				} else if ('H6' === element.tagName) {
-					element.style['font-size'] = '14px';
-					element.style['line-height'] = '24px';
-					element.style['font-weight'] = '400';
-				}
-			});
 	}
 }
 
