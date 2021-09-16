@@ -88,28 +88,7 @@ class Client {
 		return doc.hasMember(uuid);
 	}
 
-	add(ws, docId, member) {
-		if (!member.uuid) {
-			member.uuid = this.getUUID(docId, member.id);
-		}
-		let doc = this.getDoc(docId);
-		if (!doc) {
-			doc = new Doc(docId, () => {
-				//注销
-				const index = this.docs.findIndex((doc) => doc.id === docId);
-				if (index > -1) {
-					doc.doc.destroy();
-					this.docs.splice(index, 1);
-				}
-			});
-			this.docs.push(doc);
-			//创建
-			const reuslt = doc.create(this.backend.connect());
-			if (!reuslt) return;
-		} else {
-			// 如果用户之前有连接到，那么就会移除之前的连接
-			doc.removeMember(member.uuid);
-		}
+	listen(ws) {
 		try {
 			// 建立协作 socket 连接
 			const stream = new WebSocketJSONStream(ws);
@@ -118,10 +97,41 @@ class Client {
 			});
 			// 监听消息
 			this.backend.listen(stream);
-			// 增加用户到文档中
-			doc.addMember(ws, member);
 		} catch (error) {
 			console.log(error);
+		}
+	}
+
+	add(ws, docId, member) {
+		if (!member.uuid) {
+			member.uuid = this.getUUID(docId, member.id);
+		}
+
+		const doc =
+			this.getDoc(docId) ||
+			new Doc(docId, () => {
+				//注销
+				const index = this.docs.findIndex((doc) => doc.id === docId);
+				if (index > -1) {
+					doc.doc.destroy();
+					this.docs.splice(index, 1);
+				}
+			});
+		// 如果用户之前有连接到，那么就会移除之前的连接
+		doc.removeMember(member.uuid);
+		//创建获取文档实例
+		const reuslt = doc.create(this.backend.connect(), 'yanmao', () => {
+			doc.addMember(ws, member);
+			if (!this.getDoc(docId)) this.docs.push(doc);
+		});
+
+		if (!reuslt) {
+			try {
+				ws.close();
+			} catch (error) {
+				console.log(error);
+			}
+			return;
 		}
 	}
 }

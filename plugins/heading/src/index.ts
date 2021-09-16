@@ -280,7 +280,7 @@ export default class extends BlockPlugin<Options> {
 
 	execute(type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p') {
 		if (!isEngine(this.editor)) return;
-		if (type === this.queryState()) type = 'p';
+		if (!type || type === this.queryState()) type = 'p';
 		const { enableTypes } = this.options;
 		// 未启用
 		if (type !== 'p' && enableTypes && enableTypes.indexOf(type) < 0)

@@ -296,8 +296,15 @@ export default class Clipboard implements ClipboardInterface {
 			top: 0,
 			clip: 'rect(0, 0, 0, 0)',
 		});
-		block.on('copy', (e) => {
+		const clera = () => {
+			block.remove();
+			selection?.removeAllRanges();
+			selection?.addRange(cloneRange.toRange());
+		};
+		block.on('copy', (e: ClipboardEvent) => {
+			e.stopPropagation();
 			this.write(e);
+			clera();
 		});
 		$(document.body).append(block);
 		block.append(editor.node.clone($(data), true));
@@ -324,10 +331,7 @@ export default class Clipboard implements ClipboardInterface {
 			}
 		} catch (err) {
 			console.log('unable to copy using execCommand: ', err);
-		} finally {
-			block.remove();
-			selection?.removeAllRanges();
-			selection?.addRange(cloneRange.toRange());
+			clera();
 		}
 		return success;
 	}

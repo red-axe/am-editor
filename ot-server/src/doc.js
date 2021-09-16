@@ -11,16 +11,16 @@ class Doc {
 	create(connection, collectionName = 'yanmao', callback = function () {}) {
 		try {
 			const doc = connection.get(collectionName, this.id);
-			doc.fetch(function (err) {
+			doc.fetch((err) => {
 				if (err) {
 					console.error(err);
 					return;
 				}
-				if (doc.type === null) {
+				if (!doc.type) {
 					doc.create([], callback);
 					return;
 				}
-				callback();
+				callback(true);
 			});
 			this.doc = doc;
 			return doc;

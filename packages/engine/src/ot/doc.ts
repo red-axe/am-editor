@@ -5,11 +5,12 @@ import { EngineInterface } from '../types/engine';
 import { fromDOM } from './jsonml';
 import { DocInterface } from '../types/ot';
 
-class Doc extends EventEmitter2 implements DocInterface {
+class Doc<T = any> extends EventEmitter2 implements DocInterface {
 	private engine: EngineInterface;
+	type = null;
 	mode: string = 'lock';
 	version: number = 0;
-	data: any | undefined;
+	data: T | undefined = undefined;
 
 	constructor(engine: EngineInterface) {
 		super();
@@ -22,7 +23,7 @@ class Doc extends EventEmitter2 implements DocInterface {
 	}
 
 	create() {
-		this.data = fromDOM(this.engine.container);
+		this.data = fromDOM(this.engine.container) as any;
 	}
 
 	apply(ops: Op[]) {

@@ -144,6 +144,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		if (!doc) return;
 		// 除了div 和 selection-data 外 还必须有其它节点
 		if (
+			doc.type &&
 			Array.isArray(doc.data) &&
 			doc.data.length > 2 &&
 			doc['mode'] !== 'lock'

@@ -115,7 +115,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			debounce(() => {
 				if (!isEngine(this.editor)) return;
 				this.save();
-			}, 200),
+			}, 50),
 		);
 
 		this.codeMirror.setOption('extraKeys', {

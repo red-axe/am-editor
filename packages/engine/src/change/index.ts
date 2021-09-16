@@ -1183,6 +1183,7 @@ class ChangeModel implements ChangeInterface {
 			_lastNode: NodeInterface,
 			_firstNode: NodeInterface,
 		) => {
+			if (_lastNode.isCard() || firstNode.isCard()) return;
 			const isSameParent =
 				_firstNode.parent()?.name === _lastNode.parent()?.name;
 			return (

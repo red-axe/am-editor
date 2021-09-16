@@ -146,9 +146,12 @@ class OTClient extends EventEmitter {
 				maxRetries: 10,
 			},
 		);
+
 		// ws 已链接
 		socket.addEventListener('open', () => {
 			this.socket = socket as WebSocket;
+			// 加载编辑器内部的协同服务
+			this.load(socket, docID, collectionName, defautlValue);
 			// 标记关闭状态为false
 			this.isClosed = false;
 			// 监听协同服务端自定义消息
@@ -177,8 +180,9 @@ class OTClient extends EventEmitter {
 					// 当前协作者用户
 					this.current = data as Member;
 					this.engine.ot.setCurrentMember(data);
-					// 加载编辑器内部的协同服务
-					this.load(docID, collectionName, defautlValue);
+					this.emit('ready', this.engine.ot.getCurrentMember());
+					this.emit(EVENT.membersChange, this.normalizeMembers());
+					this.transmit(STATUS.active);
 				}
 				// 广播信息，一个协作用户发送给全部协作者的广播
 				if ('broadcast' === action) {
@@ -223,14 +227,20 @@ class OTClient extends EventEmitter {
 	 * @param collectionName 协作服务名称
 	 * @param defaultValue 如果服务端没有对应docId的文档，就用这个值初始化
 	 */
-	load(docId: string, collectionName: string, defaultValue?: string) {
+	load(
+		socket: ReconnectingWebSocket,
+		docId: string,
+		collectionName: string,
+		defaultValue?: string,
+	) {
 		// 实例化一个协同客户端的连接
-		const connection = new sharedb.Connection(this.socket as Socket);
+		const connection = new sharedb.Connection(socket as Socket);
 		// 获取文档对象
 		const doc = connection.get(collectionName, docId);
 		this.doc = doc;
 		// 订阅
 		doc.subscribe((error) => {
+			console.log('subscribe');
 			if (error) {
 				console.log('collab doc subscribe error', error);
 			} else {
@@ -239,9 +249,6 @@ class OTClient extends EventEmitter {
 					this.engine.ot.init(doc, defaultValue);
 					// 聚焦到编辑器
 					this.engine.focus();
-					this.emit('ready', this.engine.ot.getCurrentMember());
-					this.emit(EVENT.membersChange, this.normalizeMembers());
-					this.transmit(STATUS.active);
 				} catch (err) {
 					console.log('am-engine init failed:', err);
 				}
@@ -254,6 +261,7 @@ class OTClient extends EventEmitter {
 
 		doc.on('load', () => {
 			console.log('collab doc loaded');
+			this.sendMessage('ready');
 		});
 
 		doc.on('op', (op, type) => {

@@ -196,6 +196,13 @@ class Table extends Plugin<Options> {
 		if (node.name === 'table') {
 			clearWH(node);
 			clearWH(node, 'height');
+			// 表头放在tbody最前面
+			const thead = node.find('thead');
+			if (thead) node.find('tbody').prepend(thead.children());
+			// 表头放在tbody最前面
+			const tfoot = node.find('thead');
+			if (tfoot) node.find('tbody').append(tfoot.children());
+
 			const tds = node.find('td');
 			let fragment = getDocument().createDocumentFragment();
 			tds.each((_, index) => {

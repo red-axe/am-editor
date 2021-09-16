@@ -44,11 +44,18 @@ function startServer() {
 			const params = getParams(request);
 			let { uid } = params;
 			if (!uid) uid = id;
-			const docId = 'demo';
-			uid = getId(docId, uid);
-			client.add(ws, docId, {
-				id: uid,
-				name: `Guest-${uid}`,
+			client.listen(ws);
+			ws.addEventListener('message', (event) => {
+				try {
+					if (!event.data) return;
+					const { data, action } = JSON.parse(event.data);
+					if (action === 'ready') {
+						client.add(ws, data.doc_id, {
+							id: getId(data.doc_id, uid),
+							name: `Guest-${uid}`,
+						});
+					}
+				} catch (error) {}
 			});
 			if (!params.uid) id++;
 		});

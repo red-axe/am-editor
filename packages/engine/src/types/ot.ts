@@ -1,5 +1,6 @@
 import { EventEmitter2 } from 'eventemitter2';
 import { Doc, Op, Path } from 'sharedb';
+import { Type } from 'sharedb/lib/sharedb';
 import { CardInterface } from './card';
 import { NodeInterface } from './node';
 import { RangeInterface } from './range';
@@ -29,10 +30,11 @@ export type Operation = {
 	status?: 'undo' | 'redo';
 };
 
-export interface DocInterface extends EventEmitter2 {
+export interface DocInterface<T = any> extends EventEmitter2 {
+	type: Type | null;
 	mode: string;
 	version: number;
-	data: any;
+	data: T;
 	destroy(): void;
 	create(): void;
 	apply(ops: Op[]): void;

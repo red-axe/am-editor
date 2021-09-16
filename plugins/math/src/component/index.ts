@@ -78,9 +78,10 @@ export default class MathCard extends Card<MathValue> {
 		command.executeMethod('math', 'action', 'query', code, success, failed);
 	}
 
-	getMaxWidth() {
-		const { container } = this.editor;
-		const style = window.getComputedStyle(container.get<HTMLElement>()!);
+	getMaxWidth(node: NodeInterface = this.root) {
+		const block = this.editor.block.closest(node).get<HTMLElement>();
+		if (!block) return 0;
+		const style = window.getComputedStyle(block);
 		const width =
 			parseInt(style.width) -
 			parseInt(style['padding-left']) -
