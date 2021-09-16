@@ -179,7 +179,7 @@ export default defineComponent({
                 // 默认编辑器值，为了演示，这里初始化值写死，正式环境可以请求api加载
                 const value = '<strong>Hello</strong>,<span style="color:red">am-editor</span>'
                 // 使用协同编辑，需要安装 mongodb 数据库，并且配置 ot-server/client 中的数据库连接，最后 yarn start 启动 ot-server 服务
-                let isOt = true
+                let isOt = false
                 if (isOt) {
                     // 实例化协作编辑客户端
                     const ot = new OTClient(engineInstance);

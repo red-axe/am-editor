@@ -505,7 +505,7 @@ class Block implements BlockModelInterface {
 		splitNode?: (node: NodeInterface) => NodeInterface,
 	) {
 		if (!isEngine(this.editor)) return;
-		const { change, node, list } = this.editor;
+		const { change, node, list, inline } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof block === 'string' || isNode(block)) {
@@ -618,7 +618,11 @@ class Block implements BlockModelInterface {
 			let appendChild: NodeInterface | undefined | null = undefined;
 			const appendToParent = (childrenNodes: NodeInterface) => {
 				childrenNodes.each((child, index) => {
-					if (childrenNodes.eq(index)?.isCard()) {
+					const childNode = childrenNodes.eq(index);
+					if (childNode && node.isInline(childNode)) {
+						inline.repairCursor(childNode);
+					}
+					if (childNode?.isCard()) {
 						appendChild = appendChild
 							? appendChild.next()
 							: container.first();
@@ -627,9 +631,9 @@ class Block implements BlockModelInterface {
 					}
 					if (appendChild) {
 						appendChild.after(child);
-						appendChild = childrenNodes.eq(index);
+						appendChild = childNode;
 					} else {
-						appendChild = childrenNodes.eq(index);
+						appendChild = childNode;
 						container.prepend(child);
 					}
 				});
