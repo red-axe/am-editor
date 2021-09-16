@@ -229,7 +229,7 @@ export default class Paste {
 		const range = this.engine.change.getRange();
 		const root = range.commonAncestorNode;
 		const inline = this.engine.inline.closest(root);
-		if (nodeApi.isInline(inline)) {
+		if (!inline.isCard() && nodeApi.isInline(inline)) {
 			this.removeElementNodes($(fragment));
 			return fragment;
 		}
