@@ -194,10 +194,20 @@ export default class extends Plugin<Options> {
 		});
 	}
 
+	getUrl(value: ImageValue) {
+		const imagePlugin = this.editor.plugin.components['image'];
+		if (imagePlugin) {
+			const { onBeforeRender } = imagePlugin['options'] || {};
+			if (onBeforeRender) return onBeforeRender(value.status, value.src);
+		}
+		return value.src;
+	}
+
 	loadImage(id: string, value: ImageValue) {
 		if (!this.loadCounts[id]) this.loadCounts[id] = 1;
 		const image = new Image();
-		image.src = value.src;
+
+		image.src = this.getUrl(value);
 		image.onload = () => {
 			delete this.loadCounts[id];
 			this.editor.card.update(id, value);
