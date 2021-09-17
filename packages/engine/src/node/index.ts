@@ -200,12 +200,15 @@ class NodeModel implements NodeModelInterface {
 	 */
 	unwrap(node: NodeInterface) {
 		let child = node.first();
+		const nodes: NodeInterface[] = [];
 		while (child) {
 			const next = child.next();
 			node.before(child);
+			nodes.push(child);
 			child = next;
 		}
 		node.remove();
+		return nodes;
 	}
 	/**
 	 * 包裹节点
@@ -290,7 +293,7 @@ class NodeModel implements NodeModelInterface {
 			this.removeSide(source);
 			return;
 		}
-		const { node, block, mark, list } = this.editor;
+		const { block, mark, list } = this.editor;
 		let mergedNode = target;
 		const toIsList = this.isList(source);
 		const fromIsList = this.isList(target.name);
@@ -361,7 +364,10 @@ class NodeModel implements NodeModelInterface {
 					(markPlugin.constructor as PluginEntry).pluginName,
 				) > -1
 			) {
-				node.unwrap(child!);
+				const result = this.unwrap(child!);
+				result.forEach((children) => {
+					source.append(children);
+				});
 			}
 			// 孤立的零宽字符删除
 			else if (child.isText() && /\u200b/.test(child.text())) {
@@ -371,9 +377,9 @@ class NodeModel implements NodeModelInterface {
 				// 不在mark里面，或者没有父级节点，它的上级节点或者下级节点不是inline
 				if (
 					!parent ||
-					(!node.isMark(parent) &&
-						((prev && !node.isInline(prev)) ||
-							(next && !node.isInline(next))))
+					(!this.isMark(parent) &&
+						((prev && !this.isInline(prev)) ||
+							(next && !this.isInline(next))))
 				) {
 					child.remove();
 					child = next;
@@ -394,7 +400,7 @@ class NodeModel implements NodeModelInterface {
 			}
 
 			//追加到要合并的列表中
-			source.append(child);
+			if (child.length > 0) source.append(child);
 			child = next;
 		}
 		//移除需要合并的节点

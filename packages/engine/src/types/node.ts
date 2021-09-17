@@ -602,8 +602,9 @@ export interface NodeModelInterface {
 	/**
 	 * 去除包裹
 	 * @param node 需要去除包裹的节点
+	 * @returns 返回移除外层后的所有子节点
 	 */
-	unwrap(node: NodeInterface): void;
+	unwrap(node: NodeInterface): NodeInterface[];
 	/**
 	 * 包裹节点
 	 * @param source 需要包裹的节点

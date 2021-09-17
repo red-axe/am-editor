@@ -104,7 +104,7 @@ class Backspace {
 		if (!blockApi.isFirstOffset(range, 'start')) return;
 		let block = blockApi.closest(range.startNode);
 		// 在列表里
-		if (['ul', 'ol'].indexOf(block.name) >= 0) {
+		if (node.isList(block)) {
 			// 矫正这种情况，<ul><cursor /><li>foo</li></ul>
 			const li = block.first();
 

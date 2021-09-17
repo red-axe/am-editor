@@ -63,13 +63,14 @@ class ChangeEvent implements ChangeEventInterface {
 		if (bindInput && !bindInput()) return;
 		// 处理中文输入法状态
 		// https://developer.mozilla.org/en-US-US/docs/Web/Events/compositionstart
-		this.onContainer('compositionstart', () => {
+		this.onContainer('compositionstart', (event) => {
 			if (this.engine.readonly) {
 				return;
 			}
-
+			if (!this.isCardInput(event)) {
+				this.engine.ot.startMutationCache();
+			}
 			// 组合输入法缓存协同
-			this.engine.ot.startMutationCache();
 			const { change, node, block, list } = this.engine;
 			const range = change
 				.getRange()

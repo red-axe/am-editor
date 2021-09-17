@@ -1581,7 +1581,7 @@ class ChangeModel implements ChangeInterface {
 			paragraph.append(prevBlock);
 			prevBlock = paragraph;
 		}
-		if (['ol', 'ul'].indexOf(prevBlock.name) >= 0) {
+		if (this.engine.node.isList(prevBlock)) {
 			prevBlock = prevBlock.last();
 		}
 		// 只有一个 <br /> 时先删除
@@ -1626,7 +1626,7 @@ class ChangeModel implements ChangeInterface {
 			return;
 		}
 		// 前面是列表
-		if (['ol', 'ul'].indexOf(prevBlock.name) >= 0) {
+		if (this.engine.node.isList(prevBlock)) {
 			prevBlock = prevBlock.last();
 		}
 

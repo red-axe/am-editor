@@ -341,8 +341,9 @@ export default class Clipboard implements ClipboardInterface {
 		if (!range) return;
 		const root = range.commonAncestorNode;
 		(this.editor as EngineInterface).change.deleteContent(range);
-		const listElements =
-			-1 !== ['ul', 'ol'].indexOf(root.name) ? root : root.find('ul,ol');
+		const listElements = this.editor.node.isList(root)
+			? root
+			: root.find('ul,ol');
 		for (let i = 0; i < listElements.length; i++) {
 			const list = $(listElements[i]);
 			const childs = list.find('li');

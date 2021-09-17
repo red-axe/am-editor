@@ -183,6 +183,7 @@ export interface ListModelInterface {
 		blocks: Array<NodeInterface> | NodeInterface,
 		cardName: string,
 		value?: any,
+		tagName?: 'ol' | 'ul',
 	): Array<NodeInterface> | NodeInterface;
 	/**
 	 * 将节点转换为列表节点

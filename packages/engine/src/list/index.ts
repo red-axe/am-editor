@@ -1065,19 +1065,24 @@ class List implements ListModelInterface {
 		blocks: Array<NodeInterface> | NodeInterface,
 		cardName: string,
 		value?: any,
+		tagName: 'ol' | 'ul' = 'ul',
 	) {
 		const { node } = this.editor;
 		if (Array.isArray(blocks)) {
 			let nodes: Array<NodeInterface> = [];
 			blocks.forEach((block) => {
-				if (!node.isCustomize(block)) {
-					const node = this.toCustomize(block, cardName, value);
-					nodes = nodes.concat(node);
+				if (node.isCustomize(block)) {
+					this.unwrapCustomize(block);
 				}
+				nodes = nodes.concat(
+					this.toCustomize(block, cardName, value, tagName),
+				);
 			});
 			return nodes;
 		} else {
-			const customizeRoot = $(`<ul class="${this.CUSTOMZIE_UL_CLASS}"/>`);
+			const customizeRoot = $(
+				`<${tagName} class="${this.CUSTOMZIE_UL_CLASS}"/>`,
+			);
 			switch (blocks.name) {
 				case 'li':
 					blocks.addClass(this.CUSTOMZIE_LI_CLASS);
@@ -1085,9 +1090,6 @@ class List implements ListModelInterface {
 					return blocks;
 
 				case 'ul':
-					blocks.addClass(this.CUSTOMZIE_UL_CLASS);
-					return blocks;
-
 				case 'ol':
 					customizeRoot.attributes(blocks.attributes());
 					blocks = node.replace(blocks, customizeRoot);

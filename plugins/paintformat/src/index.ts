@@ -133,8 +133,10 @@ export default class extends Plugin<Options> {
 
 	paintBlocks(currentBlock: NodeInterface, activeBlocks: NodeInterface[]) {
 		if (!isEngine(this.editor)) return;
-		const { node } = this.editor!;
+		const { node, change } = this.editor!;
 		const blockApi = this.editor.block;
+		const range = change.getRange();
+		const selection = range.createSelection('removeformat');
 		activeBlocks.forEach((block) => {
 			if (this.options.paintBlock) {
 				const paintResult = this.options.paintBlock(
@@ -144,6 +146,8 @@ export default class extends Plugin<Options> {
 				if (paintResult === false) return;
 			}
 			if (block.name !== currentBlock.name) {
+				range.select(currentBlock).shrinkToElementNode();
+				change.blocks = [currentBlock];
 				if (block.name === 'p') {
 					const plugin = blockApi.findPlugin(currentBlock);
 					if (plugin) plugin.execute(block.name);
@@ -167,6 +171,7 @@ export default class extends Plugin<Options> {
 				});
 			}
 		});
+		selection.move();
 	}
 
 	execute(type: string = 'single') {
