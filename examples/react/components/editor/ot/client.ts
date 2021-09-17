@@ -206,7 +206,8 @@ class OTClient extends EventEmitter {
 				this.onError({
 					code: ERROR_CODE.DISCONNECTED,
 					level: ERROR_LEVEL.FATAL,
-					message: '网络连接异常，无法继续编辑',
+					message:
+						'网络连接异常，无法继续编辑！正在为您重新连接中...',
 				});
 			}
 		});
@@ -215,7 +216,7 @@ class OTClient extends EventEmitter {
 			this.onError({
 				code: ERROR_CODE.CONNECTION_ERROR,
 				level: ERROR_LEVEL.FATAL,
-				message: '协作服务异常，无法继续编辑',
+				message: '协作服务异常，无法继续编辑！正在为您重新连接中...',
 				error,
 			});
 		});

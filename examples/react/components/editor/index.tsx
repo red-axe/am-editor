@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { Modal, ModalFuncProps } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 //引入编辑器引擎
 import { $, EngineInterface, isHotkey, Path, isMobile } from '@aomao/engine';
 import EngineComponent, { EngineProps } from '../engine';
@@ -52,6 +54,14 @@ const EditorComponent: React.FC<EditorProps> = ({
 	const [loading, setLoading] = useState(true);
 	const [members, setMembers] = useState<Array<Member>>([]);
 	const [member, setMember] = useState<Member | null>(null);
+	const errorModal = useRef<{
+		destroy: () => void;
+		update: (
+			configUpdate:
+				| ModalFuncProps
+				| ((prevConfig: ModalFuncProps) => ModalFuncProps),
+		) => void;
+	} | null>(null);
 	const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 	/**
 	 * 保存到服务器
@@ -173,6 +183,33 @@ const EditorComponent: React.FC<EditorProps> = ({
 					if (onReady) onReady(member);
 					setMember(member);
 					setLoading(false);
+					if (errorModal.current) errorModal.current.destroy();
+					errorModal.current = null;
+				});
+				ot.on('error', ({ code, message }) => {
+					const errorMessage = (
+						<p>
+							{message}
+							<LoadingOutlined />
+						</p>
+					);
+					if (errorModal.current) {
+						errorModal.current.update({
+							title: code,
+							content: errorMessage,
+						});
+					} else {
+						errorModal.current = Modal.error({
+							title: code,
+							keyboard: false,
+							mask: false,
+							centered: true,
+							content: errorMessage,
+							okButtonProps: {
+								style: { display: 'none' },
+							},
+						});
+					}
 				});
 				otClient.current = ot;
 			} else {
