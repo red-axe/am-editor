@@ -2,7 +2,11 @@ import { isEqual } from 'lodash-es';
 import OTJSON from 'ot-json0';
 import { NodeInterface } from '../types/node';
 import { FOCUS, ANCHOR, CURSOR } from '../constants/selection';
-import { CARD_ASYNC_RENDER, CARD_SELECTOR } from '../constants/card';
+import {
+	CARD_ASYNC_RENDER,
+	CARD_ELEMENT_KEY,
+	CARD_SELECTOR,
+} from '../constants/card';
 
 import {
 	Op,
@@ -68,8 +72,9 @@ export const isTransientElement = (
 
 		const isCard = node.isCard();
 		//父级是卡片，并且没有可编辑区域
-		if (!isCard && parent?.isCard() && !parent.isEditableCard()) {
-			return true;
+		if (!isCard && parent?.isCard()) {
+			if (!parent.isEditableCard() || !!node.attributes(CARD_ELEMENT_KEY))
+				return true;
 		}
 
 		if (transientElements) {
