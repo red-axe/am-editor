@@ -72,9 +72,8 @@ export const isTransientElement = (
 
 		const isCard = node.isCard();
 		//父级是卡片，并且没有可编辑区域
-		if (!isCard && parent?.isCard()) {
-			if (!parent.isEditableCard() || !!node.attributes(CARD_ELEMENT_KEY))
-				return true;
+		if (!isCard && parent?.isCard() && !parent.isEditableCard()) {
+			return true;
 		}
 
 		if (transientElements) {

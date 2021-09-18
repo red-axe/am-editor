@@ -421,7 +421,7 @@ class Engine implements EngineInterface {
 				const childrenLength =
 					node.get<HTMLElement>()!.childNodes.length;
 				if (childrenLength === 0) {
-					node.remove();
+					node.append($('<br />'));
 				} else {
 					const child = node.first();
 					if (

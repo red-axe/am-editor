@@ -838,6 +838,7 @@ class List implements ListModelInterface {
 				if (node.isCustomize(startLi)) {
 					startLi.first()?.remove();
 				}
+				startLi.find('br').remove();
 				parent?.prev()?.last()?.append(startLi.children());
 				parent?.remove();
 			} else if (parent) {
@@ -947,6 +948,7 @@ class List implements ListModelInterface {
 			// 删除由于分割造成的空行
 			if (node.isEmpty(startLi) || this.isEmptyItem(startLi)) {
 				const prevElement = startLi.parent()?.prev();
+				startLi.find('br').remove();
 				if (node.isCustomize(startLi)) startLi.first()?.remove();
 				if (prevElement && node.isList(prevElement))
 					prevElement.last()?.append(startLi.children());
