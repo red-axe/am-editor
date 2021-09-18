@@ -941,6 +941,7 @@ class Block implements BlockModelInterface {
 		const block = this.closest(container);
 		range.select(block, true);
 		range.setEnd(container[0], offset);
+		if (!this.editor.node.isBlock(container)) range.enlargeToElementNode();
 		const fragment = range.cloneContents();
 
 		if (!fragment.firstChild) {
@@ -972,6 +973,7 @@ class Block implements BlockModelInterface {
 		const block = this.closest(container);
 		range.select(block, true);
 		range.setStart(container, offset);
+		if (!this.editor.node.isBlock(container)) range.enlargeToElementNode();
 		const fragment = range.cloneContents();
 
 		if (!fragment.firstChild) {

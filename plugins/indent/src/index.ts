@@ -202,10 +202,16 @@ export default class extends Plugin<Options> {
 
 	onBackspace(event: KeyboardEvent) {
 		if (!isEngine(this.editor)) return;
-		const { change, list } = this.editor;
+		const { change, list, node } = this.editor;
 		const blockApi = this.editor.block;
 		let range = change.getRange();
 		const block = this.editor.block.closest(range.startNode);
+		if (!node.isBlock(block)) return;
+		const parent = block.parent();
+		let blocks = change.blocks;
+		if (parent && node.isBlock(parent)) {
+			blocks = blocks.filter((b) => !b.equal(parent));
+		}
 		if ('li' === block.name) {
 			if (range.collapsed && !list.isFirst(range)) {
 				return;
@@ -213,7 +219,7 @@ export default class extends Plugin<Options> {
 		} else if (
 			(range.collapsed && blockApi.isLastOffset(range, 'end')) ||
 			!blockApi.isFirstOffset(range, 'start') ||
-			change.blocks.length > 1
+			blocks.length > 1
 		)
 			return;
 		else if (!range.collapsed) return;

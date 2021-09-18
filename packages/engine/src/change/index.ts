@@ -815,40 +815,37 @@ class ChangeModel implements ChangeInterface {
 			}
 		});
 
-		this.event.onDocument(
-			isMobile ? 'touchstart' : 'mousedown',
-			(e: MouseEvent | TouchEvent) => {
-				if (!e.target) return;
-				const targetNode = $(e.target);
-				const cardComponent = card.find(targetNode);
-				if (cardComponent && cardComponent.type === CardType.INLINE) {
+		this.event.onDocument('mousedown', (e: MouseEvent | TouchEvent) => {
+			if (!e.target) return;
+			const targetNode = $(e.target);
+			const cardComponent = card.find(targetNode);
+			if (cardComponent && cardComponent.type === CardType.INLINE) {
+				return;
+			}
+			// 点击元素已被移除
+			if (targetNode.closest('body').length === 0) {
+				return;
+			}
+			// 阅读模式节点
+			if (targetNode.closest('.am-view').length > 0) {
+				return;
+			}
+			// 工具栏、侧边栏、内嵌工具栏的点击
+			let node: NodeInterface | undefined = targetNode;
+			while (node) {
+				const attrValue = node.attributes(DATA_ELEMENT);
+				if (attrValue && [ROOT, EDITABLE].indexOf(attrValue) < 0) {
 					return;
 				}
-				// 点击元素已被移除
-				if (targetNode.closest('body').length === 0) {
-					return;
-				}
-				// 阅读模式节点
-				if (targetNode.closest('.am-view').length > 0) {
-					return;
-				}
-				// 工具栏、侧边栏、内嵌工具栏的点击
-				let node: NodeInterface | undefined = targetNode;
-				while (node) {
-					const attrValue = node.attributes(DATA_ELEMENT);
-					if (attrValue && [ROOT, EDITABLE].indexOf(attrValue) < 0) {
-						return;
-					}
-					node = node.parent();
-				}
-				//如果当前target是卡片，但是光标不在卡片上，让其选中
-				const { startNode } = this.getRange();
-				if (cardComponent && !card.find(startNode, true)) {
-					card.select(cardComponent);
-				}
-				card.activate(targetNode, ActiveTrigger.MOUSE_DOWN);
-			},
-		);
+				node = node.parent();
+			}
+			//如果当前target是卡片，但是光标不在卡片上，让其选中
+			const { startNode } = this.getRange();
+			if (cardComponent && !card.find(startNode, true)) {
+				card.select(cardComponent);
+			}
+			card.activate(targetNode, ActiveTrigger.MOUSE_DOWN);
+		});
 
 		this.event.onDocument('copy', (event) => {
 			clipboard.write(event);

@@ -1189,17 +1189,16 @@ class List implements ListModelInterface {
 		const contents = cloneRange.cloneContents();
 		//如果选区中没有节点
 		if (!contents.firstChild) return true;
+		const firstChild = $(contents.firstChild);
+		const lastChild = $(contents.lastChild || []);
 		//如果选区中只有一个节点，并且是br标签
-		if (
-			1 === contents.childNodes.length &&
-			'br' === $(contents.firstChild).name
-		)
+		if (1 === contents.childNodes.length && 'br' === firstChild.name)
 			return true;
 		//如果选区中只有一个节点，并且是自定义列表并且第一个是Card
 		if (
 			1 === contents.childNodes.length &&
 			node.hasClass('data-list-item') &&
-			$(contents.firstChild).isCard()
+			firstChild.isCard()
 		)
 			return true;
 		const nodeApi = this.editor.node;
@@ -1207,8 +1206,8 @@ class List implements ListModelInterface {
 		if (
 			2 === contents.childNodes.length &&
 			node.hasClass('data-list-item') &&
-			$(contents.firstChild).isCard() &&
-			nodeApi.isEmpty($(contents.lastChild || []))
+			firstChild.isCard() &&
+			nodeApi.isEmpty(lastChild)
 		)
 			return true;
 		//判断选区内容是否是空节点
@@ -1237,17 +1236,16 @@ class List implements ListModelInterface {
 		const contents = cloneRange.cloneContents();
 		//如果选区中没有节点
 		if (!contents.firstChild) return true;
+		const firstChild = $(contents.firstChild);
+		const lastChild = $(contents.lastChild || []);
 		//如果选区中只有一个节点，并且是br标签
-		if (
-			1 === contents.childNodes.length &&
-			'br' === $(contents.firstChild).name
-		)
+		if (1 === contents.childNodes.length && 'br' === firstChild.name)
 			return true;
 		//如果选区中只有一个节点，并且是自定义列表并且第一个是Card
 		if (
 			1 === contents.childNodes.length &&
 			node.hasClass('data-list-item') &&
-			$(contents.firstChild).isCard()
+			firstChild.isCard()
 		)
 			return true;
 		const nodeApi = this.editor.node;
@@ -1255,8 +1253,8 @@ class List implements ListModelInterface {
 		if (
 			2 === contents.childNodes.length &&
 			node.hasClass('data-list-item') &&
-			$(contents.firstChild).isCard() &&
-			nodeApi.isEmpty($(contents.lastChild || []))
+			firstChild.isCard() &&
+			nodeApi.isEmpty(lastChild)
 		)
 			return true;
 		//判断选区内容是否是空节点
