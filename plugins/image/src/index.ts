@@ -12,7 +12,9 @@ import ImageComponent, { ImageValue } from './component';
 import ImageUploader from './uploader';
 import locales from './locales';
 
-export default class extends Plugin {
+export default class extends Plugin<{
+	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
+}> {
 	static get pluginName() {
 		return 'image';
 	}
@@ -114,7 +116,12 @@ export default class extends Plugin {
 				if (value?.src && value.status === 'done') {
 					const img = node.find('.data-image-meta > img');
 					node.empty();
-					img.attributes('src', value.src);
+					let src = value.src;
+					const { onBeforeRender } = this.options;
+					if (onBeforeRender) {
+						src = onBeforeRender(value.status, value.src);
+					}
+					img.attributes('src', src);
 					img.css('visibility', 'visible');
 					img.css('background', '');
 					img.css('background-color', '');

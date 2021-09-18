@@ -131,6 +131,13 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				mirror.execCommand('newlineAndIndent');
 			},
 		});
+
+		this.container.on('mousedown', (event: MouseEvent) => {
+			if (!this.codeMirror?.hasFocus()) {
+				this.codeMirror?.focus();
+				event.preventDefault();
+			}
+		});
 		return this.codeMirror;
 	}
 
