@@ -317,12 +317,9 @@ const EditorComponent: React.FC<EditorProps> = ({
 	const editorAreaClick = (event: React.MouseEvent) => {
 		const { target } = event;
 		if (!target) return;
-		if (
-			engine.current &&
-			!engine.current.isFocus() &&
-			$(target).hasClass('editor-content')
-		) {
-			engine.current.focus(false);
+		if (engine.current && $(target).hasClass('editor-content')) {
+			event.preventDefault();
+			if (!engine.current.isFocus()) engine.current.focus(false);
 		}
 	};
 
@@ -337,7 +334,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 					<div className="editor-container">
 						<div
 							className="editor-content"
-							onClick={editorAreaClick}
+							onMouseDown={editorAreaClick}
 						>
 							{
 								<EngineComponent
