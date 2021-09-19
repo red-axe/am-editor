@@ -118,7 +118,7 @@ class Client {
 				}
 			});
 		// 如果用户之前有连接到，那么就会移除之前的连接
-		doc.removeMember(member.uuid);
+		// doc.removeMember(member.uuid);
 		//创建获取文档实例
 		const reuslt = doc.create(this.backend.connect(), 'yanmao', () => {
 			doc.addMember(ws, member);
