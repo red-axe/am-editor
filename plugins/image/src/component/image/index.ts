@@ -417,8 +417,9 @@ class Image {
 					value['naturalWidth'] || imageWidth * winPixelRatio;
 				const naturalHeight =
 					value['naturalHeight'] || imageHeight * winPixelRatio;
-				const src = value['src'];
-
+				let src = value['src'];
+				const { onBeforeRender } = this.options;
+				if (onBeforeRender) src = onBeforeRender('done', src);
 				const msrc = image.attributes('src');
 				imageArray.push({
 					src,
