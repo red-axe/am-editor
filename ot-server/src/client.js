@@ -17,7 +17,11 @@ try {
 const { user, pwd, db, url } = config;
 const mongodb = require('sharedb-mongo')({
 	mongo: function (callback) {
-		MongoClient.connect(`mongodb://${user}:${pwd}@${url}/${db}`, callback);
+		let connectUrl = user
+			? `mongodb://${user}:${pwd}@${url}`
+			: `mongodb://${url}`;
+		if (db) connectUrl += `/${db}`;
+		MongoClient.connect(connectUrl, callback);
 	},
 });
 const ShareDB = require('sharedb');
