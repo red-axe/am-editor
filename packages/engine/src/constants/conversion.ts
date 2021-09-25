@@ -1,3 +1,4 @@
+import { DATA_ELEMENT, ROOT } from './root';
 import $ from '../node/query';
 import { ConversionData } from '../types';
 import {
@@ -47,7 +48,8 @@ const defaultConversion: ConversionData = [
 		from: (_name, _styles, attributes) => {
 			return (
 				_name === 'div' &&
-				(!attributes[CARD_KEY] || !attributes[READY_CARD_KEY])
+				(!attributes[CARD_KEY] || !attributes[READY_CARD_KEY]) &&
+				attributes[DATA_ELEMENT] !== ROOT
 			);
 		},
 		to: (_, style, attributes) => {

@@ -114,6 +114,7 @@ class Delete implements TypingHandleInterface {
 				cloneRange.setEnd(range.endContainer, range.endOffset + 1);
 				change.select(cloneRange);
 				change.deleteContent();
+				change.select(change.getRange().shrinkToTextNode());
 				return;
 			}
 			nextNode = range.endContainer;

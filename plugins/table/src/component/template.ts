@@ -176,9 +176,10 @@ class Template implements TemplateInterface {
 					return match + colgroup;
 				});
 			}
-
-			html = this.table.helper.normalize($(html)).get<HTMLElement>()!
-				.outerHTML;
+			const normalTable = this.table.helper.normalize($(html));
+			const trs = normalTable.find('tr');
+			rows = trs.length;
+			html = normalTable.get<HTMLElement>()!.outerHTML;
 		}
 
 		const table =

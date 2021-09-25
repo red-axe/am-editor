@@ -154,7 +154,7 @@ class ChangeModel implements ChangeInterface {
 		if (this.isComposing()) return this;
 		//折叠状态
 		if (range.collapsed) {
-			const { startNode, startOffset, endNode, endOffset } = range;
+			const { startNode, startOffset } = range;
 			//如果节点下只要一个br标签，并且是<p><br /><cursor /></p>,那么选择让光标选择在 <p><cursor /><br /></p>
 			if (
 				((startNode.isElement() &&
@@ -170,7 +170,7 @@ class ChangeModel implements ChangeInterface {
 			}
 		}
 		//修复inline光标
-		const { startNode, endNode, startOffset, endOffset } = range
+		let { startNode, endNode, startOffset, endOffset } = range
 			.cloneRange()
 			.shrinkToTextNode();
 		const prev = startNode.prev();
@@ -230,12 +230,48 @@ class ChangeModel implements ChangeInterface {
 				if (range.collapsed) range.collapse(false);
 			}
 		}
+		startNode = range.startNode;
+		endNode = range.endNode;
+		const startChildNodes = startNode.children();
 		// 自定义列表节点选中卡片前面就让光标到卡片后面去
-		if (node.isCustomize(range.startNode) && startOffset === 0) {
-			range.setStart(range.startNode, 1);
+		if (node.isCustomize(startNode) && startOffset === 0) {
+			range.setStart(startNode, 1);
 		}
-		if (node.isCustomize(range.endNode) && endOffset === 0) {
-			range.setEnd(range.endNode, 1);
+		if (node.isCustomize(endNode) && endOffset === 0) {
+			range.setEnd(endNode, 1);
+		}
+		// 空节点添加br
+		if (startNode.name === 'p' && startChildNodes.length === 0) {
+			startNode.append('<br />');
+		}
+		if (
+			!range.collapsed &&
+			endNode.name === 'p' &&
+			endNode.children().length === 0
+		) {
+			endNode.append('<br />');
+		}
+		// 空列表添加br
+		if (startNode.name === 'li') {
+			if (startChildNodes.length === 0) {
+				startNode.append('<br />');
+			} else if (
+				node.isCustomize(startNode) &&
+				startChildNodes.length === 1
+			) {
+				startNode.append('<br />');
+			}
+		}
+		if (!range.collapsed && endNode.name === 'li') {
+			const endChildNodes = endNode.children();
+			if (endChildNodes.length === 0) {
+				endNode.append('<br />');
+			} else if (
+				node.isCustomize(endNode) &&
+				endChildNodes.length === 1
+			) {
+				endNode.append('<br />');
+			}
 		}
 		//在非折叠，或者当前range对象和selection中的对象不一致的时候重新设置range
 		if (
@@ -400,7 +436,7 @@ class ChangeModel implements ChangeInterface {
 			value = this.getOriginValue();
 			selection?.move();
 		}
-		return formatEngineValue(value);
+		return value;
 	}
 
 	cacheRangeBeforeCommand() {

@@ -693,7 +693,7 @@ class NodeEntry implements NodeInterface {
 	html(): string;
 	html(html: string): NodeEntry;
 	html(html?: string): NodeEntry | string {
-		if (html) {
+		if (html !== undefined) {
 			this.each((node) => {
 				(node as Element).innerHTML = html;
 			});

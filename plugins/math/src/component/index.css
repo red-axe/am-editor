@@ -20,6 +20,8 @@
 }
   .am-engine span[data-card-key="math"] .data-math-container {
     display: inline-block;
+    cursor: pointer;
+    border: 2px solid transparent; 
   }
  .data-card-math-editor {
     outline: none;
@@ -82,3 +84,12 @@
     font-size: 14px;
     display: block;
   }
+
+  .am-engine span[data-card-key="math"].card-selected [data-card-element="center"].data-card-border-selected {
+    outline: none;
+  }
+
+  .am-engine span[data-card-key="math"] .data-card-border-selected .data-math-container {
+    border: 2px solid #1890FF;
+    border-radius: 4px;
+}

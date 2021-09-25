@@ -440,6 +440,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 				.addClass('data-table')
 				.addClass('data-table-view');
 		}
+		value.rows = this.wrapper.find('tr').length;
 		if (value.width)
 			this.wrapper.find('table').css('width', `${value.width}px`);
 		return this.wrapper;

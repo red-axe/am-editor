@@ -39,6 +39,16 @@ const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 		isVoid: true,
 	},
 	{
+		name: 'span',
+		type: 'mark',
+		attributes: {
+			'data-element': {
+				required: true,
+				value: ['anchor', 'cursor', 'focus'],
+			},
+		},
+	},
+	{
 		name: 'card',
 		type: 'inline',
 		attributes: {

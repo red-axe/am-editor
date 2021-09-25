@@ -271,7 +271,6 @@ class Helper implements HelperInterface {
 		trs.each((_, index) => {
 			const $tr = trs.eq(index);
 			if (!$tr) return;
-			if ($tr.find('td').length === 0) $tr.remove();
 			let height = parseInt($tr.css('height'));
 			height = height || 33;
 			$tr.css('height', height + 'px');
