@@ -24,6 +24,7 @@ import { $ } from '../node';
 import {
 	CARD_ASYNC_RENDER,
 	DATA_ELEMENT,
+	DATA_TRANSIENT_ELEMENT,
 	ROOT,
 	UI_SELECTOR,
 } from '../constants';
@@ -247,7 +248,7 @@ class Creator extends EventEmitter2 {
 							attrOps.push({
 								path,
 								oldPath,
-								newValue: target['data'],
+								newValue: record['text-data'] || target['data'],
 							});
 							isDataString = true;
 						}
@@ -422,13 +423,14 @@ class Creator extends EventEmitter2 {
 				}
 			});
 			//所有的UI子节点
-			container
-				.find(`${UI_SELECTOR}`)
-				.allChildren()
-				.forEach((child) => {
+			const uiElements = container.find(`${UI_SELECTOR}`);
+			uiElements.each((_, index) => {
+				const ui = uiElements.eq(index);
+				ui?.allChildren().forEach((child) => {
 					if (child.type === getDocument().ELEMENT_NODE)
 						this.cacheTransientElements?.push(child[0]);
 				});
+			});
 		}
 		records = records.filter(
 			(record) =>
@@ -445,39 +447,39 @@ class Creator extends EventEmitter2 {
 	}
 
 	normalizeOps(ops: Op[]) {
-		if (this.engine.change.isComposing()) {
-			if (
-				ops.length === 2 &&
-				'ld' in ops[1] &&
-				ops[1].ld[0] &&
-				'li' in ops[0] &&
-				typeof ops[0].li === 'string'
-			) {
-				this.lineStart = true;
-				ops.splice(0, 1);
-				//ops[0].li = '';
-				this.readyToEmitOps(ops);
-				return;
-			}
-			if (ops.length === 1 && isCursorOp(ops[0])) return;
-			if (ops.length === 2 && 'si' in ops[0] && isEqual(ops[0], ops[1]))
-				ops.splice(1, 1);
-			this.laterOps = ops;
-			if (this.timer) clearTimeout(this.timer);
-			this.timer = setTimeout(() => {
-				if (!this.engine.change.isComposing()) {
-					if (this.lineStart) {
-						this.engine.history.startCache(10);
-						this.lineStart = false;
-					}
-					if (this.laterOps) {
-						this.readyToEmitOps(this.laterOps);
-						this.laterOps = null;
-					}
-					this.timer = null;
-				}
-			}, 0);
-		}
+		// if (this.engine.change.isComposing()) {
+		// 	if (
+		// 		ops.length === 2 &&
+		// 		'ld' in ops[1] &&
+		// 		ops[1].ld[0] &&
+		// 		'li' in ops[0] &&
+		// 		typeof ops[0].li === 'string'
+		// 	) {
+		// 		this.lineStart = true;
+		// 		ops.splice(0, 1);
+		//         if(ops[0].li) ops[0].li = '';
+		// 		this.readyToEmitOps(ops);
+		// 		return;
+		// 	}
+		// 	if (ops.length === 1 && isCursorOp(ops[0])) return;
+		// 	if (ops.length === 2 && 'si' in ops[0] && isEqual(ops[0], ops[1]))
+		// 		ops.splice(1, 1);
+		// 	this.laterOps = ops;
+		// 	if (this.timer) clearTimeout(this.timer);
+		// 	this.timer = setTimeout(() => {
+		// 		if (!this.engine.change.isComposing()) {
+		// 			if (this.lineStart) {
+		// 				this.engine.history.startCache(10);
+		// 				this.lineStart = false;
+		// 			}
+		// 			if (this.laterOps) {
+		// 				this.readyToEmitOps(this.laterOps);
+		// 				this.laterOps = null;
+		// 			}
+		// 			this.timer = null;
+		// 		}
+		// 	}, 0);
+		// }
 		if (this.laterOps) {
 			const equal = isEqual(this.laterOps, ops);
 			this.readyToEmitOps(this.laterOps);

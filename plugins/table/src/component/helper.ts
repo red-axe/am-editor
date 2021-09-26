@@ -526,7 +526,9 @@ class Helper implements HelperInterface {
 				const colElement = cols[c] as HTMLTableColElement;
 				const _width = cols.eq(c)?.attributes('width');
 				if (_width) {
-					cols.eq(c)?.attributes('width', parseInt(_width));
+					const widthValue = parseInt(_width);
+					if (widthValue !== NaN)
+						cols.eq(c)?.attributes('width', widthValue);
 				}
 
 				if (colElement.span > 1) {

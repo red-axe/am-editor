@@ -451,6 +451,14 @@ class Engine implements EngineInterface {
 		console.log(`confirm:${message}`);
 		return Promise.reject(false);
 	}
+
+	showPlaceholder() {
+		this._container.showPlaceholder();
+	}
+
+	hidePlaceholder() {
+		this._container.hidePlaceholder();
+	}
 }
 
 export default Engine;

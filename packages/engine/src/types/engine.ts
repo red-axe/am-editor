@@ -535,6 +535,14 @@ export interface EngineInterface extends EditorInterface {
 	 */
 	getJsonValue(): string | undefined | (string | {})[];
 	/**
+	 * 展示 placeholder
+	 */
+	showPlaceholder(): void;
+	/**
+	 * 隐藏 placeholder
+	 */
+	hidePlaceholder(): void;
+	/**
 	 * 绑定事件
 	 * @param eventType 事件类型
 	 * @param listener 事件回调

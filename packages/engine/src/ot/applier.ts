@@ -235,8 +235,10 @@ class Applier implements ApplierInterface {
 					nodeValue.substring(offset);
 				if (begine && begine.parentNode === end)
 					begine.nodeValue = value;
-				else {
+				else if (!!value) {
 					const textNode = document.createTextNode(value);
+					if (end.firstChild?.nodeName === 'BR')
+						end.firstChild.remove();
 					end.insertBefore(textNode, end.firstChild);
 				}
 				return node;

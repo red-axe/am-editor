@@ -84,7 +84,16 @@ class Mutation extends EventEmitter2 implements MutationInterface {
 	submitCache() {
 		if (this.isCache) {
 			setTimeout(() => {
+				if (this.engine.change.isComposing()) return;
 				this.isCache = false;
+				this.cache = this.cache.map((record) => {
+					if (record.type === 'characterData') {
+						if (record.target.nodeType === document.TEXT_NODE) {
+							record['text-data'] = record.target.textContent;
+						}
+					}
+					return record;
+				});
 				if (this.cache.length > 0)
 					this.creator.handleMutations(this.cache);
 				this.cache = [];

@@ -273,6 +273,10 @@ class ChangeModel implements ChangeInterface {
 				endNode.append('<br />');
 			}
 		}
+
+		if (startNode.isEditable() && startNode.children().length === 0) {
+			startNode.html('<p><br /></p>');
+		}
 		//在非折叠，或者当前range对象和selection中的对象不一致的时候重新设置range
 		if (
 			selection &&
@@ -1362,6 +1366,12 @@ class ChangeModel implements ChangeInterface {
 		}
 		// 先删除范围内的所有内容
 		safeRange.extractContents();
+		if (
+			safeRange.startNode.isEditable() &&
+			safeRange.startNode.children().length === 0
+		) {
+			safeRange.startNode.html('<p><br /></p>');
+		}
 		safeRange.collapse(true);
 		// 后续处理
 		const { startNode } = safeRange

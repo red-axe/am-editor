@@ -133,7 +133,7 @@ class Container {
 	showPlaceholder() {
 		const { placeholder } = this.options;
 		if (placeholder) {
-			if (this.#styleElement)
+			if (this.#styleElement && this.#styleElement.parentNode)
 				document.body.removeChild(this.#styleElement);
 			this.#styleElement = document.createElement('style');
 			//const left = this.node.css('padding-left');
@@ -150,7 +150,7 @@ class Container {
 			this.node.attributes({
 				'data-placeholder': placeholder,
 			});
-		} else if (this.#styleElement)
+		} else if (this.#styleElement && this.#styleElement.parentNode)
 			document.body.removeChild(this.#styleElement);
 	}
 
