@@ -49,6 +49,7 @@ class Enter implements TypingHandleInterface {
 					this.engine.container,
 					this.engine.scrollNode,
 				);
+		this.engine.trigger('select');
 	}
 
 	destroy() {

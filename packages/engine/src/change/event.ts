@@ -68,7 +68,6 @@ class ChangeEvent implements ChangeEventInterface {
 				return;
 			}
 			if (!this.isCardInput(event)) {
-				console.log('compositionstart');
 				this.engine.ot.startMutationCache();
 			}
 			// 组合输入法缓存协同
@@ -96,7 +95,6 @@ class ChangeEvent implements ChangeEventInterface {
 			if (this.engine.readonly) {
 				return;
 			}
-			console.log('compositionend');
 			this.isComposing = false;
 		});
 		//对系统工具栏操作拦截，一般针对移动端的文本上下文工具栏
@@ -152,7 +150,6 @@ class ChangeEvent implements ChangeEventInterface {
 			const { inputType } = event;
 			// 在组合输入法未正常执行结束命令插入就先提交协同
 			if (this.isComposing && !inputType.includes('Composition')) {
-				console.log('beforeinput', inputType);
 				this.engine.ot.submitMutationCache();
 			}
 			const commandTypes = ['format', 'history'];
@@ -183,7 +180,6 @@ class ChangeEvent implements ChangeEventInterface {
 			if (inputTimeout) clearTimeout(inputTimeout);
 			inputTimeout = setTimeout(() => {
 				if (!this.isComposing) {
-					console.log('input');
 					callback(e);
 					// 组合输入法结束后提交协同
 					this.engine.ot.submitMutationCache();
