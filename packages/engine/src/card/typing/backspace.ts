@@ -35,7 +35,14 @@ class Backspace {
 			// 左侧光标
 			const cardLeft = range.startNode.closest(CARD_LEFT_SELECTOR);
 			if (cardLeft.length > 0) {
-				range.select(card.root).collapse(true);
+				const prev = card.root.prev();
+				if (!prev) {
+					event.preventDefault();
+					change.mergeAfterDeletePrevNode();
+					return false;
+				} else {
+					range.select(card.root).collapse(true);
+				}
 				change.select(range);
 			}
 			// 右侧光标

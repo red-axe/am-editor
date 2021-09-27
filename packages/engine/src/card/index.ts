@@ -644,7 +644,7 @@ class CardModel implements CardModelInterface {
 				let card: CardInterface | undefined;
 				if (key) {
 					card = this.find(cardNode);
-					if (card) {
+					if (card && card.root.equal(cardNode)) {
 						if (card.destroy) card.destroy();
 						this.removeComponent(card);
 					}
