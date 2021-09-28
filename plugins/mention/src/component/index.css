@@ -29,9 +29,7 @@
 .data-mention-component-placeholder {
     color: rgba(0,0,0,0.25);
     pointer-events: none;
-    position: absolute;
     min-width: 78px;
-    left: 16px;
 }
 
 .data-mention-item {
