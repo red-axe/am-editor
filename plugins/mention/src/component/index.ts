@@ -9,6 +9,7 @@ import {
 	Position,
 	DATA_ELEMENT,
 	UI,
+	CardInterface,
 } from '@aomao/engine';
 import CollapseComponent, { CollapseComponentInterface } from './collapse';
 import { MentionItem } from '../types';
@@ -99,6 +100,8 @@ class Mention extends Card<MentionValue> {
 		[key: string]: string;
 	}) => void | { [key: string]: string };
 
+	static onInsert?: (card: CardInterface) => void;
+
 	/**
 	 * 自定义渲染列表项
 	 * @param item 数据项
@@ -144,11 +147,12 @@ class Mention extends Card<MentionValue> {
 				this.component = undefined;
 				this.#keyword?.remove();
 				card.focus(this, false);
-				card.insert(Mention.cardName, {
+				const component = card.insert(Mention.cardName, {
 					...data,
 					...newValue,
 				});
 				card.removeNode(this);
+				if (Mention.onInsert) Mention.onInsert(component);
 			},
 		});
 	}

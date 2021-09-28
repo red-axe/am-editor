@@ -12,6 +12,7 @@ import {
 	SchemaInterface,
 	CARD_KEY,
 	encodeCardValue,
+	CardInterface,
 } from '@aomao/engine';
 import MentionComponent from './component';
 import locales from './locales';
@@ -23,6 +24,7 @@ export interface Options extends PluginOptions {
 	onSelect?: (data: {
 		[key: string]: string;
 	}) => void | { [key: string]: string };
+	onInsert?: (card: CardInterface) => void;
 	onClick?: (node: NodeInterface, data: { [key: string]: string }) => void;
 	onMouseEnter?: (
 		node: NodeInterface,
@@ -78,6 +80,7 @@ class MentionPlugin extends Plugin<Options> {
 			defaultData,
 			onSearch,
 			onSelect,
+			onInsert,
 			onClick,
 			onMouseEnter,
 			onRender,
@@ -98,6 +101,7 @@ class MentionPlugin extends Plugin<Options> {
 		if (onLoading) MentionComponent.renderLoading = onLoading;
 		if (onEmpty) MentionComponent.renderEmpty = onEmpty;
 		if (onSelect) MentionComponent.onSelect = onSelect;
+		if (onInsert) MentionComponent.onInsert = onInsert;
 		MentionComponent.search = (keyword: string) => {
 			if (onSearch) return onSearch(keyword);
 			return new Promise((resolve) => {
