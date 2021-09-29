@@ -41,6 +41,7 @@ import Fontfamily from '@aomao/plugin-fontfamily';
 import Status, { StatusComponent } from '@aomao/plugin-status';
 import LineHeight from '@aomao/plugin-line-height';
 import Mention, { MentionComponent } from '@aomao/plugin-mention';
+import Test, { TestComponent } from './plugins/test';
 //import Mind, { MindComponent } from '@aomao/plugin-mind';
 import {
 	ToolbarPlugin,
@@ -94,6 +95,7 @@ export const plugins: Array<PluginEntry> = [
 	Status,
 	LineHeight,
 	Mention,
+	Test,
 	//Mind
 ];
 
@@ -109,6 +111,7 @@ export const cards: Array<CardEntry> = [
 	ToolbarComponent,
 	StatusComponent,
 	MentionComponent,
+	TestComponent,
 	//MindComponent
 ];
 

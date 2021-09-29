@@ -19,6 +19,7 @@ import {
 	CARD_ELEMENT_KEY,
 	CARD_LEFT_SELECTOR,
 	CARD_RIGHT_SELECTOR,
+	CARD_SELECTOR,
 	TRIGGER_CARD_ID,
 } from '../constants/card';
 import {
@@ -776,43 +777,43 @@ class ChangeModel implements ChangeInterface {
 			if (this.isComposing()) return;
 			const { window } = container;
 			const selection = window?.getSelection();
+
 			if (selection && selection.anchorNode) {
 				const range = Range.from(this.engine, selection)!;
+				// 判断当前光标是否包含卡片或者在卡片内部
+				let containsCard =
+					range.containsCard() ||
+					(range.commonAncestorNode.closest(CARD_SELECTOR).length >
+						0 &&
+						range.startNode.closest(
+							`${CARD_LEFT_SELECTOR},${CARD_RIGHT_SELECTOR}`,
+						).length === 0);
 				card.each((card) => {
 					const center = card.getCenter();
 					if (center && center.length > 0) {
 						let isSelect = selection.containsNode(center[0]);
-						if (
-							!isSelect &&
-							!range.collapsed &&
-							selection.focusNode
-						) {
+						if (!isSelect && containsCard && selection.focusNode) {
 							const focusCard = this.engine.card.find(
 								selection.focusNode,
-								true,
 							);
 							if (
 								focusCard &&
 								card.root.equal(focusCard.root) &&
 								(!selection.anchorNode ||
-									!focusCard.root.contains(
+									focusCard.root.contains(
 										selection.anchorNode,
 									))
 							) {
 								isSelect = true;
+								// 重合的光标找到一次其它的就不需要再去比对了
+								if (range.collapsed) containsCard = false;
 							}
 						}
 						const { singleSelectable } =
 							card.constructor as CardEntry;
-						if (singleSelectable !== false) card.select(isSelect);
+						card.select(isSelect && singleSelectable !== false);
 					}
 				});
-				const cardComponent = card.getSingleSelectedCard(range);
-				if (cardComponent) {
-					cardComponent.select(true);
-				}
-			} else {
-				card.each((card) => card.select(false));
 			}
 		});
 		this.event.onSelect((event) => {
@@ -837,31 +838,10 @@ class ChangeModel implements ChangeInterface {
 			this.onSelect();
 		});
 
-		this.event.onDocument('click', (e: MouseEvent) => {
-			if (!e.target) return;
-			const cardComponent = card.find($(e.target));
-			if (cardComponent) {
-				const cardEntry = cardComponent.constructor as CardEntry;
-				if (cardComponent.type === CardType.INLINE) {
-					card.activate(
-						cardComponent.root,
-						ActiveTrigger.CLICK,
-						cardEntry.toolbarFollowMouse ? e : undefined,
-					);
-				}
-				if (cardComponent.onFocus) {
-					cardComponent.onFocus();
-				}
-			}
-		});
-
 		this.event.onDocument('mousedown', (e: MouseEvent | TouchEvent) => {
 			if (!e.target) return;
 			const targetNode = $(e.target);
 			const cardComponent = card.find(targetNode);
-			if (cardComponent && cardComponent.type === CardType.INLINE) {
-				return;
-			}
 			// 点击元素已被移除
 			if (targetNode.closest('body').length === 0) {
 				return;
@@ -878,11 +858,6 @@ class ChangeModel implements ChangeInterface {
 					return;
 				}
 				node = node.parent();
-			}
-			//如果当前target是卡片，但是光标不在卡片上，让其选中
-			const { startNode } = this.getRange();
-			if (cardComponent && !card.find(startNode, true)) {
-				card.select(cardComponent);
 			}
 			card.activate(targetNode, ActiveTrigger.MOUSE_DOWN);
 		});

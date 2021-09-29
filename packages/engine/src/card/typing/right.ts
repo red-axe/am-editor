@@ -1,5 +1,9 @@
 import isHotkey from 'is-hotkey';
-import { CARD_LEFT_SELECTOR, CARD_RIGHT_SELECTOR } from '../../constants';
+import {
+	CARD_CENTER_SELECTOR,
+	CARD_LEFT_SELECTOR,
+	CARD_RIGHT_SELECTOR,
+} from '../../constants';
 import {
 	CardEntry,
 	CardInterface,
@@ -19,9 +23,14 @@ class Right {
 		const { singleSelectable } = card.constructor as CardEntry;
 		// 左侧光标
 		const cardLeft = range.commonAncestorNode.closest(CARD_LEFT_SELECTOR);
-		if (cardLeft.length > 0) {
+		const cardRight = range.commonAncestorNode.closest(CARD_RIGHT_SELECTOR);
+		const isCenter = cardLeft.length === 0 && cardRight.length === 0;
+		if (cardLeft.length > 0 || isCenter) {
 			event.preventDefault();
-			if (singleSelectable !== false) {
+			if (isCenter) {
+				card.select(false);
+			}
+			if (!isCenter && singleSelectable !== false) {
 				this.engine.card.select(card);
 			} else {
 				card.focus(range, false);
@@ -30,10 +39,14 @@ class Right {
 			return false;
 		}
 		// 右侧光标
-		const cardRight = range.commonAncestorNode.closest(CARD_RIGHT_SELECTOR);
 		if (cardRight.length > 0) {
-			range.setEndAfter(card.root[0]);
-			range.collapse(false);
+			const next = card.root.next();
+			if (!next) {
+				card.focus(range, false);
+			} else {
+				range.setEndAfter(card.root[0]);
+				range.collapse(false);
+			}
 			change.select(range);
 		}
 		return true;

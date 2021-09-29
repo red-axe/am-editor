@@ -362,8 +362,11 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 			(this.constructor as CardEntryType).selectStyleType
 		}-selected`;
 		const center = this.getCenter();
-		if (selected) center.addClass(selectedClass);
-		else center.removeClass(selectedClass);
+		if (selected) {
+			center.addClass(selectedClass);
+		} else {
+			center.removeClass(selectedClass);
+		}
 	}
 	onSelectByOther(
 		selected: boolean,

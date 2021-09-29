@@ -389,7 +389,7 @@ class Engine implements EngineInterface {
 					node.before(block);
 				}
 				block = $('<p />');
-			} else {
+			} else if (!node.isCursor()) {
 				block.append(node);
 			}
 		});

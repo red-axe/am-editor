@@ -337,6 +337,7 @@ class CardModel implements CardModelInterface {
 			if (trigger === ActiveTrigger.UPDATE_CARD) {
 				isCurrentActiveCard = false;
 			}
+			// 当前是卡片，但是与当前激活的卡片不一致，就取消当前的卡片激活状态
 			if (this.active && !isCurrentActiveCard) {
 				this.active.toolbarModel?.hide();
 				this.active.select(false);
@@ -347,7 +348,6 @@ class CardModel implements CardModelInterface {
 				if (!isCurrentActiveCard) {
 					card!.toolbarModel?.show(event);
 					if (
-						card.type === CardType.INLINE &&
 						(card.constructor as CardEntry).autoSelected !==
 							false &&
 						(trigger !== ActiveTrigger.CLICK ||
@@ -355,9 +355,9 @@ class CardModel implements CardModelInterface {
 					) {
 						this.select(card);
 					}
+					card.select(!card.isEditable);
 					card.activate(true);
-				}
-				if (card.type === CardType.BLOCK) {
+				} else if (card.isEditable) {
 					card.select(false);
 				}
 				if (
@@ -379,6 +379,11 @@ class CardModel implements CardModelInterface {
 			(card.type !== CardType.BLOCK || !card.activated)
 		) {
 			const range = editor.change.getRange();
+			if (
+				range.startNode.closest(EDITABLE_SELECTOR).length > 0 ||
+				(card.isEditable && range.collapsed)
+			)
+				return;
 			const root = card.root;
 			const parentNode = root.parent()!;
 			const index = parentNode
