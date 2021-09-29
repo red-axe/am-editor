@@ -11,7 +11,9 @@
 }
 
 .data-toolbar-component-placeholder {
-    color: rgba(0,0,0,0.25);pointer-events: none;position: absolute;width: 76px;left: 7px;
+    color: rgba(0,0,0,0.25);
+    pointer-events: none;
+    width: 76px;
 }
 
 .data-toolbar-component-list-empty {
