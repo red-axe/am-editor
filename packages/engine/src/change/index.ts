@@ -1305,15 +1305,14 @@ class ChangeModel implements ChangeInterface {
 			if (!range) this.apply(safeRange);
 			return;
 		}
-		const { mark, inline, card } = this.engine;
+		const { mark, inline, card, schema } = this.engine;
 		const nodeApi = this.engine.node;
 		const blockApi = this.engine.block;
+		const allowInTags = schema.getAllowInTags();
 		let cloneRange = safeRange.cloneRange();
 		cloneRange.collapse(true);
 		const activeMarks = followActiveMark ? mark.findMarks(cloneRange) : [];
-		safeRange.enlargeToElementNode(
-			safeRange.commonAncestorNode.isText() ? false : true,
-		);
+		safeRange.enlargeToElementNode();
 		// 获取上面第一个 Block
 		let block = blockApi.closest(
 			safeRange
@@ -1352,6 +1351,9 @@ class ChangeModel implements ChangeInterface {
 			}
 			block = child;
 		}
+		const isMoreLine = !blockApi
+			.closest(safeRange.startNode)
+			.equal(blockApi.closest(safeRange.endNode));
 		// 先删除范围内的所有内容
 		safeRange.extractContents();
 		if (
@@ -1362,7 +1364,7 @@ class ChangeModel implements ChangeInterface {
 		}
 		safeRange.collapse(true);
 		// 后续处理
-		const { startNode } = safeRange
+		let { startNode } = safeRange
 			.shrinkToElementNode()
 			.shrinkToTextNode()
 			.enlargeToElementNode();
@@ -1372,11 +1374,19 @@ class ChangeModel implements ChangeInterface {
 			if (!range) this.apply(safeRange);
 			return;
 		}
+		let isRemoveStartNode = false;
+		if (isMoreLine && startNode.children().length === 0) {
+			const selection = safeRange.createSelection();
+			startNode.remove();
+			selection.move();
+			isRemoveStartNode = true;
+			startNode = safeRange.startNode;
+		}
 
 		const prevNode = block;
 		const nextNode = startNode;
 		let isEmptyNode = startNode.children().length === 0;
-		if (!isEmptyNode) {
+		if (!isEmptyNode && startNode.length > 0 && startNode.inEditor()) {
 			if (
 				startNode[0].childNodes.length === 1 &&
 				startNode[0].firstChild?.nodeType ===
@@ -1386,7 +1396,7 @@ class ChangeModel implements ChangeInterface {
 			)
 				isEmptyNode = true;
 		}
-		if (isEmptyNode && nodeApi.isBlock(startNode)) {
+		if (isEmptyNode && nodeApi.isBlock(startNode) && startNode.inEditor()) {
 			let html = nodeApi.getBatchAppendHTML(activeMarks, '<br />');
 			if (startNode.isEditable()) {
 				html = '<p>'.concat(html, '</p>');
@@ -1465,7 +1475,8 @@ class ChangeModel implements ChangeInterface {
 			nextNode &&
 			nodeApi.isBlock(prevNode) &&
 			nodeApi.isBlock(nextNode) &&
-			!prevNode.equal(nextNode)
+			!prevNode.equal(nextNode) &&
+			nextNode.inEditor()
 		) {
 			deepMergeNode(
 				safeRange,
@@ -1507,6 +1518,7 @@ class ChangeModel implements ChangeInterface {
 			}
 		}
 		if (this.isEmpty()) this.initValue(safeRange);
+		if (isRemoveStartNode) safeRange.select(prevNode, true).collapse(false);
 		if (!range) this.apply(safeRange);
 	}
 

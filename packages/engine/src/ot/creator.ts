@@ -183,7 +183,10 @@ class Creator extends EventEmitter2 {
 						// 循环要移除的节点
 						Array.from(removedNodes).forEach((removedNode) => {
 							// 要移除的节点同时又在增加的就不处理
-							if (!addNodes.find((n) => n === removedNode)) {
+							if (
+								!addNodes.find((n) => n === removedNode) &&
+								!cacheNodes.find((n) => n === removedNode)
+							) {
 								let p: Path = [];
 								p = p.concat([...path], [removeIndex + 2]);
 								let op: Path = [];
@@ -199,6 +202,7 @@ class Creator extends EventEmitter2 {
 					}
 					if (addedNodes[0]) {
 						Array.from(addedNodes).forEach((addedNode) => {
+							if (cacheNodes.includes(addedNode)) return;
 							const domAddedNode = $(addedNode);
 							const data = fromDOM(domAddedNode);
 							if (addedNode.parentNode === node.get()) {

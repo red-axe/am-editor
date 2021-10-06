@@ -291,7 +291,12 @@ class Selection implements SelectionInterface {
 					isRemove = true;
 					return;
 				}
-				if (isRemove && callback(node) && !node.isCursor())
+				if (
+					isRemove &&
+					callback(node) &&
+					node.attributes(DATA_ELEMENT) !==
+						selectionNode.attributes(DATA_ELEMENT)
+				)
 					node.remove();
 			}, true);
 		}
@@ -335,7 +340,12 @@ class Selection implements SelectionInterface {
 					isRemove = true;
 					return;
 				}
-				if (isRemove && callback(node) && !node.isCursor())
+				if (
+					isRemove &&
+					callback(node) &&
+					node.attributes(DATA_ELEMENT) !==
+						selectionNode.attributes(DATA_ELEMENT)
+				)
 					node.remove();
 			}, false);
 		}

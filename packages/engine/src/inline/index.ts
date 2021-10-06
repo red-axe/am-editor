@@ -676,11 +676,13 @@ class Inline implements InlineModelInterface {
 		if (!isEngine(this.editor)) return;
 		const { change } = this.editor;
 		const safeRange = range || change.getSafeRange();
+		//const selection = safeRange.createSelection('inline-split');
 		if (safeRange.collapsed) {
 			this.splitOnCollapsed(safeRange);
 		} else {
 			this.splitOnExpanded(safeRange);
 		}
+		//selection.move()
 		if (!range) change.apply(safeRange);
 	}
 

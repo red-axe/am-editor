@@ -298,10 +298,10 @@ class List implements ListModelInterface {
 	/**
 	 * 获取当前选区的修复列表后的节点集合
 	 */
-	normalize() {
+	normalize(range?: RangeInterface) {
 		if (!isEngine(this.editor)) return [];
 		const { change, block, node } = this.editor;
-		const range = change.getRange();
+		range = range || change.getRange();
 		const blocks = block.getBlocks(range);
 		const listNodes: Array<NodeInterface> = [];
 		blocks.forEach((block, i) => {
@@ -365,7 +365,7 @@ class List implements ListModelInterface {
 		if (!isEngine(this.editor)) return;
 		const { change, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
-		const blocks = this.normalize();
+		const blocks = this.normalize(range);
 		if (
 			blocks.length > 0 &&
 			(blocks[0].name === 'li' || blocks[blocks.length - 1].name === 'li')
@@ -443,7 +443,9 @@ class List implements ListModelInterface {
 		if (!isEngine(this.editor)) return;
 		const { change, block, node } = this.editor;
 		const safeRange = range || change.getSafeRange();
-		const selection = safeRange.shrinkToElementNode().createSelection();
+		const selection = blocks
+			? undefined
+			: safeRange.shrinkToElementNode().createSelection();
 		blocks = blocks || block.getBlocks(safeRange);
 		blocks.forEach((block) => {
 			block = block.closest('ul,ol');
@@ -468,8 +470,8 @@ class List implements ListModelInterface {
 			const block = blocks[0].closest('ul,ol');
 			this.addStart(block);
 		}
-		selection.move();
-		if (!range) change.apply(safeRange);
+		selection?.move();
+		if (!range && selection !== undefined) change.apply(safeRange);
 	}
 	/**
 	 * 给列表添加start序号
@@ -682,13 +684,16 @@ class List implements ListModelInterface {
 				this.addBr($(node));
 			});
 		} else if (node.name === 'li') {
+			node.find('br').remove();
 			let child = node.last();
 			if (child?.isCursor()) child = child.prev();
 			if (child) {
-				//最后一个节点是br节点
-				if (child.name === 'br') return;
 				//自定义节点，并且最后一个是卡片
-				if (nodeApi.isCustomize(node) && child.isCard()) {
+				if (
+					nodeApi.isCustomize(node) &&
+					node.length === 1 &&
+					child.isCard()
+				) {
 					node.append($('<br />'));
 					return;
 				}

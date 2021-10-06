@@ -400,7 +400,7 @@ class NodeModel implements NodeModelInterface {
 			}
 
 			//追加到要合并的列表中
-			if (child.length > 0) source.append(child);
+			if (child.length > 0 && !child.equal(source)) source.append(child);
 			child = next;
 		}
 		//移除需要合并的节点
