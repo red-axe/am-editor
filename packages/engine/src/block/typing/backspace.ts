@@ -105,6 +105,8 @@ class Backspace {
 		// 在正文里
 		if (!isCard && node.isRootBlock(blockNode)) {
 			event.preventDefault();
+			// 空的节点就清空所有的mark空节点以及inline节点，避免重复的合并到上一级节点上
+			if (node.isEmpty(blockNode)) blockNode.html('<br />');
 			change.mergeAfterDeletePrevNode(blockNode);
 			return false;
 		}

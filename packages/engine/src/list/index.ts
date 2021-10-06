@@ -1162,7 +1162,7 @@ class List implements ListModelInterface {
 						}
 						blocks = this.blockToItem(blocks, targetNode);
 						if (start) {
-							targetNode.attributes('start', start);
+							blocks.attributes('start', start);
 						}
 					}
 					return blocks;

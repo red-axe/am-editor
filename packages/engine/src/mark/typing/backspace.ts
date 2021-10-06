@@ -9,11 +9,19 @@ class Backspace {
 	 * 在inline节点处按下backspace键
 	 */
 	trigger(event: KeyboardEvent) {
-		const { change, node } = this.engine;
+		const { change, node, block } = this.engine;
 		const range = change.getRange();
 		const { collapsed, endNode, startNode, startOffset, endOffset } = range
 			.cloneRange()
 			.shrinkToTextNode();
+		// 空的block节点下不处理mark
+		if (collapsed) {
+			const blockNode = block.closest(startNode);
+			if (blockNode.length > 0 && node.isEmpty(blockNode)) {
+				return;
+			}
+		}
+
 		if (
 			endNode.type === Node.TEXT_NODE ||
 			startNode.type === Node.TEXT_NODE
