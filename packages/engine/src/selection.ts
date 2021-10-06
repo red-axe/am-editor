@@ -149,6 +149,17 @@ class Selection implements SelectionInterface {
 		if (!this.focus || !this.anchor) {
 			return;
 		}
+		// 在有指定key的情况下，如果标记节点被移除了就去查找
+		if (this.key) {
+			const { commonAncestorNode } = this.range;
+			const root = commonAncestorNode.closest(ROOT_SELECTOR);
+			if (this.focus.closest(ROOT_SELECTOR).length === 0) {
+				this.focus = root.find(`[data-focus-id="${this.key}"]`);
+			}
+			if (this.anchor.closest(ROOT_SELECTOR).length === 0) {
+				this.anchor = root.find(`[data-anchor-id="${this.key}"]`);
+			}
+		}
 		const { node } = this.editor;
 		if (this.anchor === this.focus) {
 			const cursor = this.anchor;
@@ -244,13 +255,31 @@ class Selection implements SelectionInterface {
 		if (position === 'left' || position === 'center') {
 			const selectionNode =
 				position !== 'center' ? this.anchor : this.focus;
-			const focus = $(
-				`[${DATA_ELEMENT}=${selectionNode.attributes(DATA_ELEMENT)}]`,
+			let focus: NodeInterface | undefined = $(
+				this.key
+					? `[data-${selectionNode.attributes(DATA_ELEMENT)}-id="${
+							this.key
+					  }"]`
+					: `[${DATA_ELEMENT}=${selectionNode.attributes(
+							DATA_ELEMENT,
+					  )}]`,
 				node.get<Element>(),
 			);
+			if (!this.key) {
+				focus = focus
+					.toArray()
+					.find(
+						(node) =>
+							!node.attributes(
+								`data-${selectionNode.attributes(
+									DATA_ELEMENT,
+								)}-id`,
+							),
+					);
+			}
 			let isRemove = false;
 			node.traverse((node) => {
-				if (node.equal(focus)) {
+				if (focus && node.equal(focus)) {
 					const parent = node.parent();
 					focus.remove();
 					if (
@@ -262,20 +291,39 @@ class Selection implements SelectionInterface {
 					isRemove = true;
 					return;
 				}
-				if (isRemove && callback(node)) node.remove();
+				if (isRemove && callback(node) && !node.isCursor())
+					node.remove();
 			}, true);
 		}
 		// 删除左侧
 		if (position === 'right' || position === 'center') {
 			const selectionNode =
 				position !== 'center' ? this.focus : this.anchor;
-			const anchor = $(
-				`[${DATA_ELEMENT}=${selectionNode.attributes(DATA_ELEMENT)}]`,
+			let anchor: NodeInterface | undefined = $(
+				this.key
+					? `[data-${selectionNode.attributes(DATA_ELEMENT)}-id="${
+							this.key
+					  }"]`
+					: `[${DATA_ELEMENT}=${selectionNode.attributes(
+							DATA_ELEMENT,
+					  )}]`,
 				node.get<Element>(),
 			);
+			if (!this.key) {
+				anchor = anchor
+					.toArray()
+					.find(
+						(node) =>
+							!node.attributes(
+								`data-${selectionNode.attributes(
+									DATA_ELEMENT,
+								)}-id`,
+							),
+					);
+			}
 			let isRemove = false;
 			node.traverse((node) => {
-				if (node.equal(anchor)) {
+				if (anchor && node.equal(anchor)) {
 					const parent = node.parent();
 					anchor.remove();
 					if (
@@ -287,7 +335,8 @@ class Selection implements SelectionInterface {
 					isRemove = true;
 					return;
 				}
-				if (isRemove && callback(node)) node.remove();
+				if (isRemove && callback(node) && !node.isCursor())
+					node.remove();
 			}, false);
 		}
 		return node;

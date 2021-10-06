@@ -68,7 +68,7 @@ class Mark implements MarkModelInterface {
 				return;
 			},
 		);
-		if (result) change.rangePathBeforeCommand = cacheRange;
+		if (!result) change.rangePathBeforeCommand = cacheRange;
 		return result;
 	}
 
@@ -261,6 +261,7 @@ class Mark implements MarkModelInterface {
 		const children = root.allChildren();
 		children.forEach((child) => {
 			if (
+				!child.isCursor() &&
 				node.isEmpty(child) &&
 				node.isMark(child) &&
 				(!callback || callback(child))
@@ -333,14 +334,16 @@ class Mark implements MarkModelInterface {
 			// 清空原父容器，用新的内容代替
 			const children = parent.children();
 			children.each((_, index) => {
-				if (!children.eq(index)?.isCard()) {
-					children.eq(index)?.remove();
+				const child = children.eq(index);
+				if (!child?.isCard()) {
+					child?.remove();
 				}
 			});
 			let appendChild: NodeInterface | undefined | null = undefined;
 			const appendToParent = (childrenNodes: NodeInterface) => {
 				childrenNodes.each((child, index) => {
-					if (childrenNodes.eq(index)?.isCard()) {
+					const childNode = childrenNodes.eq(index);
+					if (childNode?.isCard()) {
 						appendChild = appendChild
 							? appendChild.next()
 							: parent.first();
@@ -349,9 +352,9 @@ class Mark implements MarkModelInterface {
 					}
 					if (appendChild) {
 						appendChild.after(child);
-						appendChild = childrenNodes.eq(index);
+						appendChild = childNode;
 					} else {
-						appendChild = childrenNodes.eq(index);
+						appendChild = childNode;
 						parent.prepend(child);
 					}
 				});
@@ -668,14 +671,16 @@ class Mark implements MarkModelInterface {
 			// 清空原父容器，用新的内容代替
 			const children = parent.children();
 			children.each((_, index) => {
-				if (!children.eq(index)?.isCard()) {
-					children.eq(index)?.remove();
+				const child = children.eq(index);
+				if (!child?.isCard()) {
+					child?.remove();
 				}
 			});
 			let appendChild: NodeInterface | undefined | null = undefined;
 			const appendToParent = (childrenNodes: NodeInterface) => {
 				childrenNodes.each((child, index) => {
-					if (childrenNodes.eq(index)?.isCard()) {
+					const childNode = childrenNodes.eq(index);
+					if (childNode?.isCard()) {
 						appendChild = appendChild
 							? appendChild.next()
 							: parent.first();
@@ -684,9 +689,9 @@ class Mark implements MarkModelInterface {
 					}
 					if (appendChild) {
 						appendChild.after(child);
-						appendChild = childrenNodes.eq(index);
+						appendChild = childNode;
 					} else {
-						appendChild = childrenNodes.eq(index);
+						appendChild = childNode;
 						parent.prepend(child);
 					}
 				});
@@ -716,6 +721,7 @@ class Mark implements MarkModelInterface {
 		const { change } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
+		const selection = safeRange.createSelection('mark-split');
 		if (
 			typeof removeMark === 'string' ||
 			(!Array.isArray(removeMark) && removeMark && isNode(removeMark))
@@ -727,6 +733,7 @@ class Mark implements MarkModelInterface {
 		} else {
 			this.splitOnExpanded(safeRange, removeMark);
 		}
+		selection.move();
 		if (!range) change.apply(safeRange);
 	}
 
@@ -1133,7 +1140,9 @@ class Mark implements MarkModelInterface {
 		}
 
 		// 插入范围的开始和结束标记
-		const selection = !isEditable ? safeRange.createSelection() : undefined;
+		const selection = !isEditable
+			? safeRange.createSelection('mark-unwrap')
+			: undefined;
 		if (selection && !selection.has()) {
 			this.merge(safeRange);
 			if (!range) change.apply(safeRange);
@@ -1144,9 +1153,9 @@ class Mark implements MarkModelInterface {
 		let started = isEditable ? true : false;
 		nodes.forEach((ancestor) => {
 			ancestor.traverse(
-				(childNode) => {
-					const child = $(childNode);
-					if (isEditable || !child.equal(selection?.anchor!)) {
+				(child) => {
+					if (child.isText() || !selection?.anchor) return;
+					if (isEditable || !child.equal(selection.anchor)) {
 						if (started) {
 							if (isEditable || !child.equal(selection?.focus!)) {
 								if (
@@ -1161,6 +1170,20 @@ class Mark implements MarkModelInterface {
 						}
 					} else if (!isEditable) {
 						started = true;
+						// 光标开始位置在 <strong><anchor />abc123</strong> 就把 strong 加进去
+						if (
+							child.equal(selection.anchor) &&
+							!selection.anchor.prev()
+						) {
+							const parent = selection.anchor.parent();
+							if (
+								parent &&
+								!parent.isCard() &&
+								node.isMark(parent)
+							) {
+								markNodes.push(parent);
+							}
+						}
 					}
 				},
 				true,
@@ -1505,8 +1528,19 @@ class Mark implements MarkModelInterface {
 	repairCursor(mark: NodeInterface | Node) {
 		const { node } = this.editor;
 		mark = isNode(mark) ? $(mark) : mark;
-		if (node.isMark(mark) && mark.children().length === 0) {
-			mark.append($('\u200b', null));
+		const isMark = node.isMark(mark);
+		if (isMark) {
+			const childrenNodes = mark.children();
+			childrenNodes.each((_, index) => {
+				const child = childrenNodes.eq(index);
+				if (child?.isText()) {
+					const text = child.text();
+					child.text(text.replace(/\u200b/g, ''));
+				}
+			});
+			if (mark.children().length === 0) {
+				mark.append($('\u200b', null));
+			}
 		}
 	}
 }

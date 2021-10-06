@@ -1040,8 +1040,21 @@ class ChangeModel implements ChangeInterface {
 	 */
 	apply(range?: RangeInterface) {
 		this.combinTextNode();
-		if (range) this.select(range);
+
+		if (range) {
+			const { inline, mark } = this.engine;
+			const selection = range.createSelection('change-apply');
+			inline
+				.findInlines(range)
+				.forEach((inlineNode) => inline.repairCursor(inlineNode));
+			mark.findMarks(range).forEach((markNode) =>
+				mark.repairCursor(markNode),
+			);
+			selection.move();
+			this.select(range);
+		}
 		this.change();
+
 		this.engine.block.generateRandomIDForDescendant(
 			this.engine.container.get<Element>()!,
 		);

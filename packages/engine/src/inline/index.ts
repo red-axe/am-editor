@@ -136,7 +136,7 @@ class Inline implements InlineModelInterface {
 				return;
 			},
 		);
-		if (result) change.rangePathBeforeCommand = cacheRange;
+		if (!result) change.rangePathBeforeCommand = cacheRange;
 		return result;
 	}
 
@@ -889,6 +889,14 @@ class Inline implements InlineModelInterface {
 		if (isNode(node)) node = $(node);
 		if (!nodeApi.isInline(node) || nodeApi.isVoid(node) || node.isCard())
 			return;
+		const childrenNodes = node.children();
+		childrenNodes.each((_, index) => {
+			const child = childrenNodes.eq(index);
+			if (child?.isText()) {
+				const text = child.text();
+				child.text(text.replace(/\u200b/g, ''));
+			}
+		});
 		this.repairBoth(node);
 		let firstChild = node.first();
 		if (firstChild?.isCursor()) firstChild = firstChild.next();

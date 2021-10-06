@@ -87,7 +87,7 @@ class Block implements BlockModelInterface {
 				return;
 			},
 		);
-		if (result) change.rangePathBeforeCommand = cacheRange;
+		if (!result) change.rangePathBeforeCommand = cacheRange;
 		return result;
 	}
 	/**
