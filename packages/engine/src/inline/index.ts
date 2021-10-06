@@ -121,19 +121,23 @@ class Inline implements InlineModelInterface {
 				? startNode
 				: startNode.children().eq(startOffset - 1);
 		if (!node) return;
-
+		const cacheRange = range.toPath();
 		const text =
 			node.type === Node.TEXT_NODE
 				? node.text().substr(0, startOffset)
 				: node.text();
-		return !Object.keys(editor.plugin.components).some((pluginName) => {
-			const plugin = editor.plugin.components[pluginName];
-			if (isInlinePlugin(plugin) && !!plugin.markdown) {
-				const reuslt = plugin.triggerMarkdown(event, text, node);
-				if (reuslt === false) return true;
-			}
-			return;
-		});
+		const result = !Object.keys(editor.plugin.components).some(
+			(pluginName) => {
+				const plugin = editor.plugin.components[pluginName];
+				if (isInlinePlugin(plugin) && !!plugin.markdown) {
+					const reuslt = plugin.triggerMarkdown(event, text, node);
+					if (reuslt === false) return true;
+				}
+				return;
+			},
+		);
+		if (result) change.rangePathBeforeCommand = cacheRange;
+		return result;
 	}
 
 	/**

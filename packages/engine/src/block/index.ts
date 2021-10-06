@@ -71,14 +71,24 @@ class Block implements BlockModelInterface {
 		const blockNode = this.closest(node);
 		if (!editor.node.isRootBlock(blockNode)) return;
 		const text = block.getLeftText(blockNode);
-		return !Object.keys(editor.plugin.components).some((pluginName) => {
-			const plugin = editor.plugin.components[pluginName];
-			if (isBlockPlugin(plugin) && !!plugin.markdown) {
-				const reuslt = plugin.markdown(event, text, blockNode, node);
-				if (reuslt === false) return true;
-			}
-			return;
-		});
+		const cacheRange = range.toPath();
+		const result = !Object.keys(editor.plugin.components).some(
+			(pluginName) => {
+				const plugin = editor.plugin.components[pluginName];
+				if (isBlockPlugin(plugin) && !!plugin.markdown) {
+					const reuslt = plugin.markdown(
+						event,
+						text,
+						blockNode,
+						node,
+					);
+					if (reuslt === false) return true;
+				}
+				return;
+			},
+		);
+		if (result) change.rangePathBeforeCommand = cacheRange;
+		return result;
 	}
 	/**
 	 * 根据节点查找block插件实例

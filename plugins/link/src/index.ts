@@ -13,7 +13,7 @@ import './index.css';
 
 export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: boolean;
+	markdown?: string;
 	onConfirm?: (
 		text: string,
 		link: string,
@@ -42,7 +42,9 @@ export default class extends InlinePlugin<Options> {
 	tagName = 'a';
 
 	markdown =
-		this.options.markdown !== false ? '\\[(.+?)\\]\\(([\\S]+?)\\)$' : '';
+		this.options.markdown === undefined
+			? '\\[(.+?)\\]\\(([\\S]+?)\\)$'
+			: this.options.markdown;
 
 	init() {
 		super.init();

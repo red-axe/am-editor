@@ -2,7 +2,7 @@ import { MarkPlugin, PluginOptions } from '@aomao/engine';
 
 export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: boolean;
+	markdown?: string;
 }
 export default class extends MarkPlugin<Options> {
 	tagName = 'sub';
@@ -15,5 +15,6 @@ export default class extends MarkPlugin<Options> {
 		return this.options.hotkey || 'mod+,';
 	}
 
-	markdown = this.options.markdown !== false ? '~' : '';
+	markdown =
+		this.options.markdown === undefined ? '~' : this.options.markdown;
 }

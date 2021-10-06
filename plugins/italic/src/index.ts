@@ -2,7 +2,7 @@ import { MarkPlugin, PluginOptions } from '@aomao/engine';
 
 export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: boolean;
+	markdown?: string;
 }
 export default class extends MarkPlugin<Options> {
 	static get pluginName() {
@@ -11,7 +11,8 @@ export default class extends MarkPlugin<Options> {
 
 	tagName = 'em';
 
-	markdown = this.options.markdown !== false ? '_' : '';
+	markdown =
+		this.options.markdown === undefined ? '_' : this.options.markdown;
 
 	hotkey() {
 		return this.options.hotkey || 'mod+i';

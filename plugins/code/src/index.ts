@@ -3,7 +3,7 @@ import './index.css';
 
 export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: boolean;
+	markdown?: string;
 }
 export default class extends InlinePlugin<Options> {
 	static get pluginName() {
@@ -17,7 +17,8 @@ export default class extends InlinePlugin<Options> {
 
 	tagName = 'code';
 
-	markdown = this.options.markdown !== false ? '`' : '';
+	markdown =
+		this.options.markdown === undefined ? '`' : this.options.markdown;
 
 	hotkey() {
 		return this.options.hotkey || 'mod+e';
