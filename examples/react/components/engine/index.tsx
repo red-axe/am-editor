@@ -15,7 +15,10 @@ export type EngineProps = EngineOptions & {
 	onChange?: (content: string, trigger: 'remote' | 'local' | 'both') => void;
 	ref?: React.Ref<EngineInterface | null>;
 };
-
+message.config({
+	top: 240,
+	duration: 3,
+});
 const EngineComponent: React.FC<EngineProps> = forwardRef<
 	EngineInterface | null,
 	EngineProps

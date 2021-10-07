@@ -9,6 +9,7 @@ import {
 	ToolbarItemOptions,
 	getFileSize,
 	isEngine,
+	Tooltip,
 } from '@aomao/engine';
 import './index.css';
 
@@ -199,6 +200,32 @@ export default class FileCard extends Card<FileValue> {
         `;
 	}
 
+	bindErrorEvent(node: NodeInterface) {
+		const copyNode = node.find('.data-icon-copy');
+		copyNode.on('mouseenter', () => {
+			Tooltip.show(
+				copyNode,
+				this.editor.language
+					.get('image', 'errorMessageCopy')
+					.toString(),
+			);
+		});
+		copyNode.on('mouseleave', () => {
+			Tooltip.hide();
+		});
+		copyNode.on('click', (event: MouseEvent) => {
+			event.stopPropagation();
+			event.preventDefault();
+			Tooltip.hide();
+			this.editor.clipboard.copy(
+				this.getValue()?.message || 'Error message',
+			);
+			this.editor.messageSuccess(
+				this.editor.language.get('copy', 'success').toString(),
+			);
+		});
+	}
+
 	setProgressPercent(percent: number) {
 		this.container?.find('.percent').html(`${percent}%`);
 	}
@@ -223,7 +250,9 @@ export default class FileCard extends Card<FileValue> {
 		} else {
 			this.renderView();
 		}
-
+		if (value.status === 'error') {
+			this.bindErrorEvent(this.root);
+		}
 		this.maxWidth = this.getMaxWidth();
 		this.updateMaxWidth();
 		window.addEventListener('resize', this.onWindowResize);

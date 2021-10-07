@@ -37,7 +37,7 @@
   .data-file-error {
     padding: 2px 4px;
     background: #f5f5f5;
-    display: inline-flex;
+    display: flex;
     border-radius: 4px;
     max-width: 200px;
     overflow: hidden;
@@ -46,6 +46,11 @@
     font-size: 12px;
     align-items: center;
     user-select: none;
+    cursor: pointer;
+}
+
+.am-engine [data-card-key="file"].card-selected [data-card-element=center].data-card-background-selected {
+    border-radius: 4px;
 }
 
 .data-file-error .data-icon {
