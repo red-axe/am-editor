@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-fontsize",
-  "version": "2.4.12",
+  "version": "2.4.13",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.4.12",
+    "@aomao/engine": "^2.4.13",
     "@babel/runtime": "^7.13.10"
   }
 }
