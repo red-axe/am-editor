@@ -227,32 +227,6 @@ class VideoComponent extends Card<VideoValue> {
 		return items;
 	}
 
-	bindErrorEvent(node: NodeInterface) {
-		const copyNode = node.find('.data-icon-copy');
-		copyNode.on('mouseenter', () => {
-			Tooltip.show(
-				copyNode,
-				this.editor.language
-					.get('image', 'errorMessageCopy')
-					.toString(),
-			);
-		});
-		copyNode.on('mouseleave', () => {
-			Tooltip.hide();
-		});
-		copyNode.on('click', (event: MouseEvent) => {
-			event.stopPropagation();
-			event.preventDefault();
-			Tooltip.hide();
-			this.editor.clipboard.copy(
-				this.getValue()?.message || 'Error message',
-			);
-			this.editor.messageSuccess(
-				this.editor.language.get('copy', 'success').toString(),
-			);
-		});
-	}
-
 	setProgressPercent(percent: number) {
 		this.container?.find('.percent').html(`${percent}%`);
 	}
@@ -470,9 +444,6 @@ class VideoComponent extends Card<VideoValue> {
 				this.editor.card.activate(this.root);
 			}
 		});
-		if (this.getValue()?.status === 'error') {
-			this.bindErrorEvent(this.root);
-		}
 	}
 }
 
