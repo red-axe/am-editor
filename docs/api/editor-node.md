@@ -1,8 +1,14 @@
-# Node/NodeInterface
+# NodeModel
 
 Edit node related operations
 
 Type: `NodeModelInterface`
+
+## Use
+
+```ts
+new Engine(...).node
+```
 
 ## Constructor
 

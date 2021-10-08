@@ -1,8 +1,14 @@
-# Mark
+# MarkModel
 
 Related operations for editing style nodes
 
 Type: `MarkModelInterface`
+
+## Use
+
+```ts
+new Engine(...).mark
+```
 
 ## Constructor
 

@@ -92,7 +92,7 @@ We can divide a separate area in the editor to display a complex editing module.
 
 `data-card-value` card custom value, which can be dynamically rendered with the help of the value during rendering
 
-`data-card-key` unique identification of the card
+`data-card-key` card name identification
 
 ### Child node
 

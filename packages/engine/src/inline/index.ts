@@ -213,6 +213,7 @@ class Inline implements InlineModelInterface {
 		// 遍历范围内的节点，添加 Inline
 		let started = false;
 		let inlineClone = node.clone(inline, false);
+		const inlnes: NodeInterface[] = [];
 		commonAncestorNode.traverse((child) => {
 			if (!child.equal(selection.anchor!)) {
 				if (started) {
@@ -237,12 +238,16 @@ class Inline implements InlineModelInterface {
 							child.before(inlineClone);
 						}
 						inlineClone.append(child);
+						this.repairCursor(inlineClone);
+						inlnes.push(inlineClone);
 						return true;
 					}
-					if (inlineClone[0].childNodes.length !== 0) {
+					if (
+						inlineClone[0].childNodes.length !== 0 &&
+						!!inlineClone.parent()
+					) {
 						inlineClone = node.clone(inlineClone, false);
 					}
-					return;
 				}
 				return;
 			} else {
@@ -274,13 +279,14 @@ class Inline implements InlineModelInterface {
 				focus!.before('<br />');
 			}
 		}
-		this.repairCursor(inlineClone);
 		selection.move();
-		safeRange.setStart(inlineClone.first()!, 1);
-		safeRange.setEnd(
-			inlineClone.last()!,
-			inlineClone.last()!.text().length - 1,
-		);
+		if (inlnes.length > 0) {
+			const startNode = inlnes[0].first()!;
+			const lastNode = inlnes[inlnes.length - 1].last()!;
+			safeRange.setStart(startNode, 1);
+			safeRange.setEnd(lastNode, lastNode.text().length - 1);
+		}
+
 		if (!range) change.apply(safeRange);
 	}
 	/**

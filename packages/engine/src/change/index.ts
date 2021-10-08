@@ -330,6 +330,7 @@ class ChangeModel implements ChangeInterface {
 		if (html === defaultHtml) return;
 		const emptyHtml = html || defaultHtml;
 		const node = $(emptyHtml);
+		if (node.children().length === 0) node.html('<br />');
 		this.engine.container.empty().append(node);
 		const safeRange = range || this.getRange();
 
@@ -370,8 +371,6 @@ class ChangeModel implements ChangeInterface {
 				});
 			});
 			container.html(parser.toValue(schema, conversion, false, true));
-
-			block.generateDataIDForDescendant(container.get<Element>()!);
 			card.render(undefined, (count) => {
 				container.allChildren(true).forEach((child) => {
 					if (node.isInline(child)) {
@@ -1092,6 +1091,9 @@ class ChangeModel implements ChangeInterface {
 				onlyOne || !isBlockLast,
 				followActiveMark,
 			);
+		} else if (range.startNode.isText()) {
+			const text = range.startNode.text();
+			if (/^\u200B/.test(text)) range.startNode.text(text.substr(1));
 		}
 
 		const apply = (range: RangeInterface) => {
@@ -1305,10 +1307,9 @@ class ChangeModel implements ChangeInterface {
 			if (!range) this.apply(safeRange);
 			return;
 		}
-		const { mark, inline, card, schema } = this.engine;
+		const { mark, inline, card } = this.engine;
 		const nodeApi = this.engine.node;
 		const blockApi = this.engine.block;
-		const allowInTags = schema.getAllowInTags();
 		let cloneRange = safeRange.cloneRange();
 		cloneRange.collapse(true);
 		const activeMarks = followActiveMark ? mark.findMarks(cloneRange) : [];
@@ -1517,8 +1518,18 @@ class ChangeModel implements ChangeInterface {
 				safeRange.collapse(false);
 			}
 		}
+		if (nodeApi.isBlock(startNode) && startNode.children().length === 0) {
+			startNode.html('<br />');
+		}
+
+		if (isRemoveStartNode) {
+			if (nodeApi.isBlock(prevNode) && prevNode.children().length === 0) {
+				prevNode.html('<br />');
+			}
+			if (prevNode.inEditor())
+				safeRange.select(prevNode, true).collapse(false);
+		}
 		if (this.isEmpty()) this.initValue(safeRange);
-		if (isRemoveStartNode) safeRange.select(prevNode, true).collapse(false);
 		if (!range) this.apply(safeRange);
 	}
 

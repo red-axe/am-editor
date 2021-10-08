@@ -1,8 +1,14 @@
-# Node/NodeInterface
+# NodeModel
 
 编辑节点的相关操作
 
 类型：`NodeModelInterface`
+
+## 使用
+
+```ts
+new Engine(...).node
+```
 
 ## 构造函数
 

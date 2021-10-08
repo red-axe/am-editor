@@ -1,8 +1,14 @@
-# Mark
+# MarkModel
 
 编辑样式节点的相关操作
 
 类型：`MarkModelInterface`
+
+## 使用
+
+```ts
+new Engine(...).mark
+```
 
 ## 构造函数
 

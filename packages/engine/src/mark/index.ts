@@ -382,8 +382,12 @@ class Mark implements MarkModelInterface {
 				rightNodes[0].remove();
 				rightNodes.splice(0, 1);
 			}
-			if (rightNodes.length > 0) {
+			if (rightNodes.filter((child) => !child.isCursor()).length > 0) {
 				let rightContainer = rightNodes[0];
+				for (let i = 0; i < rightNodes.length - 1; i++) {
+					rightContainer = rightNodes[i];
+					if (!rightContainer.isCursor()) break;
+				}
 				// 右侧没文本
 				if (node.isEmpty(rightContainer)) {
 					let firstChild: NodeInterface | null =
@@ -430,7 +434,10 @@ class Mark implements MarkModelInterface {
 					rightContainer.before(wrapZeroNode);
 				}
 				range.select(zeroWidthNode).collapse(false);
-			} else if (leftNodes.length > 0) {
+			} else if (
+				leftNodes.filter((childNode) => !childNode.isCursor()).length >
+				0
+			) {
 				const leftContainer = leftNodes[leftNodes.length - 1];
 				leftContainer.after(zeroWidthNode);
 				range.select(zeroWidthNode).collapse(false);
@@ -721,19 +728,21 @@ class Mark implements MarkModelInterface {
 		const { change } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		const doc = getDocument(safeRange.startContainer);
-		const selection = safeRange.createSelection('mark-split');
+		const collapsed = safeRange.collapsed;
+
 		if (
 			typeof removeMark === 'string' ||
 			(!Array.isArray(removeMark) && removeMark && isNode(removeMark))
 		) {
 			removeMark = $(removeMark, doc);
 		}
-		if (safeRange.collapsed) {
+		if (collapsed) {
 			this.splitOnCollapsed(safeRange, removeMark);
 		} else {
+			const selection = safeRange.createSelection('mark-split');
 			this.splitOnExpanded(safeRange, removeMark);
+			selection.move();
 		}
-		selection.move();
 		if (!range) change.apply(safeRange);
 	}
 
@@ -858,8 +867,7 @@ class Mark implements MarkModelInterface {
 
 		nodes.forEach((commonAncestorNode) => {
 			commonAncestorNode.traverse(
-				(node) => {
-					let child = $(node);
+				(child) => {
 					mark = mark as NodeInterface;
 					if (isEditable || !child.equal(selection?.anchor!)) {
 						if (started) {
@@ -1067,9 +1075,10 @@ class Mark implements MarkModelInterface {
 				}
 				//合并子级mark
 				const childMarks: Array<NodeInterface> = [];
-				mark.children().each((childNode) => {
-					const child = $(childNode);
-					if (node.isMark(child)) {
+				const children = mark.children();
+				children.each((_, index) => {
+					const child = children.eq(index);
+					if (child && !child.isCursor() && node.isMark(child)) {
 						childMarks.push(child);
 					}
 				});
@@ -1540,6 +1549,17 @@ class Mark implements MarkModelInterface {
 			});
 			if (mark.children().length === 0) {
 				mark.append($('\u200b', null));
+			}
+			const next = mark.next();
+			const nextN = next?.next();
+			if (
+				next &&
+				nextN &&
+				next.isText() &&
+				/^\u200b$/g.test(next.text()) &&
+				!node.isInline(nextN)
+			) {
+				nextN.remove();
 			}
 		}
 	}

@@ -1,8 +1,14 @@
-# Inline
+# InlineModel
 
 Edit related operations of in-line nodes
 
 Type: `InlineModelInterface`
+
+## Use
+
+```ts
+new Engine(...).inline
+```
 
 ## Constructor
 

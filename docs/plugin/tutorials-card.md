@@ -103,6 +103,225 @@ export default class extends Card {
 }
 ```
 
+### React card plugin example
+
+Card plug-in file, main function: insert card, convert/parse card
+
+`test/index.ts`
+
+```ts
+import {
+	$,
+	Plugin,
+	NodeInterface,
+	CARD_KEY,
+	isEngine,
+	SchemaInterface,
+	PluginOptions,
+	decodeCardValue,
+	encodeCardValue,
+} from '@aomao/engine';
+import TestComponent from './component';
+
+export interface Options extends PluginOptions {
+	hotkey?: string | Array<string>;
+}
+export default class extends Plugin<Options> {
+	static get pluginName() {
+		return 'test';
+	}
+	// Plug-in initialization
+	init() {
+		// listen to events parsed into html
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
+		// Set the entrance of the schema rule when monitoring and pasting
+		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
+		// monitor the node loop when pasting
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+	}
+	// execution method
+	execute() {
+		if (!isEngine(this.editor)) return;
+		const { card } = this.editor;
+		card.insert(TestComponent.cardName);
+	}
+	// hot key
+	hotkey() {
+		return this.options.hotkey || 'mod+shift+0';
+	}
+	// Add the required schema when pasting
+	pasteSchema(schema: SchemaInterface) {
+		schema.add({
+			type: 'block',
+			name: 'div',
+			attributes: {
+				'data-type': {
+					required: true,
+					value: TestComponent.cardName,
+				},
+				'data-value': '*',
+			},
+		});
+	}
+	// parse the pasted html
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === TestComponent.cardName) {
+				const value = node.attributes('data-value');
+				const cardValue = decodeCardValue(value);
+				this.editor.card.replaceNode(
+					node,
+					TestComponent.cardName,
+					cardValue,
+				);
+				node.remove();
+				return false;
+			}
+		}
+		return true;
+	}
+	// parse into html
+	parseHtml(root: NodeInterface) {
+		root.find(`[${CARD_KEY}=${TestComponent.cardName}`).each((cardNode) => {
+			const node = $(cardNode);
+			const card = this.editor.card.find(node) as TestComponent;
+			const value = card?.getValue();
+			if (value) {
+				node.empty();
+				const div = $(
+					`<div data-type="${
+						TestComponent.cardName
+					}" data-value="${encodeCardValue(value)}"></div>`,
+				);
+				node.replaceWith(div);
+			} else node.remove();
+		});
+	}
+}
+export { TestComponent };
+```
+
+react component, presents the view and interaction of the card
+
+`test/component/test.jsx`
+
+```tsx | pure
+import { FC } from 'react';
+const TestComponent: FC = () => <div>This is Test Plugin</div>;
+export default TestComponent;
+```
+
+The card component, which mainly loads the react component into the editor
+
+`test/component/index.tsx`
+
+```tsx | pure
+import {
+	$,
+	Card,
+	CardToolbarItemOptions,
+	CardType,
+	isEngine,
+	NodeInterface,
+	ToolbarItemOptions,
+} from '@aomao/engine';
+import ReactDOM from 'react-dom';
+import TestComponent from './test';
+
+class Test extends Card {
+	static get cardName() {
+		return 'test';
+	}
+
+	static get cardType() {
+		return CardType.BLOCK;
+	}
+
+	#container?: NodeInterface;
+
+	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+		if (!isEngine(this.editor) || this.editor.readonly) return [];
+		return [
+			{
+				type: 'dnd',
+			},
+			{
+				type: 'copy',
+			},
+			{
+				type: 'delete',
+			},
+			{
+				type: 'node',
+				node: $('<span>Test button</span>'),
+				didMount: (node) => {
+					node.on('click', () => {
+						alert('test button');
+					});
+				},
+			},
+		];
+	}
+
+	render() {
+		this.#container = $('<div>Loading</div>');
+		return this.#container; // Or use this.getCenter().append(this.#container) to avoid returning this.#container
+	}
+
+	didRender() {
+		ReactDOM.render(<TestComponent />, this.#container?.get<HTMLElement>());
+	}
+
+	destroy() {
+		ReactDOM.unmountComponentAtNode(this.#container?.get<HTMLElement>()!);
+	}
+}
+export default Test;
+```
+
+Use card plugins
+
+```tsx | pure
+import React, { useEffect, useRef, useState } from 'react';
+import Engine, { EngineInterface } from '@aomao/engine';
+// Import custom card plugins and card components test/index.ts
+import Test, { TestComponent } from './test';
+
+const EngineDemo = () => {
+	//Editor container
+	const ref = useRef<HTMLDivElement | null>(null);
+	//Engine instance
+	const [engine, setEngine] = useState<EngineInterface>();
+	//Editor content
+	const [content, setContent] = useState<string>('Hello card!');
+
+	useEffect(() => {
+		if (!ref.current) return;
+		//Instantiate the engine
+		const engine = new Engine(ref.current, {
+			plugins: [Test],
+			cards: [TestComponent],
+		});
+		//Set the editor value
+		engine.setValue(content);
+		//Listen to the editor value change event
+		engine.on('change', (value) => {
+			setContent(value);
+			console.log(`value:${value}`);
+		});
+		//Set the engine instance
+		setEngine(engine);
+	}, []);
+
+	return <div ref={ref} />;
+};
+export default EngineDemo;
+```
+
+Use the shortcut key `mod+shift+0` defined in `test/index.ts` to insert the card component just defined in the editor
+
 ### Vue rendering
 
 Vue components
@@ -174,6 +393,253 @@ export default class extends Card {
 	}
 }
 ```
+
+### Vue card plugin example
+
+Card plug-in file, main function: insert card, convert/parse card
+
+`test/index.ts`
+
+```ts
+import {
+	$,
+	Plugin,
+	NodeInterface,
+	CARD_KEY,
+	isEngine,
+	SchemaInterface,
+	PluginOptions,
+	decodeCardValue,
+	encodeCardValue,
+} from '@aomao/engine';
+import TestComponent from './component';
+
+export interface Options extends PluginOptions {
+	hotkey?: string | Array<string>;
+}
+export default class extends Plugin<Options> {
+	static get pluginName() {
+		return 'test';
+	}
+	// Plug-in initialization
+	init() {
+		// listen to events parsed into html
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
+		// Set the entrance of the schema rule when monitoring and pasting
+		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
+		// monitor the node loop when pasting
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+	}
+	// execution method
+	execute() {
+		if (!isEngine(this.editor)) return;
+		const { card } = this.editor;
+		card.insert(TestComponent.cardName);
+	}
+	// hot key
+	hotkey() {
+		return this.options.hotkey || 'mod+shift+0';
+	}
+	// Add the required schema when pasting
+	pasteSchema(schema: SchemaInterface) {
+		schema.add({
+			type: 'block',
+			name: 'div',
+			attributes: {
+				'data-type': {
+					required: true,
+					value: TestComponent.cardName,
+				},
+				'data-value': '*',
+			},
+		});
+	}
+	// parse the pasted html
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === TestComponent.cardName) {
+				const value = node.attributes('data-value');
+				const cardValue = decodeCardValue(value);
+				this.editor.card.replaceNode(
+					node,
+					TestComponent.cardName,
+					cardValue,
+				);
+				node.remove();
+				return false;
+			}
+		}
+		return true;
+	}
+	// parse into html
+	parseHtml(root: NodeInterface) {
+		root.find(`[${CARD_KEY}=${TestComponent.cardName}`).each((cardNode) => {
+			const node = $(cardNode);
+			const card = this.editor.card.find(node) as TestComponent;
+			const value = card?.getValue();
+			if (value) {
+				node.empty();
+				const div = $(
+					`<div data-type="${
+						TestComponent.cardName
+					}" data-value="${encodeCardValue(value)}"></div>`,
+				);
+				node.replaceWith(div);
+			} else node.remove();
+		});
+	}
+}
+export { TestComponent };
+```
+
+vue component, presents the view and interaction of the card
+
+`test/component/test.vue`
+
+```ts
+<template>
+  <div>
+    <div>This is test plugin</div>
+  </div>
+</template>
+
+<style lang="less"></style>
+
+```
+
+The card component, which mainly loads the vue component into the editor
+
+`test/component/index.ts`
+
+```ts
+import {
+	$,
+	Card,
+	CardToolbarItemOptions,
+	CardType,
+	isEngine,
+	NodeInterface,
+	ToolbarItemOptions,
+} from '@aomao/engine';
+import { App, createApp } from 'vue';
+import TestVue from './test.vue';
+
+class Test extends Card {
+	static get cardName() {
+		return 'test';
+	}
+
+	static get cardType() {
+		return CardType.BLOCK;
+	}
+
+	#container?: NodeInterface;
+	#vm?: App;
+
+	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+		if (!isEngine(this.editor) || this.editor.readonly) return [];
+		return [
+			{
+				type: 'dnd',
+			},
+			{
+				type: 'copy',
+			},
+			{
+				type: 'delete',
+			},
+			{
+				type: 'node',
+				node: $('<span>Test button</span>'),
+				didMount: (node) => {
+					node.on('click', () => {
+						alert('test button');
+					});
+				},
+			},
+		];
+	}
+
+	render() {
+		this.#container = $('<div>Loading</div>');
+		return this.#container; // Or use this.getCenter().append(this.#container) to avoid returning this.#container
+	}
+
+	didRender() {
+		this.#vm = createApp(TestVue, {});
+		this.#vm.mount(this.#container?.get<HTMLElement>());
+	}
+
+	destroy() {
+		this.#vm?.unmount();
+	}
+}
+export default Test;
+```
+
+Use card plugins
+
+```ts
+<template>
+   <div ref="container"></div>
+</template>
+
+<script lang="ts">
+import {defineComponent, onMounted, onUnmounted, ref} from "vue";
+import Engine, {
+  $,
+  EngineInterface,
+  isMobile,
+  NodeInterface,
+  removeUnit,
+} from "@aomao/engine";
+import Test, {TestComponent} from "./test";
+
+export default defineComponent({
+  name: "engine-demo",
+  setup() {
+    // editor container
+    const container = ref<HTMLElement | null>(null);
+    // Editor engine
+    const engine = ref<EngineInterface | null>(null);
+    onMounted(() => {
+      // Instantiate the editor engine after the container is loaded
+      if (container.value) {
+        //Instantiate the engine
+        const engineInstance = new Engine(container.value, {
+          // enabled plugins
+          plugins:[Test],
+          // enabled card
+          cards:[TestComponent],
+        });
+
+        engineInstance.setValue("<strong>Hello</strong>,This is demo");
+
+        // listen to the editor value change event
+        engineInstance.on("change", (editorValue) => {
+          console.log("value", editorValue);
+        });
+
+        engine.value = engineInstance;
+      }
+    });
+
+    onUnmounted(() => {
+      if (engine.value) engine.value.destroy();
+    });
+
+    return {
+      container,
+      engine,
+    };
+  },
+});
+</script>
+```
+
+Use the shortcut key `mod+shift+0` defined in `test/index.ts` to insert the card component just defined in the editor
 
 ### `Toolbar`
 

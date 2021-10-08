@@ -60,7 +60,7 @@ export type OpenDialogOptions = {
 
 The following plugins all rely on `engine.request.upload` to achieve upload
 
-We only need a simple configuration to upload
+We only need to follow the instructions of the corresponding plug-in and simply configure it to upload.
 
 -   ImageUploader
 -   FileUploader

@@ -4,6 +4,12 @@ Edit card related operations
 
 Type: `CardModelInterface`
 
+## Use
+
+```ts
+new Engine(...).card
+```
+
 ## Constructor
 
 ```ts

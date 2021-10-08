@@ -4,6 +4,12 @@
 
 类型：`CardModelInterface`
 
+## 使用
+
+```ts
+new Engine(...).card
+```
+
 ## 构造函数
 
 ```ts

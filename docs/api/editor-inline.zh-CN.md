@@ -1,8 +1,14 @@
-# Inline
+# InlineModel
 
 编辑行内节点的相关操作
 
 类型：`InlineModelInterface`
+
+## 使用
+
+```ts
+new Engine(...).inline
+```
 
 ## 构造函数
 

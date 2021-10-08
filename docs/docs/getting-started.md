@@ -271,6 +271,80 @@ const EngineDemo = () => {
 export default EngineDemo;
 ```
 
+#### Develop your own toolbar
+
+`@aomao/toolbar` is more to provide a toolbar UI display, the essence is to call `engine.command.execute` to execute plug-in commands
+
+```tsx
+/**
+ * transform: true
+ */
+import React, { useEffect, useRef, useState } from 'react';
+import Engine, { EngineInterface } from '@aomao/engine';
+import Bold from '@aomao/plugin-bold';
+
+const EngineDemo = () => {
+	//Editor container
+	const ref = useRef<HTMLDivElement | null>(null);
+	//Engine instance
+	const [engine, setEngine] = useState<EngineInterface>();
+	//Editor content
+	const [content, setContent] = useState<string>(
+		'Hello <strong>word</strong>!',
+	);
+	// button state
+	const [btnActive, setBtnActive] = useState<boolean>(false);
+
+	useEffect(() => {
+		if (!ref.current) return;
+		//Instantiate the engine
+		const engine = new Engine(ref.current, {
+			plugins: [Bold],
+		});
+		//Set the editor value
+		engine.setValue(content);
+		//Listen to the editor value change event
+		engine.on('change', (value) => {
+			setContent(value);
+			console.log(`value:${value}`);
+		});
+		// listen for cursor changes
+		engine.on('select', () => {
+			// Query the selected state of the bold plugin
+			setBtnActive(engine.command.queryState('bold'));
+		});
+		//Set the engine instance
+		setEngine(engine);
+	}, []);
+
+	const handleMouseDown = (event: React.MouseDown) => {
+		// Click the button to avoid losing the editor cursor
+		event.preventDefault();
+	};
+
+	const handleBoldClick = () => {
+		// execute the bold command
+		engine?.command.execute('bold');
+	};
+
+	return (
+		<>
+			{engine && (
+				<button
+					onMouseDown={handleMouseDown}
+					onClick={handleBoldClick}
+					style={{ color: btnActive ? 'blue' : '' }}
+				>
+					Bold
+				</button>
+			)}
+			<div ref={ref} />
+		</>
+	);
+};
+export default EngineDemo;
+```
+
 ### Collaborative editing
 
 Collaborative editing is based on [ShareDB](https://github.com/share/sharedb). Each editor acts as [client](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/ot-client.ts) through `WebSocket` and [server](https://github.com/yanmao-cc/am-editor/tree/master/ot-server) to exchange data. The editor processes and renders data.

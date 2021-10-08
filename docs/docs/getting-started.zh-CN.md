@@ -271,6 +271,80 @@ const EngineDemo = () => {
 export default EngineDemo;
 ```
 
+#### 自己开发工具栏
+
+`@aomao/toolbar` 更多的是提供了一个工具栏的 UI 展示，本质是调用 `engine.command.execute` 执行插件命令
+
+```tsx
+/**
+ * transform: true
+ */
+import React, { useEffect, useRef, useState } from 'react';
+import Engine, { EngineInterface } from '@aomao/engine';
+import Bold from '@aomao/plugin-bold';
+
+const EngineDemo = () => {
+	//编辑器容器
+	const ref = useRef<HTMLDivElement | null>(null);
+	//引擎实例
+	const [engine, setEngine] = useState<EngineInterface>();
+	//编辑器内容
+	const [content, setContent] = useState<string>(
+		'Hello <strong>word</strong>!',
+	);
+	// 按钮状态
+	const [btnActive, setBtnActive] = useState<boolean>(false);
+
+	useEffect(() => {
+		if (!ref.current) return;
+		//实例化引擎
+		const engine = new Engine(ref.current, {
+			plugins: [Bold],
+		});
+		//设置编辑器值
+		engine.setValue(content);
+		//监听编辑器值改变事件
+		engine.on('change', (value) => {
+			setContent(value);
+			console.log(`value:${value}`);
+		});
+		// 监听光标改变
+		engine.on('select', () => {
+			// 查询bold插件的选中状态
+			setBtnActive(engine.command.queryState('bold'));
+		});
+		//设置引擎实例
+		setEngine(engine);
+	}, []);
+
+	const handleMouseDown = (event: React.MouseDown) => {
+		// 点击按钮避免编辑器光标丢失
+		event.preventDefault();
+	};
+
+	const handleBoldClick = () => {
+		// 执行加粗命令
+		engine?.command.execute('bold');
+	};
+
+	return (
+		<>
+			{engine && (
+				<button
+					onMouseDown={handleMouseDown}
+					onClick={handleBoldClick}
+					style={{ color: btnActive ? 'blue' : '' }}
+				>
+					Bold
+				</button>
+			)}
+			<div ref={ref} />
+		</>
+	);
+};
+export default EngineDemo;
+```
+
 ### 协同编辑
 
 协同编辑基于[ShareDB](https://github.com/share/sharedb)实现。每位编辑者作为[客户端](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/ot-client.ts)通过`WebSocket`与[服务端](https://github.com/yanmao-cc/am-editor/tree/master/ot-server)通信交换数据。编辑器处理数据、渲染数据。

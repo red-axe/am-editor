@@ -321,6 +321,7 @@ class Engine implements EngineInterface {
 		value = this.trigger('beforeSetValue', value) || value;
 		this.change.setValue(value, undefined, callback);
 		this.normalizeTree();
+		this.block.generateDataIDForDescendant(this.container.get<Element>()!);
 		return this;
 	}
 
@@ -349,6 +350,7 @@ class Engine implements EngineInterface {
 		range.shrinkToElementNode();
 		this.change.select(range);
 		this.normalizeTree();
+		this.block.generateDataIDForDescendant(this.container.get<Element>()!);
 		return this;
 	}
 

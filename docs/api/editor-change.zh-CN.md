@@ -4,6 +4,12 @@
 
 类型：`ChangeInterface`
 
+## 使用
+
+```ts
+new Engine(...).change
+```
+
 ## 构造函数
 
 ```ts

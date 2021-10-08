@@ -1,8 +1,14 @@
-# Block
+# BlockModel
 
 编辑块级节点的相关操作
 
 类型：`BlockModelInterface`
+
+## 使用
+
+```ts
+new Engine(...).block
+```
 
 ## 构造函数
 

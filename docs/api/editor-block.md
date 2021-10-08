@@ -1,8 +1,14 @@
-# Block
+# BlockModel
 
 Edit related operations of block-level nodes
 
 Type: `BlockModelInterface`
+
+## Use
+
+```ts
+new Engine(...).block
+```
 
 ## Constructor
 

@@ -223,7 +223,12 @@ class Parser implements ParserInterface {
 						);
 						//如果是mark节点，使用新节点包裹旧节点子节点
 						while (type === 'mark') {
-							newNode.append(node.children());
+							const children = node.children();
+							newNode.append(
+								children.length > 0
+									? children
+									: $('\u200b', null),
+							);
 							node.append(newNode);
 							newNode = filter(newNode);
 							if (!newNode) break;

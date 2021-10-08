@@ -60,7 +60,7 @@ export type OpenDialogOptions = {
 
 下面的插件都是依赖 `engine.request.upload` 实现上传的
 
-我们只需要简单的配置就可以实现上传
+我们只需要按照对应插件的说明简单配置后就可以实现上传
 
 -   ImageUploader
 -   FileUploader

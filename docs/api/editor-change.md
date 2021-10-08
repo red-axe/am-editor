@@ -4,6 +4,12 @@ Operations related to editor changes
 
 Type: `ChangeInterface`
 
+## Use
+
+```ts
+new Engine(...).change
+```
+
 ## Constructor
 
 ```ts

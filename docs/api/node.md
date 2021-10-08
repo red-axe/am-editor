@@ -1,4 +1,4 @@
-# Extend Node
+# NodeInterface
 
 Expand on the `Node` node of the DOM
 
@@ -14,6 +14,7 @@ import { $ } from '@aomao/engine';
 const content = $('.content');
 //Create node
 const div = $('<div></div>');
+document.body.append(div[0]);
 //Conversion
 const p = $(document.querySelector('p'));
 const target = $(event.target);

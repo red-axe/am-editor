@@ -153,15 +153,23 @@ class Selection implements SelectionInterface {
 		if (this.key) {
 			const { commonAncestorNode } = this.range;
 			const root = commonAncestorNode.closest(ROOT_SELECTOR);
-			if (this.focus.closest(ROOT_SELECTOR).length === 0) {
-				this.focus = root.find(`[data-focus-id="${this.key}"]`);
+			if (!this.focus.inEditor()) {
+				this.focus = root.find(
+					`[data-${this.focus.attributes(DATA_ELEMENT)}-id="${
+						this.key
+					}"]`,
+				);
 			}
-			if (this.anchor.closest(ROOT_SELECTOR).length === 0) {
-				this.anchor = root.find(`[data-anchor-id="${this.key}"]`);
+			if (!this.anchor.inEditor()) {
+				this.anchor = root.find(
+					`[data-${this.anchor.attributes(DATA_ELEMENT)}-id="${
+						this.key
+					}"]`,
+				);
 			}
 		}
 		const { node } = this.editor;
-		if (this.anchor === this.focus) {
+		if (this.anchor.equal(this.focus)) {
 			const cursor = this.anchor;
 			const _parent = cursor.parent();
 			if (!_parent) return;
@@ -294,8 +302,9 @@ class Selection implements SelectionInterface {
 				if (
 					isRemove &&
 					callback(node) &&
-					node.attributes(DATA_ELEMENT) !==
-						selectionNode.attributes(DATA_ELEMENT)
+					(node.attributes(DATA_ELEMENT) !==
+						selectionNode.attributes(DATA_ELEMENT) ||
+						selectionNode.attributes(DATA_ELEMENT) === 'cursor')
 				)
 					node.remove();
 			}, true);
@@ -343,8 +352,9 @@ class Selection implements SelectionInterface {
 				if (
 					isRemove &&
 					callback(node) &&
-					node.attributes(DATA_ELEMENT) !==
-						selectionNode.attributes(DATA_ELEMENT)
+					(node.attributes(DATA_ELEMENT) !==
+						selectionNode.attributes(DATA_ELEMENT) ||
+						selectionNode.attributes(DATA_ELEMENT) === 'cursor')
 				)
 					node.remove();
 			}, false);

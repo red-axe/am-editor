@@ -1,4 +1,4 @@
-# 扩展 Node
+# NodeInterface
 
 在 DOM 的 `Node` 节点上进行扩展
 
@@ -14,6 +14,7 @@ import { $ } from '@aomao/engine';
 const content = $('.content');
 //创建节点
 const div = $('<div></div>');
+document.body.append(div[0]);
 //转换
 const p = $(document.querySelector('p'));
 const target = $(event.target);

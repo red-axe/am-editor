@@ -13,6 +13,7 @@ class Position {
 	#root?: NodeInterface;
 	#onUpdate?: (rect: any) => void;
 	#updateTimeout?: NodeJS.Timeout;
+	#observer?: MutationObserver;
 
 	constructor(editor: EditorInterface) {
 		this.#editor = editor;
@@ -40,6 +41,25 @@ class Position {
 		if (isEngine(this.#editor) && !isMobile) {
 			this.#editor.scrollNode?.on('scroll', this.updateListener);
 		}
+		let size = { width: target.width(), height: target.height() };
+		this.#observer = new MutationObserver(() => {
+			const width = target.width();
+			const height = target.height();
+
+			if (width === size.width && height === size.height) return;
+			size = {
+				width,
+				height,
+			};
+			this.updateListener();
+		});
+		this.#observer.observe(target.get<HTMLElement>()!, {
+			attributes: true,
+			attributeFilter: ['style'],
+			attributeOldValue: true,
+			childList: true,
+			subtree: true,
+		});
 		this.update();
 	}
 
@@ -90,6 +110,7 @@ class Position {
 		if (isEngine(this.#editor) && !isMobile) {
 			this.#editor.scrollNode?.off('scroll', this.updateListener);
 		}
+		this.#observer?.disconnect();
 		this.#root?.remove();
 	}
 }

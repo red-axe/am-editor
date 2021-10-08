@@ -103,6 +103,225 @@ export default class extends Card {
 }
 ```
 
+### React 卡片插件示例
+
+卡片插件文件，主要作用：插入卡片、转换/解析卡片
+
+`test/index.ts`
+
+```ts
+import {
+	$,
+	Plugin,
+	NodeInterface,
+	CARD_KEY,
+	isEngine,
+	SchemaInterface,
+	PluginOptions,
+	decodeCardValue,
+	encodeCardValue,
+} from '@aomao/engine';
+import TestComponent from './component';
+
+export interface Options extends PluginOptions {
+	hotkey?: string | Array<string>;
+}
+export default class extends Plugin<Options> {
+	static get pluginName() {
+		return 'test';
+	}
+	// 插件初始化
+	init() {
+		// 监听解析成html的事件
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
+		// 监听粘贴时候设置schema规则的入口
+		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
+		// 监听粘贴时候的节点循环
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+	}
+	// 执行方法
+	execute() {
+		if (!isEngine(this.editor)) return;
+		const { card } = this.editor;
+		card.insert(TestComponent.cardName);
+	}
+	// 快捷键
+	hotkey() {
+		return this.options.hotkey || 'mod+shift+0';
+	}
+	// 粘贴的时候添加需要的 schema
+	pasteSchema(schema: SchemaInterface) {
+		schema.add({
+			type: 'block',
+			name: 'div',
+			attributes: {
+				'data-type': {
+					required: true,
+					value: TestComponent.cardName,
+				},
+				'data-value': '*',
+			},
+		});
+	}
+	// 解析粘贴过来的html
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === TestComponent.cardName) {
+				const value = node.attributes('data-value');
+				const cardValue = decodeCardValue(value);
+				this.editor.card.replaceNode(
+					node,
+					TestComponent.cardName,
+					cardValue,
+				);
+				node.remove();
+				return false;
+			}
+		}
+		return true;
+	}
+	// 解析成html
+	parseHtml(root: NodeInterface) {
+		root.find(`[${CARD_KEY}=${TestComponent.cardName}`).each((cardNode) => {
+			const node = $(cardNode);
+			const card = this.editor.card.find(node) as TestComponent;
+			const value = card?.getValue();
+			if (value) {
+				node.empty();
+				const div = $(
+					`<div data-type="${
+						TestComponent.cardName
+					}" data-value="${encodeCardValue(value)}"></div>`,
+				);
+				node.replaceWith(div);
+			} else node.remove();
+		});
+	}
+}
+export { TestComponent };
+```
+
+react 组件，呈现卡片的视图和交互
+
+`test/component/test.jsx`
+
+```tsx | pure
+import { FC } from 'react';
+const TestComponent: FC = () => <div>This is Test Plugin</div>;
+export default TestComponent;
+```
+
+卡片组件，主要把 react 组件加载到编辑器中
+
+`test/component/index.tsx`
+
+```tsx | pure
+import {
+	$,
+	Card,
+	CardToolbarItemOptions,
+	CardType,
+	isEngine,
+	NodeInterface,
+	ToolbarItemOptions,
+} from '@aomao/engine';
+import ReactDOM from 'react-dom';
+import TestComponent from './test';
+
+class Test extends Card {
+	static get cardName() {
+		return 'test';
+	}
+
+	static get cardType() {
+		return CardType.BLOCK;
+	}
+
+	#container?: NodeInterface;
+
+	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+		if (!isEngine(this.editor) || this.editor.readonly) return [];
+		return [
+			{
+				type: 'dnd',
+			},
+			{
+				type: 'copy',
+			},
+			{
+				type: 'delete',
+			},
+			{
+				type: 'node',
+				node: $('<span>测试按钮</span>'),
+				didMount: (node) => {
+					node.on('click', () => {
+						alert('test button');
+					});
+				},
+			},
+		];
+	}
+
+	render() {
+		this.#container = $('<div>Loading</div>');
+		return this.#container; // 或者使用 this.getCenter().append(this.#container) 就不用再返回 this.#container 了
+	}
+
+	didRender() {
+		ReactDOM.render(<TestComponent />, this.#container?.get<HTMLElement>());
+	}
+
+	destroy() {
+		ReactDOM.unmountComponentAtNode(this.#container?.get<HTMLElement>()!);
+	}
+}
+export default Test;
+```
+
+使用卡片插件
+
+```tsx | pure
+import React, { useEffect, useRef, useState } from 'react';
+import Engine, { EngineInterface } from '@aomao/engine';
+// 导入自定义的卡片插件和卡片组件 test/index.ts
+import Test, { TestComponent } from './test';
+
+const EngineDemo = () => {
+	//编辑器容器
+	const ref = useRef<HTMLDivElement | null>(null);
+	//引擎实例
+	const [engine, setEngine] = useState<EngineInterface>();
+	//编辑器内容
+	const [content, setContent] = useState<string>('Hello card!');
+
+	useEffect(() => {
+		if (!ref.current) return;
+		//实例化引擎
+		const engine = new Engine(ref.current, {
+			plugins: [Test],
+			cards: [TestComponent],
+		});
+		//设置编辑器值
+		engine.setValue(content);
+		//监听编辑器值改变事件
+		engine.on('change', (value) => {
+			setContent(value);
+			console.log(`value:${value}`);
+		});
+		//设置引擎实例
+		setEngine(engine);
+	}, []);
+
+	return <div ref={ref} />;
+};
+export default EngineDemo;
+```
+
+使用 `test/index.ts` 中定义的快捷键 `mod+shift+0` 就能在编辑器中插入刚才定义的卡片组件了
+
 ### Vue 渲染
 
 Vue 组件
@@ -174,6 +393,253 @@ export default class extends Card {
 	}
 }
 ```
+
+### Vue 卡片插件示例
+
+卡片插件文件，主要作用：插入卡片、转换/解析卡片
+
+`test/index.ts`
+
+```ts
+import {
+	$,
+	Plugin,
+	NodeInterface,
+	CARD_KEY,
+	isEngine,
+	SchemaInterface,
+	PluginOptions,
+	decodeCardValue,
+	encodeCardValue,
+} from '@aomao/engine';
+import TestComponent from './component';
+
+export interface Options extends PluginOptions {
+	hotkey?: string | Array<string>;
+}
+export default class extends Plugin<Options> {
+	static get pluginName() {
+		return 'test';
+	}
+	// 插件初始化
+	init() {
+		// 监听解析成html的事件
+		this.editor.on('paser:html', (node) => this.parseHtml(node));
+		// 监听粘贴时候设置schema规则的入口
+		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
+		// 监听粘贴时候的节点循环
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+	}
+	// 执行方法
+	execute() {
+		if (!isEngine(this.editor)) return;
+		const { card } = this.editor;
+		card.insert(TestComponent.cardName);
+	}
+	// 快捷键
+	hotkey() {
+		return this.options.hotkey || 'mod+shift+0';
+	}
+	// 粘贴的时候添加需要的 schema
+	pasteSchema(schema: SchemaInterface) {
+		schema.add({
+			type: 'block',
+			name: 'div',
+			attributes: {
+				'data-type': {
+					required: true,
+					value: TestComponent.cardName,
+				},
+				'data-value': '*',
+			},
+		});
+	}
+	// 解析粘贴过来的html
+	pasteHtml(node: NodeInterface) {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === TestComponent.cardName) {
+				const value = node.attributes('data-value');
+				const cardValue = decodeCardValue(value);
+				this.editor.card.replaceNode(
+					node,
+					TestComponent.cardName,
+					cardValue,
+				);
+				node.remove();
+				return false;
+			}
+		}
+		return true;
+	}
+	// 解析成html
+	parseHtml(root: NodeInterface) {
+		root.find(`[${CARD_KEY}=${TestComponent.cardName}`).each((cardNode) => {
+			const node = $(cardNode);
+			const card = this.editor.card.find(node) as TestComponent;
+			const value = card?.getValue();
+			if (value) {
+				node.empty();
+				const div = $(
+					`<div data-type="${
+						TestComponent.cardName
+					}" data-value="${encodeCardValue(value)}"></div>`,
+				);
+				node.replaceWith(div);
+			} else node.remove();
+		});
+	}
+}
+export { TestComponent };
+```
+
+vue 组件，呈现卡片的视图和交互
+
+`test/component/test.vue`
+
+```ts
+<template>
+  <div>
+    <div>This is test plugin</div>
+  </div>
+</template>
+
+<style lang="less"></style>
+
+```
+
+卡片组件，主要把 vue 组件加载到编辑器中
+
+`test/component/index.ts`
+
+```ts
+import {
+	$,
+	Card,
+	CardToolbarItemOptions,
+	CardType,
+	isEngine,
+	NodeInterface,
+	ToolbarItemOptions,
+} from '@aomao/engine';
+import { App, createApp } from 'vue';
+import TestVue from './test.vue';
+
+class Test extends Card {
+	static get cardName() {
+		return 'test';
+	}
+
+	static get cardType() {
+		return CardType.BLOCK;
+	}
+
+	#container?: NodeInterface;
+	#vm?: App;
+
+	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+		if (!isEngine(this.editor) || this.editor.readonly) return [];
+		return [
+			{
+				type: 'dnd',
+			},
+			{
+				type: 'copy',
+			},
+			{
+				type: 'delete',
+			},
+			{
+				type: 'node',
+				node: $('<span>测试按钮</span>'),
+				didMount: (node) => {
+					node.on('click', () => {
+						alert('test button');
+					});
+				},
+			},
+		];
+	}
+
+	render() {
+		this.#container = $('<div>Loading</div>');
+		return this.#container; // 或者使用 this.getCenter().append(this.#container) 就不用再返回 this.#container 了
+	}
+
+	didRender() {
+		this.#vm = createApp(TestVue, {});
+		this.#vm.mount(this.#container?.get<HTMLElement>());
+	}
+
+	destroy() {
+		this.#vm?.unmount();
+	}
+}
+export default Test;
+```
+
+使用卡片插件
+
+```ts
+<template>
+   <div ref="container"></div>
+</template>
+
+<script lang="ts">
+import { defineComponent, onMounted, onUnmounted, ref } from "vue";
+import Engine, {
+  $,
+  EngineInterface,
+  isMobile,
+  NodeInterface,
+  removeUnit,
+} from "@aomao/engine";
+import Test, { TestComponent } from "./test";
+
+export default defineComponent({
+  name: "engine-demo",
+  setup() {
+    // 编辑器容器
+    const container = ref<HTMLElement | null>(null);
+    // 编辑器引擎
+    const engine = ref<EngineInterface | null>(null);
+    onMounted(() => {
+      // 容器加载后实例化编辑器引擎
+      if (container.value) {
+        //实例化引擎
+        const engineInstance = new Engine(container.value, {
+          // 启用的插件
+          plugins:[Test],
+          // 启用的卡片
+          cards:[TestComponent],
+        });
+
+        engineInstance.setValue("<strong>Hello</strong>,This is demo");
+
+        // 监听编辑器值改变事件
+        engineInstance.on("change", (editorValue) => {
+          console.log("value", editorValue);
+        });
+
+        engine.value = engineInstance;
+      }
+    });
+
+    onUnmounted(() => {
+      if (engine.value) engine.value.destroy();
+    });
+
+    return {
+      container,
+      engine,
+    };
+  },
+});
+</script>
+```
+
+使用 `test/index.ts` 中定义的快捷键 `mod+shift+0` 就能在编辑器中插入刚才定义的卡片组件了
 
 ### `工具栏`
 

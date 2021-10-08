@@ -1,8 +1,14 @@
-# List
+# ListModel
 
 Related operations for editing list nodes
 
 Type: `ListModelInterface`
+
+## Use
+
+```ts
+new Engine(...).list
+```
 
 ## Constructor
 

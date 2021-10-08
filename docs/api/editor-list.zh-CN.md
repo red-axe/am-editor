@@ -1,8 +1,14 @@
-# List
+# ListModel
 
 编辑列表节点的相关操作
 
 类型：`ListModelInterface`
+
+## 使用
+
+```ts
+new Engine(...).list
+```
 
 ## 构造函数
 
