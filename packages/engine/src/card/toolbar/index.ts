@@ -10,7 +10,7 @@ import {
 	ToolbarInterface as ToolbarBaseInterface,
 } from '../../types/toolbar';
 import { EditorInterface, isEngine } from '../../types/engine';
-import { DATA_ELEMENT, UI } from '../../constants';
+import { DATA_ELEMENT, TRIGGER_CARD_ID, UI } from '../../constants';
 import { $ } from '../../node';
 import { isMobile } from '../../utils';
 import Position from '../../position';
@@ -202,6 +202,7 @@ class CardToolbar implements CardToolbarInterface {
 					items,
 				});
 				toolbar.root.addClass('data-card-toolbar');
+				toolbar.root.attributes(TRIGGER_CARD_ID, this.card.id);
 				//渲染工具栏
 				toolbar.render($(document.body));
 				toolbar.hide();
