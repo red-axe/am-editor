@@ -46,14 +46,14 @@
 	color: #8C8C8C;
 }
 
-.data-card-block-max > [data-card-element="body"] > [data-card-element="center"] {
+.data-card-block-max > [data-card-element="body"] > [data-card-element="center"], .data-card-block-max > [data-card-element="body"] > [data-card-element="center"].data-card-background-selected {
     top: 96px;
-    background: #fafafa;
+    background: #fafafa !important;
     position: fixed!important;
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 99999;
+    z-index: 124;
     overflow: auto;
     padding: 20px;
 }

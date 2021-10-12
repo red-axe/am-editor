@@ -318,6 +318,7 @@ class Engine implements EngineInterface {
 	}
 
 	setValue(value: string, callback?: (count: number) => void) {
+		if (!this.isFocus()) this.focus();
 		value = this.trigger('beforeSetValue', value) || value;
 		this.change.setValue(value, undefined, callback);
 		this.normalizeTree();
@@ -326,14 +327,14 @@ class Engine implements EngineInterface {
 	}
 
 	setHtml(html: string, callback?: (count: number) => void) {
-		const range = this.change.getRange();
-		if (!range.commonAncestorNode.inEditor()) this.focus();
+		if (!this.isFocus()) this.focus();
 		this.change.setHtml(html, callback);
 		return this;
 	}
 
 	setJsonValue(value: Array<any>, callback?: (count: number) => void) {
 		const dom = $(toDOM(value));
+		if (!this.isFocus()) this.focus();
 		const attributes = dom.get<Element>()?.attributes;
 		for (let i = 0; attributes && i < attributes.length; i++) {
 			const { nodeName, nodeValue } = attributes.item(i) || {};

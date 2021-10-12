@@ -62,13 +62,13 @@ export default defineComponent({
 
         const hide = (event?: MouseEvent) => {
             if (event) {
-                let node = event.target;
-                while (node) {
-                    if (node === collapse.value) {
-                        return;
-                    }
-                    node = (node as Element).parentNode;
-                }
+                // let node = event.target;
+                // while (node) {
+                //     if (node === collapse.value) {
+                //         return;
+                //     }
+                //     node = (node as Element).parentNode;
+                // }
             }
             document.removeEventListener('click', hide);
             visible.value = false

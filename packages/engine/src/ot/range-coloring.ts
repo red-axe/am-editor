@@ -353,6 +353,20 @@ class RangeColoring implements RangeColoringInterface {
 			this.root.append(childCursor);
 		}
 		if (childCursor && childCursor[0]) {
+			childCursor.css('z-index', '');
+			// 如果当前有最大化的卡片，并且要画的光标不在最大化卡片内就隐藏这个光标
+			const maximizeCard = this.engine.card.components.find(
+				(component) => component.isMaximize,
+			);
+			if (maximizeCard) {
+				const card = this.engine.card.closest(
+					isRangeInterface(selector) ? selector.startNode : selector,
+					true,
+				);
+				if (!card || !maximizeCard.root.equal(card)) {
+					childCursor.css('z-index', 120);
+				}
+			}
 			childCursor[0]['__target'] = isRangeInterface(selector)
 				? selector.toPath(true)
 				: selector;

@@ -205,7 +205,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 			return;
 		}
 		if (selected) {
-			if (!this.selected) {
+			if (!this.selected && !this.isMaximize) {
 				this.setSelected(selected);
 				this.onSelect(selected);
 			}
@@ -341,11 +341,13 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	maximize() {
 		this.isMaximize = true;
 		this.defaultMaximize.maximize();
+		this.toolbarModel?.show();
 	}
 
 	minimize() {
 		this.isMaximize = false;
 		this.defaultMaximize.restore();
+		this.toolbarModel?.show();
 	}
 
 	/**

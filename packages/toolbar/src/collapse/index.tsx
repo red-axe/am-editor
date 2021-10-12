@@ -47,12 +47,12 @@ const Collapse: React.FC<CollapseProps> = ({
 	const hide = (event?: MouseEvent) => {
 		if (event) {
 			let node = event.target;
-			while (node) {
-				if (node === collapseRef.current) {
-					return;
-				}
-				node = (node as Element).parentNode;
-			}
+			// while (node) {
+			// 	if (node === collapseRef.current) {
+			// 		return;
+			// 	}
+			// 	node = (node as Element).parentNode;
+			// }
 		}
 		document.removeEventListener('click', hide);
 		setVisible(false);

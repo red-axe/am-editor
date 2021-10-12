@@ -286,7 +286,9 @@ class CardToolbar implements CardToolbarInterface {
 			setTimeout(() => {
 				this.position.bind(
 					container,
-					this.card.root,
+					this.card.isMaximize
+						? this.card.getCenter().first()!
+						: this.card.root,
 					'topLeft',
 					this.offset,
 					(rect) => {

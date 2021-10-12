@@ -1,6 +1,6 @@
 .ot-user-cursor {
 	position: absolute;
-	z-index: 10;
+	z-index: 125;
 	width: 2px;
 }
 
@@ -37,7 +37,7 @@
 }
 
 .ot-user-background {
-  z-index: 99999;
+  z-index: 120;
 }
 
 .ot-user-cursor-card {

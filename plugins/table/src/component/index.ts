@@ -98,22 +98,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 				},
 			];
 		const language = this.editor.language.get('table');
-		return [
-			{
-				type: 'dnd',
-			},
-			{
-				type: 'maximize',
-			},
-			{
-				type: 'copy',
-			},
-			{
-				type: 'delete',
-			},
-			{
-				type: 'separator',
-			},
+		const funBtns: Array<ToolbarItemOptions | CardToolbarItemOptions> = [
 			{
 				type: 'node',
 				title: this.editor.language.get<string>(
@@ -177,6 +162,25 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 					},
 				],
 			},
+		];
+		if (this.isMaximize) return funBtns;
+		return [
+			{
+				type: 'dnd',
+			},
+			{
+				type: 'maximize',
+			},
+			{
+				type: 'copy',
+			},
+			{
+				type: 'delete',
+			},
+			{
+				type: 'separator',
+			},
+			...funBtns,
 		];
 	}
 

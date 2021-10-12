@@ -381,7 +381,8 @@ class CardModel implements CardModelInterface {
 			const range = editor.change.getRange();
 			if (
 				range.startNode.closest(EDITABLE_SELECTOR).length > 0 ||
-				(card.isEditable && range.collapsed)
+				(card.isEditable && range.collapsed) ||
+				card.isMaximize
 			)
 				return;
 			const root = card.root;
