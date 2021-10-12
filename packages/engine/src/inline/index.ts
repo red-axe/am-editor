@@ -902,6 +902,10 @@ class Inline implements InlineModelInterface {
 			const child = childrenNodes.eq(index);
 			if (child?.isText()) {
 				const text = child.text();
+				if (text.length === 1 && /\u200b/.test(text)) {
+					child.remove();
+					return;
+				}
 				child.text(text.replace(/\u200b/g, ''));
 			}
 		});

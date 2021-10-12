@@ -616,12 +616,24 @@ class NodeModel implements NodeModelInterface {
 	removeSide(node: NodeInterface, tagName: string = 'br') {
 		// 删除第一个 BR
 		const firstNode = node.first();
-		if (firstNode?.name === tagName && node.children().length > 1) {
+		if (
+			firstNode?.name === tagName &&
+			node
+				.children()
+				.toArray()
+				.filter((node) => !node.isCursor()).length > 1
+		) {
 			firstNode.remove();
 		}
 		// 删除最后一个 BR
 		const lastNode = node.last();
-		if (lastNode?.name === tagName && node.children().length > 1) {
+		if (
+			lastNode?.name === tagName &&
+			node
+				.children()
+				.toArray()
+				.filter((node) => !node.isCursor()).length > 1
+		) {
 			lastNode.remove();
 		}
 	}
@@ -707,12 +719,21 @@ class NodeModel implements NodeModelInterface {
 				block.flatten(cloneNode, $(rootElement || []));
 				if (
 					cloneNode.name === 'p' &&
-					cloneNode.children().length === 0
+					cloneNode
+						.children()
+						.toArray()
+						.filter((node) => !node.isCursor()).length === 0
 				) {
 					cloneNode.append($('<br />'));
 				}
 			}
-			if (childNode.name === 'p' && childNode.children().length === 0) {
+			if (
+				childNode.name === 'p' &&
+				childNode
+					.children()
+					.toArray()
+					.filter((node) => !node.isCursor()).length === 0
+			) {
 				childNode.append($('<br />'));
 			}
 			this.removeSide(childNode);

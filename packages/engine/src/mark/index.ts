@@ -783,7 +783,12 @@ class Mark implements MarkModelInterface {
 			safeRange.collapsed &&
 			(!isEditable || !card?.getSelectionNodes || nodes.length === 1)
 		) {
-			if (mark.children().length === 0)
+			if (
+				mark
+					.children()
+					.toArray()
+					.filter((node) => !node.isCursor()).length === 0
+			)
 				mark.append(doc.createTextNode('\u200b'));
 			//在相通插件下，值不同，插入到同级，不做嵌套
 			const { startNode } = safeRange.shrinkToTextNode();
@@ -921,7 +926,13 @@ class Mark implements MarkModelInterface {
 												result = true;
 												break;
 											} else if (
-												parent.children().length === 1
+												parent
+													.children()
+													.toArray()
+													.filter(
+														(node) =>
+															!node.isCursor(),
+													).length === 1
 											) {
 												const curPlugin =
 													this.findPlugin(parent);
@@ -1544,11 +1555,20 @@ class Mark implements MarkModelInterface {
 				const child = childrenNodes.eq(index);
 				if (child?.isText()) {
 					const text = child.text();
+					if (text.length === 1 && /\u200b/.test(text)) {
+						child.remove();
+						return;
+					}
 					child.text(text.replace(/\u200b/g, ''));
 				}
 			});
-			if (mark.children().length === 0) {
-				mark.append($('\u200b', null));
+			if (
+				mark
+					.children()
+					.toArray()
+					.filter((node) => !node.isCursor()).length === 0
+			) {
+				mark.prepend($('\u200b', null));
 			}
 			const next = mark.next();
 			const nextN = next?.next();
