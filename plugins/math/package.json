@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-math",
-  "version": "2.4.15",
+  "version": "2.4.16",
   "description": "Math（数学公式）",
   "keywords": [
     "Math"
@@ -24,7 +24,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.4.15",
+    "@aomao/engine": "^2.4.16",
     "@babel/runtime": "^7.13.10"
   }
 }
