@@ -5,6 +5,7 @@ import Delete from './delete';
 import Enter from './enter';
 import Tab from './tab';
 import ShiftTab from './shift-tab';
+import ShiftEnter from './shift-enter';
 import At from './at';
 import Space from './space';
 import Slash from './slash';
@@ -50,6 +51,11 @@ const defaultHandles: Array<{
 		name: 'shift-tab',
 		handle: ShiftTab,
 		triggerName: 'keydown:shift-tab',
+	},
+	{
+		name: 'shift-enter',
+		handle: ShiftEnter,
+		triggerName: 'keydown:shift-enter',
 	},
 	{
 		name: 'at',

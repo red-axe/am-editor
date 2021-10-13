@@ -380,7 +380,7 @@ class Inline implements InlineModelInterface {
 		const hasChild = inline.children().length !== 0;
 		this.repairCursor(inline);
 		//如果有内容，就让光标选择在节点外的零宽字符前
-		if (!inline.isCard()) {
+		if (!inline.isCard() && !node.isVoid(inline)) {
 			if (hasChild) {
 				const next = inline.next()!;
 				safeRange.setStart(next, 1);

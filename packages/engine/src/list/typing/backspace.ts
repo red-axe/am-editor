@@ -87,7 +87,7 @@ class Backspace {
 					}
 				}
 				list.addBr(startBlock);
-				list.addBr(endBlock);
+				if (!startBlock.equal(endBlock)) list.addBr(endBlock);
 				range.setStart(
 					cloneRange.startContainer,
 					cloneRange.startOffset,

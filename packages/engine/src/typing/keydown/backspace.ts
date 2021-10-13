@@ -1,6 +1,7 @@
 import {
 	EngineInterface,
 	EventListener,
+	NodeInterface,
 	TypingHandleInterface,
 } from '../../types';
 import { $ } from '../../node';
@@ -80,9 +81,47 @@ class Backspace implements TypingHandleInterface {
 		// 范围为展开状态
 		if (!range.collapsed) {
 			event.preventDefault();
+			const prev = startNode.prev();
+			if (prev?.name === 'br') {
+				prev.remove();
+			}
 			change.deleteContent(range);
 			change.apply(range);
 			return;
+		} else {
+			let brNode: NodeInterface | undefined = undefined;
+			if (this.engine.node.isBlock(startNode)) {
+				const child = startNode[0].childNodes[startOffset - 1];
+				brNode = $(child);
+			} else if (startNode.name === 'br') {
+				brNode = startNode;
+			}
+			if (brNode?.name === 'br') {
+				const prev = brNode.prev();
+				const next = brNode.next();
+				const n = next?.next();
+				const p = prev?.prev();
+				// abc<br /><cursor /><br />
+				if (
+					prev?.name !== 'br' &&
+					next?.name === 'br' &&
+					n?.name !== 'br'
+				) {
+					event.preventDefault();
+					brNode.remove();
+					next.remove();
+					change.apply(range.shrinkToTextNode());
+				} else if (
+					next?.name !== 'br' &&
+					prev?.name === 'br' &&
+					p?.name !== 'br'
+				) {
+					event.preventDefault();
+					brNode.remove();
+					prev.remove();
+					change.apply(range.shrinkToTextNode());
+				}
+			}
 		}
 	}
 

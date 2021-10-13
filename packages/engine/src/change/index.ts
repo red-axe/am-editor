@@ -242,8 +242,14 @@ class ChangeModel implements ChangeInterface {
 			range.setEnd(endNode, 1);
 		}
 		// 空节点添加br
-		if (startNode.name === 'p' && startChildNodes.length === 0) {
-			startNode.append('<br />');
+		if (startNode.name === 'p') {
+			if (startChildNodes.length === 0) startNode.append('<br />');
+			else if (
+				startChildNodes.length > 1 &&
+				startChildNodes[startChildNodes.length - 1].nodeName === 'BR'
+			) {
+				startNode.last()?.remove();
+			}
 		}
 		if (
 			!range.collapsed &&
@@ -257,10 +263,22 @@ class ChangeModel implements ChangeInterface {
 			if (startChildNodes.length === 0) {
 				startNode.append('<br />');
 			} else if (
+				!node.isCustomize(startNode) &&
+				startChildNodes.length > 1 &&
+				startChildNodes[startChildNodes.length - 1].nodeName === 'BR'
+			) {
+				startNode.last()?.remove();
+			} else if (
 				node.isCustomize(startNode) &&
 				startChildNodes.length === 1
 			) {
 				startNode.append('<br />');
+			} else if (
+				node.isCustomize(startNode) &&
+				startChildNodes.length > 2 &&
+				startChildNodes[startChildNodes.length - 1].nodeName === 'BR'
+			) {
+				startNode.last()?.remove();
 			}
 		}
 		if (!range.collapsed && endNode.name === 'li') {
@@ -268,10 +286,22 @@ class ChangeModel implements ChangeInterface {
 			if (endChildNodes.length === 0) {
 				endNode.append('<br />');
 			} else if (
+				!node.isCustomize(endNode) &&
+				endChildNodes.length > 1 &&
+				endChildNodes[endChildNodes.length - 1].nodeName === 'BR'
+			) {
+				startNode.last()?.remove();
+			} else if (
 				node.isCustomize(endNode) &&
 				endChildNodes.length === 1
 			) {
 				endNode.append('<br />');
+			} else if (
+				node.isCustomize(endNode) &&
+				endChildNodes.length > 2 &&
+				endChildNodes[endChildNodes.length - 1].nodeName === 'BR'
+			) {
+				startNode.last()?.remove();
 			}
 		}
 

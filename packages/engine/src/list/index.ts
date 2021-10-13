@@ -683,18 +683,18 @@ class List implements ListModelInterface {
 			node.find('li').each((node) => {
 				this.addBr($(node));
 			});
-		} else if (node.name === 'li') {
-			node.find('br').remove();
+		} else if (nodeApi.isCustomize(node)) {
 			let child = node.last();
-			if (child?.isCursor()) child = child.prev();
+			while (child?.isCursor()) child = child.prev();
 			if (child) {
 				//自定义节点，并且最后一个是卡片
-				if (
-					nodeApi.isCustomize(node) &&
-					node.length === 1 &&
-					child.isCard()
-				) {
+				const children = node.children();
+				if (children.length === 1 && child.isCard()) {
 					node.append($('<br />'));
+					return;
+				}
+				if (children.length > 2 && child.name === 'br') {
+					if (child.prev()?.name !== 'br') child.remove();
 					return;
 				}
 				while (child) {
