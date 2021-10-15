@@ -324,6 +324,15 @@ class Mention extends Card<MentionValue> {
 				}, 100);
 			});
 			this.getCenter().append(this.#container);
+			setTimeout(() => {
+				if (isEngine(this.editor)) {
+					const range = this.editor.change.getRange();
+					range.select(this.#keyword!, true).collapse(false);
+					const selection = window.getSelection();
+					selection?.removeAllRanges();
+					selection?.addRange(range.toRange());
+				}
+			}, 10);
 			this.component?.render(this.root, Mention.defaultData || []);
 			if (!Mention.defaultData) {
 				setTimeout(() => {
