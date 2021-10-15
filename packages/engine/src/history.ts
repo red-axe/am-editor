@@ -182,29 +182,36 @@ class HistoryModel implements HistoryInterface {
 	}
 
 	collectSelfOps(ops: Op[]) {
-		if (this.locked) return;
-		if (!this.currentAction?.self) this.saveOp();
+		if (!this.currentAction?.self && ops.some((op) => !isCursorOp(op)))
+			this.saveOp();
 		let isSave = false;
 		ops.forEach((op) => {
 			if (!isCursorOp(op)) {
 				isSave = true;
-				this.currentAction.self = true;
-				if (!this.currentAction.ops) this.currentAction.ops = [];
-
-				if (!this.currentAction.startRangePath) {
-					this.currentAction.startRangePath =
-						this.getRangePathBeforeCommand();
-				}
-				const lastOp =
-					this.currentAction.ops[this.currentAction.ops.length - 1];
-				if (lastOp && isReverseOp(op, lastOp)) {
-					this.currentAction.ops.pop();
+				if (this.locked) {
+					if (this.actionOps.length > 0)
+						this.actionOps[this.actionOps.length - 1].ops?.push(op);
 				} else {
-					this.currentAction.ops.push(op);
+					this.currentAction.self = true;
+					if (!this.currentAction.ops) this.currentAction.ops = [];
+
+					if (!this.currentAction.startRangePath) {
+						this.currentAction.startRangePath =
+							this.getRangePathBeforeCommand();
+					}
+					const lastOp =
+						this.currentAction.ops[
+							this.currentAction.ops.length - 1
+						];
+					if (lastOp && isReverseOp(op, lastOp)) {
+						this.currentAction.ops.pop();
+					} else {
+						this.currentAction.ops.push(op);
+					}
 				}
 			}
 		});
-		if (isSave) this.lazySaveOp();
+		if (isSave && !this.locked) this.lazySaveOp();
 	}
 
 	collectRemoteOps(ops: Op[]) {

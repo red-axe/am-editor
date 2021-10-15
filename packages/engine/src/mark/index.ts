@@ -261,7 +261,6 @@ class Mark implements MarkModelInterface {
 		const children = root.allChildren();
 		children.forEach((child) => {
 			if (
-				!child.isCursor() &&
 				node.isEmpty(child) &&
 				node.isMark(child) &&
 				(!callback || callback(child))
@@ -319,7 +318,7 @@ class Mark implements MarkModelInterface {
 				right = selection.getNode(cloneParent, 'right', false);
 			} else right = selection.getNode(parent, 'right');
 			// 删除空标签
-			this.unwrapEmptyMarks(left);
+			this.unwrapEmptyMarks(left, (node) => !node.isCursor());
 			this.unwrapEmptyMarks(right, (node) => {
 				if (removeMark && !Array.isArray(removeMark))
 					removeMark = [removeMark];
@@ -985,6 +984,20 @@ class Mark implements MarkModelInterface {
 										}
 									});
 									nodeApi.wrap(targetNode, mark);
+									if (
+										!isEditable &&
+										selection?.focus &&
+										targetNode
+											.find(
+												`[data-element="${selection.focus.attributes(
+													DATA_ELEMENT,
+												)}"]`,
+											)
+											.equal(selection.focus)
+									) {
+										started = false;
+										return false;
+									}
 									return true;
 								} else if (child.name !== mark.name) {
 									child.remove();
@@ -1195,13 +1208,16 @@ class Mark implements MarkModelInterface {
 							child.equal(selection.anchor) &&
 							!selection.anchor.prev()
 						) {
-							const parent = selection.anchor.parent();
-							if (
+							let parent = selection.anchor.parent();
+							while (
 								parent &&
 								!parent.isCard() &&
 								node.isMark(parent)
 							) {
 								markNodes.push(parent);
+								parent = parent.parent();
+								if (parent && parent.children().length > 1)
+									break;
 							}
 						}
 					}
@@ -1562,13 +1578,20 @@ class Mark implements MarkModelInterface {
 					child.text(text.replace(/\u200b/g, ''));
 				}
 			});
-			if (
-				mark
-					.children()
-					.toArray()
-					.filter((node) => !node.isCursor()).length === 0
-			) {
-				mark.prepend($('\u200b', null));
+			const children = mark
+				.children()
+				.toArray()
+				.filter((node) => !node.isCursor());
+			if (children.length < 2) {
+				if (
+					children.length === 0 ||
+					(children.length === 1 &&
+						children[0].isText() &&
+						children[0].text().length === 0)
+				) {
+					if (children.length > 0) children[0].remove();
+					mark.prepend($('\u200b', null));
+				}
 			}
 			const next = mark.next();
 			const nextN = next?.next();
@@ -1579,7 +1602,7 @@ class Mark implements MarkModelInterface {
 				/^\u200b$/g.test(next.text()) &&
 				!node.isInline(nextN)
 			) {
-				nextN.remove();
+				next.remove();
 			}
 		}
 	}

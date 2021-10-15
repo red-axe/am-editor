@@ -763,7 +763,11 @@ class List implements ListModelInterface {
 			}
 		};
 		// 第一个节点嵌入到分割节点位置
-		let beginNode = $(fragment.childNodes[0]);
+		let beginNode = $(fragment)
+			.toArray()
+			.some((child) => node.isBlock(child))
+			? $(fragment.childNodes[0])
+			: $('<p></p>').append($(fragment));
 		// 要插入的是列表
 		const listElement = safeRange.startNode.closest('ul,ol');
 		if (!listElement || !node.isList(listElement)) {
@@ -948,6 +952,7 @@ class List implements ListModelInterface {
 			}
 		}
 		if (mergeLists.length > 0) this.merge(mergeLists);
+		if (!startIsMerge) startListElment.remove();
 		// 后续不需要拼接到最后节点
 		if (fragment.childNodes.length === 0) {
 			// 删除由于分割造成的空行

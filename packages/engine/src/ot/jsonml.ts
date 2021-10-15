@@ -110,10 +110,11 @@ export const getPathValue = (data: any, path: Path) => {
 
 export const pushAndRepair = (ops: RepairOp[], op: RepairOp) => {
 	const oldPath = op.oldPath?.slice() || [];
-	ops.forEach((opItem) => {
+	let isSame = false;
+	let insertIndex = -1;
+	ops.forEach((opItem, index) => {
 		const opOffset = op.newPath[op.newPath.length - 1];
 		const itemOffset = opItem.newPath[opItem.newPath.length - 1];
-
 		const itemOldPath = opItem.oldPath?.slice() || [];
 		const itemP = opItem.p.slice();
 		if ('ld' in op) {
@@ -152,7 +153,14 @@ export const pushAndRepair = (ops: RepairOp[], op: RepairOp) => {
 				}
 			}
 			if ('li' in opItem) {
-				if (itemOffset > opOffset) {
+				if (
+					isSame === false &&
+					(itemOffset as number) - 1 === opOffset
+				) {
+					isSame = true;
+					insertIndex = index;
+				}
+				if (itemOffset > opOffset && !isSame) {
 					itemP[itemP.length - 1] =
 						parseInt(itemP[itemP.length - 1].toString()) - 1;
 				}
@@ -162,5 +170,7 @@ export const pushAndRepair = (ops: RepairOp[], op: RepairOp) => {
 		opItem.p = itemP;
 	});
 	op.oldPath = oldPath;
-	ops.push(op);
+	if (insertIndex > -1) {
+		ops.splice(insertIndex, 0, op);
+	} else ops.push(op);
 };

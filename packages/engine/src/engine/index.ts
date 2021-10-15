@@ -328,7 +328,16 @@ class Engine implements EngineInterface {
 
 	setHtml(html: string, callback?: (count: number) => void) {
 		if (!this.isFocus()) this.focus();
-		this.change.setHtml(html, callback);
+		this.change.setHtml(html, (count) => {
+			this.container.allChildren(true).forEach((child) => {
+				if (this.node.isInline(child)) {
+					this.inline.repairCursor(child);
+				} else if (this.node.isMark(child)) {
+					this.mark.repairCursor(child);
+				}
+				if (callback) callback(count);
+			});
+		});
 		return this;
 	}
 

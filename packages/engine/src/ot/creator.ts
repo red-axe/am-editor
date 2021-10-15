@@ -247,7 +247,8 @@ class Creator extends EventEmitter2 {
 					if (!isDataString) {
 						if (
 							typeof getPathValue(this.doc?.data, oldPath) ===
-							'string'
+								'string' &&
+							(record['text-data'] || target['data']).length > 0
 						) {
 							attrOps.push({
 								path,

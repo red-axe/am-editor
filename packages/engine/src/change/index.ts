@@ -376,17 +376,8 @@ class ChangeModel implements ChangeInterface {
 		callback?: (count: number) => void,
 	) {
 		const range = this.getRange();
-		const {
-			schema,
-			conversion,
-			container,
-			history,
-			mark,
-			node,
-			inline,
-			block,
-			card,
-		} = this.engine;
+		const { schema, conversion, container, history, mark, card } =
+			this.engine;
 		if (value === '') {
 			this.engine.container.html(value);
 			this.initValue();
@@ -402,13 +393,6 @@ class ChangeModel implements ChangeInterface {
 			});
 			container.html(parser.toValue(schema, conversion, false, true));
 			card.render(undefined, (count) => {
-				container.allChildren(true).forEach((child) => {
-					if (node.isInline(child)) {
-						inline.repairCursor(child);
-					} else if (node.isMark(child)) {
-						mark.repairCursor(child);
-					}
-				});
 				if (callback) callback(count);
 			});
 			const cursor = container.find(CURSOR_SELECTOR);

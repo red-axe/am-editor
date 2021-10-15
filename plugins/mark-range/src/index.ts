@@ -33,7 +33,6 @@ const PLUGIN_NAME = 'mark-range';
 
 export default class extends MarkPlugin<Options> {
 	private range?: RangeInterface;
-	private isCachePreview: boolean = false;
 	private executeBySelf: boolean = false;
 	private MARK_KEY = `data-mark-key`;
 	private ids: { [key: string]: Array<string> } = {};
@@ -256,7 +255,9 @@ export default class extends MarkPlugin<Options> {
 			this.editor.mark.wrap(
 				`<${this.tagName} ${
 					this.MARK_KEY
-				}="${key}" ${this.getPreviewName(key)}="true" />`,
+				}="${key}" ${DATA_TRANSIENT_ATTRIBUTES}="${this.getPreviewName(
+					key,
+				)}" ${this.getPreviewName(key)}="true" />`,
 				range,
 			);
 			//遍历当前光标选择节点，拼接选择的文本
@@ -456,33 +457,24 @@ export default class extends MarkPlugin<Options> {
 		const id = args[0];
 		switch (action) {
 			case 'preview':
-				if (!id) {
-					this.isCachePreview = true;
-					//编辑模式，开始缓存当前操作
-					history?.startCache();
-				}
+				console.log('preview');
 				const reuslt = this.preview(key, id);
-				//没有预览成功关闭缓存
-				if (!reuslt) {
-					this.isCachePreview = false;
-					history?.destroyCache();
-				}
 				return reuslt;
 			case 'apply':
 				if (!id) return;
+				history?.lock(50);
 				this.apply(key, id);
-				//提交操作缓存，这里会在20毫秒后执行
-				history?.submitCache();
 				break;
 			case 'revoke':
+				history?.lock(50);
 				this.revoke(key, id);
-				history?.destroyCache();
 				break;
 			case 'find':
 				if (!id) return [];
 				return this.findElements(key, id);
 			case 'remove':
 				if (!id) return;
+				history?.lock(50);
 				this.remove(key, id);
 				break;
 			case 'filter':
@@ -523,11 +515,6 @@ export default class extends MarkPlugin<Options> {
 		if (!range) return;
 		const { onSelect } = this.options;
 
-		if (isEngine(this.editor) && this.isCachePreview) {
-			this.editor.history.destroyCache();
-			this.isCachePreview = false;
-		}
-
 		//不在编辑器内
 		if (
 			!$(range.getStartOffsetNode()).inEditor() ||
@@ -542,7 +529,6 @@ export default class extends MarkPlugin<Options> {
 
 		const selectInfo = this.getSelectInfo(range, true);
 		if (onSelect) onSelect(range, selectInfo);
-
 		this.range = range;
 	}
 

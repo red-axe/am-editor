@@ -852,7 +852,10 @@ class NodeEntry implements NodeInterface {
 	before(selector: Selector): NodeInterface {
 		this.each((node) => {
 			const nodes = $(selector, this.context);
-			node.parentNode?.insertBefore(nodes[0], node);
+			nodes.forEach((child) => {
+				node.parentNode?.insertBefore(child, node);
+				node = child;
+			});
 		});
 		return this;
 	}
@@ -865,11 +868,14 @@ class NodeEntry implements NodeInterface {
 	after(selector: Selector): NodeInterface {
 		this.each((node) => {
 			const nodes = $(selector, this.context);
-			if (node.nextSibling) {
-				node.parentNode?.insertBefore(nodes[0], node.nextSibling);
-			} else {
-				node.parentNode?.appendChild(nodes[0]);
-			}
+			nodes.forEach((child) => {
+				if (node.nextSibling) {
+					node.parentNode?.insertBefore(child, node.nextSibling);
+					node = child;
+				} else {
+					node.parentNode?.appendChild(child);
+				}
+			});
 		});
 		return this;
 	}
