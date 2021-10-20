@@ -341,7 +341,6 @@ export default class extends Plugin<Options> {
 		if (!query || !video_id) return success();
 
 		const { action, type, contentType, data } = query;
-
 		request.ajax({
 			url: action,
 			contentType: contentType || '',

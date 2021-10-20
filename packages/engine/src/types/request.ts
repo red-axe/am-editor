@@ -35,6 +35,7 @@ export interface AjaxInterface {
 		success: (data: any) => void,
 		error: (errorMsg: string, request?: XMLHttpRequest) => void,
 	): XMLHttpRequest | undefined;
+	abort: () => void;
 }
 
 export type UploaderOptions = {

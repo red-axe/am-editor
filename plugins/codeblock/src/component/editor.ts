@@ -134,8 +134,9 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 
 		this.container.on('mousedown', (event: MouseEvent) => {
 			if (!this.codeMirror?.hasFocus()) {
-				this.codeMirror?.focus();
-				event.preventDefault();
+				setTimeout(() => {
+					this.codeMirror?.focus();
+				}, 0);
 			}
 		});
 		return this.codeMirror;

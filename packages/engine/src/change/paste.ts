@@ -229,11 +229,15 @@ export default class Paste {
 		const range = this.engine.change.getRange();
 		const root = range.commonAncestorNode;
 		const inline = this.engine.inline.closest(root);
-		if (!inline.isCard() && nodeApi.isInline(inline)) {
+		if (root.inEditor() && !inline.isCard() && nodeApi.isInline(inline)) {
 			this.removeElementNodes($(fragment));
 			return fragment;
 		}
-		if (root.isText() && range.startContainer === range.endContainer) {
+		if (
+			root.inEditor() &&
+			root.isText() &&
+			range.startContainer === range.endContainer
+		) {
 			const text = root[0].nodeValue;
 			const leftText = text?.substr(0, range.startOffset);
 			const rightText = text?.substr(range.endOffset);
@@ -296,6 +300,7 @@ export default class Paste {
 		const { startNode } = range.cloneRange().shrinkToTextNode();
 		const startParent = startNode.parent();
 		if (
+			startNode.inEditor() &&
 			((startNode.isText() && !startNode.parent()?.isEditable()) ||
 				(startNode.name === 'li' &&
 					startParent &&

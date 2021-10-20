@@ -48,25 +48,6 @@ $ yarn start
 $ yarn build
 ```
 
-需要注意的是，[father-build](https://github.com/umijs/father) 对 vue 很不友好，我们需要改动 node_modules/father/lib/getRollupConfig.ts 文件中的 getPlugins 方法。 [我的分支上已修改，可以参考一下](https://github.com/yanmao-cc/father/blob/master/packages/father-build/src/getRollupConfig.ts)
-
-在 vue 项目中还需要添加.fatherrc.ts 配置文件
-
-```ts
-import vue from 'rollup-plugin-vue';
-import commonjs from '@rollup/plugin-commonjs';
-
-export default {
-	extraExternals: ['vue'],
-	extraRollupPlugins: [
-		{ before: 'postcss', plugins: [vue({ preprocessStyles: true })] },
-		commonjs(),
-	],
-};
-```
-
-这样在使用 father-build 编译 vue 项目时不会出错
-
 站点打包
 
 ```bash

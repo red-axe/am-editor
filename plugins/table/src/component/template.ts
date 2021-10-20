@@ -159,7 +159,7 @@ class Template implements TemplateInterface {
 						) || '';
 					break;
 			}
-			return `<div class="${MENUBAR_ITEM_CLASS_NAME}" data-action="${menu.action}">
+			return `<div class="${MENUBAR_ITEM_CLASS_NAME}" ${DATA_ELEMENT}="${UI}" data-action="${menu.action}">
                 <span class="data-icon data-icon-table-${menu.icon}"></span>${menuContent}</div>`;
 		});
 		menuBar = [

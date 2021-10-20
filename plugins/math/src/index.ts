@@ -11,6 +11,7 @@ import {
 	SchemaInterface,
 	decodeCardValue,
 	encodeCardValue,
+	AjaxInterface,
 } from '@aomao/engine';
 import MathComponent from './component';
 import locales from './locales';
@@ -45,6 +46,8 @@ export default class Math extends Plugin<Options> {
 	static get pluginName() {
 		return 'math';
 	}
+
+	#request?: AjaxInterface;
 
 	init() {
 		this.editor.language.add(locales);
@@ -83,7 +86,8 @@ export default class Math extends Plugin<Options> {
 	) {
 		const { request } = this.editor;
 		const { action, type, contentType, data, parse } = this.options;
-		request.ajax({
+		this.#request?.abort();
+		this.#request = request.ajax({
 			url: action,
 			method: 'POST',
 			contentType: contentType || 'application/json',

@@ -7,13 +7,7 @@ import Range from '../range';
 import ChangeEvent from './event';
 import Parser, { TextParser } from '../parser';
 import { ANCHOR_SELECTOR, CURSOR_SELECTOR, FOCUS_SELECTOR } from '../constants';
-import {
-	combinTextNode,
-	formatEngineValue,
-	getDocument,
-	getWindow,
-	isMobile,
-} from '../utils';
+import { combinTextNode, getDocument, getWindow } from '../utils';
 import { Path } from 'sharedb';
 import {
 	CARD_ELEMENT_KEY,
@@ -426,7 +420,24 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	setHtml(html: string, callback?: (count: number) => void) {
-		this.paste(html, undefined, callback);
+		const { card, container } = this.engine;
+		this.paste(
+			html,
+			undefined,
+			callback,
+			true,
+			(
+				fragment: DocumentFragment,
+				_range?: RangeInterface,
+				_rangeCallback?: (range: RangeInterface) => void,
+				_followActiveMark?: boolean,
+			) => {
+				container.empty().append(fragment);
+				card.render(undefined, (count) => {
+					if (callback) callback(count);
+				});
+			},
+		);
 	}
 
 	getOriginValue() {
@@ -799,7 +810,7 @@ class ChangeModel implements ChangeInterface {
 					(range.commonAncestorNode.closest(CARD_SELECTOR).length >
 						0 &&
 						range.startNode.closest(
-							`${CARD_LEFT_SELECTOR},${CARD_RIGHT_SELECTOR}`,
+							`${CARD_LEFT_SELECTOR},${CARD_RIGHT_SELECTOR},${UI_SELECTOR}`,
 						).length === 0);
 				card.each((card) => {
 					const center = card.getCenter();
@@ -1018,10 +1029,16 @@ class ChangeModel implements ChangeInterface {
 		range?: RangeInterface,
 		callback?: (count: number) => void,
 		followActiveMark: boolean = true,
+		insertFragment: (
+			fragment: DocumentFragment,
+			range?: RangeInterface,
+			callback?: (range: RangeInterface) => void,
+			followActiveMark?: boolean,
+		) => void = this.insertFragment,
 	) {
 		const fragment = new Paste(source, this.engine).normalize();
 		this.engine.trigger('paste:before', fragment);
-		this.insertFragment(
+		insertFragment(
 			fragment,
 			range,
 			(range) => {

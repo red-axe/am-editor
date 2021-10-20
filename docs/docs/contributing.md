@@ -48,25 +48,6 @@ One command can compile all packages
 $ yarn build
 ```
 
-It should be noted that [father-build](https://github.com/umijs/father) is very unfriendly to vue, we need to change the getPlugins method in the node_modules/father/lib/getRollupConfig.ts file. [My branch has been modified, you can refer to it](https://github.com/yanmao-cc/father/blob/master/packages/father-build/src/getRollupConfig.ts)
-
-You also need to add the .fatherrc.ts configuration file in the vue project
-
-```ts
-import vue from 'rollup-plugin-vue';
-import commonjs from '@rollup/plugin-commonjs';
-
-export default {
-	extraExternals: ['vue'],
-	extraRollupPlugins: [
-		{ before: 'postcss', plugins: [vue({ preprocessStyles: true })] },
-		commonjs(),
-	],
-};
-```
-
-This way there will be no error when using father-build to compile the vue project
-
 Site packaging
 
 ```bash

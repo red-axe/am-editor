@@ -96,6 +96,10 @@ class Ajax implements AjaxInterface {
 		this.request = this.getRequest(success, error);
 	}
 
+	abort() {
+		this.request?.abort();
+	}
+
 	defaultXHR() {
 		const { context, crossOrigin } = this.options;
 		if (!context) return;

@@ -13,6 +13,7 @@ import {
 	CARD_KEY,
 	encodeCardValue,
 	CardInterface,
+	AjaxInterface,
 } from '@aomao/engine';
 import MentionComponent from './component';
 import locales from './locales';
@@ -71,6 +72,7 @@ export interface Options extends PluginOptions {
 }
 
 class MentionPlugin extends Plugin<Options> {
+	#request?: AjaxInterface;
 	static get pluginName() {
 		return 'mention';
 	}
@@ -106,7 +108,8 @@ class MentionPlugin extends Plugin<Options> {
 			if (onSearch) return onSearch(keyword);
 			return new Promise((resolve) => {
 				if (action) {
-					request.ajax({
+					this.#request?.abort();
+					this.#request = request.ajax({
 						url: action,
 						contentType: contentType || '',
 						type: type === undefined ? 'json' : type,
