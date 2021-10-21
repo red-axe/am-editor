@@ -39,6 +39,7 @@ Use the `contenteditable` attribute provided by the browser to make a DOM node e
 The engine takes over most of the browser's default behaviors such as cursors and events.
 
 Monitor the changes of the `DOM` tree in the editing area through `MutationObserver`, and generate a data format of `json0` type to interact with the [ShareDB](https://github.com/share/sharedb) library to achieve collaborative editing Needs.
+**`Vue2`** example [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
 
 **`Vue3`** example [https://github.com/yanmao-cc/am-editor/tree/master/examples/vue](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
 
@@ -255,6 +256,8 @@ In the example, we have a relatively basic client code
 
 [View the complete example of Vue3](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
 
+[View the complete example of Vue2](https://github.com/zb201307/am-editor-vue2)
+
 ```tsx
 //Instantiate the collaborative editing client and pass in the current editor engine instance
 const otClient = new OTClient(engine);
@@ -309,7 +312,7 @@ There is no backend API configured in the `Vue` case. For details, please refer 
 
 ## Contribution
 
-Thanks [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.com/Elena211314) for donation
+Thanks [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.com/Elena211314)、[zb201307](https://github.com/zb201307) for donation
 
 ### Alipay
 

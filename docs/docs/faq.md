@@ -2,7 +2,7 @@
 
 ## Does am-editor support Vue2?
 
-am-editor partially supports vue2. The engine library `@aomao/engine` itself is written in javascript and does not involve the front-end framework. Mainly because some plugins we use front-end frame rendering
+The engine library `@aomao/engine` itself is written in javascript and does not involve the front-end framework. Mainly because some plugins we use front-end frame rendering
 
 The following three plugins are different
 
@@ -13,6 +13,8 @@ The following three plugins are different
 -   `@aomao/plugin-link-vue` link input, text input, using the existing UI of the front-end library is a better choice
 
 These three plugins all have vue3 dependencies and use the antv UI library. Other plugins do not rely on any front-end framework
+
+[Vue2 Plugins](https://github.com/zb201307/am-editor-vue2/tree/main/packages)
 
 ## window is not defined, document is not defined, navigator is not defined
 

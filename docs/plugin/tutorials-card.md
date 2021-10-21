@@ -58,7 +58,7 @@ Card components
 ```ts
 import ReactDOM from 'react-dom';
 import { $, Card, CardType } from '@aomao/engine';
-// Introduce custom react components
+// import custom react components
 import ReactCommponent from 'ReactCommponent';
 
 export default class extends Card {
@@ -322,7 +322,85 @@ export default EngineDemo;
 
 Use the shortcut key `mod+shift+0` defined in `test/index.ts` to insert the card component just defined in the editor
 
-### Vue rendering
+### Vue2 rendering
+
+Vue components
+
+```ts
+<template>
+    <div>Vue Component</div>
+</template>
+<script lang="ts">
+import { Component, Prop, Vue } from "vue-property-decorator";
+@Component({})
+export default class VueComponent extends Vue {
+
+}
+</script>
+```
+
+Card components
+
+```ts
+import Vue from 'vue';
+import { $, Card, CardType } from '@aomao/engine';
+// import custom vue components
+import VueCommponent from 'VueCommponent';
+
+export default class extends Card {
+	container?: NodeInterface;
+	private vm?: Vue;
+
+	static get cardName() {
+		return 'CardName';
+	}
+
+	static get cardType() {
+		return CardType.BLOCK;
+	}
+
+	/**
+	 * After the card is rendered successfully, the empty div node has been loaded in the editor
+	 * */
+	didRender() {
+		if (!this.container) return;
+		// Get a node of type HTMLElement
+		const element = this.container.get<HTMLElement>()!;
+		//Use createApp to render the Vue component to the empty div node on the container
+		//Add a delay, otherwise it may not be rendered successfully
+		setTimeout(() => {
+			this.vm = new Vue({
+				render: (h) => {
+					return h(VueComponent, {
+						props: {},
+					});
+				},
+			});
+			element.append(vm.$mount().$el);
+		}, 20);
+	}
+
+	/**
+	 * Render the card
+	 * */
+	render() {
+		// Render an empty div node
+		this.container = $('<div></div>');
+		return this.container;
+	}
+
+	/**
+	 * Uninstall components
+	 * */
+	destroy() {
+		super.destroy();
+		this.vm?.$destroy();
+		this.vm = undefined;
+	}
+}
+```
+
+### Vue3 rendering
 
 Vue components
 
@@ -344,7 +422,7 @@ Card components
 ```ts
 import { createApp, App } from 'vue';
 import { $, Card, CardType } from '@aomao/engine';
-// Introduce custom vue components
+// import custom vue components
 import VueCommponent from 'VueCommponent';
 
 export default class extends Card {
@@ -777,7 +855,7 @@ export default class extends Card<{ count: number }> {
 
 ```ts
 import { Plugin, isEngine } from '@aomao/engine';
-// Introduce cards
+// import cards
 import CardComponent from './component';
 
 type Options = {

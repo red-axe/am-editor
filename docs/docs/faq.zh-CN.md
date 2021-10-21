@@ -2,7 +2,7 @@
 
 ## am-editor 支持 Vue2 吗？
 
-am-editor 部分支持 vue2。引擎库 `@aomao/engine` 本身是 javascript 编写的，不涉及到前端框架。主要在于一些插件我们使用了前端框架渲染
+引擎库 `@aomao/engine` 本身是 javascript 编写的，不涉及到前端框架。主要在于一些插件我们使用了前端框架渲染
 
 下面这三个插件有区别
 
@@ -12,7 +12,9 @@ am-editor 部分支持 vue2。引擎库 `@aomao/engine` 本身是 javascript 编
 
 -   `@aomao/plugin-link-vue` 链接输入、文本输入，使用前端库现有的 UI 是比较好的选择
 
-这三个插件都有 vue3 的依赖，并且使用的是 antv UI 库。其它插件没有依赖任何前端框架
+这三个插件都有 vue3 的依赖，并且使用的是 antd UI 库。其它插件没有依赖任何前端框架
+
+[Vue2 插件](https://github.com/zb201307/am-editor-vue2/tree/main/packages)
 
 ## window is not defined, document is not defined, navigator is not defined
 

@@ -322,7 +322,85 @@ export default EngineDemo;
 
 使用 `test/index.ts` 中定义的快捷键 `mod+shift+0` 就能在编辑器中插入刚才定义的卡片组件了
 
-### Vue 渲染
+### Vue2 渲染
+
+Vue 组件
+
+```ts
+<template>
+    <div>Vue Component</div>
+</template>
+<script lang="ts">
+import { Component, Prop, Vue } from "vue-property-decorator";
+@Component({})
+export default class VueComponent extends Vue {
+
+}
+</script>
+```
+
+卡片组件
+
+```ts
+import Vue from 'vue';
+import { $, Card, CardType } from '@aomao/engine';
+// 引入自定义的 vue 组件
+import VueCommponent from 'VueCommponent';
+
+export default class extends Card {
+	container?: NodeInterface;
+	private vm?: Vue;
+
+	static get cardName() {
+		return '卡片名称';
+	}
+
+	static get cardType() {
+		return CardType.BLOCK;
+	}
+
+	/**
+	 * 卡片渲染成功后，空的 div 节点已在编辑器中加载
+	 * */
+	didRender() {
+		if (!this.container) return;
+		// 获取 HTMLElement 类型的节点
+		const element = this.container.get<HTMLElement>()!;
+		//使用 createApp 把 Vue 组件渲染到 container 上的空 div 节点上
+		//加个延时，不然可能无法渲染成功
+		setTimeout(() => {
+			this.vm = new Vue({
+				render: (h) => {
+					return h(VueComponent, {
+						props: {},
+					});
+				},
+			});
+			element.append(vm.$mount().$el);
+		}, 20);
+	}
+
+	/**
+	 * 渲染卡片
+	 * */
+	render() {
+		// 渲染一个空的div节点
+		this.container = $('<div></div>');
+		return this.container;
+	}
+
+	/**
+	 * 卸载组件
+	 * */
+	destroy() {
+		super.destroy();
+		this.vm?.$destroy();
+		this.vm = undefined;
+	}
+}
+```
+
+### Vue3 渲染
 
 Vue 组件
 
@@ -394,7 +472,7 @@ export default class extends Card {
 }
 ```
 
-### Vue 卡片插件示例
+### Vue3 卡片插件示例
 
 卡片插件文件，主要作用：插入卡片、转换/解析卡片
 

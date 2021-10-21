@@ -42,6 +42,8 @@
 
 通过 `MutationObserver` 监听编辑区域内的 `DOM` 树的改变，并生成 `json0` 类型的数据格式与 [ShareDB](https://github.com/share/sharedb) 库进行交互，从而达到协同编辑的需要。
 
+**`Vue2`** 案例 [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
+
 **`Vue3`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/vue](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
 
 **`React`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
@@ -257,6 +259,8 @@ return (
 
 [查看 Vue3 完整案例](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
 
+[查看 Vue2 完整案例](https://github.com/zb201307/am-editor-vue2)
+
 ```tsx
 //实例化协作编辑客户端，传入当前编辑器引擎实例
 const otClient = new OTClient(engine);
@@ -290,7 +294,7 @@ yarn ssr
 
 启动后访问 localhost:7001
 
-### Vue
+### Vue3
 
 只需要进入 examples/vue 目录安装依赖
 
