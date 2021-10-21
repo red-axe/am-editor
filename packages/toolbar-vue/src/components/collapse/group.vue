@@ -1,5 +1,5 @@
 <template>
-    <div className="toolbar-collapse-group">
+    <div class="toolbar-collapse-group">
         <div v-if="title" class="toolbar-collapse-group-title">{{title}}</div>
         <am-collapse-item 
         v-for="item in items"

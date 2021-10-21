@@ -1,5 +1,5 @@
 <template>
-    <a-spin className="loading" :tip="text" :spinning="loading">
+    <a-spin class="loading" :tip="text" :spinning="loading">
 		<slot></slot>
 	</a-spin>
 </template>

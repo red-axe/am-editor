@@ -22,7 +22,7 @@
                         <span v-if="buttonContent && buttonContent.icon" :class="['data-icon',`data-icon-${buttonContent.icon}`]" />
                         <span v-if="buttonContent && !buttonContent.icon && buttonContent.content" class="toolbar-dropdown-button-text" v-html="buttonContent.content"></span>
                     </slot>
-                    <span v-if="hasArrow !== false" className="data-icon data-icon-arrow" />
+                    <span v-if="hasArrow !== false" class="data-icon data-icon-arrow" />
                 </template>
             </am-button>
         </div>

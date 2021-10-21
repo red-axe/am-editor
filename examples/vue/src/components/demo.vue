@@ -1,6 +1,6 @@
 <template>
     <am-loading :loading="loading">
-        <div className="editor-ot-users">
+        <div class="editor-ot-users">
             <space class="editor-ot-users-content" size="small">
                 <span v-if="!isMobile" style="color: '#888888'">
                     当前在线<strong>{{members.length}}</strong>人

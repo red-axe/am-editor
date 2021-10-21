@@ -22,9 +22,9 @@
             :disabled="disabled"
             >
                 <template #icon>
-                    <span className="colorpicker-button-dropdown-empty" />
+                    <span class="colorpicker-button-dropdown-empty" />
                 </template>
-                <span className="data-icon data-icon-arrow" />
+                <span class="data-icon data-icon-arrow" />
             </am-button>
         </div>
         <div v-if="visible" class="toolbar-dropdown-list" data-element="ui">

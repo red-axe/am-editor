@@ -1029,35 +1029,38 @@ class ChangeModel implements ChangeInterface {
 		range?: RangeInterface,
 		callback?: (count: number) => void,
 		followActiveMark: boolean = true,
-		insertFragment: (
+		insertFragment?: (
 			fragment: DocumentFragment,
 			range?: RangeInterface,
 			callback?: (range: RangeInterface) => void,
 			followActiveMark?: boolean,
-		) => void = this.insertFragment,
+		) => void,
 	) {
 		const fragment = new Paste(source, this.engine).normalize();
 		this.engine.trigger('paste:before', fragment);
-		insertFragment(
-			fragment,
-			range,
-			(range) => {
-				this.engine.trigger('paste:insert', range);
-				this.#lastePasteRange = range.cloneRange();
-				range.collapse(false);
-				const selection = range.createSelection();
-				this.engine.card.render(undefined, (count) => {
-					selection.move();
-					range.scrollRangeIntoView();
-					this.select(range);
-					if (callback) {
-						callback(count);
-					}
-					this.engine.trigger('paste:after');
-				});
-			},
-			followActiveMark,
-		);
+		if (insertFragment)
+			insertFragment(fragment, range, undefined, followActiveMark);
+		else
+			this.insertFragment(
+				fragment,
+				range,
+				(range) => {
+					this.engine.trigger('paste:insert', range);
+					this.#lastePasteRange = range.cloneRange();
+					range.collapse(false);
+					const selection = range.createSelection();
+					this.engine.card.render(undefined, (count) => {
+						selection.move();
+						range.scrollRangeIntoView();
+						this.select(range);
+						if (callback) {
+							callback(count);
+						}
+						this.engine.trigger('paste:after');
+					});
+				},
+				followActiveMark,
+			);
 	}
 
 	combinTextNode() {
