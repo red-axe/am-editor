@@ -154,7 +154,7 @@ export default EngineDemo;
 
 ### Plugins
 
-Introduce `@aomao/plugin-bold` bold plug-in
+Import `@aomao/plugin-bold` bold plug-in
 
 ```tsx
 import Bold from '@aomao/plugin-bold';
@@ -173,7 +173,7 @@ const engine = new Engine(ref.current, {
 
 A card is a separate area in the editor. The UI and logic inside the card can be customized using React, Vue or other front-end libraries to customize the rendering content, and finally mount it to the editor.
 
-Introduce the `@aomao/plugin-codeblock` code block plugin. The `Language drop-down box` of this plugin is rendered using `React`, so there is a distinction. `Vue3` uses `@aomao/plugin-codeblock-vue`
+Import the `@aomao/plugin-codeblock` code block plugin. The `Language drop-down box` of this plugin is rendered using `React`, so there is a distinction. `Vue3` uses `@aomao/plugin-codeblock-vue`
 
 ```tsx
 import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
@@ -193,7 +193,7 @@ The `CodeBlock` plugin supports `markdown` by default. Enter the code block synt
 
 ### Toolbar
 
-Introduce the `@aomao/toolbar` toolbar. Due to the complex interaction, the toolbar is basically rendered using `React` + `Antd` UI components, while `Vue3` uses `@aomao/toolbar-vue`
+Import the `@aomao/toolbar` toolbar. Due to the complex interaction, the toolbar is basically rendered using `React` + `Antd` UI components, while `Vue3` uses `@aomao/toolbar-vue`
 
 Except for UI interaction, most of the work of the toolbar is just to call the engine to execute the corresponding plug-in commands after different button events are triggered. In the case of complicated requirements or the need to re-customize the UI, it is easier to modify after the fork.
 
