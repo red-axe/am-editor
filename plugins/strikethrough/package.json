@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-strikethrough",
-  "version": "2.4.19",
+  "version": "2.4.18",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.4.19",
+    "@aomao/engine": "^2.4.18",
     "@babel/runtime": "^7.13.10"
   }
 }
