@@ -251,7 +251,7 @@ class CollapseComponent implements CollapseComponentInterface {
 							true,
 							false,
 						);
-					this.scroll('down');
+					this.select(0);
 					this.bindEvents();
 					this.#scrollbar?.refresh();
 				},
