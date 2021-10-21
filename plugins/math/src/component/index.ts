@@ -55,7 +55,7 @@ export default class MathCard extends Card<MathValue> {
 				this.editorContainer?.removeClass('textarea-focus');
 			},
 			onChange: this.queryMath,
-			onOk: (event: MouseEvent) => {
+			onOk: (event: Event) => {
 				event.stopPropagation();
 				event.preventDefault();
 				card.activate($(document.body), ActiveTrigger.MANUAL);

@@ -7,6 +7,7 @@ import {
 	UI,
 	TRIGGER_CARD_ID,
 	isMobile,
+	isHotkey,
 } from '@aomao/engine';
 import { getLocales } from '../utils';
 
@@ -15,7 +16,7 @@ export type Options = {
 	onFocus?: () => void;
 	onBlur?: () => void;
 	onChange?: (value: string) => void;
-	onOk?: (event: MouseEvent) => void;
+	onOk?: (event: Event) => void;
 	onDestroy?: () => void;
 };
 
@@ -60,6 +61,12 @@ class MathEditor {
 
 		textarea.on('mousedown', () => {
 			textarea.get<HTMLTextAreaElement>()?.focus();
+		});
+
+		textarea.on('keydown', (event: KeyboardEvent) => {
+			if (onOk && isHotkey('mod+enter', event)) {
+				onOk(event);
+			}
 		});
 
 		this.container.append(textarea);
