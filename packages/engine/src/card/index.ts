@@ -355,7 +355,11 @@ class CardModel implements CardModelInterface {
 					) {
 						this.select(card);
 					}
-					card.select(!card.isEditable);
+					if (
+						!card.isEditable &&
+						(card.constructor as CardEntry).autoSelected !== false
+					)
+						card.select(!card.isEditable);
 					card.activate(true);
 				} else if (card.isEditable) {
 					card.select(false);

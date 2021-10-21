@@ -128,9 +128,21 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	submitOps(ops: Op[]) {
 		if (!this.doc) return;
-		(this.doc as Doc).submitOp(ops, {
-			source: this.clientId,
-		});
+		try {
+			(this.doc as Doc).submitOp(ops, {
+				source: this.clientId,
+			});
+		} catch (error) {
+			console.error(
+				'SubmitOps Error:',
+				'MSG:',
+				error,
+				'OPS:',
+				ops,
+				'DATA:',
+				this.doc.data,
+			);
+		}
 	}
 
 	applyAll(ops: Op[]) {

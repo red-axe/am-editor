@@ -30,6 +30,10 @@ class CodeBlcok extends Card<CodeBlockValue> {
 		return CardType.BLOCK;
 	}
 
+	static get autoSelected() {
+		return false;
+	}
+
 	static getModes() {
 		return modeDatas;
 	}

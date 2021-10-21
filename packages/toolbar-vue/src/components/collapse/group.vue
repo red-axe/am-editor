@@ -6,7 +6,7 @@
         :key="item.name"
         :engine="engine"
         v-bind="{...omit(item, 'onClick')}"
-        @click="onClick"
+        :on-click="onClick"
         />
     </div>
 </template>

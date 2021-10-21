@@ -246,7 +246,7 @@ class OTClient extends EventEmitter {
 			} else {
 				try {
 					// 实例化编辑器内部协同服务
-					this.engine.ot.init(doc, defaultValue);
+					this.engine.ot.init(doc as any, defaultValue);
 					// 聚焦到编辑器
 					this.engine.focus();
 				} catch (err) {

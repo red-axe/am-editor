@@ -34,6 +34,10 @@ class ToolbarComponent extends Card {
 		return false;
 	}
 
+	static get autoSelected() {
+		return false;
+	}
+
 	init() {
 		if (!isEngine(this.editor) || isServer) {
 			return;

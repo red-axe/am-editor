@@ -121,7 +121,7 @@ export default class extends BlockPlugin<Options> {
 		//引擎处理
 		if (!isEngine(this.editor) || this.options.showAnchor === false) return;
 
-		this.editor.on('setvalue', () => {
+		this.editor.on('setValue', () => {
 			this.updateId();
 		});
 		this.editor.on('change', () => {
@@ -151,7 +151,8 @@ export default class extends BlockPlugin<Options> {
 			}
 
 			let id = node.attributes('id');
-			if (!id) {
+			const dataId = node.attributes('data-id');
+			if (!id || dataId !== id) {
 				id = node.attributes('data-id') || getHashId(node);
 				node.attributes('id', id);
 			}
