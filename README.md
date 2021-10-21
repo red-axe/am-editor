@@ -39,6 +39,7 @@ Use the `contenteditable` attribute provided by the browser to make a DOM node e
 The engine takes over most of the browser's default behaviors such as cursors and events.
 
 Monitor the changes of the `DOM` tree in the editing area through `MutationObserver`, and generate a data format of `json0` type to interact with the [ShareDB](https://github.com/share/sharedb) library to achieve collaborative editing Needs.
+
 **`Vue2`** example [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
 
 **`Vue3`** example [https://github.com/yanmao-cc/am-editor/tree/master/examples/vue](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
