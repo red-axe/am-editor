@@ -167,6 +167,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		}
 		// 如果有设置默认值，就设置编辑器的值
 		if (defaultValue) engine.setValue(defaultValue);
+		this.mutation?.updateIndex();
 		// 没有数据，就把当前编辑器值提交
 		doc.on('create', () => {
 			const data = fromDOM(engine.container);
@@ -185,7 +186,9 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	}
 
 	setData(data: Array<any>) {
-		this.engine.setJsonValue(data);
+		this.engine.setJsonValue(data, () => {
+			this.mutation?.updateIndex();
+		});
 	}
 
 	startMutation() {

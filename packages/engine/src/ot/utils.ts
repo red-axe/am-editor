@@ -4,8 +4,8 @@ import { NodeInterface } from '../types/node';
 import { FOCUS, ANCHOR, CURSOR } from '../constants/selection';
 import {
 	CARD_ASYNC_RENDER,
-	CARD_ELEMENT_KEY,
 	CARD_SELECTOR,
+	CARD_VALUE_KEY,
 } from '../constants/card';
 
 import {

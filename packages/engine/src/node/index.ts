@@ -158,6 +158,11 @@ class NodeModel implements NodeModelInterface {
 			if (child.nodeType === getWindow().Node.TEXT_NODE) {
 				if (child['data'].replace(/\u200b/g, '') !== '') return false;
 			} else if (child.nodeType === getWindow().Node.ELEMENT_NODE) {
+				if (
+					child.nodeName.toLowerCase() === 'li' &&
+					!this.editor.list.isEmptyItem($(child))
+				)
+					return false;
 				if ((child as Element).hasAttribute(CARD_KEY)) return false;
 				if (!this.isLikeEmpty($(child))) {
 					return false;
@@ -479,7 +484,7 @@ class NodeModel implements NodeModelInterface {
 		}
 		const editor = this.editor;
 		if (!isEngine(editor)) return;
-		const { change } = editor;
+		const { change, block, schema } = editor;
 		range = range || change.getRange();
 		const nodeApi = editor.node;
 		const { startNode, startOffset } = range
@@ -515,8 +520,55 @@ class NodeModel implements NodeModelInterface {
 				}
 			}
 		}
-		range.insertNode(node);
-		return range.select(node, true).shrinkToElementNode().collapse(false);
+
+		if (nodeApi.isBlock(node)) {
+			block.split(range);
+			let blockNode = block.closest(
+				range.startNode.isEditable()
+					? range
+							.cloneRange()
+							.shrinkToElementNode()
+							.shrinkToTextNode().startNode
+					: range.startNode,
+			);
+			if (schema.isAllowIn(blockNode.name, node.nodeName.toLowerCase())) {
+				blockNode.find('br').remove();
+				blockNode.append(node);
+			} else {
+				let parentBlock = blockNode.parent();
+				while (
+					parentBlock &&
+					this.isBlock(parentBlock) &&
+					!schema.isAllowIn(parentBlock.name, blockNode.name)
+				) {
+					blockNode = parentBlock;
+					parentBlock = blockNode.parent();
+				}
+				if (
+					blockNode.isEditable() &&
+					blockNode.children().length === 0
+				) {
+					blockNode.append(node);
+				} else {
+					if (
+						(this.isLikeEmpty(blockNode) &&
+							block.isLastOffset(range, 'end')) ||
+						range.startNode.isEditable()
+					) {
+						blockNode.after(node);
+						if (!range.startNode.isEditable()) blockNode.remove();
+					} else {
+						blockNode.before(node);
+					}
+				}
+			}
+		} else {
+			range.insertNode(node);
+		}
+		return range
+			.select(node, this.isVoid(node) ? false : true)
+			.shrinkToElementNode()
+			.collapse(false);
 	}
 
 	/**
@@ -807,7 +859,10 @@ class NodeModel implements NodeModelInterface {
 	 */
 	getBatchAppendHTML(nodes: Array<NodeInterface>, appendExp: string) {
 		if (nodes.length === 0) return appendExp;
-		let appendNode = $(appendExp);
+		let appendNode =
+			appendExp.startsWith('\\u') || appendExp.startsWith('&#')
+				? $(appendExp, null)
+				: $(appendExp);
 		nodes.forEach((node) => {
 			node = node.clone(false);
 			node.append(appendNode);

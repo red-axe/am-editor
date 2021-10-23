@@ -15,7 +15,7 @@ import {
 	reduceOperations,
 } from './utils';
 import { escapeDots, escape } from '../utils/string';
-import { fromDOM, getPathValue, pushAndRepair } from './jsonml';
+import { fromDOM, getPathValue, pushAndRepair, toDOM } from './jsonml';
 import { EngineInterface } from '../types/engine';
 import { Op, Path, StringInsertOp, StringDeleteOp, Doc } from 'sharedb';
 import { NodeInterface } from '../types/node';
@@ -130,6 +130,21 @@ class Creator extends EventEmitter2 {
 				isTransientElement(targetNode, transientElements))
 		);
 	}
+
+	updateIndex(root: NodeInterface) {
+		if (root.isText()) return;
+		let childrens = root.children().toArray();
+		if (!root.isEditable()) {
+			childrens = childrens.filter(
+				(child) =>
+					!isTransientElement($(child), this.cacheTransientElements),
+			);
+		}
+		childrens.forEach((child, index) => {
+			child[0]['index'] = index;
+			if (!child.isText()) this.updateIndex(child);
+		});
+	}
 	/**
 	 * 从DOM变更记录中生产 ops （json格式的操作集合）
 	 * @param records DOM变更记录集合
@@ -139,6 +154,7 @@ class Creator extends EventEmitter2 {
 	 * @returns
 	 */
 	makeOpsFromMutations(
+		oldDom: NodeInterface,
 		records: MutationRecord[],
 		path: Path = [],
 		oldPath: Path = [],
@@ -175,30 +191,38 @@ class Creator extends EventEmitter2 {
 				if (node.equal(target)) {
 					// DOM中变更为移除
 					if (removedNodes[0]) {
-						// 获取移除节点在编辑器中的索引
-						const removeIndex = this.getRemoveNodeIndex(
-							record,
-							records,
-						);
 						// 循环要移除的节点
-						Array.from(removedNodes).forEach((removedNode) => {
-							// 要移除的节点同时又在增加的就不处理
-							if (
-								!addNodes.find((n) => n === removedNode) &&
-								!cacheNodes.find((n) => n === removedNode)
-							) {
-								let p: Path = [];
-								p = p.concat([...path], [removeIndex + 2]);
-								let op: Path = [];
-								op = op.concat([...oldPath], [removeIndex + 2]);
-								pushAndRepair(ops, {
-									ld: true,
-									p,
-									newPath: p.slice(),
-									oldPath: op,
-								});
-							}
-						});
+						Array.from(removedNodes).forEach(
+							(removedNode, index) => {
+								// 要移除的节点同时又在增加的就不处理
+								if (
+									!addNodes.find((n) => n === removedNode) &&
+									!cacheNodes.find((n) => n === removedNode)
+								) {
+									// 获取移除节点在编辑器中的索引
+									const rIndex =
+										(removedNode['index'] === undefined
+											? this.getRemoveNodeIndex(
+													oldDom,
+													record,
+													records,
+											  )
+											: removedNode['index']) +
+										2 +
+										index;
+									let p: Path = [];
+									p = p.concat([...path], [rIndex]);
+									let op: Path = [];
+									op = op.concat([...oldPath], [rIndex]);
+									pushAndRepair(ops, {
+										ld: true,
+										p,
+										newPath: p.slice(),
+										oldPath: op,
+									});
+								}
+							},
+						);
 					}
 					if (addedNodes[0]) {
 						Array.from(addedNodes).forEach((addedNode) => {
@@ -299,10 +323,19 @@ class Creator extends EventEmitter2 {
 					op.oldPath || [],
 				);
 				if (pathValue !== undefined) {
-					allOps.push({
+					const ldOp = {
 						ld: pathValue,
 						p: op.p,
-					});
+					};
+					// 重复删除的过滤掉
+					if (
+						!allOps.find(
+							(op) =>
+								'ld' in op &&
+								JSON.stringify(op) === JSON.stringify(ldOp),
+						)
+					)
+						allOps.push(ldOp);
 				}
 			}
 			if ('li' in op) {
@@ -331,6 +364,7 @@ class Creator extends EventEmitter2 {
 				const p: Path = [];
 				allOps = allOps.concat(
 					this.makeOpsFromMutations(
+						oldDom,
 						mutations,
 						p.concat(...path, [index + 2]),
 						p.concat([...oldPath], [oldIndex + 2]),
@@ -348,11 +382,25 @@ class Creator extends EventEmitter2 {
 	 * @returns
 	 */
 	getRemoveNodeIndex(
+		oldDom: NodeInterface,
 		record: MutationRecord,
 		records: MutationRecord[],
 	): number {
 		const { target, nextSibling, previousSibling, addedNodes } = record;
 		const targetElement = target as Element;
+		const removeNode = $(record.removedNodes[0]);
+		const dataId = removeNode.attributes('data-id');
+		if (!!dataId) {
+			const rNode = oldDom.find(`[data-id="${dataId}"]`);
+			if (rNode.length > 0)
+				return rNode.getIndex(
+					(node) =>
+						!isTransientElement(
+							$(node),
+							this.cacheTransientElements,
+						),
+				);
+		}
 		// 获取目标节点的过滤后非协同节点后的所有子节点
 		const childNodes =
 			target.nodeType === getDocument().ELEMENT_NODE &&
@@ -370,6 +418,9 @@ class Creator extends EventEmitter2 {
 		const nextIndex = childNodes.indexOf(nextSibling as ChildNode);
 		let index;
 		if (prevIndex !== -1) {
+			if (records.find((r) => r.addedNodes.item(0) === previousSibling)) {
+				return prevIndex;
+			}
 			index = prevIndex + 1;
 		} else if (nextIndex !== -1) {
 			index = nextIndex;
@@ -377,8 +428,12 @@ class Creator extends EventEmitter2 {
 			index = addedIndex;
 		} else if (previousSibling) {
 			if (nextSibling) {
-				if (previousSibling) {
+				if (
+					previousSibling &&
+					previousSibling !== record.removedNodes[0]
+				) {
 					index = this.getRemoveNodeIndexFromMutation(
+						oldDom,
 						previousSibling,
 						target,
 						records,
@@ -392,6 +447,7 @@ class Creator extends EventEmitter2 {
 	}
 
 	getRemoveNodeIndexFromMutation(
+		oldDom: NodeInterface,
 		node: Node,
 		target: Node,
 		records: MutationRecord[],
@@ -401,7 +457,7 @@ class Creator extends EventEmitter2 {
 				record.target === target && record.removedNodes[0] === node,
 		);
 		if (record) {
-			return this.getRemoveNodeIndex(record, records);
+			return this.getRemoveNodeIndex(oldDom, record, records);
 		}
 		return 0;
 	}
@@ -437,12 +493,38 @@ class Creator extends EventEmitter2 {
 				});
 			});
 		}
-		records = records.filter(
-			(record) =>
-				!this.isTransientMutation(record, this.cacheTransientElements),
-		);
+		const targetElements: Node[] = [];
+		records = records.filter((record) => {
+			const isTransient = this.isTransientMutation(
+				record,
+				this.cacheTransientElements,
+			);
+			if (
+				!isTransient &&
+				!targetElements.includes(record.target) &&
+				!targetElements.find((element) =>
+					element.contains(record.target),
+				)
+			) {
+				let index = -1;
+				while (
+					(index = targetElements.findIndex((element) =>
+						record.target.contains(element),
+					)) &&
+					index > -1
+				) {
+					targetElements.splice(index, 1);
+				}
+				targetElements.push(record.target);
+			}
+			return !isTransient;
+		});
 		this.clearAddedNodeCache();
-		let ops = this.makeOpsFromMutations(records);
+		const oldDom = $(toDOM(this.doc?.data || []));
+		let ops = this.makeOpsFromMutations(oldDom, records);
+		targetElements.map((element) => {
+			this.updateIndex($(element));
+		});
 		//重置缓存
 		this.cacheTransientElements = undefined;
 		ops = reduceOperations(ops);

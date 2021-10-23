@@ -219,6 +219,22 @@ export default class Paste {
 			}
 			// 移除两边的 BR
 			nodeApi.removeSide(node);
+
+			// 处理嵌套
+			let nodeParent = parent;
+			while (
+				nodeParent &&
+				!nodeParent.fragment &&
+				nodeApi.isBlock(node) &&
+				!nodeApi.isBlock(nodeParent)
+			) {
+				const nodeClone = node.clone();
+				nodeApi.unwrap(node);
+				nodeParent.before(nodeClone);
+				nodeClone.append(nodeParent);
+				node = nodeClone;
+				nodeParent = node.parent();
+			}
 		});
 	}
 
@@ -306,7 +322,8 @@ export default class Paste {
 					startParent &&
 					this.engine.node.isList(startParent))) &&
 			first &&
-			first.name === 'p'
+			first.name === 'p' &&
+			!(first.length === 1 && first.first()?.name === 'br')
 		) {
 			nodeApi.unwrap(first);
 		}

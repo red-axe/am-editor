@@ -1161,10 +1161,13 @@ class ChangeModel implements ChangeInterface {
 					offset: range.startOffset,
 				};
 			}
-			range.insertNode(firstNode);
-			while (childNodes.length > 0 && !nodeApi.isBlock(childNodes[0])) {
+			let nextNode = firstNode.next();
+			nodeApi.insert(firstNode, range);
+			while (nextNode && !nodeApi.isBlock(nextNode)) {
 				range.enlargeToElementNode().collapse(false);
-				range.insertNode(childNodes[0]);
+				const newNext = nextNode.next();
+				nodeApi.insert(nextNode, range);
+				nextNode = newNext;
 			}
 			if (childNodes.length === 0) {
 				if (startRange && startRange.node.parent()) {
@@ -1186,14 +1189,13 @@ class ChangeModel implements ChangeInterface {
 		const endNode = range.startContainer.childNodes[range.startOffset];
 
 		if (childNodes.length !== 0) {
-			const doc = getDocument(range.startContainer);
 			let lastNode = $(childNodes[childNodes.length - 1]);
 			if ('br' === lastNode.name) {
 				lastNode.remove();
 				lastNode = $(childNodes[childNodes.length - 1]);
 			}
-			const fragment = doc.createDocumentFragment();
 			let node: NodeInterface | null = $(childNodes[0]);
+
 			const appendNodes = [];
 			while (node && node.length > 0) {
 				nodeApi.removeSide(node);
@@ -1203,11 +1205,9 @@ class ChangeModel implements ChangeInterface {
 				}
 
 				appendNodes.push(node);
-				fragment.appendChild(node[0]);
+				nodeApi.insert(node, range);
 				node = next;
 			}
-
-			range.insertNode(fragment);
 			if (mergeNode[0]) {
 				appendNodes.forEach((element) => {
 					if (

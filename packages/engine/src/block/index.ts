@@ -401,7 +401,7 @@ class Block implements BlockModelInterface {
 	 */
 	split(range?: RangeInterface) {
 		if (!isEngine(this.editor)) return;
-		const { change, mark } = this.editor;
+		const { change, mark, schema } = this.editor;
 		const safeRange = range || change.getSafeRange();
 		// 范围为展开状态时先删除内容
 		if (!safeRange.collapsed) {
@@ -465,18 +465,25 @@ class Block implements BlockModelInterface {
 			this.generateRandomID(sideBlock, true);
 		}
 		block.after(sideBlock);
+		const tags = schema.getAllowInTags();
 		// Chrome 不能选中 <p></p>，里面必须要有节点，插入 BR 之后输入文字自动消失
-		if (nodeApi.isEmpty(block)) {
+		if (nodeApi.isEmpty(block) && !tags.includes(block.name)) {
 			nodeApi.html(
 				block,
-				nodeApi.getBatchAppendHTML(activeMarks, '<br />'),
+				nodeApi.getBatchAppendHTML(
+					activeMarks,
+					activeMarks.length > 0 ? '\u200b' : '<br />',
+				),
 			);
 		}
 
-		if (nodeApi.isEmpty(sideBlock)) {
+		if (nodeApi.isEmpty(sideBlock) && !tags.includes(sideBlock.name)) {
 			nodeApi.html(
 				sideBlock,
-				nodeApi.getBatchAppendHTML(activeMarks, '<br />'),
+				nodeApi.getBatchAppendHTML(
+					activeMarks,
+					activeMarks.length > 0 ? '\u200b' : '<br />',
+				),
 			);
 		}
 		block.children().each((child) => {
@@ -840,8 +847,8 @@ class Block implements BlockModelInterface {
 	 */
 	findBlocks(range: RangeInterface) {
 		range = range.cloneRange();
-		if (!range.startNode.inEditor()) return [];
 		if (range.startNode.isRoot()) range.shrinkToElementNode();
+		if (!range.startNode.inEditor()) return [];
 		const sc = range.startContainer;
 		const so = range.startOffset;
 		const ec = range.endContainer;

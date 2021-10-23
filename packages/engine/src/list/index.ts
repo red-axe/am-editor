@@ -952,7 +952,8 @@ class List implements ListModelInterface {
 			}
 		}
 		if (mergeLists.length > 0) this.merge(mergeLists);
-		if (!startIsMerge) startListElment.remove();
+		if (!startIsMerge && node.isLikeEmpty(startListElment))
+			startListElment.remove();
 		// 后续不需要拼接到最后节点
 		if (fragment.childNodes.length === 0) {
 			// 删除由于分割造成的空行

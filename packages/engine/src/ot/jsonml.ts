@@ -109,68 +109,14 @@ export const getPathValue = (data: any, path: Path) => {
 };
 
 export const pushAndRepair = (ops: RepairOp[], op: RepairOp) => {
-	const oldPath = op.oldPath?.slice() || [];
-	let isSame = false;
-	let insertIndex = -1;
-	ops.forEach((opItem, index) => {
-		const opOffset = op.newPath[op.newPath.length - 1];
-		const itemOffset = opItem.newPath[opItem.newPath.length - 1];
-		const itemOldPath = opItem.oldPath?.slice() || [];
-		const itemP = opItem.p.slice();
-		if ('ld' in op) {
-			if ('ld' in opItem) {
-				if (itemOffset <= opOffset) {
-					oldPath[oldPath.length - 1] =
-						parseInt(oldPath[oldPath.length - 1].toString()) + 1;
-				} else {
-					itemOldPath[itemOldPath.length - 1] =
-						parseInt(
-							itemOldPath[itemOldPath.length - 1].toString(),
-						) + 1;
-					itemP[itemP.length - 1] =
-						parseInt(itemP[itemP.length - 1].toString()) + 1;
-				}
-			}
-			if ('li' in opItem) {
-				if (itemOffset >= opOffset) {
-					itemP[itemP.length - 1] =
-						parseInt(itemP[itemP.length - 1].toString()) + 1;
-				} else {
-					oldPath[oldPath.length - 1] =
-						parseInt(oldPath[oldPath.length - 1].toString()) - 1;
-				}
-			}
-		}
-		if ('li' in op) {
-			if ('ld' in opItem) {
-				if (itemOffset > opOffset) {
-					itemOldPath[itemOldPath.length - 1] =
-						parseInt(
-							itemOldPath[itemOldPath.length - 1].toString(),
-						) - 1;
-					itemP[itemP.length - 1] =
-						parseInt(itemP[itemP.length - 1].toString()) - 1;
-				}
-			}
-			if ('li' in opItem) {
-				if (
-					isSame === false &&
-					(itemOffset as number) - 1 === opOffset
-				) {
-					isSame = true;
-					insertIndex = index;
-				}
-				if (itemOffset > opOffset && !isSame) {
-					itemP[itemP.length - 1] =
-						parseInt(itemP[itemP.length - 1].toString()) - 1;
-				}
-			}
-		}
-		opItem.oldPath = itemOldPath;
-		opItem.p = itemP;
+	ops.push(op);
+	ops.sort((op1, op2) => {
+		const p1 = op1.p[op1.p.length - 1];
+		const p2 = op2.p[op2.p.length - 1];
+		const isLi = 'li' in op1 && 'li' in op2;
+		if (p1 <= p2 && 'ld' in op1) return -1;
+		if (p1 < p2) return isLi ? -1 : 1;
+		if (p1 > p2) return isLi ? 1 : -1;
+		return 0;
 	});
-	op.oldPath = oldPath;
-	if (insertIndex > -1) {
-		ops.splice(insertIndex, 0, op);
-	} else ops.push(op);
 };

@@ -132,6 +132,10 @@ export type RepairOp = Op & {
 
 export interface MutationInterface extends EventEmitter2 {
 	/**
+	 * 更新每个节点相对于父节点的index
+	 */
+	updateIndex(): void;
+	/**
 	 * 设置文档对象 OT 文档对象，或自定义文档对象
 	 * @param doc 文档对象
 	 */
