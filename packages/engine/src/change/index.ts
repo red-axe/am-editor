@@ -1176,23 +1176,17 @@ class ChangeModel implements ChangeInterface {
 				nextNode = newNext;
 			}
 			if (childNodes.length === 0) {
-				if (startRange && startRange.node.parent()) {
-					range
-						.shrinkToElementNode()
-						.setStart(startRange.node, startRange.offset);
-					range.enlargeToElementNode();
-				}
 				apply(range);
 				return;
-			} else {
-				range.enlargeToElementNode(true).collapse(false);
 			}
-		} else {
-			range.enlargeToElementNode(true);
 		}
+		const cloneRange = range
+			.cloneRange()
+			.enlargeToElementNode(true)
+			.collapse(false);
 		const startNode =
-			range.startContainer.childNodes[range.startOffset - 1];
-		const endNode = range.startContainer.childNodes[range.startOffset];
+			cloneRange.startContainer.childNodes[range.startOffset - 1];
+		const endNode = cloneRange.startContainer.childNodes[range.startOffset];
 
 		if (childNodes.length !== 0) {
 			let lastNode = $(childNodes[childNodes.length - 1]);
@@ -1201,7 +1195,7 @@ class ChangeModel implements ChangeInterface {
 				lastNode = $(childNodes[childNodes.length - 1]);
 			}
 			let node: NodeInterface | null = $(childNodes[0]);
-
+			let prev: NodeInterface | null = null;
 			const appendNodes = [];
 			while (node && node.length > 0) {
 				nodeApi.removeSide(node);
@@ -1211,9 +1205,15 @@ class ChangeModel implements ChangeInterface {
 				}
 
 				appendNodes.push(node);
-				nodeApi.insert(node, range);
-				range.setEndAfter(node);
-				range.collapse(false);
+				if (prev) {
+					prev.after(node);
+				} else {
+					nodeApi.insert(node, range);
+				}
+				prev = node;
+				if (!next) {
+					range.select(node, true).collapse(false);
+				}
 				node = next;
 			}
 			if (mergeNode[0]) {
@@ -1253,8 +1253,14 @@ class ChangeModel implements ChangeInterface {
 			_firstNode: NodeInterface,
 		) => {
 			if (_lastNode.isCard() || firstNode.isCard()) return;
+			const fParent = _firstNode.parent();
+			const lParent = _lastNode.parent();
 			const isSameParent =
-				_firstNode.parent()?.name === _lastNode.parent()?.name;
+				fParent &&
+				!fParent.isEditable() &&
+				lParent &&
+				!lParent.isEditable() &&
+				fParent.name === lParent.name;
 			return (
 				('p' === _firstNode.name && isSameParent) ||
 				(_lastNode.name === _firstNode.name &&
@@ -1309,16 +1315,7 @@ class ChangeModel implements ChangeInterface {
 		if (endNode) {
 			const prevNode = getLastChild($(endNode.previousSibling || []));
 			const nextNode = getFirstChild($(endNode))!;
-			/**range
-				.select(prevNode, true)
-				.shrinkToElementNode()
-				.collapse(false);
-			if (prevNode && nodeApi.isEmpty(prevNode)) {
-				removeEmptyNode(prevNode);
-			}
-			if (nextNode && nodeApi.isEmpty(nextNode)) {
-				removeEmptyNode(nextNode);
-			} else **/ if (prevNode && isSameListChild(prevNode, nextNode)) {
+			if (prevNode && isSameListChild(prevNode, nextNode)) {
 				nodeApi.merge(prevNode, nextNode, false);
 				removeEmptyNode(nextNode);
 			}

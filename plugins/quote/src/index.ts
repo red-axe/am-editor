@@ -23,6 +23,7 @@ export default class extends BlockPlugin<Options> {
 
 	init() {
 		super.init();
+		this.editor.schema.addAllowIn(this.tagName);
 		this.editor.on('paser:html', (node) => this.parseHtml(node));
 		if (isEngine(this.editor)) {
 			this.editor.on('paste:each', (child) => this.pasteHtml(child));

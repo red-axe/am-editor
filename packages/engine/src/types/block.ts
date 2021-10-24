@@ -48,8 +48,9 @@ export interface BlockModelInterface {
 	/**
 	 * 分割当前光标选中的block节点
 	 * @param range 光标
+	 * @returns 返回分割后的节点
 	 */
-	split(range?: RangeInterface): void;
+	split(range?: RangeInterface): NodeInterface | undefined;
 	/**
 	 * 在当前光标位置插入block节点
 	 * @param block 节点

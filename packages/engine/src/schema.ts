@@ -416,8 +416,6 @@ class Schema implements SchemaInterface {
 	isAllowIn(source: string, target: string) {
 		//p节点下不允许放其它block节点
 		if (source === 'p') return false;
-		//目标节点是p标签
-		if (target === 'p' && source !== 'p') return true;
 		return this.data.blocks
 			.filter((rule) => rule.name === target)
 			.some((block) => {
@@ -427,6 +425,17 @@ class Schema implements SchemaInterface {
 				}
 				return;
 			});
+	}
+	addAllowIn(parent: string, child: string = 'p') {
+		const rule = this.data.blocks.find(
+			(rule) => rule.name === child,
+		) as SchemaBlock;
+		if (!rule.allowIn) {
+			rule.allowIn = [];
+		}
+		if (!rule.allowIn.includes(parent)) {
+			rule.allowIn.push(parent);
+		}
 	}
 	/**
 	 * 获取允许有子block节点的标签集合

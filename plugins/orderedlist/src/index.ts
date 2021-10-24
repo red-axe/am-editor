@@ -38,10 +38,11 @@ export default class extends ListPlugin<Options> {
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
-			this.editor.on(
-				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child)?.match,
-			);
+			// 有序列表原生结构和markdown结构一样，不检测，以免太多误报
+			// this.editor.on(
+			// 	'paste:markdown-check',
+			// 	(child) => !this.checkMarkdown(child)?.match,
+			// );
 		}
 	}
 

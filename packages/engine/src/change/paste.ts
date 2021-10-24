@@ -101,8 +101,9 @@ export default class Paste {
 		});
 		// 第二轮处理
 		$(fragment).traverse((node) => {
+			let parent = node.parent();
 			// 跳过已被删除的节点
-			if (!node.parent() || node.fragment === fragment) {
+			if (!parent || node.fragment === fragment) {
 				return;
 			}
 			// 删除 google docs 根节点
@@ -120,6 +121,7 @@ export default class Paste {
 				nodeApi.isBlock(node, this.schema) &&
 				node.attributes('data-type') !== 'p' &&
 				!nodeApi.isVoid(node, this.schema) &&
+				!nodeApi.isBlock(parent, this.schema) &&
 				//!node.isSolid() &&
 				nodeApi.html(node) === ''
 			) {
@@ -130,7 +132,10 @@ export default class Paste {
 			if (node.attributes('data-type') === 'p') {
 				node.removeAttributes('data-type');
 			}
-			const parent = node.parent();
+			if (nodeApi.isBlock(node, this.schema) && parent?.name === 'p') {
+				nodeApi.unwrap(node);
+				parent = node.parent();
+			}
 			// 补齐 ul 或 ol
 			if (node.name === 'li' && parent && !nodeApi.isList(parent)) {
 				const ul = $('<ul />');
@@ -164,7 +169,7 @@ export default class Paste {
 						li = isCustomizeList
 							? $('<li class="data-list-item" />')
 							: $('<li />');
-						parent.before(li);
+						parent?.before(li);
 					}
 					li.append(child);
 					if (isList) {

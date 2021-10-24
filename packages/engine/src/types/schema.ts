@@ -156,6 +156,12 @@ export interface SchemaInterface {
 	 */
 	isAllowIn(source: string, target: string): boolean;
 	/**
+	 * 给一个block节点添加允许放入的block子节点
+	 * @param parent 允许放入的父节点
+	 * @param child 允许放入的节点，默认 p
+	 */
+	addAllowIn(parent: string, child?: string): void;
+	/**
 	 * 获取允许有子block节点的标签集合
 	 * @returns
 	 */

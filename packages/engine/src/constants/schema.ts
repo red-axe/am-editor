@@ -1,4 +1,4 @@
-import { SchemaGlobal, SchemaRule } from '../types';
+import { SchemaBlock, SchemaGlobal, SchemaRule } from '../types';
 import {
 	CARD_KEY,
 	CARD_TYPE_KEY,
@@ -7,7 +7,7 @@ import {
 } from './card';
 import { ANCHOR, CURSOR, FOCUS } from './selection';
 
-const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
+const defualtSchema: Array<SchemaRule | SchemaBlock | SchemaGlobal> = [
 	{
 		type: 'block',
 		attributes: {
@@ -17,6 +17,7 @@ const defualtSchema: Array<SchemaRule | SchemaGlobal> = [
 	{
 		name: 'p',
 		type: 'block',
+		allowIn: ['$root'],
 	},
 	{
 		name: 'br',

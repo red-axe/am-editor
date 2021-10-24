@@ -155,8 +155,15 @@ class Parser implements ParserInterface {
 							value = undefined;
 							continue;
 						} else {
-							//把包含旧子节点的新节点追加到旧节点下
-							node.append(newNode);
+							if (!nodeApi.isBlock(newNode)) {
+								//把包含旧子节点的新节点追加到旧节点下
+								node.append(newNode);
+							} else {
+								// 替换
+								node.before(newNode);
+								node.remove();
+								break;
+							}
 						}
 						//排除之前的过滤规则后再次过滤
 						value = conversion.transform(

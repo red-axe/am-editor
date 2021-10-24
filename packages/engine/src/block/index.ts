@@ -418,10 +418,12 @@ class Block implements BlockModelInterface {
 			// <p>wo</p><cursor /><p>other</p>
 			// to
 			// <p>wo</p><p><cursor />other</p>
-			const sc =
-				safeRange.startContainer.childNodes[safeRange.startOffset];
+			const sc = safeRange.getStartOffsetNode();
 			if (sc) {
-				safeRange.select(sc, true).shrinkToElementNode().collapse(true);
+				safeRange
+					.select(sc, true)
+					.shrinkToElementNode()
+					.collapse(false);
 			}
 			if (!range) change.apply(safeRange);
 			return;
@@ -465,24 +467,23 @@ class Block implements BlockModelInterface {
 			this.generateRandomID(sideBlock, true);
 		}
 		block.after(sideBlock);
-		const tags = schema.getAllowInTags();
 		// Chrome 不能选中 <p></p>，里面必须要有节点，插入 BR 之后输入文字自动消失
-		if (nodeApi.isEmpty(block) && !tags.includes(block.name)) {
+		if (nodeApi.isEmpty(block)) {
 			nodeApi.html(
 				block,
 				nodeApi.getBatchAppendHTML(
 					activeMarks,
-					activeMarks.length > 0 ? '\u200b' : '<br />',
+					activeMarks.length > 0 ? '&#8203;' : '<br />',
 				),
 			);
 		}
 
-		if (nodeApi.isEmpty(sideBlock) && !tags.includes(sideBlock.name)) {
+		if (nodeApi.isEmpty(sideBlock)) {
 			nodeApi.html(
 				sideBlock,
 				nodeApi.getBatchAppendHTML(
 					activeMarks,
-					activeMarks.length > 0 ? '\u200b' : '<br />',
+					activeMarks.length > 0 ? '&#8203;' : '<br />',
 				),
 			);
 		}
@@ -509,6 +510,7 @@ class Block implements BlockModelInterface {
 		}
 
 		if (!range) change.apply(safeRange);
+		return sideBlock;
 	}
 	/**
 	 * 在当前光标位置插入block节点
@@ -659,8 +661,13 @@ class Block implements BlockModelInterface {
 		}
 
 		if (container && container.length > 0) {
-			safeRange.setStartAfter(container);
-			safeRange.collapse(true);
+			if (rightNodes.length > 0) {
+				safeRange.setStartAfter(container);
+				safeRange.collapse(true);
+			} else {
+				safeRange.select(container, true);
+				safeRange.collapse(false);
+			}
 		}
 		if (selection.focus) selection.focus.remove();
 		if (selection.anchor) selection.anchor.remove();

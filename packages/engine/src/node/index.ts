@@ -19,6 +19,7 @@ import {
 	CARD_SELECTOR,
 	CURSOR,
 	DATA_ELEMENT,
+	EDITABLE_SELECTOR,
 	FOCUS,
 	READY_CARD_KEY,
 	READY_CARD_SELECTOR,
@@ -110,14 +111,16 @@ class NodeModel implements NodeModelInterface {
 			//卡片不为空
 			if (
 				node.attributes(CARD_KEY) ||
-				node.find(CARD_SELECTOR).length > 0
+				(node.find(CARD_SELECTOR).length > 0 &&
+					node.find(EDITABLE_SELECTOR).length === 0)
 			) {
 				return false;
 			}
 			//只读卡片不为空
 			if (
 				node.attributes(READY_CARD_KEY) ||
-				node.find(READY_CARD_SELECTOR).length > 0
+				(node.find(READY_CARD_SELECTOR).length > 0 &&
+					node.find(EDITABLE_SELECTOR).length === 0)
 			) {
 				return false;
 			}
@@ -484,7 +487,7 @@ class NodeModel implements NodeModelInterface {
 		}
 		const editor = this.editor;
 		if (!isEngine(editor)) return;
-		const { change, block, schema } = editor;
+		const { change, block, schema, mark } = editor;
 		range = range || change.getRange();
 		const nodeApi = editor.node;
 		const { startNode, startOffset } = range
@@ -522,7 +525,7 @@ class NodeModel implements NodeModelInterface {
 		}
 
 		if (nodeApi.isBlock(node)) {
-			block.split(range);
+			const splitNode = block.split(range);
 			let blockNode = block.closest(
 				range.startNode.isEditable()
 					? range
@@ -531,7 +534,10 @@ class NodeModel implements NodeModelInterface {
 							.shrinkToTextNode().startNode
 					: range.startNode,
 			);
-			if (schema.isAllowIn(blockNode.name, node.nodeName.toLowerCase())) {
+			if (
+				!blockNode.isCard() &&
+				schema.isAllowIn(blockNode.name, node.nodeName.toLowerCase())
+			) {
 				blockNode.find('br').remove();
 				blockNode.append(node);
 			} else {
@@ -539,7 +545,11 @@ class NodeModel implements NodeModelInterface {
 				while (
 					parentBlock &&
 					this.isBlock(parentBlock) &&
-					!schema.isAllowIn(parentBlock.name, blockNode.name)
+					!blockNode.isEditable() &&
+					!schema.isAllowIn(
+						parentBlock.name,
+						node.nodeName.toLowerCase(),
+					)
 				) {
 					blockNode = parentBlock;
 					parentBlock = blockNode.parent();
@@ -551,22 +561,73 @@ class NodeModel implements NodeModelInterface {
 					blockNode.append(node);
 				} else {
 					if (
-						(this.isLikeEmpty(blockNode) &&
-							block.isLastOffset(range, 'end')) ||
-						range.startNode.isEditable()
+						this.isLikeEmpty(blockNode) ||
+						block.isLastOffset(range, 'start')
 					) {
 						blockNode.after(node);
-						if (!range.startNode.isEditable()) blockNode.remove();
+						// 没有分割就不会有新增的行就不用删除
+						if (this.isLikeEmpty(blockNode) && splitNode)
+							blockNode.remove();
 					} else {
 						blockNode.before(node);
 					}
 				}
 			}
 		} else {
-			range.insertNode(node);
+			const targetNode = block.closest(
+				range.startNode.isEditable()
+					? range
+							.cloneRange()
+							.shrinkToElementNode()
+							.shrinkToTextNode().startNode
+					: range.startNode,
+			);
+			const targetPlugin = targetNode
+				? block.findPlugin(targetNode)
+				: undefined;
+			//先移除不能放入块级节点的mark标签
+			if (targetPlugin) {
+				const nodeDom = $(node);
+				const isUnwrap = (markNode: NodeInterface) => {
+					if (this.isMark(markNode)) {
+						const markPlugin = mark.findPlugin(markNode);
+						if (!markPlugin) return;
+						if (
+							targetPlugin.disableMark &&
+							targetPlugin.disableMark.indexOf(
+								(markPlugin.constructor as PluginEntry)
+									.pluginName,
+							) > -1
+						) {
+							return true;
+						}
+					}
+					return false;
+				};
+				nodeDom.allChildren().forEach((markNode) => {
+					if (isUnwrap(markNode)) {
+						this.unwrap(markNode);
+					}
+				});
+				if (isUnwrap(nodeDom)) {
+					const fragment = nodeDom.document!.createDocumentFragment();
+					nodeDom.children().each((child) => {
+						fragment.append(child);
+					});
+					nodeDom.remove();
+					node = fragment.childNodes[fragment.childNodes.length - 1];
+					range.insertNode(fragment);
+				} else range.insertNode(node);
+				if (nodeDom.length === 0) return range;
+			} else range.insertNode(node);
 		}
 		return range
-			.select(node, this.isVoid(node) ? false : true)
+			.select(
+				node,
+				this.isVoid(node) || node.nodeType === Node.TEXT_NODE
+					? false
+					: true,
+			)
 			.shrinkToElementNode()
 			.collapse(false);
 	}
