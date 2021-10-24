@@ -60,7 +60,7 @@ class Table extends Plugin<Options> {
 	}
 
 	onCopy(event: ClipboardEvent) {
-		if (!isEngine(this.editor)) return;
+		if (!isEngine(this.editor)) return true;
 		const { change, card } = this.editor;
 		const range = change.getRange();
 		const component = card.find(range.commonAncestorNode, true);
@@ -77,10 +77,11 @@ class Table extends Plugin<Options> {
 				return false;
 			}
 		}
+		return true;
 	}
 
 	onCut(event: ClipboardEvent) {
-		if (!isEngine(this.editor)) return;
+		if (!isEngine(this.editor)) return true;
 		const { change, card } = this.editor;
 		const range = change.getRange();
 		const component = card.find(range.commonAncestorNode, true);
@@ -97,10 +98,11 @@ class Table extends Plugin<Options> {
 				return false;
 			}
 		}
+		return true;
 	}
 
 	onPaste(event: ClipboardEvent) {
-		if (!isEngine(this.editor)) return;
+		if (!isEngine(this.editor)) return true;
 		const { change, card } = this.editor;
 		const range = change.getRange();
 		const component = card.find(range.commonAncestorNode, true);
@@ -117,6 +119,7 @@ class Table extends Plugin<Options> {
 				return false;
 			}
 		}
+		return true;
 	}
 
 	hotkey() {

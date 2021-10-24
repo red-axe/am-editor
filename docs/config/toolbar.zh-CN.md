@@ -3,7 +3,8 @@
 引入工具栏
 
 ```ts
-//vue 请使用 @aomao/toolbar-vue
+//vue3 请使用 @aomao/toolbar-vue
+//vue2 请使用 am-editor-toolbar-vue2
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 ```
 

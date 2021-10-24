@@ -3,7 +3,8 @@
 Introduce the toolbar
 
 ```ts
-//vue please use @aomao/toolbar-vue
+//vue3 please use @aomao/toolbar-vue
+//vue2 please use am-editor-toolbar-vue2
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 ```
 
