@@ -127,7 +127,7 @@ export default EngineDemo;
 
 卡片是编辑器中单独划分的一个区域，该区域的 UI 可以使用 React、Vue 等前端框架自定义渲染内容，最后再挂载到编辑器上。
 
-引入`@aomao/plugin-codeblock`代码块插件，这个插件部分 UI 使用前端框架渲染，所以有区分。 `vue3`开发者使用 `@aomao/plugin-codeblock-vue`
+引入`@aomao/plugin-codeblock`代码块插件，这个插件部分 UI 使用前端框架渲染，所以有区分。 `vue3`开发者使用 `@aomao/plugin-codeblock-vue` `vue2`开发者使用 `am-editor-codeblock-vue2`
 
 ```tsx | pure
 import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
@@ -185,7 +185,7 @@ export default EngineDemo;
 
 ### 工具栏
 
-引入`@aomao/toolbar`工具栏，工具栏 UI 比较复杂，都是借助使用前端框架渲染，`vue3`开发者使用 `@aomao/toolbar-vue`
+引入`@aomao/toolbar`工具栏，工具栏 UI 比较复杂，都是借助使用前端框架渲染，`vue3`开发者使用 `@aomao/toolbar-vue` `vue2`开发者使用 `am-editor-toolbar-vue2`
 
 ```tsx | pure
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';

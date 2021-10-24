@@ -127,7 +127,7 @@ export default EngineDemo;
 
 A card is a separate area in the editor. The UI of this area can be customized to render content using front-end frameworks such as React and Vue, and finally mounted on the editor.
 
-Introduce the `@aomao/plugin-codeblock` code block plug-in. Part of the plug-in UI is rendered by the front-end framework, so there is a distinction. `vue3` developers use `@aomao/plugin-codeblock-vue`
+Introduce the `@aomao/plugin-codeblock` code block plug-in. Part of the plug-in UI is rendered by the front-end framework, so there is a distinction. `vue3` developers use `@aomao/plugin-codeblock-vue` `vue2` developers use `am-editor-codeblock-vue2`
 
 ```tsx | pure
 import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
@@ -185,7 +185,7 @@ export default EngineDemo;
 
 ### toolbar
 
-Introduce the `@aomao/toolbar` toolbar, the toolbar UI is more complicated, all of which are rendered by using the front-end framework, `vue3` developers use `@aomao/toolbar-vue`
+Introduce the `@aomao/toolbar` toolbar, the toolbar UI is more complicated, all of which are rendered by using the front-end framework, `vue3` developers use `@aomao/toolbar-vue` `vue2` developers use `am-editor-codeblock-vue2`
 
 ```tsx | pure
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
