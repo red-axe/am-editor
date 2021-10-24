@@ -8,10 +8,16 @@ Code block plugin
 $ yarn add @aomao/plugin-codeblock
 ```
 
-`Vue` use
+`Vue3` use
 
 ```bash
 $ yarn add @aomao/plugin-codeblock-vue
+```
+
+`Vue2` use
+
+```bash
+$ yarn add am-editor-codeblock-vue2
 ```
 
 Add to engine

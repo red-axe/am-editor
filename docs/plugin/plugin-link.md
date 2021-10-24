@@ -8,10 +8,16 @@ Link plugin
 $ yarn add @aomao/plugin-link
 ```
 
-`Vue` use
+`Vue3` use
 
 ```bash
 $ yarn add @aomao/plugin-link-vue
+```
+
+`Vue2` use
+
+```bash
+$ yarn add am-editor-link-vue2
 ```
 
 Add to engine
