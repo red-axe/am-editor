@@ -1,5 +1,5 @@
 <template>
-    <div class="data-link-preview">
+    <div class="data-link-preview" data-element="ui">
         <a-tooltip :title="openTitle">
             <a
             class="data-icon data-icon-link data-link-preview-open"

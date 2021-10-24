@@ -350,26 +350,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 					this.rowAddButton?.hide();
 				}, 200);
 			});
-		this.editor.container.on('paste', () => {});
-		// this.table.wrapper?.on('keydown', (event: KeyboardEvent) => {
-		// 	if(!isEngine(this.editor) || this.editor.readonly) return
-		// 	if(isHotkey('mod+c', event)) {
-		// 		const { selectArea } = this.table.selection
-
-		// 		if(!selectArea || selectArea.count < 2) return
-		// 		event.preventDefault()
-		// 		event.stopPropagation()
-		// 		this.table.command.mockCopy()
-		// 		console.log('mock copy')
-		// 	} else if(isHotkey('mod+v', event)) {
-		// 		const { selectArea } = this.table.selection
-		// 		if(!selectArea || selectArea.count < 2) return
-		// 		console.log('mod+v',event)
-		// 		//event.preventDefault()
-		// 		//event.stopPropagation()
-		// 		//this.table.command.shortcutPaste(event)
-		// 	}
-		// })
 	}
 	/**
 	 * 在表格上单击
@@ -1313,6 +1293,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 
 	showContextMenu(event: MouseEvent) {
 		if (!this.menuBar || !event.target) return;
+		event.preventDefault();
 		const { selection } = this.table;
 		const menuItems = this.menuBar.find(Template.MENUBAR_ITEM_CLASS);
 		menuItems.removeClass('disabled');

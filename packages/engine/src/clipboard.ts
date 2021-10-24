@@ -303,7 +303,7 @@ export default class Clipboard implements ClipboardInterface {
 		};
 		block.on('copy', (e: ClipboardEvent) => {
 			e.stopPropagation();
-			this.write(e);
+			this.write(e, range);
 			clera();
 		});
 		$(document.body).append(block);

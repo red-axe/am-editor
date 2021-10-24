@@ -7,7 +7,7 @@ import { Op, Path, StringInsertOp } from 'sharedb';
 import { ApplierInterface, RemoteAttr, RemotePath } from '../types/ot';
 import { isNodeEntry, NodeInterface } from '../types/node';
 import { getDocument, getWindow } from '../utils';
-import { isTransientElement } from './utils';
+import { isCursorOp, isTransientElement, updateIndex } from './utils';
 import { $ } from '../node';
 
 class Applier implements ApplierInterface {
@@ -310,14 +310,50 @@ class Applier implements ApplierInterface {
 			});
 			if (path) this.setRangeByRemotePath(path);
 			this.engine.change.change(true, applyNodes);
+			return applyNodes;
 		} catch (error) {
 			console.log(error);
+			return [];
 		}
 	}
 
 	applySelfOperations(ops: Op[]) {
-		ops.forEach((op) => this.applyOperation(op));
+		const applyNodes: Array<NodeInterface> = [];
+		ops.forEach((op) => {
+			const applyNode = this.applyOperation(op);
+			if (applyNode) applyNodes.push(applyNode);
+		});
 		this.engine.change.change();
+		return applyNodes;
+	}
+
+	applyIndex(ops: Op[], applyNodes: NodeInterface[]) {
+		if (!ops.every((op) => isCursorOp(op))) {
+			const targetElements: Node[] = [];
+			applyNodes.forEach((node) => {
+				const target = node.isEditable() ? node : node.parent() || node;
+				if (
+					target &&
+					target.length > 0 &&
+					!targetElements.includes(target[0]) &&
+					!targetElements.find((element) =>
+						element.contains(target[0]),
+					)
+				) {
+					let index = -1;
+					while (
+						(index = targetElements.findIndex((element) =>
+							target[0].contains(element),
+						)) &&
+						index > -1
+					) {
+						targetElements.splice(index, 1);
+					}
+					targetElements.push(target[0]);
+				}
+			});
+			targetElements.forEach((element) => updateIndex($(element)));
+		}
 	}
 
 	setRangeAfterOp(op: Op) {

@@ -132,10 +132,6 @@ export type RepairOp = Op & {
 
 export interface MutationInterface extends EventEmitter2 {
 	/**
-	 * 更新每个节点相对于父节点的index
-	 */
-	updateIndex(): void;
-	/**
 	 * 设置文档对象 OT 文档对象，或自定义文档对象
 	 * @param doc 文档对象
 	 */
@@ -184,12 +180,13 @@ export interface ApplierInterface {
 	insertInText(path: Path, offset: number, text: string): void;
 	deleteInText(path: Path, offset: number, text: string): void;
 	applyOperation(op: Op): void;
-	applyRemoteOperations(ops: Op[]): void;
-	applySelfOperations(ops: Op[]): void;
+	applyRemoteOperations(ops: Op[]): NodeInterface[];
+	applySelfOperations(ops: Op[]): NodeInterface[];
 	setRangeAfterOp(op: Op): void;
 	getRangeRemotePath(): RemotePath | undefined;
 	setRangeByRemotePath(path: RemotePath): void;
 	setRangeByPath(path: Path[]): void;
+	applyIndex(ops: Op[], applyNodes: NodeInterface[]): void;
 }
 
 export interface OTInterface extends EventEmitter2 {

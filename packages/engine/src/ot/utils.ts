@@ -287,3 +287,18 @@ export const getOldIndex = (index: number, ops: Op[]) => {
 	});
 	return i;
 };
+
+export const updateIndex = (
+	root: NodeInterface,
+	filter?: (child: NodeInterface) => boolean,
+) => {
+	if (root.isText()) return;
+	let childrens = root.children().toArray();
+	if (!root.isEditable()) {
+		childrens = filter ? childrens.filter(filter) : childrens;
+	}
+	childrens.forEach((child, index) => {
+		child[0]['index'] = index;
+		if (!child.isText()) updateIndex(child);
+	});
+};

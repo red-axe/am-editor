@@ -7,7 +7,7 @@ import Range from '../range';
 import ChangeEvent from './event';
 import Parser, { TextParser } from '../parser';
 import { ANCHOR_SELECTOR, CURSOR_SELECTOR, FOCUS_SELECTOR } from '../constants';
-import { combinTextNode, getDocument, getWindow } from '../utils';
+import { combinTextNode, getWindow } from '../utils';
 import { Path } from 'sharedb';
 import {
 	CARD_ELEMENT_KEY,
@@ -887,10 +887,16 @@ class ChangeModel implements ChangeInterface {
 		});
 
 		this.event.onDocument('copy', (event) => {
+			const range = this.getRange();
+			if (!this.engine.container.contains(range.commonAncestorNode))
+				return;
 			clipboard.write(event);
 		});
 
-		this.event.onContainer('cut', (event) => {
+		this.event.onDocument('cut', (event) => {
+			const range = this.getRange();
+			if (!this.engine.container.contains(range.commonAncestorNode))
+				return;
 			event.stopPropagation();
 			clipboard.write(event, undefined, () => {
 				clipboard.cut();
@@ -1206,6 +1212,8 @@ class ChangeModel implements ChangeInterface {
 
 				appendNodes.push(node);
 				nodeApi.insert(node, range);
+				range.setEndAfter(node);
+				range.collapse(false);
 				node = next;
 			}
 			if (mergeNode[0]) {

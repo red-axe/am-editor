@@ -13,6 +13,7 @@ import {
 import TableComponent, { Template } from './component';
 import locales from './locale';
 import './index.css';
+import { TableInterface } from './types';
 
 export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
@@ -39,6 +40,83 @@ class Table extends Plugin<Options> {
 			(child) => !this.checkMarkdown(child)?.match,
 		);
 		editor.on('paste:markdown-after', (child) => this.pasteMarkdown(child));
+		if (isEngine(editor)) {
+			editor.change.event.onDocument(
+				'copy',
+				(event) => this.onCopy(event),
+				0,
+			);
+			editor.change.event.onDocument(
+				'cut',
+				(event) => this.onCut(event),
+				0,
+			);
+			editor.change.event.onDocument(
+				'paste',
+				(event) => this.onPaste(event),
+				0,
+			);
+		}
+	}
+
+	onCopy(event: ClipboardEvent) {
+		if (!isEngine(this.editor)) return;
+		const { change, card } = this.editor;
+		const range = change.getRange();
+		const component = card.find(range.commonAncestorNode, true);
+		if (
+			component &&
+			component.getSelectionNodes &&
+			component.name === TableComponent.cardName
+		) {
+			const nodes = component.getSelectionNodes();
+			if (nodes.length > 1) {
+				event.preventDefault();
+				const tableComponent = component as TableInterface;
+				tableComponent.command.copy();
+				return false;
+			}
+		}
+	}
+
+	onCut(event: ClipboardEvent) {
+		if (!isEngine(this.editor)) return;
+		const { change, card } = this.editor;
+		const range = change.getRange();
+		const component = card.find(range.commonAncestorNode, true);
+		if (
+			component &&
+			component.getSelectionNodes &&
+			component.name === TableComponent.cardName
+		) {
+			const nodes = component.getSelectionNodes();
+			if (nodes.length > 1) {
+				event.preventDefault();
+				const tableComponent = component as TableInterface;
+				tableComponent.command.cut();
+				return false;
+			}
+		}
+	}
+
+	onPaste(event: ClipboardEvent) {
+		if (!isEngine(this.editor)) return;
+		const { change, card } = this.editor;
+		const range = change.getRange();
+		const component = card.find(range.commonAncestorNode, true);
+		if (
+			component &&
+			component.getSelectionNodes &&
+			component.name === TableComponent.cardName
+		) {
+			const nodes = component.getSelectionNodes();
+			if (nodes.length > 0) {
+				event.preventDefault();
+				const tableComponent = component as TableInterface;
+				tableComponent.command.mockPaste();
+				return false;
+			}
+		}
 	}
 
 	hotkey() {

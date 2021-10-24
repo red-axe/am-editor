@@ -92,6 +92,7 @@ export default class Paste {
 					nodeApi.unwrap(node);
 					return;
 				}
+
 				// br 换行改成正常段落
 				if (nodeApi.isBlock(node, this.schema)) {
 					this.engine.block.brToBlock(node);
@@ -225,8 +226,8 @@ export default class Paste {
 			while (
 				nodeParent &&
 				!nodeParent.fragment &&
-				nodeApi.isBlock(node) &&
-				!nodeApi.isBlock(nodeParent)
+				nodeApi.isBlock(node, this.schema) &&
+				!nodeApi.isBlock(nodeParent, this.schema)
 			) {
 				const nodeClone = node.clone();
 				nodeApi.unwrap(node);
@@ -234,6 +235,20 @@ export default class Paste {
 				nodeClone.append(nodeParent);
 				node = nodeClone;
 				nodeParent = node.parent();
+			}
+			// mark 相同的嵌套
+			nodeParent = parent;
+			while (
+				nodeParent &&
+				nodeApi.isMark(nodeParent, this.schema) &&
+				nodeApi.isMark(node, this.schema)
+			) {
+				if (this.engine.mark.compare(nodeParent.clone(), node, true)) {
+					nodeApi.unwrap(node);
+					break;
+				} else {
+					nodeParent = nodeParent.parent();
+				}
 			}
 		});
 	}
@@ -245,7 +260,11 @@ export default class Paste {
 		const range = this.engine.change.getRange();
 		const root = range.commonAncestorNode;
 		const inline = this.engine.inline.closest(root);
-		if (root.inEditor() && !inline.isCard() && nodeApi.isInline(inline)) {
+		if (
+			root.inEditor() &&
+			!inline.isCard() &&
+			nodeApi.isInline(inline, this.schema)
+		) {
 			this.removeElementNodes($(fragment));
 			return fragment;
 		}

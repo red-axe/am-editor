@@ -13,6 +13,7 @@ import {
 	isTransientAttribute,
 	isTransientElement,
 	reduceOperations,
+	updateIndex,
 } from './utils';
 import { escapeDots, escape } from '../utils/string';
 import { fromDOM, getPathValue, pushAndRepair, toDOM } from './jsonml';
@@ -131,20 +132,6 @@ class Creator extends EventEmitter2 {
 		);
 	}
 
-	updateIndex(root: NodeInterface) {
-		if (root.isText()) return;
-		let childrens = root.children().toArray();
-		if (!root.isEditable()) {
-			childrens = childrens.filter(
-				(child) =>
-					!isTransientElement($(child), this.cacheTransientElements),
-			);
-		}
-		childrens.forEach((child, index) => {
-			child[0]['index'] = index;
-			if (!child.isText()) this.updateIndex(child);
-		});
-	}
 	/**
 	 * 从DOM变更记录中生产 ops （json格式的操作集合）
 	 * @param records DOM变更记录集合
@@ -154,7 +141,6 @@ class Creator extends EventEmitter2 {
 	 * @returns
 	 */
 	makeOpsFromMutations(
-		oldDom: NodeInterface,
 		records: MutationRecord[],
 		path: Path = [],
 		oldPath: Path = [],
@@ -203,7 +189,6 @@ class Creator extends EventEmitter2 {
 									const rIndex =
 										(removedNode['index'] === undefined
 											? this.getRemoveNodeIndex(
-													oldDom,
 													record,
 													records,
 											  )
@@ -364,7 +349,6 @@ class Creator extends EventEmitter2 {
 				const p: Path = [];
 				allOps = allOps.concat(
 					this.makeOpsFromMutations(
-						oldDom,
 						mutations,
 						p.concat(...path, [index + 2]),
 						p.concat([...oldPath], [oldIndex + 2]),
@@ -382,25 +366,11 @@ class Creator extends EventEmitter2 {
 	 * @returns
 	 */
 	getRemoveNodeIndex(
-		oldDom: NodeInterface,
 		record: MutationRecord,
 		records: MutationRecord[],
 	): number {
 		const { target, nextSibling, previousSibling, addedNodes } = record;
 		const targetElement = target as Element;
-		const removeNode = $(record.removedNodes[0]);
-		const dataId = removeNode.attributes('data-id');
-		if (!!dataId) {
-			const rNode = oldDom.find(`[data-id="${dataId}"]`);
-			if (rNode.length > 0)
-				return rNode.getIndex(
-					(node) =>
-						!isTransientElement(
-							$(node),
-							this.cacheTransientElements,
-						),
-				);
-		}
 		// 获取目标节点的过滤后非协同节点后的所有子节点
 		const childNodes =
 			target.nodeType === getDocument().ELEMENT_NODE &&
@@ -433,7 +403,6 @@ class Creator extends EventEmitter2 {
 					previousSibling !== record.removedNodes[0]
 				) {
 					index = this.getRemoveNodeIndexFromMutation(
-						oldDom,
 						previousSibling,
 						target,
 						records,
@@ -447,7 +416,6 @@ class Creator extends EventEmitter2 {
 	}
 
 	getRemoveNodeIndexFromMutation(
-		oldDom: NodeInterface,
 		node: Node,
 		target: Node,
 		records: MutationRecord[],
@@ -457,7 +425,7 @@ class Creator extends EventEmitter2 {
 				record.target === target && record.removedNodes[0] === node,
 		);
 		if (record) {
-			return this.getRemoveNodeIndex(oldDom, record, records);
+			return this.getRemoveNodeIndex(record, records);
 		}
 		return 0;
 	}
@@ -520,14 +488,22 @@ class Creator extends EventEmitter2 {
 			return !isTransient;
 		});
 		this.clearAddedNodeCache();
-		const oldDom = $(toDOM(this.doc?.data || []));
-		let ops = this.makeOpsFromMutations(oldDom, records);
-		targetElements.map((element) => {
-			this.updateIndex($(element));
-		});
+		let ops = this.makeOpsFromMutations(records);
 		//重置缓存
 		this.cacheTransientElements = undefined;
 		ops = reduceOperations(ops);
+		if (!ops.every((op) => isCursorOp(op))) {
+			targetElements.map((element) => {
+				updateIndex(
+					$(element),
+					(child) =>
+						!isTransientElement(
+							$(child),
+							this.cacheTransientElements,
+						),
+				);
+			});
+		}
 		if (ops.length !== 0) {
 			this.normalizeOps(ops);
 		}

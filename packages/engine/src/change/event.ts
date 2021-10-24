@@ -12,13 +12,14 @@ import { DATA_ELEMENT, UI } from '../constants';
 import { $ } from '../node';
 import { isMobile, isSafari } from '../utils';
 
+type GlobalEventType = 'root' | 'window' | 'container' | 'document';
 class ChangeEvent implements ChangeEventInterface {
-	private events: Array<{
-		type: string;
-		eventType: string;
-		listener: EventListener;
-		rewrite?: boolean;
-	}>;
+	private events: {
+		[key: string]: { type: string; listener: EventListener }[];
+	} = {};
+	private globalEvents: {
+		[key: string]: { type: string; listener: EventListener }[];
+	} = {};
 	private engine: EngineInterface;
 	isComposing: boolean;
 	isSelecting: boolean;
@@ -27,7 +28,6 @@ class ChangeEvent implements ChangeEventInterface {
 	private keydownRange: RangeInterface | null = null;
 
 	constructor(engine: EngineInterface, options: ChangeEventOptions = {}) {
-		this.events = [];
 		this.engine = engine;
 		// 中文输入状态
 		this.isComposing = false;
@@ -282,7 +282,10 @@ class ChangeEvent implements ChangeEventInterface {
 			}
 		});
 		// https://developer.mozilla.org/en-US-US/docs/Web/Events/paste
-		this.onContainer('paste', (e) => {
+		this.onDocument('paste', (e) => {
+			const range = this.engine.change.getRange();
+			if (!this.engine.container.contains(range.commonAncestorNode))
+				return;
 			if (this.engine.readonly) {
 				return;
 			}
@@ -427,65 +430,94 @@ class ChangeEvent implements ChangeEventInterface {
 		});
 	}
 
-	onDocument(eventType: string, listener: EventListener, rewrite?: boolean) {
-		document.addEventListener(eventType, listener, rewrite);
-		this.events.push({
-			type: 'document',
-			eventType,
-			listener,
-			rewrite,
-		});
+	onDocument(eventType: string, listener: EventListener, index?: number) {
+		this.addEvent('document', eventType, listener, index);
 	}
 
-	onWindow(eventType: string, listener: EventListener, rewrite?: boolean) {
-		window.addEventListener(eventType, listener, rewrite);
-		this.events.push({
-			type: 'window',
-			eventType,
-			listener,
-			rewrite,
-		});
+	onWindow(eventType: string, listener: EventListener, index?: number) {
+		this.addEvent('window', eventType, listener, index);
 	}
 
-	onContainer(eventType: string, listener: EventListener): void {
-		this.engine.container.on(eventType, listener);
-		this.events.push({
-			type: 'container',
-			eventType,
-			listener,
-			rewrite: false,
-		});
+	onContainer(
+		eventType: string,
+		listener: EventListener,
+		index?: number,
+	): void {
+		this.addEvent('container', eventType, listener, index);
 	}
 
-	onRoot(eventType: string, listener: EventListener): void {
-		this.engine.root.on(eventType, listener);
-		this.events.push({
-			type: 'root',
-			eventType,
-			listener,
-			rewrite: false,
-		});
+	onRoot(eventType: string, listener: EventListener, index?: number): void {
+		this.addEvent('root', eventType, listener, index);
+	}
+
+	addEvent(
+		type: GlobalEventType,
+		eventType: string,
+		listener: EventListener,
+		index?: number,
+	) {
+		if (!this.globalEvents[type]) {
+			this.globalEvents[type] = [];
+		}
+		if (
+			!this.globalEvents[type].find((event) => event.type === eventType)
+		) {
+			const globalListener = (...args: any) => {
+				const listeners = this.events[type].filter(
+					(event) => event.type === eventType,
+				);
+				let result;
+				for (let i = 0; i < listeners.length; i++) {
+					result = listeners[i].listener(...args);
+
+					if (result === false) {
+						break;
+					}
+				}
+
+				return result;
+			};
+			switch (type) {
+				case 'container':
+					this.engine.container.on(eventType, globalListener);
+					break;
+				case 'root':
+					this.engine.root.on(eventType, globalListener);
+					break;
+				case 'document':
+					document.addEventListener(eventType, globalListener);
+					break;
+				case 'window':
+					window.addEventListener(eventType, globalListener);
+					break;
+			}
+			this.globalEvents[type].push({
+				type: eventType,
+				listener: globalListener,
+			});
+		}
+		if (!this.events[type]) this.events[type] = [];
+		if (index !== undefined) {
+			this.events[type].splice(index, 0, { type: eventType, listener });
+		} else {
+			this.events[type].push({ type: eventType, listener });
+		}
 	}
 
 	destroy() {
-		this.events.forEach((item) => {
-			if (item.type === 'window') {
-				window.removeEventListener(
-					item.eventType,
-					item.listener,
-					item.rewrite,
-				);
-			} else if (item.type === 'document') {
-				document.removeEventListener(
-					item.eventType,
-					item.listener,
-					item.rewrite,
-				);
-			} else if (item.type === 'container') {
-				this.engine.container.off(item.eventType, item.listener);
-			} else if (item.type === 'root') {
-				this.engine.root.off(item.eventType, item.listener);
-			}
+		Object.keys(this.globalEvents).forEach((type) => {
+			const events = this.globalEvents[type];
+			events.forEach((event) => {
+				if (type === 'window') {
+					window.removeEventListener(event.type, event.listener);
+				} else if (type === 'document') {
+					document.removeEventListener(event.type, event.listener);
+				} else if (type === 'container') {
+					this.engine.container.off(event.type, event.listener);
+				} else if (type === 'root') {
+					this.engine.root.off(event.type, event.listener);
+				}
+			});
 		});
 	}
 }

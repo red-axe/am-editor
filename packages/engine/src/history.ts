@@ -52,8 +52,10 @@ class HistoryModel implements HistoryInterface {
 			let isUndo = false;
 			this.engine.ot.stopMutation();
 			try {
-				this.engine.ot.submitOps(undoOp.ops!);
-				this.engine.ot.applier.applySelfOperations(undoOp.ops!);
+				const { ot } = this.engine;
+				ot.submitOps(undoOp.ops || []);
+				const applyNodes = ot.applier.applySelfOperations(undoOp.ops!);
+				ot.applier.applyIndex(undoOp.ops || [], applyNodes);
 				const lastOp = this.totalOps[this.totalOps.length - 1];
 				if (
 					lastOp &&
@@ -89,8 +91,10 @@ class HistoryModel implements HistoryInterface {
 			let isRedo = false;
 			this.engine.ot.stopMutation();
 			try {
-				this.engine.ot.submitOps(redoOp.ops!);
-				this.engine.ot.applier.applySelfOperations(redoOp.ops!);
+				const { ot } = this.engine;
+				ot.submitOps(redoOp.ops || []);
+				const applyNodes = ot.applier.applySelfOperations(redoOp.ops!);
+				ot.applier.applyIndex(redoOp.ops || [], applyNodes);
 				const lastOp = this.totalOps[this.totalOps.length - 1];
 				if (
 					lastOp &&

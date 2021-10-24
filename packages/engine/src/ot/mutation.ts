@@ -50,10 +50,6 @@ class Mutation extends EventEmitter2 implements MutationInterface {
 		});
 	}
 
-	updateIndex() {
-		this.creator.updateIndex(this.node);
-	}
-
 	setDoc(doc: DocInterface | Doc) {
 		this.doc = doc;
 		this.creator.setDoc(doc);

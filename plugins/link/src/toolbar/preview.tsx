@@ -19,7 +19,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({
 	onRemove,
 }) => {
 	return (
-		<div className={classnames('data-link-preview')}>
+		<div className={classnames('data-link-preview')} data-element="ui">
 			<Tooltip title={language.get('link', 'link_open')}>
 				<a
 					className="data-icon data-icon-link data-link-preview-open"

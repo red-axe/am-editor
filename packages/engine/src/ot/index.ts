@@ -2,7 +2,14 @@ import { debounce, cloneDeep } from 'lodash-es';
 import { EventEmitter2 } from 'eventemitter2';
 import { Doc, Op } from 'sharedb';
 import { EngineInterface } from '../types/engine';
-import { randomString, reduceOperations } from './utils';
+import {
+	isCursorOp,
+	randomString,
+	reduceOperations,
+	updateIndex,
+} from './utils';
+import { $ } from '../node';
+
 import {
 	ApplierInterface,
 	Attribute,
@@ -147,7 +154,8 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	applyAll(ops: Op[]) {
 		this.stopMutation();
-		this.applier.applyRemoteOperations(ops);
+		const applyNodes = this.applier.applyRemoteOperations(ops);
+		this.applier.applyIndex(ops, applyNodes);
 		this.startMutation();
 	}
 
@@ -166,8 +174,10 @@ class OTModel extends EventEmitter2 implements OTInterface {
 			return;
 		}
 		// 如果有设置默认值，就设置编辑器的值
-		if (defaultValue) engine.setValue(defaultValue);
-		this.mutation?.updateIndex();
+		if (defaultValue)
+			engine.setValue(defaultValue, () => {
+				updateIndex(this.engine.container);
+			});
 		// 没有数据，就把当前编辑器值提交
 		doc.on('create', () => {
 			const data = fromDOM(engine.container);
@@ -187,7 +197,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	setData(data: Array<any>) {
 		this.engine.setJsonValue(data, () => {
-			this.mutation?.updateIndex();
+			updateIndex(this.engine.container);
 		});
 	}
 

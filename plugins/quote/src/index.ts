@@ -33,6 +33,7 @@ export default class extends BlockPlugin<Options> {
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
+			this.editor.on('paste:each', (child) => this.pasteEach(child));
 			this.editor.on(
 				'paste:markdown-check',
 				(child) => !this.checkMarkdown(child)?.match,
@@ -94,6 +95,12 @@ export default class extends BlockPlugin<Options> {
 		}
 		command.execute((this.constructor as PluginEntry).pluginName);
 		return false;
+	}
+
+	pasteEach(node: NodeInterface) {
+		if (node.isText() && node.parent()?.name === this.tagName) {
+			this.editor.node.wrap(node, $('<p></p>'));
+		}
 	}
 
 	checkMarkdown(node: NodeInterface) {

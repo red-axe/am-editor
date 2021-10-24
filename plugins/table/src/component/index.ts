@@ -45,6 +45,10 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		return 'background';
 	}
 
+	static get autoSelected() {
+		return false;
+	}
+
 	static colors = Palette.getColors().map((group) =>
 		group.map((color) => {
 			return { color, border: Palette.getStroke(color) };

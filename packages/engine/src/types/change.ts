@@ -25,14 +25,15 @@ export interface ChangeEventInterface {
 	onDocument(
 		eventType: string,
 		listener: EventListener,
-		rewrite?: boolean,
+		index?: number,
 	): void;
-	onWindow(
+	onWindow(eventType: string, listener: EventListener, index?: number): void;
+	onContainer(
 		eventType: string,
 		listener: EventListener,
-		rewrite?: boolean,
+		index?: number,
 	): void;
-	onContainer(eventType: string, listener: EventListener): void;
+	onRoot(eventType: string, listener: EventListener, index?: number): void;
 	destroy(): void;
 }
 

@@ -369,6 +369,8 @@ class NodeEntry implements NodeInterface {
 			return true;
 		}
 
+		if (domNode === this[0]) return true;
+
 		while ((domNode = domNode?.parentNode || null)) {
 			if (domNode === this[0]) {
 				return true;
