@@ -939,6 +939,7 @@ class ChangeModel implements ChangeInterface {
 					this.engine.language.get<string>('checkMarkdown', 'title'),
 				)
 				.then(() => {
+					this.cacheRangeBeforeCommand();
 					this.engine.trigger('paste:markdown-before', textNode);
 					this.engine.trigger('paste:markdown', textNode);
 					this.engine.trigger('paste:markdown-after', textNode);
@@ -986,6 +987,7 @@ class ChangeModel implements ChangeInterface {
 			if (this.engine.trigger('paste:event', data, source) === false)
 				return;
 			if (files.length === 0) {
+				this.cacheRangeBeforeCommand();
 				setTimeout(() => {
 					// 如果 text 和 html 都有，就解析 text
 					pasteMarkdown(source, text || '');

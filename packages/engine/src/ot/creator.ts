@@ -16,7 +16,7 @@ import {
 	updateIndex,
 } from './utils';
 import { escapeDots, escape } from '../utils/string';
-import { fromDOM, getPathValue, pushAndRepair, toDOM } from './jsonml';
+import { fromDOM, getPathValue, opsSort } from './jsonml';
 import { EngineInterface } from '../types/engine';
 import { Op, Path, StringInsertOp, StringDeleteOp, Doc } from 'sharedb';
 import { NodeInterface } from '../types/node';
@@ -25,7 +25,6 @@ import { $ } from '../node';
 import {
 	CARD_ASYNC_RENDER,
 	DATA_ELEMENT,
-	DATA_TRANSIENT_ELEMENT,
 	ROOT,
 	UI_SELECTOR,
 } from '../constants';
@@ -199,7 +198,7 @@ class Creator extends EventEmitter2 {
 									p = p.concat([...path], [rIndex]);
 									let op: Path = [];
 									op = op.concat([...oldPath], [rIndex]);
-									pushAndRepair(ops, {
+									ops.push({
 										ld: true,
 										p,
 										newPath: p.slice(),
@@ -229,7 +228,7 @@ class Creator extends EventEmitter2 {
 									) + 2;
 								let p: Path = [];
 								p = p.concat([...path], [index]);
-								pushAndRepair(ops, {
+								ops.push({
 									li: data,
 									p,
 									newPath: p.slice(),
@@ -568,7 +567,10 @@ class Creator extends EventEmitter2 {
 				emitOps.push(op);
 			}
 		});
-		if (emitOps.length !== 0) this.emit('ops', emitOps);
+		if (emitOps.length !== 0) {
+			opsSort(emitOps);
+			this.emit('ops', emitOps);
+		}
 	}
 }
 export default Creator;

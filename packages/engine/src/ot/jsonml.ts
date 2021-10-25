@@ -108,15 +108,52 @@ export const getPathValue = (data: any, path: Path) => {
 	return value;
 };
 
-export const pushAndRepair = (ops: RepairOp[], op: RepairOp) => {
-	ops.push(op);
+export const opsSort = (ops: Op[]) => {
 	ops.sort((op1, op2) => {
-		const p1 = op1.p[op1.p.length - 1];
-		const p2 = op2.p[op2.p.length - 1];
+		let diff = 0;
+		for (let p = 0; p < op1.p.length; p++) {
+			const v1 = op1.p[p];
+			// od oi 最后一个参数是属性名称
+			if (typeof v1 === 'string') break;
+			// op2 中没有这个索引路径，op1 < op2
+			if (p >= op2.p.length) {
+				diff = -1;
+				break;
+			}
+			const v2 = op2.p[p];
+			if (v1 < v2) {
+				diff = -1;
+			} else if (v1 > v2) {
+				diff = 1;
+			}
+		}
+		// 文字删除，排再最前面
+		if ('sd' in op1) {
+			// 相同的文字删除，位置大的排再前面
+			if ('sd' in op2) {
+				if (diff === -1) return 1;
+				if (diff === 0) return 0;
+			}
+			return -1;
+		}
+		// 属性删除，排在节点删除最前面
+		if ('od' in op1 && diff < 1 && 'ld' in op2) {
+			return -1;
+		}
+		// 如果删除节点比增加的节点索引小，排在加入节点前面
+		if (diff < 1 && 'ld' in op1 && 'li' in op2) return -1;
+
 		const isLi = 'li' in op1 && 'li' in op2;
-		if (p1 <= p2 && 'ld' in op1 && 'li' in op2) return -1;
-		if (p1 < p2) return isLi ? -1 : 1;
-		if (p1 > p2) return isLi ? 1 : -1;
+		const isLd = 'ld' in op1 && 'ld' in op2;
+		// 都是新增节点，越小排越前面
+		if (isLi) {
+			return diff;
+		}
+		// 都是删除节点，越大排越前面
+		else if (isLd) {
+			if (diff === -1) return 1;
+			if (diff === 1) return -1;
+		}
 		return 0;
 	});
 };

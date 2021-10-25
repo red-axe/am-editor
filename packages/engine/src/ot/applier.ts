@@ -99,14 +99,15 @@ class Applier implements ApplierInterface {
 		}
 		let nextChild: Node | null | undefined = node.firstChild;
 		while (
-			nextChild?.nodeType !== 3 ||
-			(nextChild.textContent?.length || 0) < offset
+			nextChild &&
+			(nextChild.nodeType !== 3 ||
+				(nextChild.textContent?.length || 0) < offset)
 		) {
-			if (nextChild?.textContent?.length || 0 < offset) {
-				offset -= nextChild?.textContent?.length || 0;
-				nextChild = nextChild?.nextSibling;
+			if (nextChild.textContent?.length || 0 < offset) {
+				offset -= nextChild.textContent?.length || 0;
+				nextChild = nextChild.nextSibling;
 			} else {
-				nextChild = nextChild?.firstChild;
+				nextChild = nextChild.firstChild;
 			}
 		}
 		return {
