@@ -154,7 +154,7 @@ export default class Clipboard implements ClipboardInterface {
 			}
 			return node.parentNode || undefined;
 		});
-		const { node, block, list } = this.editor;
+		const { node, list } = this.editor;
 		const hasChildEngine =
 			root.find('.am-engine-view').length > 0 ||
 			root.find('.am-engine').length > 0;
