@@ -27,6 +27,7 @@ import { $, getHashId } from './node';
 
 export * from './types';
 export * from './utils';
+export * from './ot/utils';
 export * from './constants';
 
 export default Engine;

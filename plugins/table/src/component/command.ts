@@ -99,7 +99,8 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 				insertCloneCol.append($(Template.CellBG));
 			}
 			const baseCol = cols[index];
-			colgroup[0].insertBefore(insertCloneCol[0], baseCol);
+			if (insertMethod === 'after') $(baseCol).after(insertCloneCol);
+			else colgroup[0].insertBefore(insertCloneCol[0], baseCol);
 			counter--;
 		}
 		// 插入 td

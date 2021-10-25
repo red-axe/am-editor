@@ -2,13 +2,7 @@ import { debounce, cloneDeep } from 'lodash-es';
 import { EventEmitter2 } from 'eventemitter2';
 import { Doc, Op } from 'sharedb';
 import { EngineInterface } from '../types/engine';
-import {
-	isCursorOp,
-	randomString,
-	reduceOperations,
-	updateIndex,
-} from './utils';
-import { $ } from '../node';
+import { reduceOperations, updateIndex } from './utils';
 
 import {
 	ApplierInterface,
@@ -26,6 +20,7 @@ import OTDoc from './doc';
 import Applier from './applier';
 import Mutation from './mutation';
 import { fromDOM } from './jsonml';
+import { random } from '../utils';
 import './index.css';
 
 const colors = [
@@ -60,7 +55,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.applier = new Applier(engine);
 		this.mutation = new Mutation(engine.container, { engine });
 		this.mutation.on('ops', (ops) => this.handleOps(ops));
-		this.clientId = randomString();
+		this.clientId = random(8);
 		this.waitingOps = [];
 		this.engine.on('select', () => {
 			this.updateSelectionData();

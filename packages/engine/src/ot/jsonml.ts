@@ -123,8 +123,10 @@ export const opsSort = (ops: Op[]) => {
 			const v2 = op2.p[p];
 			if (v1 < v2) {
 				diff = -1;
+				break;
 			} else if (v1 > v2) {
 				diff = 1;
+				break;
 			}
 		}
 		// 文字删除，排再最前面

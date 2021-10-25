@@ -390,7 +390,10 @@ class Creator extends EventEmitter2 {
 			if (records.find((r) => r.addedNodes.item(0) === previousSibling)) {
 				return prevIndex;
 			}
-			index = prevIndex + 1;
+			index =
+				(previousSibling && previousSibling['index'] !== undefined
+					? previousSibling['index']
+					: prevIndex) + 1;
 		} else if (nextIndex !== -1) {
 			index = nextIndex;
 		} else if (addedIndex !== -1) {
@@ -493,8 +496,12 @@ class Creator extends EventEmitter2 {
 		ops = reduceOperations(ops);
 		if (!ops.every((op) => isCursorOp(op))) {
 			targetElements.map((element) => {
+				let node = $(element);
+				if (node.isEditable() && !node.isRoot()) {
+					node = this.engine.card.find(node, true)?.root || node;
+				}
 				updateIndex(
-					$(element),
+					node,
 					(child) =>
 						!isTransientElement(
 							$(child),
@@ -509,39 +516,6 @@ class Creator extends EventEmitter2 {
 	}
 
 	normalizeOps(ops: Op[]) {
-		// if (this.engine.change.isComposing()) {
-		// 	if (
-		// 		ops.length === 2 &&
-		// 		'ld' in ops[1] &&
-		// 		ops[1].ld[0] &&
-		// 		'li' in ops[0] &&
-		// 		typeof ops[0].li === 'string'
-		// 	) {
-		// 		this.lineStart = true;
-		// 		ops.splice(0, 1);
-		//         if(ops[0].li) ops[0].li = '';
-		// 		this.readyToEmitOps(ops);
-		// 		return;
-		// 	}
-		// 	if (ops.length === 1 && isCursorOp(ops[0])) return;
-		// 	if (ops.length === 2 && 'si' in ops[0] && isEqual(ops[0], ops[1]))
-		// 		ops.splice(1, 1);
-		// 	this.laterOps = ops;
-		// 	if (this.timer) clearTimeout(this.timer);
-		// 	this.timer = setTimeout(() => {
-		// 		if (!this.engine.change.isComposing()) {
-		// 			if (this.lineStart) {
-		// 				this.engine.history.startCache(10);
-		// 				this.lineStart = false;
-		// 			}
-		// 			if (this.laterOps) {
-		// 				this.readyToEmitOps(this.laterOps);
-		// 				this.laterOps = null;
-		// 			}
-		// 			this.timer = null;
-		// 		}
-		// 	}, 0);
-		// }
 		if (this.laterOps) {
 			const equal = isEqual(this.laterOps, ops);
 			this.readyToEmitOps(this.laterOps);

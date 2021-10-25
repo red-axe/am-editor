@@ -9,6 +9,7 @@ import { isNodeEntry, NodeInterface } from '../types/node';
 import { getDocument, getWindow } from '../utils';
 import { isCursorOp, isTransientElement, updateIndex } from './utils';
 import { $ } from '../node';
+import { EDITABLE_SELECTOR } from '../constants';
 
 class Applier implements ApplierInterface {
 	private engine: EngineInterface;
@@ -332,7 +333,11 @@ class Applier implements ApplierInterface {
 		if (!ops.every((op) => isCursorOp(op))) {
 			const targetElements: Node[] = [];
 			applyNodes.forEach((node) => {
-				const target = node.isEditable() ? node : node.parent() || node;
+				let target = node.isRoot() ? node : node.parent() || node;
+				if (target.isEditable() && !target.isRoot()) {
+					target =
+						this.engine.card.find(target, true)?.root || target;
+				}
 				if (
 					target &&
 					target.length > 0 &&
@@ -479,6 +484,40 @@ class Applier implements ApplierInterface {
 							getMaxOffset(endChild, endOffset),
 						);
 					}
+					if (!range.collapsed) {
+						const startCard = this.engine.card.find(
+							range.startNode,
+							true,
+						);
+						const endCard = this.engine.card.find(
+							range.endNode,
+							true,
+						);
+						if (
+							startCard &&
+							endCard &&
+							startCard?.root.equal(endCard.root)
+						) {
+							let startEditableElement =
+								range.startNode.closest(EDITABLE_SELECTOR);
+							if (startEditableElement.length === 0)
+								startEditableElement =
+									range.startNode.find(EDITABLE_SELECTOR);
+							let endEditableElement =
+								range.endNode.closest(EDITABLE_SELECTOR);
+							if (endEditableElement.length === 0)
+								endEditableElement =
+									range.endNode.find(EDITABLE_SELECTOR);
+							if (
+								startEditableElement.length > 0 &&
+								endEditableElement.length > 0 &&
+								!startEditableElement.equal(endEditableElement)
+							) {
+								range.collapse(true);
+							}
+						}
+					}
+
 					change.select(range);
 					range.scrollRangeIntoView();
 				} catch (error) {

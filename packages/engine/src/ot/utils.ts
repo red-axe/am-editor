@@ -2,11 +2,7 @@ import { isEqual } from 'lodash-es';
 import OTJSON from 'ot-json0';
 import { NodeInterface } from '../types/node';
 import { FOCUS, ANCHOR, CURSOR } from '../constants/selection';
-import {
-	CARD_ASYNC_RENDER,
-	CARD_SELECTOR,
-	CARD_VALUE_KEY,
-} from '../constants/card';
+import { CARD_ASYNC_RENDER, CARD_SELECTOR } from '../constants/card';
 
 import {
 	Op,
@@ -27,26 +23,6 @@ import {
 	UI_SELECTOR,
 } from '../constants/root';
 import { getParentInRoot } from '../utils';
-
-/**
- * 随机一个数字
- * @param start 开始
- * @param max 最大
- */
-export const random = (start: number, max: number) => {
-	return Math.floor(start + Math.random() * (max - start));
-};
-
-/**
- * 随机一个字符串不包含，0、o、O、l字符
- * @param length 长度，默认8
- */
-export const randomString = (length: number = 8) => {
-	const str = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
-	let word = '';
-	while (length--) word += str[random(0, str.length)];
-	return word;
-};
 
 export const isTransientElement = (
 	node: NodeInterface,
