@@ -154,7 +154,7 @@ export default class Clipboard implements ClipboardInterface {
 			}
 			return node.parentNode || undefined;
 		});
-		const { node, block } = this.editor;
+		const { node, block, list } = this.editor;
 		const hasChildEngine =
 			root.find('.am-engine-view').length > 0 ||
 			root.find('.am-engine').length > 0;
@@ -174,7 +174,10 @@ export default class Clipboard implements ClipboardInterface {
 
 					if (li && node.isCustomize(li)) {
 						const endLi = range.endNode.closest('li');
-						if (!li.equal(endLi)) {
+						if (
+							!li.equal(endLi) ||
+							(list.isLast(range) && list.isFirst(range))
+						) {
 							if (range.startOffset === 0) {
 								const ul = li.parent();
 								if (ul) range.setStart(ul, li.getIndex());
