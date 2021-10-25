@@ -255,23 +255,29 @@ class CardToolbar implements CardToolbarInterface {
 					}
 				}
 			} else {
-				const cardRect = this.card.root.getBoundingClientRect() || {
+				const cardRect = this.card.root
+					.get<HTMLElement>()
+					?.getBoundingClientRect() || {
 					left: 0,
 					top: 0,
 				};
 				const { root } = this.editor;
-				const rootRect = root.getBoundingClientRect() || {
+				const rootRect = root
+					.get<HTMLElement>()
+					?.getBoundingClientRect() || {
 					left: 0,
 					top: 0,
 				};
+				console.log(cardRect, rootRect);
 				const top = cardRect.top - rootRect.top;
 				const left = cardRect.left - rootRect.left;
 
 				const dnd = root.find('.data-card-dnd');
-				const dndElement = dnd.get<HTMLElement>();
-				if (dndElement) {
-					dndElement.style.top = `${top}px`;
-					dndElement.style.left = `${left - 21}px`;
+				if (dnd.length > 0) {
+					dnd.css({
+						top: `${top}px`,
+						left: `${left - dnd.width() - 2}px`,
+					});
 					dnd.addClass('data-card-dnd-active');
 				}
 			}

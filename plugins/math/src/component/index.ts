@@ -32,6 +32,10 @@ export default class MathCard extends Card<MathValue> {
 		return 'border';
 	}
 
+	static get singleSelectable() {
+		return false;
+	}
+
 	private container?: NodeInterface;
 	private editorContainer?: NodeInterface;
 	private mathEditor?: MathEditor;

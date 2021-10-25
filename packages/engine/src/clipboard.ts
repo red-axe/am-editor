@@ -174,10 +174,7 @@ export default class Clipboard implements ClipboardInterface {
 
 					if (li && node.isCustomize(li)) {
 						const endLi = range.endNode.closest('li');
-						if (
-							!li.equal(endLi) ||
-							block.isLastOffset(range, 'end')
-						) {
+						if (!li.equal(endLi)) {
 							if (range.startOffset === 0) {
 								const ul = li.parent();
 								if (ul) range.setStart(ul, li.getIndex());

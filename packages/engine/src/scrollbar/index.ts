@@ -34,6 +34,7 @@ class Scrollbar extends EventEmitter2 {
 	#reverse?: boolean;
 	#content?: NodeInterface;
 	shadowTimer?: NodeJS.Timeout;
+	#enableScroll: boolean = true;
 	/**
 	 * @param {nativeNode} container 需要添加滚动条的元素
 	 * @param {boolean} x 横向滚动条
@@ -54,6 +55,10 @@ class Scrollbar extends EventEmitter2 {
 		this.init();
 	}
 
+	/**
+	 * 设置滚动条内容节点
+	 * @param content
+	 */
 	setContentNode(content?: NodeInterface | Node) {
 		this.#content = content
 			? isNode(content)
@@ -193,6 +198,19 @@ class Scrollbar extends EventEmitter2 {
 		}
 	}
 
+	/**
+	 * 启用鼠标在内容节点上滚动或在移动设备使用手指滑动
+	 */
+	enableScroll() {
+		this.#enableScroll = true;
+	}
+	/**
+	 * 禁用鼠标在内容节点上滚动或在移动设备使用手指滑动
+	 */
+	disableScroll() {
+		this.#enableScroll = false;
+	}
+
 	scroll = (event: Event) => {
 		const { target } = event;
 		if (!target) return;
@@ -231,6 +249,7 @@ class Scrollbar extends EventEmitter2 {
 	};
 
 	bindWheelScroll = (event: any) => {
+		if (!this.#enableScroll) return;
 		if (this.x && !this.y) {
 			if (this.slideX && this.slideX.css('display') !== 'none')
 				this.wheelXScroll(event);
@@ -246,7 +265,7 @@ class Scrollbar extends EventEmitter2 {
 	 * @returns
 	 */
 	bindContainerTouchX = (event: TouchEvent) => {
-		if (!event.target) return;
+		if (!event.target || !this.#enableScroll) return;
 		if ($(event.target).hasClass('data-scrollbar-trigger')) return;
 		// 设置滚动方向相反
 		this.#reverse = true;
@@ -258,7 +277,7 @@ class Scrollbar extends EventEmitter2 {
 	 * @returns
 	 */
 	bindContainerTouchY = (event: TouchEvent) => {
-		if (!event.target) return;
+		if (!event.target || !this.#enableScroll) return;
 		if ($(event.target).hasClass('data-scrollbar-trigger')) return;
 		// 设置滚动方向相反
 		this.#reverse = true;
@@ -276,7 +295,6 @@ class Scrollbar extends EventEmitter2 {
 			}
 		} else {
 			// 在节点上滚动鼠标滚轮
-
 			this.container.on(
 				isFirefox ? 'DOMMouseScroll' : 'mousewheel',
 				this.bindWheelScroll,

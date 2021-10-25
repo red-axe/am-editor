@@ -29,6 +29,10 @@ class Status extends Card<StatusValue> {
 		return CardType.INLINE;
 	}
 
+	static get singleSelectable() {
+		return false;
+	}
+
 	static colors: Array<{
 		background: string;
 		color: string;

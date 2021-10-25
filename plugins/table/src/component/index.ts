@@ -285,11 +285,14 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 
 	activate(activated: boolean) {
 		super.activate(activated);
-		if (activated) this.wrapper?.addClass('active');
-		else {
+		if (activated) {
+			this.wrapper?.addClass('active');
+			this.scrollbar?.enableScroll();
+		} else {
 			this.selection.clearSelect();
 			this.conltrollBar.hideContextMenu();
 			this.wrapper?.removeClass('active');
+			this.scrollbar?.disableScroll();
 		}
 		this.scrollbar?.refresh();
 	}
@@ -359,6 +362,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 					this.wrapper?.removeClass('scrollbar-show');
 				}
 			});
+			this.scrollbar.disableScroll();
 			this.scrollbar.on('change', () => {
 				if (isEngine(this.editor)) this.editor.ot.initSelection();
 			});

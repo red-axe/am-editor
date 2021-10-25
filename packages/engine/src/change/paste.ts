@@ -337,14 +337,12 @@ export default class Paste {
 		let fragmentNode = $(fragment);
 		const first = fragmentNode.first();
 		//如果光标在文本节点，并且父级节点不是根节点，移除粘贴数据的第一个节点块级节点，让其内容接在光标所在行
-		const { startNode } = range.cloneRange().shrinkToTextNode();
-		const startParent = startNode.parent();
+		const { startNode } = range
+			.cloneRange()
+			.shrinkToElementNode()
+			.shrinkToTextNode();
 		if (
 			startNode.inEditor() &&
-			((startNode.isText() && !startNode.parent()?.isEditable()) ||
-				(startNode.name === 'li' &&
-					startParent &&
-					this.engine.node.isList(startParent))) &&
 			first &&
 			first.name === 'p' &&
 			!(first.length === 1 && first.first()?.name === 'br')

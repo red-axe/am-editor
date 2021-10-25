@@ -64,6 +64,10 @@ class VideoComponent extends Card<VideoValue> {
 		return CardType.BLOCK;
 	}
 
+	static get singleSelectable() {
+		return false;
+	}
+
 	private container?: NodeInterface;
 
 	getLocales() {
