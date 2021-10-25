@@ -268,7 +268,6 @@ class CardToolbar implements CardToolbarInterface {
 					left: 0,
 					top: 0,
 				};
-				console.log(cardRect, rootRect);
 				const top = cardRect.top - rootRect.top;
 				const left = cardRect.left - rootRect.left;
 
