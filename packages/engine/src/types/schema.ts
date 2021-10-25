@@ -65,6 +65,8 @@ export interface SchemaInterface {
 	add(
 		rules: SchemaRule | SchemaGlobal | Array<SchemaRule | SchemaGlobal>,
 	): void;
+	// 移除一个规则
+	remove(rule: SchemaRule): void;
 	/**
 	 * 查找规则
 	 * @param callback 查找条件

@@ -1,4 +1,4 @@
-import { cloneDeep, merge, omit } from 'lodash-es';
+import { cloneDeep, isEqual, merge, omit } from 'lodash-es';
 import {
 	isSchemaRule,
 	NodeInterface,
@@ -121,6 +121,14 @@ class Schema implements SchemaInterface {
 				return aSCount === bSCount ? 0 : aSCount > bSCount ? -1 : 1;
 			return 1;
 		});
+	}
+	// 移除一个规则
+	remove(rule: SchemaRule) {
+		let index = this._all.findIndex((r) => isEqual(r, rule));
+		if (index > -1) this._all.splice(index, 1);
+		const rules = this.data[rule.type] as SchemaRule[];
+		index = rules.findIndex((r) => isEqual(r, rule));
+		if (index > -1) rules.splice(index, 1);
 	}
 	/**
 	 * 克隆当前schema对象
