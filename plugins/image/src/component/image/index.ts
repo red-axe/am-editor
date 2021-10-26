@@ -374,6 +374,7 @@ class Image {
 	changeUrl(url: string) {
 		if (this.src !== url) {
 			this.src = url;
+			this.isLoad = false;
 			this.image.attributes('src', this.getSrc());
 		}
 	}
@@ -495,7 +496,7 @@ class Image {
 		}
 	};
 
-	render(placeholder: boolean = true) {
+	render() {
 		//阅读模式不展示错误
 		const { container, display } = this.options;
 		if (display === CardType.BLOCK) {
@@ -527,12 +528,12 @@ class Image {
 			contentNode.addClass('data-image-loaded');
 			contentNode.removeClass('data-image-loading');
 		}
-		if (this.status === 'done') {
+		if (this.status === 'done' && !this.isLoad) {
 			if (!this.root.inEditor()) container.empty().append(this.root);
 		}
 		this.maxWidth = this.getMaxWidth();
 		let { width, height } = this.size;
-		if (width && height && placeholder) {
+		if (width && height && !this.isLoad) {
 			if (width > this.maxWidth) {
 				width = this.maxWidth;
 				height = Math.round((width * height) / this.size.width);
