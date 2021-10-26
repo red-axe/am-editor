@@ -497,7 +497,7 @@ class Image {
 	};
 
 	render() {
-		//阅读模式不展示错误
+		// 阅读模式不展示错误
 		const { container, display } = this.options;
 		if (display === CardType.BLOCK) {
 			this.root.addClass('data-image-blcok');
