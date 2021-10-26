@@ -495,7 +495,7 @@ class Image {
 		}
 	};
 
-	render() {
+	render(placeholder: boolean = true) {
 		//阅读模式不展示错误
 		const { container, display } = this.options;
 		if (display === CardType.BLOCK) {
@@ -532,7 +532,7 @@ class Image {
 		}
 		this.maxWidth = this.getMaxWidth();
 		let { width, height } = this.size;
-		if (width && height) {
+		if (width && height && placeholder) {
 			if (width > this.maxWidth) {
 				width = this.maxWidth;
 				height = Math.round((width * height) / this.size.width);

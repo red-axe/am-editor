@@ -268,14 +268,16 @@ class ImageComponent extends Card<ImageValue> {
 					this.didUpdate();
 				},
 			});
+			this.image.render();
 		} else {
+			const placeholder = this.image.src !== value.src;
 			this.image.changeUrl(value.src);
 			this.image.status = value.status || 'done';
 			this.image.message = value.message;
 			this.image.size.width = value.size?.width || 0;
 			this.image.size.height = value.size?.height || 0;
+			this.image.render(placeholder);
 		}
-		this.image.render();
 	}
 
 	didUpdate() {
