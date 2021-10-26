@@ -94,11 +94,11 @@ class Uploader implements UploaderInterface {
 		});
 	}
 
-	handleBefore(file: File, files: Array<File>) {
+	async handleBefore(file: File, files: Array<File>) {
 		const { type, uid, name, size } = file;
 		const ext = getExtensionName(file);
 		const { onBefore } = this.options;
-		if (onBefore && onBefore(file) === false) {
+		if (onBefore && (await onBefore(file)) === false) {
 			return false;
 		}
 		return new Promise<boolean>((resolve, reject) => {
@@ -118,16 +118,19 @@ class Uploader implements UploaderInterface {
 					if (
 						files.every((file) => !!this.uploadingFiles[file.uid!])
 					) {
-						files.forEach((file) => {
-							if (this.options.onReady) {
-								this.options.onReady(
-									this.uploadingFiles[file.uid!],
-									file,
-								);
-							}
+						Promise.all(
+							files.map(async (file) => {
+								if (this.options.onReady) {
+									await this.options.onReady(
+										this.uploadingFiles[file.uid!],
+										file,
+									);
+								}
+							}),
+						).then(() => {
+							resolve(true);
 						});
 					}
-					resolve(true);
 				},
 				false,
 			);

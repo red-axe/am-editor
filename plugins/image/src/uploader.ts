@@ -285,11 +285,45 @@ export default class extends Plugin<Options> {
 						!!this.cardComponents[fileInfo.uid]
 					)
 						return;
-					const component = card.insert('image', {
-						status: 'uploading',
-						src: fileInfo.src,
-					}) as ImageComponent;
-					this.cardComponents[fileInfo.uid] = component;
+					const src = fileInfo.src || '';
+					const base64String =
+						typeof src !== 'string'
+							? window.btoa(
+									String.fromCharCode(...new Uint8Array(src)),
+							  )
+							: src;
+					const insertCard = (value: Partial<ImageValue>) => {
+						const component = card.insert(
+							'image',
+							{
+								...value,
+								status: 'uploading',
+								//fileInfo.src, 再协作中，如果大图片使用base64加载图片预览会造成很大资源浪费
+							},
+							base64String,
+						) as ImageComponent;
+						this.cardComponents[fileInfo.uid] = component;
+					};
+					return new Promise<void>((resolve) => {
+						const image = new Image();
+						image.src = base64String;
+						image.onload = () => {
+							insertCard({
+								src: '',
+								size: {
+									width: image.width,
+									height: image.height,
+									naturalHeight: image.naturalHeight,
+									naturalWidth: image.naturalHeight,
+								},
+							});
+							resolve();
+						};
+						image.onerror = () => {
+							insertCard({ src: '' });
+							resolve();
+						};
+					});
 				},
 				onUploading: (file, { percent }) => {
 					const component = this.cardComponents[file.uid || ''];

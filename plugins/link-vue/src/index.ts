@@ -63,7 +63,7 @@ export default class extends InlinePlugin<Options> {
 
 	execute() {
 		if (!isEngine(this.editor)) return;
-		const { inline, change, history } = this.editor;
+		const { inline, change } = this.editor;
 		if (!this.queryState()) {
 			const inlineNode = $(`<${this.tagName} />`);
 			this.setStyle(inlineNode, ...arguments);
@@ -74,7 +74,6 @@ export default class extends InlinePlugin<Options> {
 				inlineNode.text(text);
 				inline.insert(inlineNode);
 			} else {
-				history.startCache();
 				inline.wrap(inlineNode);
 			}
 			const range = change.getRange();

@@ -1130,7 +1130,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			widths.push(colBars.eq(c)?.get<HTMLElement>()?.offsetWidth || 0);
 		}
 		command.mockCopy();
-		//if (isEngine(this.editor)) this.editor.history.startCache(12);
 		if (selectArea.begin.col > index) {
 			command.insertColAt(
 				isNext ? index - 1 : index,
@@ -1233,7 +1232,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const selectArea = selection.getSelectArea();
 		const { begin, end } = selectArea;
 		command.mockCopy();
-		//if (isEngine(this.editor)) this.editor.history.startCache(12);
 		if (begin.row > index) {
 			command.insertRowAt(
 				isNext ? index - 1 : index,

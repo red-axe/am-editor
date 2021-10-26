@@ -199,7 +199,7 @@ class CardModel implements CardModelInterface {
 	}
 
 	// 插入Card
-	insertNode(range: RangeInterface, card: CardInterface) {
+	insertNode(range: RangeInterface, card: CardInterface, ...args: any) {
 		const isInline = card.type === 'inline';
 		const editor = this.editor;
 		// 范围为折叠状态时先删除内容
@@ -237,7 +237,7 @@ class CardModel implements CardModelInterface {
 		) {
 			block.unwrap(rootParent, range);
 		}
-		const result = card.render();
+		const result = card.render(...args);
 		const center = card.getCenter();
 		if (result !== undefined) {
 			card.getCenter().append(
@@ -272,12 +272,12 @@ class CardModel implements CardModelInterface {
 	}
 
 	// 更新Card
-	updateNode(card: CardInterface, value: CardValue) {
+	updateNode(card: CardInterface, value: CardValue, ...args: any) {
 		if (card.destroy) card.destroy();
 		const container = card.findByKey('center');
 		container.empty();
 		card.setValue(value);
-		const result = card.render();
+		const result = card.render(...args);
 		if (result !== undefined) {
 			card.getCenter().append(
 				typeof result === 'string' ? $(result) : result,
@@ -413,14 +413,14 @@ class CardModel implements CardModelInterface {
 		if (scrollNode) range.scrollIntoViewIfNeeded(container, scrollNode);
 	}
 
-	insert(name: string, value?: CardValue) {
+	insert(name: string, value?: CardValue, ...args: any) {
 		if (!isEngine(this.editor)) throw 'Engine not found';
 		const component = this.create(name, {
 			value,
 		});
 		const { change } = this.editor;
 		const range = change.getSafeRange();
-		const card = this.insertNode(range, component);
+		const card = this.insertNode(range, component, ...args);
 		const type = component.type;
 		if (type === 'inline') {
 			card.focus(range, false);
@@ -436,21 +436,30 @@ class CardModel implements CardModelInterface {
 		return card;
 	}
 
-	update(selector: NodeInterface | Node | string, value: CardValue) {
+	update(
+		selector: NodeInterface | Node | string,
+		value: CardValue,
+		...args: any
+	) {
 		if (!isEngine(this.editor)) return;
 		const { change } = this.editor;
 		const card = this.find(selector);
 		if (card) {
-			this.updateNode(card, value);
+			this.updateNode(card, value, ...args);
 			const range = change.getRange();
 			card.focus(range, false);
 			change.change();
 		}
 	}
 
-	replace(source: CardInterface, name: string, value?: CardValue) {
+	replace(
+		source: CardInterface,
+		name: string,
+		value?: CardValue,
+		...args: any
+	) {
 		this.remove(source.root);
-		return this.insert(name, value);
+		return this.insert(name, value, ...args);
 	}
 
 	remove(selector: NodeInterface | Node | string, hasModify: boolean = true) {

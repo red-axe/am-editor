@@ -27,9 +27,9 @@ export type UploaderOptions = {
     // 请求头
 	headers?: { [key: string]: string };
     // 上传前，可以做文件大小限制判断
-	onBefore?: (file: File) => boolean | void;
+	onBefore?: (file: File) => Promise<boolean | void>;
     // 开始上传
-	onReady?: (fileInfo: FileInfo, file: File) => void;
+	onReady?: (fileInfo: FileInfo, file: File) => Promise<void>;
     // 上传中
 	onUploading?: (file: File, progress: { percent: number }) => void;
     // 上传错误
@@ -362,24 +362,27 @@ export default class {
 				// 当前上传文件唯一标识
 				const uid = Date.now() + '-' + f;
 				file.uid = uid;
-				if (onBefore && onBefore(file) === false) return;
+				if (onBefore && (await onBefore(file)) === false) return;
 				promiseList.push(this.handleBefore(uid, file));
 			}
 			//全部文件读取完成后再插入编辑器
-			Promise.all(promiseList).then((values) => {
+			Promise.all(promiseList).then(async (values) => {
 				if (values.some((value) => value === false)) {
 					engine.messageError('read image failed');
 					return;
 				}
 				const files = values as { file: File; info: FileInfo }[];
-				if (onReady) {
-					files.forEach((v) => {
-						onReady(v.info, v.file);
+				Promise.all(
+					files.map(async (v) => {
+						if (onReady) {
+							await onReady(v.info, v.file);
+						}
+					}),
+				).then(() => {
+					files.forEach(async (file) => {
+						// 处理上传
+						this.handleUpload(file.file, options, name);
 					});
-				}
-				files.forEach(async (file) => {
-					// 处理上传
-					this.handleUpload(file.file, options, name);
 				});
 			});
 		};

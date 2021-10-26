@@ -78,7 +78,6 @@ export default class extends InlinePlugin<Options> {
 				inlineNode.text(text);
 				inline.insert(inlineNode);
 			} else {
-				history.startCache();
 				inline.wrap(inlineNode);
 			}
 			const range = change.getRange();

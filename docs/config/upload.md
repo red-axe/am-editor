@@ -27,9 +27,9 @@ export type UploaderOptions = {
     // request header
     headers?: {[key: string]: string };
     // Before uploading, you can judge the file size limit
-    onBefore?: (file: File) => boolean | void;
+    onBefore?: (file: File) => Promise<boolean | void>;
     // Start upload
-    onReady?: (fileInfo: FileInfo, file: File) => void;
+    onReady?: (fileInfo: FileInfo, file: File) => Promise<void>;
     // uploading
     onUploading?: (file: File, progress: {percent: number }) => void;
     // upload error
@@ -361,24 +361,27 @@ export default class {
 				// The unique identifier of the currently uploaded file
 				const uid = Date.now() + '-' + f;
 				file.uid = uid;
-				if (onBefore && onBefore(file) === false) return;
+				if (onBefore && (await onBefore(file)) === false) return;
 				promiseList.push(this.handleBefore(uid, file));
 			}
 			//Insert the editor after reading all files
-			Promise.all(promiseList).then((values) => {
+			Promise.all(promiseList).then(async (values) => {
 				if (values.some((value) => value === false)) {
 					engine.messageError('read image failed');
 					return;
 				}
 				const files = values as { file: File; info: FileInfo }[];
-				if (onReady) {
-					files.forEach((v) => {
-						onReady(v.info, v.file);
+				Promise.all(
+					files.map(async (v) => {
+						if (onReady) {
+							await onReady(v.info, v.file);
+						}
+					}),
+				).then(() => {
+					files.forEach(async (file) => {
+						// Process upload
+						this.handleUpload(file.file, options, name);
 					});
-				}
-				files.forEach(async (file) => {
-					// Process upload
-					this.handleUpload(file.file, options, name);
 				});
 			});
 		};

@@ -22,12 +22,7 @@ import { Op, Path, StringInsertOp, StringDeleteOp, Doc } from 'sharedb';
 import { NodeInterface } from '../types/node';
 import { DocInterface, RepairOp } from '../types/ot';
 import { $ } from '../node';
-import {
-	CARD_ASYNC_RENDER,
-	DATA_ELEMENT,
-	ROOT,
-	UI_SELECTOR,
-} from '../constants';
+import { DATA_ELEMENT, ROOT, UI_SELECTOR } from '../constants';
 import { getDocument } from '../utils/node';
 
 class Creator extends EventEmitter2 {
@@ -443,10 +438,7 @@ class Creator extends EventEmitter2 {
 			//非可编辑卡片的子节点
 			const { card, container } = this.engine;
 			card.each((card) => {
-				if (
-					!card.isEditable ||
-					!!card.root.attributes(CARD_ASYNC_RENDER)
-				) {
+				if (!card.isEditable) {
 					card.root.allChildren().forEach((child) => {
 						if (child.type === getDocument().ELEMENT_NODE)
 							this.cacheTransientElements?.push(child[0]);

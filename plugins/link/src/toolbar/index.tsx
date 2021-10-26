@@ -122,7 +122,6 @@ class Toolbar {
 		range.setStart(this.target.next()!, 1);
 		range.setEnd(this.target.next()!, 1);
 		change.apply(range);
-		history.submitCache();
 		this.mouseInContainer = false;
 		this.hide();
 	}
@@ -200,7 +199,6 @@ class Toolbar {
 				range.select(this.target, true);
 				change.select(range);
 				inline.unwrap();
-				this.engine.history.destroyCache();
 			}
 			if (clearTarget !== false) this.target = undefined;
 		}

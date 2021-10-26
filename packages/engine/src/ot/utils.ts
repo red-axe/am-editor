@@ -2,7 +2,7 @@ import { isEqual } from 'lodash-es';
 import OTJSON from 'ot-json0';
 import { NodeInterface } from '../types/node';
 import { FOCUS, ANCHOR, CURSOR } from '../constants/selection';
-import { CARD_ASYNC_RENDER, CARD_SELECTOR } from '../constants/card';
+import { CARD_SELECTOR } from '../constants/card';
 
 import {
 	Op,
@@ -74,8 +74,7 @@ export const isTransientElement = (
 				!isCard &&
 				closestNode.length > 0 &&
 				closestNode.isCard() &&
-				(!closestNode.isEditableCard() ||
-					!!closestNode.attributes(CARD_ASYNC_RENDER))
+				!closestNode.isEditableCard()
 			) {
 				return true;
 			}
@@ -92,14 +91,8 @@ export const isTransientElement = (
 };
 
 export const isTransientAttribute = (node: NodeInterface, attr: string) => {
-	if ([CARD_ASYNC_RENDER].indexOf(attr) > -1) return true;
 	if (node.isRoot() && !/^data-selection-/.test(attr)) return true;
-	if (
-		node.isCard() &&
-		(['id', 'class', 'style'].includes(attr) ||
-			!!node.attributes(CARD_ASYNC_RENDER))
-	)
-		return true;
+	if (node.isCard() && ['id', 'class', 'style'].includes(attr)) return true;
 	const transient = node.attributes(DATA_TRANSIENT_ATTRIBUTES);
 	if (
 		transient === '*' ||

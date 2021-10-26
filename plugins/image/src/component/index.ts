@@ -90,6 +90,9 @@ class ImageComponent extends Card<ImageValue> {
 	 */
 	setProgressPercent(percent: number) {
 		this.image?.setProgressPercent(percent);
+		this.setValue({
+			percent,
+		});
 	}
 
 	setSize(size: Size) {
@@ -129,7 +132,7 @@ class ImageComponent extends Card<ImageValue> {
 		if (!isEngine(this.editor) || this.editor.readonly) return [];
 		const { language } = this.editor;
 		let value = this.getValue();
-		if (this.isLocalError === true || value?.status === 'error')
+		if (this.isLocalError === true || value?.status !== 'done')
 			return [
 				{
 					type: 'delete',
@@ -225,7 +228,7 @@ class ImageComponent extends Card<ImageValue> {
 		else this.image?.blur();
 	}
 
-	render(): string | void | NodeInterface {
+	render(loadingBg?: string): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
 		if (!this.image) {
@@ -274,8 +277,9 @@ class ImageComponent extends Card<ImageValue> {
 			this.image.message = value.message;
 			this.image.size.width = value.size?.width || 0;
 			this.image.size.height = value.size?.height || 0;
+			if (value.percent) this.image.setProgressPercent(value.percent);
 		}
-		this.image.render();
+		this.image.render(loadingBg);
 	}
 
 	didUpdate() {

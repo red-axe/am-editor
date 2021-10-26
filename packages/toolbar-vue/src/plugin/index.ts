@@ -64,7 +64,7 @@ class ToolbarPlugin extends Plugin<Options> {
 
 	onSlash(event: KeyboardEvent) {
 		if (!isEngine(this.editor)) return;
-		const { change, history } = this.editor;
+		const { change } = this.editor;
 		let range = change.getRange();
 		const block = this.editor.block.closest(range.startNode);
 		const text = block.text().trim();
@@ -81,7 +81,6 @@ class ToolbarPlugin extends Plugin<Options> {
 			range = change.getRange();
 			if (range.collapsed) {
 				event.preventDefault();
-				history.startCache();
 				const data = this.options.config || defaultConfig(this.editor);
 				const card = this.editor.card.insert(
 					ToolbarComponent.cardName,
@@ -91,7 +90,6 @@ class ToolbarPlugin extends Plugin<Options> {
 				);
 				this.editor.card.activate(card.root);
 				range = change.getRange();
-				history.destroyCache();
 				//选中关键词输入节点
 				const keyword = card.find('.data-toolbar-component-keyword');
 				range.select(keyword, true);

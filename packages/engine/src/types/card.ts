@@ -319,7 +319,7 @@ export interface CardInterface {
 	/**
 	 * 渲染卡片
 	 */
-	render(): NodeInterface | string | void;
+	render(...args: any): NodeInterface | string | void;
 	/**
 	 * 销毁
 	 */
@@ -429,8 +429,13 @@ export interface CardModelInterface {
 	 * 插入卡片
 	 * @param range 选区
 	 * @param card 卡片
+	 * @param args 插入时渲染时额外的参数
 	 */
-	insertNode(range: RangeInterface, card: CardInterface): CardInterface;
+	insertNode(
+		range: RangeInterface,
+		card: CardInterface,
+		...args: any
+	): CardInterface;
 	/**
 	 * 移除卡片节点
 	 * @param card 卡片
@@ -451,8 +456,9 @@ export interface CardModelInterface {
 	 * 更新卡片重新渲染
 	 * @param card 卡片
 	 * @param value 值
+	 * @param args 更新时渲染时额外的参数
 	 */
-	updateNode(card: CardInterface, value: CardValue): void;
+	updateNode(card: CardInterface, value: CardValue, ...args: any): void;
 	/**
 	 * 激活卡片节点所在的卡片
 	 * @param node 节点
@@ -479,24 +485,32 @@ export interface CardModelInterface {
 	 * 插入卡片
 	 * @param name 卡片名称
 	 * @param value 卡片值
+	 * @param args 插入时渲染时额外的参数
 	 */
-	insert(name: string, value?: CardValue): CardInterface;
+	insert(name: string, value?: CardValue, ...args: any): CardInterface;
 	/**
 	 * 更新卡片
 	 * @param selector 卡片选择器
 	 * @param value 要更新的卡片值
+	 * @param args 更新时渲染时额外的参数
 	 */
-	update(selector: NodeInterface | Node | string, value: CardValue): void;
+	update(
+		selector: NodeInterface | Node | string,
+		value: CardValue,
+		...args: any
+	): void;
 	/**
 	 * 替换卡片
 	 * @param source 源卡片
 	 * @param name 新卡片名称
 	 * @param value 新卡片值
+	 * @param args 替换时渲染时额外的参数
 	 */
 	replace(
 		source: CardInterface,
 		name: string,
 		value?: CardValue,
+		...args: any
 	): CardInterface;
 	/**
 	 * 移除卡片

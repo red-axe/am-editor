@@ -106,39 +106,6 @@ Delay to clear all history records
 clear(): void;
 ```
 
-### `startCache`
-
-Cache subsequent operations temporarily, will not be synchronized to the collaborative server, and will not be written to history
-
-```ts
-/**
- * The subsequent operations are temporarily cached, and will not be synchronized to the collaborative server, and history will not be written
- */
-startCache(): void;
-```
-
-### `submitCache`
-
-Submit temporarily cached operations, synchronize them to the collaborative server, and write historical records
-
-```ts
-/**
- * Submit temporarily cached operations, synchronize them to the collaborative server, and write historical records
- */
-submitCache(): void;
-```
-
-### `destroyCache`
-
-Abandon temporarily cached operations
-
-```ts
-/**
- * Abandon temporarily cached operations
- */
-destroyCache(): void;
-```
-
 ### `saveOp`
 
 Save the currently unmaintained operations to the stack
