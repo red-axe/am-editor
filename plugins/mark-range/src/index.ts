@@ -457,7 +457,6 @@ export default class extends MarkPlugin<Options> {
 		const id = args[0];
 		switch (action) {
 			case 'preview':
-				console.log('preview');
 				const reuslt = this.preview(key, id);
 				return reuslt;
 			case 'apply':
