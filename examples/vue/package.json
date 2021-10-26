@@ -20,7 +20,7 @@
     "@aomao/plugin-fontsize": "^2.5.2",
     "@aomao/plugin-heading": "^2.5.2",
     "@aomao/plugin-hr": "^2.5.2",
-    "@aomao/plugin-image": "^2.5.2",
+    "@aomao/plugin-image": "^2.5.3",
     "@aomao/plugin-indent": "^2.5.2",
     "@aomao/plugin-italic": "^2.5.2",
     "@aomao/plugin-link-vue": "^2.5.2",
