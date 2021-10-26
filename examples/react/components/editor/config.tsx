@@ -122,7 +122,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 	},
 	[Image.pluginName]: {
 		onBeforeRender: (status: string, url: string) => {
-			if (url.startsWith('data:image/')) return url;
+			if (!url) return url;
 			return url + `?token=12323`;
 		},
 	},

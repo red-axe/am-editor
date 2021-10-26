@@ -145,6 +145,23 @@ export interface MutationInterface extends EventEmitter2 {
 	 */
 	stop(): void;
 	/**
+	 * 开始缓存操作，开启后将拦截监听并缓存起来
+	 */
+	startCache(): void;
+	/**
+	 * 将缓存提交处理，最后停止缓存
+	 */
+	submitCache(): void;
+	/**
+	 * 将缓存遗弃，并停止缓存
+	 */
+	destroyCache(): void;
+	/**
+	 * 获取缓存的记录
+	 * @returns
+	 */
+	getCaches(): MutationRecord[];
+	/**
 	 * 操作读取
 	 * @param ops 操作
 	 */
@@ -196,6 +213,23 @@ export interface OTInterface extends EventEmitter2 {
 	 * 停止监听DOM树改变
 	 */
 	stopMutation(): void;
+	/**
+	 * 开始缓存操作，开启后将拦截监听并缓存起来
+	 */
+	startMutationCache(): void;
+	/**
+	 * 将缓存提交处理，最后停止缓存
+	 */
+	submitMutationCache(): void;
+	/**
+	 * 将缓存遗弃，并停止缓存
+	 */
+	destroyMutationCache(): void;
+	/**
+	 * 获取缓存的记录
+	 * @returns
+	 */
+	getCaches(): MutationRecord[];
 	setMemberIdToUuid(member: Member): void;
 	setMemberUuidToId(member: Member): void;
 	setMemberColor(member: Member): void;

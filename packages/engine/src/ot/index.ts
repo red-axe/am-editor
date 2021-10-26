@@ -204,6 +204,26 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		if (this.mutation) this.mutation.stop();
 	}
 
+	startMutationCache() {
+		if (this.mutation) this.mutation.startCache();
+	}
+
+	submitMutationCache() {
+		if (this.mutation) this.mutation.submitCache();
+	}
+
+	destroyMutationCache() {
+		if (this.mutation) this.mutation.destroyCache();
+	}
+
+	/**
+	 * 获取缓存的记录
+	 * @returns
+	 */
+	getCaches(): MutationRecord[] {
+		return this.mutation?.getCaches() || [];
+	}
+
 	setMemberIdToUuid(member: Member) {
 		member.__uuid = member.uuid;
 		member.uuid = String(member.id).toLowerCase();
