@@ -23,6 +23,9 @@
     cursor: pointer;
     border: 2px solid transparent; 
   }
+  .am-engine span[data-card-key="math"] ::selection {
+    background: transparent !important;
+}
  .data-card-math-editor {
     outline: none;
     width: 420px;

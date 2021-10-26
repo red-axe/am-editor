@@ -4,4 +4,9 @@
 
 .am-engine .card-selected [data-card-element="center"].data-card-border-selected {
     outline: 2px solid #1890FF;
+    border-radius: 2px;
+}
+
+.am-engine .card-selected [data-card-element="center"].data-card-border-selected::selection {
+    background: transparent;
 }

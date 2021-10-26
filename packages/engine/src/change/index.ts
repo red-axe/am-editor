@@ -240,6 +240,7 @@ class ChangeModel implements ChangeInterface {
 			if (startChildNodes.length === 0) startNode.append('<br />');
 			else if (
 				startChildNodes.length > 1 &&
+				startChildNodes[startChildNodes.length - 2].nodeName !== 'BR' &&
 				startChildNodes[startChildNodes.length - 1].nodeName === 'BR'
 			) {
 				startNode.last()?.remove();
@@ -259,6 +260,7 @@ class ChangeModel implements ChangeInterface {
 			} else if (
 				!node.isCustomize(startNode) &&
 				startChildNodes.length > 1 &&
+				startChildNodes[startChildNodes.length - 2].nodeName !== 'BR' &&
 				startChildNodes[startChildNodes.length - 1].nodeName === 'BR'
 			) {
 				startNode.last()?.remove();
@@ -270,6 +272,7 @@ class ChangeModel implements ChangeInterface {
 			} else if (
 				node.isCustomize(startNode) &&
 				startChildNodes.length > 2 &&
+				startChildNodes[startChildNodes.length - 2].nodeName !== 'BR' &&
 				startChildNodes[startChildNodes.length - 1].nodeName === 'BR'
 			) {
 				startNode.last()?.remove();
@@ -282,6 +285,7 @@ class ChangeModel implements ChangeInterface {
 			} else if (
 				!node.isCustomize(endNode) &&
 				endChildNodes.length > 1 &&
+				endChildNodes[endChildNodes.length - 2].nodeName !== 'BR' &&
 				endChildNodes[endChildNodes.length - 1].nodeName === 'BR'
 			) {
 				startNode.last()?.remove();
@@ -293,6 +297,7 @@ class ChangeModel implements ChangeInterface {
 			} else if (
 				node.isCustomize(endNode) &&
 				endChildNodes.length > 2 &&
+				endChildNodes[endChildNodes.length - 2].nodeName !== 'BR' &&
 				endChildNodes[endChildNodes.length - 1].nodeName === 'BR'
 			) {
 				startNode.last()?.remove();
@@ -812,6 +817,28 @@ class ChangeModel implements ChangeInterface {
 						range.startNode.closest(
 							`${CARD_LEFT_SELECTOR},${CARD_RIGHT_SELECTOR},${UI_SELECTOR}`,
 						).length === 0);
+
+				let isSingle = range.collapsed;
+				if (!isSingle) {
+					const { startNode, endNode, startOffset, endOffset } =
+						range;
+					const startElement =
+						startNode.isElement() && !startNode.isCard()
+							? startNode.children().eq(startOffset)
+							: startNode;
+					const endElement =
+						endNode.isElement() && !endNode.isCard()
+							? endNode.children().eq(endOffset - 1)
+							: endNode;
+					if (
+						startElement &&
+						endElement &&
+						startElement.isCard() &&
+						startElement.equal(endElement)
+					) {
+						isSingle = true;
+					}
+				}
 				card.each((card) => {
 					const center = card.getCenter();
 					if (center && center.length > 0) {
@@ -820,22 +847,26 @@ class ChangeModel implements ChangeInterface {
 							const focusCard = this.engine.card.find(
 								selection.focusNode,
 							);
-							if (
-								focusCard &&
-								card.root.equal(focusCard.root) &&
-								(!selection.anchorNode ||
+							if (focusCard) {
+								isSingle =
+									!selection.anchorNode ||
 									focusCard.root.contains(
 										selection.anchorNode,
-									))
-							) {
-								isSelect = true;
-								// 重合的光标找到一次其它的就不需要再去比对了
-								if (range.collapsed) containsCard = false;
+									);
+								if (
+									isSingle &&
+									card.root.equal(focusCard.root)
+								) {
+									isSelect = true;
+								}
 							}
+							// 找到一次其它的就不需要再去比对了
+							if (isSelect && isSingle) containsCard = false;
 						}
-						const { singleSelectable } =
-							card.constructor as CardEntry;
-						card.select(isSelect && singleSelectable !== false);
+						const { autoSelected } = card.constructor as CardEntry;
+						card.select(
+							isSelect && (!isSingle || autoSelected !== false),
+						);
 					}
 				});
 			}

@@ -64,7 +64,7 @@ class VideoComponent extends Card<VideoValue> {
 		return CardType.BLOCK;
 	}
 
-	static get singleSelectable() {
+	static get autoSelected() {
 		return false;
 	}
 

@@ -29,7 +29,7 @@ class Status extends Card<StatusValue> {
 		return CardType.INLINE;
 	}
 
-	static get singleSelectable() {
+	static get autoSelected() {
 		return false;
 	}
 

@@ -31,6 +31,10 @@ class Checkbox extends Card<CheckboxValue> {
 		return false;
 	}
 
+	static get autoSelected() {
+		return false;
+	}
+
 	static get collab() {
 		return false;
 	}

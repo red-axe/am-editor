@@ -38,7 +38,7 @@ class Mention extends Card<MentionValue> {
 		return CardType.INLINE;
 	}
 
-	static get singleSelectable() {
+	static get autoSelected() {
 		return false;
 	}
 

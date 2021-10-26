@@ -34,10 +34,6 @@ class CodeBlcok extends Card<CodeBlockValue> {
 		return false;
 	}
 
-	static get singleSelectable() {
-		return false;
-	}
-
 	static getModes() {
 		return modeDatas;
 	}

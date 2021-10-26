@@ -63,7 +63,7 @@ export default class FileCard extends Card<FileValue> {
 		return 'background';
 	}
 
-	static get singleSelectable() {
+	static get autoSelected() {
 		return false;
 	}
 

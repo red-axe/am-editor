@@ -35,7 +35,7 @@ export default class extends Plugin<Options> {
 		const component = card.insert(
 			StatusComponent.cardName,
 		) as StatusComponent;
-		component.activate(true);
+		card.activate(component.root);
 		setTimeout(() => {
 			component.focusEditor();
 		}, 50);

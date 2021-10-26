@@ -32,7 +32,7 @@ export default class MathCard extends Card<MathValue> {
 		return 'border';
 	}
 
-	static get singleSelectable() {
+	static get autoSelected() {
 		return false;
 	}
 

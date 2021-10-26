@@ -80,6 +80,10 @@ class ImageComponent extends Card<ImageValue> {
 		return CardType.INLINE;
 	}
 
+	static get autoSelected() {
+		return false;
+	}
+
 	/**
 	 * 设置上传进度
 	 * @param percent 进度百分比

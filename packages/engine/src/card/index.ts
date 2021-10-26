@@ -348,7 +348,7 @@ class CardModel implements CardModelInterface {
 				if (!isCurrentActiveCard) {
 					card!.toolbarModel?.show(event);
 					if (
-						(card.constructor as CardEntry).autoSelected !==
+						(card.constructor as CardEntry).singleSelectable !==
 							false &&
 						(trigger !== ActiveTrigger.CLICK ||
 							isEngine(this.editor))

@@ -275,7 +275,7 @@ class CardToolbar implements CardToolbarInterface {
 				if (dnd.length > 0) {
 					dnd.css({
 						top: `${top}px`,
-						left: `${left - dnd.width() - 2}px`,
+						left: `${left - dnd.width() - 4}px`,
 					});
 					dnd.addClass('data-card-dnd-active');
 				}

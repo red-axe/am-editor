@@ -35,11 +35,13 @@ class ShitEnter implements TypingHandleInterface {
 		change.cacheRangeBeforeCommand();
 		const range = change.getRange();
 		const br = $('<br />');
-		inline.insert(br);
+		inline.insert(br, range);
 		// Chrome 问题：<h1>foo<br /><cursor /></h1> 时候需要再插入一个 br，否则没有换行效果
 		if (block.isLastOffset(range, 'end')) {
 			if (!br.next() || br.next()?.name !== 'br') {
-				br.after('<br />');
+				const cloneBr = br.clone();
+				br.after(cloneBr);
+				range.select(cloneBr).collapse(false);
 			}
 		}
 		for (let i = 0; i < this.listeners.length; i++) {
@@ -47,6 +49,7 @@ class ShitEnter implements TypingHandleInterface {
 			const result = listener(event);
 			if (result === false) break;
 		}
+		change.apply(range);
 		if (this.engine.scrollNode)
 			this.engine.change
 				.getRange()
