@@ -126,9 +126,11 @@ class Schema implements SchemaInterface {
 	remove(rule: SchemaRule) {
 		let index = this._all.findIndex((r) => isEqual(r, rule));
 		if (index > -1) this._all.splice(index, 1);
-		const rules = this.data[rule.type] as SchemaRule[];
-		index = rules.findIndex((r) => isEqual(r, rule));
-		if (index > -1) rules.splice(index, 1);
+		const rules = this.data[`${rule.type}s`] as SchemaRule[];
+		if (rules) {
+			index = rules.findIndex((r) => isEqual(r, rule));
+			if (index > -1) rules.splice(index, 1);
+		}
 		this._typeMap = {};
 	}
 	/**
