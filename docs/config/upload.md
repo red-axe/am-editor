@@ -371,13 +371,16 @@ export default class {
 					return;
 				}
 				const files = values as { file: File; info: FileInfo }[];
-				Promise.all(
-					files.map(async (v) => {
-						if (onReady) {
-							await onReady(v.info, v.file);
-						}
+				Promise.all([
+					...files.map(async (v) => {
+						return new Promise(async (resolve) => {
+							if (onReady) {
+								await onReady(v.info, v.file);
+							}
+							resolve(true);
+						});
 					}),
-				).then(() => {
+				]).then(() => {
 					files.forEach(async (file) => {
 						// Process upload
 						this.handleUpload(file.file, options, name);

@@ -118,18 +118,23 @@ class Uploader implements UploaderInterface {
 					if (
 						files.every((file) => !!this.uploadingFiles[file.uid!])
 					) {
-						Promise.all(
-							files.map(async (file) => {
-								if (this.options.onReady) {
-									await this.options.onReady(
-										this.uploadingFiles[file.uid!],
-										file,
-									);
-								}
+						Promise.all([
+							...files.map((file) => {
+								return new Promise(async (resolve) => {
+									if (this.options.onReady) {
+										await this.options.onReady(
+											this.uploadingFiles[file.uid!],
+											file,
+										);
+									}
+									resolve(true);
+								});
 							}),
-						).then(() => {
+						]).then(() => {
 							resolve(true);
 						});
+					} else {
+						resolve(true);
 					}
 				},
 				false,
