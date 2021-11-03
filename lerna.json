@@ -1,0 +1,12 @@
+{
+	"version": "independent",
+	"npmClient": "yarn",
+	"useWorkspaces": true,
+	"ignoreChanges": [
+		"**/*.md",
+		"**/*.test.ts",
+		"**/*.e2e.ts",
+		"**/fixtures/**",
+		"**/test/**"
+	]
+}

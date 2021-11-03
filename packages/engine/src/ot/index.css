@@ -1,0 +1,64 @@
+.ot-user-cursor {
+	position: absolute;
+	z-index: 125;
+	width: 2px;
+}
+
+.ot-user-cursor-trigger {
+	position: absolute;
+	top: -5px;
+	left: -2px;
+	border-radius: 100%;
+	color: #ffffff;
+	width: 6px;
+	height: 6px;
+	font-size: 0;
+	overflow: hidden;
+	transition: all 0.1s linear;
+}
+
+.ot-user-cursor-trigger-active {
+	top: -17px;
+	border-radius: 2px;
+	color: #ffffff;
+	font-size: 10px;
+	line-height: 18px;
+	height: 18px;
+	width: auto;
+	padding: 0 3px;
+	white-space: nowrap;
+}
+
+.ot-card-mask {
+	position: absolute;
+	z-index: 10;
+	background: transparent;
+	cursor: not-allowed;
+}
+
+.ot-user-background {
+  z-index: 120;
+}
+
+.ot-user-cursor-card {
+	position: absolute;
+}
+
+.ot-user-cursor-card .ot-user-cursor-trigger {
+	display: none;
+}
+
+.ot-user-cursor-card .ot-user-cursor-trigger-active {
+	position: absolute;
+	display: block;
+	top: -19px;
+	left: 0;
+	border-radius: 2px;
+	color: #ffffff;
+	font-size: 10px;
+	line-height: 18px;
+	height: 18px;
+	width: auto;
+	padding: 0 3px;
+	white-space: nowrap;
+}

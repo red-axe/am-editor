@@ -1,0 +1,31 @@
+import { MarkPlugin, PluginOptions } from '@aomao/engine';
+
+export interface Options extends PluginOptions {
+	hotkey?: { key: string; args: Array<string> };
+}
+export default class extends MarkPlugin<Options> {
+	static get pluginName() {
+		return 'backcolor';
+	}
+
+	tagName = 'span';
+
+	style = {
+		'background-color': '@var0',
+	};
+
+	variable = {
+		'@var0': {
+			required: true,
+			value: '@color',
+		},
+	};
+
+	isTrigger(color: string, defaultColor?: string) {
+		return defaultColor === undefined || color !== defaultColor;
+	}
+
+	hotkey() {
+		return this.options.hotkey || [];
+	}
+}

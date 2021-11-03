@@ -1,0 +1,33 @@
+{
+  "name": "@aomao/plugin-mind",
+  "version": "2.5.3",
+  "description": "脑图 Mind",
+  "keywords": [
+    "Mind",
+    "脑图"
+  ],
+  "author": "ITELLYOU <me@yanmao.cc>",
+  "homepage": "https://github.com/yanmao-cc/am-editor/tree/main/plugins/plugin-mind#readme",
+  "main": "dist/index.ts",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanmao-cc/am-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yanmao-cc/am-editor/issues"
+  },
+  "dependencies": {
+    "@antv/hierarchy": "^0.6.7",
+    "@antv/x6": "^1.23.10",
+    "@aomao/engine": "^2.5.3",
+    "@babel/runtime": "^7.13.10"
+  }
+}

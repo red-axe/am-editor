@@ -1,0 +1,14 @@
+import { isServer } from '@aomao/engine';
+
+export const IS_DEV = process.env.NODE_ENV !== 'production';
+export const DOMAIN = IS_DEV
+	? `http://${
+			typeof window !== 'undefined' ? 'localhost:7001' : 'localhost:7001'
+	  }`
+	: 'https://editor.yanmao.cc';
+
+export const lang = (
+	!isServer ? window.location.href.indexOf('zh-CN') > 0 : false
+)
+	? 'zh-CN'
+	: 'en-US';

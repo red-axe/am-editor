@@ -1,0 +1,362 @@
+{
+	"dnd": {
+		"title": "ドラッグして位置を調整"
+	},
+	"copy": {
+		"title": "コピー",
+		"success": "コピーは成功しました",
+		"error": "コピーに失敗しました"
+	},
+	"delete": {
+		"title": "削除"
+	},
+	"copyAnchor": {
+		"title": "アンカーリンクをコピー"
+	},
+	"link": {
+		"placeholder": "リンクまたはアンカーを入力して、Enterキーを押して確認してください",
+		"save": "保存",
+		"edit": "編集",
+		"delete": "リンクを解除",
+		"open": "リンクを開く",
+		"text": "テキスト",
+		"link": "リンク",
+		"text_placeholder": "説明テキスト",
+		"link_placeholder": "リンクアドレス",
+		"link_open": "リンクを開く",
+		"link_edit": "リンクを編集",
+		"link_remove": "リンクを解除",
+		"ok_button": "OK"
+	},
+	"copyContent": {
+		"title": "コンテンツをコピー"
+	},
+	"maximize": {
+		"title": "最大化",
+		"back": "ドキュメントに戻る"
+	},
+	"expand": {
+		"title": "埋め込みプレビュー"
+	},
+	"collapse": {
+		"title": "コンパクト"
+	},
+	"card": {
+		"lockAlert": "編集に入る前に、相手が編集を終了するのを待ってください"
+	},
+	"preferences": {
+		"title": "設定"
+	},
+	"download": {
+		"title": "ダウンロード"
+	},
+	"more": {
+		"title": "もっと表示"
+	},
+	"checkMarkdown": {
+		"title": "切り取られたコンテンツが Markdown 構文に準拠していることが検出されましたが、変換しますか？"
+	},
+	"image": {
+		"next": "次",
+		"prev": "前",
+		"zoomIn": "拡大",
+		"zoomOut": "縮小",
+		"originSize": "原寸大",
+		"bestSize": "画面に適応",
+		"errorMessageCopy": "エラーメッセージをコピー",
+		"loadError": "画像を読み込めませんでした。",
+		"uploadError": "写真のアップロードに失敗しました。",
+		"uploadLimitError": "アップロード画像のサイズは $size に制限されています。",
+		"toolbarReductionTitle": "復元",
+		"toolbarWidthTitle": "幅",
+		"toolbarHeightTitle": "幅",
+		"displayBlockTitle": "ラインを所有する",
+		"displayInlineTitle": "埋め込まれたインライン"
+	},
+	"table": {
+		"insertColLeft": "左側に $data 列を挿入",
+		"insertColRight": "右側に $data 列を挿入",
+		"insertRowUp": "上に $data 行を挿入",
+		"insertRowDown": "下に $data 行を挿入",
+		"mergeCell": "セルを結合",
+		"splitCell": "セルを分割",
+		"removeCol": "選択した列を削除",
+		"removeRow": "選択した行を削除",
+		"removeTable": "テーブルを削除",
+		"copy": "コピー",
+		"cut": "切る",
+		"paste": "ペースト",
+		"clear": "空のコンテンツ",
+		"draggingCol": "$data 列を移動しています",
+		"draggingRow": "$data 行を移動しています",
+		"color": {
+			"title": "セルの背景色",
+			"nonFillText": "塗りつぶしの色なし"
+		},
+		"noBorder": "境界線を隠す",
+		"verticalAlign": {
+			"title": "垂直方向に整列",
+			"top": "上揃え",
+			"middle": "中央揃え",
+			"bottom": "下揃え"
+		}
+	},
+	"file": {
+		"errorMessageCopy": "エラーメッセージをコピー",
+		"loadError": "ファイルの読み込みに失敗しました。",
+		"uploadError": "ファイルのアップロードに失敗しました。",
+		"uploadLimitError": "アップロードファイルのサイズは $size に制限されています。",
+		"download": "ダウンロード",
+		"preview": "プレビュー"
+	},
+	"video": {
+		"errorMessageCopy": "エラーメッセージをコピー",
+		"loadError": "動画を読み込めませんでした。",
+		"uploadError": "動画のアップロードに失敗しました。",
+		"uploadLimitError": "アップロード動画のサイズは $size に制限されています。",
+		"download": "ダウンロード",
+		"preview": "プレビュー",
+		"loading": "読み込み中...",
+		"transcoding": "トランスコーディング中..."
+	},
+	"math": {
+		"errorMessageCopy": "エラーメッセージをコピー",
+		"getError": "svg コードの取得に失敗しました",
+		"placeholder": "Tex 式を追加",
+		"ok": "OK",
+		"buttonTips": "Ctrl + Enter",
+		"tips": {
+			"text": "LaTeX 構文とは何ですか？",
+			"href": "https://math.meta.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference"
+		}
+	},
+	"toolbar": {
+		"collapse": {
+			"title": "<code>Ctrl</code> + <code>/</code>  を入力してコードブロックが挿入できます"
+		},
+		"undo": {
+			"title": "元に戻す"
+		},
+		"redo": {
+			"title": "やり直す"
+		},
+		"paintformat": {
+			"title": "フォーマットペインター"
+		},
+		"removeformat": {
+			"title": "クリアフォーマット"
+		},
+		"heading": {
+			"title": "スタイル",
+			"p": "標準",
+			"h1": "見出し 1",
+			"h2": "見出し 2",
+			"h3": "見出し 3",
+			"h4": "見出し 4",
+			"h5": "見出し 5",
+			"h6": "見出し 6"
+		},
+		"fontfamily": {
+			"title": "フォント",
+			"notInstalled": "インストールされていないフォント",
+			"items": {
+				"default": "デフォルト",
+				"arial": "Arial",
+				"comicSansMS": "Comic Sans MS",
+				"courierNew": "Courier New",
+				"georgia": "Georgia",
+				"helvetica": "Helvetica",
+				"impact": "Impact",
+				"timesNewRoman": "Times New Roman",
+				"trebuchetMS": "Trebuchet MS",
+				"verdana": "Verdana",
+				"fangSong": "FangSong",
+				"stFangsong": "STFangsong",
+				"stSong": "STSong",
+				"stKaiti": "STKaiTi",
+				"simSun": "SimSun",
+				"microsoftYaHei": "Microsoft YaHei",
+				"kaiTi": "KaiTi",
+				"kaitiSC": "KaiTi SC",
+				"simHei": "SimHei",
+				"heitiSC": "HeiTi SC",
+				"fzHei": "FZHei",
+				"fzKai": "FZKai",
+				"fzFangSong": "FZFangSong"
+			}
+		},
+		"fontsize": {
+			"title": "フォントサイズ"
+		},
+		"fontcolor": {
+			"title": "フォントの色",
+			"more": "より多くの色"
+		},
+		"backcolor": {
+			"title": "背景颜色",
+			"more": "より多くの色"
+		},
+		"bold": {
+			"title": "太字"
+		},
+		"italic": {
+			"title": "イタリック"
+		},
+		"strikethrough": {
+			"title": "打ち消し線"
+		},
+		"underline": {
+			"title": "アンダースコア"
+		},
+		"moremark": {
+			"title": "その他のテキストスタイル",
+			"sup": "上付き文字",
+			"sub": "下付き文字",
+			"code": "インラインコード"
+		},
+		"alignment": {
+			"title": "アラインメント",
+			"left": "左揃え",
+			"center": "中央に揃え",
+			"right": "右揃え",
+			"justify": "両端揃え"
+		},
+		"unorderedlist": {
+			"title": "順序なしリスト"
+		},
+		"orderedlist": {
+			"title": "順序付きリスト"
+		},
+		"tasklist": {
+			"title": "タスクリスト"
+		},
+		"indent": {
+			"title": "インデント",
+			"in": "インデントを増やす",
+			"out": "インデントを減らす"
+		},
+		"line-height": {
+			"title": "行の高さ",
+			"default": "デフォルト"
+		},
+		"link": {
+			"title": "リンク"
+		},
+		"quote": {
+			"title": "参照を挿入"
+		},
+		"hr": {
+			"title": "分割線を挿入"
+		},
+		"colorPicker": {
+			"defaultText": "デフォルト",
+			"nonFillText": "塗りつぶしの色なし",
+			"#000000": "ブラック",
+			"#262626": "ダークグレー 3",
+			"#595959": "ダークグレー 2",
+			"#8C8C8C": "ダークグレー 1",
+			"#BFBFBF": "グレー",
+			"#D9D9D9": "ライトグレー 4",
+			"#E9E9E9": "ライトグレー 3",
+			"#F5F5F5": "ライトグレー 2",
+			"#FAFAFA": "ライトグレー 1",
+			"#FFFFFF": "ホワイト",
+			"#F5222D": "赤",
+			"#FA541C": "紅色",
+			"#FA8C16": "オレンジ",
+			"#FADB14": "黄色",
+			"#52C41A": "グリーン",
+			"#13C2C2": "ブルー",
+			"#1890FF": "ライトブルー",
+			"#2F54EB": "ダークブルー",
+			"#722ED1": "紫色",
+			"#EB2F96": "赤紫色",
+			"#FFE8E6": "赤色 1",
+			"#FFECE0": "紅色 1",
+			"#FFEFD1": "オレンジ 1",
+			"#FCFCCA": "黄色 1",
+			"#E4F7D2": "グリーン 1",
+			"#D3F5F0": "ブルー 1",
+			"#D4EEFC": "ライトブルー 1",
+			"#DEE8FC": "ダークブルー 1",
+			"#EFE1FA": "紫色 1",
+			"#FAE1EB": "赤紫色 1",
+			"#FFA39E": "赤色 2",
+			"#FFBB96": "紅色 2",
+			"#FFD591": "オレンジ 2",
+			"#FFFB8F": "黄色 2",
+			"#B7EB8F": "グリーン 2",
+			"#87E8DE": "ブルー 2",
+			"#91D5FF": "ライトブルー 2",
+			"#ADC6FF": "ダークブルー 2",
+			"#D3ADF7": "紫色 2",
+			"#FFADD2": "赤紫色 2",
+			"#FF4D4F": "赤色 3",
+			"#FF7A45": "紅色 3",
+			"#FFA940": "オレンジ 3",
+			"#FFEC3D": "黄色 3",
+			"#73D13D": "グリーン 3",
+			"#36CFC9": "ブルー 3",
+			"#40A9FF": "ライトブルー 3",
+			"#597EF7": "ダークブルー 3",
+			"#9254DE": "紫色 3",
+			"#F759AB": "赤紫色 3",
+			"#CF1322": "赤色 4",
+			"#D4380D": "紅色 4",
+			"#D46B08": "オレンジ 4",
+			"#D4B106": "黄色 4",
+			"#389E0D": "グリーン 4",
+			"#08979C": "ブルー 4",
+			"#096DD9": "ライトブルー 4",
+			"#1D39C4": "ダークブルー 4",
+			"#531DAB": "紫色 4",
+			"#C41D7F": "赤紫色 4",
+			"#820014": "赤色 5",
+			"#871400": "紅色 5",
+			"#873800": "オレンジ 5",
+			"#614700": "黄色 5",
+			"#135200": "グリーン 5",
+			"#00474F": "ブルー 5",
+			"#003A8C": "ライトブルー 5",
+			"#061178": "ダークブルー 5",
+			"#22075E": "紫色 5",
+			"#780650": "赤紫色 5"
+		},
+		"component": {
+			"placeholder": "ブロック名"
+		},
+		"image": {
+			"title": "画像"
+		},
+		"codeblock": {
+			"title": "コードブロック"
+		},
+		"table": {
+			"title": "表"
+		},
+		"file": {
+			"title": "添付ファイル"
+		},
+		"video": {
+			"title": "動画"
+		},
+		"math": {
+			"title": "式"
+		},
+		"status": {
+			"title": "状態"
+		},
+		"mind": {
+			"title": "マインドマップ"
+		},
+		"commonlyUsed": {
+			"title": "よく使用される"
+		}
+	},
+	"status": {
+		"defaultValue": "状態を設定"
+	},
+	"mention": {
+		"placeholder": "言及"
+	}
+}

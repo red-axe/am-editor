@@ -1,0 +1,43 @@
+{
+  "name": "@aomao/plugin-codeblock-vue",
+  "version": "2.5.3",
+  "description": "代码块 Vue",
+  "keywords": [
+    "codeblock",
+    "editor"
+  ],
+  "main": "dist/index.ts",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "author": "me@yanmao.cc",
+  "license": "MIT",
+  "homepage": "https://github.com/yanmao-cc/am-editor#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanmao-cc/am-editor.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/yanmao-cc/am-editor/issues"
+  },
+  "dependencies": {
+    "@aomao/engine": "^2.5.3",
+    "@babel/runtime": "^7.13.10",
+    "ant-design-vue": "^2.2.6",
+    "codemirror": "^5.60.0",
+    "lodash-es": "^4.17.21",
+    "vue": "^3.2.9"
+  },
+  "devDependencies": {
+    "@types/codemirror": "^5.60.0",
+    "@types/lodash-es": "^4.17.4",
+    "@vue/compiler-sfc": "^3.2.9"
+  }
+}

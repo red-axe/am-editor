@@ -1,0 +1,71 @@
+.toolbar-collapse-header {
+    color: #8c8c8c;
+    margin: 4px 16px 0;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: left;
+    padding-bottom: 8px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.toolbar-collapse-header code{
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    padding: 2px;
+    border: 1px solid #d9d9d9;
+}
+
+.toolbar-collapse-content {
+    min-width: 200px
+}
+
+.toolbar-collapse-group-title {
+    padding: 2px 16px;
+    text-align: left;
+    color: #8c8c8c;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 24px;
+}
+
+.toolbar-collapse-item {
+    display: flex;
+    cursor: pointer;
+    padding: 4px 16px 0;
+}
+
+.toolbar-collapse-item-active {
+    background-color: #f4f4f4;
+}
+
+.editor-toolbar .toolbar-collapse-item-disabled, .data-toolbar-component-list .toolbar-collapse-item-disabled, .editor-toolbar:not(.editor-toolbar-mobile) .toolbar-collapse-item-disabled:hover,  .data-toolbar-component-list .toolbar-collapse-item-disabled:hover {
+  background-color: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: #000000;
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.toolbar-collapse-item .toolbar-collapse-item-text
+{
+    display: block;
+    text-align: left;
+    margin-left: 8px;
+}
+
+.toolbar-collapse-item .toolbar-collapse-item-title{
+    display: block;
+    color: #595959;
+    line-height: 24px;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.toolbar-collapse-item .toolbar-collapse-item-description
+{
+    display: block;
+    font-size: 12px;
+    color: rgba(0,0,0,.45);
+}

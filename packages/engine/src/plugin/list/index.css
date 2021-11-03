@@ -1,0 +1,110 @@
+.am-engine ol, .am-engine-view ol, .am-engine ul, .am-engine-view ul {
+    margin: 0 0 0 3px;
+    padding: 0;
+    list-style: none;
+}
+
+.am-engine ol ul,.am-engine-view ol ul,.am-engine ul ul,.am-engine-view ul ul,.am-engine ol ol,.am-engine-view ol ol,.am-engine ul ol,.am-engine-view ul ol {
+	margin-left: 0;
+}
+
+.am-engine ol ul li,.am-engine-view ol ul li,.am-engine ul ul li,.am-engine-view ul ul li,.am-engine ol ol li,.am-engine-view ol ol li,.am-engine ul ol li,.am-engine-view ul ol li {
+	margin-left: 2em;
+}
+
+.am-engine ol ol[data-indent-new="0"],.am-engine-view ol ol[data-indent-new="0"],.am-engine ul ol[data-indent-new="0"],.am-engine-view ul ol[data-indent-new="0"],.am-engine ol ol[data-indent-new="3"],.am-engine-view ol ol[data-indent-new="3"],.am-engine ul ol[data-indent-new="3"],.am-engine-view ul ol[data-indent-new="3"],.am-engine ol ol[data-indent-new="6"],.am-engine-view ol ol[data-indent-new="6"],.am-engine ul ol[data-indent-new="6"],.am-engine-view ul ol[data-indent-new="6"] {
+	list-style-type: decimal;
+}
+
+.am-engine ol ol[data-indent-new="1"],.am-engine-view ol ol[data-indent-new="1"],.am-engine ul ol[data-indent-new="1"],.am-engine-view ul ol[data-indent-new="1"],.am-engine ol ol[data-indent-new="4"],.am-engine-view ol ol[data-indent-new="4"],.am-engine ul ol[data-indent-new="4"],.am-engine-view ul ol[data-indent-new="4"],.am-engine ol ol[data-indent-new="7"],.am-engine-view ol ol[data-indent-new="7"],.am-engine ul ol[data-indent-new="7"],.am-engine-view ul ol[data-indent-new="7"] {
+	list-style-type: lower-alpha;
+}
+
+.am-engine ol ol[data-indent-new="2"],.am-engine-view ol ol[data-indent-new="2"],.am-engine ul ol[data-indent-new="2"],.am-engine-view ul ol[data-indent-new="2"],.am-engine ol ol[data-indent-new="5"],.am-engine-view ol ol[data-indent-new="5"],.am-engine ul ol[data-indent-new="5"],.am-engine-view ul ol[data-indent-new="5"],.am-engine ol ol[data-indent-new="8"],.am-engine-view ol ol[data-indent-new="8"],.am-engine ul ol[data-indent-new="8"],.am-engine-view ul ol[data-indent-new="8"] {
+	list-style-type: lower-roman;
+}
+
+.am-engine ol ul[data-indent-new="3"],.am-engine-view ol ul[data-indent-new="3"],.am-engine ul ul[data-indent-new="3"],.am-engine-view ul ul[data-indent-new="3"],.am-engine ol ul[data-indent-new="6"],.am-engine-view ol ul[data-indent-new="6"],.am-engine ul ul[data-indent-new="6"],.am-engine-view ul ul[data-indent-new="6"] {
+	list-style-type: disc;
+}
+
+.am-engine ol ul[data-indent-new="1"],.am-engine-view ol ul[data-indent-new="1"],.am-engine ul ul[data-indent-new="1"],.am-engine-view ul ul[data-indent-new="1"],.am-engine ol ul[data-indent-new="4"],.am-engine-view ol ul[data-indent-new="4"],.am-engine ul ul[data-indent-new="4"],.am-engine-view ul ul[data-indent-new="4"],.am-engine ol ul[data-indent-new="7"],.am-engine-view ol ul[data-indent-new="7"],.am-engine ul ul[data-indent-new="7"],.am-engine-view ul ul[data-indent-new="7"] {
+	list-style-type: circle;
+}
+
+.am-engine ol ul[data-indent-new="2"],.am-engine-view ol ul[data-indent-new="2"],.am-engine ul ul[data-indent-new="2"],.am-engine-view ul ul[data-indent-new="2"],.am-engine ol ul[data-indent-new="5"],.am-engine-view ol ul[data-indent-new="5"],.am-engine ul ul[data-indent-new="5"],.am-engine-view ul ul[data-indent-new="5"],.am-engine ol ul[data-indent-new="8"],.am-engine-view ol ul[data-indent-new="8"],.am-engine ul ul[data-indent-new="8"],.am-engine-view ul ul[data-indent-new="8"] {
+	list-style-type: square;
+}
+
+.am-engine li,.am-engine-view li {
+	margin-left: 23px;
+    position: relative;
+}
+
+.am-engine ol,.am-engine-view ol,.am-engine ol[data-indent="3"],.am-engine-view ol[data-indent="3"],.am-engine ol[data-indent="6"],.am-engine-view ol[data-indent="6"] {
+	list-style-type: decimal;
+}
+
+.am-engine ol[data-indent="1"],.am-engine-view ol[data-indent="1"],.am-engine ol[data-indent="4"],.am-engine-view ol[data-indent="4"],.am-engine ol[data-indent="7"],.am-engine-view ol[data-indent="7"] {
+	list-style-type: lower-alpha;
+}
+
+.am-engine ol[data-indent="2"],.am-engine-view ol[data-indent="2"],.am-engine ol[data-indent="5"],.am-engine-view ol[data-indent="5"],.am-engine ol[data-indent="8"],.am-engine-view ol[data-indent="8"] {
+	list-style-type: lower-roman;
+}
+
+.am-engine ul,.am-engine-view ul,.am-engine ul[data-indent="3"],.am-engine-view ul[data-indent="3"],.am-engine ul[data-indent="6"],.am-engine-view ul[data-indent="6"] {
+	list-style-type: disc;
+}
+
+.am-engine ul[data-indent="1"],.am-engine-view ul[data-indent="1"],.am-engine ul[data-indent="4"],.am-engine-view ul[data-indent="4"],.am-engine ul[data-indent="7"],.am-engine-view ul[data-indent="7"] {
+	list-style-type: circle;
+}
+
+.am-engine ul[data-indent="2"],.am-engine-view ul[data-indent="2"],.am-engine ul[data-indent="5"],.am-engine-view ul[data-indent="5"],.am-engine ul[data-indent="8"],.am-engine-view ul[data-indent="8"] {
+	list-style-type: square;
+}
+
+.am-engine ol[data-indent="1"],.am-engine-view ol[data-indent="1"],.am-engine ul[data-indent="1"],.am-engine-view ul[data-indent="1"] {
+	padding-left: 2em;
+}
+
+.am-engine ol[data-indent="2"],.am-engine-view ol[data-indent="2"],.am-engine ul[data-indent="2"],.am-engine-view ul[data-indent="2"] {
+	padding-left: 4em;
+}
+
+.am-engine ol[data-indent="3"],.am-engine-view ol[data-indent="3"],.am-engine ul[data-indent="3"],.am-engine-view ul[data-indent="3"] {
+	padding-left: 6em;
+}
+
+.am-engine ol[data-indent="4"],.am-engine-view ol[data-indent="4"],.am-engine ul[data-indent="4"],.am-engine-view ul[data-indent="4"] {
+	padding-left: 8em;
+}
+
+.am-engine ol[data-indent="5"],.am-engine-view ol[data-indent="5"],.am-engine ul[data-indent="5"],.am-engine-view ul[data-indent="5"] {
+	padding-left: 10em;
+}
+
+.am-engine ol[data-indent="6"],.am-engine-view ol[data-indent="6"],.am-engine ul[data-indent="6"],.am-engine-view ul[data-indent="6"] {
+	padding-left: 12em;
+}
+
+.am-engine ol[data-indent="7"],.am-engine-view ol[data-indent="7"],.am-engine ul[data-indent="7"],.am-engine-view ul[data-indent="7"] {
+	padding-left: 14em;
+}
+
+.am-engine ol[data-indent="8"],.am-engine-view ol[data-indent="8"],.am-engine ul[data-indent="8"],.am-engine-view ul[data-indent="8"] {
+	padding-left: 16em;
+}
+
+.am-engine .data-list,.am-engine-view .data-list {
+	color: #262626;
+	text-indent: 0;
+}
+
+.am-engine .data-list-item,.am-engine-view .data-list-item {
+    line-height: inherit;
+    position: relative;
+    list-style: none;
+    text-indent: 0;
+}

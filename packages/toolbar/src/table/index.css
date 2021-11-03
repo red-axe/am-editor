@@ -1,0 +1,19 @@
+
+  .data-toolbar-table-selector .data-toolbar-table-selector-tr {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  .data-toolbar-table-selector .data-toolbar-table-selector-tr .data-toolbar-table-selector-td {
+    width: 20px;
+    height: 16px;
+    border: 1px solid #d9d9d9;
+    margin-right: -1px;
+    margin-bottom: -1px;
+    cursor: pointer;
+  }
+  .data-toolbar-table-selector .data-toolbar-table-selector-tr .data-toolbar-table-selector-td.actived {
+    background: #ddefff;
+  }
+  .data-toolbar-table-selector .data-toolbar-table-selector-info {
+    text-align: center;
+  }

@@ -1,0 +1,18 @@
+.am-engine .data-list-item [data-card-key="checkbox"],.am-engine-view .data-list-item [data-card-key="checkbox"] {
+	margin-left: 0;
+}
+
+.am-engine .data-list-task,.am-engine-view .data-list-task {
+	list-style: none;
+	text-indent: 0;
+}
+
+.am-engine .data-list-task [data-card-key="checkbox"],.am-engine-view .data-list-task [data-card-key="checkbox"] {
+    position: relative;
+    margin-left: -22px;
+    height: 100%;
+    display: inline-block;
+    width: 22px;
+    top: -2px;
+    vertical-align: top;
+}

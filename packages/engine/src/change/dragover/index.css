@@ -1,0 +1,9 @@
+.data-drop-cursor {
+	position: absolute;
+	width: 2px;
+	background-color: #347EFF;
+}
+
+div.data-drag-image {
+	background-color: #f9f9f9;
+}

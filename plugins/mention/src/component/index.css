@@ -1,0 +1,74 @@
+.am-engine .data-mention-component, .am-engine-view .data-mention-component {
+    color: #1890ff !important;
+    cursor: pointer;
+}
+
+.am-engine [data-card-key="mention"].card-selected [data-card-element="center"].data-card-border-selected {
+    outline: 0 none;
+}
+
+.data-mention-component-list {
+    position: absolute;
+    font-size: 12px;
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 3px 3px;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 12%);
+    transition: all 0.25s cubic-bezier(0.3, 1.2, 0.2, 1);
+    z-index: 999;
+    overflow: hidden;
+    padding: 5px 0;
+    max-width: 250px;
+}
+
+.data-mention-component-body {
+    max-height: calc(40vh);
+    overflow: hidden;
+}
+
+.data-mention-component-placeholder {
+    color: rgba(0,0,0,0.25);
+    pointer-events: none;
+    min-width: 78px;
+}
+
+.data-mention-item {
+    display: flex;
+    cursor: pointer;
+    padding: 4px 16px;
+    min-width: 160px;
+    align-items: center;
+}
+
+.data-mention-item .data-mention-item-text {
+    display: block;
+    text-align: left;
+    margin-left: 8px;
+    color: #595959;
+    line-height: 24px;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.data-mention-item.data-mention-item-active {
+    background-color: #f4f4f4;
+}
+
+.data-mention-item-avatar img {
+    max-width: 38px;
+}
+
+.data-mention-component-body.data-scrollable.scroll-y {
+    padding-right: 0 !important;
+}
+
+.data-mention-hover-layout {
+  position: absolute;
+  font-size: 12px;
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 3px 3px;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 12%);
+  transition: all 0.25s cubic-bezier(0.3, 1.2, 0.2, 1);
+  z-index: 999;
+}

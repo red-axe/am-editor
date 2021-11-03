@@ -1,0 +1,44 @@
+.editor-toolbar .colorpicker-button .colorpicker-button-group {
+    padding: 0 2px;
+}
+
+.colorpicker-button-group .toolbar-button {
+    padding: 0;
+}
+
+.colorpicker-button-group .colorpicker-button-text {
+    margin-right: 0;
+    min-width: 26px;
+    height: 32px;
+    border-radius: 3px 0 0 3px;
+}
+
+.colorpicker-button-group .colorpicker-button-text:active {
+    background-color: #e8e8e8;
+}
+
+.colorpicker-button-group .colorpicker-button-dropdown {
+    margin-left: -1px;
+    min-width: 17px;
+    height: 32px;
+    text-align: center;
+    padding: 0 0;
+    border-radius: 0 3px 3px 0;
+}
+  
+.colorpicker-button-group .colorpicker-button-dropdown:hover,
+.colorpicker-button-group .colorpicker-button-dropdown:active {
+    background-color: #e8e8e8;
+}
+
+.colorpicker-button-group .colorpicker-button-dropdown .colorpicker-button-dropdown-empty {
+    display: inline-block;
+}
+
+.colorpicker-button-group:hover .toolbar-button {
+    border: 1px solid #e8e8e8;
+}
+.colorpicker-button-group-active .toolbar-button,
+.colorpicker-button-group-active:hover .toolbar-button {
+    border: 1px solid #e8e8e8;
+}

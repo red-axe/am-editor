@@ -1,0 +1,17 @@
+@import (reference) '../style/variables.less';
+
+.@{prefix}-nav-right {
+	position: relative;
+	flex: 1 1;
+	justify-content: flex-end;
+	display: flex;
+	align-items: center;
+
+	@media @mobile {
+		position: absolute;
+		display: block;
+		align-items: center;
+		top: 0;
+		right: 0;
+	}
+}

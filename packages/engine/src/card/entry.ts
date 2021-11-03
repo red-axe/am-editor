@@ -1,0 +1,371 @@
+import {
+	CARD_ELEMENT_KEY,
+	CARD_KEY,
+	CARD_LEFT_SELECTOR,
+	CARD_RIGHT_SELECTOR,
+	CARD_TYPE_KEY,
+	CARD_VALUE_KEY,
+} from '../constants/card';
+import {
+	CardOptions,
+	CardInterface,
+	MaximizeInterface,
+	CardToolbarItemOptions,
+	CardEntry as CardEntryType,
+	CardToolbarInterface,
+	ResizeInterface,
+	CardValue,
+} from '../types/card';
+import { EditorInterface } from '../types/engine';
+import { NodeInterface } from '../types/node';
+import { RangeInterface } from '../types/range';
+import { ToolbarItemOptions } from '../types/toolbar';
+import { TinyCanvasInterface } from '../types/tiny-canvas';
+import { decodeCardValue, encodeCardValue, isEngine, random } from '../utils';
+import Maximize from './maximize';
+import Resize from './resize';
+import Toolbar from './toolbar';
+import { $ } from '../node';
+import { CardType } from './enum';
+
+abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
+	protected readonly editor: EditorInterface;
+	readonly root: NodeInterface;
+	toolbarModel?: CardToolbarInterface;
+	resizeModel?: ResizeInterface;
+	activatedByOther: string | false = false;
+	selectedByOther: string | false = false;
+	/**
+	 * 可编辑的节点
+	 */
+	readonly contenteditable: Array<string> = [];
+	static readonly cardName: string;
+	static readonly cardType: CardType;
+	static readonly autoActivate: boolean;
+	static readonly autoSelected: boolean = true;
+	static readonly singleSelectable: boolean;
+	static readonly collab: boolean = true;
+	static readonly focus: boolean;
+	static readonly selectStyleType: 'border' | 'background' = 'border';
+	static readonly toolbarFollowMouse: boolean = false;
+	private defaultMaximize: MaximizeInterface;
+	isMaximize: boolean = false;
+
+	get isEditable() {
+		return this.contenteditable.length > 0;
+	}
+
+	get activated() {
+		return this.root.hasClass('card-activated');
+	}
+
+	private setActivated(activated: boolean) {
+		activated
+			? this.root.addClass('card-activated')
+			: this.root.removeClass('card-activated');
+	}
+
+	get selected() {
+		return this.root.hasClass('card-selected');
+	}
+
+	private setSelected(selected: boolean) {
+		selected
+			? this.root.addClass('card-selected')
+			: this.root.removeClass('card-selected');
+	}
+
+	get id() {
+		const value = this.getValue();
+		return typeof value === 'object' ? value.id : '';
+	}
+
+	get name() {
+		return this.root.attributes(CARD_KEY);
+	}
+
+	get type() {
+		return (
+			this.getValue()?.type ||
+			(this.root.attributes(CARD_TYPE_KEY) as CardType)
+		);
+	}
+
+	set type(type: CardType) {
+		if (!this.name || type === this.type) return;
+		// 替换后重新渲染
+		const { card } = this.editor;
+		const component = card.replace(this, this.name, {
+			...this.getValue(),
+			type,
+		});
+		card.render(component.root);
+		component.activate(false);
+		card.activate(component.root);
+	}
+
+	constructor({ editor, value, root }: CardOptions) {
+		this.editor = editor;
+		const type =
+			value?.type || (this.constructor as CardEntryType).cardType;
+		const tagName = type === 'inline' ? 'span' : 'div';
+		this.root = root ? root : $('<'.concat(tagName, ' />'));
+		if (typeof value === 'string') value = decodeCardValue(value);
+
+		value = value || {};
+		value.id = this.getId(value.id);
+		value.type = type;
+		this.setValue(value as T);
+		this.defaultMaximize = new Maximize(this.editor, this);
+	}
+
+	init() {
+		this.toolbarModel?.hide();
+		this.toolbarModel?.destroy();
+		if (this.toolbar) {
+			this.toolbarModel = new Toolbar(this.editor, this);
+		}
+		if (this.resize) {
+			this.resizeModel = new Resize(this.editor, this);
+		}
+	}
+
+	private getId(curId?: string) {
+		const idCache: Array<string> = [];
+		this.editor.card.each((card) => {
+			idCache.push(card.id);
+		});
+		if (curId && idCache.indexOf(curId) < 0) return curId;
+		let id = random();
+		while (idCache.indexOf(id) >= 0) id = random();
+		return id;
+	}
+
+	// 设置 DOM 属性里的数据
+	setValue(value: Partial<T>) {
+		if (value == null) {
+			return;
+		}
+		const currentValue = this.getValue();
+		if (!!currentValue?.id) delete value['id'];
+		const oldValue = this.getValue();
+		value = { ...oldValue, ...value } as T;
+		if (value.type && oldValue?.type !== value.type) {
+			this.type = value.type;
+		}
+
+		this.root.attributes(CARD_VALUE_KEY, encodeCardValue(value));
+	}
+	// 获取 DOM 属性里的数据
+	getValue(): (T & { id: string }) | undefined {
+		const value = this.root.attributes(CARD_VALUE_KEY);
+		if (!value) return;
+
+		return decodeCardValue(value) as T & { id: string };
+	}
+
+	/**
+	 * 获取Card内的 DOM 节点
+	 * @param selector
+	 */
+	find(selector: string) {
+		return this.root.find(selector);
+	}
+
+	findByKey(key: string) {
+		const body = this.root.first() || $([]);
+		if (key === 'body' || body.length === 0) return body;
+		const children = body.children();
+		if (['center', 'left', 'right'].includes(key))
+			return (
+				children
+					.toArray()
+					.find(
+						(child) => child.attributes(CARD_ELEMENT_KEY) === key,
+					) || $([])
+			);
+		const tag = this.type === CardType.BLOCK ? 'div' : 'span';
+		return this.find(`${tag}[${CARD_ELEMENT_KEY}=${key}]`);
+	}
+
+	activate(activated: boolean) {
+		if (activated) {
+			if (!this.activated) {
+				this.setActivated(activated);
+				this.onActivate(activated);
+			}
+		} else if (this.activated) {
+			this.setActivated(activated);
+			this.onActivate(false);
+		}
+	}
+
+	select(selected: boolean) {
+		if (!isEngine(this.editor) || this.activatedByOther) {
+			return;
+		}
+		if (selected) {
+			if (!this.selected && !this.isMaximize) {
+				this.setSelected(selected);
+				this.onSelect(selected);
+			}
+		} else if (this.selected) {
+			this.setSelected(selected);
+			this.onSelect(false);
+		}
+	}
+
+	getCenter() {
+		return this.findByKey('center');
+	}
+
+	isCenter(node: NodeInterface) {
+		const center = node.closest(
+			this.type === CardType.BLOCK
+				? `div[${CARD_ELEMENT_KEY}=center]`
+				: `span[${CARD_ELEMENT_KEY}=center]`,
+		);
+		return center.length > 0 && center.equal(this.findByKey('center'));
+	}
+
+	isCursor(node: NodeInterface) {
+		return this.isLeftCursor(node) || this.isRightCursor(node);
+	}
+
+	isLeftCursor(node: NodeInterface) {
+		if (node.isElement() && node.attributes(CARD_ELEMENT_KEY) !== 'left')
+			return false;
+		const cursor = node.closest(CARD_LEFT_SELECTOR);
+		return cursor.length > 0 && cursor.equal(this.findByKey('left'));
+	}
+
+	isRightCursor(node: NodeInterface) {
+		if (node.isElement() && node.attributes(CARD_ELEMENT_KEY) !== 'right')
+			return false;
+		const cursor = node.closest(CARD_RIGHT_SELECTOR);
+		return cursor.length > 0 && cursor.equal(this.findByKey('right'));
+	}
+
+	focus(range: RangeInterface, toStart?: boolean) {
+		const cardLeft = this.findByKey('left');
+		const cardRight = this.findByKey('right');
+
+		if (cardLeft.length === 0 || cardRight.length === 0) {
+			return;
+		}
+
+		range.select(toStart ? cardLeft : cardRight, true);
+		range.collapse(false);
+		if (this.onFocus) this.onFocus();
+	}
+
+	/**
+	 * 当卡片聚焦时触发
+	 */
+	onFocus?(): void;
+
+	maximize() {
+		this.isMaximize = true;
+		this.defaultMaximize.maximize();
+		this.toolbarModel?.show();
+	}
+
+	minimize() {
+		this.isMaximize = false;
+		this.defaultMaximize.restore();
+		this.toolbarModel?.show();
+	}
+
+	/**
+	 * 工具栏配置项
+	 */
+	toolbar?(): Array<CardToolbarItemOptions | ToolbarItemOptions>;
+	/**
+	 * 是否可改变卡片大小，或者传入渲染节点
+	 */
+	resize?: boolean | (() => NodeInterface | void);
+
+	onSelect(selected: boolean): void {
+		const selectedClass = `data-card-${
+			(this.constructor as CardEntryType).selectStyleType
+		}-selected`;
+		const center = this.getCenter();
+		if (selected) {
+			center.addClass(selectedClass);
+		} else {
+			center.removeClass(selectedClass);
+		}
+	}
+	onSelectByOther(
+		selected: boolean,
+		value?: {
+			color: string;
+			rgb: string;
+		},
+	): NodeInterface | void {
+		const center = this.getCenter();
+		if (
+			(this.constructor as CardEntryType).selectStyleType === 'background'
+		) {
+			center.css('background-color', selected ? value!.rgb : '');
+		} else {
+			center.css('outline', selected ? '2px solid ' + value!.color : '');
+		}
+		const className = 'card-selected-other';
+		if (selected) this.root.addClass(className);
+		else this.root.removeClass(className);
+	}
+	onActivate(activated: boolean) {
+		if (!this.resize) return;
+		if (activated) this.resizeModel?.show();
+		else this.resizeModel?.hide();
+	}
+	onActivateByOther(
+		activated: boolean,
+		value?: {
+			color: string;
+			rgb: string;
+		},
+	): NodeInterface | void {
+		this.onSelectByOther(activated, value);
+	}
+	onChange?(trigger: 'remote' | 'local', node: NodeInterface): void;
+	destroy() {
+		this.toolbarModel?.hide();
+		this.toolbarModel?.destroy();
+		this.resizeModel?.hide();
+		this.resizeModel?.destroy();
+	}
+	didInsert?(): void;
+	didUpdate?(): void;
+	didRender() {
+		if (this.resize) {
+			const container =
+				typeof this.resize === 'function'
+					? this.resize()
+					: this.findByKey('body');
+			if (container && container.length > 0) {
+				this.resizeModel?.render(container);
+			}
+		}
+		if (this.contenteditable.length > 0) {
+			this.editor.nodeId.generateAll(this.getCenter().get<Element>()!);
+		}
+	}
+	abstract render(): NodeInterface | string | void;
+
+	updateBackgroundSelection?(range: RangeInterface): void;
+
+	drawBackground?(
+		node: NodeInterface,
+		range: RangeInterface,
+		targetCanvas: TinyCanvasInterface,
+	): DOMRect | RangeInterface[] | void | false;
+
+	/**
+	 * 获取可编辑区域选中的所有节点
+	 */
+	getSelectionNodes?(): Array<NodeInterface>;
+}
+
+export default CardEntry;

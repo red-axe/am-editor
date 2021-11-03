@@ -1,0 +1,96 @@
+.data-anchor-button {
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	line-height: 24px;
+	text-align: center;
+	font-size: 14px;
+	display: block;
+	background: rgba(255, 255, 255, 0.9);
+	color: #BFBFBF;
+	border-radius: 2px 2px;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	opacity: 0;
+	visibility: hidden;
+	-webkit-transition: opacity 0.3s ease-in-out;
+	transition: opacity 0.3s ease-in-out;
+}
+
+.data-anchor-button.data-anchor-button-active {
+	opacity: 1;
+	visibility: visible;
+}
+
+.data-anchor-button .data-icon {
+	width: 18px;
+}
+
+.data-anchor-button:hover {
+	background: #f4f4f4;
+	color: #595959;
+}
+
+.am-engine-view h1,.am-engine-view h2,.am-engine-view h3,.am-engine-view h4,.am-engine-view h5,.am-engine-view h6 {
+    position: relative;
+}
+
+.am-engine-view h1 .data-anchor-button,.am-engine-view h2 .data-anchor-button,.am-engine-view h3 .data-anchor-button,.am-engine-view h4 .data-anchor-button,.am-engine-view h5 .data-anchor-button,.am-engine-view h6 .data-anchor-button{
+    position: absolute;
+    left: -24px;
+    display: none;
+}
+
+.am-engine-view h1:hover .data-anchor-button,.am-engine-view h2:hover .data-anchor-button,.am-engine-view h3:hover .data-anchor-button,.am-engine-view h4:hover .data-anchor-button,.am-engine-view h5:hover .data-anchor-button,.am-engine-view h6:hover .data-anchor-button {
+    display: inline-block;
+    opacity: 1;
+    visibility: visible;
+}
+
+.am-engine-view h1 , .am-engine h1,.am-engine-view h2 , .am-engine h2,.am-engine-view h3 , .am-engine h3,.am-engine-view h4 , .am-engine h4,.am-engine-view h5 , .am-engine h5,.am-engine-view h6 , .am-engine h6 {
+    margin: 0;
+    word-spacing: 1px;
+    color: #262626;
+    font-weight: bold;
+    padding:0;
+}
+
+.am-engine-view h1 , .am-engine h1 {
+    font-size: 28px;
+    line-height: 36px;
+    padding: 7px 0;
+}
+
+.am-engine-view h2 , .am-engine h2 {
+    font-size: 24px;
+    line-height: 32px;
+    padding: 7px 0;
+}
+
+.am-engine-view h3 , .am-engine h3 {
+    font-size: 20px;
+    line-height: 28px;
+    padding: 7px 0;
+}
+
+.am-engine-view h4 , .am-engine h4 {
+    font-size: 16px;
+    line-height: 24px;
+    padding: 7px 0;
+}
+
+.am-engine-view h5 , .am-engine h5 {
+    font-size: 14px;
+    line-height: 24px;
+    padding: 7px 0;
+}
+
+.am-engine-view h6 , .am-engine h6 {
+    font-size: 14px;
+    line-height: 24px;
+    padding: 7px 0;
+    font-weight: normal;
+}

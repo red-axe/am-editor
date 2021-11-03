@@ -1,0 +1,98 @@
+
+.am-engine .data-math-content-tmp,
+.am-engine-view .data-math-content-tmp {
+    padding: 0 6px;
+    border-radius: 3px 3px;
+    height: 100%;
+    color: rgba(0, 0, 0, 0.25);
+    display: inline-block;
+    white-space:nowrap;
+  }
+  .am-engine span[data-card-key="math"]:not(.card-selected) .data-math-content-tmp {
+    background: #f5f5f5;
+  }
+  .am-engine-view span[data-card-key="math"] .data-math-content-tmp {
+    background: #f5f5f5;
+  }
+
+.am-engine span[data-card-key="math"] [data-card-element="center"] {
+    max-width: calc(100% - 2px);
+}
+  .am-engine span[data-card-key="math"] .data-math-container {
+    display: inline-block;
+    cursor: pointer;
+    border: 2px solid transparent; 
+  }
+  .am-engine span[data-card-key="math"] ::selection {
+    background: transparent !important;
+}
+ .data-card-math-editor {
+    outline: none;
+    width: 420px;
+    border-radius: 3px 3px;
+    position: absolute;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    z-index: 125;
+    text-indent: 0;
+  }
+.data-card-math-editor-mobile {
+    width: calc(100vw - 40px);
+}
+  .data-card-math-editor textarea {
+    width: 100%;
+    border: none;
+    min-width: 400px;
+    min-height: 88px;
+    padding: 6px 6px;
+    line-height: 24px;
+    color: #595959;
+    outline: none;
+    font-family: 'Lucida Console', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    vertical-align: bottom;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .data-card-math-editor-mobile textarea{
+    min-width:auto;
+  }
+  .data-card-math-editor .data-math-editor-toolbar {
+    position: relative;
+    background: #f9f9f9;
+    border-top: 1px solid #e8e8e8;
+    padding: 2px 8px;
+    text-align: left;
+    text-indent: 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .data-card-math-editor .data-math-editor-toolbar .data-math-editor-toolbar-tips a {
+    font-size: 12px;
+    color: #8c8c8c;
+    vertical-align: middle;
+  }
+
+  .data-card-math-editor .data-math-editor-toolbar .data-math-editor-toolbar-tips a:hover {
+      color: #595959;
+  }
+
+  .data-card-math-editor .data-math-editor-toolbar .data-math-editor-toolbar-tips .data-icon {
+    vertical-align: middle;
+    margin-right: 4px;
+    color: #8c8c8c;
+  }
+  .data-card-math-editor .data-math-editor-toolbar .data-math-editor-toolbar-button .data-embed-toolbar-btn {
+    font-size: 14px;
+    display: block;
+  }
+
+  .am-engine span[data-card-key="math"].card-selected [data-card-element="center"].data-card-border-selected {
+    outline: none;
+  }
+
+  .am-engine span[data-card-key="math"] .data-card-border-selected .data-math-container {
+    border: 2px solid #1890FF;
+    border-radius: 4px;
+}

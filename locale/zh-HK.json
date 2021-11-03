@@ -1,0 +1,362 @@
+{
+	"dnd": {
+		"title": "拖動調整位置"
+	},
+	"copy": {
+		"title": "復製",
+		"success": "復製成功",
+		"error": "復製失敗"
+	},
+	"delete": {
+		"title": "刪除"
+	},
+	"copyAnchor": {
+		"title": "復製錨點鏈接"
+	},
+	"link": {
+		"placeholder": "請輸入鏈接或錨點，回車確認",
+		"save": "保存",
+		"edit": "編輯",
+		"delete": "取消鏈接",
+		"open": "打開鏈接",
+		"text": "文本",
+		"link": "鏈接",
+		"text_placeholder": "描述文本",
+		"link_placeholder": "鏈接地址",
+		"link_open": "打開鏈接",
+		"link_edit": "編輯鏈接",
+		"link_remove": "移除鏈接",
+		"ok_button": "確定"
+	},
+	"copyContent": {
+		"title": "復製內容"
+	},
+	"maximize": {
+		"title": "最大化",
+		"back": "返回文檔"
+	},
+	"expand": {
+		"title": "嵌入預覽"
+	},
+	"collapse": {
+		"title": "緊湊展示"
+	},
+	"card": {
+		"lockAlert": "請等待對方編輯完畢後，再進入編輯"
+	},
+	"preferences": {
+		"title": "設置"
+	},
+	"download": {
+		"title": "下載"
+	},
+	"more": {
+		"title": "更多"
+	},
+	"checkMarkdown": {
+		"title": "檢測到粘貼內容符合 Markdown 語法，是否需要轉換？"
+	},
+	"image": {
+		"next": "下一張",
+		"prev": "上一張",
+		"zoomIn": "放大",
+		"zoomOut": "縮小",
+		"originSize": "實際尺寸",
+		"bestSize": "適應屏幕",
+		"errorMessageCopy": "復製錯誤信息",
+		"loadError": "圖片加載失敗！",
+		"uploadError": "上傳圖片失敗！",
+		"uploadLimitError": "上傳圖片大小限製為 $size",
+		"toolbarReductionTitle": "還原",
+		"toolbarWidthTitle": "寬度",
+		"toolbarHeightTitle": "寬度",
+		"displayBlockTitle": "獨占一行",
+		"displayInlineTitle": "嵌入行內"
+	},
+	"table": {
+		"insertColLeft": "左邊插入 $data 列",
+		"insertColRight": "右邊插入 $data 列",
+		"insertRowUp": "上方插入 $data 行",
+		"insertRowDown": "下方插入 $data 行",
+		"mergeCell": "合並單元格",
+		"splitCell": "拆分單元格",
+		"removeCol": "刪除選中列",
+		"removeRow": "刪除選中行",
+		"removeTable": "刪除表格",
+		"copy": "復製",
+		"cut": "剪切",
+		"paste": "粘貼",
+		"clear": "清空內容",
+		"draggingCol": "正在移動 $data 列",
+		"draggingRow": "正在移動 $data 行",
+		"color": {
+			"title": "單元格背景色",
+			"nonFillText": "無填充色"
+		},
+		"noBorder": "隱藏邊框",
+		"verticalAlign": {
+			"title": "垂直對齊",
+			"top": "頂對齊",
+			"middle": "垂直居中",
+			"bottom": "底對齊"
+		}
+	},
+	"file": {
+		"errorMessageCopy": "復製錯誤信息",
+		"loadError": "文件加載失敗！",
+		"uploadError": "上傳文件失敗！",
+		"uploadLimitError": "上傳文件大小限製為 $size",
+		"download": "下載",
+		"preview": "預覽"
+	},
+	"video": {
+		"errorMessageCopy": "復製錯誤信息",
+		"loadError": "視頻加載失敗！",
+		"uploadError": "上傳視頻失敗！",
+		"uploadLimitError": "上傳視頻大小限製為 $size",
+		"download": "下載",
+		"preview": "預覽",
+		"loading": "加載中...",
+		"transcoding": "轉碼中..."
+	},
+	"math": {
+		"errorMessageCopy": "復製錯誤信息",
+		"getError": "獲取svg代碼失敗",
+		"placeholder": "添加 Tex 公式",
+		"ok": "確定",
+		"buttonTips": "Ctrl + Enter",
+		"tips": {
+			"text": "了解 LaTeX 語法",
+			"href": "https://math.meta.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference"
+		}
+	},
+	"toolbar": {
+		"collapse": {
+			"title": "輸入  <code>Ctrl</code> + <code>/</code>  快速插入卡片"
+		},
+		"undo": {
+			"title": "撤銷"
+		},
+		"redo": {
+			"title": "重做"
+		},
+		"paintformat": {
+			"title": "格式刷"
+		},
+		"removeformat": {
+			"title": "清除格式"
+		},
+		"heading": {
+			"title": "正文與標題",
+			"p": "正文",
+			"h1": "標題 1",
+			"h2": "標題 2",
+			"h3": "標題 3",
+			"h4": "標題 4",
+			"h5": "標題 5",
+			"h6": "標題 6"
+		},
+		"fontfamily": {
+			"title": "字體",
+			"notInstalled": "可能未安裝該字體",
+			"items": {
+				"default": "默認",
+				"arial": "Arial",
+				"comicSansMS": "Comic Sans MS",
+				"courierNew": "Courier New",
+				"georgia": "Georgia",
+				"helvetica": "Helvetica",
+				"impact": "Impact",
+				"timesNewRoman": "Times New Roman",
+				"trebuchetMS": "Trebuchet MS",
+				"verdana": "Verdana",
+				"fangSong": "仿宋",
+				"stFangsong": "華文仿宋",
+				"stSong": "華文宋體",
+				"stKaiti": "華文楷體",
+				"simSun": "宋體",
+				"microsoftYaHei": "微軟雅黑",
+				"kaiTi": "楷體",
+				"kaitiSC": "楷體-簡",
+				"simHei": "黑體",
+				"heitiSC": "黑體-簡",
+				"fzHei": "方正黑體",
+				"fzKai": "方正楷體",
+				"fzFangSong": "方正仿宋"
+			}
+		},
+		"fontsize": {
+			"title": "字號"
+		},
+		"fontcolor": {
+			"title": "字體顏色",
+			"more": "更多顏色"
+		},
+		"backcolor": {
+			"title": "背景顏色",
+			"more": "更多顏色"
+		},
+		"bold": {
+			"title": "粗體"
+		},
+		"italic": {
+			"title": "斜體"
+		},
+		"strikethrough": {
+			"title": "刪除線"
+		},
+		"underline": {
+			"title": "下劃線"
+		},
+		"moremark": {
+			"title": "更多文本樣式",
+			"sup": "上標",
+			"sub": "下標",
+			"code": "行內代碼"
+		},
+		"alignment": {
+			"title": "對齊方式",
+			"left": "左對齊",
+			"center": "居中對齊",
+			"right": "右對齊",
+			"justify": "兩端對齊"
+		},
+		"unorderedlist": {
+			"title": "無序列表"
+		},
+		"orderedlist": {
+			"title": "有序列表"
+		},
+		"tasklist": {
+			"title": "任務列表"
+		},
+		"indent": {
+			"title": "縮進",
+			"in": "增加縮進",
+			"out": "減少縮進"
+		},
+		"line-height": {
+			"title": "行高",
+			"default": "默認"
+		},
+		"link": {
+			"title": "鏈接"
+		},
+		"quote": {
+			"title": "插入引用"
+		},
+		"hr": {
+			"title": "插入分割線"
+		},
+		"colorPicker": {
+			"defaultText": "默認",
+			"nonFillText": "無填充色",
+			"#000000": "黑色",
+			"#262626": "深灰 3",
+			"#595959": "深灰 2",
+			"#8C8C8C": "深灰 1",
+			"#BFBFBF": "灰色",
+			"#D9D9D9": "淺灰 4",
+			"#E9E9E9": "淺灰 3",
+			"#F5F5F5": "淺灰 2",
+			"#FAFAFA": "淺灰 1",
+			"#FFFFFF": "白色",
+			"#F5222D": "紅色",
+			"#FA541C": "朱紅",
+			"#FA8C16": "橙色",
+			"#FADB14": "黃色",
+			"#52C41A": "綠色",
+			"#13C2C2": "青色",
+			"#1890FF": "淺藍",
+			"#2F54EB": "藍色",
+			"#722ED1": "紫色",
+			"#EB2F96": "玫紅",
+			"#FFE8E6": "紅色 1",
+			"#FFECE0": "朱紅 1",
+			"#FFEFD1": "橙色 1",
+			"#FCFCCA": "黃色 1",
+			"#E4F7D2": "綠色 1",
+			"#D3F5F0": "青色 1",
+			"#D4EEFC": "淺藍 1",
+			"#DEE8FC": "藍色 1",
+			"#EFE1FA": "紫色 1",
+			"#FAE1EB": "玫紅 1",
+			"#FFA39E": "紅色 2",
+			"#FFBB96": "朱紅 2",
+			"#FFD591": "橙色 2",
+			"#FFFB8F": "黃色 2",
+			"#B7EB8F": "綠色 2",
+			"#87E8DE": "青色 2",
+			"#91D5FF": "淺藍 2",
+			"#ADC6FF": "藍色 2",
+			"#D3ADF7": "紫色 2",
+			"#FFADD2": "玫紅 2",
+			"#FF4D4F": "紅色 3",
+			"#FF7A45": "朱紅 3",
+			"#FFA940": "橙色 3",
+			"#FFEC3D": "黃色 3",
+			"#73D13D": "綠色 3",
+			"#36CFC9": "青色 3",
+			"#40A9FF": "淺藍 3",
+			"#597EF7": "藍色 3",
+			"#9254DE": "紫色 3",
+			"#F759AB": "玫紅 3",
+			"#CF1322": "紅色 4",
+			"#D4380D": "朱紅 4",
+			"#D46B08": "橙色 4",
+			"#D4B106": "黃色 4",
+			"#389E0D": "綠色 4",
+			"#08979C": "青色 4",
+			"#096DD9": "淺藍 4",
+			"#1D39C4": "藍色 4",
+			"#531DAB": "紫色 4",
+			"#C41D7F": "玫紅 4",
+			"#820014": "紅色 5",
+			"#871400": "朱紅 5",
+			"#873800": "橙色 5",
+			"#614700": "黃色 5",
+			"#135200": "綠色 5",
+			"#00474F": "青色 5",
+			"#003A8C": "淺藍 5",
+			"#061178": "藍色 5",
+			"#22075E": "紫色 5",
+			"#780650": "玫紅 5"
+		},
+		"component": {
+			"placeholder": "卡片名稱"
+		},
+		"image": {
+			"title": "圖片"
+		},
+		"codeblock": {
+			"title": "代碼塊"
+		},
+		"table": {
+			"title": "表格"
+		},
+		"file": {
+			"title": "附件"
+		},
+		"video": {
+			"title": "視頻"
+		},
+		"math": {
+			"title": "公式"
+		},
+		"status": {
+			"title": "狀態"
+		},
+		"mind": {
+			"title": "腦圖"
+		},
+		"commonlyUsed": {
+			"title": "常用"
+		}
+	},
+	"status": {
+		"defaultValue": "設置狀態"
+	},
+	"mention": {
+		"placeholder": "用戶名"
+	}
+}

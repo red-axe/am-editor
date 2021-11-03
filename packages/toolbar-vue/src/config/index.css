@@ -1,0 +1,49 @@
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-heading .toolbar-button {
+    font-weight: bold;
+    min-width: 73px;
+}
+
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-heading .heading-item-h1,
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-heading .heading-item-h2,
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-heading .heading-item-h3,
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-heading .heading-item-h4,
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-heading .heading-item-h5,
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-heading .heading-item-h6 {
+    line-height: 1.6;
+    font-weight: bold;
+    color: #262626;
+}
+
+.heading-item-h1 {
+    font-size: 28px;
+}
+
+.heading-item-h2 {
+    font-size: 24px;
+}
+
+.heading-item-h3 {
+    font-size: 20px;
+}
+
+.heading-item-h4 {
+    font-size: 16px;
+}
+
+.heading-item-h5 {
+    font-size: 14px;
+}
+
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-heading .heading-item-h6 {
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-fontsize .toolbar-button {
+    font-weight: bold;
+    min-width: 58px;
+}
+
+.editor-toolbar .toolbar-dropdown.toolbar-dropdown-fontfamily .toolbar-button {
+    font-size: 12px;
+}

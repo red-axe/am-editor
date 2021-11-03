@@ -1,0 +1,72 @@
+import md5 from 'blueimp-md5';
+import { NodeInterface } from '../types';
+import $ from '../node/query';
+import { DATA_ID } from '../constants';
+import { isNode, isNodeEntry } from './utils';
+
+const _counters: { [key: string]: number } = {};
+
+export const uuid = (len: number, radix: number = 16): string => {
+	const chars =
+		'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split(
+			'',
+		);
+	let uuid = [],
+		i;
+	radix = radix || chars.length;
+	if (radix > chars.length) {
+		radix = chars.length;
+	}
+	if (len) {
+		// Compact form
+		for (i = 0; i < len; i++) uuid[i] = chars[0 | (Math.random() * radix)];
+	} else {
+		// rfc4122, version 4 form
+		let r;
+
+		// rfc4122 requires these characters
+		uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+		uuid[14] = '4';
+
+		// Fill in random data.  At i==19 set the high bits of clock sequence as
+		// per rfc4122, sec. 4.1.5
+		for (i = 0; i < 36; i++) {
+			if (!uuid[i]) {
+				r = 0 | (Math.random() * 16);
+				uuid[i] = chars[i == 19 ? (r & 0x3) | 0x8 : r];
+			}
+		}
+	}
+
+	return uuid.join('');
+};
+
+export default (
+	value: string | NodeInterface | Node,
+	unique: boolean = true,
+) => {
+	let prefix = '';
+	if (isNode(value)) value = $(value);
+	if (isNodeEntry(value)) {
+		const attributes = value.attributes();
+		const styles = attributes['style'];
+		delete attributes['style'];
+		delete attributes[DATA_ID];
+		prefix = value.name.substring(0, 1);
+		value = `${value.name}_${Object.keys(attributes || {}).join(
+			',',
+		)}_${Object.values(attributes || {}).join(',')}_${Object.keys(
+			styles || {},
+		).join(',')}_${Object.values(styles || {}).join(',')}`;
+	}
+	const md5Value = md5(value);
+	let hash =
+		prefix + md5Value.substr(0, 4) + md5Value.substr(md5Value.length - 3);
+	if (unique) {
+		const counter = _counters[hash] || 0;
+		_counters[hash] = counter + 1;
+		hash = `${hash}-${uuid(8, 48 + _counters[hash])}`;
+	}
+
+	return hash;
+};

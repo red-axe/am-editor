@@ -1,0 +1,59 @@
+.data-card-dnd {
+    position: absolute;
+    top: 0;
+    left: -21px;
+    right: auto;
+    bottom: auto;
+    width: 18px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 14px;
+    font-weight: normal;
+    display: none;
+    opacity: 0;
+    z-index: 125;
+    transition: all 0.3s ease-in-out;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.data-card-dnd-active {
+    display: block;
+    opacity: 1;
+    cursor: pointer;
+}
+
+.data-card-dnd:hover {
+	background: #f4f4f4;
+	color: #595959;
+}
+
+.data-card-dnd-trigger {
+    width: 18px;
+    height: 24px;
+    text-align: center;
+    color: #BFBFBF;
+    font-size: 16px;
+    border-radius: 2px 2px;
+    cursor: move;
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+}
+
+.am-engine-view .data-toolbar-active {
+	min-width: 200px;
+}
+
+.data-card-toolbar.data-toolbar-block {
+	top: -48px;
+	bottom: auto;
+	display: none;
+}
+
+.data-card-toolbar.data-card-toolbar-active {
+	display: block;
+}
+
+.data-card-toolbar.data-toolbar-active {
+	display: block;
+}

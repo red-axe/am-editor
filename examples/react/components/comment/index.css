@@ -1,0 +1,165 @@
+/** 编辑器中标记样式 ---- 开始 **/
+[data-comment-preview], [data-comment-id] {
+    position: relative;
+}
+
+span[data-comment-preview], span[data-comment-id] {
+    display: inline-block;
+}
+
+[data-comment-preview]::before, [data-comment-id]::before{
+    content: '';
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+    left: 0;
+    height: 2px;
+    border-bottom: 2px solid #f8e1a1 !important;
+}
+
+[data-comment-preview] {
+    background:rgb(250, 241, 209) !important;
+}
+
+[data-card-key][data-comment-id]::before, [data-card-key][data-comment-preview]::before {
+    bottom:-2px;
+}
+/** 编辑器中标记样式 ---- 结束 **/
+
+.data-comment-button-container {
+    display: none;
+    position: absolute;
+    border: 1px solid rgba(226, 226, 226, 0.84);
+    border-radius: 2px;
+    background: #fff;
+    width: 20px;
+    text-align: center;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #888888;
+}
+
+.data-comment-button-container:hover {
+    color: #347eff;
+    border-color: #347eff;
+    box-shadow: 0px 2px 4px 0px rgb(225 225 225 / 50%);
+}
+
+.data-comment-button-container .data-icon {
+    font-size: 12px;
+}
+
+.doc-comment-layer {
+    position: absolute;
+    top: 20px;
+    width: calc(50% - 454px);
+    left: calc(50% + 428px);
+    padding-left: 24px;
+}
+
+.doc-comment-title {
+    position: relative;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 2px 8px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.doc-comment-item {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #dee0e3;
+    border-radius: 4px;
+    width: calc(100% - 24px);
+}
+
+.doc-comment-item-active::before {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    content: "";
+    position: absolute;
+    width: calc(100% + 2px);
+    height: 6px;
+    background: #ffc60a;
+    margin-top: -1px;
+    margin-left: -1px;
+    margin-right: -1px;
+}
+
+.doc-comment-item-haeder {
+    padding: 12px;
+    margin-top: 2px;
+    position: relative;
+    line-height: 18px;
+}
+
+.doc-comment-item-haeder::before {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 18px;
+    border-radius: 15px;
+    background: #bbbfc4;
+}
+
+.doc-comment-item-title {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-left: 7px;
+    font-size: 12px;
+    color: #646a73;
+}
+
+.doc-comment-item-body {
+    padding: 0px 12px 12px;
+}
+
+.doc-comment-item-body .ant-space-vertical {
+    display: flex;
+}
+
+.doc-comment-edit-wrapper {
+
+}
+
+.doc-comment-edit-input {
+
+}
+
+.doc-comment-edit-button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.doc-comment-edit-button .ant-btn {
+    margin-left: 12px;
+    font-size: 12px;
+}
+
+.doc-comment-item-row {
+    font-size: 12px;
+}
+
+.doc-comment-item-author {
+    margin-bottom: 0;
+    line-height: 18px;
+    color: #646a73;
+}
+
+.doc-comment-item-time {
+}
+
+.doc-comment-item-content {
+    margin: 6px 0;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    hyphens: auto;
+    word-break: break-word;
+    color: #1f2329;
+}

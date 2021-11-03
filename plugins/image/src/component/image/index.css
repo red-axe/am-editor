@@ -1,0 +1,156 @@
+.data-image {
+    position: relative;
+    display: inline-block;
+    font-size: 14px;
+    text-align: left;
+    border-radius: 3px 3px;
+    line-height: 24px;
+    text-indent: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+.data-image-blcok {
+    display: flex;
+    margin: 0 auto;
+    width: max-content;
+}
+
+.data-image-detail {
+  display: inline-block;
+}
+
+.data-image-meta {
+    position: relative;
+    color: #595959;
+    line-height: 0;
+}
+
+.data-image-progress {
+    padding-left: 8px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.data-image-progress .data-anticon {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 24px;
+    margin-right: 10px;
+}
+
+.data-image-maximize {
+    position: absolute;
+    z-index: 2;
+    right: 10px;
+    top: 10px;
+    background-color: rgba(0, 0, 0, 0.65);
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    line-height: 20px;
+    border-radius: 4px;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+}
+
+.data-image-maximize .data-icon-maximize {
+    margin-left: 1px;
+}
+
+.data-image-loading , .data-image-loaded {
+    display: inline-block;
+    border-radius: 0 0;
+    padding: 0 0;
+    background: transparent;
+    border-color: transparent;
+}
+
+.data-image-loading .data-image-meta, .data-image-loaded .data-image-meta {
+    display: inline-block;
+}
+
+.data-image-loading .data-image-meta img,.data-image-loaded .data-image-meta img {
+    border-radius: 2px 2px;
+    display: inline-block;
+    width: 100%;
+    opacity: 0.6;
+    text-align: left;
+    cursor: pointer;
+    transition: opacity 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.data-image-loading .data-image-meta img {
+    display: none;
+}
+
+.data-image-loading  .data-image-meta .data-image-progress,.data-image-loaded .data-image-meta .data-image-progress {
+    font-family: 'Lucida Console', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 12px;
+    line-height: 24px;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0px 6px;
+    border-radius: 2px 2px;
+    background: rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+}
+
+.data-image-loaded .data-image-meta img {
+    opacity: 1;
+}
+
+.data-image-error {
+    padding: 2px 4px;
+    background: #f5f5f5;
+    display: flex;
+    border-radius: 4px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    align-items: center;
+    user-select: none;
+}
+
+.data-image-error .data-icon {
+    font-size: 12px;
+}
+
+.data-image-error .data-icon-error {
+    color: red;
+    margin-right: 8px;
+}
+
+.data-image-error .data-icon-copy {
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+.am-engine [data-card-key="image"].card-selected [data-card-element=center].data-card-background-selected {
+    border-radius: 4px;
+}
+
+.data-image-bg {
+    display: none;
+    border-radius: 2px;
+    opacity: 0.6;
+    background-size:100% 100%;
+    background-color: #FAFAFA;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjhweCIgaGVpZ2h0PSIyMnB4IiB2aWV3Qm94PSIwIDAgMjggMjIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU1LjIgKDc4MTgxKSAtIGh0dHBzOi8vc2tldGNoYXBwLmNvbSAtLT4KICAgIDx0aXRsZT5pbWFnZS1maWxs5aSH5Lu9PC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGcgaWQ9Iuafpeeci+WbvueJh+S8mOWMljQuMCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9IuWKoOi9veWbvueJhyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTU3Mi4wMDAwMDAsIC01MDYuMDAwMDAwKSI+CiAgICAgICAgICAgIDxnIGlkPSJpbWFnZS1maWxs5aSH5Lu9IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1NzAuMDAwMDAwLCA1MDEuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlIiBmaWxsPSIjMDAwMDAwIiBvcGFjaXR5PSIwIiB4PSIwIiB5PSIwIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiPjwvcmVjdD4KICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0yOSw1IEwzLDUgQzIuNDQ2ODc1LDUgMiw1LjQ0Njg3NSAyLDYgTDIsMjYgQzIsMjYuNTUzMTI1IDIuNDQ2ODc1LDI3IDMsMjcgTDI5LDI3IEMyOS41NTMxMjUsMjcgMzAsMjYuNTUzMTI1IDMwLDI2IEwzMCw2IEMzMCw1LjQ0Njg3NSAyOS41NTMxMjUsNSAyOSw1IFogTTEwLjU2MjUsOS41IEMxMS42NjU2MjUsOS41IDEyLjU2MjUsMTAuMzk2ODc1IDEyLjU2MjUsMTEuNSBDMTIuNTYyNSwxMi42MDMxMjUgMTEuNjY1NjI1LDEzLjUgMTAuNTYyNSwxMy41IEM5LjQ1OTM3NSwxMy41IDguNTYyNSwxMi42MDMxMjUgOC41NjI1LDExLjUgQzguNTYyNSwxMC4zOTY4NzUgOS40NTkzNzUsOS41IDEwLjU2MjUsOS41IFogTTI2LjYyMTg3NSwyMy4xNTkzNzUgQzI2LjU3ODEyNSwyMy4xOTY4NzUgMjYuNTE4NzUsMjMuMjE4NzUgMjYuNDU5Mzc1LDIzLjIxODc1IEw1LjUzNzUsMjMuMjE4NzUgQzUuNCwyMy4yMTg3NSA1LjI4NzUsMjMuMTA2MjUgNS4yODc1LDIyLjk2ODc1IEM1LjI4NzUsMjIuOTA5Mzc1IDUuMzA5Mzc1LDIyLjg1MzEyNSA1LjM0Njg3NSwyMi44MDYyNSBMMTAuNjY4NzUsMTYuNDkzNzUgQzEwLjc1NjI1LDE2LjM4NzUgMTAuOTE1NjI1LDE2LjM3NSAxMS4wMjE4NzUsMTYuNDYyNSBDMTEuMDMxMjUsMTYuNDcxODc1IDExLjA0Mzc1LDE2LjQ4MTI1IDExLjA1MzEyNSwxNi40OTM3NSBMMTQuMTU5Mzc1LDIwLjE4MTI1IEwxOS4xLDE0LjMyMTg3NSBDMTkuMTg3NSwxNC4yMTU2MjUgMTkuMzQ2ODc1LDE0LjIwMzEyNSAxOS40NTMxMjUsMTQuMjkwNjI1IEMxOS40NjI1LDE0LjMgMTkuNDc1LDE0LjMwOTM3NSAxOS40ODQzNzUsMTQuMzIxODc1IEwyNi42NTkzNzUsMjIuODA5Mzc1IEMyNi43NDA2MjUsMjIuOTEyNSAyNi43MjgxMjUsMjMuMDcxODc1IDI2LjYyMTg3NSwyMy4xNTkzNzUgWiIgaWQ9IlNoYXBlIiBmaWxsPSIjRThFOEU4Ij48L3BhdGg+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==);
+}
+
+.data-image-loading .data-image-bg {
+    display: inline-block;
+}
+
+.data-image-loading .data-image-maximize {
+    display: none;
+}

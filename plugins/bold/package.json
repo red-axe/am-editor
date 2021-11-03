@@ -1,0 +1,26 @@
+{
+  "name": "@aomao/plugin-bold",
+  "version": "2.5.3",
+  "main": "dist/index.ts",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "author": "me@yanmao.cc",
+  "license": "MIT",
+  "homepage": "https://github.com/yanmao-cc/am-editor#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanmao-cc/am-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yanmao-cc/am-editor/issues"
+  },
+  "dependencies": {
+    "@aomao/engine": "^2.5.3",
+    "@babel/runtime": "^7.13.10"
+  }
+}

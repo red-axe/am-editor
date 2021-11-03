@@ -1,0 +1,49 @@
+# @aomao/plugin-table
+
+表格插件
+
+## 安装
+
+```bash
+$ yarn add @aomao/plugin-table
+```
+
+添加到引擎
+
+```ts
+import Engine, { EngineInterface } from '@aomao/engine';
+import Table, { TableComponent } from '@aomao/plugin-table';
+
+new Engine(...,{ plugins:[Table] , cards:[TableComponent]})
+```
+
+## 可选项
+
+### 快捷键
+
+默认无快捷键
+
+```ts
+//快捷键，key 组合键，args，执行参数，[rows?: string, cols?: string] 行数：默认3行，列数：默认3列
+hotkey?:string | {key:string,args:Array<string>};//默认无
+
+//使用配置
+new Engine(...,{
+    config:{
+        "table":{
+            //修改快捷键
+            hotkey:{
+                key:"mod+t",
+                args:[5,5]
+            }
+        }
+    }
+ })
+```
+
+## 命令
+
+```ts
+//可携带两个参数，行数，列数，都是可选的
+engine.command.execute('table', 5, 5);
+```
