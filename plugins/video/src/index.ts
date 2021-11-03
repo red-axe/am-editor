@@ -130,42 +130,33 @@ export default class VideoPlugin extends Plugin<{
 	pasteSchema(schema: SchemaInterface) {
 		schema.add({
 			type: 'block',
-			name: 'video',
-			isVoid: true,
+			name: 'div',
 			attributes: {
-				src: {
-					required: true,
-					value: '@url',
-				},
 				'data-value': '*',
+				'data-type': {
+					required: true,
+					value: VideoComponent.cardName,
+				},
 			},
 		});
 	}
 
 	pasteHtml(node: NodeInterface) {
 		if (!isEngine(this.editor)) return;
-		if (node.isElement() && node.name === 'video') {
-			const value = node.attributes('data-value');
-			let cardValue = decodeCardValue(value);
-			if (!cardValue.url) {
-				cardValue = {
-					url: node.attributes('src'),
-					name:
-						node.attributes('data-name') ||
-						node.attributes('name') ||
-						node.attributes('title') ||
-						node.attributes('src'),
-					cover: node.attributes('poster'),
-					status: 'done',
-				};
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === VideoComponent.cardName) {
+				const value = node.attributes('data-value');
+				const cardValue = decodeCardValue(value) as VideoValue;
+				if (!cardValue.url) return;
+				this.editor.card.replaceNode(
+					node,
+					VideoComponent.cardName,
+					cardValue,
+				);
+				node.remove();
+				return false;
 			}
-			this.editor.card.replaceNode(
-				node,
-				VideoComponent.cardName,
-				cardValue,
-			);
-			node.remove();
-			return false;
 		}
 		return true;
 	}
@@ -179,9 +170,11 @@ export default class VideoPlugin extends Plugin<{
 				if (value?.url && value.status === 'done') {
 					const { onBeforeRender } = this.options;
 					const { cover, url } = value;
-					const html = `<video data-value="${encodeCardValue(
+					const html = `<div data-type="${
+						VideoComponent.cardName
+					}"  data-value="${encodeCardValue(
 						value,
-					)}" controls src="${sanitizeUrl(
+					)}"><video controls src="${sanitizeUrl(
 						onBeforeRender ? onBeforeRender('query', url) : url,
 					)}" poster="${
 						!cover
@@ -191,7 +184,7 @@ export default class VideoPlugin extends Plugin<{
 										? onBeforeRender('cover', cover)
 										: cover,
 							  )
-					}" webkit-playsinline="webkit-playsinline" playsinline="playsinline" style="outline:none;" />`;
+					}" webkit-playsinline="webkit-playsinline" playsinline="playsinline" style="outline:none;" /></div>`;
 					node.empty();
 					node.replaceWith($(html));
 				} else node.remove();

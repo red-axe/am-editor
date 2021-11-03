@@ -288,7 +288,10 @@ class ImageComponent extends Card<ImageValue> {
 	}
 
 	didRender() {
-		if (this.type === CardType.INLINE) {
+		if (
+			this.type === CardType.INLINE &&
+			this.getValue()?.status === 'done'
+		) {
 			this.toolbarModel?.setOffset([-12, 0, -12, 0]);
 		}
 	}

@@ -222,6 +222,7 @@ class ChangeModel implements ChangeInterface {
 				container.empty().append(fragment);
 				card.render(undefined, (count) => {
 					this.initValue(undefined, false);
+					this.engine.trigger('paste:after');
 					if (callback) callback(count);
 				});
 			},

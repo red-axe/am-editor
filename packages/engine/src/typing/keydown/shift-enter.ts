@@ -36,9 +36,11 @@ class ShitEnter implements TypingHandleInterface {
 		const range = change.range.get();
 		const br = $('<br />');
 		inline.insert(br, range);
-		// Chrome 问题：<h1>foo<br /><cursor /></h1> 时候需要再插入一个 br，否则没有换行效果
 		if (block.isLastOffset(range, 'end')) {
-			if (!br.next() || br.next()?.name !== 'br') {
+			if (
+				(!br.next() || br.next()?.name !== 'br') &&
+				(!br.prev() || br.prev()?.name !== 'br')
+			) {
 				const cloneBr = br.clone();
 				br.after(cloneBr);
 				range.select(cloneBr).collapse(false);

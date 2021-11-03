@@ -142,7 +142,7 @@ class Parser implements ParserInterface {
 							value = undefined;
 							continue;
 						} else {
-							if (!nodeApi.isBlock(newNode)) {
+							if (!nodeApi.isBlock(newNode, schema)) {
 								//把包含旧子节点的新节点追加到旧节点下
 								node.append(newNode);
 							} else {
@@ -199,7 +199,7 @@ class Parser implements ParserInterface {
 				//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
 				inlineApi.flat(node);
 				//当前节点是 mark 节点
-				if (nodeApi.isMark(node)) {
+				if (nodeApi.isMark(node, schema)) {
 					//过滤掉当前mark节点属性样式并使用剩下的属性样式组成新的节点
 					const oldRules: Array<SchemaRule> = [];
 					let rule = schema.getRule(node);
@@ -281,6 +281,21 @@ class Parser implements ParserInterface {
 					type = schema.getType(child);
 					if (type === undefined) {
 						passed = false;
+						const parent = child.parent();
+						if (
+							parent &&
+							nodeApi.isBlock(parent, schema) &&
+							parent.children().length === 1
+						) {
+							const newChild = $('<br />');
+							child.before(newChild);
+							child.remove();
+							child = newChild;
+							name = newChild.name;
+							attributes = {};
+							styles = {};
+							passed = true;
+						}
 					} else {
 						//过滤不符合规则的属性和样式
 						schema.filter(child, attributes, styles);
@@ -324,7 +339,10 @@ class Parser implements ParserInterface {
 				}
 			} else if (child.isText()) {
 				let text = child[0].nodeValue ? escape(child[0].nodeValue) : '';
-				if (text === '' && nodeApi.isBlock(child.parent()!)) {
+				if (
+					text === '' &&
+					nodeApi.isBlock(child.parent()!, schema || undefined)
+				) {
 					if (!child.prev()) {
 						text = text.replace(/^[ \n]+/, '');
 					}
@@ -337,9 +355,9 @@ class Parser implements ParserInterface {
 				const childNext = child.next();
 				if (
 					childPrev &&
-					nodeApi.isBlock(childPrev) &&
+					nodeApi.isBlock(childPrev, schema || undefined) &&
 					childNext &&
-					nodeApi.isBlock(childNext) &&
+					nodeApi.isBlock(childNext, schema || undefined) &&
 					text.trim() === ''
 				) {
 					text = text.trim();
@@ -400,7 +418,10 @@ class Parser implements ParserInterface {
 					}
 				}
 
-				if (nodeApi.isVoid(name, schema ? schema : undefined)) {
+				if (
+					nodeApi.isVoid(name, schema ? schema : undefined) &&
+					child.children().length === 0
+				) {
 					result.push(' />');
 				} else {
 					result.push('>');
@@ -489,7 +510,8 @@ class Parser implements ParserInterface {
 		const nodes = doc.body.childNodes;
 
 		while (nodes.length > 0) {
-			fragment.appendChild(nodes[0]);
+			const node = nodes[0];
+			fragment.appendChild(node);
 		}
 		return fragment;
 	}

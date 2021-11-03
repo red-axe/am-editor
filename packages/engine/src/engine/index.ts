@@ -359,9 +359,6 @@ class Engine implements EngineInterface {
 		}
 		const html = this.node.html(dom);
 		this.change.setValue(html, undefined, callback);
-		// const range = this.change.range.get();
-		// range.shrinkToElementNode();
-		// this.change.range.select(range);
 		this.normalize();
 		this.nodeId.generateAll(this.container);
 		return this;
