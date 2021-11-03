@@ -207,7 +207,11 @@ class Producer extends EventEmitter2 {
 
 			const oldPath = path.slice();
 			ops.forEach((op) => {
-				for (let p = 0; p < path!.length; p++) {
+				for (
+					let p = 0;
+					p < path!.length && op.p.length < path!.length;
+					p++
+				) {
 					if (('li' in op || 'ld' in op) && op.p.length === p + 1) {
 						if (op.p[p] <= path![p]) {
 							if ('li' in op) oldPath[p] = oldPath[p] - 1;

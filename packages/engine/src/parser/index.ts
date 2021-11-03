@@ -126,6 +126,7 @@ class Parser implements ParserInterface {
 						const { rule } = value;
 						oldRules.push(rule);
 						const { name, attributes, style } = value.node;
+						delete attributes['data-id'];
 						const newNode = $(`<${name} />`);
 						nodeApi.setAttributes(newNode, {
 							...attributes,
@@ -285,7 +286,8 @@ class Parser implements ParserInterface {
 						if (
 							parent &&
 							nodeApi.isBlock(parent, schema) &&
-							parent.children().length === 1
+							parent.children().length === 1 &&
+							child.children().length === 0
 						) {
 							const newChild = $('<br />');
 							child.before(newChild);

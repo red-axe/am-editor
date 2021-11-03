@@ -143,12 +143,7 @@ export const isReverseOp = (op: Op, next: Op) => {
 
 	// 节点增加和删除
 	if (insertOp.li && deleteNext.ld) {
-		return (
-			isEqual(insertOp.li, deleteNext.ld) &&
-			(isEqual(op.p, next.p) ||
-				isReversePath(op.p, next.p) ||
-				isReversePath(next.p, op.p))
-		);
+		return isEqual(insertOp.li, deleteNext.ld) && isEqual(op.p, next.p);
 	}
 
 	if (deleteOp.ld && insertNext.li) {
@@ -202,6 +197,8 @@ export const updateIndex = (
 export const opsSort = (ops: Op[]) => {
 	ops.sort((op1, op2) => {
 		let diff = 0;
+		if (isCursorOp(op1)) return 1;
+		if (isCursorOp(op2)) return -1;
 		for (let p = 0; p < op1.p.length; p++) {
 			const v1 = op1.p[p];
 			// od oi 最后一个参数是属性名称
@@ -234,8 +231,12 @@ export const opsSort = (ops: Op[]) => {
 			return -1;
 		}
 		// 如果删除节点比增加的节点索引小，排在加入节点前面
-		if (diff < 1 && 'ld' in op1 && 'li' in op2) return -1;
-
+		if ('ld' in op1 && 'li' in op2) return -1;
+		if ('li' in op1 && 'ld' in op2) return 1;
+		if (diff < 1 && 'ld' in op1 && 'si' in op2) return 1;
+		if (diff > 0 && 'ld' in op1 && 'si' in op2) return -1;
+		if (diff < 1 && 'si' in op1 && 'ld' in op2) return 1;
+		if (diff > 0 && 'si' in op1 && 'ld' in op2) return -1;
 		const isLi = 'li' in op1 && 'li' in op2;
 		const isLd = 'ld' in op1 && 'ld' in op2;
 		// 都是新增节点，越小排越前面

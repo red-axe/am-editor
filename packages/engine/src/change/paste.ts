@@ -44,7 +44,6 @@ export default class Paste {
 		const defaultStyle = this.getDefaultStyle();
 		const { inline } = this.engine;
 		const nodeApi = this.engine.node;
-		// 第一轮预处理，主要处理 span 节点
 		$(fragment).traverse((node) => {
 			// 跳过Card
 			if (node.isCard() || fragment === node.fragment) {
@@ -97,9 +96,32 @@ export default class Paste {
 				if (nodeApi.isBlock(node, this.schema)) {
 					this.engine.block.brToBlock(node);
 				}
+			} else {
+				let text = node.text();
+				if (/\s/.test(text)) {
+					text = text.replace(/\s/g, ' ');
+					node.text(text);
+				}
+				if (/\u200b/.test(text)) {
+					let isRemove = true;
+					const next = node.next();
+					const prev = node.prev();
+					const parent = node.parent();
+					if (parent && nodeApi.isMark(parent, this.schema))
+						isRemove = false;
+					else if (parent && nodeApi.isInline(parent, this.schema))
+						isRemove = false;
+					else if (next && nodeApi.isInline(next, this.schema))
+						isRemove = false;
+					else if (prev && nodeApi.isInline(prev, this.schema))
+						isRemove = false;
+					if (isRemove) {
+						text = text.replace(/\u200b/g, '');
+						node.text(text);
+					}
+				}
 			}
 		});
-		// 第二轮处理
 		$(fragment).traverse((node) => {
 			let parent = node.parent();
 			// 跳过已被删除的节点
@@ -228,7 +250,25 @@ export default class Paste {
 
 			// 处理嵌套
 			let nodeParent = parent;
+			const handleBlock = (node: NodeInterface) => {
+				if (
+					nodeParent &&
+					!nodeParent.fragment &&
+					nodeApi.isBlock(node, this.schema) &&
+					nodeApi.isBlock(nodeParent, this.schema) &&
+					!this.schema.isAllowIn(nodeParent.name, node.name)
+				) {
+					const children = node.children();
+					nodeApi.unwrap(node);
+					children.each((_, index) => {
+						handleBlock(children.eq(index)!);
+					});
+				}
+			};
+			handleBlock(node);
+
 			while (
+				node.length > 0 &&
 				nodeParent &&
 				!nodeParent.fragment &&
 				nodeApi.isBlock(node, this.schema) &&
@@ -244,6 +284,7 @@ export default class Paste {
 			// mark 相同的嵌套
 			nodeParent = parent;
 			while (
+				node.length > 0 &&
 				nodeParent &&
 				nodeApi.isMark(nodeParent, this.schema) &&
 				nodeApi.isMark(node, this.schema)

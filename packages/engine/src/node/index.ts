@@ -854,6 +854,15 @@ class NodeModel implements NodeModelInterface {
 			) {
 				childNode.append($('<br />'));
 			}
+			if (
+				this.editor.node.isBlock(childNode) &&
+				childNode.children().length === 1 &&
+				childNode.first()?.isText() &&
+				this.isEmptyWithTrim(childNode)
+			) {
+				childNode.html('<br />');
+			}
+
 			this.removeSide(childNode);
 			childNode = nextNode;
 		}
