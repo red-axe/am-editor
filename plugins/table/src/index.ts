@@ -142,6 +142,7 @@ class Table extends Plugin<Options> {
 			{
 				name: 'colgroup',
 				type: 'block',
+				allowIn: ['table'],
 			},
 			{
 				name: 'col',
@@ -156,10 +157,12 @@ class Table extends Plugin<Options> {
 			{
 				name: 'thead',
 				type: 'block',
+				allowIn: ['table'],
 			},
 			{
 				name: 'tbody',
 				type: 'block',
+				allowIn: ['table'],
 			},
 			{
 				name: 'tr',
