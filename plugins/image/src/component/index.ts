@@ -256,12 +256,14 @@ class ImageComponent extends Card<ImageValue> {
 					if (this.type === CardType.BLOCK && this.image) {
 						const maxWidth = this.image.getMaxWidth();
 						const offset = (maxWidth - this.image.root.width()) / 2;
-						this.toolbarModel?.setOffset([
-							-offset - 12,
-							0,
-							-offset - 12,
-							0,
-						]);
+						if (value.status === 'done') {
+							this.toolbarModel?.setOffset([
+								-offset - 12,
+								0,
+								-offset - 12,
+								0,
+							]);
+						}
 						if (this.activated)
 							this.toolbarModel?.showCardToolbar();
 					}
