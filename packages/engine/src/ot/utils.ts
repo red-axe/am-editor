@@ -205,7 +205,7 @@ export const opsSort = (ops: Op[]) => {
 			if (typeof v1 === 'string') break;
 			// op2 中没有这个索引路径，op1 < op2
 			if (p >= op2.p.length) {
-				diff = -1;
+				diff = 1;
 				break;
 			}
 			const v2 = op2.p[p];
@@ -230,6 +230,15 @@ export const opsSort = (ops: Op[]) => {
 		if ('od' in op1 && diff < 1 && 'ld' in op2) {
 			return -1;
 		}
+		if ('od' in op2 && diff > 0 && 'ld' in op1) {
+			return 1;
+		}
+		if ('oi' in op1 && ('li' in op2 || 'ld' in op2)) {
+			return 1;
+		}
+		if ('oi' in op2 && ('li' in op1 || 'ld' in op1)) {
+			return -1;
+		}
 		// 如果删除节点比增加的节点索引小，排在加入节点前面
 		if ('ld' in op1 && 'li' in op2) return -1;
 		if ('li' in op1 && 'ld' in op2) return 1;
@@ -237,14 +246,18 @@ export const opsSort = (ops: Op[]) => {
 		if (diff > 0 && 'ld' in op1 && 'si' in op2) return -1;
 		if (diff < 1 && 'si' in op1 && 'ld' in op2) return 1;
 		if (diff > 0 && 'si' in op1 && 'ld' in op2) return -1;
-		const isLi = 'li' in op1 && 'li' in op2;
-		const isLd = 'ld' in op1 && 'ld' in op2;
+		const isLi =
+			('li' in op1 && 'li' in op2) || ('oi' in op1 && 'oi' in op2);
+		const isLd =
+			('ld' in op1 && 'ld' in op2) || ('od' in op1 && 'od' in op2);
 		// 都是新增节点，越小排越前面
 		if (isLi) {
+			if (op1.p.length < op2.p.length) return -1;
 			return diff;
 		}
 		// 都是删除节点，越大排越前面
 		else if (isLd) {
+			if (op1.p.length < op2.p.length) return 1;
 			if (diff === -1) return 1;
 			if (diff === 1) return -1;
 		}

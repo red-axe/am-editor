@@ -75,7 +75,7 @@ class NodeId implements NodeIdInterface {
 		nodes.forEach((child) => {
 			const node = $(child);
 			// 有ID不再生成
-			if (node.attributes(DATA_ID)) return;
+			if (!force && node.attributes(DATA_ID)) return;
 
 			this.generate(node, force);
 		});

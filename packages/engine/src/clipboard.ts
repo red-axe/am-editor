@@ -268,6 +268,7 @@ export default class Clipboard implements ClipboardInterface {
 						listNodes.push(childNode);
 					}
 				});
+				this.editor.nodeId.generateAll($(contents), true);
 				// 合并列表
 				this.editor.list.merge(listNodes);
 				const parser = new Parser(contents, this.editor);
