@@ -8,6 +8,9 @@ import {
 	MarkPlugin,
 	InlinePlugin,
 	ListPlugin,
+	isBlockPlugin,
+	isInlinePlugin,
+	isMarkPlugin,
 } from './plugin';
 import Card from './card/entry';
 import View from './view';
@@ -46,6 +49,9 @@ export {
 	MarkPlugin,
 	InlinePlugin,
 	ListPlugin,
+	isBlockPlugin,
+	isInlinePlugin,
+	isMarkPlugin,
 	Card,
 	Toolbar,
 	Tooltip,

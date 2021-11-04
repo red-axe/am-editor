@@ -1,5 +1,10 @@
 import ElementPluginEntry from './element';
-import { SchemaBlock, BlockInterface, NodeInterface } from '../types';
+import {
+	SchemaBlock,
+	BlockInterface,
+	NodeInterface,
+	PluginInterface,
+} from '../types';
 
 abstract class BlockEntry<T extends {} = {}>
 	extends ElementPluginEntry<T>
@@ -52,3 +57,9 @@ abstract class BlockEntry<T extends {} = {}>
 }
 
 export default BlockEntry;
+
+export const isBlockPlugin = (
+	plugin: PluginInterface,
+): plugin is BlockInterface => {
+	return plugin.kind === 'block';
+};

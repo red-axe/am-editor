@@ -7,11 +7,10 @@ import {
 } from '../types/plugin';
 import Plugin from './base';
 import ElementPlugin from './element';
-import BlockPlugin from './block';
-import InlinePlugin from './inline';
+import BlockPlugin, { isBlockPlugin } from './block';
+import InlinePlugin, { isInlinePlugin } from './inline';
 import ListPlugin from './list';
-import MarkPlugin from './mark';
-import { BlockInterface } from '../types/block';
+import MarkPlugin, { isMarkPlugin } from './mark';
 import { isEngine } from '../utils';
 
 class PluginModel implements PluginModelInterface {
@@ -66,10 +65,7 @@ export {
 	InlinePlugin,
 	BlockPlugin,
 	ListPlugin,
-};
-
-export const isBlockPlugin = (
-	plugin: PluginInterface,
-): plugin is BlockInterface => {
-	return plugin.kind === 'block';
+	isBlockPlugin,
+	isInlinePlugin,
+	isMarkPlugin,
 };
