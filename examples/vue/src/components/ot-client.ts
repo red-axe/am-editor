@@ -6,10 +6,8 @@ import sharedb from 'sharedb/lib/client';
 import { Socket } from 'sharedb/lib/sharedb';
 
 export type Member = {
-	id: number;
 	avatar: string;
 	name: string;
-	iid: number;
 	uuid: string;
 	color?: string;
 };
@@ -206,7 +204,8 @@ class OTClient extends EventEmitter {
 				this.onError({
 					code: ERROR_CODE.DISCONNECTED,
 					level: ERROR_LEVEL.FATAL,
-					message: '网络连接异常，无法继续编辑',
+					message:
+						'网络连接异常，无法继续编辑！正在为您重新连接中...',
 				});
 			}
 		});
@@ -215,7 +214,7 @@ class OTClient extends EventEmitter {
 			this.onError({
 				code: ERROR_CODE.CONNECTION_ERROR,
 				level: ERROR_LEVEL.FATAL,
-				message: '协作服务异常，无法继续编辑',
+				message: '协作服务异常，无法继续编辑！正在为您重新连接中...',
 				error,
 			});
 		});
@@ -306,7 +305,7 @@ class OTClient extends EventEmitter {
 
 	addMembers(memberList: Array<Member>) {
 		memberList.forEach((member) => {
-			if (!this.members.find((m) => member.id === m.id)) {
+			if (!this.members.find((m) => member.uuid === m.uuid)) {
 				this.members.push(member);
 			}
 		});
@@ -332,10 +331,10 @@ class OTClient extends EventEmitter {
 		const memberMap: any = {};
 		for (let i = this.members.length; i > 0; i--) {
 			const member = this.members[i - 1];
-			if (!memberMap[member.id]) {
+			if (!memberMap[member.uuid]) {
 				const cloneMember = { ...member };
 				cloneMember.color = colorMap[member.uuid];
-				memberMap[member.id] = member;
+				memberMap[member.uuid] = member;
 				members.push(cloneMember);
 			}
 		}
