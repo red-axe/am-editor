@@ -94,6 +94,7 @@ class View implements ViewInterface {
 		this.list.init();
 		this.card.init(this.options.cards || []);
 		this.plugin.init(this.options.plugins || [], this.options.config || {});
+		this.nodeId.init();
 	}
 
 	on(eventType: string, listener: EventListener, rewrite?: boolean) {
@@ -114,8 +115,9 @@ class View implements ViewInterface {
 		const parser = new Parser(content, this);
 		const value = parser.toValue(this.schema, this.conversion, false, true);
 		this.container.html(value);
-		this.card.render();
-		if (trigger) this.trigger('render', this.container);
+		this.card.render(this.container, () => {
+			if (trigger) this.trigger('render', this.container);
+		});
 	}
 
 	messageSuccess(message: string) {
