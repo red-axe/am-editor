@@ -135,9 +135,11 @@ class Producer extends EventEmitter2 {
 	generateOps(
 		records: MutationRecord[],
 		node: NodeInterface = this.engine.container,
-	) {
+	): Array<Op> {
 		const addNodes: Array<Node> = [];
-		const allOps: Array<Op & { id?: string; bi?: number }> = [];
+		const allOps: Array<
+			Op & { id?: string; bi?: number; addNode?: NodeInterface }
+		> = [];
 		let ops: Array<RepairOp> = [];
 		let attrOps: Array<any> = [];
 		const cacheNodes: Array<Node> = [];
@@ -257,17 +259,30 @@ class Producer extends EventEmitter2 {
 						const domAddedNode = $(addedNode);
 						const data = toJSON0(domAddedNode);
 						if (addedNode.parentNode === target) {
+							domAddedNode.traverse((child) => {
+								const liIndex = allOps.findIndex(
+									(op) =>
+										'li' in op &&
+										op.addNode &&
+										child.equal(op.addNode),
+								);
+								if (liIndex > -1) {
+									allOps.splice(liIndex, 1);
+								}
+							});
 							const index =
 								getIndex(domAddedNode) + JSON0_INDEX.ELEMENT;
 							let p: Path = [];
 							p = p.concat([...path!], [index]);
-							ops.push({
+							const op = {
 								id: rootId,
 								bi: beginIndex,
 								li: data,
+								addNode: domAddedNode,
 								p,
 								newPath: p.slice(),
-							});
+							};
+							ops.push(op);
 							cacheNodes.push(addedNode);
 							this.cacheNode(addedNode);
 						} else {
@@ -345,13 +360,19 @@ class Producer extends EventEmitter2 {
 						bi: beginIndex,
 						li: op.li,
 						p: op.p,
+						addNode: op['addNode'],
 					});
 				}
 			});
 			allOps.push(...attrOps);
 		}
 
-		return allOps;
+		return allOps.map((op) => {
+			if ('li' in op) {
+				delete op.addNode;
+			}
+			return op;
+		});
 	}
 
 	/**
