@@ -20,19 +20,16 @@ class Enter {
 		card: CardInterface,
 		isStart: boolean,
 	) {
-		const { change, block } = this.engine;
-		range.select(card.root);
-		range.collapse(isStart);
-		change.range.select(range);
+		const { change } = this.engine;
 		const emptyBlock = $('<p><br /></p>');
-		block.insert(emptyBlock);
-
+		this.engine.nodeId.generate(emptyBlock);
 		if (isStart) {
-			card.focus(range, true);
+			card.root.before(emptyBlock);
 		} else {
-			range.select(emptyBlock, true);
-			range.collapse(false);
+			card.root.after(emptyBlock);
 		}
+		range.select(emptyBlock, true);
+		range.collapse(false);
 		change.range.select(range);
 	}
 	/**
