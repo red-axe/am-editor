@@ -548,6 +548,16 @@ class Block implements BlockModelInterface {
 			if (!range) change.apply(safeRange);
 			return;
 		}
+		if (
+			node.isList(safeRange.startNode) ||
+			safeRange.startNode.closest('li').length > 0
+		) {
+			const fragment = doc.createDocumentFragment();
+			fragment.appendChild(block[0]);
+			list.insert(fragment, range);
+			if (!range) change.apply(safeRange);
+			return;
+		}
 		// <p><cursor /><br /></p>
 		// to
 		// <p><br /><cursor /></p>
