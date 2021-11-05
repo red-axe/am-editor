@@ -284,7 +284,8 @@ export const toDOM = (ops: Op[] | Op[][]): Node => {
 			) {
 				continue;
 			}
-			fragment.appendChild(toDOM(ops[i] as Op[]));
+			const child = toDOM(ops[i] as Op[]);
+			if (child) fragment.appendChild(child);
 		} else if ('[object Object]' === ops[i].toString()) {
 			if (elementName) {
 				element = document.createElement(
