@@ -248,7 +248,7 @@ class Inline implements InlineModelInterface {
 						inlineClone[0].childNodes.length !== 0 &&
 						!!inlineClone.parent()
 					) {
-						inlineClone = node.clone(inlineClone, false);
+						inlineClone = node.clone(inlineClone, false, false);
 					}
 				}
 				return;
@@ -964,7 +964,7 @@ class Inline implements InlineModelInterface {
 				if (prev && prev.isText()) {
 					prev.text(prevText + '\u200b');
 				} else {
-					node.before(nodeApi.clone(zeroNode, true));
+					node.before(nodeApi.clone(zeroNode, true, false));
 				}
 			} else if (
 				prev &&
@@ -990,7 +990,7 @@ class Inline implements InlineModelInterface {
 				if (next && next.isText()) {
 					next.text('\u200b' + next.text());
 				} else {
-					node.after(this.editor.node.clone(zeroNode, true));
+					node.after(this.editor.node.clone(zeroNode, true, false));
 					if (next?.name === 'br') {
 						next.remove();
 					}

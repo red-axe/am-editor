@@ -283,7 +283,7 @@ class Block implements BlockModelInterface {
 
 		if (hasLeft) {
 			const parent = firstNodeParent;
-			leftParent = node.clone(parent, false);
+			leftParent = node.clone(parent, false, false);
 			parent.before(leftParent);
 		}
 
@@ -291,7 +291,7 @@ class Block implements BlockModelInterface {
 		if (hasRight) {
 			const _parent = blocks[blocks.length - 1].node.parent();
 			if (_parent) {
-				rightParent = node.clone(_parent, false);
+				rightParent = node.clone(_parent, false, false);
 				_parent?.after(rightParent);
 			}
 		}
@@ -1119,7 +1119,7 @@ class Block implements BlockModelInterface {
 			: newRange.extractContents();
 		const cloneBlock = keepDataId
 			? block.clone(false)
-			: this.editor.node.clone(block, false);
+			: this.editor.node.clone(block, false, false);
 		cloneBlock.append(fragement);
 		if (clone) {
 			cloneBlock.find(CARD_SELECTOR).each((card) => {
@@ -1206,7 +1206,7 @@ class Block implements BlockModelInterface {
 					parentNode.name !== block.name)
 			) {
 				//复制节点
-				const cloneNode = node.clone(parentNode, false);
+				const cloneNode = node.clone(parentNode, false, false);
 				//追加到复制的节点
 				cloneNode.append(block);
 				//设置新的节点
@@ -1216,7 +1216,7 @@ class Block implements BlockModelInterface {
 			} else {
 				block = node.replace(
 					block,
-					node.clone(this.findTop(parentNode, block), false),
+					node.clone(this.findTop(parentNode, block), false, false),
 				);
 				parentNode.before(block);
 			}
@@ -1262,7 +1262,7 @@ class Block implements BlockModelInterface {
 			const next = node.next();
 			if (!container || node.name === 'br') {
 				prevContainer = container;
-				container = this.editor.node.clone(block, false);
+				container = this.editor.node.clone(block, false, false);
 				block.before(container);
 			}
 			if (node.name !== 'br') {
@@ -1305,13 +1305,13 @@ class Block implements BlockModelInterface {
 		marks.forEach((mark) => {
 			// 回车后，默认是否复制makr样式
 			const plugin = editor.mark.findPlugin(mark);
-			mark = nodeApi.clone(mark);
+			mark = nodeApi.clone(mark, false, false);
 			//插件判断
 			if (
 				plugin?.copyOnEnter !== false &&
 				plugin?.followStyle !== false
 			) {
-				mark = nodeApi.clone(mark);
+				mark = nodeApi.clone(mark, false, false);
 				node.before(mark);
 				mark.append(node);
 				node = mark;

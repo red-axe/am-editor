@@ -127,7 +127,7 @@ export default class extends Plugin<Options> {
 	paintMarks(activeMarks: NodeInterface[]) {
 		const { mark } = this.editor!;
 		activeMarks.forEach((node) => {
-			mark.wrap(this.editor.node.clone(node));
+			mark.wrap(this.editor.node.clone(node, false, false));
 		});
 	}
 

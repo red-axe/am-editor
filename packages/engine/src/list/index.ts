@@ -270,7 +270,7 @@ class List implements ListModelInterface {
 			}
 
 			if (block.name === 'li') {
-				const toBlock = node.clone(normalBlock, false);
+				const toBlock = node.clone(normalBlock, false, false);
 				if (indent !== 0) {
 					toBlock.css('text-indent', indent * 2 + 'em');
 				}

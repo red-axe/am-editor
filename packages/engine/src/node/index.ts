@@ -251,7 +251,7 @@ class NodeModel implements NodeModelInterface {
 		// 包裹样式节点
 		if (mergeSame && this.isMark(outer)) {
 			//合并属性和样式值
-			const outerClone = node.clone(outer, false);
+			const outerClone = node.clone(outer, false, false);
 			if (source.name === outer.name) {
 				const attributes = source.attributes();
 				delete attributes.style;
@@ -270,9 +270,9 @@ class NodeModel implements NodeModelInterface {
 				Object.keys(styles).forEach((key) => {
 					if (!outer.css(key)) outer.css(key, styles[key]);
 				});
-				outer.append(node.clone(source, true).children());
+				outer.append(node.clone(source, true, false).children());
 			} else {
-				outer.append(node.clone(source, true));
+				outer.append(node.clone(source, true, false));
 			}
 
 			const children = outer.allChildren();
@@ -288,7 +288,7 @@ class NodeModel implements NodeModelInterface {
 			return source.replaceWith(outer);
 		}
 		// 其它情况
-		const shadowNode = node.clone(source, false);
+		const shadowNode = node.clone(source, false, false);
 		source.after(shadowNode);
 		outer.append(source);
 		return shadowNode.replaceWith(outer);

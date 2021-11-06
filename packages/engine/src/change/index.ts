@@ -422,7 +422,10 @@ class ChangeModel implements ChangeInterface {
 						mergeTags.indexOf(element.name) < 0 &&
 						element.closest(mergeNode.name).length === 0
 					) {
-						nodeApi.wrap(element, nodeApi.clone(mergeNode, false));
+						nodeApi.wrap(
+							element,
+							nodeApi.clone(mergeNode, false, false),
+						);
 					}
 				});
 			}
