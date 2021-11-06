@@ -20,6 +20,7 @@ import { $ } from '../node';
 import Parser, { TextParser } from '../parser';
 import Paste from './paste';
 import { CardActiveTrigger, CardType } from '../card/enum';
+import { escape } from '../utils';
 
 class NativeEvent {
 	engine: EngineInterface;
