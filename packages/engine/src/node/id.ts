@@ -139,6 +139,7 @@ class NodeId implements NodeIdInterface {
 		// 不符合规则
 		const nodeRules = rules[node.name];
 		if (
+			!nodeRules ||
 			nodeRules.length === 0 ||
 			!nodeRules.some((rule) =>
 				this.editor.schema.checkNode(

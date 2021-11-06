@@ -554,7 +554,7 @@ class Block implements BlockModelInterface {
 		) {
 			const fragment = doc.createDocumentFragment();
 			fragment.appendChild(block[0]);
-			list.insert(fragment, range);
+			list.insert(fragment, safeRange);
 			if (!range) change.apply(safeRange);
 			return;
 		}

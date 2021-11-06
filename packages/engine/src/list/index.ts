@@ -58,21 +58,25 @@ class List implements ListModelInterface {
 	 * @param node 节点
 	 */
 	isEmptyItem(node: NodeInterface): boolean {
+		const children = node
+			.children()
+			.toArray()
+			.filter((child) => !child.isCursor());
+		const nodeApi = this.editor.node;
 		return (
 			//节点名称必须为li
 			'li' === node.name &&
 			//空节点
-			(this.editor.node.isEmpty(node) ||
+			(nodeApi.isEmpty(node) ||
 				//子节点只有一个，如果是自定义列表并且第一个是卡片 或者第一个节点是 br标签，就是空节点
-				(1 === node.children().length
-					? (node.hasClass(this.CUSTOMZIE_LI_CLASS) &&
-							node.first()?.isCard()) ||
-					  'br' === node.first()?.name
+				(1 === children.length
+					? (nodeApi.isCustomize(node) && children[0].isCard()) ||
+					  'br' === children[0].name
 					: //子节点有两个，并且是自定义列表而且第一个是卡片，并且第二个节点是br标签
-					  2 === node.children().length &&
-					  node.hasClass(this.CUSTOMZIE_LI_CLASS) &&
-					  !!node.first()?.isCard() &&
-					  'br' === node.last()?.name))
+					  2 === children.length &&
+					  nodeApi.isCustomize(node) &&
+					  !!children[0].isCard() &&
+					  'br' === children[1].name))
 		);
 	}
 
@@ -404,7 +408,11 @@ class List implements ListModelInterface {
 			let afterListElementClone: NodeInterface | undefined;
 
 			if (rightList.length > 0 && afterListElement) {
-				afterListElementClone = node.clone(afterListElement, false);
+				afterListElementClone = node.clone(
+					afterListElement,
+					false,
+					false,
+				);
 				rightList.forEach((li) => {
 					afterListElementClone?.append(li[0]);
 				});
@@ -414,7 +422,11 @@ class List implements ListModelInterface {
 			let beforeListElementClone: NodeInterface | undefined;
 			//将 middleList 集合添加到前方列表节点内
 			if (middleList.length > 0 && beforeListElement) {
-				beforeListElementClone = node.clone(beforeListElement, false);
+				beforeListElementClone = node.clone(
+					beforeListElement,
+					false,
+					false,
+				);
 				middleList.forEach((li) => {
 					beforeListElementClone?.append(li[0]);
 				});
@@ -849,6 +861,12 @@ class List implements ListModelInterface {
 				parent?.prev()?.last()?.append(startLi.children());
 				parent?.remove();
 			} else if (parent) {
+				if (
+					this.isEmptyItem(startLi) &&
+					parent.children().length === 1
+				) {
+					parent.remove();
+				}
 				const mergeNodes = [parent];
 				const prev = beginNode.prev();
 				if (prev && node.isList(prev)) mergeNodes.push(prev);

@@ -244,6 +244,20 @@ export default class Clipboard implements ClipboardInterface {
 					const curentElement = document.querySelector(
 						`[${DATA_ID}=${dataId}]`,
 					);
+					// 补充自定义列表丢失的卡片
+					if (
+						node.isCustomize(childElement) &&
+						!childElement.first()?.isCard() &&
+						curentElement?.firstChild
+					) {
+						childElement.prepend(
+							node.clone(
+								$(curentElement.firstChild),
+								true,
+								false,
+							),
+						);
+					}
 					let parent: NodeInterface | Node | null | undefined =
 						curentElement?.parentElement;
 					parent = parent ? $(parent.cloneNode(false)) : null;

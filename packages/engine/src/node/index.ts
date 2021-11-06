@@ -916,14 +916,14 @@ class NodeModel implements NodeModelInterface {
 	clone(
 		node: NodeInterface,
 		deep?: boolean,
-		copyId: boolean = false,
+		copyId: boolean = true,
 	): NodeInterface {
 		const { nodeId } = this.editor;
 		const nodes: Array<Node> = [];
 		node.each((node) => {
 			const cloneNode = node.cloneNode(deep);
 			const nodeDom = $(cloneNode);
-			if (copyId) {
+			if (!copyId) {
 				nodeId.generateAll(nodeDom, true);
 				if (nodeId.isNeed(nodeDom)) {
 					nodeId.generate(nodeDom, true);

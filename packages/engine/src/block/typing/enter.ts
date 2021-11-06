@@ -61,28 +61,7 @@ class Enter {
 		}
 		// 列表
 		if (block.name === 'li') {
-			if (node.isCustomize(block)) {
-				return;
-			}
-			event.preventDefault();
-			if (blockApi.isLastOffset(range, 'end')) {
-				if (range.collapsed && blockApi.isFirstOffset(range, 'end')) {
-					const listRoot = block.closest('ul,ol');
-					blockApi.unwrap('<'.concat(listRoot.name!, ' />'));
-					blockApi.setBlocks('<p />');
-				} else {
-					const li = $('<li><br /></li>');
-					const attributes = block.attributes();
-					delete attributes[DATA_ID];
-					li.attributes(attributes);
-					blockApi.insertEmptyBlock(range, li);
-				}
-			} else {
-				blockApi.split();
-			}
-			list.merge();
-			range.scrollIntoView();
-			return false;
+			return;
 		}
 		return true;
 	}
