@@ -68,6 +68,8 @@ class NodeId implements NodeIdInterface {
 		if (isNodeEntry(root) && root.fragment) {
 			root = root.fragment;
 		}
+		const element = (isNode(root) ? root : root.get<Element>()) as Element;
+		if (element.nodeType === Node.TEXT_NODE) return;
 		const nodes =
 			(isNode(root) ? root : root.get<Element>())?.querySelectorAll(
 				tagNames,
@@ -88,6 +90,7 @@ class NodeId implements NodeIdInterface {
 	 */
 	generate(node: Node | NodeInterface, force: boolean = false) {
 		if (isNode(node)) node = $(node);
+		if (node.isText()) return;
 		const rules = this.#rules;
 		// 不符合规则
 		const nodeRules = rules[node.name];
