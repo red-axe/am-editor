@@ -56,6 +56,17 @@ readonly kind: 'engine' | 'view';
 
 类型：`NodeModelInterface`
 
+### nodeId
+
+节点 data-id 管理器
+
+```ts
+/**
+ * 节点id管理器
+ */
+nodeId: NodeIdInterface;
+```
+
 ### `list`
 
 列表节点管理

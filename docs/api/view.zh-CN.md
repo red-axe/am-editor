@@ -12,7 +12,7 @@
 /**
  * 渲染内容
  * @param content 渲染的内容
- * @param trigger 是否触发渲染完成事件，用来展示插件的特俗效果。例如在heading插件中，展示锚点显示功能。默认为 true
+ * @param trigger 是否触发渲染完成事件，用来展示插件的效果。例如在heading插件中，展示锚点显示功能。默认为 true
  */
 render(content: string, trigger?: boolean): void;
 ```

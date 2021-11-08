@@ -51,7 +51,7 @@ traverse(
  */
 toValue(
     schema?: SchemaInterface | null,
-    conversionRules?: any,
+    conversionRules?: ConversionInterface,
     replaceSpaces?: boolean,
     customTags?: boolean,
 ): string
@@ -78,7 +78,7 @@ toHTML(inner?: Node, outter?: Node): { html: string, text: string}
 /**
  * 返回DOM树
  */
-toDOM(schema?: SchemaInterface | null, conversionRules?: any): DocumentFragment
+toDOM(schema?: SchemaInterface | null, conversionRules?: ConversionInterface): DocumentFragment
 ```
 
 ### `toText`
@@ -88,12 +88,13 @@ toDOM(schema?: SchemaInterface | null, conversionRules?: any): DocumentFragment
 ```ts
 /**
  * 转换为文本
- * @param conversionRules 标签转换规则
- * @param includeCard 是否包含卡片
+ * @param schema Schema 规则
+ * @param includeCard 是否遍历卡片内部，默认不遍历
+ * @param formatOL 是否格式化有序列表，<ol><li>a</li><li>b</li></ol>  ->  1. a  2. b 默认转换
  */
 toText(
-    schema?: SchemaInterface | null,
-    conversionRules?: any,
+    schema?: SchemaInterface,
     includeCard?: boolean,
-): string
+    formatOL?: boolean,
+): string;
 ```

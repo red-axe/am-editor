@@ -323,6 +323,34 @@ Render the card
 render(container?: NodeInterface): void;
 ```
 
+### `focusPrevBlock`
+
+Focus on the previous block-level node where the card is located
+
+```ts
+/**
+ * Focus on the previous block-level node where the card is located
+ * @param card card
+ * @param range cursor
+ * @param hasModify When there is no node, whether to create an empty node and focus
+ */
+focusPrevBlock(card: CardInterface, range: RangeInterface, hasModify: boolean): void;
+```
+
+### `focusNextBlock`
+
+Focus on the next block-level node where the card is located
+
+```ts
+/**
+ * Focus on the next block-level node where the card is located
+ * @param card card
+ * @param range cursor
+ * @param hasModify When there is no node, whether to create an empty node and focus
+ */
+focusNextBlock(card: CardInterface, range: RangeInterface, hasModify: boolean): void;
+```
+
 ### `gc`
 
 Release card

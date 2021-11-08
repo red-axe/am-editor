@@ -333,6 +333,18 @@ equal(range: RangeInterface | globalThis.Range): boolean;
 getRootBlock(): NodeInterface | undefined;
 ```
 
+### `filterPath`
+
+过滤路径
+
+```ts
+/**
+ * 过滤路径
+ * @param includeCardCursor
+ */
+filterPath(includeCardCursor?: boolean): (node: Node) => boolean;
+```
+
 ### `toPath`
 
 将光标选区转换为路径
@@ -340,6 +352,9 @@ getRootBlock(): NodeInterface | undefined;
 ```ts
 /**
  * 获取光标路径
+ * @param includeCardCursor 是否包含卡片两侧光标
  */
-toPath(): Path[];
+toPath(
+	includeCardCursor?: boolean,
+): { start: RangePath; end: RangePath } | undefined;
 ```

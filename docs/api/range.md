@@ -333,13 +333,28 @@ Get the nearest root node of the current selection
 getRootBlock(): NodeInterface | undefined;
 ```
 
-### `toPath`
+### `filterPath`
 
-Convert range selection to path
+Filter path
 
 ```ts
 /**
- * Get the range path
- */
-toPath(): Path[];
+  * Filter path
+  * @param includeCardCursor
+  */
+filterPath(includeCardCursor?: boolean): (node: Node) => boolean;
+```
+
+### `toPath`
+
+Convert cursor selection to path
+
+```ts
+/**
+  * Get the cursor path
+  * @param includeCardCursor whether to include the cursor on both sides of the card
+  */
+toPath(
+includeCardCursor?: boolean,
+): {start: RangePath; end: RangePath} | undefined;
 ```

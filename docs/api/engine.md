@@ -60,6 +60,17 @@ Focus on the editor
 focus(start?: boolean): void;
 ```
 
+### `blur`
+
+Unfocus
+
+```ts
+/**
+  * Make the editor lose focus
+  */
+blur(): void;
+```
+
 ### `isFocus`
 
 Whether the current cursor is focused on the editor
@@ -100,11 +111,19 @@ Get the editor value asynchronously, and will wait for the plug-in processing to
 
 ```ts
 /**
- * Obtain the editor value asynchronously, and wait for the plug-in processing to complete before obtaining the value
- * For example, plug-in upload is waiting, and the value will be obtained after the upload is completed.
- * @param ignoreCursor whether to include cursor position information
- */
-getValueAsync(ignoreCursor?: boolean): Promise<string>;
+* Obtain the editor value asynchronously, and wait for the plug-in processing to complete before obtaining the value
+* For example, plug-in upload is waiting, and the value will be obtained after the upload is completed.
+* @param ignoreCursor Whether to include the cursor position information, it is not included by default
+* @param callback Callback when there are plugins and actions that have not been executed, return false to terminate the value acquisition, return number to set the current action waiting time, in milliseconds
+*/
+getValueAsync(
+  ignoreCursor?: boolean,
+  callback?: (
+    name: string,
+    card?: CardInterface,
+    ...args: any
+  ) => boolean | number | void,
+  ): Promise<string>;
 ```
 
 ### `getHtml`
@@ -161,10 +180,13 @@ Set the json format value, which is mainly used to synchronize with the value of
 
 ```ts
 /**
- * Set the json format value, mainly used for collaboration
- * @param value
- */
-setJsonValue(value: Array<any>): EngineInterface;
+* Set json format value, mainly used for collaboration
+* @param callback Callback after the card is rendered asynchronously
+*/
+setJsonValue(
+  value: Array<any>,
+  callback?: (count: number) => void,
+): EngineInterface;
 ```
 
 ### `setScrollNode`
@@ -173,6 +195,28 @@ Set editor scroll bar node
 
 ```ts
 setScrollNode(node?: HTMLElement)
+```
+
+### showPlaceholder
+
+Display placeholder
+
+```ts
+/**
+  * Show placeholder
+  */
+showPlaceholder(): void;
+```
+
+Hide placeholder
+
+### hidePlaceholder
+
+```ts
+/**
+  * Hide placeholder
+  */
+hidePlaceholder(): void;
 ```
 
 ### `destroy`

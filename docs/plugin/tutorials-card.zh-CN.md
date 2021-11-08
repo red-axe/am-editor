@@ -275,6 +275,7 @@ class Test extends Card {
 	}
 
 	destroy() {
+		super.destroy();
 		ReactDOM.unmountComponentAtNode(this.#container?.get<HTMLElement>()!);
 	}
 }
@@ -651,7 +652,9 @@ class Test extends Card {
 	}
 
 	destroy() {
-		this.#vm?.unmount();
+		super.destroy();
+		this.vm?.unmount();
+		this.vm = undefined;
 	}
 }
 export default Test;
@@ -844,7 +847,7 @@ export default class extends Card<{ count: number }> {
         // 创建 div 节点
         this.container = $(`<div>${value.count}</div>`)
         // 绑定 click 事件
-        this.container.on("click" => this.onClick)
+        this.container.on("click" => ()  => this.onClick())
         // 返回节点给容器加载
         return this.container
     }
@@ -1181,32 +1184,6 @@ isRightCursor(node: NodeInterface): boolean;
  * @param toStart 是否开始位置
  */
 focus(range: RangeInterface, toStart?: boolean): void;
-```
-
-### `focusPrevBlock`
-
-聚焦卡片所在位置的前一个块级节点
-
-```ts
-/**
- * 聚焦卡片所在位置的前一个块级节点
- * @param range 光标
- * @param hasModify 没有节点时，是否创建一个空节点并聚焦
- */
-focusPrevBlock(range: RangeInterface, hasModify: boolean): void;
-```
-
-### `focusNextBlock`
-
-聚焦卡片所在位置的下一个块级节点
-
-```ts
-/**
- * 聚焦卡片所在位置的下一个块级节点
- * @param range 光标
- * @param hasModify 没有节点时，是否创建一个空节点并聚焦
- */
-focusNextBlock(range: RangeInterface, hasModify: boolean): void;
 ```
 
 ### `onFocus`

@@ -56,6 +56,17 @@ Node management, including node type judgment, inserting nodes in the DOM tree
 
 Type: `NodeModelInterface`
 
+### nodeId
+
+Node data-id manager
+
+```ts
+/**
+ * Node id manager
+ */
+nodeId: NodeIdInterface;
+```
+
 ### `list`
 
 List node management

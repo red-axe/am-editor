@@ -847,15 +847,3 @@ scrollIntoView(
     align?: 'start' | 'center' | 'end' | 'nearest',
 ): void;
 ```
-
-### `removeZeroWidthSpace`
-
-移除节点内的所有零宽字符占位符 \u200B
-
-```ts
-/**
-* 移除占位符 \u200B
-* @param root 节点
-*/
-removeZeroWidthSpace(): void;
-```

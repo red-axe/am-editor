@@ -295,9 +295,9 @@ mergeAdjacent(node: NodeInterface): void;
 removeSide(node: NodeInterface, tagName?: string): void;
 ```
 
-### `flatten`
+### `flat`
 
-整理节点，把节点修复到符合编辑器值的状态
+扁平化节点，把节点修复到符合编辑器值的状态
 
 ```ts
 /**
@@ -305,7 +305,7 @@ removeSide(node: NodeInterface, tagName?: string): void;
  * @param node 节点
  * @param root 根节点，默认为node节点
  */
-flatten(node: NodeInterface, root?: NodeInterface): void;
+flat(node: NodeInterface, root?: NodeInterface): void;
 ```
 
 ### `normalize`
@@ -342,10 +342,12 @@ html(node: NodeInterface, val?: string): NodeInterface | string;
 ```ts
 /**
  * 复制元素节点
- * @param {boolean} deep 是否深度复制
+ * @param node 节点
+ * @param deep 是否深度复制
+ * @param copyId 是否复制data-id，默认复制
  * @return 复制后的元素节点
  */
-clone(node: NodeInterface, deep?: boolean): NodeInterface;
+clone(node: NodeInterface, deep?: boolean, copyId?: boolean): NodeInterface;
 ```
 
 ### `getBatchAppendHTML`

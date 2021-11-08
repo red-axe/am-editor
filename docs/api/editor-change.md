@@ -34,6 +34,14 @@ event
 event: ChangeEventInterface;
 ```
 
+### `range`
+
+Range of the change
+
+```ts
+range: ChangeRangeInterface;
+```
+
 ### `marks`
 
 All style nodes in the current cursor selection
@@ -59,64 +67,6 @@ inlines: Array<NodeInterface>;
 ```
 
 ## Method
-
-### `getRange`
-
-Get the range of the current selection
-
-```ts
-/**
- * Get the range of the current selection
- */
-getRange(): RangeInterface;
-```
-
-### `getSafeRange`
-
-Obtain a safe and controllable cursor object
-
-```ts
-/**
- * Obtain a safe and controllable cursor object
- * @param range default current cursor
- */
-getSafeRange(range?: RangeInterface): RangeInterface;
-```
-
-### `select`
-
-Select the specified range
-
-```ts
-/**
- * Select the specified range
- * @param range cursor
- */
-select(range: RangeInterface): ChangeInterface;
-```
-
-### `focus`
-
-Focus editor
-
-```ts
-/**
- * Focus editor
- * @param toStart true: start position, false: end position, the default is the previous operation position
- */
-focus(toStart?: boolean): ChangeInterface;
-```
-
-### `blur`
-
-Cancel focus
-
-```ts
-/**
- * Cancel focus
- */
-blur(): ChangeInterface;
-```
 
 ### `apply`
 
@@ -233,15 +183,22 @@ destroy(): void;
 
 ### `insert`
 
-Insert
+Insert Fragment
 
 ```ts
 /**
- * Insert fragment
- * @param fragment fragment
- * @param callback callback function after insertion
- */
-insert(fragment: DocumentFragment, callback?: () => void): void;
+  * Insert fragment
+  * @param fragment fragment
+  * @param range cursor position, default current cursor position
+  * @param callback callback function after insertion
+  * @param followActiveMark Whether the empty label follows the currently activated mark style after deletion
+  */
+insert(
+fragment: DocumentFragment,
+range?: RangeInterface,
+callback?: (range: RangeInterface) => void,
+followActiveMark?: boolean,
+): void;
 ```
 
 ### `delete`
@@ -250,11 +207,16 @@ Delete content
 
 ```ts
 /**
- * Delete content
- * @param range cursor, get the current cursor by default
- * @param isDeepMerge Perform merge operation after deletion
- */
-delete(range?: RangeInterface, isDeepMerge?: boolean): void;
+* Delete content
+* @param range cursor, get the current cursor by default
+* @param isDeepMerge Whether to merge after deletion
+* @param followActiveMark Whether the empty label follows the currently activated mark style after deletion
+*/
+delete(
+range?: RangeInterface,
+isDeepMerge?: boolean,
+followActiveMark?: boolean,
+): void;
 ```
 
 ### `unwrap`
@@ -279,17 +241,4 @@ Delete the block node closest to the current cursor or the previous node of the 
  * @param node node
  */
 mergeAfterDelete(node?: NodeInterface): void;
-```
-
-### `focusPrevBlock`
-
-The focus moves to the block node closest to the current cursor or the block before the incoming node
-
-```ts
-/**
- * The focus moves to the block node closest to the current cursor or the block before the incoming node
- * @param block node
- * @param isRemoveEmptyBlock If the previous block is empty, whether to delete, the default is no
- */
-focusPrevBlock(block?: NodeInterface, isRemoveEmptyBlock?: boolean): void;
 ```

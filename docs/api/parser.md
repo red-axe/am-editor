@@ -51,7 +51,7 @@ Traverse the DOM tree to generate standard editor values
  */
 toValue(
     schema?: SchemaInterface | null,
-    conversionRules?: any,
+    conversionRules?: ConversionInterface,
     replaceSpaces?: boolean,
     customTags?: boolean,
 ): string
@@ -78,7 +78,7 @@ Return to the DOM tree
 /**
  * Return to the DOM tree
  */
-toDOM(schema?: SchemaInterface | null, conversionRules?: any): DocumentFragment
+toDOM(schema?: SchemaInterface | null, conversionRules?: ConversionInterface): DocumentFragment
 ```
 
 ### `toText`
@@ -87,13 +87,14 @@ Convert to text
 
 ```ts
 /**
- * Convert to text
- * @param conversionRules tag conversion rules
- * @param includeCard whether to include the card
- */
+* Convert to text
+* @param schema Schema rules
+* @param includeCard Whether to traverse the inside of the card, the default is not to traverse
+* @param formatOL Whether to format the ordered list, <ol><li>a</li><li>b</li></ol> -> 1. a 2. b Default conversion
+*/
 toText(
-    schema?: SchemaInterface | null,
-    conversionRules?: any,
+    schema?: SchemaInterface,
     includeCard?: boolean,
-): string
+    formatOL?: boolean,
+): string;
 ```

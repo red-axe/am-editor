@@ -275,6 +275,7 @@ class Test extends Card {
 	}
 
 	destroy() {
+		super.destroy();
 		ReactDOM.unmountComponentAtNode(this.#container?.get<HTMLElement>()!);
 	}
 }
@@ -651,6 +652,7 @@ class Test extends Card {
 	}
 
 	destroy() {
+		super.destroy();
 		this.#vm?.unmount();
 	}
 }
@@ -844,7 +846,7 @@ export default class extends Card<{ count: number }> {
     // Create a div node
     this.container = $(`<div>${value.count}</div>`)
     // bind the click event
-    this.container.on("click" => this.onClick)
+    this.container.on("click" => () => this.onClick())
     // Return the node to load the container
     return this.container
   }
@@ -1181,32 +1183,6 @@ Focus card
  * @param toStart is the starting position
  */
 focus(range: RangeInterface, toStart?: boolean): void;
-```
-
-### `focusPrevBlock`
-
-Focus on the previous block-level node where the card is located
-
-```ts
-/**
- * Focus on the previous block-level node where the card is located
- * @param range cursor
- * @param hasModify When there is no node, whether to create an empty node and focus
- */
-focusPrevBlock(range: RangeInterface, hasModify: boolean): void;
-```
-
-### `focusNextBlock`
-
-Focus on the next block-level node where the card is located
-
-```ts
-/**
- * Focus on the next block-level node where the card is located
- * @param range cursor
- * @param hasModify When there is no node, whether to create an empty node and focus
- */
-focusNextBlock(range: RangeInterface, hasModify: boolean): void;
 ```
 
 ### `onFocus`

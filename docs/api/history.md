@@ -126,7 +126,7 @@ Collect local editing operations
 handleSelfOps(ops: Op[]): void;
 ```
 
-### `collectRemoteOps`
+### `handleRemoteOps`
 
 Collect remote operations (operations from other coordinators)
 
@@ -134,7 +134,7 @@ Collect remote operations (operations from other coordinators)
 /**
  * @param ops operation set
  * */
-collectRemoteOps(ops: Op[]): void;
+handleRemoteOps(ops: Op[]): void;
 ```
 
 ### `getUndoOp`

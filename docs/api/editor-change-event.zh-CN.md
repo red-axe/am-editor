@@ -73,13 +73,13 @@ onDrop(
 
 ### `onDocument`
 
-绑定 document 事件
+绑定事件到 document 中
 
 ```ts
 onDocument(
     eventType: string,
     listener: EventListener,
-    rewrite?: boolean,
+    index?: number,
 ): void;
 ```
 
@@ -91,7 +91,7 @@ onDocument(
 onWindow(
     eventType: string,
     listener: EventListener,
-    rewrite?: boolean,
+    index?: number
 ): void;
 ```
 
@@ -100,7 +100,15 @@ onWindow(
 绑定编辑器根节点事件
 
 ```ts
-onContainer(eventType: string, listener: EventListener): void;
+onContainer(eventType: string, listener: EventListener, index?: number): void;
+```
+
+### `onRoot`
+
+绑定事件到编辑器根节点中
+
+```ts
+onRoot(eventType: string, listener: EventListener, index?: number): void;
 ```
 
 ### `destroy`

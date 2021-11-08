@@ -36,13 +36,13 @@ Type: `EventInterface[]`
 
 ### `document`
 
-The Document object where the current Node node is located. In the use of iframe, the document in different frames is not consistent, and there are other environments as well, so we need to follow this object.
+The Document object where the current Node node is located. In the use of iframe, the document in different frames is not consistent, and there are some other environments as well, so we need to follow this object.
 
 Type: `Document | null`
 
 ### `window`
 
-The Window object where the current Node node is located. In the use of iframes, the windows in different frames are not consistent, and the same is true in some other environments, so we need to follow this object.
+The Window object where the current Node node is located. In the use of iframe, the window in different frames is not consistent, and there are some other environments as well, so we need to follow this object.
 
 Type: `Window | null`
 
@@ -78,11 +78,11 @@ Type: `boolean`
 
 ### `[n: number]`
 
-Node node collection, which can be accessed by subscript index
+Node node collection, can be accessed by subscript index
 
 Return type: Node
 
-## Method
+## method
 
 ### `each`
 
@@ -239,7 +239,7 @@ Query all child nodes of the current node
 ```ts
 /**
  *
- * @param {Node | string} selector finder
+ * @param {Node | string} selector querier
  * @return {NodeInterface} Eligible child nodes
  */
 children(selector?: string): NodeInterface;
@@ -271,7 +271,7 @@ last(): NodeInterface | null;
 
 ### `prev`
 
-Return the sibling nodes before the node (including text nodes and comment nodes)
+Return the sibling node before the node (including text node, comment node)
 
 ```ts
 /**
@@ -593,7 +593,7 @@ text(text?: string): string | NodeInterface;
 
 ### `show`
 
-Set the node to display state
+Set node to display state
 
 ```ts
 /**
@@ -610,7 +610,7 @@ Set node to hidden state
 
 ```ts
 /**
- * Set the node to hidden
+ * Set the node to be hidden
  * @return {NodeInterface} current instance
  */
 hide(): NodeInterface;
@@ -763,5 +763,87 @@ Get child nodes according to path
 
 ```ts
 /**
- * According to the path to obtain
+ * Get child nodes according to the path
+ * @param path path
+ */
+getChildByPath(path: Path, filter?: (node: Node) => boolean): Node;
+```
+
+### `getIndex`
+
+Get the index of the parent node where the current node is located
+
+```ts
+/**
+ * Get the index in the parent node of the current node
+ */
+getIndex(filter?: (node: Node) => boolean): number;
+```
+
+### `findParent`
+
+Get the parent node in the specified container
+
+```ts
+/**
+ * Get the parent node in the specified container
+ * @param container container node, the default is the editor root node
+ */
+findParent(container?: Node | NodeInterface): NodeInterface | null;
+```
+
+### `allChildren`
+
+Get all child nodes under the node
+
+```ts
+/**
+ * Get all child nodes under the node
+ */
+allChildren(): Array<Node>;
+```
+
+### `getViewport`
+
+Returns the view boundary of the top-level window object of the current node or the current node where the passed node is located
+
+```ts
+/**
+ * Returns the view boundary of the top-level window object of the current node where the current node or the passed-in node is located
+ * @param node node
+ */
+getViewport(
+    node?: NodeInterface,
+): {top: number; left: number; bottom: number; right: number };
+```
+
+### `inViewport`
+
+Determine whether the view is within the view boundary calculated by the node node based on the top-level window object of the current node
+
+```ts
+/**
+ * Determine whether the view is within the view boundary calculated by the node node according to the top-level window object of the current node
+ * @param node node
+ * @param view is at the node of the view
+ */
+inViewport(node: NodeInterface, view: NodeInterface): boolean;
+```
+
+### `scrollIntoView`
+
+If the view node is not visible, it will scroll to the align position, the default is nearest
+
+```ts
+/**
+ * If the view node is not visible, it will scroll to the align position, the default is nearest
+ * @param node node
+ * @param view view node
+ * @param align position
+ */
+scrollIntoView(
+    node: NodeInterface,
+    view: NodeInterface,
+    align?:'start' |'center' |'end' |'nearest',
+): void;
 ```

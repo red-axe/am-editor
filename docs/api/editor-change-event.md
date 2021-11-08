@@ -79,7 +79,7 @@ Bind the document event
 onDocument(
     eventType: string,
     listener: EventListener,
-    rewrite?: boolean,
+    index?: number
 ): void;
 ```
 
@@ -91,16 +91,24 @@ Bind window events
 onWindow(
     eventType: string,
     listener: EventListener,
-    rewrite?: boolean,
+    index?: number
 ): void;
 ```
 
 ### `onContainer`
 
+Binding editor container node event
+
+```ts
+onContainer(eventType: string, listener: EventListener, index?: number): void;
+```
+
+### `onRoot`
+
 Binding editor root node event
 
 ```ts
-onContainer(eventType: string, listener: EventListener): void;
+onRoot(eventType: string, listener: EventListener, index?: number): void;
 ```
 
 ### `destroy`

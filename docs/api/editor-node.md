@@ -295,7 +295,7 @@ Remove the labels on both sides of the node
 removeSide(node: NodeInterface, tagName?: string): void;
 ```
 
-### `flatten`
+### `flat`
 
 Organize the nodes and restore the nodes to the state that meets the editor value
 
@@ -305,7 +305,7 @@ Organize the nodes and restore the nodes to the state that meets the editor valu
  * @param node node
  * @param root root node, the default is node node
  */
-flatten(node: NodeInterface, root?: NodeInterface): void;
+flat(node: NodeInterface, root?: NodeInterface): void;
 ```
 
 ### `normalize`
@@ -341,11 +341,13 @@ Copy element node
 
 ```ts
 /**
- * Copy element node
- * @param {boolean} deep whether deep copy
- * @return copied element node
- */
-clone(node: NodeInterface, deep?: boolean): NodeInterface;
+* Copy element node
+* @param node node
+* @param deep Whether to deep copy
+* @param copyId whether to copy data-id, copy by default
+* @return copied element node
+*/
+clone(node: NodeInterface, deep?: boolean, copyId?: boolean): NodeInterface;
 ```
 
 ### `getBatchAppendHTML`

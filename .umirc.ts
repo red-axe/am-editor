@@ -114,6 +114,7 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 					'/api/editor-inline',
 					'/api/editor-block',
 					'/api/editor-list',
+					'/api/editor-node-id',
 				],
 			},
 			{
@@ -134,22 +135,22 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 			},
 			{
 				title: 'Schema',
-				'title_zh-CN': '架构',
+				'title_zh-CN': 'Schema',
 				path: '/api/schema',
 			},
 			{
 				title: 'Range',
-				'title_zh-CN': '光标范围',
+				'title_zh-CN': 'Range',
 				children: ['/api/range', '/api/selection'],
 			},
 			{
 				title: 'History',
-				'title_zh-CN': '历史记录',
+				'title_zh-CN': 'History',
 				path: '/api/history',
 			},
 			{
 				title: 'Editor',
-				'title_zh-CN': '编辑器',
+				'title_zh-CN': 'Editor',
 				children: [
 					{
 						title: 'Change',
@@ -160,12 +161,15 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 							`${
 								opts.lang === 'zh-CN' ? '/zh-CN' : ''
 							}/api/editor-change-event`,
+							`${
+								opts.lang === 'zh-CN' ? '/zh-CN' : ''
+							}/api/editor-change-range`,
 						],
 					},
 					{
 						title:
 							opts.lang === 'zh-CN'
-								? '共有属性和方法'
+								? 'Engine & View'
 								: 'Common attributes and methods',
 						path: `${
 							opts.lang === 'zh-CN' ? '/zh-CN' : ''
@@ -173,13 +177,13 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 						exact: true,
 					},
 					{
-						title: opts.lang === 'zh-CN' ? '引擎' : 'Engine',
+						title: opts.lang === 'zh-CN' ? 'Engine' : 'Engine',
 						path: `${
 							opts.lang === 'zh-CN' ? '/zh-CN' : ''
 						}/api/engine`,
 					},
 					{
-						title: opts.lang === 'zh-CN' ? '阅读器' : 'View',
+						title: opts.lang === 'zh-CN' ? 'View' : 'View',
 						path: `${
 							opts.lang === 'zh-CN' ? '/zh-CN' : ''
 						}/api/view`,

@@ -319,6 +319,34 @@ create(
 render(container?: NodeInterface): void;
 ```
 
+### `focusPrevBlock`
+
+聚焦卡片所在位置的前一个块级节点
+
+```ts
+/**
+ * 聚焦卡片所在位置的前一个块级节点
+ * @param card 卡片
+ * @param range 光标
+ * @param hasModify 没有节点时，是否创建一个空节点并聚焦
+ */
+focusPrevBlock(card: CardInterface, range: RangeInterface, hasModify: boolean): void;
+```
+
+### `focusNextBlock`
+
+聚焦卡片所在位置的下一个块级节点
+
+```ts
+/**
+ * 聚焦卡片所在位置的下一个块级节点
+ * @param card 卡片
+ * @param range 光标
+ * @param hasModify 没有节点时，是否创建一个空节点并聚焦
+ */
+focusNextBlock(card: CardInterface, range: RangeInterface, hasModify: boolean): void;
+```
+
 ### `gc`
 
 释放卡片

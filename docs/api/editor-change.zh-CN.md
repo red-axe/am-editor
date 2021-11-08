@@ -23,7 +23,7 @@ new (container: NodeInterface, options: ChangeOptions): ChangeInterface;
 命令执行前的光标转换后的路径
 
 ```ts
-rangePathBeforeCommand: Path[] | null;
+rangePathBeforeCommand?: { start: RangePath; end: RangePath };
 ```
 
 ### `event`
@@ -32,6 +32,14 @@ rangePathBeforeCommand: Path[] | null;
 
 ```ts
 event: ChangeEventInterface;
+```
+
+### `range`
+
+Range 对象
+
+```ts
+range: ChangeRangeInterface;
 ```
 
 ### `marks`
@@ -59,64 +67,6 @@ inlines: Array<NodeInterface>;
 ```
 
 ## 方法
-
-### `getRange`
-
-获取当前选区的范围
-
-```ts
-/**
- * 获取当前选区的范围
- */
-getRange(): RangeInterface;
-```
-
-### `getSafeRange`
-
-获取安全可控的光标对象
-
-```ts
-/**
- * 获取安全可控的光标对象
- * @param range 默认当前光标
- */
-getSafeRange(range?: RangeInterface): RangeInterface;
-```
-
-### `select`
-
-选中指定的范围
-
-```ts
-/**
- * 选中指定的范围
- * @param range 光标
- */
-select(range: RangeInterface): ChangeInterface;
-```
-
-### `focus`
-
-聚焦编辑器
-
-```ts
-/**
- * 聚焦编辑器
- * @param toStart true:开始位置,false:结束位置，默认为之前操作位置
- */
-focus(toStart?: boolean): ChangeInterface;
-```
-
-### `blur`
-
-取消焦点
-
-```ts
-	/**
- * 取消焦点
- */
-blur(): ChangeInterface;
-```
 
 ### `apply`
 
@@ -233,15 +183,22 @@ destroy(): void;
 
 ### `insert`
 
-插入片段
+插入 Fragment
 
 ```ts
 /**
  * 插入片段
  * @param fragment 片段
+ * @param range 光标位置，默认当前光标位置
  * @param callback 插入后的回调函数
+ * @param followActiveMark 删除后空标签是否跟随当前激活的mark样式
  */
-insert(fragment: DocumentFragment, callback?: () => void): void;
+insert(
+	fragment: DocumentFragment,
+	range?: RangeInterface,
+	callback?: (range: RangeInterface) => void,
+	followActiveMark?: boolean,
+): void;
 ```
 
 ### `delete`
@@ -252,9 +209,14 @@ insert(fragment: DocumentFragment, callback?: () => void): void;
 /**
  * 删除内容
  * @param range 光标，默认获取当前光标
- * @param isDeepMerge 删除后执行合并操作
+ * @param isDeepMerge 删除后是否合并
+ * @param followActiveMark 删除后空标签是否跟随当前激活的mark样式
  */
-delete(range?: RangeInterface, isDeepMerge?: boolean): void;
+delete(
+	range?: RangeInterface,
+	isDeepMerge?: boolean,
+	followActiveMark?: boolean,
+): void;
 ```
 
 ### `unwrap`
@@ -279,17 +241,4 @@ unwrap(node?: NodeInterface): void;
  * @param node 节点
  */
 mergeAfterDelete(node?: NodeInterface): void;
-```
-
-### `focusPrevBlock`
-
-焦点移动到当前光标最接近的 block 节点或传入的节点前一个 Block
-
-```ts
-/**
- * 焦点移动到当前光标最接近的block节点或传入的节点前一个 Block
- * @param block 节点
- * @param isRemoveEmptyBlock 如果前一个block为空是否删除，默认为否
- */
-focusPrevBlock(block?: NodeInterface, isRemoveEmptyBlock?: boolean): void;
 ```

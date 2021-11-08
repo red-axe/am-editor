@@ -52,33 +52,6 @@ undo(): void;
 redo(): void;
 ```
 
-### `hold`
-
-在接下来的多少毫秒内的动作保持为一个历史片段
-
-```ts
-/**
- * 多少毫秒内的动作保持为一个历史片段
- * @param time 毫秒
- */
-hold(time?: number): void;
-```
-
-### `releaseHold`
-
-重置 hold
-
-```ts
-/**
- * 重置 hold
- */
-releaseHold(): void;
-```
-
-### `lock`
-
-在接下来的多少毫秒内的动作将不作为历史记录
-
 ### `onFilter`
 
 监听过滤存入历史记录的 ops
@@ -130,7 +103,7 @@ saveOp(): void;
 handleSelfOps(ops: Op[]): void;
 ```
 
-### `collectRemoteOps`
+### `handleRemoteOps`
 
 收集远程的操作（来自其它协同者的操作）
 
@@ -138,7 +111,7 @@ handleSelfOps(ops: Op[]): void;
 /**
  * @param ops 操作集合
  * */
-collectRemoteOps(ops: Op[]): void;
+handleRemoteOps(ops: Op[]): void;
 ```
 
 ### `getUndoOp`

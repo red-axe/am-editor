@@ -34,6 +34,18 @@ add(
 ): void;
 ```
 
+### `remove`
+
+移除一个规则
+
+```ts
+/**
+* 移除一个规则
+* @param rule
+*/
+remove(rule: SchemaRule): void;
+```
+
 ### `find`
 
 查找规则
@@ -54,8 +66,29 @@ find(callback: (rule: SchemaRule) => boolean): Array<SchemaRule>;
 /**
  * 获取节点类型
  * @param node 节点
+ * @param filter 过滤
  */
-getType(node: NodeInterface): 'block' | 'mark' | 'inline' | undefined;
+getType(
+    node: NodeInterface,
+    filter?: (rule: SchemaRule) => boolean,
+): 'block' | 'mark' | 'inline' | undefined;
+```
+
+### `getRule`
+
+根据节点获取符合的规则
+
+```ts
+/**
+ * 根据节点获取符合的规则
+ * @param node 节点
+ * @param filter 过滤
+ * @returns
+ */
+getRule(
+    node: NodeInterface,
+    filter?: (rule: SchemaRule) => boolean,
+): SchemaRule | undefined;
 ```
 
 ### `checkNode`
@@ -74,38 +107,6 @@ checkNode(
 ): boolean;
 ```
 
-### `checkStyle`
-
-检测样式值是否符合节点样式规则
-
-```ts
-/**
- * 检测样式值是否符合节点样式规则
- * @param name 节点名称
- * @param styleName 样式名称
- * @param styleValue 样式值
- */
-checkStyle(name: string, styleName: string, styleValue: string): boolean;
-```
-
-### `checkAttributes`
-
-检测值是否符合节点属性的规则
-
-```ts
-/**
- * 检测值是否符合节点属性的规则
- * @param name 节点名称
- * @param attributesName 属性名称
- * @param attributesValue 属性值
- */
-checkAttributes(
-    name: string,
-    attributesName: string,
-    attributesValue: string,
-): boolean;
-```
-
 ### `checkValue`
 
 检测值是否符合规则
@@ -116,52 +117,14 @@ checkAttributes(
  * @param rule 规则
  * @param attributesName 属性名称
  * @param attributesValue 属性值
+ * @param force 是否强制比较值
  */
 checkValue(
     rule: SchemaAttributes | SchemaStyle,
     attributesName: string,
     attributesValue: string,
+    force?: boolean,
 ): boolean;
-```
-
-### `checkStyle`
-
-检测样式值是否符合节点样式规则
-
-```ts
-/**
- * 检测样式值是否符合节点样式规则
- * @param name 节点名称
- * @param styleName 样式名称
- * @param styleValue 样式值
- * @param type 指定类型
- */
-checkStyle(
-    name: string,
-    styleName: string,
-    styleValue: string,
-    type?: 'block' | 'mark' | 'inline',
-): void;
-```
-
-### `checkAttributes`
-
-检测值是否符合节点属性的规则
-
-```ts
-/**
- * 检测值是否符合节点属性的规则
- * @param name 节点名称
- * @param attributesName 属性名称
- * @param attributesValue 属性值
- * @param type 指定类型
- */
-checkAttributes(
-    name: string,
-    attributesName: string,
-    attributesValue: string,
-    type?: 'block' | 'mark' | 'inline',
-): void;
 ```
 
 ### `filterStyles`
@@ -171,15 +134,10 @@ checkAttributes(
 ```ts
 /**
  * 过滤节点样式
- * @param name 节点名称
  * @param styles 样式
- * @param type 指定类型
+ * @param rule 规则
  */
-filterStyles(
-    name: string,
-    styles: { [k: string]: string },
-    type?: 'block' | 'mark' | 'inline',
-): void;
+filterStyles(styles: { [k: string]: string }, rule: SchemaRule): void;
 ```
 
 ### `filterAttributes`
@@ -189,14 +147,31 @@ filterStyles(
 ```ts
 /**
  * 过滤节点属性
- * @param name 节点名称
  * @param attributes 属性
- * @param type 指定类型
+ * @param rule 规则
  */
 filterAttributes(
-    name: string,
     attributes: { [k: string]: string },
-    type?: 'block' | 'mark' | 'inline',
+    rule: SchemaRule,
+): void;
+```
+
+### `filter`
+
+过滤满足 node 节点规则的属性和样式
+
+```ts
+/**
+ * 过滤满足node节点规则的属性和样式
+ * @param node 节点，用于获取规则
+ * @param attributes 属性
+ * @param styles 样式
+ * @returns
+ */
+filter(
+    node: NodeInterface,
+    attributes: { [k: string]: string },
+    styles: { [k: string]: string },
 ): void;
 ```
 
@@ -260,6 +235,19 @@ closest(name: string): string;
  * @returns true | false
  */
 isAllowIn(source: string, target: string): boolean;
+```
+
+### `addAllowIn`
+
+给一个 block 节点添加允许放入的 block 子节点
+
+```ts
+/**
+ * 给一个block节点添加允许放入的block子节点
+ * @param parent 允许放入的父节点
+ * @param child 允许放入的节点，默认 p
+ */
+addAllowIn(parent: string, child?: string): void;
 ```
 
 ### `getAllowInTags`
