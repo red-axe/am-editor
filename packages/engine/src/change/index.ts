@@ -335,8 +335,15 @@ class ChangeModel implements ChangeInterface {
 			const text = range.startNode.text();
 			if (/^\u200B/.test(text)) range.startNode.text(text.substr(1));
 		}
-
+		let startRange: { node: NodeInterface; offset: number } | undefined =
+			undefined;
 		const apply = (range: RangeInterface) => {
+			if (startRange && startRange.node.parent()) {
+				range
+					.shrinkToElementNode()
+					.setStart(startRange.node, startRange.offset);
+				range.enlargeToElementNode();
+			}
 			block.merge(range);
 			list.merge(undefined, range);
 			mark.merge(range);
@@ -356,9 +363,8 @@ class ChangeModel implements ChangeInterface {
 			apply(range);
 			return;
 		}
+
 		// 第一个子节点不是block节点就追加到当前节点下
-		let startRange: { node: NodeInterface; offset: number } | undefined =
-			undefined;
 		if (!nodeApi.isBlock(firstNode)) {
 			range.shrinkToElementNode();
 			if (childNodes.length > 0) {
@@ -522,12 +528,6 @@ class ChangeModel implements ChangeInterface {
 				nodeApi.merge(prevNode, nextNode, false);
 				removeEmptyNode(nextNode);
 			}
-		}
-		if (startRange && startRange.node.parent()) {
-			range
-				.shrinkToElementNode()
-				.setStart(startRange.node, startRange.offset);
-			range.enlargeToElementNode();
 		}
 		apply(range);
 	}
