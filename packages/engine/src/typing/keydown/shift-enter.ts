@@ -34,18 +34,26 @@ class ShitEnter implements TypingHandleInterface {
 		event.preventDefault();
 		change.cacheRangeBeforeCommand();
 		const range = change.range.get();
-		const br = $('<br />');
-		inline.insert(br, range);
-		if (block.isLastOffset(range, 'end')) {
-			if (
-				(!br.next() || br.next()?.name !== 'br') &&
-				(!br.prev() || br.prev()?.name !== 'br')
-			) {
-				const cloneBr = br.clone();
-				br.after(cloneBr);
-				range.select(cloneBr).collapse(false);
+		if (range.startNode.closest('li').length === 0) {
+			this.engine.typing
+				.getHandleListener('enter', 'keydown')
+				?.trigger(event);
+			return;
+		} else {
+			const br = $('<br />');
+			inline.insert(br, range);
+			if (block.isLastOffset(range, 'end')) {
+				if (
+					(!br.next() || br.next()?.name !== 'br') &&
+					(!br.prev() || br.prev()?.name !== 'br')
+				) {
+					const cloneBr = br.clone();
+					br.after(cloneBr);
+					range.select(cloneBr).collapse(false);
+				}
 			}
 		}
+
 		for (let i = 0; i < this.listeners.length; i++) {
 			const listener = this.listeners[i];
 			const result = listener(event);

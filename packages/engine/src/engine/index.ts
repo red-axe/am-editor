@@ -50,7 +50,7 @@ import Parser from '../parser';
 import Language from '../language';
 import Mark from '../mark';
 import List from '../list';
-import { EditorInterface, TypingInterface } from '../types';
+import { TypingInterface } from '../types';
 import Typing from '../typing';
 import Container from './container';
 import Inline from '../inline';
