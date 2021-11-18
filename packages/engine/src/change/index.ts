@@ -272,6 +272,7 @@ class ChangeModel implements ChangeInterface {
 		const tags = schema.getAllowInTags();
 		return (
 			node.isEmptyWithTrim(container) &&
+			container.children().length === 1 &&
 			!container.allChildren().some((child) => tags.includes(child.name))
 		);
 	}
