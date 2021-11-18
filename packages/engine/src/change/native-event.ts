@@ -373,7 +373,10 @@ class NativeEvent {
 
 		change.event.onDocument('cut', (event) => {
 			const range = change.range.get();
-			if (!this.engine.container.contains(range.commonAncestorNode))
+			if (
+				!this.engine.container.contains(range.commonAncestorNode) ||
+				this.engine.readonly
+			)
 				return;
 			event.stopPropagation();
 			clipboard.write(event, undefined, () => {
