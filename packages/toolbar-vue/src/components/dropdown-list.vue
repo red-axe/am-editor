@@ -2,12 +2,12 @@
     <div
     :class="['toolbar-dropdown-list',`toolbar-dropdown-${direction || 'vertical'}`,{'toolbar-dropdown-dot': hasDot !== false},className]"
     >
-        <a-tooltip v-for="{ key , placement , title , hotkey , direction , hasDot , content , className , icon, disabled } in items" :key="key" :placement="placement || 'right'" 
-        :overlayStyle="(!!title || !!hotkey) && !isMobile ? {} : {display:'none'}"
+        <a-tooltip v-for="{ key , placement , title , direction , hasDot , content , className , icon, disabled } in items" :key="key" :placement="placement || 'right'" 
+        :overlayStyle="(!!title || !!hotkeys[key]) && !isMobile ? {} : {display:'none'}"
         >
             <template #title>
                 <div v-if="!!title" class="toolbar-tooltip-title">{{title}}</div>
-                <div v-if="!!hotkey" class="toolbar-tooltip-hotkey" v-html="hotkey"></div>
+                <div v-if="!!hotkeys[key]" class="toolbar-tooltip-hotkey" v-html="hotkeys[key]"></div>
             </template>
             <a 
             :class="['toolbar-dropdown-list-item',className, {'toolbar-dropdown-list-item-disabled': disabled}]"
@@ -37,13 +37,15 @@ export default defineComponent({
     props:dropdownListProps,
     setup(props){
         const getHotkey = (item:DropdownListItem) => {
-            const { command } = item
+            const { command, key } = item
             let { hotkey } = item
             //默认获取插件的热键
             if (props.engine && (hotkey === true || hotkey === undefined)) {
+                console.log(item)
                 hotkey = autoGetHotkey(
                     props.engine,
                     command && !Array.isArray(command) ? command.name : props.name,
+                    key
                 );
             }
             if (typeof hotkey === 'string' && hotkey !== '') {
@@ -52,10 +54,10 @@ export default defineComponent({
             return hotkey
         }
 
-        const hotkeys = props.items.map(item => {
-            return {[item.key]:getHotkey(item)}
+        const hotkeys:{[key: string]: any} = {}
+        props.items.forEach(item => {
+            hotkeys[item.key] = getHotkey(item)
         })
-
         return {
             isMobile,
             hotkeys
