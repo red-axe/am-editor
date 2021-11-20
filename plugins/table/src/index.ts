@@ -206,7 +206,7 @@ class Table extends Plugin<Options> {
 	}
 
 	pasteSchema(schema: SchemaInterface) {
-		schema.data.blocks.forEach((blockSchema) => {
+		(schema.data.blocks as SchemaBlock[]).forEach((blockSchema) => {
 			if (!blockSchema.allowIn) {
 				blockSchema.allowIn = [];
 			}

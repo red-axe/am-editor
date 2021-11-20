@@ -32,3 +32,28 @@ global.__amWindow = window;
 ```
 
 2. Introduce third-party packages dynamically or use `isServer` to determine whether there is a window object. This can solve the problem of no errors when running, but the content cannot be completely rendered on the server side. You can output html on the server to meet the needs of seo. Re-render the view reader after loading into the browser
+
+## Improve paste efficiency/filter paste style
+
+When pasting, there are many styles that are copied externally, such as font, font size, font color, etc. Almost every few words like Word carry these styles. These styles will not only affect the efficiency of pasting, but may also be unnecessary.
+
+```ts
+// Listen to paste to get schema events
+engine.on('paste:schema', (schema) => {
+	const plugins = ['fontsize', 'fontcolor', 'fontfamily'];
+	plugins.forEach((pluginName) => {
+		const plugin = engine.plugin.components[pluginName];
+		if (!plugin || plugin.kind !== 'mark') return;
+		const pluginSchema = (plugin as MarkPlugin).schema();
+		const schemas: SchemaMark[] = [];
+		if (Array.isArray(pluginSchema)) {
+			pluginSchema.forEach((schema) => schemas.push(schema));
+		} else {
+			schemas.push(pluginSchema);
+		}
+		schemas.forEach((rule) => {
+			schema.remove(rule);
+		});
+	});
+});
+```

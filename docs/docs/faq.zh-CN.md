@@ -32,3 +32,28 @@ global.__amWindow = window;
 ```
 
 2. 将第三方包动态引入 或者 使用 `isServer` 判定是否有 window 对象。这样能解决运行不会出错的问题，但是在服务端还是无法完整的渲染出内容。可以在服务端输出 html，满足 seo 需求。加载到浏览器后重新渲染 view 阅读器
+
+## 提高粘贴效率/过滤粘贴样式
+
+在粘贴的时候外部复制过来由很多样式，比如字体、字体大小、字体颜色等，类似 word 几乎每几个字都有携带这些样式，这些样式不仅会影响粘贴的效率，也有可能是不需要的。
+
+```ts
+// 监听粘贴获取schema事件
+engine.on('paste:schema', (schema) => {
+	const plugins = ['fontsize', 'fontcolor', 'fontfamily'];
+	plugins.forEach((pluginName) => {
+		const plugin = engine.plugin.components[pluginName];
+		if (!plugin || plugin.kind !== 'mark') return;
+		const pluginSchema = (plugin as MarkPlugin).schema();
+		const schemas: SchemaMark[] = [];
+		if (Array.isArray(pluginSchema)) {
+			pluginSchema.forEach((schema) => schemas.push(schema));
+		} else {
+			schemas.push(pluginSchema);
+		}
+		schemas.forEach((rule) => {
+			schema.remove(rule);
+		});
+	});
+});
+```
