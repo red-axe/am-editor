@@ -82,7 +82,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     width: 14px;
     height: 14px;
     cursor: pointer;
-    z-index: 2;
+    z-index: 4;
     background-color: #ffffff;
 }
 

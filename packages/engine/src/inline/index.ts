@@ -949,7 +949,7 @@ class Inline implements InlineModelInterface {
 	repairBoth(node: NodeInterface | Node) {
 		const nodeApi = this.editor.node;
 		if (isNode(node)) node = $(node);
-		if (node.parent() && !nodeApi.isVoid(node)) {
+		if (node.get()?.parentNode && !nodeApi.isVoid(node)) {
 			const zeroNode = $('\u200b', null);
 			const prev = node.prev();
 			const prevPrev = prev?.prev();
@@ -991,7 +991,7 @@ class Inline implements InlineModelInterface {
 				if (next && next.isText()) {
 					next.text('\u200b' + next.text());
 				} else {
-					node.after(this.editor.node.clone(zeroNode, true, false));
+					node.after(nodeApi.clone(zeroNode, true, false));
 					if (next?.name === 'br') {
 						next.remove();
 					}

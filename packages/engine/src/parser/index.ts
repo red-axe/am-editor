@@ -9,7 +9,12 @@ import {
 	ConversionRule,
 	SchemaRule,
 } from '../types';
-import { CARD_ELEMENT_KEY, CARD_KEY, READY_CARD_KEY } from '../constants';
+import {
+	CARD_ELEMENT_KEY,
+	CARD_KEY,
+	CARD_SELECTOR,
+	READY_CARD_KEY,
+} from '../constants';
 import {
 	escape,
 	unescape,
@@ -105,6 +110,46 @@ class Parser implements ParserInterface {
 		}
 		if (paserBefore) paserBefore(this.root);
 	}
+	convert(
+		conversion: ConversionInterface,
+		node: NodeInterface,
+		schema?: SchemaInterface,
+	) {
+		let value = conversion.transform(node);
+		const oldRules: Array<ConversionRule> = [];
+		const nodeApi = this.editor.node;
+		while (value) {
+			const { rule } = value;
+			oldRules.push(rule);
+			const { name, attributes, style } = value.node;
+			delete attributes[DATA_ID];
+			const newNode = $(`<${name} />`);
+			nodeApi.setAttributes(newNode, {
+				...attributes,
+				style,
+			});
+			//把旧节点的子节点追加到新节点下
+			newNode.append(node.children());
+			if (node.isCard()) {
+				node.before(newNode);
+				node.remove();
+				value = undefined;
+				continue;
+			} else {
+				if (!nodeApi.isBlock(newNode, schema)) {
+					//把包含旧子节点的新节点追加到旧节点下
+					node.append(newNode);
+				} else {
+					// 替换
+					node.before(newNode);
+					node.remove();
+					break;
+				}
+			}
+			//排除之前的过滤规则后再次过滤
+			value = conversion.transform(node, (r) => oldRules.indexOf(r) < 0);
+		}
+	}
 	normalize(
 		root: NodeInterface,
 		schema: SchemaInterface,
@@ -112,7 +157,18 @@ class Parser implements ParserInterface {
 	) {
 		const nodeApi = this.editor.node;
 		const inlineApi = this.editor.inline;
-		//转换标签和分割 mark 和 inline 标签
+		//转换标签和分割 mark 和 inline
+		// 不分割，就只转换卡片
+		if (!this.isNormalize) {
+			if (!conversion) return;
+			const cards = root.find(CARD_SELECTOR);
+			cards.each((_, index) => {
+				const cardNode = cards.eq(index);
+				if (!cardNode) return;
+				this.convert(conversion, cardNode, schema);
+			});
+			return;
+		}
 		root.traverse((node) => {
 			if (
 				node.equal(root) ||
@@ -122,48 +178,10 @@ class Parser implements ParserInterface {
 			if (node.isElement()) {
 				const isCard = node.isCard();
 				//转换标签
-				if (
-					conversion &&
-					((this.isNormalize && !schema.getType(node)) || isCard)
-				) {
-					let value = conversion.transform(node);
-					const oldRules: Array<ConversionRule> = [];
-					while (value) {
-						const { rule } = value;
-						oldRules.push(rule);
-						const { name, attributes, style } = value.node;
-						delete attributes[DATA_ID];
-						const newNode = $(`<${name} />`);
-						nodeApi.setAttributes(newNode, {
-							...attributes,
-							style,
-						});
-						//把旧节点的子节点追加到新节点下
-						newNode.append(node.children());
-						if (isCard) {
-							node.before(newNode);
-							node.remove();
-							value = undefined;
-							continue;
-						} else {
-							if (!nodeApi.isBlock(newNode, schema)) {
-								//把包含旧子节点的新节点追加到旧节点下
-								node.append(newNode);
-							} else {
-								// 替换
-								node.before(newNode);
-								node.remove();
-								break;
-							}
-						}
-						//排除之前的过滤规则后再次过滤
-						value = conversion.transform(
-							node,
-							(r) => oldRules.indexOf(r) < 0,
-						);
-					}
+				if (conversion && (!schema.getType(node) || isCard)) {
+					this.convert(conversion, node, schema);
 				}
-				if (!this.isNormalize || isCard) return;
+				if (isCard) return;
 				//分割
 				const filter = (node: NodeInterface) => {
 					//获取节点属性样式

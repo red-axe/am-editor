@@ -659,14 +659,15 @@ class NodeModel implements NodeModelInterface {
 	 * @param props 属性
 	 */
 	setAttributes(node: NodeInterface, attrs: any) {
-		let { style, ...attributes } = attrs;
-		Object.keys(attributes).forEach((key) => {
+		let style = attrs.style;
+		Object.keys(attrs).forEach((key) => {
+			if (key === 'style') return;
 			if (key === 'className') {
-				const value = attributes[key];
+				const value = attrs[key];
 				if (Array.isArray(value)) {
 					value.forEach((name) => node.addClass(name));
 				} else node.addClass(value);
-			} else node.attributes(key, attributes[key].toString());
+			} else node.attributes(key, attrs[key].toString());
 		});
 		if (typeof style === 'number') style = {};
 		if (typeof style === 'string') style = getStyleMap(style);

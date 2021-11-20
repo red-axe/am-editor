@@ -82,7 +82,8 @@ export default class Paste {
 				}
 			});
 			//处理后如果不是一个有效的节点就移除包裹
-			if (!this.schema.getType(node)) {
+			let type = this.schema.getType(node);
+			if (!type) {
 				nodeApi.unwrap(node);
 				return;
 			}
@@ -90,13 +91,16 @@ export default class Paste {
 			if (nodeApi.isList(node)) {
 				node.css('padding-left', '');
 			}
+
+			let attributes: { [k: string]: string } | undefined =
+				node.attributes();
 			// 删除空 style 属性
-			if (node.attributes('style').trim() === '') {
+			if ((attributes.style || '').trim() === '') {
 				node.removeAttributes('style');
 			}
 
 			// br 换行改成正常段落
-			if (nodeApi.isBlock(node, this.schema)) {
+			if (type === 'block') {
 				this.engine.block.brToBlock(node);
 			}
 			// 删除空 span
@@ -107,24 +111,23 @@ export default class Paste {
 				node = parent;
 				parent = node.parent();
 				if (!parent) return;
+				type = undefined;
+				attributes = undefined;
 			}
-			// 删除 google docs 根节点
-			// <b style="font-weight:flat;" id="docs-internal-guid-e0280780-7fff-85c2-f58a-6e615d93f1f2">
-			if (/^docs-internal-guid-/.test(node.attributes('id'))) {
-				nodeApi.unwrap(node);
-				return;
-			}
+			if (!attributes) attributes = node.attributes();
 			// 跳过Card
-			if (node.attributes(READY_CARD_KEY)) {
+			if (attributes[READY_CARD_KEY]) {
 				return;
 			}
-			const nodeIsBlock = nodeApi.isBlock(node, this.schema);
+			const nodeIsBlock = type
+				? type === 'block'
+				: nodeApi.isBlock(node, this.schema);
 			const nodeIsVoid = nodeApi.isVoid(node, this.schema);
 			let parentIsBlock = nodeApi.isBlock(parent, this.schema);
 			// 删除零高度的空行
 			if (
 				nodeIsBlock &&
-				node.attributes('data-type') !== 'p' &&
+				attributes['data-type'] !== 'p' &&
 				!nodeIsVoid &&
 				!parentIsBlock &&
 				//!node.isSolid() &&
@@ -134,7 +137,7 @@ export default class Paste {
 				return;
 			}
 			// 段落
-			if (node.attributes('data-type') === 'p') {
+			if (attributes['data-type'] === 'p') {
 				node.removeAttributes('data-type');
 			}
 			if (nodeIsBlock && parent?.name === 'p') {

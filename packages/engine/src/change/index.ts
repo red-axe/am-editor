@@ -72,12 +72,9 @@ class ChangeModel implements ChangeInterface {
 	private _change() {
 		if (!this.isComposing()) {
 			this.engine.card.gc();
-			console.time('change');
 			const value = this.getValue({
 				ignoreCursor: true,
 			});
-
-			console.timeEnd('change');
 			if (!this.valueCached || value !== this.valueCached) {
 				const trigger =
 					this.changeTrigger.length === 2

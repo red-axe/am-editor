@@ -344,6 +344,7 @@ class Table extends Plugin<Options> {
 					element?.css('background-color');
 				if (background) tds?.css('background', background);
 			});
+			this.editor.nodeId.generateAll(node, true);
 			this.editor.card.replaceNode(node, TableComponent.cardName, {
 				html: node
 					.get<HTMLElement>()!

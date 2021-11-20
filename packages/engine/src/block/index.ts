@@ -1237,7 +1237,8 @@ class Block implements BlockModelInterface {
 		if (!first) {
 			return;
 		}
-		const children = block.children();
+		const blockElement = block.get<Element>();
+		const children = blockElement?.childNodes || [];
 		// 只有一个节点
 		if (children.length === 1) {
 			const node = first;
@@ -1256,8 +1257,8 @@ class Block implements BlockModelInterface {
 		) {
 			return;
 		}
-
-		if (block.find('br').length === 0) return;
+		// 没有br标签
+		if (!blockElement?.querySelector('br')) return;
 
 		let container;
 		let prevContainer;
