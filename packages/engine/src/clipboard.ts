@@ -3,7 +3,7 @@ import Parser from './parser';
 import { ClipboardInterface } from './types/clipboard';
 import { EditorInterface, EngineInterface } from './types/engine';
 import { RangeInterface } from './types/range';
-import { getWindow, isEngine, isSafari } from './utils';
+import { isEngine, isSafari } from './utils';
 import { $ } from './node';
 import Range from './range';
 import { NodeInterface } from './types';
@@ -145,7 +145,7 @@ export default class Clipboard implements ClipboardInterface {
 			root.name === '#text' ? [document.createElement('span')] : [];
 		card = root.closest(`[${CARD_KEY}]`, (node) => {
 			if ($(node).isEditable()) return;
-			if (node.nodeType === getWindow().Node.ELEMENT_NODE) {
+			if (node.nodeType === Node.ELEMENT_NODE) {
 				const display = window
 					.getComputedStyle(node as Element)
 					.getPropertyValue('display');
@@ -170,60 +170,57 @@ export default class Clipboard implements ClipboardInterface {
 			} else {
 				// 修复自定义列表选择范围
 				let customizeStartItem: NodeInterface | undefined;
-				if (range.startNode.isText()) {
-					const li = range.startNode.closest('li');
+				const li = range.startNode.closest('li');
 
-					if (li && node.isCustomize(li)) {
-						const endLi = range.endNode.closest('li');
-						if (
-							!li.equal(endLi) ||
-							(list.isLast(range) && list.isFirst(range))
-						) {
-							if (range.startOffset === 0) {
-								const ul = li.parent();
-								const index = li.getIndex();
-								if (ul)
-									range.setStart(ul, index < 0 ? 0 : index);
-							} else {
-								const ul = li.parent();
-								// 选在列表项靠后的节点，把剩余节点拼接成完成的列表项
-								const selection = range.createSelection();
-								const rightNode = selection.getNode(
-									li,
-									'center',
-									true,
-								);
-								selection.anchor?.remove();
-								selection.focus?.remove();
-								if (isEngine(this.editor))
-									this.editor.change.combinText();
-								if (rightNode.length > 0) {
-									let isRemove = false;
-									rightNode.each((_, index) => {
-										const item = rightNode.eq(index);
-										if (!isRemove && item?.name === 'li') {
-											isRemove = true;
-											return;
-										}
-										if (isRemove) item?.remove();
-									});
-									const card = li.first();
-									const component = card
-										? this.editor.card.find(card)
-										: undefined;
-									if (component) {
-										customizeStartItem = rightNode;
-										this.editor.list.addCardToCustomize(
-											customizeStartItem,
-											component.name,
-											component.getValue(),
-										);
-										if (ul)
-											node.wrap(
-												customizeStartItem,
-												ul?.clone(),
-											);
+				if (li && node.isCustomize(li)) {
+					const endLi = range.endNode.closest('li');
+					if (
+						!li.equal(endLi) ||
+						(list.isLast(range) && list.isFirst(range))
+					) {
+						if (list.isFirst(range)) {
+							const ul = li.parent();
+							const index = li.getIndex();
+							if (ul) range.setStart(ul, index < 0 ? 0 : index);
+						} else {
+							const ul = li.parent();
+							// 选在列表项靠后的节点，把剩余节点拼接成完成的列表项
+							const selection = range.createSelection();
+							const rightNode = selection.getNode(
+								li,
+								'center',
+								true,
+							);
+							selection.anchor?.remove();
+							selection.focus?.remove();
+							if (isEngine(this.editor))
+								this.editor.change.combinText();
+							if (rightNode.length > 0) {
+								let isRemove = false;
+								rightNode.each((_, index) => {
+									const item = rightNode.eq(index);
+									if (!isRemove && item?.name === 'li') {
+										isRemove = true;
+										return;
 									}
+									if (isRemove) item?.remove();
+								});
+								const card = li.first();
+								const component = card
+									? this.editor.card.find(card)
+									: undefined;
+								if (component) {
+									customizeStartItem = rightNode;
+									this.editor.list.addCardToCustomize(
+										customizeStartItem,
+										component.name,
+										component.getValue(),
+									);
+									if (ul)
+										node.wrap(
+											customizeStartItem,
+											ul?.clone(),
+										);
 								}
 							}
 						}
@@ -235,15 +232,13 @@ export default class Clipboard implements ClipboardInterface {
 					contents.prepend(customizeStartItem[0]);
 				}
 				const listMergeBlocks: NodeInterface[] = [];
-				contents.childNodes.forEach((child) => {
-					let childElement = $(child);
-					if (childElement.name !== 'li') return;
-
+				contents.querySelectorAll('li').forEach((child) => {
+					const childElement = $(child);
 					const dataId = childElement.attributes(DATA_ID);
 					if (!dataId) return;
-					const curentElement = document.querySelector(
-						`[${DATA_ID}=${dataId}]`,
-					);
+					const curentElement = this.editor.container
+						.get<HTMLElement>()
+						?.querySelector(`[${DATA_ID}=${dataId}]`);
 					// 补充自定义列表丢失的卡片
 					if (
 						node.isCustomize(childElement) &&

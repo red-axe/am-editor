@@ -1,7 +1,5 @@
-import { getWindow } from './node';
-
 const userAgent = (
-	typeof navigator !== 'undefined' ? navigator : getWindow().navigator
+	typeof navigator !== 'undefined' ? navigator : window.navigator
 ).userAgent.toLowerCase();
 export const isServer = typeof navigator === 'undefined';
 /**

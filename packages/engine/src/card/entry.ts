@@ -176,14 +176,11 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		const body = this.root.first() || $([]);
 		if (key === 'body' || body.length === 0) return body;
 		const children = body.children();
-		if (['center', 'left', 'right'].includes(key))
-			return (
-				children
-					.toArray()
-					.find(
-						(child) => child.attributes(CARD_ELEMENT_KEY) === key,
-					) || $([])
-			);
+		const index = ['center', 'left', 'right'].indexOf(key);
+		if (index > -1) {
+			const child = children.eq(index);
+			if (child?.attributes(CARD_ELEMENT_KEY) === key) return child;
+		}
 		const tag = this.type === CardType.BLOCK ? 'div' : 'span';
 		return this.find(`${tag}[${CARD_ELEMENT_KEY}=${key}]`);
 	}

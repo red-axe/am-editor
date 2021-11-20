@@ -1,6 +1,6 @@
 import Node from './entry';
 import { NodeInterface, Selector, Context, NodeEntry } from '../types/node';
-import { getDocument, getWindow } from '../utils/node';
+import { getDocument } from '../utils/node';
 import Parse from './parse';
 import { isNode } from './utils';
 
@@ -20,7 +20,7 @@ export default (
 	const entry = new (clazz || Node)(nodes, context ? context : undefined);
 	if (
 		isNode(selector) &&
-		selector.nodeType === getWindow().Node.DOCUMENT_FRAGMENT_NODE
+		selector.nodeType === window.Node.DOCUMENT_FRAGMENT_NODE
 	)
 		entry.fragment = selector as DocumentFragment;
 	return entry;

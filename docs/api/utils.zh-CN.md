@@ -144,24 +144,6 @@
 
 接受对象：`EditorInterface`
 
-### `getWindow`
-
-从节点中获取 window 对象
-
-如果 window 是 undefined 会尝试从 global['__amWindow'] 中获取 window 对象
-
-```ts
-(node?: Node): Window & typeof globalThis
-```
-
-### `getDocument`
-
-从节点中获取 document 对象
-
-```ts
-getDocument(node?: Node): Document
-```
-
 ### `combinText`
 
 移除空的文本节点，并连接相邻的文本节点

@@ -27,7 +27,7 @@ export const autoGetHotkey = (
 	}
 	return;
 };
-
+const supportFontFamilyCache: { [key: string]: boolean } = {};
 /**
  * 是否支持字体
  * @param font 字体名称
@@ -38,7 +38,8 @@ export const isSupportFontFamily = (font: string) => {
 		console.log('Font name is not legal !');
 		return false;
 	}
-
+	if (supportFontFamilyCache[font] !== undefined)
+		return supportFontFamilyCache[font];
 	let width;
 	const body = document.body;
 
@@ -64,9 +65,10 @@ export const isSupportFontFamily = (font: string) => {
 	const serifWidth = getWidth('serif');
 	const sansWidth = getWidth('sans-serif');
 
-	return (
+	const reuslt =
 		monoWidth !== getWidth(font + ',monospace') ||
 		sansWidth !== getWidth(font + ',sans-serif') ||
-		serifWidth !== getWidth(font + ',serif')
-	);
+		serifWidth !== getWidth(font + ',serif');
+	supportFontFamilyCache[font] = reuslt;
+	return reuslt;
 };

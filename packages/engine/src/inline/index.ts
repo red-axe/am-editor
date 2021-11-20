@@ -8,12 +8,13 @@ import { EditorInterface, EngineInterface } from '../types/engine';
 import { InlineModelInterface } from '../types/inline';
 import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
-import { getDocument, getWindow, isEngine } from '../utils';
+import { getDocument, isEngine } from '../utils';
 import { Backspace, Left, Right } from './typing';
 import { $ } from '../node';
 import { isNode } from '../node/utils';
 import { isInlinePlugin } from '../plugin/inline';
 import { isRangeInterface } from '../range';
+import { SchemaInterface } from 'src';
 
 class Inline implements InlineModelInterface {
 	private editor: EditorInterface;
@@ -197,7 +198,7 @@ class Inline implements InlineModelInterface {
 		this.split(safeRange);
 		let { commonAncestorNode } = safeRange;
 		if (
-			commonAncestorNode.type === getWindow().Node.TEXT_NODE ||
+			commonAncestorNode.type === Node.TEXT_NODE ||
 			node.isMark(commonAncestorNode)
 		) {
 			commonAncestorNode = commonAncestorNode.parent()!;
@@ -808,13 +809,13 @@ class Inline implements InlineModelInterface {
 		let startNode = sc;
 		let endNode = ec;
 
-		if (sc.nodeType === getWindow().Node.ELEMENT_NODE) {
+		if (sc.nodeType === Node.ELEMENT_NODE) {
 			if (sc.childNodes[so]) {
 				startNode = sc.childNodes[so] || sc;
 			}
 		}
 
-		if (ec.nodeType === getWindow().Node.ELEMENT_NODE) {
+		if (ec.nodeType === Node.ELEMENT_NODE) {
 			if (eo > 0 && ec.childNodes[eo - 1]) {
 				endNode = ec.childNodes[eo - 1] || sc;
 			}
@@ -999,7 +1000,7 @@ class Inline implements InlineModelInterface {
 		}
 	}
 
-	flat(node: NodeInterface | RangeInterface) {
+	flat(node: NodeInterface | RangeInterface, schema?: SchemaInterface) {
 		if (isRangeInterface(node)) {
 			const selection = node.shrinkToElementNode().createSelection();
 			const inlines = this.findInlines(node);
@@ -1014,19 +1015,28 @@ class Inline implements InlineModelInterface {
 		const nodeApi = this.editor.node;
 		const markApi = this.editor.mark;
 		//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
-		if (nodeApi.isInline(node) && node.name !== 'br') {
+		if (nodeApi.isInline(node, schema) && node.name !== 'br') {
 			const parentInline = this.closest(node);
 			//不允许嵌套
-			if (!parentInline.equal(node) && nodeApi.isInline(parentInline)) {
+			if (
+				!parentInline.equal(node) &&
+				nodeApi.isInline(parentInline, schema)
+			) {
 				nodeApi.unwrap(node);
 			}
 			//不允许放入mark
 			else {
-				const parentMark = markApi.closest(node);
-				if (!parentMark.equal(node) && nodeApi.isMark(parentMark)) {
+				let parentMark: NodeInterface | undefined =
+					markApi.closest(node);
+				while (
+					parentMark &&
+					!parentMark.equal(node) &&
+					nodeApi.isMark(parentMark, schema)
+				) {
 					const cloneMark = parentMark.clone();
 					const inlineMark = node.clone();
-					parentMark.children().each((markChild) => {
+					const children = parentMark.children();
+					children.each((markChild) => {
 						// 零宽字符的文本跳过
 						if (
 							markChild.nodeType === 3 &&
@@ -1034,17 +1044,21 @@ class Inline implements InlineModelInterface {
 						) {
 							return;
 						}
-						if (node.equal(markChild)) {
-							nodeApi.wrap(
-								nodeApi.replace(node, cloneMark),
+						if ((node as NodeInterface).equal(markChild)) {
+							node = nodeApi.wrap(
+								nodeApi.replace(
+									node as NodeInterface,
+									cloneMark,
+								),
 								inlineMark,
 							);
-							this.repairBoth(inlineMark);
+							this.repairBoth(node);
 						} else {
 							nodeApi.wrap(markChild, cloneMark);
 						}
 					});
 					nodeApi.unwrap(parentMark);
+					parentMark = markApi.closest(node);
 				}
 			}
 		}

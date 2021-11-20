@@ -363,9 +363,14 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 				}
 			});
 			this.scrollbar.disableScroll();
-			this.scrollbar.on('change', () => {
-				if (isEngine(this.editor)) this.editor.ot.initSelection();
-			});
+			let changeTimeout: NodeJS.Timeout | undefined;
+			const handleScrollbarChange = () => {
+				if (changeTimeout) clearTimeout(changeTimeout);
+				changeTimeout = setTimeout(() => {
+					if (isEngine(this.editor)) this.editor.ot.initSelection();
+				}, 50);
+			};
+			this.scrollbar.on('change', handleScrollbarChange);
 		}
 		this.scrollbar?.refresh();
 		this.selection.on('select', () => {

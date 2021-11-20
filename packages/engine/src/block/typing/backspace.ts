@@ -1,5 +1,4 @@
 import { EngineInterface, RangeInterface } from '../../types';
-import { getWindow } from '../../utils';
 
 class Backspace {
 	private engine: EngineInterface;
@@ -43,16 +42,14 @@ class Backspace {
 				.shrinkToElementNode()
 				.shrinkToTextNode();
 			if (
-				cloneRange.startContainer.nodeType ===
-					getWindow().Node.TEXT_NODE &&
+				cloneRange.startContainer.nodeType === Node.TEXT_NODE &&
 				(function (range: RangeInterface) {
 					const { commonAncestorContainer } = range;
 					if (
 						range.collapsed &&
 						1 === range.startOffset &&
 						range.startContainer === commonAncestorContainer &&
-						commonAncestorContainer.nodeType ===
-							getWindow().Node.TEXT_NODE
+						commonAncestorContainer.nodeType === Node.TEXT_NODE
 					) {
 						range = range.cloneRange();
 						if (

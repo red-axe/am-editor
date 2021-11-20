@@ -2,7 +2,6 @@ import { PswpInterface } from '@/types';
 import {
 	$,
 	EditorInterface,
-	getWindow,
 	isEngine,
 	escape,
 	NodeInterface,
@@ -83,7 +82,7 @@ export type Options = {
 	onError?: () => void;
 };
 
-export const winPixelRatio = getWindow().devicePixelRatio;
+export const winPixelRatio = window.devicePixelRatio;
 let pswp: PswpInterface | undefined = undefined;
 class Image {
 	private editor: EditorInterface;

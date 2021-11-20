@@ -7,7 +7,7 @@ import {
 	RangeInterface,
 } from '../types';
 import { ListInterface, ListModelInterface } from '../types/list';
-import { getDocument, getWindow, isEngine, removeUnit } from '../utils';
+import { getDocument, isEngine, removeUnit } from '../utils';
 import { Enter, Backspace } from './typing';
 import { $ } from '../node';
 import { isNode } from '../node/utils';
@@ -716,12 +716,12 @@ class List implements ListModelInterface {
 						return;
 					}
 					//文本
-					if (child.type === getWindow().Node.TEXT_NODE) {
+					if (child.type === Node.TEXT_NODE) {
 						if (child.text() !== '') return;
 						child = child.prev();
 					}
 					//节点
-					else if (child.type === getWindow().Node.ELEMENT_NODE) {
+					else if (child.type === Node.ELEMENT_NODE) {
 						if (!nodeApi.isMark(child) || child.text() !== '')
 							return;
 						child = node.prev();

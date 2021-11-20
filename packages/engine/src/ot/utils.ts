@@ -19,13 +19,7 @@ import {
 	UI,
 	UI_SELECTOR,
 } from '../constants/root';
-import {
-	getParentInRoot,
-	getWindow,
-	toHex,
-	unescapeDots,
-	unescape,
-} from '../utils';
+import { getParentInRoot, toHex, unescapeDots, unescape } from '../utils';
 
 export const isTransientElement = (
 	node: NodeInterface,
@@ -343,7 +337,7 @@ export const toJSON0 = (
 	let values: Array<{} | string>;
 	if (!isTransientElement(node)) {
 		const { attributes, nodeValue } = node.get<Element>()!;
-		if (node.type === getWindow().Node.ELEMENT_NODE) {
+		if (node.type === Node.ELEMENT_NODE) {
 			values = [node.name];
 			const data = {};
 			for (let i = 0; attributes && i < attributes.length; i++) {
@@ -362,9 +356,7 @@ export const toJSON0 = (
 			childToJSON0(node, values);
 			return values;
 		}
-		return node.type === getWindow().Node.TEXT_NODE
-			? String(nodeValue)
-			: undefined;
+		return node.type === Node.TEXT_NODE ? String(nodeValue) : undefined;
 	}
 	return;
 };

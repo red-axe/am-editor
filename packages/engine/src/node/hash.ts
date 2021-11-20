@@ -41,6 +41,8 @@ export const uuid = (len: number, radix: number = 16): string => {
 	return uuid.join('');
 };
 
+const valueCaches = new Map<string, string>();
+
 export default (
 	value: string | NodeInterface | Node,
 	unique: boolean = true,
@@ -48,24 +50,27 @@ export default (
 	let prefix = '';
 	if (isNode(value)) value = $(value);
 	if (isNodeEntry(value)) {
-		const attributes = value.attributes();
-		const styles = attributes['style'];
-		delete attributes['style'];
+		const attributes = value.attributes() || {};
 		delete attributes[DATA_ID];
 		prefix = value.name.substring(0, 1);
-		value = `${value.name}_${Object.keys(attributes || {}).join(
-			',',
-		)}_${Object.values(attributes || {}).join(',')}_${Object.keys(
-			styles || {},
-		).join(',')}_${Object.values(styles || {}).join(',')}`;
+		value = `${value.name}_${JSON.stringify(attributes)}`;
 	}
-	const md5Value = md5(value);
-	let hash =
-		prefix + md5Value.substr(0, 4) + md5Value.substr(md5Value.length - 3);
+	const cachePerfix = valueCaches.get(value);
+	if (!cachePerfix) {
+		const md5Value = md5(value);
+		prefix =
+			prefix +
+			md5Value.substr(0, 4) +
+			md5Value.substr(md5Value.length - 3);
+		valueCaches.set(value, prefix);
+	} else {
+		prefix = cachePerfix;
+	}
+	const hash = prefix;
 	if (unique) {
 		const counter = _counters[hash] || 0;
 		_counters[hash] = counter + 1;
-		hash = `${hash}-${uuid(8, 48 + _counters[hash])}`;
+		return `${hash}-${uuid(8, 48 + _counters[hash])}`;
 	}
 
 	return hash;

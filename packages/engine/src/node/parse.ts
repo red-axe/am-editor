@@ -1,7 +1,11 @@
 import { Selector, Context } from '../types/node';
-import { getDocument, getWindow } from '../utils/node';
+import { getDocument } from '../utils/node';
 import { isNode, isNodeEntry, isNodeList } from '../node/utils';
 
+/**
+ * 缓存selector创建的node
+ */
+const nodeCaches = new Map<string, Element>();
 /**
  * 解析节点
  * @param selector 选择器
@@ -21,6 +25,20 @@ function domParser(
 			const isTd = selector.indexOf('<td') === 0;
 			//替换注释
 			selector = selector.trim().replace(/<!--[^>]*-->/g, '');
+
+			const cacheNode = nodeCaches.get(selector);
+			if (cacheNode) {
+				if (isTr) {
+					const tbody = cacheNode.querySelector('tbody');
+					return tbody ? tbody.cloneNode(true).childNodes : [];
+				}
+
+				if (isTd) {
+					const tr = cacheNode.querySelector('tr');
+					return tr ? tr.cloneNode(true).childNodes : [];
+				}
+				return cacheNode.cloneNode(true).childNodes;
+			}
 			/**
 			 * 无法单独解析 tr、td 标签，如果有tr、td标签这里需要补充 table 节点的结构
 			 */
@@ -40,7 +58,7 @@ function domParser(
 			//创建一个空节点，用来包裹需要生成的节点
 			const container = getDocument().createElement('div');
 			container.innerHTML = selector;
-
+			nodeCaches.set(selector, container.cloneNode(true) as Element);
 			if (isTr) {
 				const tbody = container.querySelector('tbody');
 				return tbody ? tbody.childNodes : [];
@@ -70,10 +88,7 @@ function domParser(
 		return nodes;
 	}
 	// 片段
-	if (
-		isNode(selector) &&
-		selector.nodeType === getWindow().Node.DOCUMENT_FRAGMENT_NODE
-	) {
+	if (isNode(selector) && selector.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
 		const nodes: Node[] = [];
 		let node = selector.firstChild;
 		while (node) {

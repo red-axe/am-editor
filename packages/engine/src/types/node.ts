@@ -623,8 +623,13 @@ export interface NodeModelInterface {
 	 * 将源节点的子节点追加到目标节点，并替换源节点
 	 * @param source 旧节点
 	 * @param target 新节点
+	 * @param copyId 是否复制id
 	 */
-	replace(source: NodeInterface, target: NodeInterface): NodeInterface;
+	replace(
+		source: NodeInterface,
+		target: NodeInterface,
+		copyId?: boolean,
+	): NodeInterface;
 	/**
 	 * 在光标位置插入一个节点
 	 * @param node 节点

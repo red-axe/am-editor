@@ -17,7 +17,6 @@ import {
 	toHex,
 	transformCustomTags,
 	getListStyle,
-	getWindow,
 } from '../utils';
 import TextParser from './text';
 import { $ } from '../node';
@@ -57,7 +56,7 @@ const stylesToString = (styles: { [k: string]: string }) => {
 };
 
 class Parser implements ParserInterface {
-	private root: NodeInterface;
+	root: NodeInterface;
 	private editor: EditorInterface;
 	constructor(
 		source: string | Node | NodeInterface,
@@ -79,10 +78,7 @@ class Parser implements ParserInterface {
 				.replace(/<p(>|\s+[^>]*>)/gi, '<paragraph$1')
 				.replace(/<\/p>/gi, '</paragraph>');
 			source = transformCustomTags(source);
-			const doc = new (getWindow().DOMParser)().parseFromString(
-				source,
-				'text/html',
-			);
+			const doc = new DOMParser().parseFromString(source, 'text/html');
 			this.root = $(doc.body);
 			const p = $('<p></p>');
 			const paragraphs = this.root.find('paragraph');
@@ -94,7 +90,7 @@ class Parser implements ParserInterface {
 				Object.keys(attributes).forEach((name) => {
 					pNode.attributes(name, attributes[name]);
 				});
-				node.replace(cNode, pNode);
+				node.replace(cNode, pNode, true);
 			});
 		} else if (isNodeEntry(source)) {
 			this.root = source;
@@ -126,7 +122,7 @@ class Parser implements ParserInterface {
 						const { rule } = value;
 						oldRules.push(rule);
 						const { name, attributes, style } = value.node;
-						delete attributes['data-id'];
+						delete attributes[DATA_ID];
 						const newNode = $(`<${name} />`);
 						nodeApi.setAttributes(newNode, {
 							...attributes,
@@ -198,7 +194,7 @@ class Parser implements ParserInterface {
 					return newNode;
 				};
 				//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
-				inlineApi.flat(node);
+				inlineApi.flat(node, schema);
 				//当前节点是 mark 节点
 				if (nodeApi.isMark(node, schema)) {
 					//过滤掉当前mark节点属性样式并使用剩下的属性样式组成新的节点
@@ -480,7 +476,7 @@ class Parser implements ParserInterface {
 			const node = domNode.get<HTMLElement>();
 			if (
 				node &&
-				node.nodeType === getWindow().Node.ELEMENT_NODE &&
+				node.nodeType === Node.ELEMENT_NODE &&
 				'none' === node.style['user-select'] &&
 				node.parentNode
 			) {

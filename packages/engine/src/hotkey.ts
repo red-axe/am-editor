@@ -9,21 +9,14 @@ import { HotkeyInterface } from './types/hotkey';
 class Hotkey implements HotkeyInterface {
 	private engine: EngineInterface;
 	private disabled: boolean = false;
+	#matchTimeout?: NodeJS.Timeout;
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
 		//绑定事件
 		this.engine.container.on('keydown', (event) => this.trigger(event));
 	}
 
-	/**
-	 * 处理按键按下事件
-	 * @param e 事件
-	 */
-	trigger(e: KeyboardEvent) {
-		//禁用快捷键不处理
-		if (this.disabled) {
-			return;
-		}
+	match(e: KeyboardEvent) {
 		//遍历插件
 		Object.keys(this.engine.plugin.components).every((name) => {
 			const plugin = this.engine.plugin.components[name];
@@ -79,6 +72,21 @@ class Hotkey implements HotkeyInterface {
 			}
 			return true;
 		});
+	}
+
+	/**
+	 * 处理按键按下事件
+	 * @param e 事件
+	 */
+	trigger(e: KeyboardEvent) {
+		//禁用快捷键不处理
+		if (this.disabled) {
+			return;
+		}
+		if (this.#matchTimeout) {
+			clearTimeout(this.#matchTimeout);
+		}
+		this.#matchTimeout = setTimeout(() => this.match(e), 50);
 	}
 
 	/**

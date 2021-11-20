@@ -144,24 +144,6 @@ Is it an engine
 
 Accepted object: `EditorInterface`
 
-### `getWindow`
-
-Get the window object from the node
-
-If window is undefined, it will try to get the window object from global['__amWindow']
-
-```ts
-(node?: Node): Window & typeof globalThis
-```
-
-### `getDocument`
-
-Get the document object from the node
-
-```ts
-getDocument(node?: Node): Document
-```
-
 ### `combinText`
 
 Remove empty text nodes and connect adjacent text nodes

@@ -10,7 +10,7 @@ import {
 	TargetOp,
 } from '../types/ot';
 import { NodeInterface } from '../types/node';
-import { getDocument, getWindow } from '../utils';
+import { getDocument } from '../utils';
 import { isCursorOp, isTransientElement, updateIndex, toDOM } from './utils';
 import { $ } from '../node';
 import { DATA_ID, EDITABLE_SELECTOR } from '../constants';
@@ -51,7 +51,7 @@ class Consumer implements ConsumerInterface {
 			1 === path.length ||
 			pathOffset === JSON0_INDEX.TAG_NAME ||
 			pathOffset === JSON0_INDEX.ATTRIBUTE ||
-			childNode.nodeType === getWindow().Node.TEXT_NODE
+			childNode.nodeType === Node.TEXT_NODE
 		) {
 			return {
 				startNode: childNode,

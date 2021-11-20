@@ -31,7 +31,7 @@ class Table extends Plugin<Options> {
 		editor.schema.add(this.schema());
 		editor.conversion.add('th', 'td');
 		editor.on('parse:html', (node) => this.parseHtml(node));
-		editor.on('paste:each-after', (child) => this.pasteHtml(child));
+		editor.on('paste:each-after', (root) => this.pasteHtml(root));
 		editor.on('paste:schema', (schema: SchemaInterface) =>
 			this.pasteSchema(schema),
 		);
@@ -266,7 +266,7 @@ class Table extends Plugin<Options> {
 		return value;
 	}
 
-	pasteHtml(node: NodeInterface) {
+	pasteHtml(root: NodeInterface) {
 		if (!isEngine(this.editor)) return;
 		const clearWH = (
 			node: NodeInterface,
@@ -277,7 +277,10 @@ class Table extends Plugin<Options> {
 			if (width.endsWith('%')) node.css(type, '');
 			if (width.endsWith('pt')) node.css(type, this.convertToPX(width));
 		};
-		if (node.name === 'table') {
+		const tables = root.find('table');
+		tables.each((_, index) => {
+			const node = tables.eq(index);
+			if (!node) return;
 			clearWH(node);
 			clearWH(node, 'height');
 			// 表头放在tbody最前面
@@ -339,9 +342,7 @@ class Table extends Plugin<Options> {
 					.outerHTML.replace(/\n|\r\n/g, '')
 					.replace(/>\s+</g, '><'),
 			});
-			return false;
-		}
-		return true;
+		});
 	}
 
 	parseHtml(root: NodeInterface) {

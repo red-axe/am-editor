@@ -572,7 +572,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			conversion,
 		);
 		const element = helper.trimBlankSpan($(pasteHTML));
-
+		this.editor.nodeId.generateAll(element, true);
 		if (element.name === 'table') {
 			helper.normalizeTable(element);
 			const pasteTableModel = helper.getTableModel(element);

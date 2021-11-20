@@ -1,5 +1,5 @@
 import { startsWith } from 'lodash-es';
-import { getDocument, getWindow } from '../../utils';
+import { getDocument } from '../../utils';
 import { AjaxInterface, AjaxOptions, SetupOptions } from '../../types/request';
 import { isFormData, toQueryString, urlAppend } from './utils';
 import {
@@ -53,7 +53,7 @@ class Ajax implements AjaxInterface {
 			...globalSetup,
 			...options,
 			url,
-			context: options.context || getWindow(),
+			context: options.context || window,
 			doc: options.doc || getDocument(),
 			jsonpCallback: options.jsonpCallback || 'callback',
 			method: options.method || 'GET',

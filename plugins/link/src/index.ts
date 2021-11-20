@@ -94,14 +94,11 @@ export default class extends InlinePlugin<Options> {
 
 	query() {
 		if (!isEngine(this.editor)) return;
-		const { change, inline } = this.editor;
-		const range = change.range.get();
-		const inlineNode = inline
-			.findInlines(range)
-			.find((node) => this.isSelf(node));
+		const { change } = this.editor;
+		const inlineNode = change.inlines.find((node) => this.isSelf(node));
 		this.toolbar?.hide(inlineNode);
-		if (inlineNode && !inlineNode.isCard()) {
-			if (range.collapsed) this.toolbar?.show(inlineNode);
+		if (inlineNode && inlineNode.length > 0 && !inlineNode.isCard()) {
+			this.toolbar?.show(inlineNode);
 			return true;
 		}
 		return false;

@@ -16,7 +16,7 @@ import {
 	PluginEntry,
 } from '../types';
 import { BlockInterface, BlockModelInterface } from '../types/block';
-import { getDocument, getWindow, isEngine } from '../utils';
+import { getDocument, isEngine } from '../utils';
 import { Backspace, Enter } from './typing';
 import { $ } from '../node';
 import { isBlockPlugin } from '../plugin';
@@ -865,13 +865,13 @@ class Block implements BlockModelInterface {
 		let startNode = sc;
 		let endNode = ec;
 
-		if (sc.nodeType === getWindow().Node.ELEMENT_NODE) {
+		if (sc.nodeType === Node.ELEMENT_NODE) {
 			if (sc.childNodes[so]) {
 				startNode = sc.childNodes[so] || sc;
 			}
 		}
 
-		if (ec.nodeType === getWindow().Node.ELEMENT_NODE) {
+		if (ec.nodeType === Node.ELEMENT_NODE) {
 			if (eo > 0 && ec.childNodes[eo - 1]) {
 				endNode = ec.childNodes[eo - 1] || sc;
 			}
@@ -1232,13 +1232,15 @@ class Block implements BlockModelInterface {
 	 * @param block 节点
 	 */
 	brToBlock(block: NodeInterface) {
+		const first = block.first();
 		// 没有子节点
-		if (!block.first()) {
+		if (!first) {
 			return;
 		}
+		const children = block.children();
 		// 只有一个节点
-		if (block.children().length === 1) {
-			const node = block.first();
+		if (children.length === 1) {
+			const node = first;
 			//\n换成 br
 			if (node && node.isText() && /^\n+$/g.test(node.text())) {
 				this.editor.node.replace(node, $('<br />'));
@@ -1248,16 +1250,18 @@ class Block implements BlockModelInterface {
 		if ('li' === block.name) return;
 		// 只有一个节点（有光标标记节点）
 		if (
-			(block.children().length === 2 &&
-				block.first()?.attributes(DATA_ELEMENT) === CURSOR) ||
+			(children.length === 2 &&
+				first?.attributes(DATA_ELEMENT) === CURSOR) ||
 			block.last()?.attributes(DATA_ELEMENT) === CURSOR
 		) {
 			return;
 		}
 
+		if (block.find('br').length === 0) return;
+
 		let container;
 		let prevContainer;
-		let node = block.first();
+		let node: NodeInterface | null = first;
 		while (node) {
 			const next = node.next();
 			if (!container || node.name === 'br') {
@@ -1337,7 +1341,7 @@ class Block implements BlockModelInterface {
 		cloneRange.enlargeFromTextNode();
 		if (
 			this.isLastOffset(range, 'end') ||
-			(cloneRange.endNode.type === getWindow().Node.ELEMENT_NODE &&
+			(cloneRange.endNode.type === Node.ELEMENT_NODE &&
 				block.children().length > 0 &&
 				cloneRange.endContainer.childNodes[cloneRange.endOffset] ===
 					block.last()?.get() &&

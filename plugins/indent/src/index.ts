@@ -282,8 +282,13 @@ export default class extends Plugin<Options> {
 
 	pasteEach(node: NodeInterface) {
 		//pt 转为px
-		if (!node.isCard() && this.editor.node.isBlock(node)) {
-			const textIndentSource = node.css(TEXT_INENT_KEY);
+		if (
+			node.isElement() &&
+			!node.isCard() &&
+			this.editor.node.isBlock(node)
+		) {
+			const styles = node.css();
+			const textIndentSource = styles[TEXT_INENT_KEY];
 			if (!!textIndentSource && textIndentSource.endsWith('pt')) {
 				const textIndent = this.convertToPX(textIndentSource);
 				if (!!textIndent) {

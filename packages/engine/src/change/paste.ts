@@ -4,6 +4,7 @@ import { READY_CARD_KEY, READY_CARD_SELECTOR } from '../constants/card';
 import Parser from '../parser';
 import { EngineInterface } from '../types/engine';
 import { $ } from '../node';
+import { DATA_ID } from '../constants';
 
 export default class Paste {
 	protected source: string;
@@ -26,77 +27,27 @@ export default class Paste {
 	}
 
 	getDefaultStyle() {
-		const defaultStyle = [
-			{
-				color: tinycolor2(this.engine.container.css('color')).toHex(),
-			},
-			{
-				'background-color': tinycolor2('white').toHex(),
-			},
-			{
-				'font-size': this.engine.container.css('font-size'),
-			},
-		];
+		const defaultStyle = {
+			color: tinycolor2(this.engine.container.css('color')).toHex(),
+			'background-color': tinycolor2('white').toHex(),
+			'font-size': this.engine.container.css('font-size'),
+		};
 		return defaultStyle;
 	}
 
 	elementNormalize(fragment: DocumentFragment) {
 		const defaultStyle = this.getDefaultStyle();
+		const defautlStyleKeys = Object.keys(defaultStyle);
 		const { inline } = this.engine;
 		const nodeApi = this.engine.node;
+
 		$(fragment).traverse((node) => {
-			// 跳过Card
-			if (node.isCard() || fragment === node.fragment) {
+			let parent = node.parent();
+			// 跳过已被删除的节点
+			if (!parent || node.isCard() || node.fragment === fragment) {
 				return;
 			}
-			// 删除与默认样式一样的样式
-			if (node.isElement()) {
-				defaultStyle.forEach((style) => {
-					const key = Object.keys(style)[0];
-					const defaultValue = style[key];
-					let value = node.get<HTMLElement>()?.style[key];
-					if (value) {
-						if (/color$/.test(key)) {
-							value = tinycolor2(value).toHex();
-						}
-						if (value === defaultValue) {
-							node.css(key, '');
-						}
-					}
-				});
-				//处理后如果不是一个有效的节点就移除包裹
-				if (!this.schema.getType(node)) nodeApi.unwrap(node);
-
-				nodeApi.removeMinusStyle(node, 'text-indent');
-				if (nodeApi.isList(node)) {
-					node.css('padding-left', '');
-				}
-				// 删除空 style 属性
-				if (!node.attributes('style')) {
-					node.removeAttributes('style');
-				}
-				// 删除空 span
-				let first: NodeInterface | null = null;
-				if (
-					node.name === 'span' &&
-					Object.keys(node.attributes()).length === 0 &&
-					Object.keys(node.css()).length === 0 &&
-					(node.text().trim() === '' ||
-						(first =
-							node.first() &&
-							first &&
-							(nodeApi.isMark(first, this.schema) ||
-								nodeApi.isBlock(first, this.schema))))
-				) {
-					nodeApi.unwrap(node);
-					return;
-				}
-
-				// br 换行改成正常段落
-				if (nodeApi.isBlock(node, this.schema)) {
-					this.engine.block.brToBlock(node);
-				}
-			} else {
+			if (node.isText()) {
 				let text = node.text();
 				if (/\s/.test(text)) {
 					text = text.replace(/\s/g, ' ');
@@ -120,13 +71,40 @@ export default class Paste {
 						node.text(text);
 					}
 				}
-			}
-		});
-		$(fragment).traverse((node) => {
-			let parent = node.parent();
-			// 跳过已被删除的节点
-			if (!parent || node.fragment === fragment) {
 				return;
+			}
+			const styles = node.css();
+			defautlStyleKeys.forEach((key) => {
+				const value = styles[key];
+				if (!value) return;
+				if (value === defaultStyle[key]) {
+					node.css(key, '');
+				}
+			});
+			//处理后如果不是一个有效的节点就移除包裹
+			if (!this.schema.getType(node)) {
+				nodeApi.unwrap(node);
+				return;
+			}
+			nodeApi.removeMinusStyle(node, 'text-indent');
+			if (nodeApi.isList(node)) {
+				node.css('padding-left', '');
+			}
+			// 删除空 style 属性
+			if (node.attributes('style').trim() === '') {
+				node.removeAttributes('style');
+			}
+
+			// br 换行改成正常段落
+			if (nodeApi.isBlock(node, this.schema)) {
+				this.engine.block.brToBlock(node);
+			}
+			// 删除空 span
+			while (node.name === 'span' && nodeApi.isEmpty(node)) {
+				parent = node.parent();
+				node.remove();
+				if (!parent) return;
+				node = parent;
 			}
 			// 删除 google docs 根节点
 			// <b style="font-weight:flat;" id="docs-internal-guid-e0280780-7fff-85c2-f58a-6e615d93f1f2">
@@ -138,12 +116,15 @@ export default class Paste {
 			if (node.attributes(READY_CARD_KEY)) {
 				return;
 			}
+			const nodeIsBlock = nodeApi.isBlock(node, this.schema);
+			const nodeIsVoid = nodeApi.isVoid(node, this.schema);
+			let parentIsBlock = nodeApi.isBlock(parent, this.schema);
 			// 删除零高度的空行
 			if (
-				nodeApi.isBlock(node, this.schema) &&
+				nodeIsBlock &&
 				node.attributes('data-type') !== 'p' &&
-				!nodeApi.isVoid(node, this.schema) &&
-				!nodeApi.isBlock(parent, this.schema) &&
+				!nodeIsVoid &&
+				!parentIsBlock &&
 				//!node.isSolid() &&
 				nodeApi.html(node) === ''
 			) {
@@ -154,19 +135,24 @@ export default class Paste {
 			if (node.attributes('data-type') === 'p') {
 				node.removeAttributes('data-type');
 			}
-			if (nodeApi.isBlock(node, this.schema) && parent?.name === 'p') {
-				nodeApi.unwrap(node);
+			if (nodeIsBlock && parent?.name === 'p') {
+				nodeApi.unwrap(parent);
 				parent = node.parent();
+				if (parent?.fragment === fragment) parent = undefined;
+				parentIsBlock = parent
+					? nodeApi.isBlock(parent, this.schema)
+					: false;
 			}
+			const parentIsList = parent ? nodeApi.isList(parent) : false;
 			// 补齐 ul 或 ol
-			if (node.name === 'li' && parent && !nodeApi.isList(parent)) {
+			if (node.name === 'li' && parent && !parentIsList) {
 				const ul = $('<ul />');
 				node.before(ul);
 				ul.append(node);
 				return;
 			}
 			// 补齐 li
-			if (node.name !== 'li' && parent && nodeApi.isList(parent)) {
+			if (node.name !== 'li' && parentIsList) {
 				const li = $('<li />');
 				node.before(li);
 				li.append(node);
@@ -202,14 +188,14 @@ export default class Paste {
 				return;
 			}
 			// p 改成 li
-			if (node.name === 'p' && parent && nodeApi.isList(parent)) {
+			if (node.name === 'p' && parentIsList) {
 				nodeApi.replace(node, $('<li />'));
 				return;
 			}
 			// 处理空 Block
 			if (
-				nodeApi.isBlock(node, this.schema) &&
-				!nodeApi.isVoid(node, this.schema) &&
+				nodeIsBlock &&
+				!nodeIsVoid &&
 				nodeApi.html(node).trim() === ''
 			) {
 				// <p></p> to <p><br /></p>
@@ -221,7 +207,7 @@ export default class Paste {
 				}
 			}
 			// <li><p>foo</p></li>
-			if (nodeApi.isBlock(node, this.schema) && parent?.name === 'li') {
+			if (nodeIsBlock && parent?.name === 'li') {
 				// <li><p><br /></p></li>
 				if (
 					node.children().length === 1 &&
@@ -235,9 +221,10 @@ export default class Paste {
 				return;
 			}
 			if (
+				!nodeIsBlock &&
 				nodeApi.isInline(node) &&
 				!node.isCard() &&
-				!nodeApi.isVoid(node, this.schema)
+				!nodeIsVoid
 			) {
 				const isVoid = node
 					.allChildren()
@@ -334,7 +321,7 @@ export default class Paste {
 
 		$(fragment).traverse((node) => {
 			if (node.fragment === fragment) return;
-			if (node.length > 0 && node.parent())
+			if (node.length > 0 && node[0].parentNode)
 				this.engine.trigger('paste:each', node);
 			// 删除非block节点的换行 \r\n\r\n<span
 			if (node.isText()) {
@@ -348,13 +335,6 @@ export default class Paste {
 					)
 						node.remove();
 				}
-			}
-		});
-		$(fragment).traverse((node) => {
-			if (node.fragment === fragment) return;
-			this.engine.trigger('paste:each-after', node);
-			if (node.isText()) {
-				const text = node.text();
 				const match = /((\n)+)/.exec(text);
 				if (match && !text.endsWith('\n') && !text.startsWith('\n')) {
 					const nextReg = node.get<Text>()!.splitText(match.index);
@@ -364,13 +344,14 @@ export default class Paste {
 				}
 			}
 			// 删除包含Card的 pre 标签
-			if (
+			else if (
 				node.name === 'pre' &&
 				node.find(READY_CARD_SELECTOR).length > 0
 			) {
 				nodeApi.unwrap(node);
 			}
 		});
+		this.engine.trigger('paste:each-after', $(fragment));
 
 		const node = nodeApi.normalize($(fragment));
 		if (node.fragment) fragment = node.fragment;
@@ -391,14 +372,12 @@ export default class Paste {
 			nodeApi.unwrap(first);
 		}
 		fragmentNode = $(fragment);
-		fragmentNode.each((_, index) => {
-			const children = fragmentNode.eq(index);
-			children?.find('ul,ol').each((_, index) => {
-				const child = children.eq(index);
-				if (child && nodeApi.isList(child)) {
-					this.engine.list.addStart(child);
-				}
-			});
+		const children = fragmentNode.find('ul,ol');
+		children.each((_, index) => {
+			const child = children.eq(index);
+			if (child && nodeApi.isList(child)) {
+				this.engine.list.addStart(child);
+			}
 		});
 		this.engine.nodeId.generateAll($(fragment), true);
 		return fragment;

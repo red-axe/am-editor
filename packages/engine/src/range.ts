@@ -1,6 +1,6 @@
 import { NodeInterface } from './types/node';
 import { RangeInterface, RangePath } from './types/range';
-import { getWindow, isMobile } from './utils';
+import { isMobile } from './utils';
 import { CARD_ELEMENT_KEY, CARD_SELECTOR } from './constants/card';
 import { ANCHOR, CURSOR, FOCUS } from './constants/selection';
 import {
@@ -205,7 +205,7 @@ class Range implements RangeInterface {
 	 */
 	enlargeFromTextNode = () => {
 		const enlargePosition = (node: Node, offset: number, type: string) => {
-			if (node.nodeType !== getWindow().Node.TEXT_NODE) {
+			if (node.nodeType !== Node.TEXT_NODE) {
 				return;
 			}
 			if (offset === 0) {
@@ -239,7 +239,7 @@ class Range implements RangeInterface {
 	 */
 	shrinkToTextNode = () => {
 		const shrinkPosition = (node: Node, offset: number, type: string) => {
-			if (node.nodeType !== getWindow().Node.ELEMENT_NODE) {
+			if (node.nodeType !== Node.ELEMENT_NODE) {
 				return;
 			}
 
@@ -260,12 +260,12 @@ class Range implements RangeInterface {
 				right = childNodes[offset];
 			}
 
-			if (left && left.nodeType === getWindow().Node.TEXT_NODE) {
+			if (left && left.nodeType === Node.TEXT_NODE) {
 				child = left;
 				offset = child.nodeValue?.length || 0;
 			}
 
-			if (right && right.nodeType === getWindow().Node.TEXT_NODE) {
+			if (right && right.nodeType === Node.TEXT_NODE) {
 				child = right;
 				offset = 0;
 			}
@@ -305,7 +305,7 @@ class Range implements RangeInterface {
 		) => {
 			let domNode = $(node);
 			if (
-				domNode.type === getWindow().Node.TEXT_NODE ||
+				domNode.type === Node.TEXT_NODE ||
 				(!toBlock && nodeApi.isBlock(domNode)) ||
 				domNode.isEditable()
 			) {
@@ -363,10 +363,10 @@ class Range implements RangeInterface {
 		let child;
 		let childDom;
 		while (
-			this.startContainer.nodeType === getWindow().Node.ELEMENT_NODE &&
+			this.startContainer.nodeType === Node.ELEMENT_NODE &&
 			(child = this.startContainer.childNodes[this.startOffset]) &&
 			(childDom = $(child)) &&
-			child.nodeType === getWindow().Node.ELEMENT_NODE &&
+			child.nodeType === Node.ELEMENT_NODE &&
 			!childDom.isCursor() &&
 			!node.isVoid(child) &&
 			(!childDom.isCard() ||
@@ -376,11 +376,11 @@ class Range implements RangeInterface {
 			this.setStart(child, 0);
 		}
 		while (
-			this.endContainer.nodeType === getWindow().Node.ELEMENT_NODE &&
+			this.endContainer.nodeType === Node.ELEMENT_NODE &&
 			this.endOffset > 0 &&
 			(child = this.endContainer.childNodes[this.endOffset - 1]) &&
 			(childDom = $(child)) &&
-			child.nodeType === getWindow().Node.ELEMENT_NODE &&
+			child.nodeType === Node.ELEMENT_NODE &&
 			!node.isVoid(child) &&
 			!childDom.isCursor() &&
 			(!childDom.isCard() ||
@@ -514,7 +514,7 @@ class Range implements RangeInterface {
 		if (
 			startContainer !== endContainer ||
 			collapsed === true ||
-			startContainer.nodeType === getWindow().Node.TEXT_NODE
+			startContainer.nodeType === Node.TEXT_NODE
 		) {
 			return elements;
 		}
@@ -533,7 +533,7 @@ class Range implements RangeInterface {
 
 	getStartOffsetNode = (): Node => {
 		const { startContainer, startOffset } = this;
-		if (startContainer.nodeType === getWindow().Node.ELEMENT_NODE) {
+		if (startContainer.nodeType === Node.ELEMENT_NODE) {
 			return (
 				startContainer.childNodes[startOffset] ||
 				startContainer.childNodes[startOffset - 1] ||
@@ -545,7 +545,7 @@ class Range implements RangeInterface {
 
 	getEndOffsetNode = (): Node => {
 		const { endContainer, endOffset } = this;
-		if (endContainer.nodeType === getWindow().Node.ELEMENT_NODE) {
+		if (endContainer.nodeType === Node.ELEMENT_NODE) {
 			return (
 				endContainer.childNodes[endOffset] ||
 				endContainer.childNodes[endOffset - 1] ||
@@ -568,10 +568,7 @@ class Range implements RangeInterface {
 
 	scrollRangeIntoView = () => {
 		const node = this.getEndOffsetNode();
-		const root =
-			node.nodeType === getWindow().Node.TEXT_NODE
-				? node.parentNode
-				: node;
+		const root = node.nodeType === Node.TEXT_NODE ? node.parentNode : node;
 		const rect = this.collapsed
 			? (root as Element).getBoundingClientRect()
 			: this.getClientRect();
@@ -890,13 +887,13 @@ Range.fromPath = (
 				offset = 0;
 			}
 			if (
-				node.nodeType === getWindow().Node.ELEMENT_NODE &&
+				node.nodeType === Node.ELEMENT_NODE &&
 				offset > node.childNodes.length
 			) {
 				offset = node.childNodes.length;
 			}
 			if (
-				node.nodeType === getWindow().Node.TEXT_NODE &&
+				node.nodeType === Node.TEXT_NODE &&
 				offset > (node.nodeValue?.length || 0)
 			) {
 				offset = node.nodeValue?.length || 0;

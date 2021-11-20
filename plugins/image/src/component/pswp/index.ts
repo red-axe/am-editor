@@ -4,7 +4,6 @@ import PhotoSwipeUI from 'photoswipe/dist/photoswipe-ui-default';
 import {
 	$,
 	EditorInterface,
-	getWindow,
 	isHotkey,
 	isMobile,
 	NodeInterface,
@@ -125,7 +124,7 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 	bindClickEvent() {
 		const onClick = (event: MouseEvent | TouchEvent) => {
 			const node =
-				getWindow().TouchEvent && event instanceof TouchEvent
+				window.TouchEvent && event instanceof TouchEvent
 					? $(event.touches[0].target)
 					: $(event.target || []);
 			if (node.hasClass('pswp__img')) {

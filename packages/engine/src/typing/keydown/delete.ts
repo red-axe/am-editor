@@ -4,7 +4,6 @@ import {
 	RangeInterface,
 	TypingHandleInterface,
 } from '../../types';
-import { getWindow } from '../../utils';
 import { CARD_KEY } from '../../constants';
 import Range from '../../range';
 import { $ } from '../../node';
@@ -72,7 +71,7 @@ class Delete implements TypingHandleInterface {
 				range.collapse(true);
 				return range;
 			}
-			if (node.nodeType === getWindow().Node.TEXT_NODE) {
+			if (node.nodeType === Node.TEXT_NODE) {
 				if (node['data'].length === 0) return this.getRange(node);
 				if (!node.ownerDocument) return null;
 				const range = Range.create(this.engine, node.ownerDocument);
@@ -107,7 +106,7 @@ class Delete implements TypingHandleInterface {
 			}
 			if (!card.isRightCursor(range.startNode)) return;
 			nextNode = card.root[0];
-		} else if (range.endContainer.nodeType === getWindow().Node.TEXT_NODE) {
+		} else if (range.endContainer.nodeType === Node.TEXT_NODE) {
 			if (range.endContainer['data'].length > range.endOffset) {
 				event.preventDefault();
 				const cloneRange = range.cloneRange();
@@ -119,8 +118,7 @@ class Delete implements TypingHandleInterface {
 			}
 			nextNode = range.endContainer;
 		} else {
-			if (range.endContainer.nodeType !== getWindow().Node.ELEMENT_NODE)
-				return;
+			if (range.endContainer.nodeType !== Node.ELEMENT_NODE) return;
 			if (range.endContainer.childNodes.length === 0) {
 				nextNode = range.endContainer;
 			} else if (range.endOffset === 0) {

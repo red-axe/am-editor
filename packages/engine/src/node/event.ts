@@ -49,14 +49,10 @@ class Event implements EventInterface {
 		const listeners = this.listeners[eventType];
 		if (listeners) {
 			let result;
-
-			for (var i = 0; i < listeners.length; i++) {
-				result = listeners[i](...args);
-
-				if (result === false) {
-					break;
-				}
-			}
+			listeners.every((listener) => {
+				result = listener(...args);
+				return result !== false;
+			});
 
 			return result;
 		}

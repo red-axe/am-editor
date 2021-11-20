@@ -16,18 +16,6 @@ export const getDocument = (node?: Node): Document => {
 		: document;
 };
 
-export const getWindow = (node?: Node): Window & typeof globalThis => {
-	if (
-		typeof window === 'undefined' &&
-		typeof global['__amWindow'] === 'undefined'
-	)
-		throw 'window is not defined,If you are using ssr, you can assign a value to the `__amWindow` global variable.';
-	const win = typeof window === 'undefined' ? global['__amWindow'] : window;
-	if (!node) return win;
-	const document = getDocument(node);
-	return document['parentWindow'] || document.defaultView || win;
-};
-
 /**
  * 移除空的文本节点，并连接相邻的文本节点
  * @param node 节点

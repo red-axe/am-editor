@@ -49,11 +49,13 @@ export default class extends ListPlugin<Options> {
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
-			this.editor.on('paste:each-after', (child) => {
-				if (
-					child.name === 'li' &&
-					child.hasClass(this.editor.list.CUSTOMZIE_LI_CLASS)
-				) {
+			this.editor.on('paste:each-after', (root) => {
+				const liNodes = root.find(
+					`li.${this.editor.list.CUSTOMZIE_LI_CLASS}`,
+				);
+				liNodes.each((_, index) => {
+					const child = liNodes.eq(index);
+					if (!child) return;
 					const firstChild = child.first();
 					if (
 						firstChild &&
@@ -71,7 +73,7 @@ export default class extends ListPlugin<Options> {
 							}
 						}
 					}
-				}
+				});
 			});
 		}
 	}

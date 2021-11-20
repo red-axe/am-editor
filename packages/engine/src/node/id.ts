@@ -68,14 +68,12 @@ class NodeId implements NodeIdInterface {
 		if (isNodeEntry(root) && root.fragment) {
 			root = root.fragment;
 		}
-		const element = (isNode(root) ? root : root.get<Element>()) as Element;
-		if (element.nodeType === Node.TEXT_NODE) return;
-		const nodes =
-			(isNode(root) ? root : root.get<Element>())?.querySelectorAll(
-				tagNames,
-			) || [];
-		nodes.forEach((child) => {
-			const node = $(child);
+		const node = isNode(root) ? root : root.get<Node>();
+		if (!node || node.nodeType === Node.TEXT_NODE) return;
+		const nodes = (isNode(root) ? $(root) : root)?.find(tagNames);
+		nodes.each((_, index) => {
+			const node = nodes.eq(index);
+			if (!node) return;
 			// 有ID不再生成
 			if (!force && node.attributes(DATA_ID)) return;
 
@@ -95,7 +93,8 @@ class NodeId implements NodeIdInterface {
 		// 不符合规则
 		const nodeRules = rules[node.name];
 		if (
-			(nodeRules && nodeRules.length === 0) ||
+			!nodeRules ||
+			nodeRules.length === 0 ||
 			!nodeRules.some((rule) =>
 				this.editor.schema.checkNode(
 					node as NodeInterface,

@@ -1,6 +1,7 @@
 import { NodeInterface } from './node';
 import { PluginInterface, ElementPluginInterface } from './plugin';
 import { RangeInterface } from './range';
+import { SchemaInterface } from './schema';
 
 export interface InlineModelInterface {
 	/**
@@ -56,7 +57,7 @@ export interface InlineModelInterface {
 	 * 标准化inline节点，不能嵌套在mark标签内，不能嵌套inline标签
 	 * @param node
 	 */
-	flat(node: NodeInterface | RangeInterface): void;
+	flat(node: NodeInterface | RangeInterface, schema?: SchemaInterface): void;
 }
 
 export interface InlineInterface extends ElementPluginInterface {

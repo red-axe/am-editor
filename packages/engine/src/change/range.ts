@@ -244,9 +244,14 @@ class ChangeRange implements ChangeRangeInterface {
 		) {
 			endNode.append('<br />');
 		}
+		const startChildren = startNode.children();
 		// 列表节点没有子节点
-		if (node.isList(startNode) && startNode.children().length === 0) {
+		if (
+			node.isList(startNode) &&
+			(startChildren.length === 0 || startChildren[0].nodeName === 'BR')
+		) {
 			const newNode = $('<p><br /></p>');
+			this.engine.nodeId.create(newNode);
 			startNode.before(newNode);
 			startNode.remove();
 			startNode = newNode;

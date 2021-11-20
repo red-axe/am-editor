@@ -7,7 +7,7 @@ import {
 } from '../constants';
 import { EditorInterface, NodeInterface, RangeInterface } from '../types';
 import { MarkInterface, MarkModelInterface } from '../types/mark';
-import { getDocument, getWindow, isEngine } from '../utils';
+import { getDocument, isEngine } from '../utils';
 import { Backspace } from './typing';
 import { $ } from '../node';
 import { isNode } from '../node/utils';
@@ -541,7 +541,7 @@ class Mark implements MarkModelInterface {
 						}
 					}
 				};
-				if (at.nodeType === getWindow().Node.TEXT_NODE) {
+				if (at.nodeType === Node.TEXT_NODE) {
 					const { textContent } = at;
 					atText = textContent!;
 					atTextLen = atText.length;
@@ -758,7 +758,7 @@ class Mark implements MarkModelInterface {
 		if (!node.isMark(mark)) return;
 		let { commonAncestorNode } = safeRange;
 
-		if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
+		if (commonAncestorNode.type === Node.TEXT_NODE) {
 			commonAncestorNode = commonAncestorNode.parent()!;
 		}
 		const card = this.editor.card.find(commonAncestorNode, true);
@@ -849,7 +849,7 @@ class Mark implements MarkModelInterface {
 		if (!isEditable) {
 			this.split(safeRange);
 			commonAncestorNode = safeRange.commonAncestorNode;
-			if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
+			if (commonAncestorNode.type === Node.TEXT_NODE) {
 				commonAncestorNode = commonAncestorNode.parent()!;
 			}
 			nodes[0] = commonAncestorNode;
@@ -1135,7 +1135,7 @@ class Mark implements MarkModelInterface {
 		}
 		let { commonAncestorNode } = safeRange;
 
-		if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
+		if (commonAncestorNode.type === Node.TEXT_NODE) {
 			commonAncestorNode = commonAncestorNode.parent()!;
 		}
 		const card = this.editor.card.find(commonAncestorNode, true);
@@ -1153,7 +1153,7 @@ class Mark implements MarkModelInterface {
 		if (!isEditable) {
 			this.split(safeRange, safeRange.collapsed ? removeMark : undefined);
 			commonAncestorNode = safeRange.commonAncestorNode;
-			if (commonAncestorNode.type === getWindow().Node.TEXT_NODE) {
+			if (commonAncestorNode.type === Node.TEXT_NODE) {
 				commonAncestorNode = commonAncestorNode.parent()!;
 			}
 			nodes[0] = commonAncestorNode;
@@ -1405,14 +1405,11 @@ class Mark implements MarkModelInterface {
 		const eo = cloneRange.endOffset;
 		let startNode = sc;
 		let endNode = ec;
-		if (
-			sc.nodeType === getWindow().Node.ELEMENT_NODE &&
-			sc.childNodes[so]
-		) {
+		if (sc.nodeType === Node.ELEMENT_NODE && sc.childNodes[so]) {
 			startNode = sc.childNodes[so] || sc;
 		}
 		if (
-			ec.nodeType === getWindow().Node.ELEMENT_NODE &&
+			ec.nodeType === Node.ELEMENT_NODE &&
 			eo > 0 &&
 			ec.childNodes[eo - 1]
 		) {
@@ -1433,10 +1430,7 @@ class Mark implements MarkModelInterface {
 		const findNodes = (node: NodeInterface) => {
 			let nodes: Array<NodeInterface> = [];
 			while (node) {
-				if (
-					node.type === getWindow().Node.ELEMENT_NODE &&
-					node.isEditable()
-				) {
+				if (node.type === Node.ELEMENT_NODE && node.isEditable()) {
 					break;
 				}
 				if (

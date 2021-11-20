@@ -23,7 +23,7 @@ import { BlockModelInterface } from './block';
 import { RequestInterface } from './request';
 import { RangeInterface } from './range';
 import { Op } from 'sharedb';
-import { NodeIdInterface } from 'src';
+import { NodeIdInterface } from './';
 
 /**
  * 编辑器容器接口
@@ -727,7 +727,7 @@ export interface EngineInterface extends EditorInterface {
 	): void;
 	/**
 	 * 解析粘贴数据，生成符合编辑器数据的片段之后扁平化阶段触发
-	 * @param node 所有粘贴片段遍历后的子节点
+	 * @param node 所有粘贴片段遍历后的根节点
 	 */
 	on(
 		eventType: 'paste:each-after',
@@ -896,7 +896,7 @@ export interface EngineInterface extends EditorInterface {
 	off(eventType: 'paste:each', listener: (root: NodeInterface) => void): void;
 	/**
 	 * 解析粘贴数据，生成符合编辑器数据的片段之后扁平化阶段触发
-	 * @param node 所有粘贴片段遍历后的子节点
+	 * @param node 所有粘贴片段遍历后的根节点
 	 */
 	off(
 		eventType: 'paste:each-after',
@@ -1023,7 +1023,7 @@ export interface EngineInterface extends EditorInterface {
 	trigger(eventType: 'paste:each', root: NodeInterface): void;
 	/**
 	 * 解析粘贴数据，生成符合编辑器数据的片段之后扁平化阶段触发
-	 * @param node 所有粘贴片段遍历后的子节点
+	 * @param node 所有粘贴片段遍历后的根节点
 	 */
 	trigger(eventType: 'paste:each-after', root: NodeInterface): void;
 	/**

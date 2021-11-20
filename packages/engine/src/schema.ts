@@ -10,7 +10,7 @@ import {
 	SchemaValue,
 	SchemaValueObject,
 } from './types';
-import { getWindow, validUrl } from './utils';
+import { validUrl } from './utils';
 import { getHashId } from './node';
 import { DATA_ID } from './constants';
 
@@ -149,23 +149,20 @@ class Schema implements SchemaInterface {
 	 * @param callback 查找条件
 	 */
 	find(callback: (rule: SchemaRule) => boolean): Array<SchemaRule> {
-		let schemas: Array<SchemaRule> = [];
-		Object.keys(this.data).some((key) => {
+		const schemas: Array<SchemaRule> = [];
+		Object.keys(this.data).forEach((key) => {
 			if (key !== 'globals') {
 				const rules = (this.data[key] as Array<SchemaRule>).filter(
-					(rule) => callback(rule),
+					callback,
 				);
-				if (rules && rules.length > 0) {
-					schemas = schemas.concat(rules);
-				}
+				schemas.push(...rules);
 			}
-			return;
 		});
 		return schemas;
 	}
 
 	getType(node: NodeInterface, filter?: (rule: SchemaRule) => boolean) {
-		if (node.type !== getWindow().Node.ELEMENT_NODE) return undefined;
+		if (node.type !== Node.ELEMENT_NODE) return undefined;
 		let id = node.attributes(DATA_ID);
 		if (!id) id = getHashId(node, false);
 		else id = id.split('-')[0];
@@ -184,7 +181,7 @@ class Schema implements SchemaInterface {
 	 */
 	getRule(node: NodeInterface, filter?: (rule: SchemaRule) => boolean) {
 		filter = filter || ((rule) => rule.name === node.name);
-		if (node.type !== getWindow().Node.ELEMENT_NODE) return undefined;
+		if (node.type !== Node.ELEMENT_NODE) return undefined;
 		return this._all.find(
 			(rule) => filter!(rule) && this.checkNode(node, rule.attributes),
 		);
@@ -197,16 +194,15 @@ class Schema implements SchemaInterface {
 	 */
 	checkNode(
 		node: NodeInterface,
-		attributes?: SchemaAttributes | SchemaStyle,
+		attributes: SchemaAttributes | SchemaStyle = {},
 	): boolean {
 		//获取节点属性
 		const nodeAttributes = node.attributes();
 		const nodeStyles = node.css();
-		delete nodeAttributes['style'];
-		const styles = (attributes || {}).style as SchemaAttributes;
-		attributes = omit({ ...attributes }, 'style');
+		const styles = (attributes.style || {}) as SchemaAttributes;
 		//需要属性每一项都能效验通过
 		const attrResult = Object.keys(attributes).every((attributesName) => {
+			if (attributesName === 'style') return true;
 			return this.checkValue(
 				attributes as SchemaAttributes,
 				attributesName,
@@ -214,7 +210,7 @@ class Schema implements SchemaInterface {
 			);
 		});
 		if (!attrResult) return false;
-		return Object.keys(styles || {}).every((styleName) => {
+		return Object.keys(styles).every((styleName) => {
 			return this.checkValue(styles, styleName, nodeStyles[styleName]);
 		});
 	}
@@ -324,15 +320,14 @@ class Schema implements SchemaInterface {
 	 * @param rule 规则
 	 */
 	filterStyles(styles: { [k: string]: string }, rule: SchemaRule) {
+		if (!rule.attributes?.style) {
+			styles = {};
+			return;
+		}
 		Object.keys(styles).forEach((styleName) => {
-			//没有设置规则，全部删除
-			if (!rule.attributes?.style) {
-				delete styles[styleName];
-				return;
-			}
 			if (
 				!this.checkValue(
-					rule?.attributes?.style! as SchemaAttributes,
+					rule.attributes!.style as SchemaAttributes,
 					styleName,
 					styles[styleName],
 					true,
@@ -347,15 +342,14 @@ class Schema implements SchemaInterface {
 	 * @param rule 规则
 	 */
 	filterAttributes(attributes: { [k: string]: string }, rule: SchemaRule) {
+		if (!rule.attributes) {
+			attributes = {};
+			return;
+		}
 		Object.keys(attributes).forEach((attributesName) => {
-			//没有设置规则，全部删除
-			if (!rule.attributes) {
-				delete attributes[attributesName];
-				return;
-			}
 			if (
 				!this.checkValue(
-					rule?.attributes! as SchemaAttributes,
+					rule.attributes as SchemaAttributes,
 					attributesName,
 					attributes[attributesName],
 					true,
@@ -379,18 +373,18 @@ class Schema implements SchemaInterface {
 	) {
 		const rule = this.getRule(node);
 		if (!rule) return;
-		let allRule: SchemaRule = { ...rule };
-		const globalRule = Object.keys(this.data.globals).find(
+		const { globals } = this.data;
+		const globalRule = Object.keys(globals).find(
 			(dataType) => rule.type === dataType,
 		);
-		if (globalRule) {
-			allRule.attributes = merge(
-				{
-					...allRule.attributes,
-				},
-				{ ...this.data.globals[globalRule] },
-			);
-		}
+		const allRule = {
+			...omit(rule, 'attributes'),
+			attributes: merge(
+				{},
+				rule.attributes,
+				globalRule ? globals[globalRule] : {},
+			),
+		};
 		this.filterAttributes(attributes, allRule);
 		this.filterStyles(styles, allRule);
 	}
@@ -403,19 +397,18 @@ class Schema implements SchemaInterface {
 	 */
 	closest(name: string) {
 		let topName = name;
-		this.data.blocks
-			.filter((rule) => rule.name === name)
-			.forEach((block) => {
-				const schema = block as SchemaBlock;
-				if (schema.allowIn) {
-					schema.allowIn.forEach((parentName) => {
-						if (this.isAllowIn(parentName, topName)) {
-							topName = parentName;
-						}
-					});
-					topName = this.closest(topName);
-				}
-			});
+		this.data.blocks.forEach((block) => {
+			if (block.name !== name) return;
+			const schema = block as SchemaBlock;
+			if (schema.allowIn) {
+				schema.allowIn.forEach((parentName) => {
+					if (this.isAllowIn(parentName, topName)) {
+						topName = parentName;
+					}
+				});
+				topName = this.closest(topName);
+			}
+		});
 		return topName;
 	}
 	/**
@@ -427,15 +420,14 @@ class Schema implements SchemaInterface {
 	isAllowIn(source: string, target: string) {
 		//p节点下不允许放其它block节点
 		if (source === 'p') return false;
-		return this.data.blocks
-			.filter((rule) => rule.name === target)
-			.some((block) => {
-				const schema = block as SchemaBlock;
-				if (schema.allowIn && schema.allowIn.indexOf(source) > -1) {
-					return true;
-				}
-				return;
-			});
+		return this.data.blocks.some((block) => {
+			if (block.name !== target) return;
+			const schema = block as SchemaBlock;
+			if (schema.allowIn && schema.allowIn.indexOf(source) > -1) {
+				return true;
+			}
+			return;
+		});
 	}
 	addAllowIn(parent: string, child: string = 'p') {
 		const rule = this.data.blocks.find(

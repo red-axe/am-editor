@@ -21,7 +21,7 @@ import {
 	READY_CARD_KEY,
 	READY_CARD_SELECTOR,
 } from '../constants';
-import { getDocument, getStyleMap, getWindow, isEngine } from '../utils';
+import { getDocument, getStyleMap, isEngine } from '../utils';
 import $ from './query';
 import getHashId from './hash';
 import { isNode, isNodeEntry } from './utils';
@@ -168,9 +168,9 @@ class NodeModel implements NodeModelInterface {
 		if (childNodes.length === 0) return true;
 		for (let i = 0; i < childNodes.length; i++) {
 			const child = childNodes[i];
-			if (child.nodeType === getWindow().Node.TEXT_NODE) {
+			if (child.nodeType === Node.TEXT_NODE) {
 				if (child['data'].replace(/\u200b/g, '') !== '') return false;
-			} else if (child.nodeType === getWindow().Node.ELEMENT_NODE) {
+			} else if (child.nodeType === Node.ELEMENT_NODE) {
 				if (
 					child.nodeName.toLowerCase() === 'li' &&
 					!this.editor.list.isEmptyItem($(child))
@@ -446,8 +446,12 @@ class NodeModel implements NodeModelInterface {
 	 * @param source 旧节点
 	 * @param target 新节点
 	 */
-	replace(source: NodeInterface, target: NodeInterface) {
-		const clone = this.clone(target, false, false);
+	replace(
+		source: NodeInterface,
+		target: NodeInterface,
+		copyId: boolean = false,
+	) {
+		const clone = this.clone(target, false, copyId);
 		let childNode =
 			this.isCustomize(source) &&
 			source.name === 'li' &&
@@ -499,7 +503,6 @@ class NodeModel implements NodeModelInterface {
 		if (!isEngine(editor)) return;
 		const { change, block, schema, mark } = editor;
 		range = range || change.range.get();
-		const nodeApi = editor.node;
 		const { startNode, startOffset } = range
 			.cloneRange()
 			.shrinkToTextNode();
@@ -512,8 +515,8 @@ class NodeModel implements NodeModelInterface {
 			//零宽字符前面还有其它字符。或者节点前面还有节点，不能是inline节点。或者前面没有节点了，并且父级不是inline节点
 			if (
 				text.length > 1 ||
-				(prev && !nodeApi.isInline(prev)) ||
-				(!prev && parent && !nodeApi.isInline(parent))
+				(prev && !this.isInline(prev)) ||
+				(!prev && parent && !this.isInline(parent))
 			) {
 				startNode
 					.get<Text>()!
@@ -534,8 +537,16 @@ class NodeModel implements NodeModelInterface {
 			}
 		}
 
-		if (nodeApi.isBlock(node)) {
-			const splitNode = block.split(range);
+		if (this.isBlock(node)) {
+			// 如果当前光标位置的block节点是空节点，就不用分割
+			const { commonAncestorNode } = range;
+			let splitNode = null;
+			if (
+				this.isBlock(commonAncestorNode) &&
+				this.isEmpty(commonAncestorNode)
+			) {
+				splitNode = commonAncestorNode;
+			} else splitNode = block.split(range);
 			let blockNode = block.closest(
 				range.startNode.isEditable()
 					? range
@@ -683,9 +694,12 @@ class NodeModel implements NodeModelInterface {
 	 * @param style 样式名称
 	 */
 	removeMinusStyle(node: NodeInterface, style: string) {
-		if (this.isBlock(node)) {
-			const val = parseInt(node.css(style), 10) || 0;
-			if (val < 0) node.css(style, '');
+		if (node.isElement()) {
+			const styles = node.css();
+			if (styles[style]) {
+				const val = parseInt(styles[style] || '0', 10) || 0;
+				if (val < 0) node.css(style, '');
+			}
 		}
 	}
 
@@ -835,29 +849,29 @@ class NodeModel implements NodeModelInterface {
 				}
 				this.removeSide(cloneNode);
 				block.flat(cloneNode, $(rootElement || []));
+				const children = cloneNode.children().toArray();
 				if (
 					cloneNode.name === 'p' &&
-					cloneNode
-						.children()
-						.toArray()
-						.filter((node) => !node.isCursor()).length === 0
+					children.filter((node) => !node.isCursor()).length === 0
 				) {
 					cloneNode.append($('<br />'));
 				}
+				if (
+					this.editor.node.isBlock(cloneNode) &&
+					this.isEmptyWithTrim(cloneNode)
+				) {
+					cloneNode.html('<br />');
+				}
 			}
+			const children = childNode.children().toArray();
 			if (
 				childNode.name === 'p' &&
-				childNode
-					.children()
-					.toArray()
-					.filter((node) => !node.isCursor()).length === 0
+				children.filter((node) => !node.isCursor()).length === 0
 			) {
 				childNode.append($('<br />'));
 			}
 			if (
 				this.editor.node.isBlock(childNode) &&
-				childNode.children().length === 1 &&
-				childNode.first()?.isText() &&
 				this.isEmptyWithTrim(childNode)
 			) {
 				childNode.html('<br />');
@@ -956,7 +970,7 @@ class NodeModel implements NodeModelInterface {
 	removeZeroWidthSpace(node: NodeInterface) {
 		node.traverse((child) => {
 			const node = child[0];
-			if (node.nodeType !== getWindow().Node.TEXT_NODE) {
+			if (node.nodeType !== Node.TEXT_NODE) {
 				return;
 			}
 			const text = node.nodeValue;
@@ -968,7 +982,7 @@ class NodeModel implements NodeModelInterface {
 			if (
 				text.charCodeAt(1) === 0x200b &&
 				next &&
-				next.nodeType === getWindow().Node.ELEMENT_NODE &&
+				next.nodeType === Node.ELEMENT_NODE &&
 				[ANCHOR, FOCUS, CURSOR].indexOf(
 					(<Element>next).getAttribute(DATA_ELEMENT) || '',
 				) >= 0

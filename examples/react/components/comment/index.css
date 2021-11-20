@@ -5,6 +5,7 @@
 
 span[data-comment-preview], span[data-comment-id] {
     display: inline-block;
+    text-indent: 0;
 }
 
 [data-comment-preview]::before, [data-comment-id]::before{

@@ -13,9 +13,7 @@ import {
 	toCamelCase,
 	getStyleMap,
 	getComputedStyle,
-	getAttrMap,
 	getDocument,
-	getWindow,
 } from '../utils';
 import { Path } from 'sharedb';
 import {
@@ -49,25 +47,24 @@ class NodeEntry implements NodeInterface {
 
 	constructor(nodes: Node | NodeList | Array<Node>, context?: Context) {
 		if (isNode(nodes)) {
-			if (nodes.nodeType === getWindow().Node.DOCUMENT_FRAGMENT_NODE) {
+			if (nodes.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
 				this.fragment = nodes as DocumentFragment;
 			}
 			nodes = [nodes];
 		}
-
-		for (let i = 0; i < nodes.length; i++) {
-			this[i] = nodes[i];
-			this.events[i] = new DOMEvent(); // 初始化事件对象
-		}
+		nodes.forEach((node, index) => {
+			this[index] = node;
+			this.events[index] = new DOMEvent(); // 初始化事件对象
+		});
 
 		this.length = nodes.length;
 
-		if (this.length > 0) {
+		if (this[0]) {
 			this.document = getDocument(context);
 			this.context = context;
-			this.name = this[0].nodeName ? this[0].nodeName.toLowerCase() : '';
+			this.name = this[0].nodeName.toLowerCase();
 			this.type = this[0].nodeType;
-			this.window = getWindow(this[0]);
+			this.window = this.document.defaultView || window;
 		}
 	}
 
@@ -77,7 +74,7 @@ class NodeEntry implements NodeInterface {
 	 * @param selector 选择器
 	 */
 	isMatchesSelector(element: ElementInterface, selector: string) {
-		if (element.nodeType !== getWindow().Node.ELEMENT_NODE || !selector) {
+		if (element.nodeType !== Node.ELEMENT_NODE || !selector) {
 			return false;
 		}
 		const defaultMatches = (element: Element, selector: string) => {
@@ -107,10 +104,13 @@ class NodeEntry implements NodeInterface {
 	each(
 		callback: (node: Node, index: number) => boolean | void,
 	): NodeInterface {
-		for (let i = 0; i < this.length; i++) {
-			if (callback(this[i], i) === false) {
+		let i = 0,
+			node;
+		while ((node = this[i])) {
+			if (callback(node, i) === false) {
 				break;
 			}
+			i++;
 		}
 		return this;
 	}
@@ -132,7 +132,7 @@ class NodeEntry implements NodeInterface {
 	 * @return {boolean}
 	 */
 	isElement(): boolean {
-		return this.type === getWindow().Node.ELEMENT_NODE;
+		return this.type === Node.ELEMENT_NODE;
 	}
 
 	/**
@@ -140,7 +140,7 @@ class NodeEntry implements NodeInterface {
 	 * @return {boolean}
 	 */
 	isText(): boolean {
-		return this.type === getWindow().Node.TEXT_NODE;
+		return this.type === Node.TEXT_NODE;
 	}
 
 	/**
@@ -167,7 +167,11 @@ class NodeEntry implements NodeInterface {
 	 * @returns
 	 */
 	isEditableCard() {
-		return this.find(EDITABLE_SELECTOR).length > 0;
+		return (
+			this.attributes(DATA_ELEMENT) === EDITABLE ||
+			(this.isElement() &&
+				!!(this[0] as Element).querySelector(EDITABLE_SELECTOR))
+		);
 	}
 
 	/**
@@ -224,7 +228,7 @@ class NodeEntry implements NodeInterface {
 		let prev = this.get()?.previousSibling;
 		let index = 0;
 
-		while (prev && prev.nodeType === getWindow().Node.ELEMENT_NODE) {
+		while (prev && prev.nodeType === Node.ELEMENT_NODE) {
 			index++;
 			prev = prev.previousSibling;
 		}
@@ -372,8 +376,8 @@ class NodeEntry implements NodeInterface {
 			return false;
 		}
 		if (
-			this.get()!.nodeType === getWindow().Node.DOCUMENT_NODE &&
-			domNode?.nodeType !== getWindow().Node.DOCUMENT_NODE
+			this.get()!.nodeType === Node.DOCUMENT_NODE &&
+			domNode?.nodeType !== Node.DOCUMENT_NODE
 		) {
 			return true;
 		}
@@ -395,7 +399,9 @@ class NodeEntry implements NodeInterface {
 	 */
 	find(selector: string): NodeInterface {
 		if (this.length > 0 && this.isElement()) {
-			const nodeList = this.get<Element>()?.querySelectorAll(selector);
+			const nodeList = (
+				this.fragment ? this.fragment : this.get<Element>()
+			)?.querySelectorAll(selector);
 			return new NodeEntry(nodeList || []);
 		}
 		return new NodeEntry([]);
@@ -526,8 +532,18 @@ class NodeEntry implements NodeInterface {
 		val?: string | number,
 	): NodeEntry | { [k: string]: string } | string {
 		if (key === undefined) {
-			const element = this.clone(false).get<Element>();
-			return getAttrMap(element?.outerHTML || '');
+			const element = this.get<Element>();
+			if (!element) return {};
+			const attrs = {};
+			const elementAttributes = element.attributes;
+			let i = 0,
+				item = null;
+			while ((item = elementAttributes[i])) {
+				const { name, value } = item;
+				attrs[name] = value;
+				i++;
+			}
+			return attrs;
 		}
 
 		if (typeof key === 'object') {
@@ -560,6 +576,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	removeAttributes(key: string): NodeInterface {
 		this.each((node) => {
+			if (node.nodeType !== Node.ELEMENT_NODE) return;
 			const element = <Element>node;
 			element.removeAttribute(key);
 		});
@@ -573,13 +590,14 @@ class NodeEntry implements NodeInterface {
 	 */
 	hasClass(className: string): boolean {
 		if (this.length === 0) return false;
-		const element = this.get<Element>()!;
-		if (element.classList) {
-			for (let i = 0; i < element.classList.length; i++) {
-				if (element.classList[i] === className) {
-					return true;
-				}
-			}
+		const element = this.get<Element>();
+		if (!element) return false;
+		let i = 0,
+			name = null;
+		const classList = element.classList || {};
+		while ((name = classList[i])) {
+			if (name === className) return true;
+			i++;
 		}
 		return false;
 	}
@@ -689,8 +707,17 @@ class NodeEntry implements NodeInterface {
 	html(html: string): NodeEntry;
 	html(html?: string): NodeEntry | string {
 		if (html !== undefined) {
+			const children = $(html);
 			this.each((node) => {
-				(node as Element).innerHTML = html;
+				let child = node.firstChild;
+				while (child) {
+					const next = child.nextSibling;
+					node.removeChild(child);
+					child = next;
+				}
+				children.forEach((child) => {
+					(node as Element).append(child.cloneNode(true));
+				});
 			});
 			return this;
 		}
@@ -772,12 +799,8 @@ class NodeEntry implements NodeInterface {
 		this.each((node) => {
 			let child = node.firstChild;
 			while (child) {
-				if (!node.parentNode) {
-					return;
-				}
-
 				const next = child.nextSibling;
-				child.parentNode?.removeChild(child);
+				node.removeChild(child);
 				child = next;
 			}
 		});
@@ -809,9 +832,10 @@ class NodeEntry implements NodeInterface {
 	 */
 	prepend(selector: Selector): NodeInterface {
 		const nodes = $(selector, this.context);
+		const isClone = typeof selector === 'string' && /<.+>/.test(selector);
 		this.each((node) => {
 			for (let i = nodes.length - 1; i >= 0; i--) {
-				const child = nodes[i];
+				const child = isClone ? nodes[i].cloneNode(true) : nodes[i];
 				if (node.firstChild) {
 					node.insertBefore(child, node.firstChild);
 				} else {
@@ -829,11 +853,12 @@ class NodeEntry implements NodeInterface {
 	 */
 	append(selector: Selector): NodeInterface {
 		const nodes = $(selector, this.context);
+		const isClone = typeof selector === 'string' && /<.+>/.test(selector);
 		this.each((node) => {
 			for (let i = 0; i < nodes.length; i++) {
-				const child = nodes[i];
+				const child = isClone ? nodes[i].cloneNode(true) : nodes[i];
 				if (typeof selector === 'string') {
-					node.appendChild(child.cloneNode(true));
+					node.appendChild(child);
 				} else {
 					node.appendChild(child);
 				}
@@ -848,10 +873,14 @@ class NodeEntry implements NodeInterface {
 	 * @return 当前实例
 	 */
 	before(selector: Selector): NodeInterface {
+		const nodes = $(selector, this.context);
+		const isClone = typeof selector === 'string' && /<.+>/.test(selector);
 		this.each((node) => {
-			const nodes = $(selector, this.context);
+			const parentNode = node.parentNode;
+			if (!parentNode) return;
 			nodes.forEach((child) => {
-				node.parentNode?.insertBefore(child, node);
+				if (isClone) child = child.cloneNode(true);
+				parentNode.insertBefore(child, node);
 				node = child;
 			});
 		});
@@ -864,14 +893,18 @@ class NodeEntry implements NodeInterface {
 	 * @return 当前实例
 	 */
 	after(selector: Selector): NodeInterface {
+		const nodes = $(selector, this.context);
+		const isClone = typeof selector === 'string' && /<.+>/.test(selector);
 		this.each((node) => {
-			const nodes = $(selector, this.context);
+			const parentNode = node.parentNode;
+			if (!parentNode) return;
 			nodes.forEach((child) => {
+				if (isClone) child = child.cloneNode(true);
 				if (node.nextSibling) {
-					node.parentNode?.insertBefore(child, node.nextSibling);
+					parentNode.insertBefore(child, node.nextSibling);
 					node = child;
 				} else {
-					node.parentNode?.appendChild(child);
+					parentNode.appendChild(child);
 				}
 			});
 		});
@@ -885,10 +918,13 @@ class NodeEntry implements NodeInterface {
 	 */
 	replaceWith(selector: Selector): NodeInterface {
 		const newNodes: Array<Node> = [];
+		const nodes = $(selector, this.context);
+		const isClone = typeof selector === 'string' && /<.+>/.test(selector);
 		this.each((node) => {
-			const nodes = $(selector, this.context);
-			const newNode = nodes[0];
-			node.parentNode?.replaceChild(newNode, node);
+			const parentNode = node.parentNode;
+			if (!parentNode) return;
+			const newNode = isClone ? nodes[0].cloneNode(true) : nodes[0];
+			parentNode.replaceChild(newNode, node);
 			newNodes.push(newNode);
 		});
 		return new NodeEntry(newNodes);
@@ -914,7 +950,7 @@ class NodeEntry implements NodeInterface {
 				}
 
 				if (result !== true) {
-					if (child.isEditableCard() && includeEditableCard) {
+					if (includeEditableCard && child.isEditableCard()) {
 						const editableElements = child.find(EDITABLE_SELECTOR);
 						editableElements.each((_, index) => {
 							const editableElement = editableElements.eq(index);
@@ -1014,7 +1050,7 @@ class NodeEntry implements NodeInterface {
 
 	inViewport(node: NodeInterface, view: NodeInterface) {
 		let viewNode = null;
-		if (view.type !== getWindow().Node.ELEMENT_NODE) {
+		if (view.type !== Node.ELEMENT_NODE) {
 			if (!view.document) return false;
 			viewNode = view.document.createElement('span');
 			if (view.next()) {
@@ -1045,7 +1081,7 @@ class NodeEntry implements NodeInterface {
 		if (typeof view.document?.body.scrollIntoView === 'function') {
 			let viewElement = null;
 			if (
-				view.type !== getWindow().Node.ELEMENT_NODE ||
+				view.type !== Node.ELEMENT_NODE ||
 				view.name.toLowerCase() === 'br'
 			) {
 				viewElement = view.document.createElement('span');

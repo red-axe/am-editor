@@ -9,7 +9,7 @@ import { RangeInterface, RangePath } from '../types/range';
 import ChangeEvent from './event';
 import Parser from '../parser';
 import { ANCHOR_SELECTOR, CURSOR_SELECTOR, FOCUS_SELECTOR } from '../constants';
-import { combinText, getWindow } from '../utils';
+import { combinText } from '../utils';
 import { TRIGGER_CARD_ID } from '../constants/card';
 import { DATA_ID, EDITABLE_SELECTOR, UI_SELECTOR } from '../constants/root';
 import { SelectionInterface } from '../types/selection';
@@ -26,7 +26,7 @@ class ChangeModel implements ChangeInterface {
 	valueCached: string | null = null;
 	onChange: (value: string, trigger: 'remote' | 'local' | 'both') => void;
 	onRealtimeChange: (trigger: 'remote' | 'local') => void;
-	onSelect: () => void;
+	onSelect: (range?: RangeInterface) => void;
 	onSetValue: () => void;
 	rangePathBeforeCommand?: { start: RangePath; end: RangePath };
 	marks: Array<NodeInterface> = [];
@@ -43,14 +43,23 @@ class ChangeModel implements ChangeInterface {
 
 		this.onChange = this.options.onChange || function () {};
 		this.onRealtimeChange = this.options.onRealtimeChange || function () {};
-		this.onSelect = this.options.onSelect || function () {};
-		this.onSetValue = this.options.onSetValue || function () {};
-		this.range = new ChangeRange(engine, {
-			onSelect: (range) => {
+
+		this.onSelect = (range?: RangeInterface) => {
+			if (selectTimeout) clearTimeout(selectTimeout);
+			selectTimeout = setTimeout(() => {
 				const { mark, block, inline } = engine;
+				range = range || this.range.get();
 				this.marks = mark.findMarks(range);
 				this.blocks = block.findBlocks(range);
 				this.inlines = inline.findInlines(range);
+				if (this.options.onSelect) this.options.onSelect();
+			}, 50);
+		};
+		this.onSetValue = this.options.onSetValue || function () {};
+		let selectTimeout: null | NodeJS.Timeout = null;
+		this.range = new ChangeRange(engine, {
+			onSelect: (range) => {
+				this.onSelect(range);
 			},
 		});
 		this.#nativeEvent = new NativeEvent(engine);
@@ -271,8 +280,8 @@ class ChangeModel implements ChangeInterface {
 		const { container, node, schema } = this.engine;
 		const tags = schema.getAllowInTags();
 		return (
-			node.isEmptyWithTrim(container) &&
 			container.children().length === 1 &&
+			node.isEmptyWithTrim(container) &&
 			!container.allChildren().some((child) => tags.includes(child.name))
 		);
 	}
@@ -392,7 +401,9 @@ class ChangeModel implements ChangeInterface {
 			.enlargeToElementNode(true)
 			.collapse(false);
 		const startNode =
-			cloneRange.startContainer.childNodes[range.startOffset - 1];
+			cloneRange.startContainer.childNodes[
+				range.startOffset === 0 ? 0 : range.startOffset - 1
+			];
 		const endNode = cloneRange.startContainer.childNodes[range.startOffset];
 
 		if (childNodes.length !== 0) {
@@ -633,8 +644,7 @@ class ChangeModel implements ChangeInterface {
 		if (!isEmptyNode && startNode.length > 0 && startNode.inEditor()) {
 			if (
 				startNode[0].childNodes.length === 1 &&
-				startNode[0].firstChild?.nodeType ===
-					getWindow().Node.ELEMENT_NODE &&
+				startNode[0].firstChild?.nodeType === Node.ELEMENT_NODE &&
 				nodeApi.isCustomize(startNode) &&
 				startNode.first()?.isCard()
 			)

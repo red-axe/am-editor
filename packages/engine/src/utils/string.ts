@@ -5,8 +5,6 @@ import {
 	READY_CARD_KEY,
 } from '../constants/card';
 import { DATA_ELEMENT } from '../constants/root';
-
-import { getWindow } from './node';
 import { isMacos } from './user-agent';
 
 /**
@@ -44,7 +42,7 @@ export const toCamelCase = (
 	return value
 		.split('-')
 		.map((str, index) => {
-			if (type === 'upper' || (type === 'lower' && index > 0)) {
+			if (type === 'upper' || index > 0) {
 				return str.charAt(0).toUpperCase() + str.substr(1);
 			}
 			if (type === 'lower' && index === 0) {
@@ -96,6 +94,7 @@ export const getAttrMap = (value: string): { [k: string]: string } => {
 	return map;
 };
 
+const stylesCaches = new Map<string, { [k: string]: string }>();
 /**
  * 将 style 样式转换为 map 数据类型
  * @param {string} style
@@ -103,15 +102,21 @@ export const getAttrMap = (value: string): { [k: string]: string } => {
 export const getStyleMap = (style: string): { [k: string]: string } => {
 	style = style.replace(/&quot;/g, '"');
 	const map: { [k: string]: string } = {};
+	if (!style) return map;
+	const cacheStyle = stylesCaches.get(style);
+	if (cacheStyle) return cacheStyle;
 	const reg = /\s*([\w\-]+)\s*:([^;]*)(;|$)/g;
 	let match;
 
 	while ((match = reg.exec(style))) {
 		const key = match[1].toLowerCase().trim();
-		const val = toHex(match[2]).trim();
+		let val = match[2].trim();
+		if (val.toLowerCase().includes('rgb')) {
+			val = toHex(match[2]);
+		}
 		map[key] = val;
 	}
-
+	stylesCaches.set(style, map);
 	return map;
 };
 
@@ -121,9 +126,8 @@ export const getStyleMap = (style: string): { [k: string]: string } => {
  * @param {string} attrName
  */
 export const getComputedStyle = (element: Element, attrName: string) => {
-	const win = getWindow(element);
 	const camelKey = toCamelCase(attrName);
-	const style = win?.getComputedStyle(element, null);
+	const style = window.getComputedStyle(element, null);
 	return style ? style[camelKey] : '';
 };
 

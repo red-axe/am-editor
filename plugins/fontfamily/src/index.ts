@@ -75,7 +75,8 @@ export default class extends MarkPlugin<Options> {
 	pasteEach(node: NodeInterface) {
 		//pt 转为px
 		if (node.name === this.tagName) {
-			const fontFamily = node.css(this.#styleName);
+			const styles = node.css();
+			const fontFamily = styles[this.#styleName];
 			if (!fontFamily) return;
 			const { filter } = this.options;
 			if (filter) {

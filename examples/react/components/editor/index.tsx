@@ -117,12 +117,12 @@ const EditorComponent: React.FC<EditorProps> = ({
 				// 获取编辑器的值
 				console.log(`value ${trigger} update:`, value);
 				// 获取当前所有at插件中的名单
-				console.log(
-					'mention:',
-					engine.current?.command.executeMethod('mention', 'getList'),
-				);
+				// console.log(
+				// 	'mention:',
+				// 	engine.current?.command.executeMethod('mention', 'getList'),
+				// );
 				// 获取编辑器的html
-				console.log('html:', engine.current?.getHtml());
+				//console.log('html:', engine.current?.getHtml());
 			},
 			[loading, autoSave, props.onChange],
 		),
@@ -132,13 +132,11 @@ const EditorComponent: React.FC<EditorProps> = ({
 	const userSave = useCallback(() => {
 		if (!engine.current) return;
 		//获取异步的值，有些组件可能还在处理中，比如正在上传
-		console.time('value-async');
 		engine.current
 			.getValueAsync(false, (pluginName, card) => {
 				console.log(`${pluginName} 正在等待...`, card?.getValue());
 			})
 			.then((value) => {
-				console.timeEnd('value-async');
 				setValue(value);
 				save();
 			})

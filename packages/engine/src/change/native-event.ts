@@ -242,8 +242,72 @@ class NativeEvent {
 		}
 	}
 
+	handleSelectionChange() {
+		const { change, container, card } = this.engine;
+		if (change.isComposing()) return;
+		const { window } = container;
+		const selection = window?.getSelection();
+
+		if (selection && selection.anchorNode) {
+			const range = Range.from(this.engine, selection)!;
+			// 判断当前光标是否包含卡片或者在卡片内部
+			let containsCard =
+				range.containsCard() ||
+				(range.commonAncestorNode.closest(CARD_SELECTOR).length > 0 &&
+					range.startNode.closest(
+						`${CARD_LEFT_SELECTOR},${CARD_RIGHT_SELECTOR},${UI_SELECTOR}`,
+					).length === 0);
+
+			let isSingle = range.collapsed;
+			if (!isSingle) {
+				const { startNode, endNode, startOffset, endOffset } = range;
+				const startElement =
+					startNode.isElement() && !startNode.isCard()
+						? startNode.children().eq(startOffset)
+						: startNode;
+				const endElement =
+					endNode.isElement() && !endNode.isCard()
+						? endNode.children().eq(endOffset - 1)
+						: endNode;
+				if (
+					startElement &&
+					endElement &&
+					startElement.isCard() &&
+					startElement.equal(endElement)
+				) {
+					isSingle = true;
+				}
+			}
+			card.each((card) => {
+				const center = card.getCenter();
+				if (center && center.length > 0) {
+					let isSelect = selection.containsNode(center[0]);
+					if (!isSelect && containsCard && selection.focusNode) {
+						const focusCard = this.engine.card.find(
+							selection.focusNode,
+						);
+						if (focusCard) {
+							isSingle =
+								!selection.anchorNode ||
+								focusCard.root.contains(selection.anchorNode);
+							if (isSingle && card.root.equal(focusCard.root)) {
+								isSelect = true;
+							}
+						}
+						// 找到一次其它的就不需要再去比对了
+						if (isSelect && isSingle) containsCard = false;
+					}
+					const { autoSelected } = card.constructor as CardEntry;
+					card.select(
+						isSelect && (!isSingle || autoSelected !== false),
+					);
+				}
+			});
+		}
+	}
+
 	init() {
-		const { change, container, card, clipboard } = this.engine;
+		const { change, card, clipboard } = this.engine;
 
 		change.event.onInput((event: InputEvent) => {
 			const range = change.range.get();
@@ -252,75 +316,13 @@ class NativeEvent {
 			change.onSelect();
 			change.change();
 		});
-
+		let selectionChangeTimeout: NodeJS.Timeout | undefined = undefined;
 		change.event.onDocument('selectionchange', () => {
-			if (change.isComposing()) return;
-			const { window } = container;
-			const selection = window?.getSelection();
-
-			if (selection && selection.anchorNode) {
-				const range = Range.from(this.engine, selection)!;
-				// 判断当前光标是否包含卡片或者在卡片内部
-				let containsCard =
-					range.containsCard() ||
-					(range.commonAncestorNode.closest(CARD_SELECTOR).length >
-						0 &&
-						range.startNode.closest(
-							`${CARD_LEFT_SELECTOR},${CARD_RIGHT_SELECTOR},${UI_SELECTOR}`,
-						).length === 0);
-
-				let isSingle = range.collapsed;
-				if (!isSingle) {
-					const { startNode, endNode, startOffset, endOffset } =
-						range;
-					const startElement =
-						startNode.isElement() && !startNode.isCard()
-							? startNode.children().eq(startOffset)
-							: startNode;
-					const endElement =
-						endNode.isElement() && !endNode.isCard()
-							? endNode.children().eq(endOffset - 1)
-							: endNode;
-					if (
-						startElement &&
-						endElement &&
-						startElement.isCard() &&
-						startElement.equal(endElement)
-					) {
-						isSingle = true;
-					}
-				}
-				card.each((card) => {
-					const center = card.getCenter();
-					if (center && center.length > 0) {
-						let isSelect = selection.containsNode(center[0]);
-						if (!isSelect && containsCard && selection.focusNode) {
-							const focusCard = this.engine.card.find(
-								selection.focusNode,
-							);
-							if (focusCard) {
-								isSingle =
-									!selection.anchorNode ||
-									focusCard.root.contains(
-										selection.anchorNode,
-									);
-								if (
-									isSingle &&
-									card.root.equal(focusCard.root)
-								) {
-									isSelect = true;
-								}
-							}
-							// 找到一次其它的就不需要再去比对了
-							if (isSelect && isSingle) containsCard = false;
-						}
-						const { autoSelected } = card.constructor as CardEntry;
-						card.select(
-							isSelect && (!isSingle || autoSelected !== false),
-						);
-					}
-				});
-			}
+			if (selectionChangeTimeout) clearTimeout(selectionChangeTimeout);
+			selectionChangeTimeout = setTimeout(
+				() => this.handleSelectionChange(),
+				50,
+			);
 		});
 		change.event.onSelect((event: any) => {
 			const range = change.range.get();

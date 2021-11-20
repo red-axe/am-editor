@@ -29,6 +29,21 @@ export type Callbacks = {
 
 export interface ParserInterface {
 	/**
+	 * 根节点
+	 */
+	root: NodeInterface;
+	/**
+	 * 标准化节点
+	 * @param root 根节点
+	 * @param schema Schema
+	 * @param conversion 转换规则
+	 */
+	normalize(
+		root: NodeInterface,
+		schema: SchemaInterface,
+		conversion: ConversionInterface | null,
+	): void;
+	/**
 	 * 遍历节点
 	 * @param node 根节点
 	 * @param conversionRules 标签名称转换器
