@@ -58,12 +58,18 @@ const stylesToString = (styles: { [k: string]: string }) => {
 class Parser implements ParserInterface {
 	root: NodeInterface;
 	private editor: EditorInterface;
+	/**
+	 * 对节点进行正常化转换，在解析编辑器值的时候设置为false可以提升性能。设置为ture的时候可以对不确定的html进行转换，例如粘贴的时候
+	 */
+	private isNormalize = true;
 	constructor(
 		source: string | Node | NodeInterface,
 		editor: EditorInterface,
 		paserBefore?: (node: NodeInterface) => void,
+		isNormalize: boolean = true,
 	) {
 		this.editor = editor;
+		this.isNormalize = isNormalize;
 		const { node } = this.editor;
 		if (typeof source === 'string') {
 			source = source.replace(/<a\s{0,1000}\/>/gi, '<a></a>');
@@ -114,8 +120,12 @@ class Parser implements ParserInterface {
 			)
 				return;
 			if (node.isElement()) {
+				const isCard = node.isCard();
 				//转换标签
-				if (conversion && (!schema.getType(node) || node.isCard())) {
+				if (
+					conversion &&
+					((this.isNormalize && !schema.getType(node)) || isCard)
+				) {
 					let value = conversion.transform(node);
 					const oldRules: Array<ConversionRule> = [];
 					while (value) {
@@ -130,10 +140,7 @@ class Parser implements ParserInterface {
 						});
 						//把旧节点的子节点追加到新节点下
 						newNode.append(node.children());
-						if (
-							node.attributes(CARD_KEY) ||
-							node.attributes(READY_CARD_KEY)
-						) {
+						if (isCard) {
 							node.before(newNode);
 							node.remove();
 							value = undefined;
@@ -156,11 +163,7 @@ class Parser implements ParserInterface {
 						);
 					}
 				}
-				if (
-					node.attributes(CARD_KEY) ||
-					node.attributes(READY_CARD_KEY)
-				)
-					return;
+				if (!this.isNormalize || isCard) return;
 				//分割
 				const filter = (node: NodeInterface) => {
 					//获取节点属性样式
@@ -473,26 +476,15 @@ class Parser implements ParserInterface {
 		}
 		this.editor.trigger('parse:html-before', this.root);
 		element.traverse((domNode) => {
-			const node = domNode.get<HTMLElement>();
-			if (
-				node &&
-				node.nodeType === Node.ELEMENT_NODE &&
-				'none' === node.style['user-select'] &&
-				node.parentNode
-			) {
-				node.parentNode.removeChild(node);
+			if (domNode.isText()) return;
+			if (domNode.css('user-select') === 'none') {
+				domNode.remove();
 			}
 		});
 		this.editor.trigger('parse:html', element);
 		element.find('p').css(this.editor.container.css());
 		this.editor.trigger('parse:html-after', element);
-		return {
-			html: element.html(),
-			text: new Parser(element, this.editor).toText(
-				this.editor.schema,
-				true,
-			),
-		};
+		return element.html();
 	}
 
 	/**

@@ -620,7 +620,7 @@ export default class extends MarkPlugin<Options> {
 				: Range.create(this.editor)
 		).cloneRange();
 
-		const parser = new Parser(container, this.editor);
+		const parser = new Parser(container, this.editor, undefined, false);
 		const { schema, conversion } = this.editor;
 		if (!range) {
 			container.remove();
@@ -697,7 +697,7 @@ export default class extends MarkPlugin<Options> {
 				: Range.create(this.editor)
 		).cloneRange();
 
-		const parser = new Parser(container, this.editor);
+		const parser = new Parser(container, this.editor, undefined, false);
 		const { schema, conversion } = this.editor;
 		if (!range) {
 			container.remove();

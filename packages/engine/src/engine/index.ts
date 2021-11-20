@@ -319,7 +319,7 @@ class Engine implements EngineInterface {
 		node.removeAttributes('spellcheck');
 		node.removeAttributes('data-gramm');
 		node.removeAttributes('role');
-		return new Parser(node, this).toHTML().html;
+		return new Parser(node, this).toHTML();
 	}
 
 	setValue(value: string, callback?: (count: number) => void) {

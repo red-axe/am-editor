@@ -78,7 +78,7 @@ export interface ParserInterface {
 	 * @param inner 内包裹节点
 	 * @param outter 外包裹节点
 	 */
-	toHTML(inner?: Node, outter?: Node): { html: string; text: string };
+	toHTML(inner?: Node, outter?: Node): string;
 
 	/**
 	 * 返回DOM树

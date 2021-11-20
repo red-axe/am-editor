@@ -105,6 +105,8 @@ export default class Paste {
 				node.remove();
 				if (!parent) return;
 				node = parent;
+				parent = node.parent();
+				if (!parent) return;
 			}
 			// 删除 google docs 根节点
 			// <b style="font-weight:flat;" id="docs-internal-guid-e0280780-7fff-85c2-f58a-6e615d93f1f2">

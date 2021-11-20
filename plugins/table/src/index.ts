@@ -206,6 +206,14 @@ class Table extends Plugin<Options> {
 	}
 
 	pasteSchema(schema: SchemaInterface) {
+		schema.data.blocks.forEach((blockSchema) => {
+			if (!blockSchema.allowIn) {
+				blockSchema.allowIn = [];
+			}
+			if (blockSchema.allowIn.indexOf('td') < 0) {
+				blockSchema.allowIn.push('td');
+			}
+		});
 		schema.find((r) => r.name === 'table')[0].attributes = {
 			class: ['data-table'],
 			'data-table-no-border': '*',

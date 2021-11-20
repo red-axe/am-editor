@@ -281,7 +281,11 @@ export default class Clipboard implements ClipboardInterface {
 				// 合并列表
 				this.editor.list.merge(listNodes);
 				const parser = new Parser(contents, this.editor);
-				let { html, text } = parser.toHTML(inner, outter);
+				let html = parser.toHTML(inner, outter);
+				const text = new Parser(html, this.editor).toText(
+					this.editor.schema,
+					true,
+				);
 				if (callback) {
 					callback({ html, text });
 				}
