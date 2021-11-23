@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-fontcolor",
-  "version": "2.6.10",
+  "version": "2.6.11",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.6.10",
+    "@aomao/engine": "^2.6.11",
     "@babel/runtime": "^7.13.10"
   }
 }
