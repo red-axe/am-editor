@@ -8,7 +8,7 @@ import EngineComponent, { EngineProps } from '../engine';
 import OTComponent, { OTClient, Member, STATUS, ERROR } from './ot';
 //Demo相关
 import Loading from '../loading';
-import CommentLayer, { CommentRef, getConfig } from '../comment';
+import CommentLayer, { CommentRef } from '../comment';
 import Toc from '../toc';
 import { cards, pluginConfig, plugins } from './config';
 import Toolbar, { ToolbarItemProps } from './toolbar';
@@ -104,7 +104,6 @@ const EditorComponent: React.FC<EditorProps> = ({
 		config: {
 			...props.config,
 			...pluginConfig,
-			'mark-range': getConfig(engine, comment),
 		},
 		// 编辑器值改变事件
 		onChange: useCallback(
@@ -122,7 +121,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 				// 	engine.current?.command.executeMethod('mention', 'getList'),
 				// );
 				// 获取编辑器的html
-				//console.log('html:', engine.current?.getHtml());
+				console.log('html:', engine.current?.getHtml());
 			},
 			[loading, autoSave, props.onChange],
 		),

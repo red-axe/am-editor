@@ -47,31 +47,7 @@ keys: Array<string>
 //For example, comments keys = ["comment"]
 ```
 
-### Mark node change callback
-
-In collaborative editing, this callback will be triggered after other authors add tags, or edit or delete some nodes that contain tagged nodes
-
-This callback will also be triggered when using undo and redo related operations
-
-addIds: Newly added mark node number collection
-
-removeIds: a collection of deleted marker node numbers
-
-ids: a collection of all valid marked node numbers
-
-```ts
-onChange?: (addIds: {[key: string]: Array<string>},removeIds: {[key: string]: Array<string>},ids: {[key:string]: Array<string> }) = > void
-```
-
-### Callback when the marked section is selected
-
-Triggered when the cursor changes. If selectInfo has a value, it will carry the nearest cursor position. If it is a nested relationship, then it will return the innermost mark number
-
-```ts
-onSelect?: (range: RangeInterface, selectInfo?: {key: string, id: string}) => void
-```
-
-### hot key
+### Hotkey
 
 No shortcut keys by default
 
@@ -164,6 +140,36 @@ value Gets the html in the root node of the current editor as the value by defau
 
 ```ts
 engine.command.execute('mark-range', key: string,'wrap', paths: Array<{ id: Array<string>, path: Array<Path>}>, value?: string): string
+```
+
+## Event
+
+### Mark node change callback
+
+In collaborative editing, this callback will be triggered after other authors add tags, or edit or delete some nodes that contain tagged nodes
+
+This callback will also be triggered when using undo and redo related operations
+
+addIds: Newly added mark node number collection
+
+removeIds: a collection of deleted marker node numbers
+
+ids: a collection of all valid marked node numbers
+
+```ts
+engine.on('mark-range:change', (addIds: { [key: string]: Array<string>},removeIds: { [key: string]: Array<string>},ids: { [key:string] : Array<string> }) => {
+	...
+})
+```
+
+### Callback when the marked section is selected
+
+Triggered when the cursor changes. If selectInfo has a value, it will carry the nearest cursor position. If it is a nested relationship, then it will return the innermost mark number
+
+```ts
+engine.on('mark-range:select', (range: RangeInterface, selectInfo?: { key: string, id: string}) => {
+	...
+})
 ```
 
 ## Style definition

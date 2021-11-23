@@ -1041,10 +1041,69 @@ class Mark implements MarkModelInterface {
 		});
 
 		selection?.move();
-		this.merge(safeRange);
+		if (isEditable) {
+			const markNodes: NodeInterface[] = [];
+			nodes.forEach((editableRoot) => {
+				editableRoot.allChildren().forEach((child) => {
+					if (child.isElement() && node.isMark(child)) {
+						markNodes.push(child);
+					}
+				});
+			});
+			this.mergeMarks(markNodes);
+		} else this.merge(safeRange);
 		if (!range) change?.apply(safeRange);
 	}
+	mergeMarks(marks: Array<NodeInterface>) {
+		const { node } = this.editor;
+		marks.forEach((mark) => {
+			const prevMark = mark.prev();
+			const nextMark = mark.next();
+			//查找是否有一样的父级mark
+			const parentMark = mark.parent();
+			const findSameParent = (
+				parentMark: NodeInterface,
+				sourceMark: NodeInterface,
+			): boolean => {
+				if (node.isMark(parentMark)) {
+					let parent: NodeInterface | undefined = undefined;
+					if (this.compare(parentMark, sourceMark, true)) {
+						return true;
+					} else if ((parent = parentMark.parent())) {
+						return findSameParent(parent, sourceMark);
+					}
+				}
+				return false;
+			};
+			//如果有一样的父级mark，则去除包裹
+			if (parentMark && findSameParent(parentMark, mark)) {
+				node.unwrap(mark);
+				return;
+			}
 
+			if (prevMark && this.compare(prevMark, mark, true)) {
+				node.merge(prevMark, mark);
+				// 原来 mark 已经被移除，重新指向
+				mark = prevMark;
+			}
+
+			if (nextMark && this.compare(nextMark, mark, true)) {
+				node.merge(mark, nextMark);
+			}
+			//合并子级mark
+			const childMarks: Array<NodeInterface> = [];
+			const children = mark.children();
+			children.each((_, index) => {
+				const child = children.eq(index);
+				if (child && !child.isCursor() && node.isMark(child)) {
+					childMarks.push(child);
+				}
+			});
+			if (childMarks.length > 0) {
+				this.mergeMarks(childMarks);
+			}
+		});
+	}
 	/**
 	 * 合并当前选区的mark节点
 	 * @param range 光标，默认当前选区光标
@@ -1058,56 +1117,7 @@ class Mark implements MarkModelInterface {
 			return;
 		}
 		const selection = safeRange.shrinkToElementNode().createSelection();
-		const mergeMarks = (marks: Array<NodeInterface>) => {
-			marks.forEach((mark) => {
-				const prevMark = mark.prev();
-				const nextMark = mark.next();
-				//查找是否有一样的父级mark
-				const parentMark = mark.parent();
-				const findSameParent = (
-					parentMark: NodeInterface,
-					sourceMark: NodeInterface,
-				): boolean => {
-					if (node.isMark(parentMark)) {
-						let parent: NodeInterface | undefined = undefined;
-						if (this.compare(parentMark, sourceMark, true)) {
-							return true;
-						} else if ((parent = parentMark.parent())) {
-							return findSameParent(parent, sourceMark);
-						}
-					}
-					return false;
-				};
-				//如果有一样的父级mark，则去除包裹
-				if (parentMark && findSameParent(parentMark, mark)) {
-					node.unwrap(mark);
-					return;
-				}
-
-				if (prevMark && this.compare(prevMark, mark, true)) {
-					node.merge(prevMark, mark);
-					// 原来 mark 已经被移除，重新指向
-					mark = prevMark;
-				}
-
-				if (nextMark && this.compare(nextMark, mark, true)) {
-					node.merge(mark, nextMark);
-				}
-				//合并子级mark
-				const childMarks: Array<NodeInterface> = [];
-				const children = mark.children();
-				children.each((_, index) => {
-					const child = children.eq(index);
-					if (child && !child.isCursor() && node.isMark(child)) {
-						childMarks.push(child);
-					}
-				});
-				if (childMarks.length > 0) {
-					mergeMarks(childMarks);
-				}
-			});
-		};
-		mergeMarks(marks);
+		this.mergeMarks(marks);
 		selection.move();
 		safeRange.handleBr();
 		if (!range) change.apply(safeRange);
@@ -1183,8 +1193,12 @@ class Mark implements MarkModelInterface {
 		nodes.forEach((ancestor) => {
 			ancestor.traverse(
 				(child) => {
-					if (child.isText() || !selection?.anchor) return;
-					if (isEditable || !child.equal(selection.anchor)) {
+					if (!isEditable && (child.isText() || !selection?.anchor))
+						return;
+					if (
+						isEditable ||
+						(selection?.anchor && !child.equal(selection.anchor))
+					) {
 						if (started) {
 							if (isEditable || !child.equal(selection?.focus!)) {
 								if (
@@ -1201,6 +1215,7 @@ class Mark implements MarkModelInterface {
 						started = true;
 						// 光标开始位置在 <strong><anchor />abc123</strong> 就把 strong 加进去
 						if (
+							selection?.anchor &&
 							child.equal(selection.anchor) &&
 							!selection.anchor.prev()
 						) {
@@ -1269,7 +1284,17 @@ class Mark implements MarkModelInterface {
 			}
 		});
 		selection?.move();
-		this.merge(safeRange);
+		if (isEditable) {
+			const markNodes: NodeInterface[] = [];
+			nodes.forEach((editableRoot) => {
+				editableRoot.allChildren().forEach((child) => {
+					if (child.isElement() && node.isMark(child)) {
+						markNodes.push(child);
+					}
+				});
+			});
+			this.mergeMarks(markNodes);
+		} else this.merge(safeRange);
 		if (!range) change.apply(safeRange);
 	}
 

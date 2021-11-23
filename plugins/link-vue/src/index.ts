@@ -158,17 +158,26 @@ export default class extends InlinePlugin<Options> {
 			(match = reg.exec(textNode.textContent))
 		) {
 			//从匹配到的位置切断
-			let regNode = textNode.splitText(match.index + 1);
+			let regNode = textNode.splitText(match.index);
+			if (
+				textNode.textContent.endsWith('!') ||
+				match[2].startsWith('!')
+			) {
+				newText += textNode.textContent;
+				textNode = regNode.splitText(match[0].length);
+				newText += regNode.textContent;
+				continue;
+			}
 			newText += textNode.textContent;
 			//从匹配结束位置分割
-			textNode = regNode.splitText(match[0].length - 1);
+			textNode = regNode.splitText(match[0].length);
 
 			const text = match[2];
 			const url = match[3];
 
 			const inlineNode = $(`<${this.tagName} />`);
 			this.setAttributes(inlineNode, '_blank', url);
-			inlineNode.text(!!text ? text : url);
+			inlineNode.html(!!text ? text : url);
 
 			newText += inlineNode.get<Element>()?.outerHTML;
 		}

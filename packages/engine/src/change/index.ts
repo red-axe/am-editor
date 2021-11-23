@@ -173,14 +173,19 @@ class ChangeModel implements ChangeInterface {
 			this.engine.container.html(value);
 			this.initValue(undefined, false);
 		} else {
-			const parser = new Parser(value, this.engine, (root) => {
-				mark.removeEmptyMarks(root);
-				root.allChildren(true).forEach((child) => {
-					if (onParse) {
-						onParse(child);
-					}
-				});
-			});
+			const parser = new Parser(
+				value,
+				this.engine,
+				(root) => {
+					mark.removeEmptyMarks(root);
+					root.allChildren(true).forEach((child) => {
+						if (onParse) {
+							onParse(child);
+						}
+					});
+				},
+				false,
+			);
 			container.html(parser.toValue(schema, conversion, false, true));
 			card.render(undefined, (count) => {
 				if (callback) callback(count);
@@ -283,7 +288,7 @@ class ChangeModel implements ChangeInterface {
 		const tags = schema.getAllowInTags();
 		return (
 			container.children().length === 1 &&
-			node.isEmptyWithTrim(container) &&
+			node.isEmpty(container) &&
 			!container.allChildren().some((child) => tags.includes(child.name))
 		);
 	}
@@ -428,7 +433,7 @@ class ChangeModel implements ChangeInterface {
 				if (prev) {
 					prev.after(node);
 				} else {
-					nodeApi.insert(node, range);
+					nodeApi.insert(node, range, true);
 				}
 				prev = node;
 				if (!next) {

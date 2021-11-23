@@ -949,6 +949,10 @@ The style of the selected yes, the default is the border change, optional values
 
 Whether the card toolbar follows the mouse position, the default flase
 
+### `lazyRender`
+
+Whether to enable lazy loading, the rendering is triggered when the card node is visible in the view
+
 ## Attributes
 
 ### `editor`
@@ -1392,6 +1396,14 @@ Triggered after updating the card
  * Triggered after update
  */
 didUpdate?(): void;
+```
+
+### `beforeRender`
+
+Triggered before the card is rendered after the lazy rendering is turned on
+
+```ts
+beforeRender(): void
 ```
 
 ### `didRender`

@@ -508,7 +508,7 @@ export interface NodeInterface {
 	 * 返回当前节点或者传入的节点所在当前节点的顶级window对象的视图边界
 	 * @param node 节点
 	 */
-	getViewport(node?: NodeInterface): {
+	getViewport(): {
 		top: number;
 		left: number;
 		bottom: number;
@@ -517,19 +517,17 @@ export interface NodeInterface {
 
 	/**
 	 * 判断view是否在node节点根据当前节点的顶级window对象计算的视图边界内
-	 * @param node 节点
 	 * @param view 是否在视图的节点
+	 * @param simpleMode 简单模式，任一边界超出编辑器范围时，返回 true
 	 */
-	inViewport(node: NodeInterface, view: NodeInterface): boolean;
+	inViewport(view: NodeInterface, simpleMode?: boolean): boolean;
 
 	/**
 	 * 如果view节点不可见，将滚动到align位置，默认为nearest
-	 * @param node 节点
 	 * @param view 视图节点
 	 * @param align 位置
 	 */
 	scrollIntoView(
-		node: NodeInterface,
 		view: NodeInterface,
 		align?: 'start' | 'center' | 'end' | 'nearest',
 	): void;
@@ -634,10 +632,12 @@ export interface NodeModelInterface {
 	 * 在光标位置插入一个节点
 	 * @param node 节点
 	 * @param range 光标
+	 * @param removeCurrentEmptyBlock 当前光标行是空行时是否删除
 	 */
 	insert(
 		node: Node | NodeInterface,
 		range?: RangeInterface,
+		removeCurrentEmptyBlock?: boolean,
 	): RangeInterface | undefined;
 	/**
 	 * 光标位置插入文本

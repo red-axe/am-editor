@@ -358,40 +358,50 @@ class Table extends Plugin<Options> {
 		root.find(`[${CARD_KEY}=${TableComponent.cardName}`).each(
 			(tableNode) => {
 				const node = $(tableNode);
-				const table = node.find('table');
-				if (table.length === 0) {
-					node.remove();
-					return;
-				}
-				const width = table.attributes('width') || table.css('width');
-				table.css({
-					outline: 'none',
-					'border-collapse': 'collapse',
-					width: '100%',
-				});
-				table.attributes('data-width', width);
-				const tds = table.find('td');
-				tds.each((_, index) => {
-					const tdElement = tds.eq(index);
-					tdElement?.css({
-						'min-width': 'auto',
-						'white-space': 'flat',
-						'word-wrap': 'break-word',
-						margin: '4px 8px',
-						border: !!table.attributes('data-table-no-border')
-							? '0 none'
-							: '1px solid #d9d9d9',
-						padding: '4px 8px',
-						cursor: 'default',
-						'vertical-align':
-							tdElement.css('vertical-align') || 'top',
+				const card = this.editor.card.find(node) as TableComponent;
+				const value = card?.getValue();
+				if (value && value.html) {
+					let table = node.find('table');
+					if (table.length === 0) {
+						table = $(value.html);
+						if (table.length === 0) {
+							node.remove();
+							return;
+						}
+					}
+					const width =
+						table.attributes('width') || table.css('width');
+					table.css({
+						outline: 'none',
+						'border-collapse': 'collapse',
+						width: '100%',
 					});
-				});
-				table.find(Template.TABLE_TD_BG_CLASS).remove();
-				table.find(Template.TABLE_TD_CONTENT_CLASS).each((content) => {
-					this.editor.node.unwrap($(content));
-				});
-				node.replaceWith(table);
+					table.attributes('data-width', width);
+					const tds = table.find('td');
+					tds.each((_, index) => {
+						const tdElement = tds.eq(index);
+						tdElement?.css({
+							'min-width': 'auto',
+							'white-space': 'flat',
+							'word-wrap': 'break-word',
+							margin: '4px 8px',
+							border: !!table.attributes('data-table-no-border')
+								? '0 none'
+								: '1px solid #d9d9d9',
+							padding: '4px 8px',
+							cursor: 'default',
+							'vertical-align':
+								tdElement.css('vertical-align') || 'top',
+						});
+					});
+					table.find(Template.TABLE_TD_BG_CLASS).remove();
+					table
+						.find(Template.TABLE_TD_CONTENT_CLASS)
+						.each((content) => {
+							this.editor.node.unwrap($(content));
+						});
+					node.replaceWith(table);
+				}
 			},
 		);
 	}

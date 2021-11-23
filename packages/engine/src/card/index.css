@@ -10,3 +10,23 @@
 .am-engine .card-selected [data-card-element="center"].data-card-border-selected::selection {
     background: transparent;
 }
+
+.am-engine-view [data-card-element="center"] .data-card-loading,.am-engine [data-card-element="center"] .data-card-loading {
+    display: inline-block;
+    font-style: normal;
+    vertical-align: -0.125em;
+    text-align: center;
+    text-transform: none;
+    line-height: 0;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    margin-right: 5px;
+    padding: 16px;
+    width: 100%;
+}
+
+.am-engine-view [data-card-element="center"] .data-card-loading .data-card-spin,.am-engine [data-card-element="center"] .data-card-loading .data-card-spin {
+    display: inline-block;
+    -webkit-animation: loadingCircle 1s infinite linear;
+    animation: loadingCircle 1s infinite linear;
+}

@@ -63,6 +63,7 @@ class View implements ViewInterface {
 	command: CommandInterface;
 	request: RequestInterface;
 	nodeId: NodeIdInterface;
+	#_scrollNode: NodeInterface | null = null;
 
 	constructor(selector: Selector, options?: ContentViewOptions) {
 		this.options = { ...this.options, ...options };
@@ -72,7 +73,7 @@ class View implements ViewInterface {
 		this.schema = new Schema();
 		this.schema.add(schemaDefaultData);
 		this.conversion = new Conversion(this);
-		this.card = new CardModel(this);
+		this.card = new CardModel(this, this.options.lazyRender);
 		this.clipboard = new Clipboard(this);
 		this.plugin = new PluginModel(this);
 		this.node = new NodeModel(this);
@@ -95,6 +96,37 @@ class View implements ViewInterface {
 		this.card.init(this.options.cards || []);
 		this.plugin.init(this.options.plugins || [], this.options.config || {});
 		this.nodeId.init();
+	}
+
+	setScrollNode(node?: HTMLElement) {
+		this.#_scrollNode = node ? $(node) : null;
+	}
+
+	get scrollNode(): NodeInterface | null {
+		if (this.#_scrollNode) return this.#_scrollNode;
+		const { scrollNode } = this.options;
+		let sn = scrollNode
+			? typeof scrollNode === 'function'
+				? scrollNode()
+				: scrollNode
+			: null;
+		// 查找父级样式 overflow 或者 overflow-y 为 auto 或者 scroll 的节点
+		const targetValues = ['auto', 'scroll'];
+		let parent = this.container.parent();
+		while (parent && parent.length > 0 && parent.name !== 'body') {
+			if (
+				targetValues.includes(parent.css('overflow')) ||
+				targetValues.includes(parent.css('overflow-y'))
+			) {
+				sn = parent.get<HTMLElement>();
+				break;
+			} else {
+				parent = parent.parent();
+			}
+		}
+		if (sn === null) sn = document.documentElement;
+		this.#_scrollNode = sn ? $(sn) : null;
+		return this.#_scrollNode;
 	}
 
 	on(eventType: string, listener: EventListener, rewrite?: boolean) {

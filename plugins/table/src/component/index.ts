@@ -49,6 +49,10 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		return false;
 	}
 
+	static get lazyRender() {
+		return true;
+	}
+
 	static colors = Palette.getColors().map((group) =>
 		group.map((color) => {
 			return { color, border: Palette.getStroke(color) };
@@ -257,7 +261,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			endElement.name !== 'td' ||
 			startElement.equal(endElement)
 		)
-			return [range];
+			return;
 
 		const startRect = startElement
 			.get<HTMLElement>()!

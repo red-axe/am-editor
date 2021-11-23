@@ -42,6 +42,10 @@ class CodeBlcok extends Card<CodeBlockValue> {
 		return modeDatas;
 	}
 
+	static get lazyRender() {
+		return true;
+	}
+
 	resize = () => {
 		return this.codeEditor?.container.find('.data-codeblock-content');
 	};
@@ -121,6 +125,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 
 	focusEditor() {
 		this.codeEditor?.focus();
+		this.editor.card.activate(this.root);
 	}
 
 	render() {

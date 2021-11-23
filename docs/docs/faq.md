@@ -18,20 +18,7 @@ These three plugins all have vue3 dependencies and use the antv UI library. Othe
 
 ## window is not defined, document is not defined, navigator is not defined
 
-SSR will execute the render method on the server side, and the server side does not have DOM/BOM variables and methods
-
-In the editing mode, there is basically no need for server-side rendering. Mainly lies in the view rendering. If pure html is used, the dynamic interaction of the content of `Card` will be lacking.
-
-1. Use the built-in window object of jsdom. You can use the getWindow object to get this \_\_amWindow object inside the engine or plug-in. But it cannot solve the problem of third-party packages relying on the window object
-
-```ts
-const { JSDOM } = require('jsdom');
-
-const { window } = new JSDOM(`<html><body></body></html>`);
-global.__amWindow = window;
-```
-
-2. Introduce third-party packages dynamically or use `isServer` to determine whether there is a window object. This can solve the problem of no errors when running, but the content cannot be completely rendered on the server side. You can output html on the server to meet the needs of seo. Re-render the view reader after loading into the browser
+SSR will execute the render method on the server side, and the server side does not have DOM/BOM variables and methods. Does not support server-side rendering
 
 ## Improve paste efficiency/filter paste style
 
@@ -57,3 +44,13 @@ engine.on('paste:schema', (schema) => {
 	});
 });
 ```
+
+## Import and Export
+
+Use the two methods `getHtml` and `setHtml` provided by the engine instance, and use `html` as the intermediary for conversion
+
+You can use third-party libraries or back-end APIs to read other documents and convert them to the standard format of `html` and then transfer them back to the front-end, call `setHtml` to set them in the editor
+
+Convert to other document formats in the same way, use `getHtml` to obtain `html` and then convert
+
+Some cards may require additional attributes to restore the `html` correctly. You can check the conversion conditions in the `pasteHtml` method in the specific card plug-in

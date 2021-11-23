@@ -1,7 +1,9 @@
 import {
+	CARD_EDITABLE_KEY,
 	CARD_ELEMENT_KEY,
 	CARD_KEY,
 	CARD_LEFT_SELECTOR,
+	CARD_LOADING_KEY,
 	CARD_RIGHT_SELECTOR,
 	CARD_TYPE_KEY,
 	CARD_VALUE_KEY,
@@ -27,6 +29,7 @@ import Resize from './resize';
 import Toolbar from './toolbar';
 import { $ } from '../node';
 import { CardType } from './enum';
+import { DATA_ELEMENT, UI } from '../constants';
 
 abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	protected readonly editor: EditorInterface;
@@ -48,6 +51,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	static readonly focus: boolean;
 	static readonly selectStyleType: 'border' | 'background' = 'border';
 	static readonly toolbarFollowMouse: boolean = false;
+	static readonly lazyRender: boolean = false;
 	private defaultMaximize: MaximizeInterface;
 	isMaximize: boolean = false;
 
@@ -104,6 +108,10 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		card.activate(component.root);
 	}
 
+	get loading() {
+		return !!this.root.attributes('data-card-loading');
+	}
+
 	constructor({ editor, value, root }: CardOptions) {
 		this.editor = editor;
 		const type =
@@ -111,7 +119,6 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		const tagName = type === 'inline' ? 'span' : 'div';
 		this.root = root ? root : $('<'.concat(tagName, ' />'));
 		if (typeof value === 'string') value = decodeCardValue(value);
-
 		value = value || {};
 		value.id = this.getId(value.id);
 		value.type = type;
@@ -120,6 +127,10 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	}
 
 	init() {
+		this.root.attributes(
+			CARD_EDITABLE_KEY,
+			this.isEditable ? 'true' : 'false',
+		);
 		this.toolbarModel?.hide();
 		this.toolbarModel?.destroy();
 		if (this.toolbar) {
@@ -176,7 +187,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		const body = this.root.first() || $([]);
 		if (key === 'body' || body.length === 0) return body;
 		const children = body.children();
-		const index = ['center', 'left', 'right'].indexOf(key);
+		const index = ['left', 'center', 'right'].indexOf(key);
 		if (index > -1) {
 			const child = children.eq(index);
 			if (child?.attributes(CARD_ELEMENT_KEY) === key) return child;
@@ -335,7 +346,23 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	}
 	didInsert?(): void;
 	didUpdate?(): void;
+	beforeRender() {
+		const center = this.getCenter();
+		const loadingElement = $(
+			`<${
+				this.type === CardType.BLOCK ? 'div' : 'span'
+			} class="data-card-loading" ${DATA_ELEMENT}="${UI}" />`,
+		);
+		loadingElement.append(
+			'<svg viewBox="0 0 1024 1024" class="data-card-spin" data-icon="loading" width="1em" height="1em" fill="currentColor" aria-hidden="true"> <path d="M988 548c-19.9 0-36-16.1-36-36 0-59.4-11.6-117-34.6-171.3a440.45 440.45 0 0 0-94.3-139.9 437.71 437.71 0 0 0-139.9-94.3C629 83.6 571.4 72 512 72c-19.9 0-36-16.1-36-36s16.1-36 36-36c69.1 0 136.2 13.5 199.3 40.3C772.3 66 827 103 874 150c47 47 83.9 101.8 109.7 162.7 26.7 63.1 40.2 130.2 40.2 199.3.1 19.9-16 36-35.9 36z"></path></svg>',
+		);
+		center.empty().append(loadingElement);
+	}
 	didRender() {
+		if (this.loading) this.find('.data-card-loading').remove();
+		setTimeout(() => {
+			this.root.removeAttributes(CARD_LOADING_KEY);
+		}, 100);
 		if (this.resize) {
 			const container =
 				typeof this.resize === 'function'
@@ -345,7 +372,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 				this.resizeModel?.render(container);
 			}
 		}
-		if (this.contenteditable.length > 0) {
+		if (this.isEditable) {
 			this.editor.nodeId.generateAll(this.getCenter().get<Element>()!);
 		}
 	}

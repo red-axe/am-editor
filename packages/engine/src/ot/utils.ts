@@ -1,7 +1,13 @@
 import { isEqual } from 'lodash-es';
 import { NodeInterface } from '../types/node';
 import { FOCUS, ANCHOR, CURSOR } from '../constants/selection';
-import { CARD_KEY, CARD_SELECTOR, READY_CARD_KEY } from '../constants/card';
+import {
+	CARD_EDITABLE_KEY,
+	CARD_KEY,
+	CARD_LOADING_KEY,
+	CARD_SELECTOR,
+	READY_CARD_KEY,
+} from '../constants/card';
 import {
 	Op,
 	Path,
@@ -24,19 +30,21 @@ import { getParentInRoot, toHex, unescapeDots, unescape } from '../utils';
 export const isTransientElement = (
 	node: NodeInterface,
 	transientElements?: Array<Node>,
+	loadingCards?: NodeInterface[],
 ) => {
 	if (node.isElement()) {
+		const nodeAttributes = node.attributes();
 		//范围标记
 		if (
-			[CURSOR, ANCHOR, FOCUS].indexOf(node.attributes(DATA_ELEMENT)) > -1
+			[CURSOR, ANCHOR, FOCUS].indexOf(nodeAttributes[DATA_ELEMENT]) > -1
 		) {
 			return true;
 		}
 
 		//data-element=ui 属性
 		if (
-			!!node.attributes(DATA_TRANSIENT_ELEMENT) ||
-			node.attributes(DATA_ELEMENT) === UI
+			!!nodeAttributes[DATA_TRANSIENT_ELEMENT] ||
+			nodeAttributes[DATA_ELEMENT] === UI
 		) {
 			return true;
 		}
@@ -45,41 +53,53 @@ export const isTransientElement = (
 
 		const isCard = node.isCard();
 		//父级是卡片，并且没有可编辑区域
+		const parentIsLoading = parent?.attributes(CARD_LOADING_KEY);
+		if (parentIsLoading && parent) loadingCards?.push(parent);
 		if (!isCard && parent?.isCard() && !parent.isEditableCard()) {
 			return true;
 		}
 
 		if (transientElements) {
-			if (
-				!isCard &&
-				transientElements.find((element) => element === node[0])
-			)
-				return true;
-		} else {
-			let closestNode = node.closest(
-				`${CARD_SELECTOR},${UI_SELECTOR}`,
-				getParentInRoot,
+			if (isCard) return false;
+			const element = transientElements.find(
+				(element) => element === node[0],
 			);
-			if (
-				closestNode.length > 0 &&
-				closestNode.attributes(DATA_ELEMENT) === UI
-			) {
+			if (element) {
+				if (element['__card_root'])
+					loadingCards?.push(element['__card_root']);
 				return true;
 			}
-			//在卡片里面，并且卡片不是可编辑卡片 或者是标记为正在异步渲染时的卡片
-			if (
-				!isCard &&
-				closestNode.length > 0 &&
-				closestNode.isCard() &&
-				!closestNode.isEditableCard()
-			) {
-				return true;
-			}
-			if (closestNode.length === 0) return false;
 		}
+		let closestNode = node.closest(
+			`${CARD_SELECTOR},${UI_SELECTOR}`,
+			getParentInRoot,
+		);
+		const attributes = closestNode?.attributes() || {};
+		if (closestNode.length > 0 && attributes[DATA_ELEMENT] === UI) {
+			return true;
+		}
+		//在卡片里面，并且卡片不是可编辑卡片 或者是标记为正在异步渲染时的卡片的子节点
+		if (attributes[CARD_LOADING_KEY]) {
+			loadingCards?.push(closestNode);
+		}
+		if (
+			!isCard &&
+			closestNode.length > 0 &&
+			closestNode.isCard() &&
+			!closestNode.isEditableCard()
+		) {
+			return true;
+		}
+		if (closestNode.length === 0) return false;
+
 		if (!isCard || node.isEditableCard()) return false;
 		//当前是卡片，父级也是卡片
 		const parentCard = parent?.closest(CARD_SELECTOR, getParentInRoot);
+		// 如果父级是可编辑卡片，并且在加载中，过滤掉其子节点
+		const loadingCard = parentCard?.attributes(CARD_LOADING_KEY);
+		if (loadingCard && parentCard) {
+			loadingCards?.push(parentCard);
+		}
 		if (parentCard && parentCard.isCard() && !parentCard.isEditableCard()) {
 			return true;
 		}
@@ -89,7 +109,13 @@ export const isTransientElement = (
 
 export const isTransientAttribute = (node: NodeInterface, attr: string) => {
 	if (node.isRoot() && !/^data-selection-/.test(attr)) return true;
-	if (node.isCard() && ['id', 'class', 'style'].includes(attr)) return true;
+	if (
+		node.isCard() &&
+		['id', 'class', 'style', CARD_LOADING_KEY, CARD_EDITABLE_KEY].includes(
+			attr,
+		)
+	)
+		return true;
 	const transient = node.attributes(DATA_TRANSIENT_ATTRIBUTES);
 	if (
 		transient === '*' ||
@@ -218,6 +244,10 @@ export const opsSort = (ops: Op[]) => {
 				if (diff === -1) return 1;
 				if (diff === 0) return 0;
 			}
+			// sd 小于ld就放在前面
+			if ('ld' in op2) {
+				return diff;
+			}
 			return -1;
 		}
 		// 属性删除，排在节点删除最前面
@@ -246,7 +276,11 @@ export const opsSort = (ops: Op[]) => {
 			('ld' in op1 && 'ld' in op2) || ('od' in op1 && 'od' in op2);
 		// 都是新增节点，越小排越前面
 		if (isLi) {
-			if (op1.p.length < op2.p.length) return -1;
+			if (
+				op1.p.length < op2.p.length &&
+				op1.p.every((p, i) => p <= op2.p[i])
+			)
+				return -1;
 			return diff;
 		}
 		// 都是删除节点，越大排越前面

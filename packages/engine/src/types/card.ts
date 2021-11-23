@@ -122,6 +122,10 @@ export interface CardEntry {
 	 * toolbar 跟随鼠标点击位置
 	 */
 	readonly toolbarFollowMouse: boolean;
+	/**
+	 * 是否在卡片处于视图内时才渲染，默认 false
+	 */
+	readonly lazyRender: boolean;
 }
 
 export interface CardInterface {
@@ -157,6 +161,7 @@ export interface CardInterface {
 	 * 可编辑的节点
 	 */
 	readonly contenteditable: Array<string>;
+	readonly loading: boolean;
 	/**
 	 * 卡片类型，设置卡片类型会触发card重新渲染
 	 */
@@ -300,6 +305,10 @@ export interface CardInterface {
 	 * 最小化
 	 */
 	minimize(): void;
+	/**
+	 * 渲染前触发，异步加载、懒加载会调用这个方法
+	 */
+	beforeRender?(): void;
 	/**
 	 * 渲染卡片
 	 */
@@ -553,6 +562,8 @@ export interface CardModelInterface {
 		range: RangeInterface,
 		hasModify: boolean,
 	): void;
+
+	destroy(): void;
 }
 
 export interface MaximizeInterface {

@@ -950,6 +950,10 @@ export default class extends Plugin {
 
 卡片工具栏是否跟随鼠标位置，默认 flase
 
+### `lazyRender`
+
+是否启用懒加载，卡片节点在视图内可见时触发渲染
+
 ## 属性
 
 ### `editor`
@@ -1393,6 +1397,14 @@ didInsert?(): void;
  * 更新后触发
  */
 didUpdate?(): void;
+```
+
+### `beforeRender`
+
+开启懒惰渲染后，卡片渲染前触发
+
+```ts
+beforeRender(): void
 ```
 
 ### `didRender`

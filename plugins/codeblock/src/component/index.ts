@@ -38,6 +38,10 @@ class CodeBlcok extends Card<CodeBlockValue> {
 		return false;
 	}
 
+	static get lazyRender() {
+		return true;
+	}
+
 	static getModes() {
 		return modeDatas;
 	}
@@ -118,6 +122,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 
 	focusEditor() {
 		this.codeEditor?.focus();
+		this.editor.card.activate(this.root);
 	}
 
 	render() {

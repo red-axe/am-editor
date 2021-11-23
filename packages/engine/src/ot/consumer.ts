@@ -13,7 +13,7 @@ import { NodeInterface } from '../types/node';
 import { getDocument } from '../utils';
 import { isCursorOp, isTransientElement, updateIndex, toDOM } from './utils';
 import { $ } from '../node';
-import { DATA_ID, EDITABLE_SELECTOR } from '../constants';
+import { CARD_LOADING_KEY, DATA_ID, EDITABLE_SELECTOR } from '../constants';
 import { RangePath } from '../types';
 import { isNodeEntry } from '../node/utils';
 
@@ -197,12 +197,17 @@ class Consumer implements ConsumerInterface {
 		return domNode;
 	}
 
-	insertNode(root: NodeInterface, path: Path, value: string | Op[] | Op[][]) {
+	insertNode(
+		root: NodeInterface,
+		path: Path,
+		value: string | Op[] | Op[][],
+		isRemote?: boolean,
+	) {
 		const { engine } = this;
 		const { startNode, endNode } = this.getElementFromPath(root, path);
 		const domBegine = $(startNode);
 		const domEnd = $(endNode);
-		if (domEnd.length > 0 && !domBegine.isRoot()) {
+		if (domEnd.length > 0 && !domBegine.isRoot() && !root.isCard()) {
 			const element =
 				typeof value === 'string'
 					? document.createTextNode(value)
@@ -213,6 +218,9 @@ class Consumer implements ConsumerInterface {
 				domEnd.get()?.insertBefore(element, null);
 			}
 			const node = $(element);
+			if (node.isCard()) {
+				node.attributes(CARD_LOADING_KEY, isRemote ? 'remote' : 'true');
+			}
 			engine.card.render(node);
 			return node;
 		}
@@ -301,7 +309,7 @@ class Consumer implements ConsumerInterface {
 			} else if ('ld' in op) {
 				return this.deleteNode(root, path, isRemote);
 			} else if ('li' in op) {
-				return this.insertNode(root, path, op.li);
+				return this.insertNode(root, path, op.li, isRemote);
 			}
 			return;
 		}

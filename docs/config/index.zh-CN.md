@@ -230,5 +230,11 @@ console.log(view.language.get<string>('test'));
 ### scrollNode
 
 -   类型: `Node | (() => Node | null)`
--   默认值：查找父级样式 `overflow` 或者 `overflow-y` 为 `auto` 或者 `scroll` 的节点，如果没有就取 `document.body`
+-   默认值：查找父级样式 `overflow` 或者 `overflow-y` 为 `auto` 或者 `scroll` 的节点，如果没有就取 `document.documentElement`
 -   详细：编辑器滚动条节点，主要用于监听 `scroll` 事件设置弹层浮动位置和主动设置滚动到编辑器目标位置
+
+### lazyRender
+
+-   类型: `boolena`
+-   默认值：`true`
+-   详细：懒惰渲染卡片（仅限已启用 lazyRender 的卡片），默认为 true

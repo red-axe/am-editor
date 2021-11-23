@@ -1,5 +1,6 @@
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import {
+	CARD_EDITABLE_KEY,
 	CARD_TYPE_KEY,
 	CARD_VALUE_KEY,
 	READY_CARD_KEY,
@@ -112,7 +113,7 @@ export const getStyleMap = (style: string): { [k: string]: string } => {
 		const key = match[1].toLowerCase().trim();
 		let val = match[2].trim();
 		if (val.toLowerCase().includes('rgb')) {
-			val = toHex(match[2]);
+			val = toHex(val);
 		}
 		map[key] = val;
 	}
@@ -241,12 +242,18 @@ export const transformCustomTags = (value: string) => {
 		.replace(/(<card\s+[^>]+>).*?<\/card>/gi, (_, tag) => {
 			//获取Card属性
 			const attributes = getAttrMap(tag);
-			const { type, name, value } = attributes;
+			const { type, name, value, editable } = attributes;
 			const isInline = type === 'inline';
 			const tagName = isInline ? 'span' : 'div';
 			const list = ['<'.concat(tagName)];
 			list.push(' '.concat(CARD_TYPE_KEY, '="').concat(type || '', '"'));
 			list.push(' '.concat(READY_CARD_KEY, '="').concat(name || '', '"'));
+			if (editable !== '')
+				list.push(
+					' '
+						.concat(CARD_EDITABLE_KEY, '="')
+						.concat(editable || '', '"'),
+				);
 			Object.keys(attributes).forEach((attrsName) => {
 				if (
 					attrsName.indexOf('data-') === 0 &&

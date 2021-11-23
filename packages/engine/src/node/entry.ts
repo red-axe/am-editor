@@ -5,7 +5,7 @@ import {
 	EDITABLE,
 	EDITABLE_SELECTOR,
 } from '../constants/root';
-import { CARD_TAG, CARD_TYPE_KEY } from '../constants/card';
+import { CARD_EDITABLE_KEY, CARD_TAG, CARD_TYPE_KEY } from '../constants/card';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import DOMEvent from './event';
 import $ from './parse';
@@ -167,8 +167,10 @@ class NodeEntry implements NodeInterface {
 	 * @returns
 	 */
 	isEditableCard() {
+		const attributes = this.attributes();
 		return (
-			this.attributes(DATA_ELEMENT) === EDITABLE ||
+			attributes[DATA_ELEMENT] === EDITABLE ||
+			attributes[CARD_EDITABLE_KEY] === 'true' ||
 			(this.isElement() &&
 				!!(this[0] as Element).querySelector(EDITABLE_SELECTOR))
 		);
@@ -398,7 +400,7 @@ class NodeEntry implements NodeInterface {
 	 * @return 返回一个 NodeEntry 实例
 	 */
 	find(selector: string): NodeInterface {
-		if (this.length > 0 && this.isElement()) {
+		if (this.length > 0 && (this.isElement() || this.fragment)) {
 			const nodeList = (
 				this.fragment ? this.fragment : this.get<Element>()
 			)?.querySelectorAll(selector);
@@ -536,6 +538,8 @@ class NodeEntry implements NodeInterface {
 			if (!element) return {};
 			const attrs = {};
 			const elementAttributes = element.attributes;
+			if (!elementAttributes || elementAttributes.length === 0)
+				return attrs;
 			let i = 0,
 				item = null;
 			while ((item = elementAttributes[i])) {
@@ -1019,14 +1023,14 @@ class NodeEntry implements NodeInterface {
 		return childNodes;
 	}
 
-	getViewport(node?: NodeInterface) {
+	getViewport() {
 		const { innerHeight, innerWidth } = this.window || {
 			innerHeight: 0,
 			innerWidth: 0,
 		};
 		let top, left, bottom, right;
-		if (node && node.length > 0) {
-			const element = node.get<Element>()!;
+		if (this.length > 0) {
+			const element = this.get<Element>()!;
 			const rect = element.getBoundingClientRect();
 			top = rect.top;
 			left = rect.left;
@@ -1048,7 +1052,7 @@ class NodeEntry implements NodeInterface {
 		};
 	}
 
-	inViewport(node: NodeInterface, view: NodeInterface) {
+	inViewport(view: NodeInterface, simpleMode: boolean = false) {
 		let viewNode = null;
 		if (view.type !== Node.ELEMENT_NODE) {
 			if (!view.document) return false;
@@ -1063,18 +1067,21 @@ class NodeEntry implements NodeInterface {
 		const viewElement = view[0] as Element;
 		const { top, left, right, bottom } =
 			viewElement.getBoundingClientRect();
-		const vp = this.getViewport(node);
+		const vp = this.getViewport();
 		if (viewNode) viewNode.parentNode?.removeChild(viewNode);
-		return !(
-			top < vp.top ||
-			bottom > vp.bottom ||
-			left < vp.left ||
-			right > vp.right
+		// 简单模式，只判断任一方向是否在视口内
+		if (simpleMode) {
+			return top <= vp.bottom || bottom <= vp.bottom;
+		}
+		return (
+			top >= vp.top &&
+			left >= vp.left &&
+			bottom <= vp.bottom &&
+			right <= vp.right
 		);
 	}
 
 	scrollIntoView(
-		node: NodeInterface,
 		view: NodeInterface,
 		align: 'start' | 'center' | 'end' | 'nearest' = 'nearest',
 	) {
@@ -1089,7 +1096,7 @@ class NodeEntry implements NodeInterface {
 				view[0].parentNode?.insertBefore(viewElement, view[0]);
 				view = new NodeEntry(viewElement);
 			}
-			if (!this.inViewport(node, view)) {
+			if (!this.inViewport(view)) {
 				view.get<Element>()?.scrollIntoView({
 					block: align,
 					inline: align,

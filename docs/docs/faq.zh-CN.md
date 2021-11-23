@@ -18,20 +18,7 @@
 
 ## window is not defined, document is not defined, navigator is not defined
 
-SSR 因为会在服务端执行 render 渲染方法，而服务端没有 DOM/BOM 变量和方法
-
-在编辑模式下，基本上没有服务端渲染的需求。主要在于视图渲染，如果使用纯 html 呈现将缺少`Card`内容的动态交互。
-
-1. 使用 jsdom 内置 window 对象。在引擎或插件内部可以使用 getWindow 对象获取这个 \_\_amWindow 对象。但是无法解决第三方包依赖 window 对象的问题
-
-```ts
-const { JSDOM } = require('jsdom');
-
-const { window } = new JSDOM(`<html><body></body></html>`);
-global.__amWindow = window;
-```
-
-2. 将第三方包动态引入 或者 使用 `isServer` 判定是否有 window 对象。这样能解决运行不会出错的问题，但是在服务端还是无法完整的渲染出内容。可以在服务端输出 html，满足 seo 需求。加载到浏览器后重新渲染 view 阅读器
+SSR 因为会在服务端执行 render 渲染方法，而服务端没有 DOM/BOM 变量和方法。不支持服务端渲染
 
 ## 提高粘贴效率/过滤粘贴样式
 
@@ -57,3 +44,13 @@ engine.on('paste:schema', (schema) => {
 	});
 });
 ```
+
+## 导入/导出
+
+使用 engine 实例提供的 `getHtml` 和 `setHtml` 两个方法，以 `html` 为中介进行转换
+
+可以使用第三方库或者后端 api 读取其它文档并转换为`html`标准格式后传回前端，调用 `setHtml` 设置到编辑器中
+
+转化为其它文档格式同理，使用 `getHtml` 获取到 `html` 后进行转换
+
+有些卡片可能需要额外的属性才能使 `html` 正确的还原，可以查看具体卡片插件中的 `pasteHtml` 方法中有哪些转换条件

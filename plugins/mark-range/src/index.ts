@@ -18,15 +18,6 @@ import { Path } from 'sharedb';
 export interface Options extends PluginOptions {
 	keys: Array<string>;
 	hotkey?: string | Array<string>;
-	onChange?: (
-		addIds: { [key: string]: Array<string> },
-		removeIds: { [key: string]: Array<string> },
-		ids: { [key: string]: Array<string> },
-	) => void;
-	onSelect?: (
-		range: RangeInterface,
-		selectInfo?: { key: string; id: string },
-	) => void;
 }
 
 const PLUGIN_NAME = 'mark-range';
@@ -262,7 +253,6 @@ export default class extends MarkPlugin<Options> {
 				markNode.attributes(this.getPreviewName(key), 'true');
 			});
 		} else if (this.range) {
-			const { onSelect } = this.options;
 			const { block, node, card } = this.editor;
 			let range = this.range;
 			//光标重合时，选择整个block块
@@ -270,15 +260,15 @@ export default class extends MarkPlugin<Options> {
 				const blockNode = block.closest(range.startNode);
 				if (!node.isBlock(blockNode)) return;
 				range.select(blockNode, true);
-				if (isEngine(this.editor)) {
-					this.editor.change.range.select(range);
-				}
+				const selection = window.getSelection();
+				selection?.removeAllRanges();
+				selection?.addRange(range.toRange());
 			}
 			const selectInfo = this.getSelectInfo(range, true);
 			//当前光标已存在标记
 			if (selectInfo && selectInfo.key === key) {
 				//触发选择
-				if (onSelect) onSelect(range, selectInfo);
+				this.editor.trigger(`${PLUGIN_NAME}:select`, range, selectInfo);
 				return;
 			}
 			//包裹标记预览样式
@@ -544,14 +534,13 @@ export default class extends MarkPlugin<Options> {
 		if (!selection) return;
 		const range = Range.from(this.editor, selection);
 		if (!range) return;
-		const { onSelect } = this.options;
 
 		//不在编辑器内
 		if (
 			!$(range.getStartOffsetNode()).inEditor() ||
 			!$(range.getEndOffsetNode()).inEditor()
 		) {
-			if (onSelect) onSelect(range);
+			this.editor.trigger(`${PLUGIN_NAME}:select`, range);
 			this.range = undefined;
 			return;
 		}
@@ -559,12 +548,11 @@ export default class extends MarkPlugin<Options> {
 		this.triggerChange();
 
 		const selectInfo = this.getSelectInfo(range, true);
-		if (onSelect) onSelect(range, selectInfo);
+		this.editor.trigger(`${PLUGIN_NAME}:select`, range, selectInfo);
 		this.range = range;
 	}
 
 	triggerChange() {
-		const { onChange } = this.options;
 		const addIds: { [key: string]: Array<string> } = {};
 		const removeIds: { [key: string]: Array<string> } = {};
 		const ids = this.getIds();
@@ -585,7 +573,7 @@ export default class extends MarkPlugin<Options> {
 			});
 		});
 		this.ids = ids;
-		if (onChange) onChange(addIds, removeIds, ids);
+		this.editor.trigger(`${PLUGIN_NAME}:change`, addIds, removeIds, ids);
 	}
 
 	/**

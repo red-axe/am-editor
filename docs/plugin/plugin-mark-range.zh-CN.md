@@ -47,30 +47,6 @@ keys: Array<string>
 //例如评论 keys = ["comment"]
 ```
 
-### 标记节点改变回调
-
-在协同编辑时，其它作者添加标记后,或者在编辑、删除一些节点中包含标记节点时都会触发此回调
-
-在使用 撤销、重做 相关操作时，也会触发此回调
-
-addIds: 新增的标记节点编号集合
-
-removeIds: 删除的标记节点编号集合
-
-ids: 所有有效的标记节点编号集合
-
-```ts
-onChange?: (addIds: { [key: string]: Array<string>},removeIds: { [key: string]: Array<string>},ids: { [key:string] : Array<string> }) => void
-```
-
-### 选中标记节时点回调
-
-在光标改变时触发，selectInfo 有值的情况下将携带光标所在最近，如果是嵌套关系，那么就返回最里层的标记编号
-
-```ts
-onSelect? : (range: RangeInterface, selectInfo?: { key: string, id: string}) => void
-```
-
 ### 快捷键
 
 默认无快捷键
@@ -164,6 +140,36 @@ value 默认获取当前编辑器根节点中的 html 作为值
 
 ```ts
 engine.command.execute('mark-range', key: string, 'wrap', paths: Array<{ id: Array<string>, path: Array<Path>}>, value?: string): string
+```
+
+## 事件
+
+### 标记节点改变回调
+
+在协同编辑时，其它作者添加标记后,或者在编辑、删除一些节点中包含标记节点时都会触发此回调
+
+在使用 撤销、重做 相关操作时，也会触发此回调
+
+addIds: 新增的标记节点编号集合
+
+removeIds: 删除的标记节点编号集合
+
+ids: 所有有效的标记节点编号集合
+
+```ts
+engine.on('mark-range:change', (addIds: { [key: string]: Array<string>},removeIds: { [key: string]: Array<string>},ids: { [key:string] : Array<string> }) => {
+	...
+})
+```
+
+### 选中标记节时点回调
+
+在光标改变时触发，selectInfo 有值的情况下将携带光标所在最近，如果是嵌套关系，那么就返回最里层的标记编号
+
+```ts
+engine.on('mark-range:select', (range: RangeInterface, selectInfo?: { key: string, id: string}) => {
+	...
+})
 ```
 
 ## 样式定义

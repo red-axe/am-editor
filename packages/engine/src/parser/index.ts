@@ -22,6 +22,7 @@ import {
 	toHex,
 	transformCustomTags,
 	getListStyle,
+	getStyleMap,
 } from '../utils';
 import TextParser from './text';
 import { $ } from '../node';
@@ -186,7 +187,7 @@ class Parser implements ParserInterface {
 				const filter = (node: NodeInterface) => {
 					//获取节点属性样式
 					const attributes = node.attributes();
-					const style = node.css();
+					const style = getStyleMap(attributes.style || '');
 					delete attributes.style;
 					if (
 						Object.keys(attributes).length === 0 &&
@@ -281,7 +282,7 @@ class Parser implements ParserInterface {
 			if (child.isElement()) {
 				let name = child.name;
 				let attributes = child.attributes();
-				let styles = child.css();
+				let styles = getStyleMap(attributes.style || '');
 				//删除属性中的style属性
 				delete attributes.style;
 
@@ -486,8 +487,9 @@ class Parser implements ParserInterface {
 	 */
 	toHTML(inner?: Node, outter?: Node) {
 		const element = $('<div />');
+		const style = this.editor.container.css();
 		if (inner && outter) {
-			$(inner).append(this.root).css(this.editor.container.css());
+			$(inner).append(this.root).css(style);
 			element.append(outter);
 		} else {
 			element.append(this.root);
@@ -500,7 +502,7 @@ class Parser implements ParserInterface {
 			}
 		});
 		this.editor.trigger('parse:html', element);
-		element.find('p').css(this.editor.container.css());
+		element.find('p').css(style);
 		this.editor.trigger('parse:html-after', element);
 		return element.html();
 	}

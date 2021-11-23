@@ -74,6 +74,10 @@ export interface EditorInterface {
 	 */
 	container: NodeInterface;
 	/**
+	 * 滚动条节点
+	 */
+	readonly scrollNode: NodeInterface | null;
+	/**
 	 * 编辑器根节点，默认为编辑器父节点
 	 */
 	root: NodeInterface;
@@ -465,6 +469,10 @@ export type EngineOptions = {
 	 * 是否只读
 	 */
 	readonly?: boolean;
+	/**
+	 * 懒惰渲染卡片（仅限已启用 lazyRender 的卡片），默认为 true
+	 */
+	lazyRender?: boolean;
 };
 
 export interface Engine {
@@ -479,10 +487,6 @@ export interface EngineInterface extends EditorInterface {
 	 * 选项
 	 */
 	options: EngineOptions;
-	/**
-	 * 滚动条节点
-	 */
-	readonly scrollNode: NodeInterface | null;
 	/**
 	 * 是否只读
 	 */

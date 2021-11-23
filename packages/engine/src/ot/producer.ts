@@ -21,8 +21,16 @@ import { Op, Path, StringInsertOp, StringDeleteOp, Doc } from 'sharedb';
 import { NodeInterface } from '../types/node';
 import { DocInterface, RepairOp } from '../types/ot';
 import { $ } from '../node';
-import { DATA_ID, JSON0_INDEX, UI_SELECTOR } from '../constants';
+import {
+	CARD_ELEMENT_KEY,
+	CARD_KEY,
+	CARD_LOADING_KEY,
+	DATA_ID,
+	JSON0_INDEX,
+	UI_SELECTOR,
+} from '../constants';
 import { getDocument } from '../utils/node';
+import { CardValue } from 'src';
 
 class Producer extends EventEmitter2 {
 	private engine: EngineInterface;
@@ -95,6 +103,7 @@ class Producer extends EventEmitter2 {
 	isTransientMutation(
 		record: MutationRecord,
 		transientElements?: Array<Node>,
+		loadingCards?: NodeInterface[],
 	) {
 		const { addedNodes, removedNodes, target, type, attributeName } =
 			record;
@@ -110,17 +119,21 @@ class Producer extends EventEmitter2 {
 			childs.push(targetNode);
 			if (
 				childs.some((child) =>
-					isTransientElement(child, transientElements),
+					isTransientElement(child, transientElements, loadingCards),
 				)
 			)
 				return true;
 		}
 		return (
 			(type === 'attributes' &&
-				(isTransientAttribute(targetNode, attributeName || '') ||
-					isTransientElement(targetNode, transientElements))) ||
+				(isTransientElement(
+					targetNode,
+					transientElements,
+					loadingCards,
+				) ||
+					isTransientAttribute(targetNode, attributeName || ''))) ||
 			(type === 'characterData' &&
-				isTransientElement(targetNode, transientElements))
+				isTransientElement(targetNode, transientElements, loadingCards))
 		);
 	}
 
@@ -242,14 +255,18 @@ class Producer extends EventEmitter2 {
 							p = p.concat([...path!], [rIndex]);
 							let op: Path = [];
 							op = op.concat([...oldPath], [rIndex]);
-							ops.push({
+							const newOp = {
 								id: rootId,
 								bi: beginIndex,
 								ld: true,
 								p,
 								newPath: p.slice(),
 								oldPath: op,
-							});
+							};
+							if (record['nl']) {
+								newOp['nl'] = true;
+							}
+							ops.push(newOp);
 						}
 					});
 				}
@@ -272,8 +289,9 @@ class Producer extends EventEmitter2 {
 							});
 							const index =
 								getIndex(domAddedNode) + JSON0_INDEX.ELEMENT;
-							let p: Path = [];
-							p = p.concat([...path!], [index]);
+							let p: Path = [...(path || [])];
+							// 卡片没有完全渲染就在插入body位置插入
+							p = p.concat([index]);
 							const op = {
 								id: rootId,
 								bi: beginIndex,
@@ -282,6 +300,10 @@ class Producer extends EventEmitter2 {
 								p,
 								newPath: p.slice(),
 							};
+
+							if (record['nl']) {
+								op['nl'] = true;
+							}
 							ops.push(op);
 							cacheNodes.push(addedNode);
 							this.cacheNode(addedNode);
@@ -296,13 +318,17 @@ class Producer extends EventEmitter2 {
 						typeof getValue(this.doc?.data, oldPath) === 'string' &&
 						(record['text-data'] || target['data']).length > 0
 					) {
-						attrOps.push({
+						const newOp = {
 							id: rootId,
 							bi: beginIndex,
 							path,
 							oldPath,
 							newValue: record['text-data'] || target['data'],
-						});
+						};
+						if (record['nl']) {
+							newOp['nl'] = true;
+						}
+						attrOps.push(newOp);
 						isValueString = true;
 					}
 				}
@@ -325,7 +351,9 @@ class Producer extends EventEmitter2 {
 					);
 					if (oldValue) newOp.od = oldValue;
 					if (attrValue) newOp.oi = attrValue;
-
+					if (record['nl']) {
+						newOp.nl = true;
+					}
 					attrOps.push(newOp);
 				}
 			}
@@ -342,6 +370,7 @@ class Producer extends EventEmitter2 {
 							bi: beginIndex,
 							ld: pathValue,
 							p: op.p,
+							nl: op['nl'],
 						};
 						// 重复删除的过滤掉
 						if (
@@ -360,8 +389,9 @@ class Producer extends EventEmitter2 {
 						bi: beginIndex,
 						li: op.li,
 						p: op.p,
+						nl: op['nl'],
 						addNode: op['addNode'],
-					});
+					} as any);
 				}
 			});
 			allOps.push(...attrOps);
@@ -374,12 +404,46 @@ class Producer extends EventEmitter2 {
 			return op;
 		});
 	}
-
+	/**
+	 * 从 doc 中查找目标卡片
+	 * @param data
+	 * @param name
+	 * @param callback
+	 * @returns 返回卡片属性，以及是否已渲染
+	 */
+	findCardForDoc = (
+		data: any,
+		name: string,
+		callback?: (attriables: { [key: string]: string }) => boolean,
+	): { attriables: any; rendered: boolean } | void => {
+		for (let i = 1; i < data.length; i++) {
+			if (i === 1) {
+				const attriables = data[i];
+				if (attriables && attriables['data-card-key'] === name) {
+					if (callback && callback(attriables)) {
+						const body = data[i + 1];
+						return {
+							attriables,
+							rendered:
+								Array.isArray(body) &&
+								Array.isArray(body[2]) &&
+								Array.isArray(body[2][2]),
+						};
+					}
+				}
+			} else if (Array.isArray(data[i])) {
+				const result = this.findCardForDoc(data[i], name, callback);
+				if (result) return result;
+			}
+		}
+	};
 	/**
 	 * 处理DOM节点变更记录
 	 * @param records 记录集合
 	 */
 	handleMutations(records: MutationRecord[]) {
+		// 初次加载中的卡片，在提交ops后把loading状态移除
+		const loadingCards: NodeInterface[] = [];
 		//需要先过滤标记为非协同节点的变更，包括 data-element=ui、data-transient-element 等标记的节点，可以在 isTransientMutation 中查看逻辑
 		//记录大于300的时候，先获取所有的不需要参与协同交互的节点，以提高效率
 		if (records.length > 299) {
@@ -387,10 +451,16 @@ class Producer extends EventEmitter2 {
 			//非可编辑卡片的子节点
 			const { card, container } = this.engine;
 			card.each((card) => {
-				if (!card.isEditable) {
+				// 增加异步加载的卡片子节点
+				if (!card.isEditable || card.loading) {
+					// 正在加载的可编辑卡片要获取内部子节点
+					const isEditableLoading = card.isEditable && card.loading;
 					card.root.allChildren().forEach((child) => {
-						if (child.type === getDocument().ELEMENT_NODE)
+						if (child.type === getDocument().ELEMENT_NODE) {
+							if (isEditableLoading)
+								child[0]['__card_root'] = card.root;
 							this.cacheTransientElements?.push(child[0]);
+						}
 					});
 				}
 			});
@@ -405,11 +475,44 @@ class Producer extends EventEmitter2 {
 			});
 		}
 		const targetElements: Node[] = [];
+		const cardMap = new Map<Node, boolean>();
 		records = records.filter((record) => {
-			const isTransient = this.isTransientMutation(
+			const beginCardIndex = loadingCards.length;
+			let isTransient = this.isTransientMutation(
 				record,
 				this.cacheTransientElements,
+				loadingCards,
 			);
+			// 判断要过滤的卡片是否在协同数据中渲染成功
+			if (loadingCards.length > beginCardIndex && this.doc) {
+				const cardElement = loadingCards[loadingCards.length - 1];
+				const tMapValue = cardMap.get(cardElement[0]);
+				if (tMapValue === undefined && cardElement.isEditableCard()) {
+					const cardName = cardElement.attributes(CARD_KEY);
+					const result = this.findCardForDoc(
+						this.doc.data,
+						cardName,
+						(attriables) => {
+							return (
+								attriables[DATA_ID] ===
+								cardElement.attributes(DATA_ID)
+							);
+						},
+					);
+					if (
+						!result?.rendered &&
+						cardElement.attributes(CARD_LOADING_KEY) !== 'remote'
+					) {
+						isTransient = false;
+						record['nl'] = true;
+					} else {
+						isTransient = true;
+					}
+					cardMap.set(cardElement[0], isTransient);
+				} else if (tMapValue !== undefined) {
+					isTransient = tMapValue;
+				}
+			}
 			if (
 				!isTransient &&
 				!targetElements.includes(record.target) &&
@@ -431,15 +534,17 @@ class Producer extends EventEmitter2 {
 			return !isTransient;
 		});
 		this.clearCache();
-		let ops = this.generateOps(records);
+
 		//重置缓存
 		this.cacheTransientElements = undefined;
+		let ops = this.generateOps(records);
 		ops = filterOperations(ops);
 		if (!ops.every((op) => isCursorOp(op))) {
-			targetElements.map((element) => {
+			targetElements.forEach((element) => {
 				let node = $(element);
 				if (node.isEditable() && !node.isRoot()) {
-					node = this.engine.card.find(node, true)?.root || node;
+					const card = this.engine.card.find(node, true);
+					node = card?.root || node;
 				}
 				updateIndex(
 					node,

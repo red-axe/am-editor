@@ -166,7 +166,7 @@ class Engine implements EngineInterface {
 		// 历史
 		this.history = new History(this);
 		// 卡片
-		this.card = new CardModel(this);
+		this.card = new CardModel(this, this.options.lazyRender);
 		// 剪贴板
 		this.clipboard = new Clipboard(this);
 		// http请求
@@ -440,7 +440,7 @@ class Engine implements EngineInterface {
 		this._container.destroy();
 		this.change.destroy();
 		this.hotkey.destroy();
-		this.card.gc();
+		this.card.destroy();
 		if (this.ot) {
 			this.ot.destroy();
 		}

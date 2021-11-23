@@ -116,6 +116,10 @@ export const cards: Array<CardEntry> = [
 ];
 
 export const pluginConfig: { [key: string]: PluginOptions } = {
+	[MarkRange.pluginName]: {
+		//标记类型集合
+		keys: ['comment'],
+	},
 	[Italic.pluginName]: {
 		// 默认为 _ 下划线，这里修改为单个 * 号
 		markdown: '*',

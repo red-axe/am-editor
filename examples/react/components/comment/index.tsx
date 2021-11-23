@@ -33,49 +33,6 @@ export type CommentProps = {
 
 export type CommentRef = {
 	reload: () => void;
-	select: (id?: string) => void;
-	showButton: (range: RangeInterface) => void;
-	updateStatus: (ids: Array<string>, status: boolean) => void;
-};
-
-const getConfig = (
-	editor: React.MutableRefObject<EditorInterface | null>,
-	comment: React.MutableRefObject<CommentRef | null>,
-) => {
-	return {
-		//标记类型集合
-		keys: ['comment'],
-		//标记数据更新后触发
-		onChange: (
-			addIds: { [key: string]: Array<string> },
-			removeIds: { [key: string]: Array<string> },
-		) => {
-			const commentAddIds = addIds['comment'] || [];
-			const commentRemoveIds = removeIds['comment'] || [];
-
-			//更新状态
-			comment.current?.updateStatus(commentAddIds, true);
-			comment.current?.updateStatus(commentRemoveIds, false);
-		},
-		//光标改变时触发
-		onSelect: (
-			range: RangeInterface,
-			selectInfo?: { key: string; id: string },
-		) => {
-			const { key, id } = selectInfo || {};
-			comment.current?.showButton(range);
-			comment.current?.select(key === 'comment' ? id : undefined);
-			if (comment && key === 'comment' && id) {
-				editor.current?.command.executeMethod(
-					'mark-range',
-					'action',
-					key,
-					'preview',
-					id,
-				);
-			}
-		},
-	};
 };
 
 const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
@@ -210,6 +167,7 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 		useEffect(() => {
 			const onMouseDown = (event: MouseEvent) => {
 				if (editItem) return;
+				event.preventDefault();
 				event.stopPropagation();
 				if (isEngine(editor)) {
 					const text = editor.command.executeMethod(
@@ -240,10 +198,6 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 		 * 暴露函数
 		 */
 		useImperativeHandle(ref, () => ({
-			select,
-			showButton: (range: RangeInterface) =>
-				buttonRef.current?.show(range),
-			updateStatus,
 			reload: load,
 		}));
 
@@ -379,6 +333,45 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 				else updateList(data);
 			});
 		};
+
+		useEffect(() => {
+			//标记数据更新后触发
+			const markChange = (
+				addIds: { [key: string]: Array<string> },
+				removeIds: { [key: string]: Array<string> },
+			) => {
+				const commentAddIds = addIds['comment'] || [];
+				const commentRemoveIds = removeIds['comment'] || [];
+
+				//更新状态
+				updateStatus(commentAddIds, true);
+				updateStatus(commentRemoveIds, false);
+			};
+			editor.on('mark-range:change', markChange);
+			//光标改变时触发
+			const markSelect = (
+				range: RangeInterface,
+				selectInfo?: { key: string; id: string },
+			) => {
+				const { key, id } = selectInfo || {};
+				buttonRef.current?.show(range);
+				select(key === 'comment' ? id : undefined);
+				if (key === 'comment' && id) {
+					editor.command.executeMethod(
+						'mark-range',
+						'action',
+						key,
+						'preview',
+						id,
+					);
+				}
+			};
+			editor.on('mark-range:select', markSelect);
+			return () => {
+				editor.off('mark-range:change', markChange);
+				editor.off('mark-range:select', markSelect);
+			};
+		}, [editor, updateStatus, select]);
 
 		/**
 		 * 更新每个评论项的位置，默认以编辑器中的评论区域的top为目标。在评论项过多的情况下。以当前激活的可编辑项为基准，在其上方的向上偏移，在其下方的向下偏移
@@ -623,5 +616,3 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 );
 
 export default Comment;
-
-export { getConfig };

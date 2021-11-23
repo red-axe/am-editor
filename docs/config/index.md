@@ -230,5 +230,11 @@ After rendering, `View` loses all editing capabilities and collaboration capabil
 ### scrollNode
 
 -   Type: `Node | (() => Node | null)`
--   Default value: Find the node whose parent style `overflow` or `overflow-y` is `auto` or `scroll`, if not, take `document.body`
+-   Default value: Find the node whose parent style `overflow` or `overflow-y` is `auto` or `scroll`, if not, take `document.documentElement`
 -   Detailed: The editor scroll bar node is mainly used to monitor the `scroll` event to set the floating position of the bomb layer and actively set the scroll to the editor target position
+
+### lazyRender
+
+-   Type: `boolena`
+-   Default value: `true`
+-   Detailed: Lazy rendering of cards (only cards with lazyRender enabled), the default is true

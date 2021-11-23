@@ -1,11 +1,6 @@
 import { cloneDeep } from 'lodash-es';
-import {
-	CARD_KEY,
-	CARD_TYPE_KEY,
-	CARD_VALUE_KEY,
-	DATA_ELEMENT,
-	READY_CARD_KEY,
-} from '../constants';
+import { getStyleMap } from '../utils';
+import { DATA_ELEMENT } from '../constants';
 import {
 	EditorInterface,
 	NodeInterface,
@@ -48,7 +43,7 @@ class Conversion implements ConversionInterface {
 	) {
 		let name = node.name;
 		let attributes = node.attributes();
-		let style = node.css();
+		let style = getStyleMap(attributes.style || '');
 		//删除属性中的style属性
 		delete attributes.style;
 		// 光标相关节点

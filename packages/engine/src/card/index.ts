@@ -11,6 +11,7 @@ import {
 	EDITABLE_SELECTOR,
 	DATA_TRANSIENT_ELEMENT,
 	DATA_TRANSIENT_ATTRIBUTES,
+	CARD_LOADING_KEY,
 } from '../constants';
 import {
 	CardEntry,
@@ -38,12 +39,16 @@ class CardModel implements CardModelInterface {
 		[k: string]: CardEntry;
 	};
 	components: Array<CardInterface>;
+	lazyRender: boolean;
+	private asyncComponents: CardInterface[] = [];
 	private editor: EditorInterface;
+	private renderTimeout?: NodeJS.Timeout;
 
-	constructor(editor: EditorInterface) {
+	constructor(editor: EditorInterface, lazyRender: boolean = true) {
 		this.classes = {};
 		this.components = [];
 		this.editor = editor;
+		this.lazyRender = lazyRender;
 	}
 
 	get active() {
@@ -98,7 +103,36 @@ class CardModel implements CardModelInterface {
 		cards.forEach((card) => {
 			this.classes[card.cardName] = card;
 		});
+
+		window.addEventListener('resize', this.renderAsnycComponents);
+		this.editor.scrollNode?.on('scroll', this.renderAsnycComponents);
+		window.addEventListener('scroll', this.renderAsnycComponents);
 	}
+
+	renderAsnycComponents = () => {
+		if (this.renderTimeout) clearTimeout(this.renderTimeout);
+		this.renderTimeout = setTimeout(() => {
+			const components = this.asyncComponents.concat();
+			components.forEach((card) => {
+				// 在视图内才渲染卡片
+				if (
+					card.root.length === 0 ||
+					this.editor.root.inViewport(card.root, true)
+				) {
+					if (card.root.length > 0 && card.loading) {
+						card.getCenter().empty();
+						this.renderComponent(card);
+					}
+					this.asyncComponents.splice(
+						this.asyncComponents.findIndex(
+							(component) => component === card,
+						),
+						1,
+					);
+				}
+			});
+		}, 100);
+	};
 
 	add(clazz: CardEntry) {
 		this.classes[clazz.cardName] = clazz;
@@ -238,27 +272,7 @@ class CardModel implements CardModelInterface {
 		) {
 			block.unwrap(rootParent, range);
 		}
-		const result = card.render(...args);
-		const center = card.getCenter();
-		if (result !== undefined) {
-			card.getCenter().append(
-				typeof result === 'string' ? $(result) : result,
-			);
-		}
-		if (card.contenteditable.length > 0) {
-			center.find(card.contenteditable.join(',')).each((node) => {
-				const child = $(node);
-				child.attributes(
-					'contenteditable',
-					!isEngine(this.editor) || this.editor.readonly
-						? 'false'
-						: 'true',
-				);
-				child.attributes(DATA_ELEMENT, EDITABLE);
-			});
-		}
-		//创建工具栏
-		card.didRender();
+		this.renderComponent(card, ...args);
 		if (card.didInsert) {
 			card.didInsert();
 		}
@@ -419,17 +433,6 @@ class CardModel implements CardModelInterface {
 		const { change } = this.editor;
 		const range = change.range.toTrusty();
 		const card = this.insertNode(range, component, ...args);
-		const type = component.type;
-		if (type === 'inline') {
-			card.focus(range, false);
-		}
-		change.range.select(range);
-		if (
-			type === 'block' &&
-			(component.constructor as CardEntry).autoActivate !== false
-		) {
-			this.activate(card.root, CardActiveTrigger.CARD_CHANGE);
-		}
 		change.change();
 		return card;
 	}
@@ -538,6 +541,7 @@ class CardModel implements CardModelInterface {
 
 		component.root.attributes(CARD_TYPE_KEY, type);
 		component.root.attributes(CARD_KEY, name);
+		component.root.attributes(CARD_LOADING_KEY, 'true');
 		//如果没有指定是否能聚集，那么当card不是只读的时候就可以聚焦
 		const hasFocus =
 			clazz.focus !== undefined
@@ -628,28 +632,6 @@ class CardModel implements CardModelInterface {
 			: this.editor.container.find(READY_CARD_SELECTOR);
 		this.gc();
 		let setp = 0;
-		const render = (card: CardInterface) => {
-			const result = card.render();
-			const center = card.getCenter();
-			if (result !== undefined) {
-				center.append(typeof result === 'string' ? $(result) : result);
-			}
-			if (card.contenteditable.length > 0) {
-				center.find(card.contenteditable.join(',')).each((node) => {
-					const child = $(node);
-					if (!child.attributes('contenteditable'))
-						child.attributes(
-							'contenteditable',
-							!isEngine(this.editor) || this.editor.readonly
-								? 'false'
-								: 'true',
-						);
-					child.attributes(DATA_ELEMENT, EDITABLE);
-				});
-				this.render(center);
-			}
-			card.didRender();
-		};
 
 		const asyncRenderCards: Array<CardInterface> = [];
 		cards.each((node) => {
@@ -668,6 +650,7 @@ class CardModel implements CardModelInterface {
 						if (card.destroy) card.destroy();
 						this.removeComponent(card);
 					}
+					cardNode.attributes(CARD_LOADING_KEY, 'true');
 				}
 				//ready_card_key 待创建的需要重新生成节点，并替换当前待创建节点
 				card = this.create(name, {
@@ -676,8 +659,9 @@ class CardModel implements CardModelInterface {
 				});
 				Object.keys(attributes).forEach((attributesName) => {
 					if (
-						attributesName.indexOf('data-') === 0 &&
-						attributesName.indexOf('data-card') !== 0
+						(attributesName.indexOf('data-') === 0 &&
+							attributesName.indexOf('data-card') !== 0) ||
+						attributesName === CARD_LOADING_KEY
 					) {
 						card!.root.attributes(
 							attributesName,
@@ -698,7 +682,21 @@ class CardModel implements CardModelInterface {
 		});
 
 		asyncRenderCards.forEach(async (card) => {
-			render(card);
+			if (this.lazyRender && (card.constructor as CardEntry).lazyRender) {
+				if (card.beforeRender) {
+					const result = card.beforeRender();
+					const center = card.getCenter();
+					if (result !== undefined) {
+						center.append(
+							typeof result === 'string' ? $(result) : result,
+						);
+					}
+				}
+				if (!this.asyncComponents.includes(card))
+					this.asyncComponents.push(card);
+			} else {
+				this.renderComponent(card);
+			}
 			setp++;
 			if (setp === asyncRenderCards.length) {
 				if (callback) callback(asyncRenderCards.length);
@@ -707,6 +705,33 @@ class CardModel implements CardModelInterface {
 		if (asyncRenderCards.length === 0) {
 			if (callback) callback(0);
 		}
+		if (asyncRenderCards.length > 0) {
+			// 触发当前在视图内的卡片渲染
+			this.renderAsnycComponents();
+		}
+	}
+
+	renderComponent(card: CardInterface, ...args: any) {
+		const center = card.getCenter();
+		const result = card.render();
+		if (result !== undefined) {
+			center.append(typeof result === 'string' ? $(result) : result);
+		}
+		if (card.contenteditable.length > 0) {
+			center.find(card.contenteditable.join(',')).each((node) => {
+				const child = $(node);
+				if (!child.attributes('contenteditable'))
+					child.attributes(
+						'contenteditable',
+						!isEngine(this.editor) || this.editor.readonly
+							? 'false'
+							: 'true',
+					);
+				child.attributes(DATA_ELEMENT, EDITABLE);
+			});
+			this.render(center);
+		}
+		card.didRender();
 	}
 
 	removeComponent(card: CardInterface): void {
@@ -731,6 +756,13 @@ class CardModel implements CardModelInterface {
 				i--;
 			}
 		}
+	}
+
+	destroy() {
+		this.gc();
+		window.removeEventListener('resize', this.renderAsnycComponents);
+		this.editor.scrollNode?.off('scroll', this.renderAsnycComponents);
+		window.removeEventListener('scroll', this.renderAsnycComponents);
 	}
 
 	// 焦点移动到上一个 Block

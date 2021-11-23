@@ -6,6 +6,7 @@ import {
 	CARD_TYPE_KEY,
 	CARD_VALUE_KEY,
 	READY_CARD_KEY,
+	CARD_EDITABLE_KEY,
 } from './card';
 
 const defaultConversion: ConversionData = [
@@ -21,6 +22,7 @@ const defaultConversion: ConversionData = [
 				name: (
 					attributes[CARD_KEY] || attributes[READY_CARD_KEY]
 				).toLowerCase(),
+				editable: attributes[CARD_EDITABLE_KEY],
 			};
 			//其它 data 属性
 			Object.keys(oldAttrs).forEach((attrName) => {

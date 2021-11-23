@@ -52,4 +52,12 @@ export type ContentViewOptions = {
 	 * 阅读器根节点，默认为阅读器所在节点的父节点
 	 */
 	root?: Node;
+	/**
+	 * 滚动条节点，查找父级样式 overflow 或者 overflow-y 为 auto 或者 scroll 的节点
+	 */
+	scrollNode?: Node | (() => Node | null);
+	/**
+	 * 懒惰渲染卡片（仅限已启用 lazyRender 的卡片），默认为 true
+	 */
+	lazyRender?: boolean;
 };

@@ -79,6 +79,13 @@ class Backspace {
 					change.mergeAfterDelete();
 					return false;
 				} else {
+					// 左侧还是卡片删除卡片
+					const leftCard = this.engine.card.find(prev);
+					if (leftCard) {
+						this.engine.card.remove(leftCard.id);
+						range.handleBr();
+						return false;
+					}
 					range.select(card.root).collapse(true);
 				}
 				change.range.select(range);

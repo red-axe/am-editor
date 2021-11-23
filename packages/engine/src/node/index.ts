@@ -493,8 +493,13 @@ class NodeModel implements NodeModelInterface {
 	 * 在光标位置插入一个节点
 	 * @param node 节点
 	 * @param range 光标
+	 * @param removeCurrentEmptyBlock 当前光标行是空行时是否删除
 	 */
-	insert(node: Node | NodeInterface, range?: RangeInterface) {
+	insert(
+		node: Node | NodeInterface,
+		range?: RangeInterface,
+		removeCurrentEmptyBlock: boolean = false,
+	) {
 		if (isNodeEntry(node)) {
 			if (node.length === 0) throw 'Not found node';
 			node = node[0];
@@ -545,7 +550,9 @@ class NodeModel implements NodeModelInterface {
 				this.isBlock(commonAncestorNode) &&
 				this.isEmpty(commonAncestorNode)
 			) {
-				splitNode = commonAncestorNode;
+				splitNode = removeCurrentEmptyBlock
+					? commonAncestorNode
+					: undefined;
 			} else splitNode = block.split(range);
 			let blockNode = block.closest(
 				range.startNode.isEditable()

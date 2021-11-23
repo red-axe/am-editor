@@ -115,7 +115,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	handleChange(ops: Op[]) {
 		this.submitOps(ops);
-		this.engine.history.handleSelfOps(ops);
+		this.engine.history.handleSelfOps(ops.filter((op) => !op['nl']));
 		if (this.doc && this.doc?.type !== null) {
 			this.updateRangeColoringPosition();
 		}
