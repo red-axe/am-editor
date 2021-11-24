@@ -502,7 +502,6 @@ class Parser implements ParserInterface {
 			}
 		});
 		this.editor.trigger('parse:html', element);
-		element.find('p').css(style);
 		this.editor.trigger('parse:html-after', element);
 		return element.html();
 	}
