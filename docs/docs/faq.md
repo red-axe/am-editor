@@ -54,3 +54,20 @@ You can use third-party libraries or back-end APIs to read other documents and c
 Convert to other document formats in the same way, use `getHtml` to obtain `html` and then convert
 
 Some cards may require additional attributes to restore the `html` correctly. You can check the conversion conditions in the `pasteHtml` method in the specific card plug-in
+
+## icon missing
+
+icon icon is a font icon introduced directly through [iconfont](https://at.alicdn.com/t/project/1456030/0cbd04d3-3ca1-4898-b345-e0a9150fcc80.html?spm=a313x.7781069.1998910419.35).
+
+```css
+@font-face {
+	font-family: 'data-icon'; /* Project id 1456030 */
+	src: url('//at.alicdn.com/t/font_1456030_mvh913k905.woff2?t=1629619375484')
+			format('woff2'), url('//at.alicdn.com/t/font_1456030_mvh913k905.woff?t=1629619375484')
+			format('woff'),
+		url('//at.alicdn.com/t/font_1456030_mvh913k905.ttf?t=1629619375484')
+			format('truetype');
+}
+```
+
+If there is no access, we can download these three files, and then redefine @font-face in css and introduce a new font file

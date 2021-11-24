@@ -54,3 +54,20 @@ engine.on('paste:schema', (schema) => {
 转化为其它文档格式同理，使用 `getHtml` 获取到 `html` 后进行转换
 
 有些卡片可能需要额外的属性才能使 `html` 正确的还原，可以查看具体卡片插件中的 `pasteHtml` 方法中有哪些转换条件
+
+## icon 丢失
+
+icon 图标是直接通过 [iconfont](https://at.alicdn.com/t/project/1456030/0cbd04d3-3ca1-4898-b345-e0a9150fcc80.html?spm=a313x.7781069.1998910419.35) 引入的字体图标。
+
+```css
+@font-face {
+	font-family: 'data-icon'; /* Project id 1456030 */
+	src: url('//at.alicdn.com/t/font_1456030_mvh913k905.woff2?t=1629619375484')
+			format('woff2'), url('//at.alicdn.com/t/font_1456030_mvh913k905.woff?t=1629619375484')
+			format('woff'),
+		url('//at.alicdn.com/t/font_1456030_mvh913k905.ttf?t=1629619375484')
+			format('truetype');
+}
+```
+
+如果出现不能访问的情况，我们可以把这三个文件下载下来，然后在 css 中重新定义 @font-face 并引入新的字体文件
