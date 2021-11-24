@@ -189,7 +189,25 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 		 * 在 加载数据完毕 或者 列表数据 更新后，设置每个评论项位置
 		 */
 		useEffect(() => {
-			if (loading) return;
+			const update = () => {
+				setList((list) => {
+					return list.concat().map((item) => {
+						const top = getRectTop(
+							`[data-comment-id="${item.id}"]`,
+						);
+						if (top < 0) return item;
+						return { ...item, top };
+					});
+				});
+			};
+			const resizeObserver = new ResizeObserver(update);
+			resizeObserver.observe(editor.container[0]);
+			return () => {
+				resizeObserver.unobserve(editor.container[0]);
+			};
+		}, []);
+
+		useEffect(() => {
 			updateHeight();
 			normalize();
 		}, [loading, list]);
@@ -210,7 +228,9 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 		 * @param selectors css 选择器
 		 * @returns
 		 */
-		const getRectTop = (selectors: string | NodeInterface): number => {
+		const getRectTop = (
+			selectors: string | NodeInterface | Node,
+		): number => {
 			//获取选择器节点
 			let element =
 				typeof selectors === 'string'
