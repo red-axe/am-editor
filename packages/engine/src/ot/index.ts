@@ -20,7 +20,7 @@ import RangeColoring from './range-coloring';
 import OTDoc from './doc';
 import Consumer from './consumer';
 import Mutation from './mutation';
-import { toJSON0 } from './utils';
+import { toJSON0, isCursorOp } from './utils';
 import { random } from '../utils';
 import './index.css';
 
@@ -61,7 +61,20 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		const operations = filterOperations(this.waitingOps);
 		if (operations.length > 0) {
 			this.waitingOps = [];
-			this.apply(operations);
+			this.apply(
+				operations.filter((op) => {
+					// 过滤掉修改自身光标位置的操作
+					if (
+						isCursorOp(op) &&
+						op.p.includes(
+							`data-selection-${this.currentMember?.uuid}`,
+						)
+					) {
+						return false;
+					}
+					return true;
+				}),
+			);
 			this.engine.history.handleRemoteOps(operations);
 			const selections = this.selection.getSelections();
 			this.renderSelection(selections);

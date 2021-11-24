@@ -173,7 +173,26 @@ export default class extends BlockPlugin<Options> {
 		const { change, node } = this.editor;
 		const range = change.range.get();
 		const blockApi = this.editor.block;
-		if (!blockApi.isFirstOffset(range, 'start')) return;
+
+		const inEnd = blockApi.isLastOffset(range, 'end');
+		if (inEnd && !range.collapsed) {
+			const startBlock = blockApi.closest(range.startNode);
+			const endBlock = blockApi.closest(range.endNode);
+			const startParentBlock = startBlock.parent();
+			const endParentBlock = endBlock.parent();
+			if (
+				startParentBlock &&
+				endParentBlock &&
+				endParentBlock.name === 'blockquote' &&
+				!startParentBlock.equal(endParentBlock)
+			) {
+				endParentBlock.remove();
+				return;
+			}
+		}
+
+		const inFirst = blockApi.isFirstOffset(range, 'start');
+		if (!inFirst) return;
 		const block = blockApi.closest(range.startNode);
 		const parentBlock = block.parent();
 
