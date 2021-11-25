@@ -518,6 +518,7 @@ class Block implements BlockModelInterface {
 		block: NodeInterface | Node | string,
 		range?: RangeInterface,
 		splitNode?: (node: NodeInterface) => NodeInterface,
+		removeCurrentEmptyBlock: boolean = false,
 	) {
 		if (!isEngine(this.editor)) return;
 		const { change, node, list, inline } = this.editor;
@@ -543,7 +544,7 @@ class Block implements BlockModelInterface {
 		}
 		// 当前选择范围在段落外面
 		if (container.isEditable()) {
-			node.insert(block, safeRange);
+			node.insert(block, safeRange, removeCurrentEmptyBlock);
 			safeRange.collapse(false);
 			if (!range) change.apply(safeRange);
 			return;
@@ -678,7 +679,7 @@ class Block implements BlockModelInterface {
 		if (selection.focus) selection.focus.remove();
 		if (selection.anchor) selection.anchor.remove();
 		// 插入新 Block
-		node.insert(block, safeRange);
+		node.insert(block, safeRange, removeCurrentEmptyBlock);
 		if (!range) change.apply(safeRange);
 	}
 	/**

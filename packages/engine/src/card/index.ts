@@ -247,18 +247,23 @@ class CardModel implements CardModelInterface {
 		if (isInline) {
 			inline.insert(card.root, range);
 		} else {
-			block.insert(card.root, range, (container) => {
-				//获取最外层的block嵌套节点
-				let blockParent = container.parent();
-				while (blockParent && !blockParent.isEditable()) {
-					container = blockParent;
-					const parent = blockParent.parent();
-					if (parent && node.isBlock(parent)) {
-						blockParent = parent;
-					} else break;
-				}
-				return container;
-			});
+			block.insert(
+				card.root,
+				range,
+				(container) => {
+					//获取最外层的block嵌套节点
+					let blockParent = container.parent();
+					while (blockParent && !blockParent.isEditable()) {
+						container = blockParent;
+						const parent = blockParent.parent();
+						if (parent && node.isBlock(parent)) {
+							blockParent = parent;
+						} else break;
+					}
+					return container;
+				},
+				true,
+			);
 		}
 		this.components.push(card);
 		card.focus(range);

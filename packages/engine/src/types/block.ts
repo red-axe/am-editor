@@ -63,6 +63,7 @@ export interface BlockModelInterface {
 		block: NodeInterface | Node | string,
 		range?: RangeInterface,
 		splitNode?: (node: NodeInterface) => NodeInterface,
+		removeCurrentEmptyBlock?: boolean,
 	): void;
 	/**
 	 * 设置当前光标所在的所有block节点为新的节点或设置新属性
