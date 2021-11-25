@@ -137,8 +137,9 @@ export interface ChangeRangeInterface {
 	/**
 	 * 选中指定的范围
 	 * @param range 光标
+	 * @param triggerSelect 时候触发onSelect事件
 	 */
-	select(range: RangeInterface): void;
+	select(range: RangeInterface, triggerSelect?: boolean): void;
 	/**
 	 * 聚焦编辑器
 	 * @param toStart true:开始位置,false:结束位置，默认为之前操作位置

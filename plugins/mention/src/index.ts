@@ -14,6 +14,8 @@ import {
 	encodeCardValue,
 	CardInterface,
 	AjaxInterface,
+	READY_CARD_KEY,
+	CARD_VALUE_KEY,
 } from '@aomao/engine';
 import MentionComponent from './component';
 import locales from './locales';
@@ -229,9 +231,10 @@ class MentionPlugin extends Plugin<Options> {
 	pasteHtml(node: NodeInterface) {
 		if (!isEngine(this.editor)) return;
 		if (node.isElement()) {
-			const type = node.attributes('data-type');
+			const attributes = node.attributes();
+			const type = attributes['data-type'];
 			if (type === MentionComponent.cardName) {
-				const value = node.attributes('data-value');
+				const value = attributes['data-value'];
 				const cardValue = decodeCardValue(value);
 				if (!cardValue.name) return;
 				this.editor.card.replaceNode(
@@ -247,22 +250,24 @@ class MentionPlugin extends Plugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${MentionComponent.cardName}`).each(
-			(cardNode) => {
-				const node = $(cardNode);
-				const card = this.editor.card.find(node) as MentionComponent;
-				const value = card?.getValue();
-				if (value?.id && value.name) {
-					const html = `<span data-type="${
-						MentionComponent.cardName
-					}" data-value="${encodeCardValue(
-						value,
-					)}" style="color:#1890ff">@${value.name}</span>`;
-					node.empty();
-					node.replaceWith($(html));
-				} else node.remove();
-			},
-		);
+		root.find(
+			`[${CARD_KEY}="${MentionComponent.cardName}"],[${READY_CARD_KEY}="${MentionComponent.cardName}"]`,
+		).each((cardNode) => {
+			const node = $(cardNode);
+			const card = this.editor.card.find(node) as MentionComponent;
+			const value =
+				card?.getValue() ||
+				decodeCardValue(node.attributes(CARD_VALUE_KEY));
+			if (value?.id && value.name) {
+				const html = `<span data-type="${
+					MentionComponent.cardName
+				}" data-value="${encodeCardValue(
+					value,
+				)}" style="color:#1890ff">@${value.name}</span>`;
+				node.empty();
+				node.replaceWith($(html));
+			} else node.remove();
+		});
 	}
 
 	execute() {}

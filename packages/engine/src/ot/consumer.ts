@@ -453,7 +453,7 @@ class Consumer implements ConsumerInterface {
 			if (endInfo && endInfo.container) {
 				range.setEnd(endInfo.container, endInfo.offset);
 			}
-			this.engine.change.range.select(range);
+			this.engine.change.range.select(range, false);
 		} catch (error) {
 			console.error(error);
 		}

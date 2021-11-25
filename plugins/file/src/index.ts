@@ -3,12 +3,14 @@ import {
 	CardEntry,
 	CardInterface,
 	CARD_KEY,
+	CARD_VALUE_KEY,
 	decodeCardValue,
 	encodeCardValue,
 	isEngine,
 	NodeInterface,
 	Plugin,
 	PluginEntry,
+	READY_CARD_KEY,
 	SchemaInterface,
 } from '@aomao/engine';
 import FileComponent, { FileValue } from './component';
@@ -154,10 +156,14 @@ export default class extends Plugin {
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${FileComponent.cardName}`).each((cardNode) => {
+		root.find(
+			`[${CARD_KEY}="${FileComponent.cardName}"],[${READY_CARD_KEY}="${FileComponent.cardName}"`,
+		).each((cardNode) => {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as FileComponent;
-			const value = card?.getValue();
+			const value =
+				card?.getValue() ||
+				decodeCardValue(node.attributes(CARD_VALUE_KEY));
 			if (value?.url && value.status === 'done') {
 				const html = `<a data-type="${
 					FileComponent.cardName

@@ -23,7 +23,7 @@ import { BlockModelInterface } from './block';
 import { RequestInterface } from './request';
 import { RangeInterface } from './range';
 import { Op } from 'sharedb';
-import { NodeIdInterface } from './';
+import { HotkeyInterface, NodeIdInterface } from './';
 
 /**
  * 编辑器容器接口
@@ -508,6 +508,10 @@ export interface EngineInterface extends EditorInterface {
 	 * 历史记录
 	 */
 	history: HistoryInterface;
+	/**
+	 * 快捷键
+	 */
+	hotkey: HotkeyInterface;
 	/**
 	 * 聚焦到编辑器
 	 */

@@ -133,7 +133,7 @@ class ChangeRange implements ChangeRangeInterface {
 		return range;
 	}
 
-	select(range: RangeInterface) {
+	select(range: RangeInterface, triggerSelect: boolean = true) {
 		const { container, inline, node, change } = this.engine;
 		const { window } = container;
 		const selection = window?.getSelection();
@@ -321,7 +321,7 @@ class ChangeRange implements ChangeRangeInterface {
 			selection.addRange(range.toRange());
 		}
 		const { onSelect } = this.#otpions;
-		if (onSelect) onSelect(range);
+		if (onSelect && triggerSelect) onSelect(range);
 	}
 
 	/**

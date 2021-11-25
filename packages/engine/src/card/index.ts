@@ -627,16 +627,20 @@ class CardModel implements CardModelInterface {
 	/**
 	 * 渲染
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
-	 * @param options 是否异步渲染， 全部异步渲染完成后触发
+	 * @param callback 渲染完成后回调
+	 * @param lazyRender 是否懒渲染，默认取决于editor的lazyRender属性
 	 */
-	render(container?: NodeInterface, callback?: (count: number) => void) {
+	render(
+		container?: NodeInterface,
+		callback?: (count: number) => void,
+		lazyRender = this.lazyRender,
+	) {
 		const cards = container
 			? container.isCard()
 				? container
 				: container.find(`${READY_CARD_SELECTOR}`)
 			: this.editor.container.find(READY_CARD_SELECTOR);
 		this.gc();
-		let setp = 0;
 
 		const asyncRenderCards: Array<CardInterface> = [];
 		cards.each((node) => {
@@ -686,8 +690,8 @@ class CardModel implements CardModelInterface {
 			}
 		});
 
-		asyncRenderCards.forEach(async (card) => {
-			if (this.lazyRender && (card.constructor as CardEntry).lazyRender) {
+		asyncRenderCards.forEach((card) => {
+			if (lazyRender && (card.constructor as CardEntry).lazyRender) {
 				if (card.beforeRender) {
 					const result = card.beforeRender();
 					const center = card.getCenter();
@@ -702,15 +706,9 @@ class CardModel implements CardModelInterface {
 			} else {
 				this.renderComponent(card);
 			}
-			setp++;
-			if (setp === asyncRenderCards.length) {
-				if (callback) callback(asyncRenderCards.length);
-			}
 		});
-		if (asyncRenderCards.length === 0) {
-			if (callback) callback(0);
-		}
-		if (asyncRenderCards.length > 0) {
+		if (callback) callback(asyncRenderCards.length);
+		if (this.asyncComponents.length > 0) {
 			// 触发当前在视图内的卡片渲染
 			this.renderAsnycComponents();
 		}
@@ -718,7 +716,7 @@ class CardModel implements CardModelInterface {
 
 	renderComponent(card: CardInterface, ...args: any) {
 		const center = card.getCenter();
-		const result = card.render();
+		const result = card.render(...args);
 		if (result !== undefined) {
 			center.append(typeof result === 'string' ? $(result) : result);
 		}

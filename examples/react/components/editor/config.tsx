@@ -126,7 +126,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 	},
 	[Image.pluginName]: {
 		onBeforeRender: (status: string, url: string) => {
-			if (!url) return url;
+			if (!url || url.indexOf('http') === 0) return url;
 			return url + `?token=12323`;
 		},
 	},
@@ -138,7 +138,8 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 		remote: {
 			action: `${DOMAIN}/upload/image`,
 		},
-		isRemote: (src: string) => src.indexOf(DOMAIN) < 0,
+		isRemote: (src: string) =>
+			src.indexOf(DOMAIN) < 0 && src.indexOf('192.168') < 0,
 	},
 	[FileUploader.pluginName]: {
 		action: `${DOMAIN}/upload/file`,

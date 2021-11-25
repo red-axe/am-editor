@@ -12,6 +12,8 @@ import {
 	unescape,
 	CARD_TYPE_KEY,
 	PluginOptions,
+	READY_CARD_KEY,
+	decodeCardValue,
 } from '@aomao/engine';
 import CodeBlockComponent, { CodeBlockEditor } from './component';
 
@@ -299,62 +301,60 @@ export default class extends Plugin<Options> {
 	parseHtml(root: NodeInterface) {
 		if (isServer) return;
 
-		root.find(`[${CARD_KEY}=${CodeBlockComponent.cardName}`).each(
-			(cardNode) => {
-				const node = $(cardNode);
-				const card = this.editor.card.find(node) as CodeBlockComponent;
-				const value = card?.getValue();
-				if (value) {
-					node.empty();
-					const synatxMap = {};
-					CodeBlockComponent.getModes().forEach((item) => {
-						synatxMap[item.value] = item.syntax;
-					});
-					const codeEditor = new CodeBlockEditor(this.editor, {
-						synatxMap,
-					});
+		root.find(
+			`[${CARD_KEY}="${CodeBlockComponent.cardName}"],[${READY_CARD_KEY}="${CodeBlockComponent.cardName}"]`,
+		).each((cardNode) => {
+			const node = $(cardNode);
+			const card = this.editor.card.find(node) as CodeBlockComponent;
+			const value =
+				card?.getValue() ||
+				decodeCardValue(node.attributes(CARD_VALUE_KEY));
+			if (value) {
+				node.empty();
+				const synatxMap = {};
+				CodeBlockComponent.getModes().forEach((item) => {
+					synatxMap[item.value] = item.syntax;
+				});
+				const codeEditor = new CodeBlockEditor(this.editor, {
+					synatxMap,
+				});
 
-					const content = codeEditor.container.find(
-						'.data-codeblock-content',
-					);
-					content.css({
-						border: '1px solid #e8e8e8',
-						'max-width': '750px',
-					});
-					codeEditor.render(value.mode || 'plain', value.code || '');
-					content.addClass('am-engine-view');
-					content.hide();
-					document.body.appendChild(content[0]);
-					content.traverse((node) => {
-						if (
-							node.type === Node.ELEMENT_NODE &&
-							(node.get<HTMLElement>()?.classList?.length || 0) >
-								0
-						) {
-							const element = node.get<HTMLElement>()!;
-							const style = window.getComputedStyle(element);
-							[
-								'color',
-								'margin',
-								'padding',
-								'background',
-							].forEach((attr) => {
+				const content = codeEditor.container.find(
+					'.data-codeblock-content',
+				);
+				content.css({
+					border: '1px solid #e8e8e8',
+					'max-width': '750px',
+				});
+				codeEditor.render(value.mode || 'plain', value.code || '');
+				content.addClass('am-engine-view');
+				content.hide();
+				document.body.appendChild(content[0]);
+				content.traverse((node) => {
+					if (
+						node.type === Node.ELEMENT_NODE &&
+						(node.get<HTMLElement>()?.classList?.length || 0) > 0
+					) {
+						const element = node.get<HTMLElement>()!;
+						const style = window.getComputedStyle(element);
+						['color', 'margin', 'padding', 'background'].forEach(
+							(attr) => {
 								element.style[attr] =
 									style.getPropertyValue(attr);
-							});
-						}
-					});
-					content.show();
-					content.css('background', '#f9f9f9');
-					node.append(content);
-					node.removeAttributes(CARD_KEY);
-					node.removeAttributes(CARD_TYPE_KEY);
-					node.removeAttributes(CARD_VALUE_KEY);
-					node.attributes('data-syntax', value.mode || 'plain');
-					content.removeClass('am-engine-view');
-				} else node.remove();
-			},
-		);
+							},
+						);
+					}
+				});
+				content.show();
+				content.css('background', '#f9f9f9');
+				node.append(content);
+				node.removeAttributes(CARD_KEY);
+				node.removeAttributes(CARD_TYPE_KEY);
+				node.removeAttributes(CARD_VALUE_KEY);
+				node.attributes('data-syntax', value.mode || 'plain');
+				content.removeClass('am-engine-view');
+			} else node.remove();
+		});
 	}
 }
 export { CodeBlockComponent };

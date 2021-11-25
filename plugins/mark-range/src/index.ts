@@ -12,6 +12,7 @@ import {
 	SchemaMark,
 	Selection,
 	PluginOptions,
+	uuid,
 } from '@aomao/engine';
 import { Path } from 'sharedb';
 
@@ -26,7 +27,9 @@ export default class extends MarkPlugin<Options> {
 	private range?: RangeInterface;
 	private executeBySelf: boolean = false;
 	private MARK_KEY = `data-mark-key`;
+	private MARK_UUID = `data-mark-uuid`;
 	private ids: { [key: string]: Array<string> } = {};
+	private m_uuid = uuid(18, 24);
 
 	readonly followStyle: boolean = false;
 
@@ -84,8 +87,8 @@ export default class extends MarkPlugin<Options> {
 
 		if (isEngine(this.editor)) {
 			const { change } = this.editor;
-			this.editor.on('change', () => {
-				this.triggerChange();
+			this.editor.on('change', (_, trigger) => {
+				this.triggerChange(trigger !== 'local');
 			});
 			this.editor.on('select', () => this.onSelectionChange());
 			this.editor.on('parse:value', (node, atts) => {
@@ -141,6 +144,7 @@ export default class extends MarkPlugin<Options> {
 						required: true,
 						value: key,
 					},
+					[this.MARK_UUID]: '*',
 					[this.getIdName(key)]: '*',
 				},
 			};
@@ -277,7 +281,9 @@ export default class extends MarkPlugin<Options> {
 					this.MARK_KEY
 				}="${key}" ${DATA_TRANSIENT_ATTRIBUTES}="${this.getPreviewName(
 					key,
-				)}" ${this.getPreviewName(key)}="true" />`,
+				)}" ${this.MARK_UUID}="${this.m_uuid}" ${this.getPreviewName(
+					key,
+				)}="true" />`,
 				range,
 			);
 			//遍历当前光标选择节点，拼接选择的文本
@@ -478,7 +484,6 @@ export default class extends MarkPlugin<Options> {
 	execute() {}
 
 	action(key: string, action: string, ...args: any): any {
-		const history = isEngine(this.editor) ? this.editor.history : undefined;
 		const id = args[0];
 		switch (action) {
 			case 'preview':
@@ -552,10 +557,11 @@ export default class extends MarkPlugin<Options> {
 		this.range = range;
 	}
 
-	triggerChange() {
+	triggerChange(remote: boolean = false) {
 		const addIds: { [key: string]: Array<string> } = {};
 		const removeIds: { [key: string]: Array<string> } = {};
 		const ids = this.getIds();
+
 		this.options.keys.forEach((key) => {
 			const prevIds = this.ids[key] || [];
 			const curIds = ids[key] || [];
@@ -572,6 +578,25 @@ export default class extends MarkPlugin<Options> {
 				}
 			});
 		});
+		if (remote) {
+			const currentElements = this.editor.container.find(
+				`[${this.MARK_UUID}="${this.m_uuid}"]`,
+			);
+			currentElements.each((_, index) => {
+				const child = currentElements.eq(index);
+				const attributes = child?.attributes() || {};
+				const key = attributes[this.MARK_KEY];
+				// 如果这个元素没有被标记，并且没有创建、没有预览选项就增加预览样式
+				const previewName = this.getPreviewName(key);
+				if (
+					key &&
+					!attributes[this.getIdName(key)] &&
+					!attributes[previewName]
+				) {
+					child!.attributes(previewName, 'true');
+				}
+			});
+		}
 		this.ids = ids;
 		this.editor.trigger(`${PLUGIN_NAME}:change`, addIds, removeIds, ids);
 	}

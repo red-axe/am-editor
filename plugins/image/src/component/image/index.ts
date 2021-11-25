@@ -544,6 +544,11 @@ class Image {
 					width: width + 'px',
 					height: height + 'px',
 				});
+				const { onChange } = this.options;
+				if (width > 0 && height > 0) {
+					this.size = { ...this.size, width, height };
+					if (onChange) onChange(this.size);
+				}
 			}
 			this.bg.css({
 				width: width + 'px',

@@ -3,12 +3,14 @@ import {
 	CardEntry,
 	CardInterface,
 	CARD_KEY,
+	CARD_VALUE_KEY,
 	decodeCardValue,
 	encodeCardValue,
 	isEngine,
 	NodeInterface,
 	Plugin,
 	PluginEntry,
+	READY_CARD_KEY,
 	sanitizeUrl,
 	SchemaInterface,
 } from '@aomao/engine';
@@ -162,34 +164,36 @@ export default class VideoPlugin extends Plugin<{
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${VideoComponent.cardName}`).each(
-			(cardNode) => {
-				const node = $(cardNode);
-				const card = this.editor.card.find(node) as VideoComponent;
-				const value = card?.getValue();
-				if (value?.url && value.status === 'done') {
-					const { onBeforeRender } = this.options;
-					const { cover, url } = value;
-					const html = `<div data-type="${
-						VideoComponent.cardName
-					}"  data-value="${encodeCardValue(
-						value,
-					)}"><video controls src="${sanitizeUrl(
-						onBeforeRender ? onBeforeRender('query', url) : url,
-					)}" poster="${
-						!cover
-							? 'none'
-							: sanitizeUrl(
-									onBeforeRender
-										? onBeforeRender('cover', cover)
-										: cover,
-							  )
-					}" webkit-playsinline="webkit-playsinline" playsinline="playsinline" style="outline:none;" /></div>`;
-					node.empty();
-					node.replaceWith($(html));
-				} else node.remove();
-			},
-		);
+		root.find(
+			`[${CARD_KEY}="${VideoComponent.cardName}"],[${READY_CARD_KEY}="${VideoComponent.cardName}"]`,
+		).each((cardNode) => {
+			const node = $(cardNode);
+			const card = this.editor.card.find(node) as VideoComponent;
+			const value =
+				card?.getValue() ||
+				decodeCardValue(node.attributes(CARD_VALUE_KEY));
+			if (value?.url && value.status === 'done') {
+				const { onBeforeRender } = this.options;
+				const { cover, url } = value;
+				const html = `<div data-type="${
+					VideoComponent.cardName
+				}"  data-value="${encodeCardValue(
+					value,
+				)}"><video controls src="${sanitizeUrl(
+					onBeforeRender ? onBeforeRender('query', url) : url,
+				)}" poster="${
+					!cover
+						? 'none'
+						: sanitizeUrl(
+								onBeforeRender
+									? onBeforeRender('cover', cover)
+									: cover,
+						  )
+				}" webkit-playsinline="webkit-playsinline" playsinline="playsinline" style="outline:none;" /></div>`;
+				node.empty();
+				node.replaceWith($(html));
+			} else node.remove();
+		});
 	}
 }
 

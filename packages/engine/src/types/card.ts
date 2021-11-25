@@ -530,9 +530,14 @@ export interface CardModelInterface {
 	/**
 	 * 渲染
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
-	 * @param callback 全部异步渲染完成后触发
+	 * @param callback 渲染完成后回调
+	 * @param lazyRender 是否懒渲染，默认取决于editor的lazyRender属性
 	 */
-	render(container?: NodeInterface, callback?: (count: number) => void): void;
+	render(
+		container?: NodeInterface,
+		callback?: (count: number) => void,
+		lazyRender?: boolean,
+	): void;
 	/**
 	 * 重新渲染卡片
 	 * @param cards 卡片集合

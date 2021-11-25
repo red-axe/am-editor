@@ -4,9 +4,13 @@ import {
 	CardInterface,
 	CardType,
 	CARD_KEY,
+	CARD_TYPE_KEY,
+	CARD_VALUE_KEY,
+	decodeCardValue,
 	NodeInterface,
 	Plugin,
 	PluginEntry,
+	READY_CARD_KEY,
 } from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 import ImageUploader from './uploader';
@@ -108,40 +112,41 @@ export default class extends Plugin<{
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${ImageComponent.cardName}`).each(
-			(cardNode) => {
-				const node = $(cardNode);
-				const card = this.editor.card.find(node) as ImageComponent;
-				const value = card?.getValue();
-				if (value?.src && value.status === 'done') {
-					const img = node.find('.data-image-meta > img');
-					node.empty();
-					let src = value.src;
-					const { onBeforeRender } = this.options;
-					if (onBeforeRender) {
-						src = onBeforeRender(value.status, value.src);
+		root.find(
+			`[${CARD_KEY}="${ImageComponent.cardName}"],[${READY_CARD_KEY}="${ImageComponent.cardName}"]`,
+		).each((cardNode) => {
+			const node = $(cardNode);
+			const card = this.editor.card.find(node) as ImageComponent;
+			const value =
+				card?.getValue() ||
+				decodeCardValue(node.attributes(CARD_VALUE_KEY));
+			if (value?.src && value.status === 'done') {
+				let img = $('<img />');
+				node.empty();
+				let src = value.src;
+				const { onBeforeRender } = this.options;
+				if (onBeforeRender) {
+					src = onBeforeRender(value.status, value.src);
+				}
+				const type = node.attributes(CARD_TYPE_KEY);
+				img.attributes('src', src);
+				img.css('visibility', 'visible');
+				const size = value.size;
+				if (size.width) img.css('width', `${size.width}px`);
+				if (size.height) img.css('height', `${size.height}px`);
+				img.removeAttributes('class');
+				img.attributes('data-type', type);
+				if (img.length > 0) {
+					if (type === CardType.BLOCK) {
+						img = this.editor.node.wrap(
+							img,
+							$(`<p style="text-align:center;"></p>`),
+						);
 					}
-					img.attributes('src', src);
-					img.css('visibility', 'visible');
-					img.css('background', '');
-					img.css('background-color', '');
-					img.css('background-repeat', '');
-					img.css('background-position', '');
-					img.css('background-image', '');
-					img.removeAttributes('class');
-
-					if (img.length > 0) {
-						node.replaceWith(img);
-						if (card.type === CardType.BLOCK) {
-							this.editor.node.wrap(
-								img,
-								$(`<p style="text-align:center;"></p>`),
-							);
-						}
-					}
-				} else node.remove();
-			},
-		);
+					node.replaceWith(img);
+				}
+			} else node.remove();
+		});
 	}
 }
 

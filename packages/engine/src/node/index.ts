@@ -23,7 +23,7 @@ import {
 } from '../constants';
 import { getDocument, getStyleMap, isEngine } from '../utils';
 import $ from './query';
-import getHashId from './hash';
+import getHashId, { uuid } from './hash';
 import { isNode, isNodeEntry } from './utils';
 
 class NodeModel implements NodeModelInterface {
@@ -1027,4 +1027,4 @@ class NodeModel implements NodeModelInterface {
 
 export default NodeModel;
 
-export { Entry as NodeEntry, Event, $, getHashId };
+export { Entry as NodeEntry, Event, $, getHashId, uuid };

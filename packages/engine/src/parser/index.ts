@@ -9,12 +9,7 @@ import {
 	ConversionRule,
 	SchemaRule,
 } from '../types';
-import {
-	CARD_ELEMENT_KEY,
-	CARD_KEY,
-	CARD_SELECTOR,
-	READY_CARD_KEY,
-} from '../constants';
+import { CARD_ELEMENT_KEY, CARD_SELECTOR } from '../constants';
 import {
 	escape,
 	unescape,

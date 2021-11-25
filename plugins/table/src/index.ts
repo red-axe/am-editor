@@ -9,6 +9,10 @@ import {
 	PluginOptions,
 	SchemaInterface,
 	getDocument,
+	Parser,
+	READY_CARD_KEY,
+	decodeCardValue,
+	CARD_VALUE_KEY,
 } from '@aomao/engine';
 import TableComponent, { Template } from './component';
 import locales from './locale';
@@ -355,55 +359,57 @@ class Table extends Plugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${TableComponent.cardName}`).each(
-			(tableNode) => {
-				const node = $(tableNode);
-				const card = this.editor.card.find(node) as TableComponent;
-				const value = card?.getValue();
-				if (value && value.html) {
-					let table = node.find('table');
+		root.find(
+			`[${CARD_KEY}="${TableComponent.cardName}"],[${READY_CARD_KEY}="${TableComponent.cardName}"]`,
+		).each((tableNode) => {
+			const node = $(tableNode);
+			const card = this.editor.card.find(node) as TableComponent;
+			const value =
+				card?.getValue() ||
+				decodeCardValue(node.attributes(CARD_VALUE_KEY));
+			if (value && value.html) {
+				let table = node.find('table');
+				if (table.length === 0) {
+					// 表格值里面的卡片都是没有被转换过的，所以需要先把卡片转换过来
+					table = $(value.html);
 					if (table.length === 0) {
-						table = $(value.html);
-						if (table.length === 0) {
-							node.remove();
-							return;
-						}
+						node.remove();
+						return;
+					} else {
+						table = $(new Parser(table, this.editor).toHTML());
 					}
-					const width =
-						table.attributes('width') || table.css('width');
-					table.css({
-						outline: 'none',
-						'border-collapse': 'collapse',
-						width: '100%',
-					});
-					table.attributes('data-width', width);
-					const tds = table.find('td');
-					tds.each((_, index) => {
-						const tdElement = tds.eq(index);
-						tdElement?.css({
-							'min-width': 'auto',
-							'white-space': 'flat',
-							'word-wrap': 'break-word',
-							margin: '4px 8px',
-							border: !!table.attributes('data-table-no-border')
-								? '0 none'
-								: '1px solid #d9d9d9',
-							padding: '4px 8px',
-							cursor: 'default',
-							'vertical-align':
-								tdElement.css('vertical-align') || 'top',
-						});
-					});
-					table.find(Template.TABLE_TD_BG_CLASS).remove();
-					table
-						.find(Template.TABLE_TD_CONTENT_CLASS)
-						.each((content) => {
-							this.editor.node.unwrap($(content));
-						});
-					node.replaceWith(table);
 				}
-			},
-		);
+				const width = table.attributes('width') || table.css('width');
+				table.css({
+					outline: 'none',
+					'border-collapse': 'collapse',
+					width: '100%',
+				});
+				table.attributes('data-width', width);
+				const tds = table.find('td');
+				tds.each((_, index) => {
+					const tdElement = tds.eq(index);
+					tdElement?.css({
+						'min-width': 'auto',
+						'white-space': 'flat',
+						'word-wrap': 'break-word',
+						margin: '4px 8px',
+						border: !!table.attributes('data-table-no-border')
+							? '0 none'
+							: '1px solid #d9d9d9',
+						padding: '4px 8px',
+						cursor: 'default',
+						'vertical-align':
+							tdElement.css('vertical-align') || 'top',
+					});
+				});
+				table.find(Template.TABLE_TD_BG_CLASS).remove();
+				table.find(Template.TABLE_TD_CONTENT_CLASS).each((content) => {
+					this.editor.node.unwrap($(content));
+				});
+				node.replaceWith(table);
+			}
+		});
 	}
 
 	getMarkdownCell(match: RegExpExecArray, count?: number) {

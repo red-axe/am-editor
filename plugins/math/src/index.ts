@@ -12,6 +12,8 @@ import {
 	decodeCardValue,
 	encodeCardValue,
 	AjaxInterface,
+	READY_CARD_KEY,
+	CARD_VALUE_KEY,
 } from '@aomao/engine';
 import MathComponent from './component';
 import locales from './locales';
@@ -241,9 +243,10 @@ export default class Math extends Plugin<Options> {
 	pasteHtml(node: NodeInterface) {
 		if (!isEngine(this.editor)) return;
 		if (node.isElement()) {
-			const type = node.attributes('data-type');
+			const attributes = node.attributes();
+			const type = attributes['data-type'];
 			if (type === MathComponent.cardName) {
-				const value = node.attributes('data-value');
+				const value = attributes['data-value'];
 				const cardValue = decodeCardValue(value);
 				if (!cardValue.url) return;
 				this.editor.card.replaceNode(
@@ -259,10 +262,14 @@ export default class Math extends Plugin<Options> {
 	}
 
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${MathComponent.cardName}`).each((cardNode) => {
+		root.find(
+			`[${CARD_KEY}="${MathComponent.cardName}"],[${READY_CARD_KEY}="${MathComponent.cardName}"]`,
+		).each((cardNode) => {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as MathComponent;
-			const value = card?.getValue();
+			const value =
+				card?.getValue() ||
+				decodeCardValue(node.attributes(CARD_VALUE_KEY));
 			if (value) {
 				const img = node.find('img');
 				node.empty();

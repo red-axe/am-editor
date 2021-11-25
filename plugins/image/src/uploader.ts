@@ -14,6 +14,7 @@ import {
 	decodeCardValue,
 	encodeCardValue,
 	removeUnit,
+	CardType,
 } from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 
@@ -476,15 +477,28 @@ export default class extends Plugin<Options> {
         } */
 		//图片
 		if (node.name === 'img') {
-			const src = node.attributes('src') || node.attributes('data-src');
-			const alt = node.attributes('alt');
+			const attributes = node.attributes();
+			const src = attributes['src'] || attributes['data-src'];
+			const alt = attributes['alt'];
 			if (!src) {
 				node.remove();
 				return;
 			}
 			const width = node.css('width');
 			const height = node.css('height');
+			const dataTypeValue = attributes['data-type'];
+			let type = CardType.INLINE;
+			if (dataTypeValue === 'block') {
+				const parent = node.parent();
+				// 移除转换为html的时候加载的额外p标签
+				if (parent && parent.name === 'p') {
+					this.editor.node.unwrap(node);
+				}
+				type = CardType.BLOCK;
+			}
+
 			this.editor.card.replaceNode(node, 'image', {
+				type,
 				src,
 				status:
 					(isRemote && isRemote(src)) || /^data:image\//i.test(src)
