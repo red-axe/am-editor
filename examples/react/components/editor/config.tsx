@@ -41,6 +41,7 @@ import Fontfamily from '@aomao/plugin-fontfamily';
 import Status, { StatusComponent } from '@aomao/plugin-status';
 import LineHeight from '@aomao/plugin-line-height';
 import Mention, { MentionComponent } from '@aomao/plugin-mention';
+import Embed, { EmbedComponent } from '@aomao/plugin-embed';
 import Test, { TestComponent } from './plugins/test';
 //import Mind, { MindComponent } from '@aomao/plugin-mind';
 import {
@@ -95,6 +96,7 @@ export const plugins: Array<PluginEntry> = [
 	Status,
 	LineHeight,
 	Mention,
+	Embed,
 	Test,
 	//Mind
 ];
@@ -112,6 +114,7 @@ export const cards: Array<CardEntry> = [
 	StatusComponent,
 	MentionComponent,
 	TestComponent,
+	EmbedComponent,
 	//MindComponent
 ];
 

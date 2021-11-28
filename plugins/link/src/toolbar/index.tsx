@@ -57,7 +57,7 @@ class Toolbar {
 			top: `${window.pageYOffset + rect.bottom + 4}px`,
 			left: `${window.pageXOffset}px`,
 			position: 'absolute',
-			'z-index': 1,
+			'z-index': 125,
 		});
 	}
 
@@ -181,6 +181,7 @@ class Toolbar {
 			container,
 			() => {
 				if (!this.root || !this.target) return;
+				this.#position?.destroy();
 				this.#position?.bind(this.root, this.target);
 			},
 		);

@@ -858,7 +858,11 @@ class Block implements BlockModelInterface {
 	findBlocks(range: RangeInterface) {
 		range = range.cloneRange();
 		if (range.startNode.isRoot()) range.shrinkToElementNode();
-		if (!range.startNode.inEditor()) return [];
+		if (
+			!range.startNode.inEditor() ||
+			this.editor.card.find(range.startNode)
+		)
+			return [];
 		const sc = range.startContainer;
 		const so = range.startOffset;
 		const ec = range.endContainer;

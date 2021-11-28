@@ -271,7 +271,7 @@ export default class Math extends Plugin<Options> {
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
 			if (value) {
-				const img = node.find('img');
+				const img = $('<img />');
 				node.empty();
 				img.attributes('src', value.url);
 				img.css('visibility', 'visible');

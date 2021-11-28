@@ -1327,7 +1327,11 @@ class Mark implements MarkModelInterface {
 	findMarks(range: RangeInterface) {
 		const cloneRange = range.cloneRange();
 		if (cloneRange.startNode.isRoot()) cloneRange.shrinkToElementNode();
-		if (!cloneRange.startNode.inEditor()) return [];
+		if (
+			!cloneRange.startNode.inEditor() ||
+			this.editor.card.find(cloneRange.startNode)
+		)
+			return [];
 		const { node } = this.editor;
 		const handleRange = (
 			allowBlock: boolean,

@@ -56,7 +56,7 @@ class Toolbar {
 			top: `${window.pageYOffset + rect.bottom + 4}px`,
 			left: `${window.pageXOffset}px`,
 			position: 'absolute',
-			'z-index': 1,
+			'z-index': 125,
 		});
 	}
 
@@ -187,6 +187,7 @@ class Toolbar {
 		}
 
 		setTimeout(() => {
+			this.position?.destroy();
 			this.position?.bind(this.root!, this.target!);
 			this.vm =
 				!href || forceEdit

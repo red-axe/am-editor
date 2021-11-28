@@ -1,8 +1,8 @@
 @font-face {
     font-family: "data-icon"; /* Project id 1456030 */
-    src: url('//at.alicdn.com/t/font_1456030_mvh913k905.woff2?t=1629619375484') format('woff2'),
-         url('//at.alicdn.com/t/font_1456030_mvh913k905.woff?t=1629619375484') format('woff'),
-         url('//at.alicdn.com/t/font_1456030_mvh913k905.ttf?t=1629619375484') format('truetype');
+    src: url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'),
+       url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff?t=1638071536645') format('woff'),
+       url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype');
   }  
   
   .data-icon {
@@ -20,12 +20,11 @@
   .data-icon-inline-image:before {
     content: "\e601";
   }
-
+  
   .data-icon-no-border:before {
     content: "\e608";
   }
   
-
   .data-icon-line-height:before {
     content: "\e697";
   }
@@ -33,7 +32,7 @@
   .data-icon-text:before {
     content: "\e600";
   }
-
+  
   .data-icon-comment:before {
     content: "\e73e";
   }
@@ -314,7 +313,7 @@
     content: "\e74e";
   }
   
-  .data-icon-embedded-preview:before {
+  .data-icon-expand:before {
     content: "\e74f";
   }
   

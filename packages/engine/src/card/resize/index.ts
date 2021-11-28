@@ -69,7 +69,7 @@ class Resize implements ResizeInterface {
 			},
 		});
 		if (!this.component) return;
-		this.component.hide();
+		if (!this.card.activated) this.component.hide();
 		container.append(this.component);
 		const value: any = this.card.getValue() || {};
 		if (value.height) {

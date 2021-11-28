@@ -65,6 +65,7 @@ function getMenus(opts: { lang?: string; base: '/docs' | '/plugin' | '/api' }) {
 					'/plugin/plugin-bold',
 					'/plugin/plugin-code',
 					'/plugin/plugin-codelock',
+					'/plugin/plugin-embed',
 					'/plugin/plugin-file',
 					'/plugin/plugin-fontcolor',
 					'/plugin/plugin-fontsize',
