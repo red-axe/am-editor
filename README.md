@@ -46,6 +46,10 @@ Monitor the changes of the `DOM` tree in the editing area through `MutationObser
 
 **`React`** example [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
+**`Vue2 DEMO`** [https://github.com/yanmao-cc/am-editor-demo-vue2](https://github.com/yanmao-cc/am-editor-demo-vue2)
+
+**`Vue2 Nuxt DEMO`** [https://github.com/yanmao-cc/am-editor-nuxt](https://github.com/yanmao-cc/am-editor-nuxt)
+
 ## Features
 
 -   Out of the box, it provides dozens of rich plug-ins to meet most needs

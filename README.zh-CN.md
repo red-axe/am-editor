@@ -48,6 +48,10 @@
 
 **`React`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
+**`Vue2 DEMO`** [https://github.com/yanmao-cc/am-editor-demo-vue2](https://github.com/yanmao-cc/am-editor-demo-vue2)
+
+**`Vue2 Nuxt DEMO`** [https://github.com/yanmao-cc/am-editor-nuxt](https://github.com/yanmao-cc/am-editor-nuxt)
+
 ## 特性
 
 -   开箱即用，提供几十种丰富的插件来满足大部分需求
