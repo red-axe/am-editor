@@ -387,34 +387,48 @@ class NativeEvent {
 			});
 		});
 
-		const pasteMarkdown = async (html: string, text: string) => {
-			// 先解析html
-			let parser = new Parser(html, this.engine);
-			const schema = this.engine.schema.clone();
-			//转换Text，没那么严格，加入以下规则，以免被过滤掉，并且 div后面会加换行符
-			schema.add([
-				{
-					name: 'span',
-					type: 'mark',
-				},
-				{
-					name: 'div',
-					type: 'block',
-				},
-			]);
-			// 不遍历卡片，不对 ol 节点格式化，以免复制列表就去提示检测到markdown
-			let parserText = parser.toText(schema, false, false);
-			// html中没有解析到文本
-			if (!parserText) {
-				parser = new Parser(text, this.engine);
-				parserText = parser.toText(schema);
-			}
-			const textNode = $(document.createTextNode(parserText));
-			// 如果没有符合的语法就返回
+		const parserMarkdown = (text: string) => {
+			const textNode = $(document.createTextNode(text));
 			const result = this.engine.trigger(
 				'paste:markdown-check',
 				textNode,
 			);
+			return {
+				node: textNode,
+				result,
+			};
+		};
+
+		const pasteMarkdown = async (html: string, text: string) => {
+			// 先解析text
+			let { node, result } = parserMarkdown(text);
+			// 没有 markdown，尝试解析 html
+			if (result !== false) {
+				// 先解析html
+				let parser = new Parser(html, this.engine);
+				const schema = this.engine.schema.clone();
+				//转换Text，没那么严格，加入以下规则，以免被过滤掉，并且 div后面会加换行符
+				schema.add([
+					{
+						name: 'span',
+						type: 'mark',
+					},
+					{
+						name: 'div',
+						type: 'block',
+					},
+				]);
+				// 不遍历卡片，不对 ol 节点格式化，以免复制列表就去提示检测到markdown
+				let parserText = parser.toText(schema, false, false);
+				// html中没有解析到文本
+				if (!parserText) {
+					parser = new Parser(text, this.engine);
+					parserText = parser.toText(schema);
+				}
+				const htmlResult = parserMarkdown(parserText);
+				node = htmlResult.node;
+				result = htmlResult.result;
+			}
 			if (result !== false) return;
 			// 提示是否要转换
 			this.engine
@@ -423,19 +437,21 @@ class NativeEvent {
 				)
 				.then(() => {
 					change.cacheRangeBeforeCommand();
-					this.engine.trigger('paste:markdown-before', textNode);
-					this.engine.trigger('paste:markdown', textNode);
-					this.engine.trigger('paste:markdown-after', textNode);
+					this.engine.trigger('paste:markdown-before', node);
+					this.engine.trigger('paste:markdown', node);
+					this.engine.trigger('paste:markdown-after', node);
 
-					textNode.get<Text>()?.normalize();
+					node.get<Text>()?.normalize();
 					this.paste(
-						textNode.text(),
+						node.text(),
 						this.#lastePasteRange,
 						undefined,
 						false,
 					);
 				})
-				.catch(() => {});
+				.catch((err) => {
+					if (err) this.engine.messageError(err);
+				});
 		};
 
 		change.event.onPaste((data) => {

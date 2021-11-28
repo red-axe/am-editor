@@ -178,6 +178,7 @@ class Toolbar {
 		const name = !href || forceEdit ? 'am-link-editor' : 'am-link-preview';
 		if (this.vm && this.vm._component.name === name) {
 			if (!this.root || !this.target) return;
+			this.position?.destroy();
 			this.position?.bind(this.root, this.target);
 			return;
 		} else if (this.vm) {

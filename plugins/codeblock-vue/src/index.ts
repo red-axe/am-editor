@@ -245,7 +245,7 @@ export default class extends Plugin<Options> {
 			mode: string = 'text',
 		) => {
 			//获取中间字符
-			const codeText = new Parser(nodes.join('\n'), this.editor).toText();
+			const codeText = nodes.join('\n');
 			let code = unescape(codeText);
 
 			if (code.endsWith('\n')) code = code.substr(0, code.length - 2);
