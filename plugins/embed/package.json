@@ -1,29 +1,26 @@
 {
   "name": "@aomao/plugin-embed",
-  "version": "1.0.0",
-  "description": "> TODO: description",
-  "author": "yanmao <55792257+yanmao-cc@users.noreply.github.com>",
-  "homepage": "https://github.com/yanmao-cc/am-editor/tree/master/plugins/embed#readme",
-  "license": "MIT",
-  "main": "src/index.ts",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
-  },
+  "version": "2.6.14",
+  "main": "dist/index.ts",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
   "files": [
-    "lib"
+    "dist",
+    "lib",
+    "src"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
+  "author": "me@yanmao.cc",
+  "license": "MIT",
+  "homepage": "https://github.com/yanmao-cc/am-editor#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yanmao-cc/am-editor.git"
   },
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
-  },
   "bugs": {
     "url": "https://github.com/yanmao-cc/am-editor/issues"
+  },
+  "dependencies": {
+    "@aomao/engine": "^2.6.14",
+    "@babel/runtime": "^7.13.10"
   }
 }
