@@ -208,7 +208,7 @@ class EmbedComponent extends Card<EmbedValue> {
 		)}</a></span>
                     <a target="_blank" class="data-icon data-icon-preview" href="${url}"></a>
                 </div>
-                <div class="data-embed-body" height="${height}${
+                <div class="data-embed-body" style="height:${height}${
 			height === 'auto' ? '' : 'px'
 		}">
                     <div class="data-embed-content-bg">

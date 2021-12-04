@@ -216,7 +216,7 @@ class MentionPlugin extends Plugin<Options> {
 
 	pasteSchema(schema: SchemaInterface) {
 		schema.add({
-			type: 'mark',
+			type: 'inline',
 			name: 'span',
 			attributes: {
 				'data-type': {

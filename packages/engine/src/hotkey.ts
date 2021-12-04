@@ -9,7 +9,6 @@ import { HotkeyInterface } from './types/hotkey';
 class Hotkey implements HotkeyInterface {
 	private engine: EngineInterface;
 	private disabled: boolean = false;
-	#matchTimeout?: NodeJS.Timeout;
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
 		//绑定事件
@@ -83,10 +82,7 @@ class Hotkey implements HotkeyInterface {
 		if (this.disabled) {
 			return;
 		}
-		if (this.#matchTimeout) {
-			clearTimeout(this.#matchTimeout);
-		}
-		this.#matchTimeout = setTimeout(() => this.match(e), 50);
+		this.match(e);
 	}
 
 	/**

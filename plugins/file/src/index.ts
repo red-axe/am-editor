@@ -123,7 +123,7 @@ export default class extends Plugin {
 
 	pasteSchema(schema: SchemaInterface) {
 		schema.add({
-			type: 'mark',
+			type: 'inline',
 			name: 'a',
 			attributes: {
 				'data-type': {

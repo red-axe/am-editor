@@ -17,6 +17,7 @@ export const getToolbarDefaultConfig = (
 ): Array<ButtonProps | DropdownProps | ColorProps | CollapseProps> => {
 	const language = engine.language.get('toolbar');
 	const headingLanguage = language['heading'];
+	const fontSizeInContainer = engine.container.css('font-size');
 	return [
 		{
 			type: 'collapse',
@@ -538,7 +539,7 @@ export const getToolbarDefaultConfig = (
 				{ key: '40px', content: '40px', hotkey: false },
 				{ key: '48px', content: '48px', hotkey: false },
 			].map((item) =>
-				item.key === engine.container.css('font-size')
+				item.key === fontSizeInContainer
 					? { ...item, isDefault: true }
 					: item,
 			),

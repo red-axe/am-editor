@@ -160,11 +160,7 @@ class ChangeEvent implements ChangeEventInterface {
 						.substring(type.length)
 						.toLowerCase();
 					if (this.engine.command.queryEnabled(commandName)) {
-						this.engine.hotkey.disable();
 						this.engine.command.execute(commandName);
-						setTimeout(() => {
-							this.engine.hotkey.enable();
-						}, 0);
 					}
 				}
 			});
