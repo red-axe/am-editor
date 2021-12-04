@@ -27,8 +27,6 @@ new Engine(...,{ plugins:[ Image , ImageUploader ] , cards:[ ImageComponent ]})
 onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
 ```
 
-无可选项
-
 ## `ImageUploader` 可选项
 
 ```ts
@@ -47,6 +45,8 @@ new Engine(...,{
 `action`: 上传地址，始终使用 `POST` 请求
 
 `crossOrigin`: 是否跨域
+
+`withCredentials`: https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
 
 `headers`: 请求头
 
@@ -75,6 +75,10 @@ file:{
      * 是否跨域
      */
     crossOrigin?: boolean;
+    /**
+     * https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+     */
+    withCredentials?: boolean;
    /**
     * 请求头
     */
@@ -137,7 +141,11 @@ remote:{
      * 是否跨域
      */
     crossOrigin?: boolean;
-   /**
+    /**
+     * https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+     */
+    withCredentials?: boolean;
+    /**
     * 请求头
     */
     headers?: { [key: string]: string } | (() => { [key: string]: string });

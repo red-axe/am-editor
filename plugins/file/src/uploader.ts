@@ -40,6 +40,10 @@ export interface Options extends PluginOptions {
 	 */
 	crossOrigin?: boolean;
 	/**
+	 * https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+	 */
+	withCredentials?: boolean;
+	/**
 	 * 请求头
 	 */
 	headers?: { [key: string]: string } | (() => { [key: string]: string });
@@ -118,6 +122,7 @@ export default class extends Plugin<Options> {
 			contentType,
 			multiple,
 			crossOrigin,
+			withCredentials,
 			headers,
 			name,
 		} = this.options;
@@ -143,6 +148,7 @@ export default class extends Plugin<Options> {
 				type,
 				contentType,
 				crossOrigin,
+				withCredentials,
 				headers: typeof headers === 'function' ? headers() : headers,
 				onBefore: (file) => {
 					if (file.size > limitSize) {

@@ -52,6 +52,10 @@ export interface Options extends PluginOptions {
 		 */
 		crossOrigin?: boolean;
 		/**
+		 * https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+		 */
+		withCredentials?: boolean;
+		/**
 		 * 请求头
 		 */
 		headers?:
@@ -72,6 +76,10 @@ export interface Options extends PluginOptions {
 		 * 是否跨域
 		 */
 		crossOrigin?: boolean;
+		/**
+		 * https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+		 */
+		withCredentials?: boolean;
 		/**
 		 * 请求头
 		 */
@@ -237,6 +245,7 @@ export default class extends Plugin<Options> {
 			contentType,
 			multiple,
 			crossOrigin,
+			withCredentials,
 			headers,
 			name,
 		} = this.options.file;
@@ -261,6 +270,7 @@ export default class extends Plugin<Options> {
 			{
 				url: action,
 				crossOrigin,
+				withCredentials,
 				headers: typeof headers === 'function' ? headers() : headers,
 				data,
 				type,
@@ -517,8 +527,16 @@ export default class extends Plugin<Options> {
 
 	uploadAddress(src: string, component: ImageComponent) {
 		if (!isEngine(this.editor)) return;
-		const { action, type, data, contentType, crossOrigin, headers, name } =
-			this.options.remote;
+		const {
+			action,
+			type,
+			data,
+			contentType,
+			crossOrigin,
+			withCredentials,
+			headers,
+			name,
+		} = this.options.remote;
 		const { parse } = this.options;
 		const addressName = name || 'url';
 		this.editor.request.ajax({
@@ -527,6 +545,7 @@ export default class extends Plugin<Options> {
 			contentType: contentType || 'application/json',
 			type: type === undefined ? 'json' : type,
 			crossOrigin,
+			withCredentials,
 			headers: typeof headers === 'function' ? headers() : headers,
 			data: {
 				...data,

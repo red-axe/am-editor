@@ -46,6 +46,8 @@ new Engine(...,{
 
 `crossOrigin`: Whether to cross-origin
 
+`withCredentials`: https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+
 `headers`: request header
 
 `contentType`: File upload is uploaded in `multipart/form-data;` type by default
@@ -69,6 +71,10 @@ action:string
   * Whether cross-domain
   */
 crossOrigin?: boolean;
+/**
+ * https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+ */
+withCredentials?: boolean;
 /**
 * Request header
 */

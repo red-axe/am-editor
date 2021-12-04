@@ -83,6 +83,10 @@ export type UploaderOptions = {
 	 */
 	crossOrigin?: boolean;
 	/**
+	 * https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+	 */
+	withCredentials?: boolean;
+	/**
 	 * 请求头
 	 */
 	headers?: { [key: string]: string };

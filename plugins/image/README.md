@@ -46,6 +46,8 @@ new Engine(...,{
 
 `crossOrigin`: 是否跨域
 
+`withCredentials`: https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+
 `headers`: 请求头
 
 `contentType`: 图片文件上传默认以 `multipart/form-data;` 类型上传
@@ -73,6 +75,10 @@ file:{
      * 是否跨域
      */
     crossOrigin?: boolean;
+    /**
+     * https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+     */
+    withCredentials?: boolean;
    /**
     * 请求头
     */
@@ -135,7 +141,11 @@ remote:{
      * 是否跨域
      */
     crossOrigin?: boolean;
-   /**
+    /**
+     * https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+     */
+    withCredentials?: boolean;
+    /**
     * 请求头
     */
     headers?: { [key: string]: string } | (() => { [key: string]: string });

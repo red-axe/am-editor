@@ -46,6 +46,8 @@ new Engine(...,{
 
 `crossOrigin`: 是否跨域
 
+`withCredentials`: https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+
 `headers`: 请求头
 
 `contentType`: 文件上传默认以 `multipart/form-data;` 类型上传
@@ -69,6 +71,10 @@ action:string
  * 是否跨域
  */
 crossOrigin?: boolean;
+/**
+ * https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+ */
+withCredentials?: boolean;
 /**
 * 请求头
 */
