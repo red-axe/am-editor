@@ -256,7 +256,13 @@ export default class Clipboard implements ClipboardInterface {
 					let parent: NodeInterface | Node | null | undefined =
 						curentElement?.parentElement;
 					parent = parent ? $(parent.cloneNode(false)) : null;
-					if (curentElement && parent && node.isList(parent)) {
+					const childParent = child.parentElement;
+					if (
+						curentElement &&
+						parent &&
+						node.isList(parent) &&
+						(!childParent || !node.isList(childParent))
+					) {
 						if (parent.name === 'ol') {
 							// 设置复制位置的 start 属性，默认不设置
 							// let start = parseInt(parent.attributes('start') || '0', 10)
