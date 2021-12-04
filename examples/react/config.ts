@@ -5,7 +5,7 @@ export const DOMAIN = IS_DEV
 	? `http://${
 			typeof window !== 'undefined' ? 'localhost:7001' : 'localhost:7001'
 	  }`
-	: 'https://editor.yanmao.cc';
+	: 'https://editor.aomao.com';
 
 export const lang = (
 	!isServer ? window.location.href.indexOf('zh-CN') > 0 : false

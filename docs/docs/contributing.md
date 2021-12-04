@@ -66,11 +66,11 @@ am-editor uses [dumi](https://d.umijs.org/) as a document site tool,
 
 ### Alipay
 
-![alipay](https://cdn-object.yanmao.cc/contribution/alipay.png?x-oss-process=image/resize,w_200)
+![alipay](https://cdn-object.aomao.com/contribution/alipay.png?x-oss-process=image/resize,w_200)
 
 ### WeChat Pay
 
-![wechat](https://cdn-object.yanmao.cc/contribution/weichat.png?x-oss-process=image/resize,w_200)
+![wechat](https://cdn-object.aomao.com/contribution/weichat.png?x-oss-process=image/resize,w_200)
 
 ### PayPal
 

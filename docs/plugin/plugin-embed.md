@@ -60,7 +60,7 @@ Parameter 5: Whether the size can be changed, the default is true
 ```ts
 engine.command.execute(
 	Math.pluginName,
-	'https://editor.yanmao.cc', // optional
+	'https://editor.aomao.com', // optional
 	'ico icon',
 	'Display title',
 	false,

@@ -48,7 +48,7 @@ DOM 节点在编辑器中是最重要的对象，编辑器数据结构就是一�
 
 ```html
 <p>
-	This is <a href="https://www.yanmao.cc">a <strong>link</strong></a>
+	This is <a href="https://www.aomao.com">a <strong>link</strong></a>
 </p>
 ```
 

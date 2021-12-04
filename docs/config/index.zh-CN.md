@@ -110,9 +110,9 @@ console.log(view.language.get<string>('test'));
 [VideoUploader.pluginName]: {
     action: `${DOMAIN}/upload/video`,
 },
-// 数学公式生成地址，项目在：https://drawing.yanmao.cc
+// 数学公式生成地址，项目在：https://drawing.aomao.com
 [Math.pluginName]: {
-    action: `https://g.yanmao.cc/latex`,
+    action: `https://g.aomao.com/latex`,
     parse: (res: any) => {
         if (res.success) return { result: true, data: res.svg };
         return { result: false };

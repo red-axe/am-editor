@@ -6,7 +6,7 @@
     "Mind",
     "脑图"
   ],
-  "author": "ITELLYOU <me@yanmao.cc>",
+  "author": "ITELLYOU <me@aomao.com>",
   "homepage": "https://github.com/yanmao-cc/am-editor/tree/main/plugins/plugin-mind#readme",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",

@@ -6,7 +6,7 @@ module.exports = (appInfo, appConfig = {}) => {
 
 	// use for cookie sign key, should change to your own and keep security
 	config.keys = appInfo.name + '_1513765449219_5858';
-	config.domain = 'https://editor.yanmao.cc';
+	config.domain = 'https://editor.aomao.com';
 	config.umiServerPath = '../public/umi.server';
 	// add your config here
 	config.middleware = [];

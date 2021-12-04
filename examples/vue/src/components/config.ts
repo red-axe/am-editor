@@ -52,7 +52,7 @@ import { createApp } from 'vue';
 import Loading from './loading.vue';
 import MentionPopover from './mention.vue';
 
-const DOMAIN = 'https://editor.yanmao.cc/api';
+const DOMAIN = 'https://editor.aomao.com/api';
 
 export const plugins: Array<PluginEntry> = [
 	Redo,
@@ -144,7 +144,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 		},
 	},
 	[Math.pluginName]: {
-		action: `https://g.yanmao.cc/latex`,
+		action: `https://g.aomao.com/latex`,
 		parse: (res: any) => {
 			if (res.success) return { result: true, data: res.svg };
 			return { result: false };

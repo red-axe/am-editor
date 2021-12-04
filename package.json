@@ -21,7 +21,7 @@
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
-    "author": "me@yanmao.cc",
+    "author": "me@aomao.com",
     "homepage": "https://github.com/yanmao-cc/am-editor#readme",
     "repository": {
         "type": "git",

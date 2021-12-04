@@ -60,7 +60,7 @@ renderBefore?:(url: string) => {url?: string
 ```ts
 engine.command.execute(
 	Math.pluginName,
-	'https://editor.yanmao.cc', // 可选
+	'https://editor.aomao.com', // 可选
 	'ico 图标',
 	'展示的标题',
 	false,

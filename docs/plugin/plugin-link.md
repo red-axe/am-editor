@@ -46,7 +46,7 @@ new Engine(...,{
             //Modify shortcut keys
             hotkey:{
                 key:"mod+k",
-                args:["_balnk_","https://www.yanmao.cc","ITELLYOU"]
+                args:["_balnk_","https://www.aomao.com","ITELLYOU"]
             }
         }
     }
@@ -91,7 +91,7 @@ Three parameters can be passed in [target?:string,href?:string,text?:string] Ope
 
 ```ts
 //target:'_blank','_parent','_top','_self', href: link, text: text
-engine.command.execute('link', '_blank', 'https://www.yanmao.cc', 'ITELLYOU');
+engine.command.execute('link', '_blank', 'https://www.aomao.com', 'ITELLYOU');
 //Use command to execute query current status, return boolean | undefined
 engine.command.queryState('link');
 ```

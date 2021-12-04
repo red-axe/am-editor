@@ -6,8 +6,8 @@
 
 <p align="center">
   <a href="https://github.com/yanmao-cc/am-editor/blob/master/README.zh-CN.md"><strong>中文</strong></a> ·
-  <a href="https://editor.yanmao.cc"><strong>Demo</strong></a> ·
-  <a href="https://editor.yanmao.cc/docs"><strong>Documentation</strong></a> ·
+  <a href="https://editor.aomao.com"><strong>Demo</strong></a> ·
+  <a href="https://editor.aomao.com/docs"><strong>Documentation</strong></a> ·
   <a href="#plugins"><strong>Plugins</strong></a> ·
   <a href="https://qm.qq.com/cgi-bin/qm/qr?k=Gva5NtZ2USlHSLbFOeMroysk8Uwo7fCS&jump_from=webapi"><strong>QQ-Group 907664876</strong></a> ·
 </p>
@@ -241,7 +241,7 @@ return (
 )
 ```
 
-For more complex toolbar configuration, please check the document [https://editor.yanmao.cc/config/toolbar](https://editor.yanmao.cc/config/toolbar)
+For more complex toolbar configuration, please check the document [https://editor.aomao.com/config/toolbar](https://editor.aomao.com/config/toolbar)
 
 ### Collaborative editing
 
@@ -325,11 +325,11 @@ Thanks [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.
 
 ### Alipay
 
-![alipay](https://cdn-object.yanmao.cc/contribution/alipay.png?x-oss-process=image/resize,w_200)
+![alipay](https://cdn-object.aomao.com/contribution/alipay.png?x-oss-process=image/resize,w_200)
 
 ### WeChat Pay
 
-![wechat](https://cdn-object.yanmao.cc/contribution/weichat.png?x-oss-process=image/resize,w_200)
+![wechat](https://cdn-object.aomao.com/contribution/weichat.png?x-oss-process=image/resize,w_200)
 
 ### PayPal
 

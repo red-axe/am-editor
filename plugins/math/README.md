@@ -83,15 +83,15 @@ parse?: (
 
 ### 画图接口
 
-可以使用 `https://g.yanmao.cc/latex` 地址生成公式对应的 `SVG` 代码。该项目使用[mathjax](https://www.mathjax.org/) 生成 `SVG` 代码
+可以使用 `https://g.aomao.com/latex` 地址生成公式对应的 `SVG` 代码。该项目使用[mathjax](https://www.mathjax.org/) 生成 `SVG` 代码
 
-演示站点：[https://drawing.yanmao.cc/](https://drawing.yanmao.cc/)
+演示站点：[https://drawing.aomao.com/](https://drawing.aomao.com/)
 
 配置：
 
 ```ts
 [Math.pluginName]: {
-    action: `https://g.yanmao.cc/latex`,
+    action: `https://g.aomao.com/latex`,
     parse: (res: any) => {
         if(res.success) return { result: true, data: res.svg}
         return { result: false}

@@ -22,7 +22,7 @@ const getMember = () => {
 const wsUrl =
 	IS_DEV && !isServer
 		? `ws://${window.location.hostname}:8080`
-		: 'wss://collab.yanmao.cc';
+		: 'wss://collab.aomao.com';
 const member = getMember();
 
 const getReadonlyValue =

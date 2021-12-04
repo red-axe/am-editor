@@ -46,7 +46,7 @@ new Engine(...,{
             //修改快捷键
             hotkey:{
                 key:"mod+k",
-                args:["_balnk_","https://www.yanmao.cc","ITELLYOU"]
+                args:["_balnk_","https://www.aomao.com","ITELLYOU"]
             }
         }
     }
@@ -91,7 +91,7 @@ onConfirm?: (
 
 ```ts
 //target:'_blank', '_parent', '_top', '_self'，href:链接，text:文字
-engine.command.execute('link', '_blank', 'https://www.yanmao.cc', 'ITELLYOU');
+engine.command.execute('link', '_blank', 'https://www.aomao.com', 'ITELLYOU');
 //使用 command 执行查询当前状态，返回 boolean | undefined
 engine.command.queryState('link');
 ```

@@ -110,9 +110,9 @@ Some plugins require the configuration of additional properties:
 [VideoUploader.pluginName]: {
     action: `${DOMAIN}/upload/video`,
 },
-// Mathematical formula generation address, the project is at: https://drawing.yanmao.cc
+// Mathematical formula generation address, the project is at: https://drawing.aomao.com
 [Math.pluginName]: {
-    action: `https://g.yanmao.cc/latex`,
+    action: `https://g.aomao.com/latex`,
     parse: (res: any) => {
         if (res.success) return {result: true, data: res.svg };
         return {result: false };

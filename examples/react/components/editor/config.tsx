@@ -157,7 +157,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 		},
 	},
 	[Math.pluginName]: {
-		action: `https://g.yanmao.cc/latex`,
+		action: `https://g.aomao.com/latex`,
 		parse: (res: any) => {
 			if (res.success) return { result: true, data: res.svg };
 			return { result: false };

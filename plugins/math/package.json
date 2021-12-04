@@ -5,7 +5,7 @@
   "keywords": [
     "Math"
   ],
-  "author": "ITELLYOU <me@yanmao.cc>",
+  "author": "ITELLYOU <me@aomao.com>",
   "homepage": "https://github.com/yanmao-cc/am-editor/tree/main/plugins/plugin-math#readme",
   "main": "dist/index.ts",
   "module": "dist/index.esm.js",
