@@ -397,7 +397,8 @@ class ChangeModel implements ChangeInterface {
 			let nextNode = firstNode.next();
 			nodeApi.insert(firstNode, range);
 			while (nextNode && !nodeApi.isBlock(nextNode)) {
-				range.enlargeToElementNode().collapse(false);
+				if (range.startContainer.nodeType === Node.TEXT_NODE)
+					range.enlargeToElementNode().collapse(false);
 				const newNext = nextNode.next();
 				nodeApi.insert(nextNode, range);
 				nextNode = newNext;

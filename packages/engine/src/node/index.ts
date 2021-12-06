@@ -529,9 +529,13 @@ class NodeModel implements NodeModelInterface {
 					.remove();
 			}
 		}
+		// 是否在卡片上，卡片还没有渲染
+		let elementType = parent?.attributes(CARD_ELEMENT_KEY);
+		if (!elementType && startNode.isCard()) {
+			range.setStartAfter(startNode);
+		}
 		// 检测是否位于卡片两边节点
-		const elementType = parent?.attributes(CARD_ELEMENT_KEY);
-		if (parent && elementType && ['left', 'right'].includes(elementType)) {
+		if (elementType && parent && ['left', 'right'].includes(elementType)) {
 			const cardComponent = editor.card.find(parent);
 			if (cardComponent) {
 				if (elementType === 'left') {

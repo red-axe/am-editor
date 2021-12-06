@@ -196,16 +196,37 @@ class Parser implements ParserInterface {
 					//移除 data-id，以免在下次判断类型的时候使用缓存
 					newNode.removeAttributes(DATA_ID);
 					//移除符合当前节点的属性样式，剩余的属性样式组成新的节点
-					Object.keys(attributes).forEach((name) => {
+					const attrKeys = Object.keys(attributes);
+					let filterAttrCount = 0;
+					attrKeys.forEach((name) => {
 						if (attributes[name]) {
+							filterAttrCount++;
 							newNode.removeAttributes(name);
 						}
 					});
-					Object.keys(style).forEach((name) => {
+					let filterStyleCount = 0;
+					const styleKeys = Object.keys(style);
+					styleKeys.forEach((name) => {
 						if (style[name]) {
+							filterStyleCount++;
 							newNode.css(name, '');
 						}
 					});
+					// 如果这个节点过滤掉所有属性样式后还是一个有效的节点就替换掉当前节点
+					if (
+						filterAttrCount === attrKeys.length &&
+						filterStyleCount === styleKeys.length &&
+						schema.getType(newNode) === 'mark'
+					) {
+						node.before(newNode);
+						const children = node.children();
+						newNode.append(
+							children.length > 0 ? children : $('\u200b', null),
+						);
+						node.remove();
+						node = newNode;
+						return;
+					}
 					if (newNode.attributes('style').trim() === '')
 						newNode.removeAttributes('style');
 					return newNode;
@@ -221,26 +242,6 @@ class Parser implements ParserInterface {
 						oldRules.push(rule);
 						let newNode = filter(node);
 						if (!newNode) return;
-						// 如果这个节点过滤掉所有属性样式后还是一个有效的节点就替换掉当前节点
-						const newAttributes = newNode.attributes();
-						const newStyle = getStyleMap(newAttributes.style || '');
-						delete newAttributes.style;
-						if (
-							Object.keys(newAttributes).length === 0 &&
-							Object.keys(newStyle).length === 0 &&
-							schema.getType(newNode) === 'mark'
-						) {
-							node.before(newNode);
-							const children = node.children();
-							newNode.append(
-								children.length > 0
-									? children
-									: $('\u200b', null),
-							);
-							node.remove();
-							node = newNode;
-							return;
-						}
 						//获取这个新的节点所属类型，并且不能是之前节点一样的规则
 						let type = schema.getType(
 							newNode,
