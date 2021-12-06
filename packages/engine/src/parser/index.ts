@@ -221,6 +221,26 @@ class Parser implements ParserInterface {
 						oldRules.push(rule);
 						let newNode = filter(node);
 						if (!newNode) return;
+						// 如果这个节点过滤掉所有属性样式后还是一个有效的节点就替换掉当前节点
+						const newAttributes = newNode.attributes();
+						const newStyle = getStyleMap(newAttributes.style || '');
+						delete newAttributes.style;
+						if (
+							Object.keys(newAttributes).length === 0 &&
+							Object.keys(newStyle).length === 0 &&
+							schema.getType(newNode) === 'mark'
+						) {
+							node.before(newNode);
+							const children = node.children();
+							newNode.append(
+								children.length > 0
+									? children
+									: $('\u200b', null),
+							);
+							node.remove();
+							node = newNode;
+							return;
+						}
 						//获取这个新的节点所属类型，并且不能是之前节点一样的规则
 						let type = schema.getType(
 							newNode,
@@ -229,6 +249,7 @@ class Parser implements ParserInterface {
 								rule.type === 'mark' &&
 								oldRules.indexOf(rule) < 0,
 						);
+
 						//如果是mark节点，使用新节点包裹旧节点子节点
 						while (type === 'mark') {
 							const children = node.children();

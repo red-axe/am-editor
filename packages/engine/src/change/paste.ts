@@ -28,8 +28,10 @@ export default class Paste {
 
 	getDefaultStyle() {
 		const defaultStyle = {
-			color: tinycolor2(this.engine.container.css('color')).toHex(),
-			'background-color': tinycolor2('white').toHex(),
+			color: tinycolor2(this.engine.container.css('color')).toHexString(),
+			'background-color': tinycolor2(
+				this.engine.container.css('background-color'),
+			).toHexString(),
 			'font-size': this.engine.container.css('font-size'),
 		};
 		return defaultStyle;
@@ -77,7 +79,7 @@ export default class Paste {
 			defautlStyleKeys.forEach((key) => {
 				const value = styles[key];
 				if (!value) return;
-				if (value === defaultStyle[key]) {
+				if (value.toLowerCase() === defaultStyle[key].toLowerCase()) {
 					node.css(key, '');
 				}
 			});
