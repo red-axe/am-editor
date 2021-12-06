@@ -132,7 +132,7 @@ export default class extends Plugin<Options> {
 	}
 
 	paintBlocks(currentBlock: NodeInterface, activeBlocks: NodeInterface[]) {
-		if (!isEngine(this.editor)) return;
+		if (!isEngine(this.editor) || !currentBlock.inEditor()) return;
 		const { node, change } = this.editor!;
 		const blockApi = this.editor.block;
 		const range = change.range.get();
