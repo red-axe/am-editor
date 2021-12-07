@@ -473,7 +473,10 @@ class NativeEvent {
 							-1
 					) {
 						source = html;
-					} else if (text && /^https?:\/\/\S+$/.test(text)) {
+					} else if (
+						text &&
+						/^https?:\/\/\S+$/.test(text.toLowerCase().trim())
+					) {
 						const value = escape(text);
 						source = `<a href="${value}" target="_blank">${value}</a>`;
 					} else if (html) {

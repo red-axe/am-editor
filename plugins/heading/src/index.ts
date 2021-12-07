@@ -62,6 +62,7 @@ export default class extends BlockPlugin<Options> {
 					const id = node.attributes('id');
 					if (id) {
 						node.find('.data-anchor-button').remove();
+						Tooltip.hide();
 						const button = $(
 							`<a class="data-anchor-button"><span class="data-icon data-icon-${node.name}"></span></a>`,
 						);
@@ -173,6 +174,7 @@ export default class extends BlockPlugin<Options> {
 
 		if (block.length === 0) {
 			button.remove();
+			Tooltip.hide();
 			return;
 		}
 		const rootRect = root.get<Element>()?.getBoundingClientRect() || {
@@ -208,6 +210,7 @@ export default class extends BlockPlugin<Options> {
 				button.find('.data-icon-'.concat(block.name)).length === 0)
 		) {
 			button.remove();
+			Tooltip.hide();
 		}
 
 		if (block.length === 0 || card.closest(block, true)) {
