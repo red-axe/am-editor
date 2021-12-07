@@ -251,10 +251,27 @@ class Producer extends EventEmitter2 {
 							// 获取移除节点在编辑器中的索引
 							const rIndex =
 								removedNode['__index'] + JSON0_INDEX.ELEMENT;
+
+							// 删除的情况下，目标节点也应该获取 __index ，不然在还有新增的情况会导致path不正确
+							const newPath = path?.concat();
+							if (newPath && newPath.length > 0) {
+								newPath.pop();
+								newPath.push(
+									target['__index'] + JSON0_INDEX.ELEMENT,
+								);
+							}
+							const newOldPath = oldPath?.concat();
+							if (newOldPath.length > 0) {
+								newOldPath.pop();
+								newOldPath.push(
+									target['__index'] + JSON0_INDEX.ELEMENT,
+								);
+							}
+
 							let p: Path = [];
-							p = p.concat([...path!], [rIndex]);
+							p = p.concat([...newPath!], [rIndex]);
 							let op: Path = [];
-							op = op.concat([...oldPath], [rIndex]);
+							op = op.concat([...newOldPath], [rIndex]);
 							const newOp = {
 								id: rootId,
 								bi: beginIndex,
@@ -372,15 +389,28 @@ class Producer extends EventEmitter2 {
 							p: op.p,
 							nl: op['nl'],
 						};
-						// 重复删除的过滤掉
-						if (
-							!allOps.find(
-								(op) =>
-									'ld' in op &&
-									JSON.stringify(op) === JSON.stringify(ldOp),
-							)
-						)
-							allOps.push(ldOp);
+						// 比较删除深度，当前删除深度比已有的要深就忽略，当前删除的深度比已有的要浅就替换
+						const findResult = allOps.find((op, index) => {
+							if ('ld' in op) {
+								const strP = op.p.join(',');
+								const strLdP = ldOp.p.join(',');
+								// 相等，不需要增加
+								if (strP === strLdP) {
+									return true;
+								}
+								// 删除深度比已有的要深，忽略
+								// if(strLdP.startsWith(strP)) {
+								// 	return true
+								// }
+								// // 删除深度比已有的要浅，替换
+								// if(strP.startsWith(strLdP)) {
+								// 	allOps.splice(index, 1, ldOp);
+								// 	return true
+								// }
+							}
+							return false;
+						});
+						if (!findResult) allOps.push(ldOp);
 					}
 				}
 				if ('li' in op) {
