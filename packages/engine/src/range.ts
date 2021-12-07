@@ -95,7 +95,6 @@ class Range implements RangeInterface {
 		const startNode = this.startNode;
 		if (
 			!$(node).isCursor() &&
-			startNode.name === 'p' &&
 			startNode.children().length === 1 &&
 			startNode.first()?.name === 'br'
 		) {

@@ -366,10 +366,11 @@ export default class Paste {
 		let fragmentNode = $(fragment);
 		const first = fragmentNode.first();
 		//如果光标在文本节点，并且父级节点不是根节点，移除粘贴数据的第一个节点块级节点，让其内容接在光标所在行
-		const { startNode } = range
+		const cloneRange = range
 			.cloneRange()
 			.shrinkToElementNode()
 			.shrinkToTextNode();
+		const { startNode } = cloneRange;
 		if (
 			startNode.inEditor() &&
 			first &&

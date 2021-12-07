@@ -98,8 +98,17 @@ export default class extends InlinePlugin<Options> {
 		const inlineNode = change.inlines.find((node) => this.isSelf(node));
 		this.toolbar?.hide(inlineNode);
 		if (inlineNode && inlineNode.length > 0 && !inlineNode.isCard()) {
-			this.toolbar?.show(inlineNode);
-			return true;
+			const range = change.range.get();
+			if (
+				range.collapsed ||
+				(inlineNode.contains(range.startNode) &&
+					inlineNode.contains(range.endNode))
+			) {
+				this.toolbar?.show(inlineNode);
+				return true;
+			} else {
+				this.toolbar?.hide();
+			}
 		}
 		return false;
 	}

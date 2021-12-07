@@ -389,9 +389,13 @@ class ChangeModel implements ChangeInterface {
 		if (!nodeApi.isBlock(firstNode)) {
 			range.shrinkToElementNode();
 			if (childNodes.length > 0) {
+				const children = range.startNode.children();
 				startRange = {
 					node: range.startNode,
-					offset: range.startOffset,
+					offset:
+						children.length === 1 && children[0].nodeName === 'BR'
+							? 0
+							: range.startOffset,
 				};
 			}
 			let nextNode = firstNode.next();
@@ -423,6 +427,16 @@ class ChangeModel implements ChangeInterface {
 			if ('br' === lastNode.name) {
 				lastNode.remove();
 				lastNode = $(childNodes[childNodes.length - 1]);
+			}
+			if (!startRange) {
+				const children = range.startNode.children();
+				startRange = {
+					node: range.startNode,
+					offset:
+						children.length === 1 && children[0].nodeName === 'BR'
+							? 0
+							: range.startOffset,
+				};
 			}
 			let node: NodeInterface | null = $(childNodes[0]);
 			let prev: NodeInterface | null = null;
