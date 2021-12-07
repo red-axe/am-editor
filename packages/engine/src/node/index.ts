@@ -519,9 +519,9 @@ class NodeModel implements NodeModelInterface {
 		if (startNode.isText() && /\u200b$/.test(leftText)) {
 			//零宽字符前面还有其它字符。或者节点前面还有节点，不能是inline节点。或者前面没有节点了，并且父级不是inline节点
 			if (
-				text.length > 1 ||
-				(prev && !this.isInline(prev)) ||
-				(!prev && parent && !this.isInline(parent))
+				text.length > 1 &&
+				((prev && !this.isInline(prev)) ||
+					(!prev && parent && !this.isInline(parent)))
 			) {
 				startNode
 					.get<Text>()!
