@@ -239,10 +239,9 @@ export const opsSort = (ops: Op[]) => {
 		}
 		// 文字删除，排再最前面
 		if ('sd' in op1) {
-			// 相同的文字删除，位置大的排再前面
+			// 相同文字删除不处理，按原来顺序操作，textToOps 中已经计算好删除后的位置.2021-12-08
 			if ('sd' in op2) {
-				if (diff === -1) return 1;
-				if (diff === 0) return 0;
+				return 0;
 			}
 			// sd 小于ld就放在前面
 			if ('ld' in op2) {
