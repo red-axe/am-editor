@@ -15,9 +15,11 @@ export default class extends Plugin<Options> {
 		const range = change.range.get();
 		const blocks = blockApi.getBlocks(range);
 		// 没有mark和inline节点的时候才对block节点移除格式
-		if (change.marks.length > 0) {
+		const marks = mark.findMarks(range);
+		const inlines = inline.findInlines(range);
+		if (marks.length > 0) {
 			mark.unwrap();
-		} else if (change.inlines.length > 0) {
+		} else if (inlines.length > 0) {
 			inline.unwrap();
 		} else {
 			const selection = range.createSelection('removeformat');
