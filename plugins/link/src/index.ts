@@ -54,6 +54,7 @@ export default class extends InlinePlugin<Options> {
 				onConfirm: this.options.onConfirm,
 			});
 		}
+		editor.on('paste:each', (child) => this.pasteHtml(child));
 		editor.on('parse:html', (node) => this.parseHtml(node));
 		editor.on('select', () => {
 			this.query();
@@ -206,5 +207,23 @@ export default class extends InlinePlugin<Options> {
 			'overflow-wrap': 'break-word',
 			'text-indent': '0',
 		});
+	}
+
+	pasteHtml(child: NodeInterface) {
+		if (child.isText()) {
+			const text = child.text();
+			const { node, inline } = this.editor;
+			if (
+				/^https?:\/\/\S+$/.test(text.toLowerCase().trim()) &&
+				inline.closest(child)
+			) {
+				node.wrap(
+					child,
+					$(`<${this.tagName} target="_blank" href="${text}"></a>`),
+				);
+				return false;
+			}
+		}
+		return true;
 	}
 }

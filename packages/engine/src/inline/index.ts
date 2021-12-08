@@ -1000,6 +1000,14 @@ class Inline implements InlineModelInterface {
 						next.remove();
 					}
 				}
+			} else if (
+				next &&
+				next.isText() &&
+				/\u200B\u200B$/g.test(nextText) &&
+				nextNext &&
+				!nodeApi.isInline(nextNext)
+			) {
+				next.text(nextText.substr(0, nextText.length - 1));
 			}
 		}
 	}

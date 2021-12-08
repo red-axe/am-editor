@@ -632,9 +632,20 @@ class ChangeModel implements ChangeInterface {
 			}
 			block = child;
 		}
+		const { endNode, endOffset } = safeRange;
 		const isMoreLine = !blockApi
 			.closest(safeRange.startNode)
-			.equal(blockApi.closest(safeRange.endNode));
+			.equal(blockApi.closest(endNode));
+		// <a>aaa<cursor /></a> -> <a>aaa</a>cursor />
+		const inlineNode = inline.closest(endNode);
+		if (inlineNode.length > 0 && endNode.parent()?.equal(inlineNode)) {
+			if (endNode.isText()) {
+				const text = endNode.text();
+				if (endOffset === text.length - 1) {
+					safeRange.setEndAfter(inlineNode);
+				}
+			}
+		}
 		// 先删除范围内的所有内容
 		safeRange.extractContents();
 		if (

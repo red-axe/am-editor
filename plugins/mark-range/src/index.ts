@@ -288,7 +288,7 @@ export default class extends MarkPlugin<Options> {
 			);
 			//遍历当前光标选择节点，拼接选择的文本
 			let text = '';
-			const subRanges = range.getSubRanges(true);
+			const subRanges = range.getSubRanges(true, false);
 			subRanges.forEach((subRange) => {
 				//如果是卡片，就给卡片加上预览样式
 				const cardComponent = card.find(subRange.startNode);

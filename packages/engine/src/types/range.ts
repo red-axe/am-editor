@@ -215,8 +215,12 @@ export interface RangeInterface {
 	/**
 	 * 获取子选区集合
 	 * @param includeCard 是否包含卡片
+	 * @param filterSingleSelectableCard 是否过滤掉 singleSelectable = false 的卡片（不能单独选中）
 	 */
-	getSubRanges(includeCard?: boolean): Array<RangeInterface>;
+	getSubRanges(
+		includeCard?: boolean,
+		filterSingleSelectableCard?: boolean,
+	): Array<RangeInterface>;
 	/**
 	 * 设置一个节点为开始节点和结束节点到range
 	 * @param node

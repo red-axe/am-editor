@@ -403,9 +403,13 @@ class Range implements RangeInterface {
 
 	/**
 	 * 获取子选区集合
-	 * @param range
+	 * @param includeCard 是否包含卡片
+	 * @param filterSingleSelectableCard 是否过滤掉 singleSelectable = false 的卡片（不能单独选中）
 	 */
-	getSubRanges = (includeCard: boolean = false) => {
+	getSubRanges = (
+		includeCard: boolean = false,
+		filterSingleSelectableCard = true,
+	) => {
 		const ranges: Array<RangeInterface> = [];
 		this.commonAncestorNode.traverse((child) => {
 			if (child.isText()) {
@@ -448,8 +452,9 @@ class Range implements RangeInterface {
 				const cardComponent = this.editor.card.find(child);
 				if (
 					!cardComponent ||
-					(cardComponent.constructor as CardEntry)
-						.singleSelectable === false
+					(filterSingleSelectableCard &&
+						(cardComponent.constructor as CardEntry)
+							.singleSelectable === false)
 				)
 					return;
 				const center = cardComponent.getCenter();

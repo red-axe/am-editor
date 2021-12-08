@@ -944,6 +944,16 @@ class NodeEntry implements NodeInterface {
 		includeEditableCard: boolean = false,
 	) {
 		const walk = (node: NodeInterface) => {
+			if (!includeEditableCard && node.isCard()) {
+				return;
+			}
+			if (
+				includeEditableCard &&
+				node.isCard() &&
+				!node.isEditableCard()
+			) {
+				return;
+			}
 			let child = order ? node.first() : node.last();
 			while (child) {
 				const next = order ? child.next() : child.prev();

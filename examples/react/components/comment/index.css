@@ -1,22 +1,9 @@
 /** 编辑器中标记样式 ---- 开始 **/
 [data-comment-preview],
 [data-comment-id] {
-	position: relative;
-}
-
-span[data-comment-preview],
-span[data-comment-id] {
-	display: inline;
 	padding-bottom: 2px;
 	text-indent: 0;
 	border-bottom: 2px solid #f8e1a1 !important;
-}
-/* 去掉代码行数标记 */
-.CodeMirror-linenumber span[data-comment-preview],
-.CodeMirror-linenumber span[data-comment-id] {
-	padding-bottom: 0;
-	border-bottom: none !important;
-	background: none !important;
 }
 
 [data-comment-preview] {
