@@ -87,11 +87,11 @@ class Resizer {
 		);
 		this.point = {
 			x:
-				TouchEvent && event instanceof TouchEvent
+				window.TouchEvent && event instanceof TouchEvent
 					? event.touches[0].clientX
 					: (event as MouseEvent).clientX,
 			y:
-				TouchEvent && event instanceof TouchEvent
+				window.TouchEvent && event instanceof TouchEvent
 					? event.touches[0].clientY
 					: (event as MouseEvent).clientY,
 		};
@@ -116,7 +116,7 @@ class Resizer {
 		event.preventDefault();
 		event.stopPropagation();
 		const { clientX, clientY } =
-			TouchEvent && event instanceof TouchEvent
+			window.TouchEvent && event instanceof TouchEvent
 				? event.touches[0]
 				: (event as MouseEvent);
 

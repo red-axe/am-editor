@@ -413,9 +413,9 @@ class Image {
 				const imageWidth = parseInt(image.css('width'));
 				const imageHeight = parseInt(image.css('height'));
 				const naturalWidth =
-					value['naturalWidth'] || imageWidth * winPixelRatio;
+					value.size['naturalWidth'] || imageWidth * winPixelRatio;
 				const naturalHeight =
-					value['naturalHeight'] || imageHeight * winPixelRatio;
+					value.size['naturalHeight'] || imageHeight * winPixelRatio;
 				let src = value['src'];
 				const { onBeforeRender } = this.options;
 				if (onBeforeRender) src = onBeforeRender('done', src);
