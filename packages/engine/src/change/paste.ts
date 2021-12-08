@@ -51,10 +51,10 @@ export default class Paste {
 			}
 			if (node.isText()) {
 				let text = node.text();
-				if (/\s/.test(text)) {
-					text = text.replace(/\s/g, ' ');
-					node.text(text);
-				}
+				// if (/\x20/.test(text)) {
+				// 	text = text.replace(/\x20/g, ' ');
+				// 	node.text(text);
+				// }
 				if (/\u200b/.test(text)) {
 					let isRemove = true;
 					const next = node.next();
