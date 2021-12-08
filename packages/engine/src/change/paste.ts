@@ -107,6 +107,10 @@ export default class Paste {
 			}
 			// 删除空 span
 			while (node.name === 'span' && nodeApi.isEmpty(node)) {
+				const children = node.children();
+				if (children.length > 0 && children.isElement()) {
+					break;
+				}
 				parent = node.parent();
 				node.remove();
 				if (!parent) return;
