@@ -176,7 +176,7 @@ class Table extends Plugin<Options> {
 						height: '@length',
 					},
 				},
-				allowIn: ['tbody'],
+				allowIn: ['tbody', 'thead', 'tfoot'],
 			},
 			{
 				name: 'td',
@@ -299,11 +299,17 @@ class Table extends Plugin<Options> {
 			const thead = node.find('thead');
 			if (thead && thead.length > 0)
 				node.find('tbody').prepend(thead.children());
+			thead.remove();
 			// 表头放在tbody最前面
 			const tfoot = node.find('thead');
 			if (tfoot && tfoot.length > 0)
 				node.find('tbody').append(tfoot.children());
-
+			tfoot.remove();
+			const ths = node.find('th');
+			ths.each((_, index) => {
+				const th = ths.eq(index);
+				th?.replaceWith($(`<td>${th.html()}</td>`));
+			});
 			const tds = node.find('td');
 			let fragment = getDocument().createDocumentFragment();
 			tds.each((_, index) => {
