@@ -122,6 +122,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 				// );
 				// 获取编辑器的html
 				console.log('html:', engine.current?.getHtml());
+				// console.log('json:', engine.current?.getJsonValue());
 			},
 			[loading, autoSave, props.onChange],
 		),
