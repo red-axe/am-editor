@@ -660,6 +660,7 @@ class CardModel implements CardModelInterface {
 						this.removeComponent(card);
 					}
 					cardNode.attributes(CARD_LOADING_KEY, 'true');
+					cardNode.empty();
 				}
 				//ready_card_key 待创建的需要重新生成节点，并替换当前待创建节点
 				card = this.create(name, {

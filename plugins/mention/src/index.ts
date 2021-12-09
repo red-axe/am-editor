@@ -108,6 +108,8 @@ class MentionPlugin extends Plugin<Options> {
 		if (onInsert) MentionComponent.onInsert = onInsert;
 		MentionComponent.search = (keyword: string) => {
 			if (onSearch) return onSearch(keyword);
+			const reuslt = this.editor.trigger('mention:search', keyword);
+			if (reuslt !== undefined) return reuslt;
 			return new Promise((resolve) => {
 				if (action) {
 					this.#request?.abort();

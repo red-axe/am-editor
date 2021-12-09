@@ -107,7 +107,13 @@ export default class extends Plugin<Options> {
 			if (typeof removeCommand === 'function') removeCommand(range);
 			else command.execute(removeCommand);
 			this.paintMarks(activeMarks);
-			if (activeBlocks) this.paintBlocks(currentBlock, activeBlocks);
+			// 移除样式后，会导致block被移除，需要重新查找
+			const blocks = block.getBlocks(range);
+			if (activeBlocks) {
+				blocks.forEach((block) => {
+					this.paintBlocks(block, activeBlocks);
+				});
+			}
 			range.select(dummy);
 			range.collapse(true);
 			dummy.remove();
@@ -118,9 +124,11 @@ export default class extends Plugin<Options> {
 			else command.execute(removeCommand);
 			this.paintMarks(activeMarks);
 			const blocks = block.getBlocks(range);
-			blocks.forEach((block) => {
-				if (activeBlocks) this.paintBlocks(block, activeBlocks);
-			});
+			if (activeBlocks) {
+				blocks.forEach((block) => {
+					this.paintBlocks(block, activeBlocks);
+				});
+			}
 		}
 	}
 
@@ -138,6 +146,7 @@ export default class extends Plugin<Options> {
 		const range = change.range.get();
 		const selection = range.createSelection('removeformat');
 		activeBlocks.forEach((block) => {
+			if (!currentBlock.inEditor()) return;
 			if (this.options.paintBlock) {
 				const paintResult = this.options.paintBlock(
 					currentBlock,

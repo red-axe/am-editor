@@ -230,36 +230,51 @@ class CollapseComponent implements CollapseComponentInterface {
 		this.target = target;
 
 		let body = this.getBody();
-		if (CollapseComponent.renderLoading) {
-			const result = CollapseComponent.renderLoading(this.root);
+		let result = null;
+
+		if (
+			CollapseComponent.renderLoading ||
+			(result = this.engine.trigger('mention:loading', this.root))
+		) {
+			result = CollapseComponent.renderLoading
+				? CollapseComponent.renderLoading(this.root)
+				: result;
 			body = this.getBody();
 			if (result) body?.append(result);
 		} else if (data.filter((item) => !!item.key).length === 0) {
-			const result = CollapseComponent.renderEmpty(this.root);
+			const result =
+				this.engine.trigger('mention:empty', this.root) ||
+				CollapseComponent.renderEmpty(this.root);
 			body = this.getBody();
 			if (result) body?.append(result);
-		} else if (CollapseComponent.render) {
-			CollapseComponent.render(this.root, data, this.bindItem).then(
-				(result) => {
-					const body = this.getBody();
-					if (result) body?.append(result);
-					this.#scrollbar?.destroy();
-					if (body)
-						this.#scrollbar = new Scrollbar(
-							body,
-							false,
-							true,
-							false,
-						);
-					this.select(0);
-					this.bindEvents();
-					this.#scrollbar?.refresh();
-				},
-			);
+		} else if (
+			CollapseComponent.render ||
+			(result = this.engine.trigger('mention:render', this.root))
+		) {
+			(CollapseComponent.render
+				? CollapseComponent.render(this.root, data, this.bindItem)
+				: result
+			).then((content: any) => {
+				const body = this.getBody();
+				if (content) body?.append(content);
+				this.#scrollbar?.destroy();
+				if (body)
+					this.#scrollbar = new Scrollbar(body, false, true, false);
+				this.select(0);
+				this.bindEvents();
+				this.#scrollbar?.refresh();
+			});
 			return;
 		} else {
 			data.forEach((data) => {
-				const result = CollapseComponent.renderItem
+				const triggerResult = this.engine.trigger(
+					'mention:render-item',
+					data,
+					this.root!,
+				);
+				const result = triggerResult
+					? triggerResult
+					: CollapseComponent.renderItem
 					? CollapseComponent.renderItem(data, this.root!)
 					: this.renderTemplate(data);
 				if (!result) return;

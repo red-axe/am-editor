@@ -129,8 +129,7 @@ class Parser implements ParserInterface {
 			if (node.isCard()) {
 				node.before(newNode);
 				node.remove();
-				value = undefined;
-				continue;
+				return newNode;
 			} else {
 				if (!nodeApi.isBlock(newNode, schema)) {
 					//把包含旧子节点的新节点追加到旧节点下
@@ -139,12 +138,13 @@ class Parser implements ParserInterface {
 					// 替换
 					node.before(newNode);
 					node.remove();
-					break;
+					return newNode;
 				}
 			}
 			//排除之前的过滤规则后再次过滤
 			value = conversion.transform(node, (r) => oldRules.indexOf(r) < 0);
 		}
+		return;
 	}
 	normalize(
 		root: NodeInterface,
@@ -175,7 +175,11 @@ class Parser implements ParserInterface {
 				const isCard = node.isCard();
 				//转换标签
 				if (conversion && (!schema.getType(node) || isCard)) {
-					this.convert(conversion, node, schema);
+					const newNode = this.convert(conversion, node, schema);
+					if (newNode) {
+						this.normalize(newNode, schema, conversion);
+						return;
+					}
 				}
 				if (isCard) return;
 				//分割

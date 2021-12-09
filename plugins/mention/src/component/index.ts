@@ -137,7 +137,9 @@ class Mention extends Card<MentionValue> {
 				this.changeToText();
 			},
 			onSelect: (_, data: { [key: string]: string }) => {
-				let newValue = {};
+				let newValue =
+					this.editor.trigger('mention:select', data) || {};
+				delete newValue['id'];
 				if (Mention.onSelect) {
 					newValue = Mention.onSelect(data) || {};
 					delete newValue['id'];
@@ -152,6 +154,7 @@ class Mention extends Card<MentionValue> {
 					...newValue,
 				});
 				card.removeNode(this);
+				this.editor.trigger('mention:insert', component);
 				if (Mention.onInsert) Mention.onInsert(component);
 			},
 		});
@@ -201,15 +204,17 @@ class Mention extends Card<MentionValue> {
 
 		const keyword = content.substr(1);
 		// 搜索关键词为空
-		if (keyword === '' && Mention.defaultData) {
-			this.component?.render(this.root, Mention.defaultData);
+		const defaultData =
+			this.editor.trigger('mention:default') || Mention.defaultData;
+		if (keyword === '' && defaultData) {
+			this.component?.render(this.root, defaultData);
 			return;
 		}
-		if (Mention.renderLoading) {
-			CollapseComponent.renderLoading = Mention.renderLoading;
-			this.component?.render(this.root, []);
-			CollapseComponent.renderLoading = undefined;
-		}
+		//if (Mention.renderLoading) {
+		CollapseComponent.renderLoading = Mention.renderLoading;
+		this.component?.render(this.root, []);
+		CollapseComponent.renderLoading = undefined;
+		//}
 		Mention.search(keyword).then((data) => {
 			this.component?.render(this.root, data);
 		});
@@ -245,7 +250,11 @@ class Mention extends Card<MentionValue> {
 				if (this.#hideTimeout) clearTimeout(this.#hideTimeout);
 			});
 			this.#enterLayout.on('mouseleave', this.hideEnter);
-
+			this.editor.trigger('mention:enter', this.#enterLayout, {
+				key: unescape(key || ''),
+				name: unescape(name),
+				...info,
+			});
 			Mention.mouseEnter!(this.#enterLayout, {
 				key: unescape(key || ''),
 				name: unescape(name),
@@ -270,12 +279,18 @@ class Mention extends Card<MentionValue> {
 			);
 
 			this.#container.on('click', () => {
-				if (!this.#container || !Mention.itemClick) return;
-				Mention.itemClick(this.#container, {
+				if (!this.#container) return;
+				this.editor.trigger('mention:item-click', this.#container, {
 					key: unescape(key || ''),
 					name: unescape(name),
 					...info,
 				});
+				if (Mention.itemClick)
+					Mention.itemClick(this.#container, {
+						key: unescape(key || ''),
+						name: unescape(name),
+						...info,
+					});
 			});
 
 			this.#container.on('mouseenter', this.showEnter);
@@ -333,8 +348,17 @@ class Mention extends Card<MentionValue> {
 					selection?.addRange(range.toRange());
 				}
 			}, 10);
-			this.component?.render(this.root, Mention.defaultData || []);
-			if (!Mention.defaultData) {
+			this.component?.render(
+				this.root,
+				this.editor.trigger('mention:default') ||
+					Mention.defaultData ||
+					[],
+			);
+			if (
+				!(Mention.defaultData
+					? Mention.defaultData
+					: this.editor.trigger('mention:default'))
+			) {
 				setTimeout(() => {
 					this.handleInput();
 				}, 50);
