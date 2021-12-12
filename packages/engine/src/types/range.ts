@@ -31,6 +31,7 @@ export interface Range {
 		path: Path[],
 		context?: NodeInterface,
 		includeCardCursor?: boolean,
+		root?: NodeInterface,
 	): RangeInterface;
 }
 
