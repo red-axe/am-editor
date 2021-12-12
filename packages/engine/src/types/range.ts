@@ -26,6 +26,7 @@ export interface Range {
 	 * @param path
 	 * @param context 上下文，默认编辑器节点
 	 * @param includeCardCursor 是否还原到卡片两侧光标处，必须保证 参数 path 中包含光标位置信息
+	 * @param root 根节点，默认编辑器根节点
 	 */
 	fromPath(
 		path: Path[],
