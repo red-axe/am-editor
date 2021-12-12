@@ -305,8 +305,10 @@ export interface RangeInterface {
 	/**
 	 * 获取光标路径
 	 * @param includeCardCursor 是否包含卡片两侧光标
+	 * @param root 根节点，默认编辑器根节点
 	 */
 	toPath(
 		includeCardCursor?: boolean,
+		root?: NodeInterface,
 	): { start: RangePath; end: RangePath } | undefined;
 }

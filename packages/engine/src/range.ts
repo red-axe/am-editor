@@ -767,7 +767,10 @@ class Range implements RangeInterface {
 		};
 	}
 
-	toPath(includeCardCursor: boolean = false) {
+	toPath(
+		includeCardCursor: boolean = false,
+		root: NodeInterface = this.editor.container,
+	) {
 		const range = this.cloneRange();
 		const node = range.commonAncestorNode;
 		if (!node.isRoot() && !node.inEditor()) return;
@@ -777,7 +780,7 @@ class Range implements RangeInterface {
 			let rootBeginId: string = node.attributes(DATA_ID);
 			let rootBeginIndex: number = rootBeginId ? 0 : -1;
 			const path = node.getPath(
-				this.editor.container,
+				root,
 				node.parent()?.isRoot()
 					? undefined
 					: this.filterPath(includeCardCursor),

@@ -662,7 +662,7 @@ export default class extends MarkPlugin<Options> {
 				const rangePath = rangeClone
 					.shrinkToElementNode()
 					.shrinkToTextNode()
-					.toPath();
+					.toPath(undefined, container);
 				paths.push({
 					id: id.split(','),
 					path: rangePath

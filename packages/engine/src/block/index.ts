@@ -668,13 +668,8 @@ class Block implements BlockModelInterface {
 		}
 
 		if (container && container.length > 0) {
-			if (rightNodes.length > 0) {
-				safeRange.setStartAfter(container);
-				safeRange.collapse(true);
-			} else {
-				safeRange.select(container, true);
-				safeRange.collapse(false);
-			}
+			safeRange.select(container, true);
+			safeRange.collapse(false);
 		}
 		if (selection.focus) selection.focus.remove();
 		if (selection.anchor) selection.anchor.remove();
