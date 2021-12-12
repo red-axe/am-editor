@@ -39,6 +39,7 @@ class Range implements RangeInterface {
 			end: RangePath;
 		},
 		includeCardCursor?: boolean,
+		root?: NodeInterface,
 	) => RangeInterface;
 
 	base: globalThis.Range;
