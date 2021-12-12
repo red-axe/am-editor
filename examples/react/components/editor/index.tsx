@@ -342,18 +342,21 @@ const EditorComponent: React.FC<EditorProps> = ({
 								/>
 							}
 						</div>
-						{engine.current &&
-							!isMobile &&
-							member &&
-							props.comment && (
-								<CommentLayer
-									ref={comment}
-									editor={engine.current}
-									member={member}
-									onUpdate={onCommentRequestUpdate}
-									{...props.comment}
-								/>
-							)}
+						{engine.current && !isMobile && props.comment && (
+							<CommentLayer
+								ref={comment}
+								editor={engine.current}
+								member={
+									member || {
+										avatar: 'https://cdn-image.aomao.com/10016/avatar/2020/04/17/1587113793-da092550-5b12-477e-b229-631908d0ac2b.png',
+										name: 'test',
+										uuid: 'test',
+									}
+								}
+								onUpdate={onCommentRequestUpdate}
+								{...props.comment}
+							/>
+						)}
 					</div>
 					{engine.current && !isMobile && props.toc && (
 						<Toc editor={engine.current} />

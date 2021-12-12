@@ -841,6 +841,7 @@ Range.fromPath = (
 		end: RangePath;
 	},
 	includeCardCursor: boolean = false,
+	root: NodeInterface = editor.container,
 ) => {
 	const startPath = path.start.path.slice();
 	const endPath = path.end.path.slice();
@@ -908,15 +909,15 @@ Range.fromPath = (
 		}
 	};
 	const beginContext = path.start.id
-		? editor.container.find(`[${DATA_ID}="${path.start.id}"]`)
-		: editor.container;
+		? root.find(`[${DATA_ID}="${path.start.id}"]`)
+		: root;
 	const startNode = getNode(
 		path.start.bi > -1 ? startPath.slice(path.start.bi) : startPath,
 		beginContext,
 	);
 	const endContext = path.end.id
-		? editor.container.find(`[${DATA_ID}="${path.end.id}"]`)
-		: editor.container;
+		? root.find(`[${DATA_ID}="${path.end.id}"]`)
+		: root;
 	const endNode = getNode(
 		path.end.bi > -1 ? endPath.slice(path.end.bi) : endPath,
 		endContext,

@@ -720,10 +720,15 @@ export default class extends MarkPlugin<Options> {
 		range.select(container, true).collapse(true);
 
 		(paths || []).forEach(({ id, path }) => {
-			const pathRange = Range.fromPath(this.editor, {
-				start: { path: path[0] as number[], id: '', bi: -1 },
-				end: { path: path[1] as number[], id: '', bi: -1 },
-			});
+			const pathRange = Range.fromPath(
+				this.editor,
+				{
+					start: { path: path[0] as number[], id: '', bi: -1 },
+					end: { path: path[1] as number[], id: '', bi: -1 },
+				},
+				undefined,
+				container,
+			);
 			const elements = pathRange.findElements();
 			elements.forEach((element) => {
 				const node = $(element);
