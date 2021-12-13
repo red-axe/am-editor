@@ -138,7 +138,12 @@ class Parser implements ParserInterface {
 					// 替换
 					node.before(newNode);
 					node.remove();
-					return newNode;
+					//排除之前的过滤规则后再次过滤
+					value = conversion.transform(
+						newNode,
+						(r) => oldRules.indexOf(r) < 0,
+					);
+					continue;
 				}
 			}
 			//排除之前的过滤规则后再次过滤
