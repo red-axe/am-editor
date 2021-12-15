@@ -52,7 +52,7 @@ function startServer() {
 					if (action === 'ready') {
 						client.add(ws, data.doc_id, {
 							id: getId(data.doc_id, uid),
-							name: `Guest-${uid}`,
+							name: `G-${uid}`,
 						});
 					}
 				} catch (error) {}

@@ -27,7 +27,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 
 .data-table tr {
-    height: 33px;
+    height: 35px;
 }
 
 .data-table tr td {
@@ -67,7 +67,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 
 .table-wrapper.scrollbar-show {
-    margin-bottom: -8px;
+    margin-bottom: -10px;
 }
 
 .table-wrapper.data-table-highlight tr td[table-cell-selection]:after {
@@ -98,9 +98,8 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     background-color: #ffffff;
 }
 
-.table-wrapper.data-table-highlight-all .table-header {
+.table-wrapper.data-table-highlight-all .table-header .table-header-item {
     background: rgba(255, 77, 79, 0.4) !important;
-    border-color:  rgba(255, 77, 79, 0.4) !important;
 }
 
 .table-wrapper .table-header-item:hover{
@@ -113,16 +112,15 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 
 .table-wrapper .table-header.selected .table-header-item {
     background: #4daaff;
+    border-color: #4daaff;
 }
 
 .table-wrapper .table-cols-header {
     position: relative;
-    height: 14px;
+    height: 13px;
     display: none;
     width: 100%;
     cursor: default;
-    margin-bottom: -1px;
-    z-index: 2;
 }
 
 .table-wrapper.active .table-cols-header {
@@ -131,7 +129,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 
 .table-wrapper .table-cols-header .table-cols-header-item {
     position: relative;
-    height: 14px;
+    height: 13px;
     width: auto;
     border: 1px solid #dfdfdf;
     border-bottom: 0 none;
@@ -161,7 +159,6 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     background: #fff;
     z-index: 1;
     border-radius: 0;
-    height: 14px;
     border-bottom: 0;
     cursor: move;
 }
@@ -250,11 +247,11 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     width: 14px;
     z-index: 1;
     border-right: 0;
-    visibility: hidden;
+    display: none;
 }
 
 .table-wrapper.active .table-rows-header {
-    visibility: visible;
+    display: block;
 }
 
 .table-wrapper .table-rows-header .table-rows-header-item {
@@ -387,7 +384,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 
 .table-wrapper .table-viewport .scrollbar-shadow-left {
     top: 0;
-    bottom: 8px;
+    bottom: 10px;
 }
 
 .table-wrapper.active .table-viewport .scrollbar-shadow-left {
@@ -397,7 +394,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 
 .table-wrapper .table-viewport .scrollbar-shadow-right {
     top: 0;
-    bottom: 8px;
+    bottom: 10px;
 }
 
 .table-wrapper.active .table-viewport .scrollbar-shadow-right {
@@ -467,6 +464,10 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     margin: 4px 8px;
     position: relative;
     z-index: 3;
+}
+
+.table-wrapper .table-main-content * {
+    max-width: 100%;
 }
 
 .table-wrapper .table-main-bg {
@@ -573,7 +574,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 
 .table-wrapper.scrollbar-show .data-scrollable.scroll-x {
-    padding-bottom: 8px;
+    padding-bottom: 10px;
 }
 
 .table-wrapper .data-scrollable.scroll-x {
@@ -584,20 +585,17 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     overflow: hidden;
 }
 
-.table-wrapper.scrollbar-show .data-scrollable.scroll-x:hover {
-    /**overflow-x: auto;**/
-}
-
 .table-wrapper.scrollbar-show .data-scrollable.scroll-x .data-scrollbar-x{
     margin-bottom: 2px;
 }
 
 .table-wrapper .data-scrollable .data-scrollbar.data-scrollbar-x {
-    height: 4px;
+    height: 6px;
+    z-index: 5;
 }
 
 .table-wrapper .data-scrollable .data-scrollbar.data-scrollbar-x .data-scrollbar-trigger {
-    height: 4px;
+    height: 6px;
 }
 
 .table-wrapper .table-rows-header .table-row-delete-button,.table-wrapper .table-rows-header .table-row-add-button {
@@ -697,11 +695,11 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 
 .data-table-reader.data-scrollable.scroll-x {
-    padding-bottom: 8px;
+    padding-bottom: 10px;
 }
 
 .data-table-reader .scrollbar-shadow-left, .data-table-reader .scrollbar-shadow-right {
-    bottom: 8px;
+    bottom: 10px;
 }
 
 .data-table-reader.scrollbar-show.data-scrollable.scroll-x .data-scrollbar-x{
@@ -709,14 +707,20 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 
 .data-table-reader.data-scrollable .data-scrollbar.data-scrollbar-x {
-    height: 4px;
+    height: 6px;
 }
 
 .data-table-reader.data-scrollable .data-scrollbar.data-scrollbar-x .data-scrollbar-trigger {
-    height: 4px;
+    height: 6px;
 }
 
 [data-card-key="table"].data-card-block-max > [data-card-element="body"] > [data-card-element="center"] {
     padding: 48px;
     margin-top: 4px;
+}
+/**
+表格可溢出样式
+**/
+.table-wrapper.table-overflow {
+    width: auto;
 }

@@ -251,7 +251,7 @@ class Helper implements HelperInterface {
 			const $tr = trs.eq(index);
 			if (!$tr) return;
 			let height = parseInt($tr.css('height'));
-			height = height || 33;
+			height = height || 35;
 			$tr.css('height', height + 'px');
 		});
 		//补充可编辑器区域
@@ -603,7 +603,7 @@ class Helper implements HelperInterface {
 			const $tr = trs.eq(index);
 			if (!$tr) return;
 			let height = parseInt($tr.css('height'));
-			height = height || 33;
+			height = height || 35;
 			$tr.css('height', height + 'px');
 		});
 		return table;

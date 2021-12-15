@@ -8,6 +8,7 @@ import {
 	ToolbarItemOptions,
 } from './toolbar';
 import { CardActiveTrigger, CardType } from '../card/enum';
+import { Placement } from './position';
 
 export type CardOptions = {
 	editor: EditorInterface;
@@ -53,6 +54,7 @@ export interface CardToolbarInterface {
 	 * @param offset 偏移量 [tx,ty,bx,by]
 	 */
 	setOffset(offset: Array<number>): void;
+	setDefaultAlign(align: Placement): void;
 	/**
 	 * 销毁
 	 */

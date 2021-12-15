@@ -27,6 +27,7 @@ import Request, {
 import Scrollbar from './scrollbar';
 import Position from './position';
 import { $, getHashId, uuid } from './node';
+import Resizer from './resizer';
 
 export * from './types';
 export * from './utils';
@@ -69,4 +70,5 @@ export {
 	isRangeInterface,
 	isRange,
 	isSelection,
+	Resizer,
 };

@@ -3,6 +3,7 @@ import {
 	CardEntry,
 	PluginOptions,
 	NodeInterface,
+	$,
 } from '@aomao/engine';
 //引入插件 begin
 import Redo from '@aomao/plugin-redo';
@@ -43,7 +44,6 @@ import LineHeight from '@aomao/plugin-line-height';
 import Mention, { MentionComponent } from '@aomao/plugin-mention';
 import Embed, { EmbedComponent } from '@aomao/plugin-embed';
 import Test, { TestComponent } from './plugins/test';
-//import Mind, { MindComponent } from '@aomao/plugin-mind';
 import {
 	ToolbarPlugin,
 	ToolbarComponent,
@@ -98,7 +98,6 @@ export const plugins: Array<PluginEntry> = [
 	Mention,
 	Embed,
 	Test,
-	//Mind
 ];
 
 export const cards: Array<CardEntry> = [
@@ -115,10 +114,35 @@ export const cards: Array<CardEntry> = [
 	MentionComponent,
 	TestComponent,
 	EmbedComponent,
-	//MindComponent
 ];
 
 export const pluginConfig: { [key: string]: PluginOptions } = {
+	[Table.pluginName]: {
+		overflow: {
+			maxLeftWidth: () => {
+				// 编辑区域位置
+				const rect = $('.editor-content')
+					.get<HTMLElement>()
+					?.getBoundingClientRect();
+				const editorLeft = rect?.left || 0;
+				// 减去大纲的宽度
+				const width = editorLeft - $('.data-toc-wrapper').width();
+				// 留 16px 的间隔
+				return width <= 0 ? 100 : width - 16;
+			},
+			maxRightWidth: () => {
+				// 编辑区域位置
+				const rect = $('.editor-content')
+					.get<HTMLElement>()
+					?.getBoundingClientRect();
+				const editorRigth = (rect?.right || 0) - (rect?.width || 0);
+				// 减去评论区域的宽度
+				const width = editorRigth - $('.doc-comment-layer').width();
+				// 留 16px 的间隔
+				return width <= 0 ? 100 : width - 16;
+			},
+		},
+	},
 	[MarkRange.pluginName]: {
 		//标记类型集合
 		keys: ['comment'],
@@ -153,7 +177,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 	},
 	[Video.pluginName]: {
 		onBeforeRender: (status: string, url: string) => {
-			return url + `?token=12323`;
+			return url;
 		},
 	},
 	[Math.pluginName]: {

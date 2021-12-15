@@ -1,4 +1,5 @@
 import { EventEmitter2 } from 'eventemitter2';
+import domAlign from 'dom-align';
 import { DATA_ELEMENT, UI } from '../constants';
 import { NodeInterface } from '../types';
 import { $ } from '../node';
@@ -9,6 +10,12 @@ import './index.css';
 export type ScrollbarDragging = {
 	point: number;
 	position: number;
+};
+
+export type ScrollbarCustomeOptions = {
+	onScrollX?: (x: number) => number;
+	getOffsetWidth?: (width: number) => number;
+	getScrollLeft?: (left: number) => number;
 };
 
 class Scrollbar extends EventEmitter2 {
@@ -36,6 +43,7 @@ class Scrollbar extends EventEmitter2 {
 	#content?: NodeInterface;
 	shadowTimer?: NodeJS.Timeout;
 	#enableScroll: boolean = true;
+	#scroll?: ScrollbarCustomeOptions;
 	/**
 	 * @param {nativeNode} container 需要添加滚动条的元素
 	 * @param {boolean} x 横向滚动条
@@ -47,12 +55,14 @@ class Scrollbar extends EventEmitter2 {
 		x: boolean = true,
 		y: boolean = false,
 		shadow: boolean = true,
+		scroll?: ScrollbarCustomeOptions,
 	) {
 		super();
 		this.container = isNode(container) ? $(container) : container;
 		this.x = x;
 		this.y = y;
 		this.shadow = shadow;
+		this.#scroll = scroll;
 		this.init();
 	}
 
@@ -72,7 +82,7 @@ class Scrollbar extends EventEmitter2 {
 		const children = this.container.children();
 		let hasScrollbar = false;
 		children.each((child) => {
-			if ($(child).hasClass('data-scrollbar')) {
+			if (!hasScrollbar && $(child).hasClass('data-scrollbar')) {
 				hasScrollbar = true;
 			}
 		});
@@ -81,7 +91,7 @@ class Scrollbar extends EventEmitter2 {
 			this.container.addClass('data-scrollable');
 			if (this.x) {
 				this.scrollBarX = $(
-					`<div ${DATA_ELEMENT}="${UI}" class="data-scrollbar data-scrollbar-x "><div class="data-scrollbar-trigger"></div></div>`,
+					`<div ${DATA_ELEMENT}="${UI}" class="data-scrollbar data-scrollbar-x"><div class="data-scrollbar-trigger"></div></div>`,
 				);
 				this.slideX = this.scrollBarX.find('.data-scrollbar-trigger');
 				this.container.append(this.scrollBarX);
@@ -89,7 +99,7 @@ class Scrollbar extends EventEmitter2 {
 			}
 			if (this.y) {
 				this.scrollBarY = $(
-					`<div ${DATA_ELEMENT}="${UI}" class="data-scrollbar data-scrollbar-y "><div class="data-scrollbar-trigger"></div></div>`,
+					`<div ${DATA_ELEMENT}="${UI}" class="data-scrollbar data-scrollbar-y"><div class="data-scrollbar-trigger"></div></div>`,
 				);
 				this.slideY = this.scrollBarY.find('.data-scrollbar-trigger');
 				this.container.append(this.scrollBarY);
@@ -110,12 +120,14 @@ class Scrollbar extends EventEmitter2 {
 		}
 	}
 
-	refresh() {
+	refresh = () => {
 		const element = this.container.get<HTMLElement>();
 		if (element) {
-			const { offsetWidth, offsetHeight, scrollLeft, scrollTop } =
-				element;
+			const offsetWidth = this.#scroll?.getOffsetWidth
+				? this.#scroll.getOffsetWidth(element.offsetWidth)
+				: element.offsetWidth;
 
+			const { offsetHeight, scrollTop } = element;
 			const contentElement = this.#content?.get<HTMLElement>();
 			const sPLeft = removeUnit(this.container.css('padding-left'));
 			const sPRight = removeUnit(this.container.css('padding-right'));
@@ -170,14 +182,30 @@ class Scrollbar extends EventEmitter2 {
 			if (
 				this.x &&
 				contentElement &&
-				element.scrollWidth - sPLeft - sPRight !==
+				element.scrollWidth - sPLeft - sPRight >
 					contentElement.offsetWidth
 			) {
-				element.scrollLeft -=
+				let left =
 					element.scrollWidth -
 					sPLeft -
 					sPRight -
 					contentElement.offsetWidth;
+				if (this.#scroll) {
+					const { onScrollX, getScrollLeft } = this.#scroll;
+
+					left = getScrollLeft
+						? getScrollLeft(-0) + element.scrollLeft - left
+						: element.scrollLeft - left;
+
+					if (onScrollX) {
+						const result = onScrollX(left);
+						if (result > 0) element.scrollLeft = result;
+						else element.scrollLeft = 0;
+					}
+					this.scroll({ left });
+				} else {
+					element.scrollLeft -= left;
+				}
 				return;
 			}
 			// 实际内容高度小于容器滚动高度（有内容删除了）
@@ -194,10 +222,13 @@ class Scrollbar extends EventEmitter2 {
 					contentElement.offsetHeight;
 				return;
 			}
-			this.reRenderX(scrollLeft);
+			const left = this.#scroll?.getScrollLeft
+				? this.#scroll.getScrollLeft(element.scrollLeft)
+				: element.scrollLeft;
+			this.reRenderX(left);
 			this.reRenderY(scrollTop);
 		}
-	}
+	};
 
 	/**
 	 * 启用鼠标在内容节点上滚动或在移动设备使用手指滑动
@@ -212,13 +243,26 @@ class Scrollbar extends EventEmitter2 {
 		this.#enableScroll = false;
 	}
 
-	scroll = (event: Event) => {
-		const { target } = event;
-		if (!target) return;
+	scroll = (event: Event | { top?: number; left?: number }) => {
+		let top = 0;
+		let left = 0;
+		if (!this.#scroll && event instanceof Event) {
+			const { scrollTop, scrollLeft } = event.target as HTMLElement;
+			top = scrollTop;
+			left = scrollLeft;
+		} else if (!(event instanceof Event)) {
+			if (event.top === undefined) {
+				event.top = this.container.get<HTMLElement>()?.scrollTop || 0;
+			}
+			if (event.left === undefined) {
+				event.left = this.container.get<HTMLElement>()?.scrollLeft || 0;
+			}
+			top = event.top;
+			left = event.left;
+		} else return;
 
-		const { scrollTop, scrollLeft } = target as HTMLElement;
-		this.reRenderX(scrollLeft);
-		this.reRenderY(scrollTop);
+		this.reRenderX(left);
+		this.reRenderY(top);
 	};
 
 	wheelXScroll = (event: any) => {
@@ -227,12 +271,29 @@ class Scrollbar extends EventEmitter2 {
 		const dir = wheelValue > 0 ? 'up' : 'down';
 		const containerElement = this.container.get<HTMLElement>();
 		if (!containerElement) return;
-		let left = containerElement.scrollLeft + (dir === 'up' ? -20 : 20);
+		const containerWidth = this.#scroll?.getOffsetWidth
+			? this.#scroll.getOffsetWidth(containerElement.offsetWidth)
+			: containerElement.offsetWidth;
+		const step = Math.max(containerWidth / 8, 20);
+		let left =
+			(this.#scroll?.getScrollLeft
+				? this.#scroll.getScrollLeft(containerElement.scrollLeft)
+				: containerElement.scrollLeft) + (dir === 'up' ? -step : step);
 		left =
 			dir === 'up'
 				? Math.max(0, left)
 				: Math.min(left, this.sWidth - this.oWidth);
-		containerElement.scrollLeft = left;
+		if (this.#scroll) {
+			const { onScrollX } = this.#scroll;
+			if (onScrollX) {
+				const result = onScrollX(left);
+				if (result > 0) containerElement.scrollLeft = result;
+				else containerElement.scrollLeft = 0;
+			}
+			this.scroll({ left });
+		} else {
+			containerElement.scrollLeft = left;
+		}
 	};
 
 	wheelYScroll = (event: any) => {
@@ -241,7 +302,9 @@ class Scrollbar extends EventEmitter2 {
 		const dir = wheelValue > 0 ? 'up' : 'down';
 		const containerElement = this.container.get<HTMLElement>();
 		if (!containerElement) return;
-		let top = containerElement.scrollTop + (dir === 'up' ? -20 : 20);
+		const containerHeight = containerElement.offsetHeight;
+		const step = Math.max(containerHeight / 8, 20);
+		let top = containerElement.scrollTop + (dir === 'up' ? -step : step);
 		top =
 			dir === 'up'
 				? Math.max(0, top)
@@ -325,6 +388,7 @@ class Scrollbar extends EventEmitter2 {
 			childList: true,
 			subtree: true,
 		});
+		window.addEventListener('resize', this.refresh);
 		// 绑定滚动条事件
 		this.bindXScrollEvent();
 		this.bindYScrollEvent();
@@ -361,8 +425,19 @@ class Scrollbar extends EventEmitter2 {
 			this.slideX?.css('left', left + 'px');
 			let min = left / (this.oWidth - this.xWidth);
 			min = Math.min(1, min);
-			this.container.get<HTMLElement>()!.scrollLeft =
-				(this.sWidth - this.oWidth) * min;
+			const containerElement = this.container.get<HTMLElement>()!;
+			const x = (this.sWidth - this.oWidth) * min;
+			if (this.#scroll) {
+				const { onScrollX } = this.#scroll;
+				if (onScrollX) {
+					const result = onScrollX(x);
+					if (result > 0) containerElement.scrollLeft = result;
+					else containerElement.scrollLeft = 0;
+				}
+				this.scroll({ left: x });
+			} else {
+				containerElement.scrollLeft = x;
+			}
 		}
 	};
 
@@ -463,7 +538,13 @@ class Scrollbar extends EventEmitter2 {
 
 	reRenderShadow = (width: number) => {
 		if (this.shadow) {
-			this.shadowLeft?.css('left', width + 'px');
+			const element = this.container.get<HTMLElement>();
+			if (element) {
+				this.shadowLeft?.css(
+					'left',
+					(this.#scroll ? element.scrollLeft : width) + 'px',
+				);
+			}
 			this.shadowRight?.css('left', width + this.oWidth - 4 + 'px');
 		}
 	};
@@ -476,7 +557,12 @@ class Scrollbar extends EventEmitter2 {
 			min = Math.min(1, min);
 			this.slideX?.css('left', (this.oWidth - this.xWidth) * min + 'px');
 			this.reRenderShadow(left);
-			this.emit('change');
+			if (left === removeUnit(this.scrollBarX?.css('left') || '0'))
+				return;
+			this.emit('change', {
+				x: left,
+				y: removeUnit(this.scrollBarY?.css('top') || '0'),
+			});
 		}
 	};
 
@@ -487,7 +573,11 @@ class Scrollbar extends EventEmitter2 {
 			let min = value <= 0 ? 0 : top / value;
 			min = Math.min(1, min);
 			this.slideY?.css('top', (this.oHeight - this.yHeight) * min + 'px');
-			this.emit('change');
+			if (top === removeUnit(this.scrollBarX?.css('top') || '0')) return;
+			this.emit('change', {
+				x: removeUnit(this.scrollBarX?.css('left') || '0'),
+				y: top,
+			});
 		}
 	};
 
@@ -526,6 +616,7 @@ class Scrollbar extends EventEmitter2 {
 			this.shadowRight?.remove();
 		}
 		this.#observer?.disconnect();
+		window.removeEventListener('resize', this.refresh);
 	}
 }
 

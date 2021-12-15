@@ -14,6 +14,7 @@ import { DATA_ELEMENT, TRIGGER_CARD_ID, UI } from '../../constants';
 import { $ } from '../../node';
 import { isEngine, isMobile } from '../../utils';
 import Position from '../../position';
+import placements from '../../position/placements';
 import './index.css';
 
 export const isCardToolbarItemOptions = (
@@ -30,6 +31,7 @@ class CardToolbar implements CardToolbarInterface {
 	private position: Position;
 	#hideTimeout: NodeJS.Timeout | null = null;
 	#showTimeout: NodeJS.Timeout | null = null;
+	#defaultAlign: keyof typeof placements = 'topLeft';
 
 	constructor(editor: EditorInterface, card: CardInterface) {
 		this.editor = editor;
@@ -39,6 +41,10 @@ class CardToolbar implements CardToolbarInterface {
 		if (!isEngine(this.editor) || this.editor.readonly) {
 			this.bindEnterShow();
 		}
+	}
+
+	setDefaultAlign(align: keyof typeof placements) {
+		this.#defaultAlign = align;
 	}
 
 	clearHide = () => {
@@ -287,14 +293,14 @@ class CardToolbar implements CardToolbarInterface {
 				(this.card.constructor as CardEntry).cardName,
 			);
 			if (this.toolbar) this.toolbar.show();
-			let prevAlign = 'topLeft';
+			let prevAlign = this.#defaultAlign;
 			setTimeout(() => {
 				this.position.bind(
 					container,
 					this.card.isMaximize
 						? this.card.getCenter().first()!
 						: this.card.root,
-					'topLeft',
+					this.#defaultAlign,
 					this.offset,
 					(rect) => {
 						if (
@@ -311,7 +317,7 @@ class CardToolbar implements CardToolbarInterface {
 							this.position.update(false);
 						} else if (
 							this.offset &&
-							rect.align === 'topLeft' &&
+							rect.align === this.#defaultAlign &&
 							rect.align !== prevAlign
 						) {
 							this.position.setOffset(this.offset);

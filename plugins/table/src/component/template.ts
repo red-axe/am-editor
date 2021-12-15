@@ -13,6 +13,7 @@ import {
 } from '../types';
 
 const TABLE_WRAPPER_CLASS_NAME = 'table-wrapper';
+const TABLE_OVERFLOW_CLASS_NAME = 'table-overflow';
 const TABLE_CLASS_NAME = 'data-table';
 const COLS_HEADER_CLASS_NAME = 'table-cols-header';
 const COLS_HEADER_ITEM_CLASS_NAME = 'table-cols-header-item';
@@ -41,6 +42,7 @@ const TABLE_TD_BG_CLASS_NAME = 'table-main-bg';
 
 class Template implements TemplateInterface {
 	static readonly TABLE_WRAPPER_CLASS = `.${TABLE_WRAPPER_CLASS_NAME}`;
+	static readonly TABLE_OVERFLOW_CLASS = `.${TABLE_OVERFLOW_CLASS_NAME}`;
 	static readonly TABLE_CLASS = `.${TABLE_CLASS_NAME}`;
 	static readonly COLS_HEADER_CLASS = `.${COLS_HEADER_CLASS_NAME}`;
 	static readonly COLS_HEADER_ITEM_CLASS = `.${COLS_HEADER_ITEM_CLASS_NAME}`;
@@ -122,7 +124,7 @@ class Template implements TemplateInterface {
 	 * @return {string} 返回 html 字符串
 	 */
 	htmlEdit(
-		{ rows, cols, html, noBorder }: TableValue,
+		{ rows, cols, html, noBorder, overflow }: TableValue,
 		menus: TableMenu,
 	): string {
 		cols = cols === -Infinity ? 1 : cols;
@@ -188,7 +190,9 @@ class Template implements TemplateInterface {
 				noBorder === true ? " data-table-no-border='true'" : ''
 			} ${DATA_TRANSIENT_ATTRIBUTES}="class">${colgroup}${trs}</table>`;
 
-		return `<div class="${TABLE_WRAPPER_CLASS_NAME}" ${DATA_TRANSIENT_ATTRIBUTES}="*">${tableHeader}<div class="${VIEWPORT}">${this.renderColsHeader(
+		return `<div class="${TABLE_WRAPPER_CLASS_NAME} ${
+			overflow !== false ? TABLE_OVERFLOW_CLASS_NAME : ''
+		}" ${DATA_TRANSIENT_ATTRIBUTES}="*">${tableHeader}<div class="${VIEWPORT}">${this.renderColsHeader(
 			cols,
 		)}${table}${placeholder}${tableHighlight}</div>${this.renderRowsHeader(
 			rows,

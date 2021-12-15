@@ -31,47 +31,7 @@ new Engine(...,{
  })
 ```
 
-`defaultData`: Default drop-down query list display data
-
-`onSearch`: the method to query, or configure the action, choose one of the two
-
-`onSelect`: Call back after selecting an item in the list, here you can return a custom value combined with key and name to form a new value and store it in cardValue. And it will return together after executing the getList command
-
-`onClick`: Triggered when clicking on the "mention"
-
-`onMouseEnter`: Triggered when the mouse moves over the "mention"
-
-`onRender`: custom rendering list
-
-`onRenderItem`: custom rendering list item
-
-`onLoading`: custom rendering loading status
-
-`onEmpty`: custom render empty state
-
-`action`: query address, always use `GET` request, parameter `keyword`
-
-`data`: When querying, these data will be sent to the server at the same time
-
 ```ts
-//List data displayed by default
-defaultData?: Array<{ key: string, name: string, avatar?: string}>
-//Method for query, or configure action, choose one of the two
-onSearch?:(keyword: string) => Promise<Array<{ key: string, name: string, avatar?: string}>>
-//Call back after selecting an item in the list, here you can return a custom value combined with key and name to form a new value and store it in cardValue. And it will return together after executing the getList command
-onSelect?: (data: {[key:string]: string}) => void | {[key: string]: string}
-//Click event on "mention"
-onClick?:(data: {[key:string]: string}) => void
-// Triggered when the mouse moves over the "mention"
-onMouseEnter?:(node: NodeInterface, data: {[key:string]: string}) => void
-//Customize the rendering list, bindItem can bind the required properties and events for the list item
-onRender?: (data: MentionItem, root: NodeInterface, bindItem: (node: NodeInterface, data: {[key:string]: string}) => NodeInterface) => Promise<string | NodeInterface | void>;
-//Custom rendering list items
-onRenderItem?: (item: MentionItem, root: NodeInterface) => string | NodeInterface | void
-// Customize the rendering loading status
-onLoading?: (root: NodeInterface) => string | NodeInterface | void
-// Custom render empty state
-onEmpty?: (root: NodeInterface) => string | NodeInterface | void
 /**
  * look for the address
  */
@@ -123,4 +83,137 @@ Get all mentions in the document
 ```ts
 //Return Array<{ key: string, name: string}>
 engine.command.executeMethod('mention', 'getList');
+```
+
+## Plug-in events
+
+`mention:default`: default drop-down query list to display data
+
+```ts
+this.engine.on('mention:default', () => {
+	return [];
+});
+```
+
+`mention:search`: Method of query, or configure action, choose one of the two
+
+```ts
+this.engine.on('mention:search', (keyword) => {
+	return new Promise((resolve) => {
+		query({ keyword })
+			.then((result) => {
+				resolve(result);
+			})
+			.catch(() => resolve([]));
+	});
+});
+```
+
+`mention:select`: Call back after selecting an item in the list, here you can return a custom value combined with key and name to form a new value and store it in cardValue. And will return together after executing the getList command
+
+```ts
+this.engine.on('mention:select', (data) => {
+	data['test'] = 'test';
+	return data;
+});
+```
+
+`mention:item-click`: triggered when clicking on "mention"
+
+```ts
+this.engine.on(
+	'mention:item-click',
+	(root: NodeInterface, { key, name }: { key: string; name: string }) => {
+		console.log('mention click:', key, '-', name);
+	},
+);
+```
+
+`mention:enter`: Triggered when the mouse moves over the "mention"
+
+```ts
+this.engine.on(
+	'mention:enter',
+	(layout: NodeInterface, { name }: { key: string; name: string }) => {
+		ReactDOM.render(
+			<div style={{ padding: 5 }}>
+				<p>This is name: {name}</p>
+				<p>Configure the mention:enter event of the mention plugin</p>
+				<p>Use ReactDOM.render to customize rendering here</p>
+				<p>Use ReactDOM.render to customize rendering here</p>
+			</div>,
+			layout.get<HTMLElement>()!,
+		);
+	},
+);
+```
+
+`mention:render`: custom rendering list
+
+```ts
+this.engine.on(
+	'mention:render',
+	(
+		root: NodeInterface,
+		data: Array<MentionItem>,
+		bindItem: (
+			node: NodeInterface,
+			data: { [key: string]: string },
+		) => NodeInterface,
+	) => {
+		return new Promise<void>((resolve) => {
+			const renderCallback = (items: { [key: string]: Element }) => {
+				// Traverse the DOM node of each item
+				Object.keys(items).forEach((key) => {
+					const element = items[key];
+					const item = data.find((d) => d.key === key);
+					if (!item) return;
+					// Bind the attributes and events of each list item to meet the functional needs of the up, down, left, and right selection in the editor
+					bindItem($(element), item);
+				});
+				resolve();
+			};
+			ReactDOM.render(
+				<MentionList data={data} callback={renderCallback} />,
+				root.get<HTMLElement>()!,
+			);
+		});
+	},
+);
+```
+
+`mention:render-item`: custom rendering list item
+
+```ts
+this.engine.on('mention:render-item', (data, root) => {
+	const item = $(`<div>${data}</div>`);
+	root.append(item);
+	return item;
+});
+```
+
+`mention:loading`: custom rendering loading status
+
+```ts
+this.engine.on('mention:loading', (data, root) => {
+	root.html(`<div>${data}</div>`);
+	// or
+	ReactDOM.render(
+		<div className="data-mention-loading">Loading...</div>,
+		root.get<HTMLElement>()!,
+	);
+});
+```
+
+`mention:empty`: custom render empty state
+
+```ts
+this.engine.on('mention:empty', (root) => {
+	root.html('<div>No data found</div>');
+	// or
+	ReactDOM.render(
+		<div className="data-mention-empty">Empty</div>,
+		root.get<HTMLElement>()!,
+	);
+});
 ```

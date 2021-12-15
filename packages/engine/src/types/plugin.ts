@@ -22,8 +22,12 @@ export interface PluginEntry {
 	readonly pluginName: string;
 }
 
-export interface PluginInterface {
+export interface PluginInterface<T extends PluginOptions = {}> {
 	readonly kind: string;
+	/**
+	 * 可选项
+	 **/
+	options: T;
 	/**
 	 * 是否禁用，默认不禁用。在默认不指定的情况下，编辑器为 readonly 的时候全部禁用
 	 */

@@ -490,11 +490,11 @@ class NativeEvent {
 				return;
 			if (files.length === 0) {
 				change.cacheRangeBeforeCommand();
+				this.paste(source);
 				setTimeout(() => {
 					// 如果 text 和 html 都有，就解析 text
 					pasteMarkdown(source, text || '');
 				}, 200);
-				this.paste(source);
 			}
 		});
 

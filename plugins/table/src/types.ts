@@ -107,6 +107,7 @@ export type TableValue = {
 	html?: string;
 	color?: string;
 	noBorder?: boolean;
+	overflow?: boolean;
 };
 
 export type TableMenuItem = {
@@ -367,7 +368,7 @@ export interface TableSelectionInterface extends EventEmitter2 {
 
 	hideHighlight(): void;
 
-	focusCell(cell: NodeInterface | Node): void;
+	focusCell(cell: NodeInterface | Node, start?: boolean): void;
 
 	selectCellRange(cell: NodeInterface | Node): void;
 

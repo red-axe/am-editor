@@ -105,12 +105,6 @@ class RangeColoring implements RangeColoringInterface {
 			child = $(
 				`<div class="${USER_BACKGROUND_CLASS}" ${DATA_UUID}="${uuid}" ${DATA_COLOR}="${color}" />`,
 			);
-			child.css({
-				position: 'absolute',
-				top: 0,
-				left: 0,
-				'pointer-events': 'none',
-			});
 			this.root.append(child);
 			targetCanvas = new TinyCanvas({
 				container: child.get<HTMLElement>()!,
@@ -118,6 +112,12 @@ class RangeColoring implements RangeColoringInterface {
 
 			child[0]['__canvas'] = targetCanvas;
 		}
+		child.css({
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			'pointer-events': 'none',
+		});
 		child[0]['__range'] = range.cloneRange();
 		const parentWidth = this.root.width();
 		const parentHeight = this.root.height();
@@ -140,6 +140,14 @@ class RangeColoring implements RangeColoringInterface {
 			if (!!result) {
 				if (Array.isArray(result)) subRanges = result;
 				else {
+					if (result.x < 0) {
+						targetCanvas.resize(
+							parentWidth - result.x,
+							parentHeight,
+						);
+						child.css('left', `${result.x}px`);
+						result.x = 0;
+					}
 					targetCanvas.clearRect(result);
 					targetCanvas.drawRect({ ...result.toJSON(), ...fill });
 					return [range];

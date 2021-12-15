@@ -42,6 +42,7 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 			hideAnimationDuration: 0,
 			closeOnVerticalDrag: isMobile,
 			tapToClose: true,
+			bgOpacity: 0.8,
 			barsSize: {
 				top: 44,
 				bottom: 80,

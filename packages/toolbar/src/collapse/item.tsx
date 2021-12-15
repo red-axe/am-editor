@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import classnames from 'classnames-es-ts';
-import { EngineInterface } from '@aomao/engine';
+import { EngineInterface, Placement } from '@aomao/engine';
 import Popover from 'antd/es/popover';
 import 'antd/es/popover/style';
 
@@ -17,19 +17,7 @@ export type CollapseItemProps = {
 	disabled?: boolean;
 	onDisabled?: () => boolean;
 	className?: string;
-	placement?:
-		| 'right'
-		| 'top'
-		| 'left'
-		| 'bottom'
-		| 'topLeft'
-		| 'topRight'
-		| 'bottomLeft'
-		| 'bottomRight'
-		| 'leftTop'
-		| 'leftBottom'
-		| 'rightTop'
-		| 'rightBottom';
+	placement?: Placement;
 	onClick?: (event: React.MouseEvent, name: string) => void | boolean;
 	onMouseDown?: (event: React.MouseEvent) => void;
 };

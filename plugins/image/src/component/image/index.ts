@@ -1,17 +1,16 @@
-import { PswpInterface } from '@/types';
+import type { PswpInterface } from '@/types';
+import type { EditorInterface, NodeInterface } from '@aomao/engine';
 import {
 	$,
-	EditorInterface,
 	isEngine,
 	escape,
-	NodeInterface,
 	sanitizeUrl,
 	Tooltip,
 	isMobile,
+	Resizer,
 	CardType,
 } from '@aomao/engine';
 import Pswp from '../pswp';
-import Resizer from '../resizer';
 import './index.css';
 
 export type Status = 'uploading' | 'done' | 'error';
@@ -295,12 +294,12 @@ class Image {
 		this.meta.css({
 			'background-color': '',
 			width: '',
-			height: '',
+			//height: '',
 		});
 
 		this.image.css({
 			width: '',
-			height: '',
+			//height: '',
 		});
 
 		const img = this.image.get<HTMLImageElement>();
@@ -334,7 +333,7 @@ class Image {
 		}
 
 		this.image.css('width', `${width}px`);
-		this.image.css('height', `${height}px`);
+		//this.image.css('height', `${height}px`);
 	}
 
 	changeSize(width: number, height: number) {
@@ -359,7 +358,7 @@ class Image {
 		this.size.height = height;
 		this.image.css({
 			width: `${width}px`,
-			height: `${height}px`,
+			//height: `${height}px`,
 		});
 
 		const { onChange } = this.options;
@@ -450,7 +449,7 @@ class Image {
 		if (isMobile || !isEngine(this.editor) || this.editor.readonly) return;
 		// 拖动调整图片大小
 		const resizer = new Resizer({
-			src: this.getSrc(),
+			imgUrl: this.getSrc(),
 			width: clientWidth,
 			height: clientHeight,
 			rate: this.rate,
@@ -542,7 +541,7 @@ class Image {
 			if (this.src) {
 				this.image.css({
 					width: width + 'px',
-					height: height + 'px',
+					//height: height + 'px',
 				});
 				const { onChange } = this.options;
 				if (width > 0 && height > 0) {

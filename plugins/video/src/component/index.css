@@ -1,5 +1,7 @@
-[data-card-key="video"] {
-    outline: 1px solid #ddd;
+.data-video {
+  margin: 0 auto;
+  position: relative;
+  cursor: pointer;
 }
   .data-video-content {
     position: relative;
@@ -9,6 +11,8 @@
   .data-video-content video {
     width: 100%;
     outline: none;
+    position: relative;
+    z-index: 1;
   }
   .data-video-uploading,
   .data-video-uploaded,
@@ -23,7 +27,7 @@
     line-height: 0;
   }
   .data-video-active {
-    outline: 1px solid #d9d9d9;
+    user-select: none;
   }
   .data-video-center {
     position: absolute;
@@ -81,3 +85,20 @@
     vertical-align: middle;
     margin: -2px 5px 0 0;
   }
+
+.data-video-title {
+  text-align: center;
+}
+.data-video-title::selection {
+  background: transparent
+}
+.data-video .data-resizer {
+  z-index: inherit;
+}
+.data-video .data-resizer .data-resizer-holder {
+  z-index: 2;
+}
+
+.data-video .data-resizing {
+  z-index: 3;
+}

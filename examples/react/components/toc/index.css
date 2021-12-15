@@ -1,9 +1,8 @@
 .data-toc-wrapper {
     position: absolute;
     top: 20px;
-    width: calc(50% - 454px);
-    right: calc(50% + 428px);
-    padding-right: 24px;
+    min-width: 210px;
+    padding: 0 16px;
 }
 
 .data-toc-title {

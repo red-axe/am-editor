@@ -23,3 +23,5 @@
 # log
 *.log
 .vscode
+
+**/ffmpeg

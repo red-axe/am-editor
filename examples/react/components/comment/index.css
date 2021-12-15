@@ -44,9 +44,9 @@
 .doc-comment-layer {
 	position: absolute;
 	top: 20px;
-	width: calc(50% - 454px);
-	left: calc(50% + 428px);
-	padding-left: 24px;
+	padding-left: 16px;
+    min-width: 260px;
+    right: 16px;
 }
 
 .doc-comment-title {

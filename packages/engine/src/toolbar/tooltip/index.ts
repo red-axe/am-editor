@@ -1,17 +1,8 @@
 import { DATA_ELEMENT } from '../../constants/root';
 import { NodeInterface } from '../../types/node';
+import { Placement } from '../../types/position';
 import { $ } from '../../node';
 import './index.css';
-
-type Placement =
-	| 'top'
-	| 'topLeft'
-	| 'topRight'
-	| 'bottom'
-	| 'bottomLeft'
-	| 'bottomRight'
-	| 'left'
-	| 'right';
 
 const template = (options: { placement: Placement }) => {
 	return `

@@ -458,7 +458,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		this.emit('select', this.selectArea);
 	}
 
-	focusCell(cell: NodeInterface | Node) {
+	focusCell(cell: NodeInterface | Node, start: boolean = false) {
 		if (!isEngine(this.editor)) return;
 		const { change } = this.editor;
 		if (isNode(cell)) cell = $(cell);
@@ -469,7 +469,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				.select(editableElement, true)
 				.shrinkToElementNode()
 				.shrinkToTextNode()
-				.collapse(false);
+				.collapse(start);
 			setTimeout(() => {
 				change.range.select(range);
 			}, 20);
@@ -1090,9 +1090,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			top += rect.top - (vRect?.top || 0) - 13;
 			left += rect.left - (vRect?.left || 0);
 		}
-		const sLeft = removeUnit(
-			this.table.wrapper?.find('.data-scrollbar')?.css('left') || '0',
-		);
+		const sLeft =
+			removeUnit(
+				this.table.wrapper?.find('.data-scrollbar')?.css('left') || '0',
+			) + removeUnit(this.table.wrapper?.css('margin-left') || '0');
 		left += sLeft;
 
 		const headerHeight =

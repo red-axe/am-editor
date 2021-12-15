@@ -41,6 +41,17 @@ new Engine(...,{
   })
 ```
 
+### Overflow display
+
+```ts
+overflow?: {
+     // Relative to the maximum displayable width on the left side of the editor
+     maxLeftWidth?: () => number;
+     // Relative to the maximum displayable width on the right side of the editor
+     maxRightWidth?: () => number;
+};
+```
+
 ## Command
 
 ```ts

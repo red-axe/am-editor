@@ -1,38 +1,22 @@
-import { $, NodeInterface, EventListener, isMobile } from '@aomao/engine';
+import type { NodeInterface, EventListener } from '../types';
+import type {
+	ResizerInterface,
+	ResizerOptions,
+	Point,
+	ResizerPosition,
+	Size,
+} from '../types';
+import { $ } from '../node';
+import { isMobile } from '../utils';
 import './index.css';
 
-export type Options = {
-	src: string;
-	width: number;
-	height: number;
-	maxWidth: number;
-	rate: number;
-	onChange?: (size: Size) => void;
-};
-
-export type Position =
-	| 'right-top'
-	| 'left-top'
-	| 'right-bottom'
-	| 'left-bottom';
-
-export type Point = {
-	x: number;
-	y: number;
-};
-
-export type Size = {
-	width: number;
-	height: number;
-};
-
-class Resizer {
-	private options: Options;
+class Resizer implements ResizerInterface {
+	private options: ResizerOptions;
 	private root: NodeInterface;
-	private image: NodeInterface;
+	private image?: NodeInterface;
 	private resizerNumber: NodeInterface;
 	private point: Point = { x: 0, y: 0 };
-	private position?: Position;
+	private position?: ResizerPosition;
 	private size: Size;
 	maxWidth: number;
 	/**
@@ -40,11 +24,12 @@ class Resizer {
 	 */
 	private resizing: boolean = false;
 
-	constructor(options: Options) {
+	constructor(options: ResizerOptions) {
 		this.options = options;
-		this.root = $(this.renderTemplate(options.src));
-		this.image = this.root.find('img');
-		this.resizerNumber = this.root.find('.data-image-resizer-number');
+		this.root = $(this.renderTemplate(options.imgUrl));
+		if (options.imgUrl) this.image = this.root.find('img');
+		this.image?.hide();
+		this.resizerNumber = this.root.find('.data-resizer-number');
 		const { width, height } = this.options;
 		this.size = {
 			width,
@@ -53,19 +38,19 @@ class Resizer {
 		this.maxWidth = this.options.maxWidth;
 	}
 
-	renderTemplate(src: string) {
+	renderTemplate(imgUrl?: string) {
 		return `
-        <div class="data-image-resizer">
-            <img class="data-image-resizer-bg data-image-resizer-bg-active" src="${src}" />
-            <div class="data-image-resizer-holder data-image-resizer-holder-right-top"></div>
-            <div class="data-image-resizer-holder data-image-resizer-holder-right-bottom"></div>
-            <div class="data-image-resizer-holder data-image-resizer-holder-left-bottom"></div>
-            <div class="data-image-resizer-holder data-image-resizer-holder-left-top"></div>
-            <span class="data-image-resizer-number"></span>
+        <div class="data-resizer">
+            ${imgUrl ? `<img src="${imgUrl}">` : ''}
+            <div class="data-resizer-holder data-resizer-holder-right-top"></div>
+            <div class="data-resizer-holder data-resizer-holder-right-bottom"></div>
+            <div class="data-resizer-holder data-resizer-holder-left-bottom"></div>
+            <div class="data-resizer-holder data-resizer-holder-left-top"></div>
+            <span class="data-resizer-number"></span>
         </div>`;
 	}
 
-	onMouseDown(event: MouseEvent | TouchEvent, position: Position) {
+	onMouseDown(event: MouseEvent | TouchEvent, position: ResizerPosition) {
 		if (this.resizing) return;
 		event.preventDefault();
 		event.stopPropagation();
@@ -97,11 +82,10 @@ class Resizer {
 		};
 		this.position = position;
 		this.resizing = true;
-		this.resizerNumber.addClass(
-			`data-image-resizer-number-${this.position}`,
-		);
-		this.resizerNumber.addClass('data-image-resizer-number-active');
-		this.image.show();
+		this.root.addClass('data-resizing');
+		this.resizerNumber.addClass(`data-resizer-number-${this.position}`);
+		this.resizerNumber.addClass('data-resizer-number-active');
+		this.image?.show();
 		document.addEventListener(
 			isMobile ? 'touchmove' : 'mousemove',
 			this.onMouseMove,
@@ -140,13 +124,11 @@ class Resizer {
 			width: clientWidth,
 			height: clientHeight,
 		};
-		this.resizerNumber.removeClass(
-			`data-image-resizer-number-${this.position}`,
-		);
-		this.resizerNumber.removeClass('data-image-resizer-number-active');
+		this.resizerNumber.removeClass(`data-resizer-number-${this.position}`);
+		this.resizerNumber.removeClass('data-resizer-number-active');
 		this.position = undefined;
 		this.resizing = false;
-
+		this.root.removeClass('data-resizing');
 		document.removeEventListener(
 			isMobile ? 'touchmove' : 'mousemove',
 			this.onMouseMove,
@@ -157,7 +139,7 @@ class Resizer {
 		);
 		const { onChange } = this.options;
 		if (onChange) onChange(this.size);
-		this.image.hide();
+		this.image?.hide();
 	};
 
 	updateSize(width: number, height: number) {
@@ -166,6 +148,10 @@ class Resizer {
 		} else {
 			width = this.size.width + width;
 		}
+		this.setSize(width, height);
+	}
+
+	setSize(width: number, height: number) {
 		if (width < 24) {
 			width = 24;
 		}
@@ -181,10 +167,6 @@ class Resizer {
 		}
 		width = Math.round(width);
 		height = Math.round(height);
-		this.setSize(width, height);
-	}
-
-	setSize(width: number, height: number) {
 		this.root.css({
 			width: width + 'px',
 			height: height + 'px',
@@ -193,37 +175,33 @@ class Resizer {
 	}
 
 	on(eventType: string, listener: EventListener) {
-		this.image.on(eventType, listener);
+		this.image?.on(eventType, listener);
 	}
 
 	off(eventType: string, listener: EventListener) {
-		this.image.off(eventType, listener);
+		this.image?.off(eventType, listener);
 	}
 
 	render() {
 		const { width, height } = this.options;
-		this.root.css({
-			width: `${width}px`,
-			height: `${height}px`,
-		});
-
+		this.setSize(width, height);
 		this.root
-			.find('.data-image-resizer-holder-right-top')
+			.find('.data-resizer-holder-right-top')
 			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'right-top');
 			});
 		this.root
-			.find('.data-image-resizer-holder-right-bottom')
+			.find('.data-resizer-holder-right-bottom')
 			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'right-bottom');
 			});
 		this.root
-			.find('.data-image-resizer-holder-left-bottom')
+			.find('.data-resizer-holder-left-bottom')
 			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'left-bottom');
 			});
 		this.root
-			.find('.data-image-resizer-holder-left-top')
+			.find('.data-resizer-holder-left-top')
 			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'left-top');
 			});

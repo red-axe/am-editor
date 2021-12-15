@@ -40,6 +40,14 @@ new Engine(...,{
  })
 ```
 
+### 是否显示视频标题
+
+默认显示
+
+```ts
+showTitle?: boolean
+```
+
 ### 文件上传
 
 `action`: 上传地址，始终使用 `POST` 请求

@@ -3,10 +3,10 @@ import { EditorInterface } from '../types/engine';
 import { PluginOptions, PluginInterface } from '../types/plugin';
 
 abstract class PluginEntry<T extends PluginOptions = {}>
-	implements PluginInterface
+	implements PluginInterface<T>
 {
 	protected readonly editor: EditorInterface;
-	protected options: T;
+	options: T;
 	constructor(editor: EditorInterface, options: PluginOptions) {
 		this.editor = editor;
 		this.options = (options || {}) as T;

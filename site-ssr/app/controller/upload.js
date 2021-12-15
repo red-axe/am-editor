@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const sendToWormhole = require('stream-wormhole');
+const ffmpeg = require('fluent-ffmpeg');
 const { Controller } = require('egg');
 
 class UploadController extends Controller {
@@ -159,10 +160,53 @@ class UploadController extends Controller {
 			// 监听写入完成事件
 			remoteFileStrem.on('finish', () => {
 				if (errFlag) return;
-				resolve({
+				const result = {
 					url,
 					download: url,
-				});
+					name: sourceName,
+				};
+				try {
+					ffmpeg.setFfmpegPath(
+						path.join(app.baseDir, './app/ffmpeg/win/ffmpeg.exe'),
+					);
+					ffmpeg.setFfprobePath(
+						path.join(app.baseDir, './app/ffmpeg/win/ffprobe.exe'),
+					);
+					ffmpeg.ffprobe(filePath, (err, metadata) => {
+						const fileName = new Date().getTime() + '-v-image.png'; // stream对象也包含了文件名，大小等基本信息
+
+						// 创建文件写入路径
+						const imagePath = path.join(
+							app.baseDir,
+							`/app/public/upload/${fileName}`,
+						);
+
+						if (err) {
+							console.error(err);
+							reject(err);
+							return;
+						} else {
+							const { width, height } = metadata.streams[0];
+							result.width = width;
+							result.height = height;
+							ffmpeg(filePath)
+								.screenshots({
+									timestamps: ['50%'],
+									filename: fileName,
+									folder: path.join(
+										app.baseDir,
+										'/app/public/upload',
+									),
+								})
+								.on('end', () => {
+									result.cover = `${this.domain}/upload/${fileName}`;
+									resolve(result);
+								});
+						}
+					});
+				} catch {
+					resolve(result);
+				}
 			});
 		});
 

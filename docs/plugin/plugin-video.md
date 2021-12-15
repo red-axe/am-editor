@@ -40,6 +40,14 @@ new Engine(...,{
  })
 ```
 
+### Whether to display the video title
+
+Default Display
+
+```ts
+showTitle?: boolean
+```
+
 ### File Upload
 
 `action`: upload address, always use `POST` request

@@ -14,7 +14,7 @@ import {
 
 import VideoComponent from './component';
 
-export interface Options extends PluginOptions {
+export interface VideoUploaderOptions extends PluginOptions {
 	/**
 	 * 视频上传地址
 	 */
@@ -70,6 +70,9 @@ export interface Options extends PluginOptions {
 					id?: string;
 					cover?: string;
 					status?: string;
+					name?: string;
+					width?: number;
+					height?: number;
 			  }
 			| string;
 	};
@@ -96,7 +99,7 @@ export interface Options extends PluginOptions {
 	};
 }
 
-export default class extends Plugin<Options> {
+export default class extends Plugin<VideoUploaderOptions> {
 	private cardComponents: { [key: string]: VideoComponent } = {};
 
 	static get pluginName() {
@@ -219,6 +222,12 @@ export default class extends Plugin<Options> {
 					const download: string =
 						response.download ||
 						(response.data && response.data.download);
+					const width: number =
+						response.width ||
+						(response.data && response.data.width);
+					const height: number =
+						response.height ||
+						(response.data && response.data.height);
 					let status: string =
 						response.status ||
 						(response.data && response.data.status);
@@ -232,6 +241,8 @@ export default class extends Plugin<Options> {
 									cover?: string;
 									download?: string;
 									status?: string;
+									width?: number;
+									height?: number;
 							  }
 							| string;
 					} = {
@@ -242,6 +253,8 @@ export default class extends Plugin<Options> {
 							cover,
 							download,
 							status,
+							width,
+							height,
 						},
 					};
 					if (parse) {
@@ -253,6 +266,9 @@ export default class extends Plugin<Options> {
 								cover?: string;
 								download?: string;
 								status?: string;
+								name?: string;
+								width?: number;
+								height?: number;
 							};
 							if (typeof customizeResult.data === 'string')
 								result.data = {
@@ -307,6 +323,8 @@ export default class extends Plugin<Options> {
 								? { url: result.data }
 								: {
 										...result.data,
+										naturalWidth: result.data.width,
+										naturalHeight: result.data.height,
 								  },
 						);
 					}

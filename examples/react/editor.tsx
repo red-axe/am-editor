@@ -10,7 +10,7 @@ import Space from 'antd/es/space';
 import Button from 'antd/es/button';
 import 'antd/es/space/style';
 import 'antd/es/button/style';
-import './editor.css';
+import './editor.less';
 
 const localMember =
 	typeof localStorage === 'undefined' ? null : localStorage.getItem('member');
@@ -72,7 +72,7 @@ export default () => {
 
 	return (
 		<Context.Provider value={{ lang }}>
-			<Space className="doc-editor-mode">
+			{/* <Space className="doc-editor-mode">
 				<Button
 					size="small"
 					disabled={readonly}
@@ -89,7 +89,7 @@ export default () => {
 				>
 					{lang === 'zh-CN' ? '编辑模式' : 'Edit mode'}
 				</Button>
-			</Space>
+			</Space> */}
 			<Editor
 				lang={lang}
 				placeholder="这里是编辑区域哦~"

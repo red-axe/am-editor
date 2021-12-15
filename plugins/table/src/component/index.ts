@@ -5,9 +5,11 @@ import {
 	CardType,
 	EDITABLE_SELECTOR,
 	isEngine,
+	isMobile,
 	NodeInterface,
 	Parser,
 	RangeInterface,
+	removeUnit,
 	Scrollbar,
 	ToolbarItemOptions,
 } from '@aomao/engine';
@@ -65,7 +67,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	selection: TableSelectionInterface = new TableSelection(this.editor, this);
 	conltrollBar: ControllBarInterface = new ControllBar(this.editor, this, {
 		col_min_width: 40,
-		row_min_height: 33,
+		row_min_height: 35,
 	});
 	command: TableCommandInterface = new TableCommand(this.editor, this);
 	scrollbar?: Scrollbar;
@@ -80,6 +82,138 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		if (isEngine(this.editor)) {
 			this.editor.on('undo', this.doChange);
 			this.editor.on('redo', this.doChange);
+			// tab 键选择
+			if (!this.editor.event.listeners['keydown:tab'])
+				this.editor.event.listeners['keydown:tab'] = [];
+			this.editor.event.listeners['keydown:tab'].unshift(
+				(event: KeyboardEvent) => {
+					if (!isEngine(this.editor)) return;
+					const { change, block, node } = this.editor;
+
+					const range = change.range.get();
+					const td = range.endNode.closest('td');
+					if (td.length === 0) return;
+					const closestBlock = block.closest(range.endNode);
+					if (
+						td.length > 0 &&
+						(block.isLastOffset(range, 'end') ||
+							(closestBlock.name !== 'li' &&
+								node.isEmptyWidthChild(closestBlock)))
+					) {
+						let next = td.next();
+						if (!next) {
+							const nextRow = td.parent()?.next();
+							// 最后一行，最后一列
+							if (!nextRow) {
+								// 新建一行
+								this.command.insertRowDown();
+								next =
+									td
+										.parent()
+										?.next()
+										?.find('td:first-child') || null;
+							} else {
+								next = nextRow.find('td:first-child') || null;
+							}
+						}
+						if (next) {
+							event.preventDefault();
+							this.selection.focusCell(next);
+							return false;
+						}
+					}
+					return;
+				},
+			);
+			// 下键选择
+			this.editor.on('keydown:down', (event) => {
+				if (!isEngine(this.editor)) return;
+				const { change } = this.editor;
+
+				const range = change.range.get();
+				const td = range.endNode.closest('td');
+				if (td.length === 0) return;
+				const contentElement = td.find('.table-main-content');
+				if (!contentElement) return;
+				const tdRect = contentElement
+					.get<HTMLElement>()!
+					.getBoundingClientRect();
+				const rangeRect = range.getBoundingClientRect();
+				if (
+					td.length > 0 &&
+					(rangeRect.bottom === 0 ||
+						tdRect.bottom - rangeRect.bottom < 10)
+				) {
+					const index = td.index();
+					const nextRow = td.parent()?.next();
+					if (nextRow) {
+						let nextIndex = 0;
+						let nextTd = nextRow.find('td:last-child');
+						this.selection.tableModel?.table[nextRow.index()].some(
+							(cell) => {
+								if (
+									!this.helper.isEmptyModelCol(cell) &&
+									nextIndex >= index &&
+									cell.element
+								) {
+									nextTd = $(cell.element);
+									return true;
+								}
+								nextIndex++;
+							},
+						);
+						if (nextTd) {
+							event.preventDefault();
+							this.selection.focusCell(nextTd, true);
+							return false;
+						}
+					}
+				}
+			});
+			// 上键选择
+			this.editor.on('keydown:up', (event) => {
+				if (!isEngine(this.editor)) return;
+				const { change } = this.editor;
+
+				const range = change.range.get();
+				const td = range.endNode.closest('td');
+				if (td.length === 0) return;
+				const contentElement = td.find('.table-main-content');
+				if (!contentElement) return;
+				const tdRect = contentElement
+					.get<HTMLElement>()!
+					.getBoundingClientRect();
+				const rangeRect = range.getBoundingClientRect();
+				if (
+					td.length > 0 &&
+					(rangeRect.top === 0 || rangeRect.top - tdRect.top < 10)
+				) {
+					const index = td.index();
+					const prevRow = td.parent()?.prev();
+					if (prevRow) {
+						let prevIndex = 0;
+						let prevTd = prevRow.find('td:first-child');
+						this.selection.tableModel?.table[prevRow.index()].some(
+							(cell) => {
+								if (
+									!this.helper.isEmptyModelCol(cell) &&
+									prevIndex >= index &&
+									cell.element
+								) {
+									prevTd = $(cell.element);
+									return true;
+								}
+								prevIndex++;
+							},
+						);
+						if (prevTd) {
+							event.preventDefault();
+							this.selection.focusCell(prevTd);
+							return false;
+						}
+					}
+				}
+			});
 		}
 		if (this.colorTool) return;
 		this.colorTool = new ColorTool(this.editor, this.id, {
@@ -172,10 +306,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			},
 		];
 		if (this.isMaximize) return funBtns;
-		return [
-			{
-				type: 'dnd',
-			},
+		const toolbars: Array<ToolbarItemOptions | CardToolbarItemOptions> = [
 			{
 				type: 'maximize',
 			},
@@ -190,6 +321,12 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			},
 			...funBtns,
 		];
+		if (removeUnit(this.wrapper?.css('margin-left') || '0') === 0) {
+			toolbars.unshift({
+				type: 'dnd',
+			});
+		}
+		return toolbars;
 	}
 
 	updateAlign(event: MouseEvent, align: 'top' | 'middle' | 'bottom' = 'top') {
@@ -291,12 +428,10 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		super.activate(activated);
 		if (activated) {
 			this.wrapper?.addClass('active');
-			this.scrollbar?.enableScroll();
 		} else {
 			this.selection.clearSelect();
 			this.conltrollBar.hideContextMenu();
 			this.wrapper?.removeClass('active');
-			this.scrollbar?.disableScroll();
 		}
 		this.scrollbar?.refresh();
 	}
@@ -344,6 +479,33 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		return nodes;
 	}
 
+	overflow(max: number) {
+		// 表格宽度
+		const tableWidth = this.wrapper?.find('.data-table')?.width() || 0;
+		const rootWidth = this.getCenter().width();
+		// 溢出的宽度
+		const overflowWidth = tableWidth - rootWidth;
+		if (overflowWidth > 0) {
+			this.wrapper?.css(
+				'margin-right',
+				`-${overflowWidth > max ? max : overflowWidth}px`,
+			);
+		} else if (overflowWidth < 0) {
+			this.wrapper?.css('margin-right', '');
+		}
+	}
+
+	updateScrollbar = () => {
+		if (!this.scrollbar) return;
+		const hideHeight =
+			(this.wrapper?.getBoundingClientRect()?.bottom || 0) -
+			(this.wrapper?.getViewport().bottom || 0);
+		console.log(hideHeight);
+		this.wrapper?.find('.data-scrollbar-x').css({
+			bottom: `${hideHeight > 0 ? hideHeight + 2 : 0}px`,
+		});
+	};
+
 	didRender() {
 		super.didRender();
 		this.viewport = isEngine(this.editor)
@@ -356,8 +518,49 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		if (!isEngine(this.editor) || this.editor.readonly)
 			this.toolbarModel?.setOffset([0, 0]);
 		else this.toolbarModel?.setOffset([0, -28, 0, -6]);
+		const tablePlugin = this.editor.plugin.components['table'];
+		const tableOptions = tablePlugin?.options['overflow'] || {};
 		if (this.viewport) {
-			this.scrollbar = new Scrollbar(this.viewport, true, false, true);
+			const overflowLeftConfig = tableOptions['maxLeftWidth']
+				? {
+						onScrollX: (x: number) => {
+							const max = tableOptions['maxLeftWidth']();
+							this.wrapper?.css(
+								'margin-left',
+								`-${x > max ? max : x}px`,
+							);
+							if (x > 0) {
+								this.editor.root.find('.data-card-dnd').hide();
+							} else {
+								this.editor.root.find('.data-card-dnd').show();
+							}
+							return x - max;
+						},
+						getScrollLeft: (left: number) => {
+							return (
+								left -
+								removeUnit(
+									this.wrapper?.css('margin-left') || '0',
+								)
+							);
+						},
+						getOffsetWidth: (width: number) => {
+							return (
+								width +
+								removeUnit(
+									this.wrapper?.css('margin-left') || '0',
+								)
+							);
+						},
+				  }
+				: undefined;
+			this.scrollbar = new Scrollbar(
+				this.viewport,
+				true,
+				false,
+				true,
+				overflowLeftConfig,
+			);
 			this.scrollbar.setContentNode(this.viewport.find('.data-table')!);
 			this.scrollbar.on('display', (display: 'node' | 'block') => {
 				if (display === 'block') {
@@ -367,14 +570,18 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 				}
 			});
 			this.scrollbar.disableScroll();
-			let changeTimeout: NodeJS.Timeout | undefined;
 			const handleScrollbarChange = () => {
-				if (changeTimeout) clearTimeout(changeTimeout);
-				changeTimeout = setTimeout(() => {
-					if (isEngine(this.editor)) this.editor.ot.initSelection();
-				}, 50);
+				if (tableOptions['maxRightWidth'])
+					this.overflow(tableOptions['maxRightWidth']());
+				if (isEngine(this.editor)) this.editor.ot.initSelection();
 			};
 			this.scrollbar.on('change', handleScrollbarChange);
+			if (!isMobile)
+				window.addEventListener('scroll', this.updateScrollbar);
+			window.addEventListener('resize', this.updateScrollbar);
+			if (isEngine(this.editor) && !isMobile) {
+				this.editor.scrollNode?.on('scroll', this.updateScrollbar);
+			}
 		}
 		this.selection.on('select', () => {
 			this.conltrollBar.refresh();
@@ -401,6 +608,8 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			if (!silence) {
 				this.onChange();
 			}
+			if (tableOptions['maxRightWidth'])
+				this.overflow(tableOptions['maxRightWidth']());
 			this.scrollbar?.refresh();
 		});
 
@@ -412,6 +621,9 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			if (tableValue) this.setValue(tableValue);
 			this.onChange();
 		}
+		if (tableOptions['maxRightWidth'])
+			this.overflow(tableOptions['maxRightWidth']());
+		this.scrollbar?.refresh();
 	}
 
 	render() {

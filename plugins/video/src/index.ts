@@ -10,6 +10,7 @@ import {
 	NodeInterface,
 	Plugin,
 	PluginEntry,
+	PluginOptions,
 	READY_CARD_KEY,
 	sanitizeUrl,
 	SchemaInterface,
@@ -18,12 +19,15 @@ import VideoComponent, { VideoValue } from './component';
 import VideoUploader from './uploader';
 import locales from './locales';
 
-export default class VideoPlugin extends Plugin<{
+export interface VideoOptions extends PluginOptions {
 	onBeforeRender?: (
 		action: 'download' | 'query' | 'cover',
 		url: string,
 	) => string;
-}> {
+	showTitle?: boolean;
+}
+
+export default class VideoPlugin extends Plugin<VideoOptions> {
 	static get pluginName() {
 		return 'video';
 	}
@@ -46,6 +50,10 @@ export default class VideoPlugin extends Plugin<{
 		cover?: string,
 		size?: number,
 		download?: string,
+		naturalWidth?: number,
+		naturalHeight?: number,
+		width?: number,
+		height?: number,
 	): void {
 		const value: VideoValue = {
 			status,
@@ -55,6 +63,10 @@ export default class VideoPlugin extends Plugin<{
 			name: name || url,
 			size,
 			download,
+			width,
+			height,
+			naturalWidth,
+			naturalHeight,
 		};
 		if (status === 'error') {
 			value.url = '';

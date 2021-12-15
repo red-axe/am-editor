@@ -25,6 +25,7 @@
     "egg-scripts": "^2.13.0",
     "egg-view-assets": "^1.7.0",
     "egg-view-nunjucks": "^2.3.0",
+    "fluent-ffmpeg": "^2.1.2",
     "jsdom": "^16.4.0",
     "prop-types": "^15.6.2",
     "qs": "^6.7.0",

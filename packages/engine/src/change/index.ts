@@ -441,6 +441,7 @@ class ChangeModel implements ChangeInterface {
 			let node: NodeInterface | null = $(childNodes[0]);
 			let prev: NodeInterface | null = null;
 			const appendNodes = [];
+			let startRangeNodeParent = startRange.node.parent();
 			while (node && node.length > 0) {
 				nodeApi.removeSide(node);
 				const next: NodeInterface | null = node.next();
@@ -457,6 +458,22 @@ class ChangeModel implements ChangeInterface {
 				prev = node;
 				if (!next) {
 					range.select(node, true).collapse(false);
+				}
+				// 被删除了重新设置开始节点位置
+				if (
+					startRange &&
+					(!startRangeNodeParent || startRangeNodeParent.length === 0)
+				) {
+					const children = node.children();
+					startRangeNodeParent = node.parent();
+					startRange = {
+						node: node,
+						offset:
+							children.length === 1 &&
+							children[0].nodeName === 'BR'
+								? 0
+								: range.startOffset,
+					};
 				}
 				node = next;
 			}

@@ -1,16 +1,18 @@
-import { Tooltip } from '@aomao/engine';
+import type {
+	CardToolbarItemOptions,
+	ToolbarItemOptions,
+	NodeInterface,
+	ResizerInterface,
+} from '@aomao/engine';
 import {
 	$,
 	Card,
-	CardToolbarItemOptions,
 	CardType,
 	escape,
 	getFileSize,
 	isEngine,
-	isMobile,
-	NodeInterface,
 	sanitizeUrl,
-	ToolbarItemOptions,
+	Resizer,
 } from '@aomao/engine';
 import './index.css';
 
@@ -50,12 +52,36 @@ export type VideoValue = {
 	 */
 	size?: number;
 	/**
+	 * 宽度
+	 */
+	width?: number;
+	/**
+	 * 高度
+	 */
+	height?: number;
+	/**
+	 * 真实宽度
+	 */
+	naturalWidth?: number;
+	/**
+	 * 真实高度
+	 */
+	naturalHeight?: number;
+	/**
 	 * 错误状态下的错误信息
 	 */
 	message?: string;
 };
 
 class VideoComponent extends Card<VideoValue> {
+	maxWidth: number = 0;
+	resizer?: ResizerInterface;
+	video?: NodeInterface;
+	rate: number = 1;
+	isLoad: boolean = false;
+	container?: NodeInterface;
+	videoContainer?: NodeInterface;
+	title?: NodeInterface;
 	static get cardName() {
 		return 'video';
 	}
@@ -68,7 +94,9 @@ class VideoComponent extends Card<VideoValue> {
 		return false;
 	}
 
-	private container?: NodeInterface;
+	static get singleSelectable() {
+		return false;
+	}
 
 	getLocales() {
 		return this.editor.language.get<{ [key: string]: string }>('video');
@@ -102,7 +130,9 @@ class VideoComponent extends Card<VideoValue> {
 		}
 
 		const fileSize: string = size ? getFileSize(size) : '';
-
+		const titleElement = name
+			? `<div class="data-video-title">${escape(name)}</div>`
+			: '';
 		if (status === 'uploading') {
 			return `
             <div class="data-video">
@@ -143,10 +173,11 @@ class VideoComponent extends Card<VideoValue> {
             </div>
             `;
 		}
-
+		const videoPlugin = this.editor.plugin.components['video'];
 		return `
         <div class="data-video">
             <div class="data-video-content data-video-done"></div>
+			${videoPlugin && videoPlugin.options.showTitle !== false ? titleElement : ''}
         </div>
         `;
 	}
@@ -176,12 +207,18 @@ class VideoComponent extends Card<VideoValue> {
 		if (cover) {
 			video.poster = sanitizeUrl(this.onBeforeRender('cover', cover));
 		}
-
+		this.maxWidth = this.getMaxWidth();
+		if (value.naturalHeight && value.naturalWidth)
+			this.rate = value.naturalHeight / value.naturalWidth;
 		this.container?.find('.data-video-content').append(video);
-
+		this.videoContainer = this.container?.find('.data-video-content');
 		video.oncontextmenu = function () {
 			return false;
 		};
+
+		this.video = $(video);
+		this.title = this.container?.find('.data-video-title');
+		this.resetSize();
 		// 一次渲染时序开启 controls 会触发一次内容为空的 window.onerror，疑似 chrome bug
 		setTimeout(() => {
 			video.controls = true;
@@ -234,9 +271,158 @@ class VideoComponent extends Card<VideoValue> {
 		this.container?.find('.percent').html(`${percent}%`);
 	}
 
+	getMaxWidth(node: NodeInterface = this.getCenter()) {
+		const block = this.editor.block.closest(node).get<HTMLElement>();
+		if (!block) return 0;
+		return block.clientWidth - 6;
+	}
+
+	/**
+	 * 重置大小
+	 */
+	resetSize() {
+		if (!this.videoContainer) return;
+		const value = this.getValue();
+		if (!value) return;
+		this.videoContainer.css({
+			width: '',
+			//height: '',
+		});
+		this.container?.css({
+			width: '',
+		});
+
+		const video = this.video?.get<HTMLVideoElement>();
+		if (!video) return;
+		let { width, height, naturalWidth, naturalHeight } = value;
+		if (!naturalWidth) {
+			naturalWidth = video.videoWidth;
+		}
+		if (!naturalHeight) {
+			naturalHeight = video.videoHeight;
+		}
+
+		if (!height) {
+			width = naturalWidth;
+			height = Math.round(this.rate * width);
+		} else if (!width) {
+			height = naturalHeight;
+			width = Math.round(height / this.rate);
+		} else if (width && height) {
+			// 修正非正常的比例
+			height = Math.round(this.rate * width);
+		} else {
+			width = naturalWidth;
+			height = naturalHeight;
+		}
+
+		if (width > this.maxWidth) {
+			width = this.maxWidth;
+			height = Math.round(width * this.rate);
+		}
+		this.container?.css({
+			width: `${width}px`,
+		});
+		this.videoContainer.css('width', `${width}px`);
+		//this.videoContainer.css('height', `${height}px`);
+	}
+
+	changeSize(width: number, height: number) {
+		if (width < 24) {
+			width = 24;
+			height = width * this.rate;
+		}
+
+		if (width > this.maxWidth) {
+			width = this.maxWidth;
+			height = width * this.rate;
+		}
+
+		if (height < 24) {
+			height = 24;
+			width = height / this.rate;
+		}
+
+		width = Math.round(width);
+		height = Math.round(height);
+		this.videoContainer?.css({
+			width: `${width}px`,
+			//height: `${height}px`,
+		});
+		this.container?.css({
+			width: `${width}px`,
+		});
+		this.setValue({
+			width,
+			height,
+		});
+		this.resizer?.destroy();
+		this.initResizer();
+	}
+
+	onWindowResize = () => {
+		if (!isEngine(this.editor)) return;
+		this.maxWidth = this.getMaxWidth();
+		this.resetSize();
+
+		if (this.resizer) {
+			this.resizer.maxWidth = this.maxWidth;
+			this.resizer.setSize(
+				this.videoContainer?.width() || 0,
+				this.videoContainer?.height() || 0,
+			);
+		}
+	};
+
+	initResizer() {
+		const value = this.getValue();
+		if (!value) return;
+		const { naturalHeight, naturalWidth, status } = value;
+		if (!naturalHeight || !naturalWidth || status !== 'done') return;
+		const { width, height, cover } = value;
+		this.maxWidth = this.getMaxWidth();
+		this.rate = naturalHeight / naturalWidth;
+		window.removeEventListener('resize', this.onWindowResize);
+		window.addEventListener('resize', this.onWindowResize);
+		// 拖动调整视频大小
+		const resizer = new Resizer({
+			imgUrl: cover,
+			width: width || naturalWidth,
+			height: height || naturalHeight,
+			rate: this.rate,
+			maxWidth: this.maxWidth,
+			onChange: ({ width, height }) => this.changeSize(width, height),
+		});
+		this.resizer = resizer;
+		const resizerNode = resizer.render();
+		this.videoContainer?.append(resizerNode);
+	}
+
 	onActivate(activated: boolean) {
-		if (activated) this.container?.addClass('data-video-active');
-		else this.container?.removeClass('data-video-active');
+		if (activated) {
+			this.container?.addClass('data-video-active');
+			this.initResizer();
+		} else {
+			this.container?.removeClass('data-video-active');
+			this.resizer?.destroy();
+		}
+	}
+
+	onSelectByOther(
+		selected: boolean,
+		value?: {
+			color: string;
+			rgb: string;
+		},
+	): NodeInterface | void {
+		this.container?.css(
+			'outline',
+			selected ? '2px solid ' + value!.color : '',
+		);
+		const className = 'card-selected-other';
+		if (selected) this.root.addClass(className);
+		else this.root.removeClass(className);
+		return this.container;
 	}
 
 	checker(
@@ -284,6 +470,8 @@ class VideoComponent extends Card<VideoValue> {
 		const { command, plugin } = this.editor;
 		const { video_id, status } = value;
 		const locales = this.getLocales();
+
+		this.maxWidth = this.getMaxWidth();
 		//阅读模式
 		if (!isEngine(this.editor)) {
 			if (status === 'done') {
@@ -418,6 +606,7 @@ class VideoComponent extends Card<VideoValue> {
 							: value.download,
 					};
 					this.container = $(this.renderTemplate(newValue));
+					this.video = this.container.find('video');
 					center.empty();
 					center.append(this.container);
 					this.initPlayer();
@@ -436,17 +625,27 @@ class VideoComponent extends Card<VideoValue> {
 			);
 			return this.container;
 		} else {
-			return $(this.renderTemplate(value));
+			this.container = $(this.renderTemplate(value));
+			return this.container;
 		}
 	}
 
+	handleClick = () => {
+		if (isEngine(this.editor) && !this.activated) {
+			this.editor.card.activate(this.root);
+		}
+	};
+
 	didRender() {
 		super.didRender();
-		this.container?.on(isMobile ? 'touchstart' : 'click', () => {
-			if (isEngine(this.editor) && !this.activated) {
-				this.editor.card.activate(this.root);
-			}
-		});
+		this.toolbarModel?.setDefaultAlign('top');
+		this.container?.on('click', this.handleClick);
+	}
+
+	destroy() {
+		super.destroy();
+		this.container?.off('click', this.handleClick);
+		window.removeEventListener('resize', this.onWindowResize);
 	}
 }
 

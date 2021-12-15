@@ -228,6 +228,23 @@ class ImageComponent extends Card<ImageValue> {
 		else this.image?.blur();
 	}
 
+	onSelectByOther(
+		selected: boolean,
+		value?: {
+			color: string;
+			rgb: string;
+		},
+	): NodeInterface | void {
+		this.image?.root?.css(
+			'outline',
+			selected ? '2px solid ' + value!.color : '',
+		);
+		const className = 'card-selected-other';
+		if (selected) this.root.addClass(className);
+		else this.root.removeClass(className);
+		return this.image?.root;
+	}
+
 	render(loadingBg?: string): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
@@ -253,20 +270,6 @@ class ImageComponent extends Card<ImageValue> {
 				},
 				onChange: (size) => {
 					if (size) this.setSize(size);
-					if (this.type === CardType.BLOCK && this.image) {
-						const maxWidth = this.image.getMaxWidth();
-						const offset = (maxWidth - this.image.root.width()) / 2;
-						if (value.status === 'done') {
-							this.toolbarModel?.setOffset([
-								-offset - 12,
-								0,
-								-offset - 12,
-								0,
-							]);
-						}
-						if (this.activated)
-							this.toolbarModel?.showCardToolbar();
-					}
 				},
 				onError: () => {
 					this.isLocalError = true;
@@ -290,12 +293,8 @@ class ImageComponent extends Card<ImageValue> {
 	}
 
 	didRender() {
-		if (
-			this.type === CardType.INLINE &&
-			this.getValue()?.status === 'done'
-		) {
-			this.toolbarModel?.setOffset([-12, 0, -12, 0]);
-		}
+		super.didRender();
+		this.toolbarModel?.setDefaultAlign('top');
 	}
 }
 

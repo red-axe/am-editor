@@ -21,6 +21,10 @@ import { TableInterface } from './types';
 
 export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
+	overflow?: {
+		maxLeftWidth?: () => number;
+		maxRightWidth?: () => number;
+	};
 	markdown?: boolean;
 }
 
@@ -265,6 +269,7 @@ class Table extends Plugin<Options> {
 		this.editor.card.insert(TableComponent.cardName, {
 			rows: rows || 3,
 			cols: cols || 3,
+			overflow: this.options.overflow,
 		});
 	}
 

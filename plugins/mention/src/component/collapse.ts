@@ -249,7 +249,12 @@ class CollapseComponent implements CollapseComponentInterface {
 			if (result) body?.append(result);
 		} else if (
 			CollapseComponent.render ||
-			(result = this.engine.trigger('mention:render', this.root))
+			(result = this.engine.trigger(
+				'mention:render',
+				this.root,
+				data,
+				this.bindItem,
+			))
 		) {
 			(CollapseComponent.render
 				? CollapseComponent.render(this.root, data, this.bindItem)

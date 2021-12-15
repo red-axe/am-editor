@@ -14,7 +14,7 @@ class Position {
 	#root?: NodeInterface;
 	#onUpdate?: (rect: any) => void;
 	#updateTimeout?: NodeJS.Timeout;
-	#observer?: MutationObserver;
+	#observer?: ResizeObserver;
 
 	constructor(editor: EditorInterface) {
 		this.#editor = editor;
@@ -43,7 +43,7 @@ class Position {
 			this.#editor.scrollNode?.on('scroll', this.updateListener);
 		}
 		let size = { width: target.width(), height: target.height() };
-		this.#observer = new MutationObserver(() => {
+		this.#observer = new ResizeObserver(() => {
 			const width = target.width();
 			const height = target.height();
 
@@ -54,13 +54,7 @@ class Position {
 			};
 			this.updateListener();
 		});
-		this.#observer.observe(target.get<HTMLElement>()!, {
-			attributes: true,
-			attributeFilter: ['style'],
-			attributeOldValue: true,
-			childList: true,
-			subtree: true,
-		});
+		this.#observer.observe(target.get<HTMLElement>()!);
 		this.update();
 	}
 

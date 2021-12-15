@@ -322,6 +322,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		const className = 'card-selected-other';
 		if (selected) this.root.addClass(className);
 		else this.root.removeClass(className);
+		return center;
 	}
 	onActivate(activated: boolean) {
 		if (!this.resize) return;
@@ -335,7 +336,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 			rgb: string;
 		},
 	): NodeInterface | void {
-		this.onSelectByOther(activated, value);
+		return this.onSelectByOther(activated, value);
 	}
 	onChange?(trigger: 'remote' | 'local', node: NodeInterface): void;
 	destroy() {

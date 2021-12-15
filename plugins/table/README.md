@@ -41,6 +41,17 @@ new Engine(...,{
  })
 ```
 
+### 溢出展示
+
+```ts
+overflow?: {
+    // 相对编辑器左侧最大能展示的宽度
+    maxLeftWidth?: () => number;
+    // 相对于编辑器右侧最大能展示的宽度
+    maxRightWidth?: () => number;
+};
+```
+
 ## 命令
 
 ```ts
