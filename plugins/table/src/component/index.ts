@@ -485,12 +485,12 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		const rootWidth = this.getCenter().width();
 		// 溢出的宽度
 		const overflowWidth = tableWidth - rootWidth;
-		if (overflowWidth > 0) {
+		if (overflowWidth > 0 && !this.isMaximize) {
 			this.wrapper?.css(
 				'margin-right',
 				`-${overflowWidth > max ? max : overflowWidth}px`,
 			);
-		} else if (overflowWidth < 0) {
+		} else if (overflowWidth < 0 || this.isMaximize) {
 			this.wrapper?.css('margin-right', '');
 		}
 	}
@@ -500,7 +500,6 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		const hideHeight =
 			(this.wrapper?.getBoundingClientRect()?.bottom || 0) -
 			(this.wrapper?.getViewport().bottom || 0);
-		console.log(hideHeight);
 		this.wrapper?.find('.data-scrollbar-x').css({
 			bottom: `${hideHeight > 0 ? hideHeight + 2 : 0}px`,
 		});
@@ -524,6 +523,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			const overflowLeftConfig = tableOptions['maxLeftWidth']
 				? {
 						onScrollX: (x: number) => {
+							if (this.isMaximize) x = 0;
 							const max = tableOptions['maxLeftWidth']();
 							this.wrapper?.css(
 								'margin-left',
@@ -573,7 +573,10 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			const handleScrollbarChange = () => {
 				if (tableOptions['maxRightWidth'])
 					this.overflow(tableOptions['maxRightWidth']());
-				if (isEngine(this.editor)) this.editor.ot.initSelection();
+				if (isEngine(this.editor)) {
+					this.editor.ot.initSelection();
+					this.conltrollBar.refresh();
+				}
 			};
 			this.scrollbar.on('change', handleScrollbarChange);
 			if (!isMobile)

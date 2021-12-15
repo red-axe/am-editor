@@ -9,7 +9,9 @@
 [data-comment-preview] {
 	background: rgb(250, 241, 209) !important;
 }
-
+[data-comment-preview]::selection {
+    background: transparent !important;
+}
 [data-card-key][data-comment-id]::before,
 [data-card-key][data-comment-preview]::before {
 	bottom: -2px;
