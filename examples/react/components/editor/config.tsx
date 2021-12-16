@@ -121,7 +121,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 		overflow: {
 			maxLeftWidth: () => {
 				// 编辑区域位置
-				const rect = $('.editor-content')
+				const rect = $('.am-engine')
 					.get<HTMLElement>()
 					?.getBoundingClientRect();
 				const editorLeft = rect?.left || 0;
@@ -132,7 +132,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 			},
 			maxRightWidth: () => {
 				// 编辑区域位置
-				const rect = $('.editor-content')
+				const rect = $('.am-engine')
 					.get<HTMLElement>()
 					?.getBoundingClientRect();
 				const editorRigth = (rect?.right || 0) - (rect?.width || 0);

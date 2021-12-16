@@ -1,11 +1,13 @@
 @import (reference) '../../styles/variables.less';
 
 .editor-wrapper-view {
-	width: 812px;
-	min-width: 812px;
+	.am-engine-view {
+		width: 812px;
+		min-width: 812px;
 
-	@media @mobile {
-		min-width: auto !important;
-		width: 100% !important;
+		@media @mobile {
+			min-width: auto !important;
+			width: 100% !important;
+		}
 	}
 }

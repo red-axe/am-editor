@@ -199,10 +199,12 @@ class Template implements TemplateInterface {
 		)}${menuBar}</div>`;
 	}
 
-	htmlView({ html, noBorder }: TableValue) {
-		return `<div class="${VIEWPORT_READER}"${
+	htmlView({ html, noBorder, overflow }: TableValue) {
+		return `<div class="${TABLE_WRAPPER_CLASS_NAME} ${
+			overflow !== false ? TABLE_OVERFLOW_CLASS_NAME : ''
+		}"><div class="${VIEWPORT_READER}"${
 			noBorder === true ? " data-table-no-border='true'" : ''
-		}>${html}</div>`;
+		}>${html}</div></div>`;
 	}
 }
 

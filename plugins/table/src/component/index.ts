@@ -509,7 +509,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		super.didRender();
 		this.viewport = isEngine(this.editor)
 			? this.wrapper?.find(Template.VIEWPORT)
-			: this.wrapper;
+			: this.wrapper?.find(Template.VIEWPORT_READER);
 
 		this.selection.init();
 		this.conltrollBar.init();

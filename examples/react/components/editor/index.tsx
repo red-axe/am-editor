@@ -13,6 +13,7 @@ import Toc from '../toc';
 import { cards, pluginConfig, plugins } from './config';
 import Toolbar, { ToolbarItemProps } from './toolbar';
 import './index.less';
+import ReactDOM from 'react-dom';
 
 export type Content = {
 	value: string;
@@ -321,10 +322,25 @@ const EditorComponent: React.FC<EditorProps> = ({
 		}
 	};
 
+	useEffect(() => {
+		const headerOTMembersElement = document.getElementById(
+			'am-editor-ot-members',
+		);
+		if (!headerOTMembersElement || !props.ot) {
+			return;
+		}
+		ReactDOM.render(
+			<OTComponent members={members} />,
+			headerOTMembersElement,
+		);
+		return () => {
+			ReactDOM.unmountComponentAtNode(headerOTMembersElement);
+		};
+	}, [members, props.ot]);
+
 	return (
 		<Loading loading={loading}>
 			<>
-				{props.ot && <OTComponent members={members} />}
 				{engine.current && (
 					<Toolbar engine={engine.current} items={props.toolbar} />
 				)}

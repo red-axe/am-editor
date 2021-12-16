@@ -96,6 +96,7 @@ const Navbar: FC<INavbarProps> = ({
 				{navSuffix}
 				<LocaleSelect location={location} />
 			</nav>
+			<div id="am-editor-ot-members"></div>
 			{navLast}
 		</div>
 	);

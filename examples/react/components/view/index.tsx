@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import Message from 'antd/es/message';
-import { View, ViewInterface, isServer } from '@aomao/engine';
+import { $, View, ViewInterface, removeUnit } from '@aomao/engine';
 import { plugins, cards } from '../editor/config';
 import Loading from '../loading';
 import Context from '../../context';
@@ -30,6 +30,29 @@ const ViewRender: React.FC<ViewProps> = ({ content, html }) => {
 				lang,
 				plugins: viewPlugins,
 				cards,
+				config: {
+					table: {
+						overflow: {
+							maxLeftWidth: () => {
+								return 0;
+							},
+							maxRightWidth: () => {
+								// 编辑区域位置
+								const wrapper = $('.editor-wrapper-view');
+								const view = $('.am-engine-view');
+								const wRect = wrapper
+									.get<HTMLElement>()
+									?.getBoundingClientRect();
+								const vRect = view
+									.get<HTMLElement>()
+									?.getBoundingClientRect();
+								const width =
+									(wRect?.width || 0) - (vRect?.width || 0);
+								return width <= 0 ? 100 : width;
+							},
+						},
+					},
+				},
 			});
 			view.current.messageSuccess = (msg: string) => {
 				Message.success(msg);
