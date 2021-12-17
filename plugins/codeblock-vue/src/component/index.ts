@@ -130,7 +130,11 @@ class CodeBlcok extends Card<CodeBlockValue> {
 
 	render() {
 		if (!this.codeEditor) return;
-		if (!this.mirror) this.getCenter().append(this.codeEditor.container);
+		if (!this.codeEditor.container.inEditor()) {
+			this.codeEditor.container = $(this.codeEditor.renderTemplate());
+			this.mirror = undefined;
+			this.getCenter().append(this.codeEditor.container);
+		}
 		const value = this.getValue();
 
 		const mode = value?.mode || 'plain';

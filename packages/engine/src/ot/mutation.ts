@@ -23,7 +23,7 @@ class Mutation extends EventEmitter2 implements MutationInterface {
 	private node: NodeInterface;
 	private engine: EngineInterface;
 	private doc?: DocInterface | Doc;
-	private isStopped: boolean;
+	isStopped: boolean;
 	private observer: MutationObserver;
 	private producer: Producer;
 	private isCache: boolean = false;

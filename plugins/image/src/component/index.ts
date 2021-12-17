@@ -248,7 +248,7 @@ class ImageComponent extends Card<ImageValue> {
 	render(loadingBg?: string): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
-		if (!this.image) {
+		if (!this.image || this.image.root.length === 0) {
 			this.image = new Image(this.editor, {
 				root: this.root,
 				container: this.getCenter(),

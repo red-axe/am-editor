@@ -307,7 +307,11 @@ class ChangeRange implements ChangeRangeInterface {
 			}
 		}
 
-		if (startNode.isEditable() && startNode.children().length === 0) {
+		if (
+			startNode.isEditable() &&
+			startNode.children().length === 0 &&
+			!this.engine.ot.isStopped
+		) {
 			startNode.html('<p><br /></p>');
 		}
 		//在非折叠，或者当前range对象和selection中的对象不一致的时候重新设置range

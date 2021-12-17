@@ -207,6 +207,10 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		if (this.mutation) this.mutation.stop();
 	}
 
+	isStopped() {
+		return this.mutation?.isStopped ?? false;
+	}
+
 	startMutationCache() {
 		if (this.mutation) this.mutation.startCache();
 	}

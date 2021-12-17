@@ -49,7 +49,10 @@ class Consumer implements ConsumerInterface {
 		) {
 			const { card } = this.engine;
 			const cardComponent = card.find(node);
-			if (cardComponent) card.renderComponent(cardComponent);
+			if (cardComponent) {
+				cardComponent.getCenter().empty();
+				card.renderComponent(cardComponent);
+			}
 		}
 		const childNode = Array.from(node.childNodes).filter((node) => {
 			const childNode = $(node);

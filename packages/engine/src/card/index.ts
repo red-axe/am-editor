@@ -32,6 +32,7 @@ import { Backspace, Enter, Left, Right, Up, Down, Default } from './typing';
 import { $ } from '../node';
 import { isNode, isNodeEntry } from '../node/utils';
 import { CardActiveTrigger, CardType } from './enum';
+import { updateIndex } from '../ot/utils';
 import './index.css';
 
 class CardModel implements CardModelInterface {
@@ -104,34 +105,37 @@ class CardModel implements CardModelInterface {
 			this.classes[card.cardName] = card;
 		});
 
-		window.addEventListener('resize', this.renderAsnycComponents);
-		this.editor.scrollNode?.on('scroll', this.renderAsnycComponents);
-		window.addEventListener('scroll', this.renderAsnycComponents);
+		window.addEventListener('resize', this.renderAsyncComponents);
+		this.editor.scrollNode
+			?.get<HTMLElement>()
+			?.addEventListener('scroll', this.renderAsyncComponents);
+		window.addEventListener('scroll', this.renderAsyncComponents);
 	}
 
-	renderAsnycComponents = () => {
+	renderAsyncComponents = async () => {
 		if (this.renderTimeout) clearTimeout(this.renderTimeout);
 		this.renderTimeout = setTimeout(() => {
 			const components = this.asyncComponents.concat();
-			components.forEach((card) => {
+			components.forEach(async (card) => {
 				// 在视图内才渲染卡片
 				if (
 					card.root.length === 0 ||
 					this.editor.root.inViewport(card.root, true)
 				) {
-					if (card.root.length > 0 && card.loading) {
-						card.getCenter().empty();
-						this.renderComponent(card);
-					}
 					this.asyncComponents.splice(
 						this.asyncComponents.findIndex(
 							(component) => component === card,
 						),
 						1,
 					);
+					if (card.root.length > 0 && card.loading) {
+						if (card.destroy) card.destroy();
+						card.getCenter().empty();
+						this.renderComponent(card);
+					}
 				}
 			});
-		}, 100);
+		}, 50);
 	};
 
 	add(clazz: CardEntry) {
@@ -483,7 +487,7 @@ class CardModel implements CardModelInterface {
 		const parent = card.root.parent();
 		this.removeNode(card);
 		list.addBr(range.startNode);
-		if (parent && node.isEmpty(parent)) {
+		if (parent && node.isEmpty(parent) && !this.editor.ot.isStopped) {
 			if (parent.isEditable()) {
 				node.html(parent, '<p><br /></p>');
 				range.select(parent, true);
@@ -511,7 +515,7 @@ class CardModel implements CardModelInterface {
 
 		const parent = card.root.parent();
 		this.removeNode(card);
-		if (parent && node.isEmpty(parent)) {
+		if (parent && node.isEmpty(parent) && !this.editor.ot.isStopped) {
 			if (parent.isEditable()) {
 				node.html(parent, '<p><br /></p>');
 			} else {
@@ -645,6 +649,12 @@ class CardModel implements CardModelInterface {
 		const asyncRenderCards: Array<CardInterface> = [];
 		cards.each((node) => {
 			const cardNode = $(node);
+			cardNode.find(`${CARD_SELECTOR},${READY_CARD_SELECTOR}`).remove();
+			cardNode.empty();
+		});
+		cards.each((node) => {
+			const cardNode = $(node);
+			if (cardNode.length === 0 || !cardNode[0].parentNode) return;
 			const readyKey = cardNode.attributes(READY_CARD_KEY);
 			const key = cardNode.attributes(CARD_KEY);
 			const name = readyKey || key;
@@ -680,7 +690,10 @@ class CardModel implements CardModelInterface {
 						);
 					}
 				});
-				if (readyKey) cardNode.replaceWith(card.root);
+				if (readyKey) {
+					cardNode.replaceWith(card.root);
+					cardNode.remove();
+				}
 				this.components.push(card);
 
 				// 重新渲染
@@ -691,7 +704,7 @@ class CardModel implements CardModelInterface {
 				}
 			}
 		});
-
+		let isTriggerRenderAsync = false;
 		asyncRenderCards.forEach((card) => {
 			if (lazyRender && (card.constructor as CardEntry).lazyRender) {
 				if (card.beforeRender) {
@@ -703,16 +716,16 @@ class CardModel implements CardModelInterface {
 						);
 					}
 				}
-				if (!this.asyncComponents.includes(card))
-					this.asyncComponents.push(card);
+				isTriggerRenderAsync = true;
+				this.asyncComponents.push(card);
 			} else {
 				this.renderComponent(card);
 			}
 		});
 		if (callback) callback(asyncRenderCards.length);
-		if (this.asyncComponents.length > 0) {
+		if (isTriggerRenderAsync) {
 			// 触发当前在视图内的卡片渲染
-			this.renderAsnycComponents();
+			this.renderAsyncComponents();
 		}
 	}
 
@@ -737,6 +750,7 @@ class CardModel implements CardModelInterface {
 			this.render(center);
 		}
 		card.didRender();
+		updateIndex(card.root);
 	}
 
 	removeComponent(card: CardInterface): void {
@@ -765,9 +779,11 @@ class CardModel implements CardModelInterface {
 
 	destroy() {
 		this.gc();
-		window.removeEventListener('resize', this.renderAsnycComponents);
-		this.editor.scrollNode?.off('scroll', this.renderAsnycComponents);
-		window.removeEventListener('scroll', this.renderAsnycComponents);
+		window.removeEventListener('resize', this.renderAsyncComponents);
+		this.editor.scrollNode
+			?.get<HTMLElement>()
+			?.removeEventListener('scroll', this.renderAsyncComponents);
+		window.removeEventListener('scroll', this.renderAsyncComponents);
 	}
 
 	// 焦点移动到上一个 Block

@@ -633,7 +633,11 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		Template.isReadonly = !isEngine(this.editor) || this.editor.readonly;
 		const value = this.getValue();
 		// 重新渲染
-		if (this.wrapper) {
+		if (
+			this.wrapper &&
+			this.wrapper.length > 0 &&
+			!!this.wrapper[0].parentNode
+		) {
 			// 重新绘制列头部和行头部
 			const colsHeader = this.wrapper.find(Template.COLS_HEADER_CLASS);
 			if (value?.cols) {

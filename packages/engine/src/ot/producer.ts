@@ -554,33 +554,34 @@ class Producer extends EventEmitter2 {
 					isTransient = tMapValue;
 				}
 				// 标记节点为已处理
-				const { addedNodes } = record;
-				addedNodes.forEach((addNode) => {
+				record.addedNodes.forEach((addNode) => {
 					addNode['__card_rendered'] = true;
 				});
 				// 需要比对异步加载的卡片子节点(body -> center -> 非 ui 和 data-transient-element节点)是否已经处理完，处理完就移除掉卡片根节点的 CARD_LOADING_KEY 标记
 				// card.root.removeAttributes(CARD_LOADING_KEY);
 				// 判断卡片下面的节点
-				const isRendered = cardElement.isEditableCard()
-					? cardElement
-							.find(CARD_CENTER_SELECTOR)
-							.children()
-							.toArray()
-							.every((child) => {
-								if (child.length === 0) return true;
-								const attributes = child.attributes();
-								if (
-									attributes[DATA_ELEMENT] === UI ||
-									!!attributes[DATA_TRANSIENT_ELEMENT]
-								) {
-									return true;
-								}
-								if (child[0]['__card_rendered'] === true) {
-									return true;
-								}
-								return false;
-							})
-					: true;
+				const children = cardElement
+					.find(CARD_CENTER_SELECTOR)
+					.children()
+					.toArray();
+
+				const isRendered =
+					children.length > 0 &&
+					children.every((child) => {
+						if (child.length === 0) return true;
+						const attributes = child.attributes();
+						if (
+							(attributes[DATA_ELEMENT] === UI ||
+								!!attributes[DATA_TRANSIENT_ELEMENT]) &&
+							!child.hasClass(CARD_LOADING_KEY)
+						) {
+							return true;
+						}
+						if (child[0]['__card_rendered'] === true) {
+							return true;
+						}
+						return false;
+					});
 				if (isRendered) {
 					const handleEditableCard = (
 						editableCard: NodeInterface,
@@ -591,15 +592,9 @@ class Producer extends EventEmitter2 {
 							.every((childCard) => {
 								const childLoading =
 									childCard.attributes(CARD_LOADING_KEY);
-								if (!childLoading) {
-									return true;
-								}
-								// 如果子卡片是懒加载的，则算已加载完成
-								const cardComponent =
-									this.engine.card.find(childCard);
 								if (
-									(cardComponent?.constructor as CardEntry)
-										.lazyRender
+									!childLoading ||
+									childCard[0]['__card_rendered']
 								) {
 									return true;
 								}

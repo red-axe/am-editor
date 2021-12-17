@@ -272,6 +272,10 @@ export type RepairOp = TargetOp & {
 
 export interface MutationInterface extends EventEmitter2 {
 	/**
+	 * 是否终止中
+	 */
+	isStopped: boolean;
+	/**
 	 * 设置文档对象 OT 文档对象，或自定义文档对象
 	 * @param doc 文档对象
 	 */
@@ -471,6 +475,10 @@ export interface OTInterface extends EventEmitter2 {
 	 * 停止监听DOM树改变
 	 */
 	stopMutation(): void;
+	/**
+	 * 是否终止中
+	 */
+	isStopped(): boolean;
 	/**
 	 * 开始缓存操作，开启后将拦截监听并缓存起来
 	 */

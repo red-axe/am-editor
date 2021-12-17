@@ -241,7 +241,7 @@ export default class FileCard extends Card<FileValue> {
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
-		if (!this.container) {
+		if (!this.container || this.container.length === 0) {
 			this.container = $(this.renderTemplate(value));
 			this.getCenter().empty().append(this.container);
 		} else {

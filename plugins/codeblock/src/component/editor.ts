@@ -144,7 +144,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 
 	update(mode: string, code?: string) {
 		this.mode = mode;
-		if (code) {
+		if (code !== undefined) {
 			this.codeMirror?.setValue(code);
 		}
 		this.codeMirror?.setOption('mode', this.getSyntax(mode));
@@ -152,7 +152,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			'readOnly',
 			!isEngine(this.editor) || this.editor.readonly ? true : false,
 		);
-		if (!code) this.save();
+		if (code !== undefined) this.save();
 	}
 
 	render(mode: string, value: string) {
