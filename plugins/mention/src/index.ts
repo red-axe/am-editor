@@ -160,11 +160,6 @@ class MentionPlugin extends Plugin<Options> {
 		if (!isEngine(this.editor)) return;
 		const { change } = this.editor;
 		let range = change.range.get();
-		const block = this.editor.block.closest(range.startNode);
-		const text = block.text().trim();
-		if (text === '@' && isSafari) {
-			block.empty();
-		}
 
 		// 空格触发
 		if (this.options.spaceTrigger) {
@@ -181,9 +176,8 @@ class MentionPlugin extends Plugin<Options> {
 			}
 		}
 
-		event.preventDefault(); // 插入 @，并弹出选择器
-
-		range = change.range.get();
+		event.preventDefault();
+		// 插入 @，并弹出选择器
 		if (range.collapsed) {
 			event.preventDefault();
 			const card = this.editor.card.insert(MentionComponent.cardName);
@@ -196,6 +190,7 @@ class MentionPlugin extends Plugin<Options> {
 			range.collapse(false);
 			change.range.select(range);
 		}
+		return false;
 	}
 
 	getList() {

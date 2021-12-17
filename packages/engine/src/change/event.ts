@@ -101,6 +101,14 @@ class ChangeEvent implements ChangeEventInterface {
 		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
 		this.onContainer('beforeinput', (event: InputEvent) => {
 			if (this.engine.readonly) return;
+			// safari 组合输入法会直接输入字符
+			if (isSafari && event.data === '@') {
+				const result = this.engine.trigger('keydown:at', event);
+				if (result === false) {
+					event.preventDefault();
+					return;
+				}
+			}
 			const { change, card, node, block, list } = this.engine;
 			if (!change.rangePathBeforeCommand)
 				change.cacheRangeBeforeCommand();
