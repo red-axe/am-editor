@@ -156,6 +156,7 @@ class Mention extends Card<MentionValue> {
 				card.removeNode(this);
 				this.editor.trigger('mention:insert', component);
 				if (Mention.onInsert) Mention.onInsert(component);
+				card.focus(component, false);
 			},
 		});
 	}
