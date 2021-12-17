@@ -1,9 +1,9 @@
 import { EventEmitter2 } from 'eventemitter2';
-import domAlign from 'dom-align';
+import { throttle } from 'lodash-es';
 import { DATA_ELEMENT, UI } from '../constants';
 import { NodeInterface } from '../types';
 import { $ } from '../node';
-import { isFirefox, isMobile, removeUnit } from '../utils';
+import { isFirefox, isIos, isMacos, isMobile, removeUnit } from '../utils';
 import { isNode } from '../node/utils';
 import './index.css';
 
@@ -157,9 +157,10 @@ class Scrollbar extends EventEmitter2 {
 			if (this.x) {
 				this.slideX?.css('width', this.xWidth + 'px');
 				const display =
-					this.oWidth === this.sWidth ||
+					this.oWidth - sPLeft - sPRight === this.sWidth ||
 					(contentElement &&
-						contentElement.offsetWidth <= this.oWidth)
+						contentElement.offsetWidth <=
+							this.oWidth - sPLeft - sPRight)
 						? 'none'
 						: 'block';
 				this.slideX?.css('display', display);
@@ -170,9 +171,10 @@ class Scrollbar extends EventEmitter2 {
 			if (this.y) {
 				this.slideY?.css('height', this.yHeight + 'px');
 				const display =
-					this.oHeight === this.sHeight ||
+					this.oHeight - sPTop - sPBottom === this.sHeight ||
 					(contentElement &&
-						contentElement.offsetHeight <= this.oHeight)
+						contentElement.offsetHeight <=
+							this.oHeight - sPTop - sPBottom)
 						? 'none'
 						: 'block';
 				this.slideY?.css('display', display);
@@ -264,60 +266,93 @@ class Scrollbar extends EventEmitter2 {
 		this.reRenderX(left);
 		this.reRenderY(top);
 	};
+	wheelXScroll = throttle(
+		(event: any) => {
+			event.preventDefault();
+			const dir =
+				(isMacos
+					? event.wheelDeltaX
+					: event.wheelDelta / 120 || -event.detail) > 0
+					? 'up'
+					: 'down';
+			const containerElement = this.container.get<HTMLElement>();
+			if (!containerElement) return;
+			const containerWidth = this.#scroll?.getOffsetWidth
+				? this.#scroll.getOffsetWidth(containerElement.offsetWidth)
+				: containerElement.offsetWidth;
+			const step = Math.max(
+				containerWidth /
+					(isMacos ? 20 - Math.abs(event.wheelDelta) : 8),
+				20,
+			);
 
-	wheelXScroll = (event: any) => {
-		event.preventDefault();
-		const wheelValue = event.wheelDelta / 120 || -event.detail;
-		const dir = wheelValue > 0 ? 'up' : 'down';
-		const containerElement = this.container.get<HTMLElement>();
-		if (!containerElement) return;
-		const containerWidth = this.#scroll?.getOffsetWidth
-			? this.#scroll.getOffsetWidth(containerElement.offsetWidth)
-			: containerElement.offsetWidth;
-		const step = Math.max(containerWidth / 8, 20);
-		let left =
-			(this.#scroll?.getScrollLeft
-				? this.#scroll.getScrollLeft(containerElement.scrollLeft)
-				: containerElement.scrollLeft) + (dir === 'up' ? -step : step);
-		left =
-			dir === 'up'
-				? Math.max(0, left)
-				: Math.min(left, this.sWidth - this.oWidth);
-		if (this.#scroll) {
-			const { onScrollX } = this.#scroll;
-			if (onScrollX) {
-				const result = onScrollX(left);
-				if (result > 0) containerElement.scrollLeft = result;
-				else containerElement.scrollLeft = 0;
+			let left =
+				(this.#scroll?.getScrollLeft
+					? this.#scroll.getScrollLeft(containerElement.scrollLeft)
+					: containerElement.scrollLeft) +
+				(dir === 'up' ? -step : step);
+
+			left =
+				dir === 'up'
+					? Math.max(0, left)
+					: Math.min(left, this.sWidth - this.oWidth);
+			if (this.#scroll) {
+				const { onScrollX } = this.#scroll;
+				if (onScrollX) {
+					const result = onScrollX(left);
+					if (result > 0) containerElement.scrollLeft = result;
+					else containerElement.scrollLeft = 0;
+				}
+				this.scroll({ left });
+			} else {
+				containerElement.scrollLeft = left;
 			}
-			this.scroll({ left });
-		} else {
-			containerElement.scrollLeft = left;
-		}
-	};
+		},
+		100,
+		{ trailing: true },
+	);
 
-	wheelYScroll = (event: any) => {
-		event.preventDefault();
-		const wheelValue = event.wheelDelta / 120 || -event.detail;
-		const dir = wheelValue > 0 ? 'up' : 'down';
-		const containerElement = this.container.get<HTMLElement>();
-		if (!containerElement) return;
-		const containerHeight = containerElement.offsetHeight;
-		const step = Math.max(containerHeight / 8, 20);
-		let top = containerElement.scrollTop + (dir === 'up' ? -step : step);
-		top =
-			dir === 'up'
-				? Math.max(0, top)
-				: Math.min(top, this.sHeight - this.oHeight);
-		containerElement.scrollTop = top;
-	};
+	wheelYScroll = throttle(
+		(event: any) => {
+			event.preventDefault();
+			const dir =
+				(isMacos
+					? event.wheelDeltaX
+					: event.wheelDelta / 120 || -event.detail) > 0
+					? 'up'
+					: 'down';
+			const containerElement = this.container.get<HTMLElement>();
+			if (!containerElement) return;
+			const containerHeight = containerElement.offsetHeight;
+			const step = Math.max(
+				containerHeight /
+					(isMacos ? 20 - Math.abs(event.wheelDelta) : 8),
+				20,
+			);
+			let top =
+				containerElement.scrollTop + (dir === 'up' ? -step : step);
+			top =
+				dir === 'up'
+					? Math.max(0, top)
+					: Math.min(top, this.sHeight - this.oHeight);
+			containerElement.scrollTop = top;
+		},
+		100,
+		{ trailing: true },
+	);
 
 	bindWheelScroll = (event: any) => {
 		if (!this.#enableScroll) return;
-		if (this.x && !this.y) {
-			if (this.slideX && this.slideX.css('display') !== 'none')
+		// 滚轮x和y一致并且x的绝对值要大于y的绝对值才做横向滚动
+		let isX =
+			this.x &&
+			event.wheelDeltaX !== event.wheelDeltaY &&
+			Math.abs(event.wheelDeltaX) > Math.abs(event.wheelDeltaY);
+		if (isX) {
+			if (this.slideX && this.slideX.css('display') !== 'none') {
 				this.wheelXScroll(event);
-		} else if (this.y) {
+			}
+		} else if (this.y && event.wheelDeltaY !== 0) {
 			if (this.slideY && this.slideY.css('display') !== 'none')
 				this.wheelYScroll(event);
 		}

@@ -569,7 +569,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 					this.wrapper?.removeClass('scrollbar-show');
 				}
 			});
-			this.scrollbar.disableScroll();
+			//this.scrollbar.disableScroll();
 			const handleScrollbarChange = () => {
 				if (tableOptions['maxRightWidth'])
 					this.overflow(tableOptions['maxRightWidth']());

@@ -32,7 +32,7 @@ class Button {
 		const rootRect = root.get<HTMLElement>()!.getBoundingClientRect();
 		const top = rangeRect.y - rootRect.y;
 		this.#container.css('top', `${top}px`);
-		this.#container.css('right', `-16px`);
+		this.#container.css('right', `-24px`);
 		this.#container.show('flex');
 	}
 
