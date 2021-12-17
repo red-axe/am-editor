@@ -170,6 +170,63 @@ class Parser implements ParserInterface {
 			});
 			return;
 		}
+		// 过滤分割
+		const filter = (node: NodeInterface, type: string = 'mark') => {
+			//获取节点属性样式
+			const attributes = node.attributes();
+			const style = getStyleMap(attributes.style || '');
+			delete attributes.style;
+			if (
+				Object.keys(attributes).length === 0 &&
+				Object.keys(style).length === 0
+			)
+				return;
+			//过滤不符合当前节点规则的属性样式
+			schema.filter(node, attributes, style);
+			//复制一个节点
+			const newNode = node.clone();
+			//移除 data-id，以免在下次判断类型的时候使用缓存
+			newNode.removeAttributes(DATA_ID);
+			//移除符合当前节点的属性样式，剩余的属性样式组成新的节点
+			const attrKeys = Object.keys(attributes);
+			let filterAttrCount = 0;
+			attrKeys.forEach((name) => {
+				if (attributes[name]) {
+					filterAttrCount++;
+					newNode.removeAttributes(name);
+				}
+			});
+			let filterStyleCount = 0;
+			const styleKeys = Object.keys(style);
+			styleKeys.forEach((name) => {
+				if (style[name]) {
+					filterStyleCount++;
+					newNode.css(name, '');
+				}
+			});
+			// 如果这个节点过滤掉所有属性样式后还是一个有效的节点就替换掉当前节点
+			if (
+				filterAttrCount === attrKeys.length &&
+				filterStyleCount === styleKeys.length &&
+				schema.getType(newNode) === type
+			) {
+				node.before(newNode);
+				const children = node.children();
+				newNode.append(
+					children.length > 0
+						? children
+						: type === 'block'
+						? '<br />'
+						: $('\u200b', null),
+				);
+				node.remove();
+				node = newNode;
+				return;
+			}
+			if (newNode.attributes('style').trim() === '')
+				newNode.removeAttributes('style');
+			return newNode;
+		};
 		root.traverse((node) => {
 			if (
 				node.equal(root) ||
@@ -187,61 +244,6 @@ class Parser implements ParserInterface {
 					}
 				}
 				if (isCard) return;
-				//分割
-				const filter = (node: NodeInterface) => {
-					//获取节点属性样式
-					const attributes = node.attributes();
-					const style = getStyleMap(attributes.style || '');
-					delete attributes.style;
-					if (
-						Object.keys(attributes).length === 0 &&
-						Object.keys(style).length === 0
-					)
-						return;
-					//过滤不符合当前节点规则的属性样式
-					schema.filter(node, attributes, style);
-					//复制一个节点
-					const newNode = node.clone();
-					//移除 data-id，以免在下次判断类型的时候使用缓存
-					newNode.removeAttributes(DATA_ID);
-					//移除符合当前节点的属性样式，剩余的属性样式组成新的节点
-					const attrKeys = Object.keys(attributes);
-					let filterAttrCount = 0;
-					attrKeys.forEach((name) => {
-						if (attributes[name]) {
-							filterAttrCount++;
-							newNode.removeAttributes(name);
-						}
-					});
-					let filterStyleCount = 0;
-					const styleKeys = Object.keys(style);
-					styleKeys.forEach((name) => {
-						if (style[name]) {
-							filterStyleCount++;
-							newNode.css(name, '');
-						}
-					});
-					// 如果这个节点过滤掉所有属性样式后还是一个有效的节点就替换掉当前节点
-					if (
-						filterAttrCount === attrKeys.length &&
-						filterStyleCount === styleKeys.length &&
-						schema.getType(newNode) === 'mark'
-					) {
-						node.before(newNode);
-						const children = node.children();
-						newNode.append(
-							children.length > 0 ? children : $('\u200b', null),
-						);
-						node.remove();
-						node = newNode;
-						return;
-					}
-					if (newNode.attributes('style').trim() === '')
-						newNode.removeAttributes('style');
-					return newNode;
-				};
-				//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
-				inlineApi.flat(node, schema);
 				//当前节点是 mark 节点
 				if (nodeApi.isMark(node, schema)) {
 					//过滤掉当前mark节点属性样式并使用剩下的属性样式组成新的节点
@@ -285,6 +287,9 @@ class Parser implements ParserInterface {
 							oldRules.push(rule);
 						}
 					}
+				} else if (nodeApi.isInline(node)) {
+					//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
+					inlineApi.flat(node, schema);
 				}
 			}
 		});

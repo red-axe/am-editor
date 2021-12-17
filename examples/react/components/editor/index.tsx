@@ -333,9 +333,6 @@ const EditorComponent: React.FC<EditorProps> = ({
 			<OTComponent members={members} />,
 			headerOTMembersElement,
 		);
-		return () => {
-			ReactDOM.unmountComponentAtNode(headerOTMembersElement);
-		};
 	}, [members, props.ot]);
 
 	return (

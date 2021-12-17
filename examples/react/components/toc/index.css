@@ -1,7 +1,7 @@
 .data-toc-wrapper {
     position: absolute;
     top: 20px;
-    min-width: 210px;
+    max-width: 210px;
     padding: 0 16px;
 }
 

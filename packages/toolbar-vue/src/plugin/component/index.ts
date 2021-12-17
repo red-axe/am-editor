@@ -23,6 +23,7 @@ class ToolbarComponent extends Card<{ data: Data }> {
 	private placeholder?: NodeInterface;
 	private component?: CollapseComponentInterface;
 	#collapseData?: Data;
+	#data?: any;
 
 	static get cardName() {
 		return 'toolbar';
@@ -55,6 +56,10 @@ class ToolbarComponent extends Card<{ data: Data }> {
 		});
 	}
 
+	setData(_data: any) {
+		this.#data = _data;
+	}
+
 	getData(): Data {
 		if (!isEngine(this.editor)) {
 			return [];
@@ -74,32 +79,32 @@ class ToolbarComponent extends Card<{ data: Data }> {
 			collapseItems.push(...group.items);
 		});
 		const value = this.getValue();
-		if (!value || !value.data) return [];
-
-		value.data.forEach((group: any) => {
-			const title = group.title;
-			const items: Array<Omit<CollapseItemProps, 'engine'>> = [];
-			group.items.forEach((item: any) => {
-				let name = item;
-				if (typeof item !== 'string') name = item.name;
-				const collapseItem = collapseItems.find(
-					(item) => item.name === name,
-				);
-				if (collapseItem) {
-					items.push({
-						...collapseItem,
-						...(typeof item !== 'string' ? item : {}),
-						disabled: collapseItem.onDisabled
-							? collapseItem.onDisabled()
-							: !this.editor.command.queryEnabled(name),
-					});
-				}
-			});
-			data.push({
-				title,
-				items,
-			});
-		});
+		(this.#data || (value ? value.data : []) || []).forEach(
+			(group: any) => {
+				const title = group.title;
+				const items: Array<Omit<CollapseItemProps, 'engine'>> = [];
+				group.items.forEach((item: any) => {
+					let name = item;
+					if (typeof item !== 'string') name = item.name;
+					const collapseItem = collapseItems.find(
+						(item) => item.name === name,
+					);
+					if (collapseItem) {
+						items.push({
+							...collapseItem,
+							...(typeof item !== 'string' ? item : {}),
+							disabled: collapseItem.onDisabled
+								? collapseItem.onDisabled()
+								: !this.editor.command.queryEnabled(name),
+						});
+					}
+				});
+				data.push({
+					title,
+					items,
+				});
+			},
+		);
 		return data;
 	}
 
@@ -203,7 +208,8 @@ class ToolbarComponent extends Card<{ data: Data }> {
 		else this.placeholder?.hide();
 	}
 
-	render(): string | void | NodeInterface {
+	render(data?: any): string | void | NodeInterface {
+		this.setData(data);
 		const editor = this.editor;
 		if (!isEngine(editor) || isServer) return;
 		const language = editor.language.get<{ placeholder: string }>(

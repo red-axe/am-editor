@@ -42,6 +42,15 @@ class Consumer implements ConsumerInterface {
 				endOffset: index,
 			};
 		const offset = index - JSON0_INDEX.ELEMENT;
+		// 正在加载中的节点，直接渲染
+		if (
+			node.nodeType === Node.ELEMENT_NODE &&
+			(node as HTMLElement).hasAttribute(CARD_LOADING_KEY)
+		) {
+			const { card } = this.engine;
+			const cardComponent = card.find(node);
+			if (cardComponent) card.renderComponent(cardComponent);
+		}
 		const childNode = Array.from(node.childNodes).filter((node) => {
 			const childNode = $(node);
 			return !isTransientElement(childNode);
@@ -51,7 +60,7 @@ class Consumer implements ConsumerInterface {
 			1 === path.length ||
 			pathOffset === JSON0_INDEX.TAG_NAME ||
 			pathOffset === JSON0_INDEX.ATTRIBUTE ||
-			childNode.nodeType === Node.TEXT_NODE
+			(childNode && childNode.nodeType === Node.TEXT_NODE)
 		) {
 			return {
 				startNode: childNode,

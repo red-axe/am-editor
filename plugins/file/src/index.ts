@@ -165,13 +165,15 @@ export default class extends Plugin {
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
 			if (value?.url && value.status === 'done') {
-				const html = `<a data-type="${
+				const html = `<span data-type="${
 					FileComponent.cardName
-				}" data-value="${encodeCardValue(value)}" href="${
+				}" data-value="${encodeCardValue(
+					value,
+				)}"><a target="_blank" href="${
 					value.url
 				}" style="word-wrap: break-word;color: #096DD9;touch-action: manipulation;background-color: rgba(0,0,0,0);text-decoration: none;outline: none;cursor: pointer;transition: color .3s;"><span style="font-size: 14px;">\ud83d\udcce</span>${
 					value.name
-				}</a>`;
+				}</a></span>`;
 				node.empty();
 				node.replaceWith($(html));
 			} else node.remove();

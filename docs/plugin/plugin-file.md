@@ -124,11 +124,14 @@ Download address: response.download || response.data && response.data.download T
 /**
  * Parse the uploaded Respone and return result: whether it is successful or not, data: success: file address, failure: error message
  */
-parse?: (
-    response: any,
-) => {
-    result: boolean;
-    data: string;
+parse?: (response: any) => {
+  result: boolean;
+  data: {
+          url: string;
+          preview?: string;
+          download?: string;
+          status?: string;
+      } | string;
 };
 ```
 

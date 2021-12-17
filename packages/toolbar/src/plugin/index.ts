@@ -1,3 +1,4 @@
+import React from 'react';
 import {
 	DATA_TRANSIENT_ELEMENT,
 	EditorInterface,
@@ -86,10 +87,10 @@ class ToolbarPlugin extends Plugin<Options> {
 				const data = this.options.config || defaultConfig(this.editor);
 				const card = this.editor.card.insert(
 					ToolbarComponent.cardName,
-					{
-						data,
-					},
-				);
+					{},
+					data,
+				) as ToolbarComponent;
+				card.setData(data);
 				card.root.attributes(DATA_TRANSIENT_ELEMENT, 'true');
 				this.editor.card.activate(card.root);
 				range = change.range.get();

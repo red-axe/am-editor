@@ -196,7 +196,7 @@ class Scrollbar extends EventEmitter2 {
 					left = getScrollLeft
 						? getScrollLeft(-0) + element.scrollLeft - left
 						: element.scrollLeft - left;
-
+					if (left < 0) left = 0;
 					if (onScrollX) {
 						const result = onScrollX(left);
 						if (result > 0) element.scrollLeft = result;

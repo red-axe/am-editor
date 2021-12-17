@@ -537,7 +537,9 @@ class NativeEvent {
 		) => void,
 	) {
 		const { change } = this.engine;
-		const fragment = new Paste(source, this.engine).normalize();
+		const fragment = new Paste(source, this.engine).normalize(
+			insert === undefined,
+		);
 		this.engine.trigger('paste:before', fragment);
 		if (insert) insert(fragment, range, undefined, followActiveMark);
 		else

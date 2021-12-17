@@ -96,7 +96,6 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 			</div>
 		);
 	};
-
 	return prompt ? (
 		<Popover
 			placement={placement || 'right'}

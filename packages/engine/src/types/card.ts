@@ -313,6 +313,7 @@ export interface CardInterface {
 	beforeRender?(): void;
 	/**
 	 * 渲染卡片
+	 * @param args 渲染自定义参数
 	 */
 	render(...args: any): NodeInterface | string | void;
 	/**
@@ -540,6 +541,12 @@ export interface CardModelInterface {
 		callback?: (count: number) => void,
 		lazyRender?: boolean,
 	): void;
+	/**
+	 * 渲染单个卡片
+	 * @param card 卡片实例
+	 * @param args 渲染自定义参数
+	 */
+	renderComponent(card: CardInterface, ...args: any): void;
 	/**
 	 * 重新渲染卡片
 	 * @param cards 卡片集合

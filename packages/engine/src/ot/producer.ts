@@ -14,7 +14,7 @@ import {
 	updateIndex,
 	opsSort,
 } from './utils';
-import { escapeDots, escape } from '../utils/string';
+import { escapeDots, escape, decodeCardValue } from '../utils/string';
 import { toJSON0, getValue } from './utils';
 import { EngineInterface } from '../types/engine';
 import { Op, Path, StringInsertOp, StringDeleteOp, Doc } from 'sharedb';
@@ -22,15 +22,20 @@ import { NodeInterface } from '../types/node';
 import { DocInterface, RepairOp } from '../types/ot';
 import { $ } from '../node';
 import {
-	CARD_ELEMENT_KEY,
+	CARD_CENTER_SELECTOR,
 	CARD_KEY,
 	CARD_LOADING_KEY,
+	CARD_SELECTOR,
+	CARD_VALUE_KEY,
+	DATA_ELEMENT,
 	DATA_ID,
+	DATA_TRANSIENT_ELEMENT,
 	JSON0_INDEX,
+	UI,
 	UI_SELECTOR,
 } from '../constants';
 import { getDocument } from '../utils/node';
-import { CardValue } from 'src';
+import type { CardEntry } from '../types/card';
 
 class Producer extends EventEmitter2 {
 	private engine: EngineInterface;
@@ -519,18 +524,24 @@ class Producer extends EventEmitter2 {
 				const tMapValue = cardMap.get(cardElement[0]);
 				if (tMapValue === undefined && cardElement.isEditableCard()) {
 					const cardName = cardElement.attributes(CARD_KEY);
+					const cardValue = decodeCardValue(
+						cardElement.attributes(CARD_VALUE_KEY),
+					);
 					const result = this.findCardForDoc(
 						this.doc.data,
 						cardName,
 						(attriables) => {
-							return (
-								attriables[DATA_ID] ===
-								cardElement.attributes(DATA_ID)
+							// 卡片id一致
+							const value = decodeCardValue(
+								attriables[CARD_VALUE_KEY],
 							);
+							return value.id === cardValue.id;
 						},
 					);
+					// 没有这个卡片节点，或者卡片内部已经渲染了才需要过滤
 					if (
-						!result?.rendered &&
+						result &&
+						!result.rendered &&
 						cardElement.attributes(CARD_LOADING_KEY) !== 'remote'
 					) {
 						isTransient = false;
@@ -541,6 +552,83 @@ class Producer extends EventEmitter2 {
 					cardMap.set(cardElement[0], isTransient);
 				} else if (tMapValue !== undefined) {
 					isTransient = tMapValue;
+				}
+				// 标记节点为已处理
+				const { addedNodes } = record;
+				addedNodes.forEach((addNode) => {
+					addNode['__card_rendered'] = true;
+				});
+				// 需要比对异步加载的卡片子节点(body -> center -> 非 ui 和 data-transient-element节点)是否已经处理完，处理完就移除掉卡片根节点的 CARD_LOADING_KEY 标记
+				// card.root.removeAttributes(CARD_LOADING_KEY);
+				// 判断卡片下面的节点
+				const isRendered = cardElement.isEditableCard()
+					? cardElement
+							.find(CARD_CENTER_SELECTOR)
+							.children()
+							.toArray()
+							.every((child) => {
+								if (child.length === 0) return true;
+								const attributes = child.attributes();
+								if (
+									attributes[DATA_ELEMENT] === UI ||
+									!!attributes[DATA_TRANSIENT_ELEMENT]
+								) {
+									return true;
+								}
+								if (child[0]['__card_rendered'] === true) {
+									return true;
+								}
+								return false;
+							})
+					: true;
+				if (isRendered) {
+					const handleEditableCard = (
+						editableCard: NodeInterface,
+					) => {
+						const childAllLoaded = editableCard
+							.find(CARD_SELECTOR)
+							.toArray()
+							.every((childCard) => {
+								const childLoading =
+									childCard.attributes(CARD_LOADING_KEY);
+								if (!childLoading) {
+									return true;
+								}
+								// 如果子卡片是懒加载的，则算已加载完成
+								const cardComponent =
+									this.engine.card.find(childCard);
+								if (
+									(cardComponent?.constructor as CardEntry)
+										.lazyRender
+								) {
+									return true;
+								}
+								return false;
+							});
+						if (childAllLoaded) {
+							editableCard.removeAttributes(CARD_LOADING_KEY);
+						}
+					};
+					// 可编辑卡片需要查看子卡片是否都渲染成功
+					if (cardElement.isEditableCard()) {
+						handleEditableCard(cardElement);
+					} else {
+						cardElement.removeAttributes(CARD_LOADING_KEY);
+						// 非可编辑卡片需要判断当前是否在可编辑器卡内，加载成功需要判断父级的可编辑卡片是否都加载成功
+						const cardParentElement = cardElement.parent();
+						if (cardParentElement) {
+							const parentEditableCard = this.engine.card.closest(
+								cardParentElement,
+								true,
+							);
+							if (
+								parentEditableCard &&
+								parentEditableCard.length > 0
+							) {
+								handleEditableCard(parentEditableCard);
+							}
+						}
+					}
 				}
 			}
 			if (
@@ -564,7 +652,6 @@ class Producer extends EventEmitter2 {
 			return !isTransient;
 		});
 		this.clearCache();
-
 		//重置缓存
 		this.cacheTransientElements = undefined;
 		let ops = this.generateOps(records);

@@ -1090,6 +1090,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			top += rect.top - (vRect?.top || 0) - 13;
 			left += rect.left - (vRect?.left || 0);
 		}
+
 		const sLeft =
 			removeUnit(
 				this.table.wrapper?.find('.data-scrollbar')?.css('left') || '0',

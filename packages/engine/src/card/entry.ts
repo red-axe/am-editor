@@ -361,9 +361,6 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	}
 	didRender() {
 		if (this.loading) this.find(`.${CARD_LOADING_KEY}`).remove();
-		setTimeout(() => {
-			this.root.removeAttributes(CARD_LOADING_KEY);
-		}, 100);
 		if (this.resize) {
 			const container =
 				typeof this.resize === 'function'

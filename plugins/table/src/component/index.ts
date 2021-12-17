@@ -636,13 +636,17 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		if (this.wrapper) {
 			// 重新绘制列头部和行头部
 			const colsHeader = this.wrapper.find(Template.COLS_HEADER_CLASS);
-			colsHeader.replaceWith(
-				$(this.template.renderColsHeader(value?.cols || 0)),
-			);
+			if (value?.cols) {
+				colsHeader.replaceWith(
+					$(this.template.renderColsHeader(value?.cols || 0)),
+				);
+			}
 			const rowsHeader = this.wrapper.find(Template.ROWS_HEADER_CLASS);
-			rowsHeader.replaceWith(
-				$(this.template.renderRowsHeader(value?.rows || 0)),
-			);
+			if (value?.rows) {
+				rowsHeader.replaceWith(
+					$(this.template.renderRowsHeader(value?.rows || 0)),
+				);
+			}
 			setTimeout(() => {
 				// 找到所有可编辑节点，对没有 contenteditable 属性的节点添加contenteditable一下
 				this.wrapper?.find(EDITABLE_SELECTOR).each((editableNode) => {

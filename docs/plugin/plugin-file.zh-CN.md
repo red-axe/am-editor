@@ -124,11 +124,14 @@ limitSize?: number;
 /**
  * 解析上传后的Respone，返回 result:是否成功，data:成功：文件地址，失败：错误信息
  */
-parse?: (
-    response: any,
-) => {
+parse?: (response: any) => {
     result: boolean;
-    data: string;
+    data: {
+            url: string;
+            preview?: string;
+            download?: string;
+            status?: string;
+        } | string;
 };
 ```
 

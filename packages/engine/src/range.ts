@@ -913,15 +913,19 @@ Range.fromPath = (
 		? root.find(`[${DATA_ID}="${path.start.id}"]`)
 		: root;
 	const startNode = getNode(
-		path.start.bi > -1 ? startPath.slice(path.start.bi) : startPath,
-		beginContext,
+		path.start.bi > -1 && beginContext.length > 0
+			? startPath.slice(path.start.bi)
+			: startPath,
+		beginContext.length > 0 ? beginContext : undefined,
 	);
 	const endContext = path.end.id
 		? root.find(`[${DATA_ID}="${path.end.id}"]`)
 		: root;
 	const endNode = getNode(
-		path.end.bi > -1 ? endPath.slice(path.end.bi) : endPath,
-		endContext,
+		path.end.bi > -1 && endContext.length > 0
+			? endPath.slice(path.end.bi)
+			: endPath,
+		endContext.length > 0 ? endContext : undefined,
 	);
 	const range = Range.create(editor, document);
 	setRange(

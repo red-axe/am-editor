@@ -320,12 +320,9 @@ class Schema implements SchemaInterface {
 	 * @param rule 规则
 	 */
 	filterStyles(styles: { [k: string]: string }, rule: SchemaRule) {
-		if (!rule.attributes?.style) {
-			styles = {};
-			return;
-		}
 		Object.keys(styles).forEach((styleName) => {
 			if (
+				!rule.attributes?.style ||
 				!this.checkValue(
 					rule.attributes!.style as SchemaAttributes,
 					styleName,
@@ -342,12 +339,9 @@ class Schema implements SchemaInterface {
 	 * @param rule 规则
 	 */
 	filterAttributes(attributes: { [k: string]: string }, rule: SchemaRule) {
-		if (!rule.attributes) {
-			attributes = {};
-			return;
-		}
 		Object.keys(attributes).forEach((attributesName) => {
 			if (
+				!rule.attributes ||
 				!this.checkValue(
 					rule.attributes as SchemaAttributes,
 					attributesName,

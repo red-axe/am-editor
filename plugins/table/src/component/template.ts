@@ -190,9 +190,9 @@ class Template implements TemplateInterface {
 				noBorder === true ? " data-table-no-border='true'" : ''
 			} ${DATA_TRANSIENT_ATTRIBUTES}="class">${colgroup}${trs}</table>`;
 
-		return `<div class="${TABLE_WRAPPER_CLASS_NAME} ${
+		return `<div ${DATA_TRANSIENT_ATTRIBUTES}="*" class="${TABLE_WRAPPER_CLASS_NAME} ${
 			overflow !== false ? TABLE_OVERFLOW_CLASS_NAME : ''
-		}" ${DATA_TRANSIENT_ATTRIBUTES}="*">${tableHeader}<div class="${VIEWPORT}">${this.renderColsHeader(
+		}" ${DATA_TRANSIENT_ATTRIBUTES}="*">${tableHeader}<div ${DATA_TRANSIENT_ATTRIBUTES}="*" class="${VIEWPORT}">${this.renderColsHeader(
 			cols,
 		)}${table}${placeholder}${tableHighlight}</div>${this.renderRowsHeader(
 			rows,

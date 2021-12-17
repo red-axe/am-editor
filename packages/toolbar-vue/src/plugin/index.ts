@@ -84,10 +84,10 @@ class ToolbarPlugin extends Plugin<Options> {
 				const data = this.options.config || defaultConfig(this.editor);
 				const card = this.editor.card.insert(
 					ToolbarComponent.cardName,
-					{
-						data,
-					},
-				);
+					{},
+					data,
+				) as ToolbarComponent;
+				card.setData(data);
 				this.editor.card.activate(card.root);
 				range = change.range.get();
 				//选中关键词输入节点

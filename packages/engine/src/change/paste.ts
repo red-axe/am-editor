@@ -297,7 +297,7 @@ export default class Paste {
 		});
 	}
 
-	normalize() {
+	normalize(autoAppendCurrent: boolean = true) {
 		const nodeApi = this.engine.node;
 		let fragment = this.parser();
 		this.elementNormalize(fragment);
@@ -376,6 +376,7 @@ export default class Paste {
 			.shrinkToTextNode();
 		const { startNode } = cloneRange;
 		if (
+			autoAppendCurrent &&
 			startNode.inEditor() &&
 			first &&
 			first.name === 'p' &&

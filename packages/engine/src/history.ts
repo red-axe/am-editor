@@ -106,7 +106,7 @@ class HistoryModel implements HistoryInterface {
 				console.error(error);
 			}
 			if (this.engine.isEmpty()) this.engine.change.initValue();
-			this.engine.ot.startMutation();
+
 			if (isUndo) {
 				//清除操作前记录的range
 				this.engine.change.getRangePathBeforeCommand();
@@ -114,6 +114,7 @@ class HistoryModel implements HistoryInterface {
 				this.engine.change.change();
 				this.engine.trigger('undo');
 			}
+			this.engine.ot.startMutation();
 		}
 	}
 
@@ -139,7 +140,7 @@ class HistoryModel implements HistoryInterface {
 				this.reset();
 				console.error(error);
 			}
-			this.engine.ot.startMutation();
+
 			if (isRedo) {
 				// 清除操作前记录的range
 				this.engine.change.getRangePathBeforeCommand();
@@ -147,6 +148,7 @@ class HistoryModel implements HistoryInterface {
 				this.engine.change.change();
 				this.engine.trigger('redo');
 			}
+			this.engine.ot.startMutation();
 		}
 	}
 
