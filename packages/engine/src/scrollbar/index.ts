@@ -308,7 +308,7 @@ class Scrollbar extends EventEmitter2 {
 				containerElement.scrollLeft = left;
 			}
 		},
-		100,
+		isMacos ? 100 : 0,
 		{ trailing: true },
 	);
 
@@ -337,7 +337,7 @@ class Scrollbar extends EventEmitter2 {
 					: Math.min(top, this.sHeight - this.oHeight);
 			containerElement.scrollTop = top;
 		},
-		100,
+		isMacos ? 100 : 0,
 		{ trailing: true },
 	);
 

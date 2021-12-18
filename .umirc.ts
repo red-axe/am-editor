@@ -354,6 +354,16 @@ export default defineConfig({
 			name: 'renderer',
 			content: 'webkit',
 		},
+		{
+			name: 'keywords',
+			content:
+				'Web富文本编辑器,React富文本编辑器,Vue富文本编辑器,协作编辑器,vue-editor, react-editor, aomao-editor, rich-text-editor',
+		},
+		{
+			name: 'description',
+			content:
+				'一个适用于React、Vue等前端库的Web富文本编辑器。开箱即用，提供几十种丰富的编辑器插件来满足大部分需求，丰富的多媒体支持，不仅支持图片和音视频，还有卡片概念的加持，可以插入嵌入式多媒体内容，使用React、Vue等前端库可以在编辑器中渲染各种各样的内容。支持 Markdown 语法，内置协同编辑方案，轻量配置即可使用。',
+		},
 	],
 	headScripts: [
 		{
