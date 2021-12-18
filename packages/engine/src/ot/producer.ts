@@ -539,11 +539,7 @@ class Producer extends EventEmitter2 {
 						},
 					);
 					// 没有这个卡片节点，或者卡片内部已经渲染了才需要过滤
-					if (
-						result &&
-						!result.rendered &&
-						cardElement.attributes(CARD_LOADING_KEY) !== 'remote'
-					) {
+					if (result && !result.rendered) {
 						isTransient = false;
 						record['nl'] = true;
 					} else {

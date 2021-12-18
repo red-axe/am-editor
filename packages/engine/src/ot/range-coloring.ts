@@ -71,17 +71,27 @@ class RangeColoring implements RangeColoringInterface {
 		range: RangeInterface,
 		style: DrawStyle,
 	) {
-		let startOffset = range.startOffset;
-		while (startOffset < range.endOffset) {
-			range.setStart(range.commonAncestorContainer, startOffset);
-			range.setEnd(range.commonAncestorContainer, startOffset + 1);
-			const rect = this.getRectWithRange(node, range);
-			canvas.clearRect(rect);
-			canvas.drawRect({ ...rect.toJSON(), ...style });
-			startOffset++;
+		const { startOffset, startNode, endNode } = range;
+		let start = range.startOffset;
+		const endOffset = range.endOffset;
+		let startTop = range.getClientRect().top;
+		let drawOffset = startOffset;
+		while (start < endOffset) {
+			range.setStart(range.commonAncestorContainer, start);
+			range.setEnd(range.commonAncestorContainer, start + 1);
+			const curRect = range.getClientRect();
+			if (curRect.top > startTop || start === endOffset - 1) {
+				range.setStart(range.commonAncestorContainer, drawOffset);
+				drawOffset = start;
+				startTop = curRect.top;
+				const rect = this.getRectWithRange(node, range);
+				canvas.clearRect(rect);
+				canvas.drawRect({ ...rect.toJSON(), ...style });
+			}
+			start++;
 		}
-		range.setStart(range.startContainer, range.startOffset);
-		range.setEnd(range.endContainer, range.endOffset);
+		range.setStart(startNode, startOffset);
+		range.setEnd(endNode, endOffset);
 	}
 
 	drawBackground(
