@@ -57,11 +57,11 @@ const defaultHandles: Array<{
 		handle: ShiftEnter,
 		triggerName: 'keydown:shift-enter',
 	},
-	{
-		name: 'at',
-		handle: At,
-		triggerName: 'keydown:at',
-	},
+	// {
+	// 	name: 'at',
+	// 	handle: At,
+	// 	triggerName: 'keydown:at',
+	// },
 	{
 		name: 'space',
 		handle: Space,

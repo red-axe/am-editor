@@ -10,7 +10,7 @@ import { CARD_ELEMENT_KEY } from '../constants/card';
 import { ClipboardData } from '../types/clipboard';
 import { DATA_ELEMENT, UI } from '../constants';
 import { $ } from '../node';
-import { isMobile, isSafari } from '../utils';
+import { isAndroid, isMobile, isSafari } from '../utils';
 
 type GlobalEventType = 'root' | 'window' | 'container' | 'document';
 class ChangeEvent implements ChangeEventInterface {
@@ -61,6 +61,7 @@ class ChangeEvent implements ChangeEventInterface {
 	onInput(callback: EventListener) {
 		const { bindInput } = this.options;
 		if (bindInput && !bindInput()) return;
+		let androidCustomeListComposingNode: NodeInterface | null = null;
 		// 处理中文输入法状态
 		// https://developer.mozilla.org/en-US-US/docs/Web/Events/compositionstart
 		this.onContainer('compositionstart', (event) => {
@@ -101,8 +102,9 @@ class ChangeEvent implements ChangeEventInterface {
 		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
 		this.onContainer('beforeinput', (event: InputEvent) => {
 			if (this.engine.readonly) return;
-			// safari 组合输入法会直接输入字符
-			if (isSafari && event.data === '@') {
+			// safari 组合输入法会直接插入@字符，这里统一全部拦截输入@字符的时候再去触发@事件
+			if (event.data === '@') {
+				// 如果没有要对 @ 字符处理的就不拦截
 				const result = this.engine.trigger('keydown:at', event);
 				if (result === false) {
 					event.preventDefault();
@@ -112,9 +114,9 @@ class ChangeEvent implements ChangeEventInterface {
 			const { change, card, node, block, list } = this.engine;
 			if (!change.rangePathBeforeCommand)
 				change.cacheRangeBeforeCommand();
+			const sourceRange = change.range.get();
 			// 单独选中卡片或者selection处于卡片边缘，手动删除卡片
-			const range = change.range
-				.get()
+			const range = sourceRange
 				.cloneRange()
 				.shrinkToTextNode()
 				.enlargeToElementNode();
@@ -127,6 +129,36 @@ class ChangeEvent implements ChangeEventInterface {
 			) {
 				if (startNode.first()?.name !== 'br')
 					startNode.prepend('<br />');
+			}
+			// 安卓在自定义列表前组合输入的时候会出现字符错乱
+			// 解决：在列表下的自定义卡片后面插入一个零宽字符，等组合输入法完成后再删除
+			if (
+				isAndroid &&
+				startNode.name === 'li' &&
+				range.startOffset === 1 &&
+				node.isCustomize(startNode) &&
+				this.isComposing
+			) {
+				const first = startNode.first();
+				const next = first?.next();
+				const addTemp = () => {
+					const zeroText = $('\u200B', null);
+					first?.after(zeroText);
+					range.setOffset(zeroText, 1, 1);
+					change.range.select(range);
+					androidCustomeListComposingNode = startNode;
+				};
+				if (next?.isText()) {
+					const text = next.text();
+					if (!/^\u200b/.test(text)) {
+						addTemp();
+					}
+				} else {
+					if (next?.name === 'br') {
+						next.remove();
+					}
+					addTemp();
+				}
 			}
 
 			if (!range.collapsed) {
@@ -188,8 +220,41 @@ class ChangeEvent implements ChangeEventInterface {
 				this.engine.hidePlaceholder();
 			}
 			if (inputTimeout) clearTimeout(inputTimeout);
+
 			inputTimeout = setTimeout(() => {
 				if (!this.isComposing) {
+					// 清理输入前插入到自定义列表的卡片后的零宽字符
+					if (isAndroid && androidCustomeListComposingNode) {
+						const first = androidCustomeListComposingNode.first();
+						const next = first?.next();
+						if (next?.isText()) {
+							const text = next.text();
+							if (/^\u200b/.test(text)) {
+								const textNode = next.get<Text>();
+								textNode?.splitText(1);
+								textNode?.remove();
+							}
+						}
+						const range = this.engine.change.range.get();
+						const { startNode, startOffset } = range;
+						if (range.collapsed && startNode?.isText()) {
+							const text = startNode.text();
+							const sufix = text.substring(startOffset);
+							if (/^\u200b/.test(sufix)) {
+								startNode.text(
+									text.substring(0, startOffset) +
+										sufix.substring(1),
+								);
+								range.setOffset(
+									startNode,
+									startOffset,
+									startOffset,
+								);
+								this.engine.change.range.select(range);
+							}
+						}
+						androidCustomeListComposingNode = null;
+					}
 					callback(e);
 					// 组合输入法结束后提交协同
 					this.engine.ot.submitMutationCache();
