@@ -217,7 +217,8 @@ class UploadController extends Controller {
 								});
 						}
 					});
-				} catch {
+				} catch (err) {
+					console.error(err);
 					resolve(result);
 				}
 			});
