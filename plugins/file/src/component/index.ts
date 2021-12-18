@@ -94,7 +94,7 @@ export default class FileCard extends Card<FileValue> {
 	onBeforeRender = (action: 'preview' | 'download', url: string) => {
 		const filePlugin = this.editor.plugin.components['file'];
 		if (filePlugin) {
-			const { onBeforeRender } = filePlugin['options'] || {};
+			const { onBeforeRender } = (filePlugin['options'] || {}) as any;
 			if (onBeforeRender) return onBeforeRender(action, url);
 		}
 		return url;

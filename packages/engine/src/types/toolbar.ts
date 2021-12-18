@@ -41,7 +41,40 @@ export type ButtonOptions = {
 	 */
 	didMount?: (node: NodeInterface) => void;
 };
-
+export type SwitchOptions = {
+	/**
+	 * 类型
+	 */
+	type: 'switch';
+	/**
+	 * 样式名称
+	 */
+	class?: string;
+	/**
+	 * 是否禁用
+	 */
+	disabled?: boolean;
+	/**
+	 * 按钮内容
+	 */
+	content: string;
+	/**
+	 * 是否选中
+	 */
+	checked?: boolean;
+	/**
+	 * 获取当前状态
+	 */
+	getState?: () => boolean;
+	/**
+	 * 单击事件
+	 */
+	onClick?: (event: MouseEvent, node: NodeInterface) => void;
+	/**
+	 * 按钮渲染成功后的回调
+	 */
+	didMount?: (node: NodeInterface) => void;
+};
 /**
  * 输入框
  */
@@ -190,7 +223,8 @@ export type ToolbarItemOptions =
 	| ButtonOptions
 	| InputOptions
 	| DropdownOptions
-	| NodeOptions;
+	| NodeOptions
+	| SwitchOptions;
 
 /**
  * 工具栏

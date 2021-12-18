@@ -1,765 +1,749 @@
 .data-codeblock-container {
-    position: relative;
-    padding: 0;
-    overflow: visible;
-    border: 1px solid #e8e8e8;
-    border-radius: 2px 2px;
-    text-indent: 0;
-}
-
-.data-codeblock-container .am-embed-toolbar-item {
-    float: right;
-    line-height: 32px;
-}
-
-.data-codeblock-content {
-     background: #f9f9f9;
-     overflow: auto;
-}
-
-.am-engine .CodeMirror,
-.am-engine-view .CodeMirror {
-    
-    /* \u5b57\u4f53\u53c2\u7167 github\uff0c\u8003\u8651\u548c 14px \u6587\u5b57\u5728\u4e00\u8d77\u6392\u7248\uff0c\u5b57\u53f7\u7528 13px */
-     font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
-     font-size: 13px;
-     line-height: 21px;
-     color: #595959;
-     direction: ltr;
-    
-}
-
-.am-engine .CodeMirror-lines,
-.am-engine-view .CodeMirror-lines {
-     padding: 8px 0;
-    
-}
-
-.am-engine .CodeMirror-scrollbar-filler,
-.am-engine-view .CodeMirror-scrollbar-filler,
-.am-engine .CodeMirror-gutter-filler,
-.am-engine-view .CodeMirror-gutter-filler {
-     background-color: white;
-    
-    /* The little square between H and V scrollbars */
-    
-}
-
-.am-engine .CodeMirror-gutters,
-.am-engine-view .CodeMirror-gutters {
-     border: 0;
-     white-space: nowrap;
-     padding: 0 8px;
-     background-color: unset;
-    
-}
-
-.am-engine .CodeMirror-linenumber,
-.am-engine-view .CodeMirror-linenumber {
+     position: relative;
      padding: 0;
-     min-width: 20px;
-     text-align: right;
-     color: #BFBFBF;
-     white-space: nowrap;
-    
-}
-
-.am-engine .CodeMirror-guttermarker,
-.am-engine-view .CodeMirror-guttermarker {
-     color: black;
-    
-}
-
-.am-engine .CodeMirror-guttermarker-subtle,
-.am-engine-view .CodeMirror-guttermarker-subtle {
-     color: #999;
-    
-}
-
-.am-engine .CodeMirror-cursor,
-.am-engine-view .CodeMirror-cursor {
-     border-left: 1px solid black;
-     border-right: none;
-     width: 0;
-    
-}
-
-.am-engine .CodeMirror div.CodeMirror-secondarycursor,
-.am-engine-view .CodeMirror div.CodeMirror-secondarycursor {
-     border-left: 1px solid silver;
-    
-}
-
-.am-engine .cm-fat-cursor .CodeMirror-cursor,
-.am-engine-view .cm-fat-cursor .CodeMirror-cursor {
-     width: auto;
-     border: 0 !important;
-     background: #7e7;
-    
-}
-
-.am-engine .cm-fat-cursor div.CodeMirror-cursors,
-.am-engine-view .cm-fat-cursor div.CodeMirror-cursors {
-     z-index: 1;
-    
-}
-
-.am-engine .cm-fat-cursor-mark,
-.am-engine-view .cm-fat-cursor-mark {
-     background-color: rgba(20, 255, 20, 0.5);
-     -webkit-animation: blink 1.06s steps(1) infinite;
-     animation: blink 1.06s steps(1) infinite;
-    
-}
-
-.am-engine .cm-animate-fat-cursor,
-.am-engine-view .cm-animate-fat-cursor {
-     width: auto;
-     border: 0;
-     -webkit-animation: blink 1.06s steps(1) infinite;
-     animation: blink 1.06s steps(1) infinite;
-     background-color: #7e7;
-    
-}
-
-@-webkit-keyframes blink {
-     50% {
-         background-color: transparent;
-        
-    }
-
-    
-}
-
-@keyframes blink {
-     50% {
-         background-color: transparent;
-        
-    }
-
-    
-}
-
-.am-engine .cm-tab,
-.am-engine-view .cm-tab {
-     display: inline-block;
-     text-decoration: inherit;
-    
-}
-
-.am-engine .CodeMirror-rulers,
-.am-engine-view .CodeMirror-rulers {
-     position: absolute;
-     left: 0;
-     right: 0;
-     top: -50px;
-     bottom: -20px;
-     overflow: hidden;
-    
-}
-
-.am-engine .CodeMirror-ruler,
-.am-engine-view .CodeMirror-ruler {
-     border-left: 1px solid #ccc;
-     top: 0;
-     bottom: 0;
-     position: absolute;
-    
-}
-
-.am-engine .cm-s-default .cm-header,
-.am-engine-view .cm-s-default .cm-header {
-     color: blue;
-    
-}
-
-.am-engine .cm-s-default .cm-quote,
-.am-engine-view .cm-s-default .cm-quote {
-     color: #090;
-    
-}
-
-.am-engine .cm-negative,
-.am-engine-view .cm-negative {
-     color: #d44;
-    
-}
-
-.am-engine .cm-positive,
-.am-engine-view .cm-positive {
-     color: #292;
-    
-}
-
-.am-engine .cm-header,
-.am-engine-view .cm-header,
-.am-engine .cm-strong,
-.am-engine-view .cm-strong {
-     font-weight: bold;
-    
-}
-
-.am-engine .cm-em,
-.am-engine-view .cm-em {
-     font-style: italic;
-    
-}
-
-.am-engine .cm-link,
-.am-engine-view .cm-link {
-     text-decoration: underline;
-    
-}
-
-.am-engine .cm-strikethrough,
-.am-engine-view .cm-strikethrough {
-     text-decoration: line-through;
-    
-}
-
-.am-engine .cm-s-default .cm-keyword,
-.am-engine-view .cm-s-default .cm-keyword {
-     color: #d73a49;
-    
-}
-
-.am-engine .cm-s-default .cm-atom,
-.am-engine-view .cm-s-default .cm-atom {
-     color: #905;
-    
-}
-
-.am-engine .cm-s-default .cm-number,
-.am-engine-view .cm-s-default .cm-number {
-     color: #005cc5;
-    
-}
-
-.am-engine .cm-s-default .cm-def,
-.am-engine-view .cm-s-default .cm-def {
-     color: #005cc5;
-    
-}
-
-.am-engine .cm-s-default .cm-variable-2,
-.am-engine-view .cm-s-default .cm-variable-2 {
-     color: #005cc5;
-    
-}
-
-.am-engine .cm-s-default .cm-variable-3,
-.am-engine-view .cm-s-default .cm-variable-3,
-.am-engine .cm-s-default .cm-type,
-.am-engine-view .cm-s-default .cm-type {
-     color: #22863a;
-    
-}
-
-.am-engine .cm-s-default .cm-comment,
-.am-engine-view .cm-s-default .cm-comment {
-     color: #6a737d;
-    
-}
-
-.am-engine .cm-s-default .cm-string,
-.am-engine-view .cm-s-default .cm-string {
-     color: #690;
-    
-}
-
-.am-engine .cm-s-default .cm-string-2,
-.am-engine-view .cm-s-default .cm-string-2 {
-     color: #690;
-    
-}
-
-.am-engine .cm-s-default .cm-meta,
-.am-engine-view .cm-s-default .cm-meta {
-     color: #1f7f9a;
-    
-}
-
-.am-engine .cm-s-default .cm-qualifier,
-.am-engine-view .cm-s-default .cm-qualifier {
-     color: #555;
-    
-}
-
-.am-engine .cm-s-default .cm-builtin,
-.am-engine-view .cm-s-default .cm-builtin {
-     color: #6f42c1;
-    
-}
-
-.am-engine .cm-s-default .cm-bracket,
-.am-engine-view .cm-s-default .cm-bracket {
-     color: #997;
-    
-}
-
-.am-engine .cm-s-default .cm-tag,
-.am-engine-view .cm-s-default .cm-tag {
-     color: #22863a;
-    
-}
-
-.am-engine .cm-s-default .cm-attribute,
-.am-engine-view .cm-s-default .cm-attribute {
-     color: #6f42c1;
-    
-}
-
-.am-engine .cm-s-default .cm-hr,
-.am-engine-view .cm-s-default .cm-hr {
-     color: #999;
-    
-}
-
-.am-engine .cm-s-default .cm-link,
-.am-engine-view .cm-s-default .cm-link {
-     color: #00c;
-    
-}
-
-.am-engine .cm-s-default .cm-error,
-.am-engine-view .cm-s-default .cm-error {
-     color: #f00;
-    
-}
-
-.am-engine .cm-invalidchar,
-.am-engine-view .cm-invalidchar {
-     color: #f00;
-    
-}
-
-.am-engine .cm-s-default .cm-operator,
-.am-engine-view .cm-s-default .cm-operator {
-     color: #d73a49;
-    
-}
-
-.am-engine .cm-s-default .cm-property,
-.am-engine-view .cm-s-default .cm-property {
-     color: #005cc5;
-    
-}
-
-.am-engine .CodeMirror-composing,
-.am-engine-view .CodeMirror-composing {
-     border-bottom: 2px solid;
-    
-}
-
-.am-engine div.CodeMirror span.CodeMirror-matchingbracket,
-.am-engine-view div.CodeMirror span.CodeMirror-matchingbracket {
-     color: #0b0;
-    
-}
-
-.am-engine div.CodeMirror span.CodeMirror-nonmatchingbracket,
-.am-engine-view div.CodeMirror span.CodeMirror-nonmatchingbracket {
-     color: #a22;
-    
-}
-
-.am-engine .CodeMirror-matchingtag,
-.am-engine-view .CodeMirror-matchingtag {
-     background: rgba(255, 150, 0, 0.3);
-    
-}
-
-.am-engine .CodeMirror-activeline-background,
-.am-engine-view .CodeMirror-activeline-background {
-     background: transparent;
-    
-}
-
-.am-engine .CodeMirror,
-.am-engine-view .CodeMirror {
-     position: relative;
-     overflow: hidden;
-     height: auto;
-     background: transparent;
-    
-}
-
-.am-engine .CodeMirror-scroll,
-.am-engine-view .CodeMirror-scroll {
-     overflow: scroll !important;
-    
-    /* Things will break if this is overridden */
-    
-    /* 30px is the magic margin used to hide the element's real scrollbars */
-    
-    /* See overflow: hidden in .CodeMirror */
-     margin-bottom: -50px;
-     margin-right: -50px;
-     padding-bottom: 50px;
-     outline: none;
-    
-    /* Prevent dragging from highlighting the element */
-     position: relative;
-     z-index: 0;
-    
-}
-
-.am-engine .CodeMirror-sizer,
-.am-engine-view .CodeMirror-sizer {
-     position: relative;
-     border-right: 50px solid transparent;
-     min-height: auto !important;
-    
-}
-
-.am-engine .CodeMirror-vscrollbar,
-.am-engine-view .CodeMirror-vscrollbar,
-.am-engine .CodeMirror-hscrollbar,
-.am-engine-view .CodeMirror-hscrollbar,
-.am-engine .CodeMirror-scrollbar-filler,
-.am-engine-view .CodeMirror-scrollbar-filler,
-.am-engine .CodeMirror-gutter-filler,
-.am-engine-view .CodeMirror-gutter-filler {
-     position: absolute;
-     z-index: 6;
-     display: none;
-    
-}
-
-.am-engine .CodeMirror-vscrollbar,
-.am-engine-view .CodeMirror-vscrollbar {
-     right: 0;
-     top: 0;
-     overflow-x: hidden;
-     overflow-y: scroll;
-     display: none !important;
-    
-}
-
-.am-engine .CodeMirror-hscrollbar,
-.am-engine-view .CodeMirror-hscrollbar {
-     bottom: 0;
-     left: 0;
-     overflow-y: hidden;
-     overflow-x: scroll;
-     display: none !important;
-    
-}
-
-.am-engine .CodeMirror-scrollbar-filler,
-.am-engine-view .CodeMirror-scrollbar-filler {
-     right: 0;
-     bottom: 0;
-    
-}
-
-.am-engine .CodeMirror-gutter-filler,
-.am-engine-view .CodeMirror-gutter-filler {
-     left: 0;
-     bottom: 0;
-    
-}
-
-.am-engine .CodeMirror-gutters,
-.am-engine-view .CodeMirror-gutters {
-     position: absolute;
-     left: 0;
-     top: 0;
-     min-height: 100%;
-     background: #f9f9f9;
-    
-}
-
-.am-engine .CodeMirror-gutter,
-.am-engine-view .CodeMirror-gutter {
-     white-space: normal;
-     height: 100%;
-     display: inline-block;
-     vertical-align: top;
-     margin-bottom: -30px;
-    
-}
-
-.am-engine .CodeMirror-gutter-wrapper,
-.am-engine-view .CodeMirror-gutter-wrapper {
-     position: absolute;
-     z-index: 4;
-     background: none !important;
-     border: none !important;
-    
-}
-
-.am-engine .CodeMirror-gutter-background,
-.am-engine-view .CodeMirror-gutter-background {
-     position: absolute;
-     top: 0;
-     bottom: 0;
-     z-index: 4;
-    
-}
-
-.am-engine .CodeMirror-gutter-elt,
-.am-engine-view .CodeMirror-gutter-elt {
-     position: absolute;
-     cursor: default;
-     z-index: 4;
-    
-}
-
-.am-engine .CodeMirror-gutter-wrapper ::-moz-selection,
-.am-engine-view .CodeMirror-gutter-wrapper ::-moz-selection {
-     background-color: transparent;
-    
-}
-
-.am-engine .CodeMirror-gutter-wrapper ::selection,
-.am-engine-view .CodeMirror-gutter-wrapper ::selection {
-     background-color: transparent;
-    
-}
-
-.am-engine .CodeMirror-gutter-wrapper ::-moz-selection,
-.am-engine-view .CodeMirror-gutter-wrapper ::-moz-selection {
-     background-color: transparent;
-    
-}
-
-.am-engine .CodeMirror-lines,
-.am-engine-view .CodeMirror-lines {
-     cursor: text;
-     min-height: 40px;
-    
-    /* prevents collapsing before first draw */
-    
-}
-
-.am-engine .CodeMirror pre,
-.am-engine-view .CodeMirror pre {
-    
-    /* Reset some styles that the rest of the page might have set */
-     border-radius: 0;
-     border-width: 0;
-     background: transparent;
-     font-family: inherit;
-     font-size: inherit;
-     margin: 0;
-     white-space: pre;
-     word-wrap: normal;
-     line-height: inherit;
-     color: inherit;
-     z-index: 2;
-     position: relative;
      overflow: visible;
-     -webkit-tap-highlight-color: transparent;
-     font-variant-ligatures: contextual;
-    
-}
-
-.am-engine .CodeMirror-wrap pre,
-.am-engine-view .CodeMirror-wrap pre {
-     word-wrap: break-word;
-     white-space: pre-wrap;
-     word-break: normal;
-    
-}
-
-.am-engine .CodeMirror-linebackground,
-.am-engine-view .CodeMirror-linebackground {
-     position: absolute;
-     left: 0;
-     right: 0;
-     top: 0;
-     bottom: 0;
-     z-index: 0;
-    
-}
-
-.am-engine .CodeMirror-linewidget,
-.am-engine-view .CodeMirror-linewidget {
-     position: relative;
-     z-index: 2;
-     padding: 0.1px;
-    
-    /* Force widget margins to stay inside of the container */
-    
-}
-
-.am-engine .CodeMirror-rtl pre,
-.am-engine-view .CodeMirror-rtl pre {
-     direction: rtl;
-    
-}
-
-.am-engine .CodeMirror-code,
-.am-engine-view .CodeMirror-code {
-     outline: none;
-    
-}
-
-.am-engine .CodeMirror-scroll,
-.am-engine-view .CodeMirror-scroll,
-.am-engine .CodeMirror-sizer,
-.am-engine-view .CodeMirror-sizer,
-.am-engine .CodeMirror-gutter,
-.am-engine-view .CodeMirror-gutter,
-.am-engine .CodeMirror-gutters,
-.am-engine-view .CodeMirror-gutters,
-.am-engine .CodeMirror-linenumber,
-.am-engine-view .CodeMirror-linenumber {
-     box-sizing: content-box;
-    
-}
-
-.am-engine .CodeMirror-measure,
-.am-engine-view .CodeMirror-measure {
-     position: absolute;
-     width: 100%;
-     height: 0;
-     overflow: hidden;
-     visibility: hidden;
-    
-}
-
-.am-engine .CodeMirror-cursor,
-.am-engine-view .CodeMirror-cursor {
-     position: absolute;
-     pointer-events: none;
-    
-}
-
-.am-engine .CodeMirror-measure pre,
-.am-engine-view .CodeMirror-measure pre {
-     position: static;
-    
-}
-
-.am-engine div.CodeMirror-cursors,
-.am-engine-view div.CodeMirror-cursors {
-     visibility: hidden;
-     position: relative;
-     z-index: 3;
-    
-}
-
-.am-engine div.CodeMirror-dragcursors,
-.am-engine-view div.CodeMirror-dragcursors {
-     visibility: visible;
-    
-}
-
-.am-engine .CodeMirror-focused div.CodeMirror-cursors,
-.am-engine-view .CodeMirror-focused div.CodeMirror-cursors {
-     visibility: visible;
-    
-}
-
-.am-engine .CodeMirror-selected,
-.am-engine-view .CodeMirror-selected {
-     background: #e8e8e8;
-    
-}
-
-.am-engine .CodeMirror-focused .CodeMirror-selected,
-.am-engine-view .CodeMirror-focused .CodeMirror-selected {
-     background: #b3d7fd;
-    
-}
-
-.am-engine .CodeMirror-crosshair,
-.am-engine-view .CodeMirror-crosshair {
-     cursor: crosshair;
-    
-}
-
-.am-engine .CodeMirror-line::-moz-selection,
-.am-engine-view .CodeMirror-line::-moz-selection,
-.am-engine .CodeMirror-line>span::-moz-selection,
-.am-engine-view .CodeMirror-line>span::-moz-selection,
-.am-engine .CodeMirror-line>span>span::-moz-selection,
-.am-engine-view .CodeMirror-line>span>span::-moz-selection {
-     background: #b3d7fd;
-    
-}
-
-.am-engine .CodeMirror-line::selection,
-.am-engine-view .CodeMirror-line::selection,
-.am-engine .CodeMirror-line>span::selection,
-.am-engine-view .CodeMirror-line>span::selection,
-.am-engine .CodeMirror-line>span>span::selection,
-.am-engine-view .CodeMirror-line>span>span::selection {
-     background: #b3d7fd;
-    
-}
-
-.am-engine .CodeMirror-line::-moz-selection,
-.am-engine-view .CodeMirror-line::-moz-selection,
-.am-engine .CodeMirror-line>span::-moz-selection,
-.am-engine-view .CodeMirror-line>span::-moz-selection,
-.am-engine .CodeMirror-line>span>span::-moz-selection,
-.am-engine-view .CodeMirror-line>span>span::-moz-selection {
-     background: #b3d7fd;
-    
-}
-
-.am-engine .cm-searching,
-.am-engine-view .cm-searching {
-     background-color: #ffa;
-     background-color: rgba(255, 255, 0, 0.4);
-    
-}
-
-.am-engine .cm-force-border,
-.am-engine-view .cm-force-border {
-     padding-right: 0.1px;
-    
-}
-
-@media print {
-
-    /* .am-engine,
-     .am-engine-view { */
-        
-        /* Hide the cursor when printing */
-        
-    /* } */
-
-     .am-engine .CodeMirror div.CodeMirror-cursors,
-     .am-engine-view .CodeMirror div.CodeMirror-cursors {
-         visibility: hidden;
-        
-    }
-
-    
-}
-
-.am-engine .cm-tab-wrap-hack:after,
-.am-engine-view .cm-tab-wrap-hack:after {
-     content: '';
-    
-}
-
-.am-engine span.CodeMirror-selectedtext,
-.am-engine-view span.CodeMirror-selectedtext {
-     background: none;
-    
-}
-
-.am-engine-view .data-codeblock-container {
-     margin: 5px 0;
-    
-}
-
-.am-engine-view .CodeMirror {
-     padding: 16px;
-     overflow: initial;
-    
-}
-
-.am-engine-view .CodeMirror pre {
-     padding: 0;
-    
-}
-
-.am-content-editor .am-engine .data-codeblock-container .CodeMirror-lines {
-    min-height: 40px;
-}
+     border: 1px solid #e8e8e8;
+     border-radius: 2px 2px;
+     text-indent: 0;
+ }
+ 
+ .data-codeblock-container .am-embed-toolbar-item {
+     float: right;
+     line-height: 32px;
+ }
+ 
+ .data-codeblock-content {
+      background: #f9f9f9;
+      overflow: auto;
+ }
+ 
+ .am-engine .CodeMirror,
+ .am-engine-view .CodeMirror {
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 21px;
+      color: #595959;
+      direction: ltr;
+      height: auto;
+      overflow: hidden;
+      background: transparent;
+ }
+ 
+ .am-engine .CodeMirror-lines,
+ .am-engine-view .CodeMirror-lines {
+      padding: 8px 0;
+ }
+ 
+ .am-engine .CodeMirror-scrollbar-filler,
+ .am-engine-view .CodeMirror-scrollbar-filler,
+ .am-engine .CodeMirror-gutter-filler,
+ .am-engine-view .CodeMirror-gutter-filler {
+      background-color: white;
+     
+     /* The little square between H and V scrollbars */
+     
+ }
+ 
+ .am-engine .CodeMirror-gutters,
+ .am-engine-view .CodeMirror-gutters {
+      border: 0;
+      white-space: nowrap;
+      padding: 0 8px;
+      background-color: unset;
+     
+ }
+ 
+ .am-engine .CodeMirror-linenumber,
+ .am-engine-view .CodeMirror-linenumber {
+      padding: 0;
+      min-width: 20px;
+      text-align: right;
+      color: #BFBFBF;
+      white-space: nowrap;
+     
+ }
+ 
+ .am-engine .CodeMirror-guttermarker,
+ .am-engine-view .CodeMirror-guttermarker {
+      color: black;
+     
+ }
+ 
+ .am-engine .CodeMirror-guttermarker-subtle,
+ .am-engine-view .CodeMirror-guttermarker-subtle {
+      color: #999;
+     
+ }
+ 
+ .am-engine .CodeMirror-cursor,
+ .am-engine-view .CodeMirror-cursor {
+      border-left: 1px solid black;
+      border-right: none;
+      width: 0;
+     
+ }
+ 
+ .am-engine .CodeMirror div.CodeMirror-secondarycursor,
+ .am-engine-view .CodeMirror div.CodeMirror-secondarycursor {
+      border-left: 1px solid silver;
+     
+ }
+ 
+ .am-engine .cm-fat-cursor .CodeMirror-cursor,
+ .am-engine-view .cm-fat-cursor .CodeMirror-cursor {
+      width: auto;
+      border: 0 !important;
+      background: #7e7;
+     
+ }
+ 
+ .am-engine .cm-fat-cursor div.CodeMirror-cursors,
+ .am-engine-view .cm-fat-cursor div.CodeMirror-cursors {
+      z-index: 1;
+     
+ }
+ 
+ .am-engine .cm-fat-cursor-mark,
+ .am-engine-view .cm-fat-cursor-mark {
+      background-color: rgba(20, 255, 20, 0.5);
+      -webkit-animation: blink 1.06s steps(1) infinite;
+      animation: blink 1.06s steps(1) infinite;
+     
+ }
+ 
+ .am-engine .cm-animate-fat-cursor,
+ .am-engine-view .cm-animate-fat-cursor {
+      width: auto;
+      border: 0;
+      -webkit-animation: blink 1.06s steps(1) infinite;
+      animation: blink 1.06s steps(1) infinite;
+      background-color: #7e7;
+     
+ }
+ 
+ @-webkit-keyframes blink {
+      50% {
+          background-color: transparent;
+         
+     }
+ 
+     
+ }
+ 
+ @keyframes blink {
+      50% {
+          background-color: transparent;
+         
+     }
+ 
+     
+ }
+ 
+ .am-engine .cm-tab,
+ .am-engine-view .cm-tab {
+      display: inline-block;
+      text-decoration: inherit;
+     
+ }
+ 
+ .am-engine .CodeMirror-rulers,
+ .am-engine-view .CodeMirror-rulers {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -50px;
+      bottom: -20px;
+      overflow: hidden;
+     
+ }
+ 
+ .am-engine .CodeMirror-ruler,
+ .am-engine-view .CodeMirror-ruler {
+      border-left: 1px solid #ccc;
+      top: 0;
+      bottom: 0;
+      position: absolute;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-header,
+ .am-engine-view .cm-s-default .cm-header {
+      color: blue;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-quote,
+ .am-engine-view .cm-s-default .cm-quote {
+      color: #090;
+     
+ }
+ 
+ .am-engine .cm-negative,
+ .am-engine-view .cm-negative {
+      color: #d44;
+     
+ }
+ 
+ .am-engine .cm-positive,
+ .am-engine-view .cm-positive {
+      color: #292;
+     
+ }
+ 
+ .am-engine .cm-header,
+ .am-engine-view .cm-header,
+ .am-engine .cm-strong,
+ .am-engine-view .cm-strong {
+      font-weight: bold;
+     
+ }
+ 
+ .am-engine .cm-em,
+ .am-engine-view .cm-em {
+      font-style: italic;
+     
+ }
+ 
+ .am-engine .cm-link,
+ .am-engine-view .cm-link {
+      text-decoration: underline;
+     
+ }
+ 
+ .am-engine .cm-strikethrough,
+ .am-engine-view .cm-strikethrough {
+      text-decoration: line-through;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-keyword,
+ .am-engine-view .cm-s-default .cm-keyword {
+      color: #d73a49;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-atom,
+ .am-engine-view .cm-s-default .cm-atom {
+      color: #905;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-number,
+ .am-engine-view .cm-s-default .cm-number {
+      color: #005cc5;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-def,
+ .am-engine-view .cm-s-default .cm-def {
+      color: #005cc5;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-variable-2,
+ .am-engine-view .cm-s-default .cm-variable-2 {
+      color: #005cc5;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-variable-3,
+ .am-engine-view .cm-s-default .cm-variable-3,
+ .am-engine .cm-s-default .cm-type,
+ .am-engine-view .cm-s-default .cm-type {
+      color: #22863a;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-comment,
+ .am-engine-view .cm-s-default .cm-comment {
+      color: #6a737d;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-string,
+ .am-engine-view .cm-s-default .cm-string {
+      color: #690;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-string-2,
+ .am-engine-view .cm-s-default .cm-string-2 {
+      color: #690;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-meta,
+ .am-engine-view .cm-s-default .cm-meta {
+      color: #1f7f9a;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-qualifier,
+ .am-engine-view .cm-s-default .cm-qualifier {
+      color: #555;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-builtin,
+ .am-engine-view .cm-s-default .cm-builtin {
+      color: #6f42c1;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-bracket,
+ .am-engine-view .cm-s-default .cm-bracket {
+      color: #997;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-tag,
+ .am-engine-view .cm-s-default .cm-tag {
+      color: #22863a;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-attribute,
+ .am-engine-view .cm-s-default .cm-attribute {
+      color: #6f42c1;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-hr,
+ .am-engine-view .cm-s-default .cm-hr {
+      color: #999;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-link,
+ .am-engine-view .cm-s-default .cm-link {
+      color: #00c;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-error,
+ .am-engine-view .cm-s-default .cm-error {
+      color: #f00;
+     
+ }
+ 
+ .am-engine .cm-invalidchar,
+ .am-engine-view .cm-invalidchar {
+      color: #f00;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-operator,
+ .am-engine-view .cm-s-default .cm-operator {
+      color: #d73a49;
+     
+ }
+ 
+ .am-engine .cm-s-default .cm-property,
+ .am-engine-view .cm-s-default .cm-property {
+      color: #005cc5;
+     
+ }
+ 
+ .am-engine .CodeMirror-composing,
+ .am-engine-view .CodeMirror-composing {
+      border-bottom: 2px solid;
+     
+ }
+ 
+ .am-engine div.CodeMirror span.CodeMirror-matchingbracket,
+ .am-engine-view div.CodeMirror span.CodeMirror-matchingbracket {
+      color: #0b0;
+     
+ }
+ 
+ .am-engine div.CodeMirror span.CodeMirror-nonmatchingbracket,
+ .am-engine-view div.CodeMirror span.CodeMirror-nonmatchingbracket {
+      color: #a22;
+     
+ }
+ 
+ .am-engine .CodeMirror-matchingtag,
+ .am-engine-view .CodeMirror-matchingtag {
+      background: rgba(255, 150, 0, 0.3);
+     
+ }
+ 
+ .am-engine .CodeMirror-activeline-background,
+ .am-engine-view .CodeMirror-activeline-background {
+      background: transparent;
+     
+ }
+ 
+ .am-engine .CodeMirror-scroll,
+ .am-engine-view .CodeMirror-scroll {
+      overflow: scroll !important;
+     
+     /* Things will break if this is overridden */
+     
+     /* 30px is the magic margin used to hide the element's real scrollbars */
+     
+     /* See overflow: hidden in .CodeMirror */
+      margin-bottom: -50px;
+      margin-right: -50px;
+      padding-bottom: 50px;
+      outline: none;
+     
+     /* Prevent dragging from highlighting the element */
+      position: relative;
+      z-index: 0;
+     
+ }
+ 
+ .am-engine .CodeMirror-sizer,
+ .am-engine-view .CodeMirror-sizer {
+      position: relative;
+      border-right: 50px solid transparent;
+      min-height: auto !important;
+     
+ }
+ 
+ .am-engine .CodeMirror-vscrollbar,
+ .am-engine-view .CodeMirror-vscrollbar,
+ .am-engine .CodeMirror-hscrollbar,
+ .am-engine-view .CodeMirror-hscrollbar,
+ .am-engine .CodeMirror-scrollbar-filler,
+ .am-engine-view .CodeMirror-scrollbar-filler,
+ .am-engine .CodeMirror-gutter-filler,
+ .am-engine-view .CodeMirror-gutter-filler {
+      position: absolute;
+      z-index: 6;
+      display: none;
+     
+ }
+ 
+ .am-engine .CodeMirror-vscrollbar,
+ .am-engine-view .CodeMirror-vscrollbar {
+      right: 0;
+      top: 0;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      display: none;
+     
+ }
+ 
+ .am-engine .CodeMirror-hscrollbar,
+ .am-engine-view .CodeMirror-hscrollbar {
+      bottom: 0;
+      left: 0;
+      overflow-y: hidden;
+      overflow-x: scroll;
+      display: none;
+     
+ }
+ 
+ .am-engine .CodeMirror-scrollbar-filler,
+ .am-engine-view .CodeMirror-scrollbar-filler {
+      right: 0;
+      bottom: 0;
+     
+ }
+ 
+ .am-engine .CodeMirror-gutter-filler,
+ .am-engine-view .CodeMirror-gutter-filler {
+      left: 0;
+      bottom: 0;
+     
+ }
+ 
+ .am-engine .CodeMirror-gutters,
+ .am-engine-view .CodeMirror-gutters {
+      position: absolute;
+      left: 0;
+      top: 0;
+      min-height: 100%;
+      background: #f9f9f9;
+      z-index: 3;
+ }
+ 
+ .am-engine .CodeMirror-gutter,
+ .am-engine-view .CodeMirror-gutter {
+      white-space: normal;
+      height: 100%;
+      display: inline-block;
+      vertical-align: top;
+      margin-bottom: -30px;
+     
+ }
+ 
+ .am-engine .CodeMirror-gutter-wrapper,
+ .am-engine-view .CodeMirror-gutter-wrapper {
+      position: absolute;
+      z-index: 4;
+      background: none !important;
+      border: none !important;
+     
+ }
+ 
+ .am-engine .CodeMirror-gutter-background,
+ .am-engine-view .CodeMirror-gutter-background {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      z-index: 4;
+     
+ }
+ 
+ .am-engine .CodeMirror-gutter-elt,
+ .am-engine-view .CodeMirror-gutter-elt {
+      position: absolute;
+      cursor: default;
+      z-index: 4;
+     
+ }
+ 
+ .am-engine .CodeMirror-gutter-wrapper ::-moz-selection,
+ .am-engine-view .CodeMirror-gutter-wrapper ::-moz-selection {
+      background-color: transparent;
+     
+ }
+ 
+ .am-engine .CodeMirror-gutter-wrapper ::selection,
+ .am-engine-view .CodeMirror-gutter-wrapper ::selection {
+      background-color: transparent;
+     
+ }
+ 
+ .am-engine .CodeMirror-gutter-wrapper ::-moz-selection,
+ .am-engine-view .CodeMirror-gutter-wrapper ::-moz-selection {
+      background-color: transparent;
+     
+ }
+ 
+ .am-engine .CodeMirror-lines,
+ .am-engine-view .CodeMirror-lines {
+      cursor: text;
+      min-height: 40px;
+     
+     /* prevents collapsing before first draw */
+     
+ }
+ 
+ .am-engine .CodeMirror pre,
+ .am-engine-view .CodeMirror pre {
+     
+     /* Reset some styles that the rest of the page might have set */
+      border-radius: 0;
+      border-width: 0;
+      background: transparent;
+      font-family: inherit;
+      font-size: inherit;
+      margin: 0;
+      white-space: pre;
+      word-wrap: normal;
+      line-height: inherit;
+      color: inherit;
+      z-index: 2;
+      position: relative;
+      overflow: visible;
+      -webkit-tap-highlight-color: transparent;
+      font-variant-ligatures: contextual;
+     
+ }
+ 
+ .am-engine .CodeMirror-wrap pre,
+ .am-engine-view .CodeMirror-wrap pre {
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      word-break: normal;
+     
+ }
+ 
+ .am-engine .CodeMirror-linebackground,
+ .am-engine-view .CodeMirror-linebackground {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 0;
+     
+ }
+ 
+ .am-engine .CodeMirror-linewidget,
+ .am-engine-view .CodeMirror-linewidget {
+      position: relative;
+      z-index: 2;
+      padding: 0.1px;
+     
+     /* Force widget margins to stay inside of the container */
+     
+ }
+ 
+ .am-engine .CodeMirror-rtl pre,
+ .am-engine-view .CodeMirror-rtl pre {
+      direction: rtl;
+     
+ }
+ 
+ .am-engine .CodeMirror-code,
+ .am-engine-view .CodeMirror-code {
+      outline: none;
+     
+ }
+ 
+ .am-engine .CodeMirror-scroll,
+ .am-engine-view .CodeMirror-scroll,
+ .am-engine .CodeMirror-sizer,
+ .am-engine-view .CodeMirror-sizer,
+ .am-engine .CodeMirror-gutter,
+ .am-engine-view .CodeMirror-gutter,
+ .am-engine .CodeMirror-gutters,
+ .am-engine-view .CodeMirror-gutters,
+ .am-engine .CodeMirror-linenumber,
+ .am-engine-view .CodeMirror-linenumber {
+      box-sizing: content-box;
+     
+ }
+ 
+ .am-engine .CodeMirror-simplescroll-horizontal, .am-engine-view .CodeMirror-simplescroll-horizontal {
+      bottom: 4px;
+      cursor: pointer;
+ }
+ 
+ .am-engine .CodeMirror-measure,
+ .am-engine-view .CodeMirror-measure {
+      position: absolute;
+      width: 100%;
+      height: 0;
+      overflow: hidden;
+      visibility: hidden;
+     
+ }
+ 
+ .am-engine .CodeMirror-cursor,
+ .am-engine-view .CodeMirror-cursor {
+      position: absolute;
+      pointer-events: none;
+     
+ }
+ 
+ .am-engine .CodeMirror-measure pre,
+ .am-engine-view .CodeMirror-measure pre {
+      position: static;
+     
+ }
+ 
+ .am-engine div.CodeMirror-cursors,
+ .am-engine-view div.CodeMirror-cursors {
+      visibility: hidden;
+      position: relative;
+      z-index: 3;
+     
+ }
+ 
+ .am-engine div.CodeMirror-dragcursors,
+ .am-engine-view div.CodeMirror-dragcursors {
+      visibility: visible;
+     
+ }
+ 
+ .am-engine .CodeMirror-focused div.CodeMirror-cursors,
+ .am-engine-view .CodeMirror-focused div.CodeMirror-cursors {
+      visibility: visible;
+     
+ }
+ 
+ .am-engine .CodeMirror-selected,
+ .am-engine-view .CodeMirror-selected {
+      background: #e8e8e8;
+     
+ }
+ 
+ .am-engine .CodeMirror-focused .CodeMirror-selected,
+ .am-engine-view .CodeMirror-focused .CodeMirror-selected {
+      background: #b3d7fd;
+     
+ }
+ 
+ .am-engine .CodeMirror-crosshair,
+ .am-engine-view .CodeMirror-crosshair {
+      cursor: crosshair;
+     
+ }
+ 
+ .am-engine .CodeMirror-line::-moz-selection,
+ .am-engine-view .CodeMirror-line::-moz-selection,
+ .am-engine .CodeMirror-line>span::-moz-selection,
+ .am-engine-view .CodeMirror-line>span::-moz-selection,
+ .am-engine .CodeMirror-line>span>span::-moz-selection,
+ .am-engine-view .CodeMirror-line>span>span::-moz-selection {
+      background: #b3d7fd;
+     
+ }
+ 
+ .am-engine .CodeMirror-line::selection,
+ .am-engine-view .CodeMirror-line::selection,
+ .am-engine .CodeMirror-line>span::selection,
+ .am-engine-view .CodeMirror-line>span::selection,
+ .am-engine .CodeMirror-line>span>span::selection,
+ .am-engine-view .CodeMirror-line>span>span::selection {
+      background: #b3d7fd;
+     
+ }
+ 
+ .am-engine .CodeMirror-line::-moz-selection,
+ .am-engine-view .CodeMirror-line::-moz-selection,
+ .am-engine .CodeMirror-line>span::-moz-selection,
+ .am-engine-view .CodeMirror-line>span::-moz-selection,
+ .am-engine .CodeMirror-line>span>span::-moz-selection,
+ .am-engine-view .CodeMirror-line>span>span::-moz-selection {
+      background: #b3d7fd;
+     
+ }
+ 
+ .am-engine .cm-searching,
+ .am-engine-view .cm-searching {
+      background-color: #ffa;
+      background-color: rgba(255, 255, 0, 0.4);
+     
+ }
+ 
+ .am-engine .cm-force-border,
+ .am-engine-view .cm-force-border {
+      padding-right: 0.1px;
+     
+ }
+ 
+ @media print {
+ 
+     /* .am-engine,
+      .am-engine-view { */
+         
+         /* Hide the cursor when printing */
+         
+     /* } */
+ 
+      .am-engine .CodeMirror div.CodeMirror-cursors,
+      .am-engine-view .CodeMirror div.CodeMirror-cursors {
+          visibility: hidden;
+         
+     }
+ 
+     
+ }
+ 
+ .am-engine .cm-tab-wrap-hack:after,
+ .am-engine-view .cm-tab-wrap-hack:after {
+      content: '';
+     
+ }
+ 
+ .am-engine span.CodeMirror-selectedtext,
+ .am-engine-view span.CodeMirror-selectedtext {
+      background: none;
+     
+ }
+ 
+ .am-engine-view .data-codeblock-container {
+      margin: 5px 0;
+     
+ }
+ 
+ .am-content-editor .am-engine .data-codeblock-container .CodeMirror-lines {
+     min-height: 40px;
+ }

@@ -58,6 +58,9 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		return {
 			tabSize,
 			indentUnit: tabSize,
+			scrollbarStyle: 'simple',
+			readOnly: !isEngine(this.editor) || this.editor.readonly,
+			viewportMargin: Infinity,
 		};
 	}
 
@@ -77,9 +80,6 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				lineWrapping: false,
 				autofocus: false,
 				dragDrop: false,
-				readOnly: !isEngine(this.editor) || this.editor.readonly,
-				scrollbarStyle: 'null',
-				viewportMargin: 1 / 0,
 				...this.getConfig(value, syntaxMode),
 				...options,
 			},
@@ -141,6 +141,10 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		return this.codeMirror;
 	}
 
+	setAutoWrap(value: boolean) {
+		this.codeMirror?.setOption('lineWrapping', value);
+	}
+
 	update(mode: string, code?: string) {
 		this.mode = mode;
 		if (code !== undefined) {
@@ -154,7 +158,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		if (code !== undefined) this.save();
 	}
 
-	render(mode: string, value: string) {
+	render(mode: string, value: string, options?: EditorConfiguration) {
 		const root = this.container.find('.data-codeblock-content');
 		mode = this.getSyntax(mode);
 		const stage = $(
@@ -162,7 +166,10 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		);
 		root.append(stage);
 		const pre = stage.find('pre')[0];
-		this.runMode(value || '', mode, pre, this.getConfig(value, mode));
+		this.runMode(value || '', mode, pre, {
+			...this.getConfig(value, mode),
+			...options,
+		});
 	}
 
 	save() {

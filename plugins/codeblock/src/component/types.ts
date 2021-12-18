@@ -23,7 +23,8 @@ export interface CodeBlockEditorInterface {
 	getSyntax(mode: string): string;
 	create(mode: string, value: string, options?: EditorConfiguration): Editor;
 	update(mode: string, value?: string): void;
-	render(mode: string, value: string): void;
+	setAutoWrap(value: boolean): void;
+	render(mode: string, value: string, options?: EditorConfiguration): void;
 	save(): void;
 	focus(): void;
 	/**

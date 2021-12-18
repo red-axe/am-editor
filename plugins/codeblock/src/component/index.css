@@ -19,14 +19,14 @@
 
 .am-engine .CodeMirror,
 .am-engine-view .CodeMirror {
-    
-    /* \u5b57\u4f53\u53c2\u7167 github\uff0c\u8003\u8651\u548c 14px \u6587\u5b57\u5728\u4e00\u8d77\u6392\u7248\uff0c\u5b57\u53f7\u7528 13px */
-     font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+     font-family: monospace;
      font-size: 13px;
      line-height: 21px;
      color: #595959;
      direction: ltr;
-    
+     height: auto;
+     overflow: hidden;
+     background: transparent;
 }
 
 .am-engine .CodeMirror-lines,
@@ -374,15 +374,6 @@
     
 }
 
-.am-engine .CodeMirror,
-.am-engine-view .CodeMirror {
-     position: relative;
-     overflow: hidden;
-     height: auto;
-     background: transparent;
-    
-}
-
 .am-engine .CodeMirror-scroll,
 .am-engine-view .CodeMirror-scroll {
      overflow: scroll !important;
@@ -431,7 +422,7 @@
      top: 0;
      overflow-x: hidden;
      overflow-y: scroll;
-     display: none !important;
+     display: none;
     
 }
 
@@ -441,7 +432,7 @@
      left: 0;
      overflow-y: hidden;
      overflow-x: scroll;
-     display: none !important;
+     display: none;
     
 }
 
@@ -466,7 +457,7 @@
      top: 0;
      min-height: 100%;
      background: #f9f9f9;
-    
+     z-index: 3;
 }
 
 .am-engine .CodeMirror-gutter,
@@ -609,6 +600,11 @@
     
 }
 
+.am-engine .CodeMirror-simplescroll-horizontal, .am-engine-view .CodeMirror-simplescroll-horizontal {
+     bottom: 4px;
+     cursor: pointer;
+}
+
 .am-engine .CodeMirror-measure,
 .am-engine-view .CodeMirror-measure {
      position: absolute;
@@ -745,17 +741,6 @@
 
 .am-engine-view .data-codeblock-container {
      margin: 5px 0;
-    
-}
-
-.am-engine-view .CodeMirror {
-     padding: 16px;
-     overflow: initial;
-    
-}
-
-.am-engine-view .CodeMirror pre {
-     padding: 0;
     
 }
 

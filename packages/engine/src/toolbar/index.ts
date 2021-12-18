@@ -6,11 +6,13 @@ import {
 	NodeOptions,
 	ToolbarOptions,
 	ToolbarInterface,
+	SwitchOptions,
 } from '../types/toolbar';
 import Button from './button';
 import Dropdown from './dropdown';
 import Input from './input';
 import Tooltip from './tooltip';
+import Switch from './switch';
 import { DATA_ELEMENT } from '../constants';
 import { $ } from '../node';
 import './index.css';
@@ -22,7 +24,8 @@ const template = () => {
 class Toolbar implements ToolbarInterface {
 	private options: ToolbarOptions;
 	root: NodeInterface;
-	private items: Array<NodeInterface | Button | Input | Dropdown> = [];
+	private items: Array<NodeInterface | Button | Input | Dropdown | Switch> =
+		[];
 
 	constructor(options: ToolbarOptions) {
 		this.options = { ...options };
@@ -34,6 +37,10 @@ class Toolbar implements ToolbarInterface {
 			let item;
 			if (options.type === 'button') {
 				item = new Button(options as ButtonOptions);
+				item.render(node);
+			}
+			if (options.type === 'switch') {
+				item = new Switch(options as SwitchOptions);
 				item.render(node);
 			}
 			if (options.type === 'input') {
@@ -102,4 +109,4 @@ class Toolbar implements ToolbarInterface {
 
 export default Toolbar;
 
-export { Button, Input, Dropdown, Tooltip };
+export { Button, Input, Dropdown, Tooltip, Switch };

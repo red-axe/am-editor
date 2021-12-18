@@ -30,3 +30,5 @@ import 'codemirror/mode/vb/vb';
 import 'codemirror/mode/velocity/velocity';
 import 'codemirror/mode/xml/xml';
 import 'codemirror/mode/yaml/yaml';
+import 'codemirror/addon/scroll/simplescrollbars';
+import 'codemirror/addon/scroll/simplescrollbars.css';

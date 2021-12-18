@@ -263,7 +263,8 @@ class ImageComponent extends Card<ImageValue> {
 				onBeforeRender: (status, src) => {
 					const imagePlugin = this.editor.plugin.components['image'];
 					if (imagePlugin) {
-						const { onBeforeRender } = imagePlugin['options'] || {};
+						const { onBeforeRender } = (imagePlugin['options'] ||
+							{}) as any;
 						if (onBeforeRender) return onBeforeRender(status, src);
 					}
 					return src;

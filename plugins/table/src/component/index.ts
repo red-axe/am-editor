@@ -160,6 +160,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 									return true;
 								}
 								nextIndex++;
+								return false;
 							},
 						);
 						if (nextTd) {
@@ -169,6 +170,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 						}
 					}
 				}
+				return;
 			});
 			// 上键选择
 			this.editor.on('keydown:up', (event) => {
@@ -204,6 +206,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 									return true;
 								}
 								prevIndex++;
+								return false;
 							},
 						);
 						if (prevTd) {
@@ -213,6 +216,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 						}
 					}
 				}
+				return;
 			});
 		}
 		if (this.colorTool) return;

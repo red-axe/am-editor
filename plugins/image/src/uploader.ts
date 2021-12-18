@@ -206,7 +206,7 @@ export default class extends Plugin<Options> {
 	getUrl(value: ImageValue) {
 		const imagePlugin = this.editor.plugin.components['image'];
 		if (imagePlugin) {
-			const { onBeforeRender } = imagePlugin['options'] || {};
+			const { onBeforeRender } = (imagePlugin['options'] || {}) as any;
 			if (onBeforeRender) return onBeforeRender(value.status, value.src);
 		}
 		return value.src;

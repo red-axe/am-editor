@@ -10,9 +10,11 @@ const template = (options: DropdownSwitchOptions) => {
         <span class="data-toolbar-dropdown-item-content"${
 			options.disabled ? ' disabled="disabled"' : ''
 		}>${options.content}</span>
-        <button type="button" role="switch" aria-checked="true" class="switch-btn ${
-			checked ? ' switch-checked' : ''
-		}">
+        <button type="button"${
+			options.disabled ? ' disabled="disabled"' : ''
+		} role="switch" aria-checked="true" class="switch-btn ${
+		checked ? ' switch-checked' : ''
+	}">
             <div class="switch-handle"></div>
             <span class="switch-inner"></span>
         </button>
@@ -30,7 +32,7 @@ export default class {
 
 	renderTo(container: NodeInterface) {
 		this.root = $(template(this.options));
-		this.switch = this.root.find('.ant-switch');
+		this.switch = this.root.find('.switch-btn');
 		container.append(this.root);
 		this.root.on('mousedown', (e) => e.preventDefault());
 		const { onClick } = this.options;
@@ -46,9 +48,9 @@ export default class {
 	updateSwitch() {
 		if (this.options.getState) {
 			if (this.options.getState()) {
-				this.switch?.addClass('ant-switch-checked');
+				this.switch?.addClass('switch-checked');
 			} else {
-				this.switch?.removeClass('ant-switch-checked');
+				this.switch?.removeClass('switch-checked');
 			}
 		}
 	}

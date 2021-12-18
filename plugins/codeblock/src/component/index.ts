@@ -18,6 +18,7 @@ import './index.css';
 export type CodeBlockValue = {
 	mode?: string;
 	code?: string;
+	autoWrap?: boolean;
 };
 
 class CodeBlcok extends Card<CodeBlockValue> {
@@ -82,10 +83,30 @@ class CodeBlcok extends Card<CodeBlockValue> {
 			},
 		});
 	}
-
+	#viewAutoWrap?: boolean = undefined;
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
 		if (!isEngine(this.editor) || this.editor.readonly) {
-			return [{ type: 'copy' }];
+			return [
+				{ type: 'copy' },
+				{
+					type: 'switch',
+					content: this.editor.language.get<string>(
+						CodeBlcok.cardName,
+						'autoWrap',
+					),
+					getState: () => {
+						if (this.#viewAutoWrap === undefined) {
+							this.#viewAutoWrap = !!this.getValue()?.autoWrap;
+						}
+						return this.#viewAutoWrap;
+					},
+					onClick: () => {
+						const autoWrap = !this.#viewAutoWrap;
+						this.#viewAutoWrap = autoWrap;
+						this.codeEditor?.setAutoWrap(autoWrap);
+					},
+				},
+			];
 		}
 		return [
 			{
@@ -117,6 +138,24 @@ class CodeBlcok extends Card<CodeBlockValue> {
 					}, 100);
 				},
 			},
+			{
+				type: 'switch',
+				content: this.editor.language.get<string>(
+					CodeBlcok.cardName,
+					'autoWrap',
+				),
+				getState: () => {
+					return !!this.getValue()?.autoWrap;
+				},
+				onClick: () => {
+					const value = this.getValue();
+					const autoWrap = !value?.autoWrap;
+					this.setValue({
+						autoWrap,
+					});
+					this.codeEditor?.setAutoWrap(autoWrap);
+				},
+			},
 		];
 	}
 
@@ -139,13 +178,18 @@ class CodeBlcok extends Card<CodeBlockValue> {
 		if (isEngine(this.editor)) {
 			if (this.mirror) {
 				this.codeEditor.update(mode, code);
+				this.codeEditor.setAutoWrap(!!value?.autoWrap);
 				return;
 			}
 			setTimeout(() => {
-				this.mirror = this.codeEditor?.create(mode, code);
+				this.mirror = this.codeEditor?.create(mode, code, {
+					lineWrapping: !!value?.autoWrap,
+				});
 			}, 50);
 		} else {
-			this.codeEditor.render(mode, code);
+			this.codeEditor?.create(mode, code, {
+				lineWrapping: !!value?.autoWrap,
+			});
 		}
 	}
 }

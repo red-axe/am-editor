@@ -370,6 +370,11 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 				this.resizeModel?.render(container);
 			}
 		}
+		this.toolbarModel?.hide();
+		this.toolbarModel?.destroy();
+		if (this.toolbar) {
+			this.toolbarModel = new Toolbar(this.editor, this);
+		}
 		if (this.isEditable) {
 			this.editor.nodeId.generateAll(this.getCenter().get<Element>()!);
 		}

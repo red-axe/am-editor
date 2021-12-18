@@ -20,7 +20,10 @@ import './index.css';
 export const isCardToolbarItemOptions = (
 	item: ToolbarItemOptions | CardToolbarItemOptions,
 ): item is CardToolbarItemOptions => {
-	return ['button', 'input', 'dropdown', 'node'].indexOf(item.type) === -1;
+	return (
+		['button', 'input', 'dropdown', 'node', 'switch'].indexOf(item.type) ===
+		-1
+	);
 };
 
 class CardToolbar implements CardToolbarInterface {

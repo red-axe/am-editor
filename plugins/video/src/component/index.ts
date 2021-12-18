@@ -177,7 +177,11 @@ class VideoComponent extends Card<VideoValue> {
 		return `
         <div class="data-video">
             <div class="data-video-content data-video-done"></div>
-			${videoPlugin && videoPlugin.options.showTitle !== false ? titleElement : ''}
+			${
+				videoPlugin && (videoPlugin.options as any).showTitle !== false
+					? titleElement
+					: ''
+			}
         </div>
         `;
 	}
@@ -185,7 +189,7 @@ class VideoComponent extends Card<VideoValue> {
 	onBeforeRender = (action: 'query' | 'download' | 'cover', url: string) => {
 		const videoPlugin = this.editor.plugin.components['video'];
 		if (videoPlugin) {
-			const { onBeforeRender } = videoPlugin['options'] || {};
+			const { onBeforeRender } = (videoPlugin['options'] || {}) as any;
 			if (onBeforeRender) return onBeforeRender(action, url);
 		}
 		return url;
