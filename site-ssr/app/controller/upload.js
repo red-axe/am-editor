@@ -183,7 +183,6 @@ class UploadController extends Controller {
 							osDir === 'win' ? '.exe' : ''
 						}`,
 					);
-					if (osDir !== 'win') fs.chmod('777', probePath);
 					ffmpeg.setFfprobePath(probePath);
 					ffmpeg.ffprobe(filePath, (err, metadata) => {
 						const fileName = new Date().getTime() + '-v-image.png'; // stream对象也包含了文件名，大小等基本信息
@@ -219,6 +218,7 @@ class UploadController extends Controller {
 					});
 				} catch (err) {
 					console.error(err);
+					result.message = err.message;
 					resolve(result);
 				}
 			});
