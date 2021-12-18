@@ -325,9 +325,10 @@ class VideoComponent extends Card<VideoValue> {
 			height = Math.round(width * this.rate);
 		}
 		this.container?.css({
-			width: `${width}px`,
+			width: width > 0 ? `${width}px` : '',
 		});
-		this.videoContainer.css('width', `${width}px`);
+		this.videoContainer.css('width', width > 0 ? `${width}px` : '');
+
 		//this.videoContainer.css('height', `${height}px`);
 	}
 
@@ -350,12 +351,13 @@ class VideoComponent extends Card<VideoValue> {
 		width = Math.round(width);
 		height = Math.round(height);
 		this.videoContainer?.css({
-			width: `${width}px`,
+			width: width > 0 ? `${width}px` : '',
 			//height: `${height}px`,
 		});
 		this.container?.css({
-			width: `${width}px`,
+			width: width > 0 ? `${width}px` : '',
 		});
+
 		this.setValue({
 			width,
 			height,

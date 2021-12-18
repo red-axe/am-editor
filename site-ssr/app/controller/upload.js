@@ -3,6 +3,7 @@ const path = require('path');
 const sendToWormhole = require('stream-wormhole');
 const ffmpeg = require('fluent-ffmpeg');
 const { Controller } = require('egg');
+const os = require('os');
 
 class UploadController extends Controller {
 	constructor(cxt) {
@@ -166,12 +167,24 @@ class UploadController extends Controller {
 					name: sourceName,
 				};
 				try {
+					const platform = os.platform();
+					const osDir = platform === 'linux' ? 'linux' : 'win';
 					ffmpeg.setFfmpegPath(
-						path.join(app.baseDir, './app/ffmpeg/win/ffmpeg.exe'),
+						path.join(
+							app.baseDir,
+							`./app/ffmpeg/${osDir}/ffmpeg${
+								osDir === 'win' ? '.exe' : ''
+							}`,
+						),
 					);
-					ffmpeg.setFfprobePath(
-						path.join(app.baseDir, './app/ffmpeg/win/ffprobe.exe'),
+					const probePath = path.join(
+						app.baseDir,
+						`./app/ffmpeg/${osDir}/ffprobe${
+							osDir === 'win' ? '.exe' : ''
+						}`,
 					);
+					if (osDir !== 'win') fs.chmod('777', probePath);
+					ffmpeg.setFfprobePath(probePath);
 					ffmpeg.ffprobe(filePath, (err, metadata) => {
 						const fileName = new Date().getTime() + '-v-image.png'; // stream对象也包含了文件名，大小等基本信息
 
