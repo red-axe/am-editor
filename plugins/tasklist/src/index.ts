@@ -13,7 +13,7 @@ import './index.css';
 
 export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: boolean;
+	markdown?: boolean | string[];
 }
 
 export default class extends ListPlugin<Options> {
@@ -188,7 +188,8 @@ export default class extends ListPlugin<Options> {
 
 	//设置markdown
 	markdown(event: KeyboardEvent, text: string, block: NodeInterface) {
-		if (!isEngine(this.editor) || this.options.markdown === false) return;
+		const { markdown } = this.options;
+		if (!isEngine(this.editor) || markdown === false) return;
 		const { node, command } = this.editor;
 		const blockApi = this.editor.block;
 		const plugin = blockApi.findPlugin(block);
@@ -201,7 +202,12 @@ export default class extends ListPlugin<Options> {
 			return;
 		}
 
-		if (['[]', '[ ]', '[x]'].indexOf(text) < 0) return;
+		let markdownWords = ['[]', '[ ]', '[x]'];
+		if (Array.isArray(markdown)) {
+			markdownWords = markdown;
+		}
+
+		if (markdownWords.indexOf(text) < 0) return;
 		event.preventDefault();
 		blockApi.removeLeftText(block);
 		if (node.isEmpty(block)) {
