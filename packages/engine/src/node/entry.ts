@@ -1038,22 +1038,11 @@ class NodeEntry implements NodeInterface {
 			innerHeight: 0,
 			innerWidth: 0,
 		};
-		let top, left, bottom, right;
-		if (this.length > 0) {
-			const element = this.get<Element>()!;
-			const rect = element.getBoundingClientRect();
-			top = rect.top;
-			left = rect.left;
-			bottom = rect.bottom;
-			right = rect.right;
-		} else {
-			const element = this.get<Element>()!;
-			const rect = element.getBoundingClientRect();
-			top = rect.top;
-			left = rect.left;
-			bottom = rect.bottom;
-			right = rect.right;
-		}
+
+		const element = this.get<Element>()!;
+		const rect = element.getBoundingClientRect();
+		const { top, left, bottom, right } = rect;
+
 		return {
 			top,
 			left,
@@ -1081,10 +1070,15 @@ class NodeEntry implements NodeInterface {
 		if (viewNode) viewNode.parentNode?.removeChild(viewNode);
 		// 简单模式，只判断任一方向是否在视口内
 		if (simpleMode) {
-			return top <= vp.bottom || bottom <= vp.bottom;
+			return (
+				(top > 0 && top <= vp.bottom) ||
+				(bottom > 0 && bottom <= vp.bottom)
+			);
 		}
 		return (
+			top > 0 &&
 			top >= vp.top &&
+			left > 0 &&
 			left >= vp.left &&
 			bottom <= vp.bottom &&
 			right <= vp.right

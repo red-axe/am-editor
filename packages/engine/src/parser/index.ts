@@ -501,9 +501,9 @@ class Parser implements ParserInterface {
 		if (result.length > 0 && /^\n+/g.test(result[0])) {
 			result[0] = result[0].replace(/^\n+/g, '');
 		}
-		if (result.length > 0 && /^\n+/g.test(result[result.length - 1])) {
+		if (result.length > 0 && /\n+$/g.test(result[result.length - 1])) {
 			result[result.length - 1] = result[result.length - 1].replace(
-				/^\n+/g,
+				/\n+$/g,
 				'',
 			);
 		}

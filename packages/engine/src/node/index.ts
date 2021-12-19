@@ -827,7 +827,6 @@ class NodeModel implements NodeModelInterface {
 							isBegin = true;
 							if (text.length === 0) {
 								childNode.remove();
-								break;
 							}
 						}
 						//移除末尾换行符
@@ -836,11 +835,11 @@ class NodeModel implements NodeModelInterface {
 							childNode.text(text.substr(0, match.index));
 							cloneNode.append(childNode);
 							break;
-						} else if (isBegin) {
+						} else if (isBegin && childNode.length > 0) {
 							childNode.text(text);
 						}
 					}
-					cloneNode.append(childNode);
+					if (childNode.length > 0) cloneNode.append(childNode);
 					//判断下一个节点的开头是换行符，有换行符就跳出
 					if (nextNode?.isText()) {
 						const text = nextNode.text();

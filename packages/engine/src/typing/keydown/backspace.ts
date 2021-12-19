@@ -78,7 +78,14 @@ class Backspace implements TypingHandleInterface {
 			result = listener(event);
 			if (result === false) break;
 		}
-		if (result === false) return;
+		if (result === false) {
+			if (this.engine.scrollNode)
+				range.scrollIntoViewIfNeeded(
+					this.engine.container,
+					this.engine.scrollNode,
+				);
+			return;
+		}
 		// 范围为展开状态
 		if (!range.collapsed) {
 			event.preventDefault();
@@ -88,6 +95,11 @@ class Backspace implements TypingHandleInterface {
 			}
 			change.delete(range);
 			change.apply(range);
+			if (this.engine.scrollNode)
+				range.scrollIntoViewIfNeeded(
+					this.engine.container,
+					this.engine.scrollNode,
+				);
 			return;
 		} else {
 			let brNode: NodeInterface | undefined = undefined;

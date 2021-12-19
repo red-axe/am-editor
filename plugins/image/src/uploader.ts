@@ -685,13 +685,13 @@ export default class extends Plugin<Options> {
 		if (!text) return;
 		// 带跳转链接的图片
 		let reg =
-			/(\[!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)\]\(([\S]+?)\))|(!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\))/;
+			/(\[!\[([^\]]{0,})\]\((\S{0,})(https?:\/\/[^\)]{5,})\)\]\(([\S]+?)\))|(!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\))/i;
 		let match = reg.exec(text);
 
 		if (!match) {
 			// 无跳转链接的图片
 			//![aomao-preview](https://user-images.githubusercontent.com/55792257/125074830-62d79300-e0f0-11eb-8d0f-bb96a7775568.png)
-			reg = /(!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\))/;
+			reg = /(!\[([^\]]{0,})\]\((\S{0,})(https?:\/\/[^\)]{5,})\))/i;
 			match = reg.exec(text);
 		}
 		return {
@@ -720,9 +720,9 @@ export default class extends Plugin<Options> {
 			//从匹配结束位置分割
 			textNode = regNode.splitText(match[0].length);
 			const isLink = match[0].startsWith('[');
-			const alt = isLink ? match[2] : match[6];
-			const src = isLink ? match[3] : match[7];
-			const link = isLink ? match[4] : '';
+			const alt = match[2] || match[6];
+			const src = match[4] || match[8];
+			const link = isLink ? match[5] : '';
 
 			const cardNode = card.replaceNode($(regNode), 'image', {
 				src,

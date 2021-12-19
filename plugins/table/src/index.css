@@ -18,6 +18,14 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
   background: transparent
 }
 
+.am-engine [data-card-key="table"].card-selected [data-card-element="center"].data-card-background-selected {
+    background: transparent;
+}
+
+.am-engine [data-card-key="table"].card-selected [data-card-element="center"].data-card-background-selected .table-wrapper {
+    background: rgba(27, 162, 227, 0.2);
+}
+
 .am-engine-mobile div[data-card-key="table"].card-activated {
   margin-left: 20px;
 }

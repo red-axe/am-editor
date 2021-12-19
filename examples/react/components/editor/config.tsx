@@ -128,7 +128,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 				// 减去大纲的宽度
 				const width = editorLeft - $('.data-toc-wrapper').width();
 				// 留 16px 的间隔
-				return width <= 0 ? 100 : width - 16;
+				return width <= 0 ? 0 : width - 16;
 			},
 			maxRightWidth: () => {
 				// 编辑区域位置
@@ -139,7 +139,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 				// 减去评论区域的宽度
 				const width = editorRigth - $('.doc-comment-layer').width();
 				// 留 16px 的间隔
-				return width <= 0 ? 100 : width - 16;
+				return width <= 0 ? 0 : width - 16;
 			},
 		},
 	},

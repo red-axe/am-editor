@@ -399,13 +399,19 @@ class ChangeModel implements ChangeInterface {
 				};
 			}
 			let nextNode = firstNode.next();
+			let beforeNode = firstNode;
 			nodeApi.insert(firstNode, range);
 			while (nextNode && !nodeApi.isBlock(nextNode)) {
 				if (range.startContainer.nodeType === Node.TEXT_NODE)
 					range.enlargeToElementNode().collapse(false);
 				const newNext = nextNode.next();
-				nodeApi.insert(nextNode, range);
+				beforeNode.after(nextNode);
+				beforeNode = nextNode;
+				//nodeApi.insert(nextNode, range);
 				nextNode = newNext;
+			}
+			if (beforeNode !== firstNode) {
+				range.select(beforeNode, true).collapse(false);
 			}
 			if (childNodes.length === 0) {
 				apply(range);

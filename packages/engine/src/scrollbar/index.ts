@@ -1,5 +1,5 @@
 import { EventEmitter2 } from 'eventemitter2';
-import { throttle } from 'lodash-es';
+import { debounce, throttle } from 'lodash-es';
 import { DATA_ELEMENT, UI } from '../constants';
 import { NodeInterface } from '../types';
 import { $ } from '../node';
@@ -37,7 +37,6 @@ class Scrollbar extends EventEmitter2 {
 	private sHeight: number = 0;
 	private xWidth: number = 0;
 	private yHeight: number = 0;
-	private maxScrollLeft: number = 0;
 	#observer?: MutationObserver;
 	#reverse?: boolean;
 	#content?: NodeInterface;
@@ -120,85 +119,121 @@ class Scrollbar extends EventEmitter2 {
 		}
 	}
 
-	refresh = () => {
+	getWidth() {
 		const element = this.container.get<HTMLElement>();
-		if (element) {
-			const offsetWidth = this.#scroll?.getOffsetWidth
-				? this.#scroll.getOffsetWidth(element.offsetWidth)
-				: element.offsetWidth;
+		if (!element) return 0;
+		const offsetWidth = this.#scroll?.getOffsetWidth
+			? this.#scroll.getOffsetWidth(element.offsetWidth)
+			: element.offsetWidth;
+		return offsetWidth;
+	}
 
-			const { offsetHeight, scrollTop } = element;
-			const contentElement = this.#content?.get<HTMLElement>();
-			const sPLeft = removeUnit(this.container.css('padding-left'));
-			const sPRight = removeUnit(this.container.css('padding-right'));
-			const sPTop = removeUnit(this.container.css('padding-top'));
-			const sPBottom = removeUnit(this.container.css('padding-bottom'));
-			const scrollWidth = contentElement
-				? contentElement.offsetWidth + sPLeft + sPRight
-				: element.scrollWidth;
-			const scrollHeight = contentElement
-				? contentElement.offsetHeight + sPTop + sPBottom
-				: element.scrollHeight;
-			this.oWidth =
-				offsetWidth -
-				removeUnit(this.container.css('border-left-width')) -
-				removeUnit(this.container.css('border-right-width'));
-			this.oHeight =
-				offsetHeight -
-				removeUnit(this.container.css('border-top-width')) -
-				removeUnit(this.container.css('border-bottom-width'));
-			this.sWidth = scrollWidth;
-			this.sHeight = scrollHeight;
-			this.xWidth = Math.floor((this.oWidth * this.oWidth) / scrollWidth);
-			this.yHeight = Math.floor(
-				(this.oHeight * this.oHeight) / scrollHeight,
-			);
-			this.maxScrollLeft = scrollWidth - this.oWidth;
-			if (this.x) {
-				this.slideX?.css('width', this.xWidth + 'px');
-				const display =
-					this.oWidth - sPLeft - sPRight === this.sWidth ||
-					(contentElement &&
-						contentElement.offsetWidth <=
-							this.oWidth - sPLeft - sPRight)
-						? 'none'
-						: 'block';
-				this.slideX?.css('display', display);
-				this.emit('display', display);
-				this.shadowLeft?.css('display', display);
-				this.shadowRight?.css('display', display);
-			}
-			if (this.y) {
-				this.slideY?.css('height', this.yHeight + 'px');
-				const display =
-					this.oHeight - sPTop - sPBottom === this.sHeight ||
-					(contentElement &&
-						contentElement.offsetHeight <=
-							this.oHeight - sPTop - sPBottom)
-						? 'none'
-						: 'block';
-				this.slideY?.css('display', display);
-				this.emit('display', display);
-			}
-			// 实际内容宽度小于容器滚动宽度（有内容删除了）
-			if (
-				this.x &&
-				contentElement &&
-				element.scrollWidth - sPLeft - sPRight >
-					contentElement.offsetWidth
-			) {
-				let left =
-					element.scrollWidth -
-					sPLeft -
-					sPRight -
-					contentElement.offsetWidth;
+	refresh = debounce(
+		() => {
+			const element = this.container.get<HTMLElement>();
+			if (element) {
+				const { offsetHeight, scrollTop } = element;
+				const contentElement = this.#content?.get<HTMLElement>();
+				const sPLeft = removeUnit(this.container.css('padding-left'));
+				const sPRight = removeUnit(this.container.css('padding-right'));
+				const sPTop = removeUnit(this.container.css('padding-top'));
+				const sPBottom = removeUnit(
+					this.container.css('padding-bottom'),
+				);
+				const scrollWidth = contentElement
+					? contentElement.offsetWidth + sPLeft + sPRight
+					: element.scrollWidth;
+				const scrollHeight = contentElement
+					? contentElement.offsetHeight + sPTop + sPBottom
+					: element.scrollHeight;
+				this.oWidth = this.getWidth();
+				this.oHeight =
+					offsetHeight -
+					removeUnit(this.container.css('border-top-width')) -
+					removeUnit(this.container.css('border-bottom-width'));
+				this.sWidth = scrollWidth;
+				this.sHeight = scrollHeight;
+				this.xWidth = Math.floor(
+					(this.oWidth * this.oWidth) / scrollWidth,
+				);
+				this.yHeight = Math.floor(
+					(this.oHeight * this.oHeight) / scrollHeight,
+				);
+				if (this.x) {
+					this.slideX?.css('width', this.xWidth + 'px');
+					const display =
+						this.oWidth - sPLeft - sPRight === this.sWidth ||
+						(contentElement &&
+							contentElement.offsetWidth <=
+								this.oWidth - sPLeft - sPRight)
+							? 'none'
+							: 'block';
+					this.slideX?.css('display', display);
+					this.emit('display', display);
+					this.shadowLeft?.css('display', display);
+					this.shadowRight?.css('display', display);
+				}
+				if (this.y) {
+					this.slideY?.css('height', this.yHeight + 'px');
+					const display =
+						this.oHeight - sPTop - sPBottom === this.sHeight ||
+						(contentElement &&
+							contentElement.offsetHeight <=
+								this.oHeight - sPTop - sPBottom)
+							? 'none'
+							: 'block';
+					this.slideY?.css('display', display);
+					this.emit('display', display);
+				}
+				// 实际内容宽度小于容器滚动宽度（有内容删除了）
+				if (
+					this.x &&
+					contentElement &&
+					element.scrollWidth - sPLeft - sPRight >
+						contentElement.offsetWidth
+				) {
+					let left =
+						element.scrollWidth -
+						sPLeft -
+						sPRight -
+						contentElement.offsetWidth;
+					if (this.#scroll) {
+						const { onScrollX, getScrollLeft } = this.#scroll;
+
+						left = getScrollLeft
+							? getScrollLeft(-0) + element.scrollLeft - left
+							: element.scrollLeft - left;
+						if (left < 0) left = 0;
+						if (onScrollX) {
+							const result = onScrollX(left);
+							if (result > 0) element.scrollLeft = result;
+							else element.scrollLeft = 0;
+						}
+						this.scroll({ left });
+					} else {
+						element.scrollLeft -= left;
+					}
+					return;
+				}
+				// 实际内容高度小于容器滚动高度（有内容删除了）
+				if (
+					this.y &&
+					contentElement &&
+					element.scrollHeight - sPTop - sPBottom !==
+						contentElement.offsetHeight
+				) {
+					element.scrollTop -=
+						element.scrollHeight -
+						sPTop -
+						sPBottom -
+						contentElement.offsetHeight;
+					return;
+				}
+				const left = this.#scroll?.getScrollLeft
+					? this.#scroll.getScrollLeft(element.scrollLeft)
+					: element.scrollLeft;
 				if (this.#scroll) {
-					const { onScrollX, getScrollLeft } = this.#scroll;
-
-					left = getScrollLeft
-						? getScrollLeft(-0) + element.scrollLeft - left
-						: element.scrollLeft - left;
-					if (left < 0) left = 0;
+					const { onScrollX } = this.#scroll;
 					if (onScrollX) {
 						const result = onScrollX(left);
 						if (result > 0) element.scrollLeft = result;
@@ -206,31 +241,14 @@ class Scrollbar extends EventEmitter2 {
 					}
 					this.scroll({ left });
 				} else {
-					element.scrollLeft -= left;
+					this.reRenderX(left);
 				}
-				return;
+				this.reRenderY(scrollTop);
 			}
-			// 实际内容高度小于容器滚动高度（有内容删除了）
-			if (
-				this.y &&
-				contentElement &&
-				element.scrollHeight - sPTop - sPBottom !==
-					contentElement.offsetHeight
-			) {
-				element.scrollTop -=
-					element.scrollHeight -
-					sPTop -
-					sPBottom -
-					contentElement.offsetHeight;
-				return;
-			}
-			const left = this.#scroll?.getScrollLeft
-				? this.#scroll.getScrollLeft(element.scrollLeft)
-				: element.scrollLeft;
-			this.reRenderX(left);
-			this.reRenderY(scrollTop);
-		}
-	};
+		},
+		50,
+		{ leading: true },
+	);
 
 	/**
 	 * 启用鼠标在内容节点上滚动或在移动设备使用手指滑动
@@ -591,13 +609,12 @@ class Scrollbar extends EventEmitter2 {
 			let min = value <= 0 ? 0 : left / value;
 			min = Math.min(1, min);
 			this.slideX?.css('left', (this.oWidth - this.xWidth) * min + 'px');
-			this.reRenderShadow(left);
-			if (left === removeUnit(this.scrollBarX?.css('left') || '0'))
-				return;
 			this.emit('change', {
 				x: left,
 				y: removeUnit(this.scrollBarY?.css('top') || '0'),
 			});
+			this.oWidth = this.getWidth();
+			this.reRenderShadow(left);
 		}
 	};
 
@@ -608,7 +625,6 @@ class Scrollbar extends EventEmitter2 {
 			let min = value <= 0 ? 0 : top / value;
 			min = Math.min(1, min);
 			this.slideY?.css('top', (this.oHeight - this.yHeight) * min + 'px');
-			if (top === removeUnit(this.scrollBarX?.css('top') || '0')) return;
 			this.emit('change', {
 				x: removeUnit(this.scrollBarX?.css('left') || '0'),
 				y: top,
@@ -652,6 +668,7 @@ class Scrollbar extends EventEmitter2 {
 		}
 		this.#observer?.disconnect();
 		window.removeEventListener('resize', this.refresh);
+		window.removeEventListener('scroll', this.refresh);
 	}
 }
 

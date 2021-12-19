@@ -351,7 +351,8 @@ export default class Paste {
 					const nextReg = node.get<Text>()!.splitText(match.index);
 					const endReg = nextReg.splitText(match[0].length);
 					node.after(nextReg);
-					node.after(endReg);
+					nextReg.after(endReg);
+					if (!node.text()) node.remove();
 				}
 			}
 			// 删除包含Card的 pre 标签
