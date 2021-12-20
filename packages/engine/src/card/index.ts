@@ -750,7 +750,16 @@ class CardModel implements CardModelInterface {
 			this.render(center);
 		}
 		card.didRender();
-		updateIndex(card.root);
+		const cardParent = card.root.parent();
+		// 如果父节点是根节点，则直接获取index
+		if (cardParent?.isRoot()) {
+			card.root[0]['__index'] = card.root.index();
+		} else if (cardParent) {
+			// 以卡片的父节点为基础去更新index
+			updateIndex(cardParent);
+		}
+		//  可编辑卡片更新内部节点的index
+		if (card.isEditable) updateIndex(card.root);
 	}
 
 	removeComponent(card: CardInterface): void {
@@ -824,7 +833,11 @@ class CardModel implements CardModelInterface {
 			}
 		}
 
-		range.select(prevBlock, true).shrinkToElementNode().collapse(false);
+		range
+			.select(prevBlock, true)
+			.shrinkToElementNode()
+			.shrinkToTextNode()
+			.collapse(false);
 	}
 	// 焦点移动到下一个 Block
 	focusNextBlock(
@@ -865,7 +878,11 @@ class CardModel implements CardModelInterface {
 			}
 		}
 
-		range.select(nextBlock, true).shrinkToElementNode().collapse(true);
+		range
+			.select(nextBlock, true)
+			.shrinkToElementNode()
+			.shrinkToTextNode()
+			.collapse(true);
 	}
 }
 

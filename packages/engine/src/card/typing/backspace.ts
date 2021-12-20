@@ -42,7 +42,7 @@ class Backspace {
 
 		range.select(prevBlock, true);
 		range.collapse(false);
-		change.range.select(range);
+		change.range.select(range.shrinkToTextNode());
 	}
 	/**
 	 * 在卡片节点处按下backspace键
@@ -127,7 +127,7 @@ class Backspace {
 			if (cardRight.length > 0) {
 				event.preventDefault();
 				this.focusPrevBlock(card.root);
-				this.engine.card.remove(card.id);
+				this.engine.card.remove(card.id, false);
 				return false;
 			}
 		}
