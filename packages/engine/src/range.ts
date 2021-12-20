@@ -1,7 +1,12 @@
 import { NodeInterface } from './types/node';
 import { RangeInterface, RangePath } from './types/range';
 import { isMobile } from './utils';
-import { CARD_ELEMENT_KEY, CARD_SELECTOR } from './constants/card';
+import {
+	CARD_ELEMENT_KEY,
+	CARD_SELECTOR,
+	CARD_LEFT_SELECTOR,
+	CARD_RIGHT_SELECTOR,
+} from './constants/card';
 import { ANCHOR, CURSOR, FOCUS } from './constants/selection';
 import {
 	DATA_ELEMENT,
@@ -371,7 +376,8 @@ class Range implements RangeInterface {
 			!node.isVoid(child) &&
 			(!childDom.isCard() ||
 				childDom.isEditableCard() ||
-				childDom.closest(EDITABLE_SELECTOR).length > 0)
+				(childDom.closest(EDITABLE_SELECTOR).length > 0 &&
+					childDom.find(CARD_LEFT_SELECTOR).length > 0))
 		) {
 			this.setStart(child, 0);
 		}
@@ -385,7 +391,8 @@ class Range implements RangeInterface {
 			!childDom.isCursor() &&
 			(!childDom.isCard() ||
 				childDom.isEditableCard() ||
-				childDom.closest(EDITABLE_SELECTOR).length > 0)
+				(childDom.closest(EDITABLE_SELECTOR).length > 0 &&
+					childDom.find(CARD_RIGHT_SELECTOR).length > 0))
 		) {
 			this.setEnd(child, child.childNodes.length);
 		}
