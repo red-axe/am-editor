@@ -15,7 +15,6 @@ class Container {
 	private options: Options;
 	private node: NodeInterface;
 	private _focused: boolean = false;
-	#styleElement?: Element;
 
 	constructor(selector: Selector, options: Options) {
 		this.node = $(selector);
@@ -133,29 +132,18 @@ class Container {
 	showPlaceholder() {
 		const { placeholder } = this.options;
 		if (placeholder) {
-			if (this.#styleElement && this.#styleElement.parentNode)
-				document.body.removeChild(this.#styleElement);
-			this.#styleElement = document.createElement('style');
 			//const left = this.node.css('padding-left');
 			//const top = this.node.css('padding-top');
-			const styleText = document.createTextNode(`.am-engine:before {
-                content: attr(data-placeholder);
-                pointer-events: none;
-                position: absolute;
-                color: #bbbfc4;
-                height: 0;
-            }`);
-			this.#styleElement.appendChild(styleText);
-			document.body.appendChild(this.#styleElement);
 			this.node.attributes({
 				'data-placeholder': placeholder,
 			});
-		} else if (this.#styleElement && this.#styleElement.parentNode)
-			document.body.removeChild(this.#styleElement);
+			this.node.addClass('am-engine-placeholder');
+		}
 	}
 
 	hidePlaceholder() {
 		this.node.removeAttributes('data-placeholder');
+		this.node.removeClass('am-engine-placeholder');
 	}
 
 	destroy() {
@@ -169,7 +157,6 @@ class Container {
 		this.node.removeAttributes('data-gramm');
 		this.node.removeAttributes('tabindex');
 		this.node.removeAttributes('data-placeholder');
-		if (this.#styleElement) document.body.removeChild(this.#styleElement);
 		if (this.options.className) {
 			(Array.isArray(className)
 				? className

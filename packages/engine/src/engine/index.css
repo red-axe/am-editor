@@ -598,6 +598,14 @@
     background-color: #FFFFFF;
 }
 
+.am-engine.am-engine-placeholder:before {
+  content: attr(data-placeholder);
+  pointer-events: none;
+  position: absolute;
+  color: #bbbfc4;
+  height: 0;
+}
+
 .am-engine ::selection {
     background: rgba(180, 213, 254, 0.5) !important;
     color: inherit!important;
