@@ -56,14 +56,20 @@ class Backspace {
 		if (!card) {
 			// 光标前面有Card，并且不是自定义列表，移除卡片
 			const prevNode = range.getPrevNode();
+			const prevParent = prevNode?.parent();
 			if (
 				!event['isDelete'] &&
 				prevNode &&
 				prevNode.isCard() &&
-				!this.engine.node.isCustomize(prevNode)
+				(!prevParent || !this.engine.node.isCustomize(prevParent))
 			) {
 				event.preventDefault();
+				const cloneRange = range.cloneRange();
+				cloneRange.setStartBefore(prevNode);
+				cloneRange.collapse(true);
 				this.engine.card.remove(prevNode);
+				cloneRange.handleBr();
+				change.range.select(cloneRange.shrinkToTextNode());
 				return false;
 			}
 			return true;
@@ -94,8 +100,13 @@ class Backspace {
 			const cardRight = range.startNode.closest(CARD_RIGHT_SELECTOR);
 			if (cardRight.length > 0) {
 				event.preventDefault();
+
+				const cloneRange = range.cloneRange();
+				cloneRange.setStartBefore(card.root);
+				cloneRange.collapse(true);
 				this.engine.card.remove(card.id);
-				range.handleBr();
+				cloneRange.handleBr();
+				change.range.select(cloneRange.shrinkToTextNode());
 				return false;
 			}
 		} else {
