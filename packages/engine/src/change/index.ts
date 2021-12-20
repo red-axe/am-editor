@@ -120,6 +120,18 @@ class ChangeModel implements ChangeInterface {
 			if (editableElement && editableElement.length > 0) {
 				const card = this.engine.card.find(editableElement, true);
 				if (card?.onChange) card?.onChange(trigger, editableElement);
+			} else {
+				applyNodes?.forEach((node) => {
+					editableElement = node.closest(EDITABLE_SELECTOR);
+					if (editableElement && editableElement.length > 0) {
+						const card = this.engine.card.find(
+							editableElement,
+							true,
+						);
+						if (card?.onChange)
+							card?.onChange(trigger, editableElement);
+					}
+				});
 			}
 		}
 

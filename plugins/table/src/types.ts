@@ -1,4 +1,9 @@
-import { CardInterface, ClipboardData, NodeInterface } from '@aomao/engine';
+import {
+	CardInterface,
+	CardValue,
+	ClipboardData,
+	NodeInterface,
+} from '@aomao/engine';
 import { EventEmitter2 } from 'eventemitter2';
 
 export interface HelperInterface {
@@ -99,7 +104,8 @@ export interface TemplateInterface {
 	renderColsHeader(rows: number): string;
 }
 
-export type TableValue = {
+export interface TableValue extends CardValue {
+	id: string;
 	rows: number;
 	cols: number;
 	width?: number;
@@ -108,7 +114,7 @@ export type TableValue = {
 	color?: string;
 	noBorder?: boolean;
 	overflow?: boolean;
-};
+}
 
 export type TableMenuItem = {
 	action?: string;
@@ -154,8 +160,6 @@ export interface TableInterface extends CardInterface {
 	 * 渲染
 	 */
 	render(): string | NodeInterface | void;
-
-	getTableValue(): TableValue | undefined;
 }
 
 export type ControllOptions = {

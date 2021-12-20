@@ -172,7 +172,7 @@ class NodeEntry implements NodeInterface {
 			attributes[DATA_ELEMENT] === EDITABLE ||
 			attributes[CARD_EDITABLE_KEY] === 'true' ||
 			(this.isElement() &&
-				!!(this[0] as Element).querySelector(EDITABLE_SELECTOR))
+				!!this.get<HTMLElement>()?.querySelector(EDITABLE_SELECTOR))
 		);
 	}
 

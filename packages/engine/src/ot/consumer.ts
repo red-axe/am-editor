@@ -352,7 +352,8 @@ class Consumer implements ConsumerInterface {
 			const applyNode = this.handleOperation(op);
 			if (applyNode) applyNodes.push(applyNode);
 		});
-		this.engine.change.change();
+		if (ops.some((op) => !isCursorOp(op)))
+			this.engine.change.change(false, applyNodes);
 		return applyNodes;
 	}
 

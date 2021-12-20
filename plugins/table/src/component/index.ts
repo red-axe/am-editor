@@ -3,6 +3,7 @@ import {
 	Card,
 	CardToolbarItemOptions,
 	CardType,
+	CardValue,
 	EDITABLE_SELECTOR,
 	isEngine,
 	isMobile,
@@ -344,12 +345,13 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.alignToolButton?.html(alignHtml);
 	}
 
-	getTableValue() {
-		if (!this.wrapper) return;
+	getValue() {
+		const value = super.getValue() as TableValue;
+		if (!this.wrapper) return value;
 		const tableRoot = this.wrapper.find(Template.TABLE_CLASS);
-		if (!tableRoot) return;
+		if (!tableRoot) return value;
 		const { tableModel } = this.selection;
-		if (!tableModel) return;
+		if (!tableModel) return value;
 		const { schema, conversion } = this.editor;
 		const container = $('<div></div>');
 		container.append(tableRoot.clone(true));
@@ -362,6 +364,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		const { rows, cols, height, width } = tableModel;
 		const html = parser.toValue(schema, conversion, false, true);
 		return {
+			...value,
 			rows,
 			cols,
 			height,
@@ -446,12 +449,12 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.#changeTimeout = setTimeout(() => {
 			this.conltrollBar.refresh();
 			this.selection.render('change');
-			const oldValue = this.getValue();
+			const oldValue = super.getValue();
 			if (oldValue?.noBorder) {
 				this.noBorderToolButton?.addClass('active');
 			} else this.noBorderToolButton?.removeClass('active');
 			if (trigger === 'local') {
-				const value = this.getTableValue();
+				const value = this.getValue();
 				if (value) this.setValue(value);
 			}
 		}, 100);
@@ -624,7 +627,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		if (!tableRoot) return;
 		const value = this.getValue();
 		if (!value?.html) {
-			const tableValue = this.getTableValue();
+			const tableValue = this.getValue();
 			if (tableValue) this.setValue(tableValue);
 			this.onChange();
 		}

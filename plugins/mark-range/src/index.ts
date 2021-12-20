@@ -13,6 +13,9 @@ import {
 	Selection,
 	PluginOptions,
 	uuid,
+	EDITABLE_SELECTOR,
+	CARD_SELECTOR,
+	transformCustomTags,
 } from '@aomao/engine';
 import { Path } from 'sharedb';
 
@@ -393,6 +396,15 @@ export default class extends MarkPlugin<Options> {
 				//设置新的id串
 				mark.attributes(this.getIdName(key), ids.join(','));
 				mark.removeAttributes(this.getPreviewName(key));
+				const editableCard = mark.closest(EDITABLE_SELECTOR);
+				if (editableCard.length > 0) {
+					const cardComponent = this.editor.card.find(
+						editableCard,
+						true,
+					);
+					if (cardComponent && cardComponent.onChange)
+						cardComponent.onChange('local', cardComponent.root);
+				}
 			});
 		this.#isApply = true;
 	}
@@ -458,6 +470,7 @@ export default class extends MarkPlugin<Options> {
 				.split(',');
 			if (oldIds[0] === '') oldIds.splice(0, 1);
 			//移除标记样式包裹
+			const editableCard = mark.closest(EDITABLE_SELECTOR);
 			if (oldIds.length === 1 && !!oldIds.find((i) => i === id)) {
 				if (mark.isCard()) {
 					mark.removeAttributes(this.MARK_KEY);
@@ -473,6 +486,11 @@ export default class extends MarkPlugin<Options> {
 				const index = oldIds.findIndex((i) => i === id);
 				oldIds.splice(index, 1);
 				mark.attributes(this.getIdName(key), oldIds.join(','));
+			}
+			if (editableCard.length > 0) {
+				const cardComponent = this.editor.card.find(editableCard, true);
+				if (cardComponent && cardComponent.onChange)
+					cardComponent.onChange('local', cardComponent.root);
 			}
 		});
 	}
@@ -621,9 +639,9 @@ export default class extends MarkPlugin<Options> {
 			clip: 'rect(0, 0, 0, 0)',
 		});
 		$(document.body).append(container);
-		if (value) container.html(value);
+		if (value) container.html(transformCustomTags(value));
 
-		card.render(container);
+		card.render(container, undefined, false);
 
 		const selection = container.window?.getSelection();
 		const range = (
@@ -645,33 +663,47 @@ export default class extends MarkPlugin<Options> {
 		range.select(container, true).collapse(true);
 
 		const paths: Array<{ id: Array<string>; path: Array<Path> }> = [];
-		container.traverse((childNode) => {
-			const id = childNode.attributes(this.getIdName(key));
-			if (!!id) {
-				const rangeClone = range.cloneRange();
+		container.traverse(
+			(childNode) => {
+				const id = childNode.attributes(this.getIdName(key));
+				if (!!id) {
+					const rangeClone = range.cloneRange();
 
-				if (childNode.isCard()) {
-					rangeClone.select(childNode);
-					childNode.removeAttributes(this.getIdName(key));
-				} else {
-					rangeClone.select(childNode, true);
-					const selection = rangeClone.createSelection();
-					node.unwrap(childNode);
-					selection.move();
+					if (childNode.isCard()) {
+						rangeClone.select(childNode);
+						childNode.removeAttributes(this.getIdName(key));
+					} else {
+						rangeClone.select(childNode, true);
+						const selection = rangeClone.createSelection();
+						node.unwrap(childNode);
+						selection.move();
+					}
+					const rangePath = rangeClone
+						.shrinkToElementNode()
+						.shrinkToTextNode()
+						.toPath(undefined, container);
+					paths.push({
+						id: id.split(','),
+						path: rangePath
+							? [rangePath.start.path, rangePath.end.path]
+							: [],
+					});
 				}
-				const rangePath = rangeClone
-					.shrinkToElementNode()
-					.shrinkToTextNode()
-					.toPath(undefined, container);
-				paths.push({
-					id: id.split(','),
-					path: rangePath
-						? [rangePath.start.path, rangePath.end.path]
-						: [],
-				});
+			},
+			false,
+			true,
+		);
+		const cardNodes = container.find(CARD_SELECTOR);
+		cardNodes.each((_, index) => {
+			const cardNode = cardNodes.eq(index);
+			if (cardNode?.isEditableCard()) {
+				const card = this.editor.card.find(cardNode);
+				if (card) {
+					const value = card.getValue();
+					card.setValue(value || {});
+				}
 			}
-		}, false);
-
+		});
 		value = parser.toValue(schema, conversion);
 		container.remove();
 		return {
@@ -699,9 +731,9 @@ export default class extends MarkPlugin<Options> {
 			clip: 'rect(0, 0, 0, 0)',
 		});
 		$(document.body).append(container);
-		if (value) container.html(value);
+		if (value) container.html(transformCustomTags(value));
 
-		card.render(container);
+		card.render(container, undefined, false);
 		const selection = container.window?.getSelection();
 		const range = (
 			selection
@@ -742,6 +774,17 @@ export default class extends MarkPlugin<Options> {
 				)}="${id.join(',')}" />`,
 				pathRange,
 			);
+		});
+		const cardNodes = container.find(CARD_SELECTOR);
+		cardNodes.each((_, index) => {
+			const cardNode = cardNodes.eq(index);
+			if (cardNode?.isEditableCard()) {
+				const card = this.editor.card.find(cardNode);
+				if (card) {
+					const value = card.getValue();
+					card.setValue(value || {});
+				}
+			}
 		});
 		value = parser.toValue(schema, conversion);
 		container.remove();
