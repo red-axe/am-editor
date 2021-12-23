@@ -3,6 +3,7 @@ import {
 	ElementPluginInterface,
 	NodeInterface,
 	ConversionData,
+	PluginInterface,
 } from '../types';
 import {
 	SchemaAttributes,
@@ -16,10 +17,11 @@ import { $ } from '../node';
 import PluginEntry from './base';
 import { isNode } from '../node/utils';
 
-abstract class ElementPluginEntry<T extends PluginOptions = {}>
+abstract class ElementPluginEntry<T extends PluginOptions>
 	extends PluginEntry<T>
 	implements ElementPluginInterface
 {
+	readonly kind: string = 'element';
 	/**
 	 * 规则缓存
 	 */
@@ -242,6 +244,23 @@ abstract class ElementPluginEntry<T extends PluginOptions = {}>
 	 * 在粘贴时的标签转换，例如：b > strong
 	 */
 	conversion?(): ConversionData;
+
+	/**
+	 * 创建符合当前插件规则的节点
+	 * @param args 参数
+	 * @returns 节点
+	 */
+	createElement(...args: any) {
+		const markNode = $(`<${this.tagName} />`);
+		this.setStyle(markNode, ...args);
+		this.setAttributes(markNode, ...args);
+		return markNode;
+	}
 }
 
 export default ElementPluginEntry;
+export const isElementPlugin = (
+	plugin: PluginInterface,
+): plugin is ElementPluginInterface => {
+	return plugin.kind === 'element';
+};

@@ -6,12 +6,12 @@ import {
 	PluginOptions,
 } from '@aomao/engine';
 
-export interface Options extends PluginOptions {
+export interface LineHeightOptions extends PluginOptions {
 	hotkey?: string;
 	filter?: (lineHeight: string) => string | boolean;
 }
 
-export default class extends Plugin<Options> {
+export default class<T extends LineHeightOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'line-height';
 	}

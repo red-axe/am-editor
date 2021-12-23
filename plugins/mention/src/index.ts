@@ -17,11 +17,11 @@ import {
 	READY_CARD_KEY,
 	CARD_VALUE_KEY,
 } from '@aomao/engine';
-import MentionComponent from './component';
+import MentionComponent, { MentionValue } from './component';
 import locales from './locales';
 import { MentionItem } from './types';
 
-export interface Options extends PluginOptions {
+export interface MentionOptions extends PluginOptions {
 	defaultData?: Array<MentionItem>;
 	onSearch?: (keyword: string) => Promise<Array<MentionItem>>;
 	onSelect?: (data: {
@@ -73,7 +73,7 @@ export interface Options extends PluginOptions {
 	};
 }
 
-class MentionPlugin extends Plugin<Options> {
+class MentionPlugin<T extends MentionOptions> extends Plugin<T> {
 	#request?: AjaxInterface;
 	static get pluginName() {
 		return 'mention';
@@ -194,12 +194,11 @@ class MentionPlugin extends Plugin<Options> {
 	}
 
 	getList() {
-		const values: Array<{ [key: string]: string }> = [];
+		const values: Array<MentionValue> = [];
 		this.editor.card.each((card) => {
-			const Component = card.constructor as CardEntry;
-			if (Component.cardName === MentionComponent.cardName) {
+			if (card.name === MentionComponent.cardName) {
 				const { key, name, ...value } =
-					(card as MentionComponent).getValue() || {};
+					(card as MentionComponent<MentionValue>).getValue() || {};
 				if (name && key)
 					values.push({
 						key: unescape(key),
@@ -232,7 +231,7 @@ class MentionPlugin extends Plugin<Options> {
 			const type = attributes['data-type'];
 			if (type === MentionComponent.cardName) {
 				const value = attributes['data-value'];
-				const cardValue = decodeCardValue(value);
+				const cardValue = decodeCardValue<MentionValue>(value);
 				if (!cardValue.name) return;
 				this.editor.card.replaceNode(
 					node,
@@ -251,7 +250,10 @@ class MentionPlugin extends Plugin<Options> {
 			`[${CARD_KEY}="${MentionComponent.cardName}"],[${READY_CARD_KEY}="${MentionComponent.cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find(node) as MentionComponent;
+			const card = this.editor.card.find<
+				MentionValue,
+				MentionComponent<MentionValue>
+			>(node);
 			const value =
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
@@ -270,4 +272,5 @@ class MentionPlugin extends Plugin<Options> {
 	execute() {}
 }
 export { MentionComponent };
+export type { MentionValue };
 export default MentionPlugin;

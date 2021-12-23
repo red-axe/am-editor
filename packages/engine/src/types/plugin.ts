@@ -1,3 +1,4 @@
+import { BlockInterface, InlineInterface, MarkInterface } from '.';
 import { CardInterface } from './card';
 import { ConversionData } from './conversion';
 import { EditorInterface } from './engine';
@@ -18,12 +19,16 @@ export type PluginOptions = {
 
 export interface PluginEntry {
 	prototype: PluginInterface;
-	new (editor: EditorInterface, options: PluginOptions): PluginInterface;
+	new (
+		editor: EditorInterface,
+		options: PluginOptions,
+	): PluginInterface<PluginOptions>;
 	readonly pluginName: string;
 }
 
 export interface PluginInterface<T extends PluginOptions = {}> {
 	readonly kind: string;
+	readonly name: string;
 	/**
 	 * 可选项
 	 **/
@@ -146,6 +151,12 @@ export interface ElementPluginInterface extends PluginInterface {
 	 * 在粘贴时的标签转换，例如：b > strong
 	 */
 	conversion?(): ConversionData;
+	/**
+	 * 创建符合当前插件规则的节点
+	 * @param args 参数
+	 * @returns 节点
+	 */
+	createElement(...args: any): NodeInterface;
 }
 
 export interface PluginModelInterface {
@@ -175,4 +186,13 @@ export interface PluginModelInterface {
 			index?: number,
 		) => boolean | void,
 	): void;
+	/**
+	 * 获取一个插件
+	 * @param pluginName 插件名称
+	 */
+	findPlugin(pluginName: string): PluginInterface | undefined;
+	findElementPlugin(pluginName: string): ElementPluginInterface | undefined;
+	findMarkPlugin(pluginName: string): MarkInterface | undefined;
+	findInlinePlugin(pluginName: string): InlineInterface | undefined;
+	findBlockPlugin(pluginName: string): BlockInterface | undefined;
 }

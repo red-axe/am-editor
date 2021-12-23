@@ -11,12 +11,12 @@ import {
 import CheckboxComponent, { CheckboxValue } from './checkbox';
 import './index.css';
 
-export interface Options extends PluginOptions {
+export interface TasklistOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean | string[];
 }
 
-export default class extends ListPlugin<Options> {
+export default class<T extends TasklistOptions> extends ListPlugin<T> {
 	static get pluginName() {
 		return 'tasklist';
 	}
@@ -61,11 +61,12 @@ export default class extends ListPlugin<Options> {
 						firstChild &&
 						firstChild.name === CheckboxComponent.cardName
 					) {
-						const card = this.editor.card.find(firstChild);
+						const card =
+							this.editor.card.find<CheckboxValue>(firstChild);
 						if (card) {
 							const parent = child.parent();
 							parent?.addClass('data-list-task');
-							const value = card.getValue() as CheckboxValue;
+							const value = card.getValue();
 							if (value && value.checked) {
 								parent?.attributes('checked', 'true');
 							} else {
@@ -266,9 +267,13 @@ export default class extends ListPlugin<Options> {
 						: codeLength,
 				);
 				const tempNode = $('<span />');
-				const cardNode = card.replaceNode(tempNode, this.cardName, {
-					checked: match[0].indexOf('x') > 0,
-				});
+				const cardNode = card.replaceNode<CheckboxValue>(
+					tempNode,
+					this.cardName,
+					{
+						checked: match[0].indexOf('x') > 0,
+					},
+				);
 				tempNode.remove();
 				nodes.push(
 					`<li class="${list.CUSTOMZIE_LI_CLASS}">${
@@ -289,3 +294,4 @@ export default class extends ListPlugin<Options> {
 	}
 }
 export { CheckboxComponent };
+export type { CheckboxValue };

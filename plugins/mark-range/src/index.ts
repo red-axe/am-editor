@@ -19,14 +19,14 @@ import {
 } from '@aomao/engine';
 import { Path } from 'sharedb';
 
-export interface Options extends PluginOptions {
+export interface MarkRangeOptions extends PluginOptions {
 	keys: Array<string>;
 	hotkey?: string | Array<string>;
 }
 
 const PLUGIN_NAME = 'mark-range';
 
-export default class extends MarkPlugin<Options> {
+export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 	private range?: RangeInterface;
 	private executeBySelf: boolean = false;
 	private MARK_KEY = `data-mark-key`;

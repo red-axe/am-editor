@@ -2,6 +2,7 @@ import {
 	Card,
 	CardToolbarItemOptions,
 	CardType,
+	CardValue,
 	isEngine,
 	isMobile,
 	NodeInterface,
@@ -9,7 +10,7 @@ import {
 } from '@aomao/engine';
 import Image, { Size } from './image';
 
-export type ImageValue = {
+export interface ImageValue extends CardValue {
 	/**
 	 *  图片地址
 	 */
@@ -64,9 +65,9 @@ export type ImageValue = {
 		 */
 		naturalHeight: number;
 	};
-};
+}
 
-class ImageComponent extends Card<ImageValue> {
+class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 	private image?: Image;
 	private widthInput?: NodeInterface;
 	private heightInput?: NodeInterface;
@@ -92,11 +93,11 @@ class ImageComponent extends Card<ImageValue> {
 		this.image?.setProgressPercent(percent);
 		this.setValue({
 			percent,
-		});
+		} as T);
 	}
 
 	setSize(size: Size) {
-		this.setValue({ size } as ImageValue);
+		this.setValue({ size } as T);
 		if (this.widthInput) {
 			this.widthInput.get<HTMLInputElement>()!.value =
 				size.width.toString();

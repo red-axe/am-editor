@@ -1,11 +1,11 @@
 import { NodeInterface, InlinePlugin, PluginOptions } from '@aomao/engine';
 import './index.css';
 
-export interface Options extends PluginOptions {
+export interface CodeOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 }
-export default class extends InlinePlugin<Options> {
+export default class<T extends CodeOptions> extends InlinePlugin<T> {
 	static get pluginName() {
 		return 'code';
 	}

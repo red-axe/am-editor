@@ -5,7 +5,7 @@
   "author": "AoMao <me@aomao.com>",
   "homepage": "https://github.com/yanmao-cc/am-editor/tree/master/plugins/plugin-table#readme",
   "license": "MIT",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
   "files": [

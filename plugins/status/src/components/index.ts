@@ -1,3 +1,4 @@
+import { CardValue } from '@aomao/engine';
 import {
 	$,
 	Card,
@@ -5,19 +6,18 @@ import {
 	isEngine,
 	NodeInterface,
 	Position,
+	toHex,
+	SelectStyleType,
 } from '@aomao/engine';
 import StatusEditor from './editor';
 import './index.css';
 
-export type StatusValue = {
+export interface StatusValue extends CardValue {
 	text: string;
-	color: {
-		background: string;
-		color: string;
-	};
-};
+	marks?: string[];
+}
 
-class Status extends Card<StatusValue> {
+class Status<T extends StatusValue = StatusValue> extends Card<T> {
 	#position?: Position;
 
 	static get cardName() {
@@ -32,40 +32,37 @@ class Status extends Card<StatusValue> {
 		return false;
 	}
 
+	static get selectStyleType() {
+		return SelectStyleType.NONE;
+	}
+
 	static colors: Array<{
 		background: string;
 		color: string;
-		border?: string;
 	}> = [
 		{
 			background: '#FFE8E6',
 			color: '#820014',
-			border: '#FF4D4F',
 		},
 		{
 			background: '#FCFCCA',
 			color: '#614700',
-			border: '#FFEC3D',
 		},
 		{
 			background: '#E4F7D2',
 			color: '#135200',
-			border: '#73D13D',
 		},
 		{
 			background: '#E9E9E9',
 			color: '#595959',
-			border: '#E9E9E9',
 		},
 		{
 			background: '#D4EEFC',
 			color: '#003A8C',
-			border: '#40A9FF',
 		},
 		{
 			background: '#DEE8FC',
 			color: '#061178',
-			border: '#597EF7',
 		},
 	];
 
@@ -87,10 +84,10 @@ class Status extends Card<StatusValue> {
 					color: string;
 				},
 			) => {
+				this.setColor(color);
 				this.setValue({
 					text,
-					color,
-				});
+				} as T);
 				this.updateContent();
 			},
 			onOk: (event: MouseEvent) => {
@@ -105,23 +102,60 @@ class Status extends Card<StatusValue> {
 		});
 	}
 
+	setColor(color: { background: string; color: string }) {
+		const { plugin } = this.editor;
+		const backgroundPlugin = plugin.findMarkPlugin('backcolor');
+		if (backgroundPlugin) {
+			const backgroundElement = backgroundPlugin.createElement(
+				color.background,
+			);
+			this.executeMark(backgroundElement, true);
+		}
+		const fontcolorPlugin = plugin.findMarkPlugin('fontcolor');
+		if (fontcolorPlugin) {
+			const fontcolorElement = fontcolorPlugin.createElement(color.color);
+			this.executeMark(fontcolorElement, true);
+		}
+	}
+
+	getColor() {
+		const marks = this.queryMarks();
+		const background =
+			marks
+				.find(
+					(mark) =>
+						this.editor.mark.findPlugin(mark)?.name === 'backcolor',
+				)
+				?.css('background-color') || '';
+		const color =
+			marks
+				.find(
+					(mark) =>
+						this.editor.mark.findPlugin(mark)?.name === 'fontcolor',
+				)
+				?.css('color') || '';
+		return {
+			background: toHex(background),
+			color: toHex(color),
+		};
+	}
+
 	updateContent() {
 		if (!this.#container) return;
 		const value = this.getValue();
-		let { text, color } = value || { text: '', color: undefined };
+		let { text, marks } = value || { text: '', marks: [] };
 
-		let opacity = 1;
+		this.#container.removeClass('data-label-empty');
 		if (!text) {
 			text = this.editor.language.get('status')['defaultValue'];
-			opacity = 0.45;
+			this.#container.addClass('data-label-empty');
 		}
-		if (!color) {
-			color = this.getDefaultColor();
-		}
-		this.#container.css('background', color.background);
-		this.#container.css('color', color.color);
-		this.#container.css('opacity', opacity);
 		this.#container.html(text);
+		const color = this.getDefaultColor();
+		this.setColor(color);
+		(marks || []).forEach((mark) => {
+			this.executeMark($(mark), true);
+		});
 	}
 
 	getDefaultColor() {
@@ -131,6 +165,56 @@ class Status extends Card<StatusValue> {
 					background: '#FFFFFF',
 					color: '#222222',
 			  };
+	}
+
+	getSelectionNodes() {
+		return this.#container ? [this.#container] : [];
+	}
+
+	executeMark(mark?: NodeInterface, warp?: boolean) {
+		if (!this.#container) return;
+
+		const children = this.#container.children();
+		if (!mark) {
+			// 移除所有标记
+			this.editor.mark.unwrapByNodes(this.queryMarks());
+			this.setValue({
+				marks: [] as string[],
+			} as T);
+		} else if (warp) {
+			const backgroundPlugin = this.editor.mark.findPlugin(mark);
+			if (backgroundPlugin?.name === 'backcolor') {
+				mark.addClass('data-label-background');
+			}
+			// 增加标记
+			children.each((_, index) => {
+				const child = children.eq(index);
+				if (child) this.editor.mark.wrapByNode(child, mark);
+			});
+			const marks = this.queryMarks().map(
+				(child) => child.get<HTMLElement>()?.outerHTML || '',
+			);
+			this.setValue({
+				marks,
+			} as T);
+		} else {
+			// 移除标记
+			this.editor.mark.unwrapByNodes(this.queryMarks(), mark);
+			const marks = this.queryMarks().map(
+				(child) => child.get<HTMLElement>()?.outerHTML || '',
+			);
+			this.setValue({
+				marks,
+			} as T);
+		}
+		this.#statusEditor?.updateActive(this.getColor());
+	}
+
+	queryMarks() {
+		if (!this.#container) return [];
+		return this.#container
+			.allChildren()
+			.filter((child) => child.isElement());
 	}
 
 	focusEditor() {
@@ -147,12 +231,17 @@ class Status extends Card<StatusValue> {
 	renderEditor() {
 		if (!this.#statusEditor) return;
 		const value = this.getValue();
-		if (!value) return;
+		if (!value || !value.id) return;
 		this.#position?.destroy();
+		const defaultColor = this.getDefaultColor();
+		const currentColor = this.getColor();
 		this.#editorContainer = this.#statusEditor.render(
 			value.id,
 			value.text || '',
-			value.color || this.getDefaultColor(),
+			{
+				...defaultColor,
+				...currentColor,
+			},
 		);
 		if (!this.#container) return;
 		this.#position?.bind(this.#editorContainer, this.#container);
@@ -166,9 +255,7 @@ class Status extends Card<StatusValue> {
 		this.#container = $(`<span class="data-label-container"></span>`);
 		this.updateContent();
 		if (isEngine(this.editor)) {
-			this.#container.css('cursor', 'pointer');
 			this.#container.attributes('draggable', 'true');
-			this.#container.css('user-select', 'none');
 		}
 		return this.#container;
 	}

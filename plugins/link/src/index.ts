@@ -11,7 +11,7 @@ import locales from './locales';
 
 import './index.css';
 
-export interface Options extends PluginOptions {
+export interface LinkOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 	onConfirm?: (
@@ -19,7 +19,7 @@ export interface Options extends PluginOptions {
 		link: string,
 	) => Promise<{ text: string; link: string }>;
 }
-export default class extends InlinePlugin<Options> {
+export default class<T extends LinkOptions> extends InlinePlugin<T> {
 	private toolbar?: Toolbar;
 
 	static get pluginName() {

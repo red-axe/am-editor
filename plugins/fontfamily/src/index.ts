@@ -6,11 +6,11 @@ import {
 	PluginOptions,
 } from '@aomao/engine';
 
-export interface Options extends PluginOptions {
+export interface FontfamilyOptions extends PluginOptions {
 	hotkey?: { key: string; args: Array<string> };
 	filter?: (fontfamily: string) => string | boolean;
 }
-export default class extends MarkPlugin<Options> {
+export default class<T extends FontfamilyOptions> extends MarkPlugin<T> {
 	static get pluginName() {
 		return 'fontfamily';
 	}

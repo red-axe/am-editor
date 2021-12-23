@@ -2,7 +2,7 @@
     "name": "@aomao/plugin-image",
     "version": "2.6.23",
     "description": "图片",
-    "main": "dist/index.ts",
+    "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
     "files": [

@@ -1,27 +1,33 @@
-.am-engine [data-card-key="status"].card-selected [data-card-element="center"].data-card-border-selected {
-    outline: none;
-}
-
-.am-engine [data-card-key="status"].card-selected [data-card-element="center"].data-card-border-selected .data-label-container
+.am-engine [data-card-key="status"].card-selected [data-card-element="center"] .data-label-container::before
 {
-    border: 2px solid #1890FF;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1890FF;
+    opacity: 0.2;
+    border-radius: 2px;
 }
 
 .data-label-container {
-    font-weight: 400;
-    font-size: 12px;
     overflow: hidden;
     max-width: 200px;
-    display: inline-block;
     white-space: nowrap;
-    margin-bottom: -4px;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    user-select: none;
+}
+
+.data-label-container .data-label-background {
     border-radius: 4px;
     border: 2px solid transparent;
     padding: 0 3px;
-    text-overflow: ellipsis;
-    line-height: 14px;
-    margin-left: 1px;
-    margin-right: 1px;
+}
+
+.data-label-container.data-label-empty {
+    opacity: 0.45;
 }
 
 .data-card-status-editor {

@@ -10,6 +10,7 @@ import {
 	Resizer,
 	CardType,
 } from '@aomao/engine';
+import { ImageValue } from '..';
 import Pswp from '../pswp';
 import './index.css';
 
@@ -405,16 +406,19 @@ class Image {
 				return image.find('img').length > 0;
 			})
 			.forEach((imageNode, index) => {
-				const card = this.editor.card.find(imageNode);
-				if (!card) return;
+				const card = this.editor.card.find<ImageValue>(imageNode);
+				const value = card?.getValue();
+				if (!card || !value) return;
 				const image = card.getCenter().find('img');
-				const value = card.getValue() || {};
 				const imageWidth = parseInt(image.css('width'));
 				const imageHeight = parseInt(image.css('height'));
-				const naturalWidth =
-					value.size['naturalWidth'] || imageWidth * winPixelRatio;
-				const naturalHeight =
-					value.size['naturalHeight'] || imageHeight * winPixelRatio;
+				const size = value.size;
+				const naturalWidth = size
+					? size.naturalWidth
+					: imageWidth * winPixelRatio;
+				const naturalHeight = size
+					? size.naturalHeight
+					: imageHeight * winPixelRatio;
 				let src = value['src'];
 				const { onBeforeRender } = this.options;
 				if (onBeforeRender) src = onBeforeRender('done', src);

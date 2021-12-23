@@ -28,10 +28,10 @@ import Maximize from './maximize';
 import Resize from './resize';
 import Toolbar from './toolbar';
 import { $ } from '../node';
-import { CardType } from './enum';
+import { CardType, SelectStyleType } from './enum';
 import { DATA_ELEMENT, UI } from '../constants';
 
-abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
+abstract class CardEntry<T extends CardValue = {}> implements CardInterface<T> {
 	protected readonly editor: EditorInterface;
 	readonly root: NodeInterface;
 	toolbarModel?: CardToolbarInterface;
@@ -49,7 +49,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	static readonly singleSelectable: boolean;
 	static readonly collab: boolean = true;
 	static readonly focus: boolean;
-	static readonly selectStyleType: 'border' | 'background' = 'border';
+	static readonly selectStyleType: SelectStyleType = SelectStyleType.BORDER;
 	static readonly toolbarFollowMouse: boolean = false;
 	static readonly lazyRender: boolean = false;
 	private defaultMaximize: MaximizeInterface;
@@ -81,7 +81,7 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 
 	get id() {
 		const value = this.getValue();
-		return typeof value === 'object' ? value.id : '';
+		return typeof value === 'object' ? value?.id || '' : '';
 	}
 
 	get name() {
@@ -112,17 +112,17 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		return !!this.root.attributes(CARD_LOADING_KEY);
 	}
 
-	constructor({ editor, value, root }: CardOptions) {
+	constructor({ editor, value, root }: CardOptions<T>) {
 		this.editor = editor;
 		const type =
 			value?.type || (this.constructor as CardEntryType).cardType;
 		const tagName = type === 'inline' ? 'span' : 'div';
 		this.root = root ? root : $('<'.concat(tagName, ' />'));
 		if (typeof value === 'string') value = decodeCardValue(value);
-		value = value || {};
+		value = value || ({} as T);
 		value.id = this.getId(value.id);
 		value.type = type;
-		this.setValue(value as T);
+		this.setValue(value);
 		this.defaultMaximize = new Maximize(this.editor, this);
 	}
 
@@ -159,20 +159,19 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		}
 		const currentValue = this.getValue();
 		if (!!currentValue?.id) delete value['id'];
-		const oldValue = this.getValue();
-		value = { ...oldValue, ...value } as T;
-		if (value.type && oldValue?.type !== value.type) {
+		value = { ...currentValue, ...value } as T;
+		if (value.type && currentValue?.type !== value.type) {
 			this.type = value.type;
 		}
 
 		this.root.attributes(CARD_VALUE_KEY, encodeCardValue(value));
 	}
 	// 获取 DOM 属性里的数据
-	getValue(): (T & { id: string }) | undefined {
+	getValue() {
 		const value = this.root.attributes(CARD_VALUE_KEY);
-		if (!value) return;
+		if (!value) return {} as T;
 
-		return decodeCardValue(value) as T & { id: string };
+		return decodeCardValue<T>(value);
 	}
 
 	/**
@@ -294,9 +293,10 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	resize?: boolean | (() => NodeInterface | void);
 
 	onSelect(selected: boolean): void {
-		const selectedClass = `data-card-${
-			(this.constructor as CardEntryType).selectStyleType
-		}-selected`;
+		const selectStyleType = (this.constructor as CardEntryType)
+			.selectStyleType;
+		if (selectStyleType === SelectStyleType.NONE) return;
+		const selectedClass = `data-card-${selectStyleType}-selected`;
 		const center = this.getCenter();
 		if (selected) {
 			center.addClass(selectedClass);
@@ -312,9 +312,9 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 		},
 	): NodeInterface | void {
 		const center = this.getCenter();
-		if (
-			(this.constructor as CardEntryType).selectStyleType === 'background'
-		) {
+		const selectStyleType = (this.constructor as CardEntryType)
+			.selectStyleType;
+		if (selectStyleType === SelectStyleType.BACKGROUND) {
 			center.css('background-color', selected ? value!.rgb : '');
 		} else {
 			center.css('outline', selected ? '2px solid ' + value!.color : '');
@@ -390,9 +390,13 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface {
 	): DOMRect | RangeInterface[] | void | false;
 
 	/**
-	 * 获取可编辑区域选中的所有节点
+	 * 获取卡片区域选中的所有节点
 	 */
 	getSelectionNodes?(): Array<NodeInterface>;
+
+	executeMark?(mark: NodeInterface): void;
+
+	queryMarks?(): NodeInterface[];
 }
 
 export default CardEntry;

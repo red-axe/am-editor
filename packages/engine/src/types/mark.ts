@@ -57,6 +57,27 @@ export interface MarkModelInterface {
 	 */
 	wrap(mark: NodeInterface | Node | string, range?: RangeInterface): void;
 	/**
+	 *
+	 * @param node 包裹一个节点
+	 * @param mark 包裹的样式
+	 * @param plugin 包裹的样式节点所属mark插件，如果循环传入可提高效率，否则每次都需要查找
+	 * @returns 未处理返回 void，因为某些原因不能包裹返回 false，包裹成功返回 NodeInterface
+	 */
+	wrapByNode(
+		node: NodeInterface,
+		mark: NodeInterface,
+		plugin?: MarkInterface,
+	): false | void | NodeInterface;
+	/**
+	 * 移除多个节点的mark
+	 * @param nodes 要移除的节点集合
+	 * @param removeMark 要移除的mark样式
+	 */
+	unwrapByNodes(
+		nodes: NodeInterface[],
+		removeMark?: NodeInterface | Array<NodeInterface>,
+	): void;
+	/**
 	 * 去掉mark包裹
 	 * @param range 光标
 	 * @param removeMark 要移除的mark标签

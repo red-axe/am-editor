@@ -5,6 +5,7 @@ import {
 	isEngine,
 	isMobile,
 	NodeInterface,
+	CardValue,
 } from '@aomao/engine';
 import './index.css';
 
@@ -12,9 +13,9 @@ const CHECKBOX_CLASS = 'data-checkbox';
 const CHECKBOX_INNER_CLASS = 'data-checkbox-inner';
 const CHECKBOX_CHECKED_CLASS = 'data-checkbox-checked';
 
-export type CheckboxValue = {
+export interface CheckboxValue extends CardValue {
 	checked: boolean;
-};
+}
 
 class Checkbox extends Card<CheckboxValue> {
 	#container?: NodeInterface;

@@ -9,7 +9,7 @@ import {
 } from '@aomao/engine';
 import './index.css';
 
-export interface Options extends PluginOptions {
+export interface PaintformatOptions extends PluginOptions {
 	removeCommand?: string | ((range: RangeInterface) => void);
 	paintBlock?: (
 		currentBlocl: NodeInterface,
@@ -19,7 +19,7 @@ export interface Options extends PluginOptions {
 
 const PAINTFORMAT_CLASS = 'data-paintformat-mode';
 
-export default class extends Plugin<Options> {
+export default class<T extends PaintformatOptions> extends Plugin<T> {
 	private activeMarks?: NodeInterface[];
 	private activeBlocks?: NodeInterface[];
 	private type?: string;

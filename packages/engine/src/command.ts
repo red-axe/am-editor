@@ -1,3 +1,4 @@
+import { isMarkPlugin } from './plugin';
 import { ChangeInterface } from './types';
 import { CommandInterface } from './types/command';
 import { EditorInterface } from './types/engine';
@@ -30,8 +31,15 @@ class Command implements CommandInterface {
 		)
 			return false;
 		// 当前激活非可编辑卡片时全部禁用
-		if (this.editor.card.active && !this.editor.card.active.isEditable)
+		if (this.editor.card.active) {
+			if (
+				(isMarkPlugin(plugin) || plugin.kind === 'plugin') &&
+				this.editor.card.active.executeMark
+			)
+				return true;
+			if (this.editor.card.active.isEditable) return true;
 			return false;
+		}
 		// TODO:查询当前所处位置的插件
 		return true;
 	}

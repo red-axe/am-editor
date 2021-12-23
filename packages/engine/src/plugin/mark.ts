@@ -65,9 +65,7 @@ abstract class MarkEntry<T extends {} = {}>
 		const editor = this.editor;
 		if (!isEngine(editor)) return;
 		const { change, mark } = editor;
-		const markNode = $(`<${this.tagName} />`);
-		this.setStyle(markNode, ...args);
-		this.setAttributes(markNode, ...args);
+		const markNode = this.createElement(...args);
 		const trigger = this.isTrigger
 			? this.isTrigger(...args)
 			: !this.queryState();

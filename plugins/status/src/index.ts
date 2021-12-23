@@ -5,16 +5,18 @@ import {
 	CARD_KEY,
 	isEngine,
 	PluginOptions,
-	PluginEntry,
 	SchemaInterface,
+	encodeCardValue,
+	decodeCardValue,
+	CARD_VALUE_KEY,
 } from '@aomao/engine';
-import StatusComponent from './components';
+import StatusComponent, { StatusValue } from './components';
 import locales from './locales';
 
-export interface Options extends PluginOptions {
+export interface StatusOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 }
-export default class extends Plugin<Options> {
+export default class<T extends StatusOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'status';
 	}
@@ -32,9 +34,10 @@ export default class extends Plugin<Options> {
 	execute() {
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
-		const component = card.insert(
-			StatusComponent.cardName,
-		) as StatusComponent;
+		const component = card.insert<
+			StatusValue,
+			StatusComponent<StatusValue>
+		>(StatusComponent.cardName);
 		card.activate(component.root);
 		setTimeout(() => {
 			component.focusEditor();
@@ -54,16 +57,7 @@ export default class extends Plugin<Options> {
 					required: true,
 					value: StatusComponent.cardName,
 				},
-				style: {
-					background: {
-						required: true,
-						value: '@color',
-					},
-					color: {
-						required: true,
-						value: '@color',
-					},
-				},
+				'data-value': '*',
 			},
 		});
 	}
@@ -71,15 +65,17 @@ export default class extends Plugin<Options> {
 	pasteHtml(node: NodeInterface) {
 		if (!isEngine(this.editor)) return;
 		if (node.isElement()) {
-			const type = node.attributes('data-type');
+			const attributes = node.attributes();
+			const type = attributes['data-type'];
 			if (type === StatusComponent.cardName) {
-				this.editor.card.replaceNode(node, StatusComponent.cardName, {
-					text: node.text(),
-					color: {
-						background: node.css('background'),
-						color: node.css('color'),
-					},
-				});
+				const value = attributes['data-value'];
+				const cardValue = decodeCardValue(value);
+				if (!cardValue.name) return;
+				this.editor.card.replaceNode(
+					node,
+					StatusComponent.cardName,
+					cardValue,
+				);
 				node.remove();
 				return false;
 			}
@@ -91,27 +87,34 @@ export default class extends Plugin<Options> {
 		root.find(`[${CARD_KEY}=${StatusComponent.cardName}`).each(
 			(statusNode) => {
 				const node = $(statusNode);
+				const card = this.editor.card.find<StatusValue>(node);
+				const value =
+					card?.getValue() ||
+					decodeCardValue(node.attributes(CARD_VALUE_KEY));
 				const container = node.find('span.data-label-container');
-				container.css({
-					'font-weight': 400,
-					'font-size': '12px',
-					overflow: 'hidden',
-					'max-width': '200px',
-					display: 'inline-block',
-					'white-space': 'nowrap',
-					'margin-bottom': '-4px',
-					'border-radius': '4px',
-					border: 'none',
-					padding: '2px 5px',
-					'text-overflow': 'ellipsis',
-					'line-height': '14px',
-					'margin-left': '1px',
-					'margin-right': '1px',
-				});
-				container.attributes('data-type', StatusComponent.cardName);
-				node.replaceWith(container);
+				if (value?.text) {
+					const html = `<span data-type="${
+						StatusComponent.cardName
+					}" data-value="${encodeCardValue(
+						value,
+					)}">${container.html()}</span>`;
+					node.empty();
+					const newNode = $(html);
+					newNode.css({
+						'font-weight': 400,
+						overflow: 'hidden',
+						'max-width': '200px',
+						'white-space': 'nowrap',
+						'border-radius': '4px',
+						border: '2px solid transparent',
+						padding: '0 3px',
+						'text-overflow': 'ellipsis',
+					});
+					node.replaceWith(newNode);
+				} else node.remove();
 			},
 		);
 	}
 }
 export { StatusComponent };
+export type { StatusValue };

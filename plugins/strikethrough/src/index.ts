@@ -1,10 +1,10 @@
 import { MarkPlugin, PluginOptions } from '@aomao/engine';
 
-export interface Options extends PluginOptions {
+export interface StrikethroughOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 }
-export default class extends MarkPlugin<Options> {
+export default class<T extends StrikethroughOptions> extends MarkPlugin<T> {
 	tagName = 'del';
 
 	static get pluginName() {

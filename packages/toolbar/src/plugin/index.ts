@@ -9,14 +9,14 @@ import {
 	PluginOptions,
 } from '@aomao/engine';
 import { CollapseItemProps } from '../collapse/item';
-import ToolbarComponent from './component';
+import ToolbarComponent, { ToolbarValue } from './component';
 import locales from '../locales';
 
 type Config = Array<{
 	title: React.ReactNode;
 	items: Array<Omit<CollapseItemProps, 'engine'> | string>;
 }>;
-export interface Options extends PluginOptions {
+export interface ToolbarOptions extends PluginOptions {
 	config: Config;
 }
 
@@ -42,7 +42,7 @@ const defaultConfig = (editor: EditorInterface): Config => {
 	];
 };
 
-class ToolbarPlugin extends Plugin<Options> {
+class ToolbarPlugin<T extends ToolbarOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'toolbar';
 	}
@@ -89,7 +89,7 @@ class ToolbarPlugin extends Plugin<Options> {
 					ToolbarComponent.cardName,
 					{},
 					data,
-				) as ToolbarComponent;
+				) as ToolbarComponent<ToolbarValue>;
 				card.setData(data);
 				card.root.attributes(DATA_TRANSIENT_ELEMENT, 'true');
 				this.editor.card.activate(card.root);
@@ -108,4 +108,5 @@ class ToolbarPlugin extends Plugin<Options> {
 	}
 }
 export { ToolbarComponent };
+export type { ToolbarValue };
 export default ToolbarPlugin;

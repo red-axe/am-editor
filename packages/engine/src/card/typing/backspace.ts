@@ -74,6 +74,7 @@ class Backspace {
 			}
 			return true;
 		}
+		if (event['isDelete']) return true;
 		// inline 卡片
 		if (card.type === CardType.INLINE) {
 			// 左侧光标

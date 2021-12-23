@@ -10,15 +10,18 @@ import {
 	NodeInterface,
 	Plugin,
 	PluginEntry,
+	PluginOptions,
 	READY_CARD_KEY,
 } from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 import ImageUploader from './uploader';
 import locales from './locales';
 
-export default class extends Plugin<{
+export interface ImageOptions extends PluginOptions {
 	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
-}> {
+}
+
+export default class<T extends ImageOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'image';
 	}
@@ -57,9 +60,9 @@ export default class extends Plugin<{
 		const check = (component: CardInterface) => {
 			return (
 				component.root.inEditor() &&
-				(component.constructor as CardEntry).cardName ===
-					ImageComponent.cardName &&
-				(component as ImageComponent).getValue()?.status === 'uploading'
+				component.name === ImageComponent.cardName &&
+				(component as ImageComponent<ImageValue>).getValue()?.status ===
+					'uploading'
 			);
 		};
 		// 找到不合格的组件
@@ -116,7 +119,9 @@ export default class extends Plugin<{
 			`[${CARD_KEY}="${ImageComponent.cardName}"],[${READY_CARD_KEY}="${ImageComponent.cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find(node) as ImageComponent;
+			const card = this.editor.card.find(
+				node,
+			) as ImageComponent<ImageValue>;
 			const value =
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
@@ -132,8 +137,8 @@ export default class extends Plugin<{
 				img.attributes('src', src);
 				img.css('visibility', 'visible');
 				const size = value.size;
-				if (size.width) img.css('width', `${size.width}px`);
-				if (size.height) img.css('height', `${size.height}px`);
+				if (size?.width) img.css('width', `${size.width}px`);
+				if (size?.height) img.css('height', `${size.height}px`);
 				img.removeAttributes('class');
 				img.attributes('data-type', type);
 				if (img.length > 0) {
@@ -151,3 +156,4 @@ export default class extends Plugin<{
 }
 
 export { ImageComponent, ImageUploader };
+export type { ImageValue };

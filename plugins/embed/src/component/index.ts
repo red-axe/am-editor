@@ -23,7 +23,7 @@ export interface EmbedValue extends CardValue {
 
 export type EmbedRenderBeforeEvent = (url: string) => EmbedValue;
 
-class EmbedComponent extends Card<EmbedValue> {
+class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 	renderBefore?: EmbedRenderBeforeEvent;
 
 	static get cardName() {
@@ -66,7 +66,7 @@ class EmbedComponent extends Card<EmbedValue> {
 		if (value?.collapsed) return;
 		this.setValue({
 			collapsed: true,
-		});
+		} as V);
 		this.render();
 		super.didRender();
 	}
@@ -76,7 +76,7 @@ class EmbedComponent extends Card<EmbedValue> {
 		if (!value?.collapsed) return;
 		this.setValue({
 			collapsed: false,
-		});
+		} as V);
 		this.render();
 		super.didRender();
 	}
@@ -145,7 +145,7 @@ class EmbedComponent extends Card<EmbedValue> {
 					...info,
 				};
 			}
-			this.setValue(value);
+			this.setValue(value as V);
 			this.render();
 			this.#mask?.hide();
 			this.toolbarModel?.show();

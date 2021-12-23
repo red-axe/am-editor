@@ -8,6 +8,7 @@ import {
 	isEngine,
 	isServer,
 	ToolbarItemOptions,
+	CardValue,
 } from '@aomao/engine';
 import CodeBlockEditor from './editor';
 import renderSelect from './select';
@@ -15,13 +16,13 @@ import modeDatas from './mode';
 import { CodeBlockEditorInterface } from './types';
 import './index.css';
 
-export type CodeBlockValue = {
+export interface CodeBlockValue extends CardValue {
 	mode?: string;
 	code?: string;
 	autoWrap?: boolean;
-};
+}
 
-class CodeBlcok extends Card<CodeBlockValue> {
+class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 	mirror?: Editor;
 	static get cardName() {
 		return 'codeblock';
@@ -72,7 +73,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 				this.setValue({
 					mode,
 					code: value,
-				});
+				} as V);
 			},
 			onMouseDown: (event) => {
 				if (!this.activated)
@@ -152,7 +153,7 @@ class CodeBlcok extends Card<CodeBlockValue> {
 					const autoWrap = !value?.autoWrap;
 					this.setValue({
 						autoWrap,
-					});
+					} as V);
 					this.codeEditor?.setAutoWrap(autoWrap);
 				},
 			},

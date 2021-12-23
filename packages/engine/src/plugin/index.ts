@@ -1,21 +1,23 @@
 import { EditorInterface } from '../types/engine';
 import {
+	ElementPluginInterface,
 	PluginEntry,
 	PluginInterface,
 	PluginModelInterface,
 	PluginOptions,
 } from '../types/plugin';
 import Plugin from './base';
-import ElementPlugin from './element';
+import ElementPlugin, { isElementPlugin } from './element';
 import BlockPlugin, { isBlockPlugin } from './block';
 import InlinePlugin, { isInlinePlugin } from './inline';
 import ListPlugin from './list';
 import MarkPlugin, { isMarkPlugin } from './mark';
 import { isEngine } from '../utils';
+import { BlockInterface, InlineInterface, MarkInterface } from 'src';
 
 class PluginModel implements PluginModelInterface {
-	protected data: { [k: string]: PluginEntry } = {};
-	components: { [k: string]: PluginInterface } = {};
+	protected data: Record<string, PluginEntry> = {};
+	components: Record<string, PluginInterface<PluginOptions>> = {};
 	protected editor: EditorInterface;
 	constructor(editor: EditorInterface) {
 		this.editor = editor;
@@ -41,6 +43,41 @@ class PluginModel implements PluginModelInterface {
 			if (plugin.init) plugin.init();
 			this.components[clazz.pluginName] = plugin;
 		}
+	}
+
+	findPlugin(pluginName: string) {
+		const plugin = this.components[pluginName];
+		return plugin;
+	}
+
+	findElementPlugin(pluginName: string) {
+		const plugin = this.findPlugin(pluginName);
+		if (isElementPlugin(plugin)) {
+			return plugin as ElementPluginInterface;
+		}
+		return;
+	}
+	findMarkPlugin(pluginName: string) {
+		const plugin = this.findPlugin(pluginName);
+		if (isMarkPlugin(plugin)) {
+			return plugin as MarkInterface;
+		}
+		return;
+	}
+	findInlinePlugin(pluginName: string) {
+		const plugin = this.findPlugin(pluginName);
+		if (isInlinePlugin(plugin)) {
+			return plugin as InlineInterface;
+		}
+		return;
+	}
+
+	findBlockPlugin(pluginName: string) {
+		const plugin = this.findPlugin(pluginName);
+		if (isBlockPlugin(plugin)) {
+			return plugin as BlockInterface;
+		}
+		return;
 	}
 
 	each(

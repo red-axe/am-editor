@@ -7,7 +7,7 @@
   ],
   "author": "ITELLYOU <me@aomao.com>",
   "homepage": "https://github.com/yanmao-cc/am-editor/tree/main/plugins/plugin-math#readme",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
   "files": [

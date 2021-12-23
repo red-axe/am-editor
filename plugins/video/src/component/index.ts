@@ -3,6 +3,7 @@ import type {
 	ToolbarItemOptions,
 	NodeInterface,
 	ResizerInterface,
+	CardValue,
 } from '@aomao/engine';
 import {
 	$,
@@ -16,7 +17,9 @@ import {
 } from '@aomao/engine';
 import './index.css';
 
-export type VideoValue = {
+export type VideoStatus = 'uploading' | 'transcoding' | 'done' | 'error';
+
+export interface VideoValue extends CardValue {
 	/**
 	 * 视频唯一标识
 	 */
@@ -42,7 +45,7 @@ export type VideoValue = {
 	 * uploading 上传中
 	 * done 上传成功
 	 */
-	status?: 'uploading' | 'transcoding' | 'done' | 'error';
+	status?: VideoStatus;
 	/**
 	 * 上传进度
 	 */
@@ -71,9 +74,9 @@ export type VideoValue = {
 	 * 错误状态下的错误信息
 	 */
 	message?: string;
-};
+}
 
-class VideoComponent extends Card<VideoValue> {
+class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	maxWidth: number = 0;
 	resizer?: ResizerInterface;
 	video?: NodeInterface;
@@ -361,7 +364,7 @@ class VideoComponent extends Card<VideoValue> {
 		this.setValue({
 			width,
 			height,
-		});
+		} as T);
 		this.resizer?.destroy();
 		this.initResizer();
 	}
@@ -556,7 +559,7 @@ class VideoComponent extends Card<VideoValue> {
 					download?: string;
 					status?: string;
 				}) => {
-					const newValue: VideoValue = {
+					const newValue: T = {
 						...value,
 						url: !!data?.url ? data.url : value.url,
 						name: !!data?.name ? data.name : value.name,
@@ -573,7 +576,7 @@ class VideoComponent extends Card<VideoValue> {
 					this.initPlayer();
 				},
 				(error: string) => {
-					const newValue: VideoValue = {
+					const newValue: T = {
 						...value,
 						status: 'error',
 						message: error || locales['loadError'],

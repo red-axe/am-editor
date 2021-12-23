@@ -15,7 +15,7 @@ import {
 	sanitizeUrl,
 	SchemaInterface,
 } from '@aomao/engine';
-import VideoComponent, { VideoValue } from './component';
+import VideoComponent, { VideoValue, VideoStatus } from './component';
 import VideoUploader from './uploader';
 import locales from './locales';
 
@@ -27,7 +27,7 @@ export interface VideoOptions extends PluginOptions {
 	showTitle?: boolean;
 }
 
-export default class VideoPlugin extends Plugin<VideoOptions> {
+export default class VideoPlugin<T extends VideoOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'video';
 	}
@@ -87,9 +87,9 @@ export default class VideoPlugin extends Plugin<VideoOptions> {
 		const check = (component: CardInterface) => {
 			return (
 				component.root.inEditor() &&
-				(component.constructor as CardEntry).cardName ===
-					VideoComponent.cardName &&
-				(component as VideoComponent).getValue()?.status === 'uploading'
+				component.name === VideoComponent.cardName &&
+				(component as VideoComponent<VideoValue>).getValue()?.status ===
+					'uploading'
 			);
 		};
 		// 找到不合格的组件
@@ -180,7 +180,7 @@ export default class VideoPlugin extends Plugin<VideoOptions> {
 			`[${CARD_KEY}="${VideoComponent.cardName}"],[${READY_CARD_KEY}="${VideoComponent.cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find(node) as VideoComponent;
+			const card = this.editor.card.find<VideoValue>(node);
 			const value =
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
@@ -210,3 +210,4 @@ export default class VideoPlugin extends Plugin<VideoOptions> {
 }
 
 export { VideoComponent, VideoUploader };
+export type { VideoValue, VideoStatus };

@@ -1451,7 +1451,7 @@ drawBackground?(
 
 ```ts
 /**
- * 获取可编辑区域选中的所有节点
+ * 获取卡片区域选中的所有节点
  */
 getSelectionNodes?(): Array<NodeInterface>
 ```

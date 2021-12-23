@@ -3,6 +3,7 @@ import {
 	$,
 	Card,
 	CardType,
+	CardValue,
 	isEngine,
 	NodeInterface,
 	Position,
@@ -11,12 +12,12 @@ import { getLocales } from '../utils';
 import MathEditor from './editor';
 import './index.css';
 
-export type MathValue = {
+export interface MathValue extends CardValue {
 	code: string;
 	url: string;
-};
+}
 
-export default class MathCard extends Card<MathValue> {
+export default class MathCard<T extends MathValue> extends Card<T> {
 	#position?: Position;
 
 	static get cardName() {
@@ -25,10 +26,6 @@ export default class MathCard extends Card<MathValue> {
 
 	static get cardType() {
 		return CardType.INLINE;
-	}
-
-	static get selectStyleType(): 'background' | 'border' {
-		return 'border';
 	}
 
 	static get autoSelected() {
@@ -126,7 +123,7 @@ export default class MathCard extends Card<MathValue> {
 				this.setValue({
 					url,
 					code,
-				});
+				} as T);
 				this.isSaving = false;
 			},
 			() => {
@@ -134,7 +131,7 @@ export default class MathCard extends Card<MathValue> {
 				this.setValue({
 					url: '',
 					code,
-				});
+				} as T);
 				this.isSaving = false;
 			},
 		);
@@ -196,7 +193,7 @@ export default class MathCard extends Card<MathValue> {
 	renderEditor() {
 		if (!this.mathEditor) return;
 		const value = this.getValue();
-		if (!value) return;
+		if (!value || !value.id) return;
 		this.editorContainer = this.mathEditor.render(value.id, value.code);
 		if (this.container)
 			this.#position?.bind(this.editorContainer, this.container);

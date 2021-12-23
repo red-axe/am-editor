@@ -12,7 +12,7 @@ import {
 	encodeCardValue,
 } from '@aomao/engine';
 
-import VideoComponent from './component';
+import VideoComponent, { VideoValue, VideoStatus } from './component';
 
 export interface VideoUploaderOptions extends PluginOptions {
 	/**
@@ -69,7 +69,7 @@ export interface VideoUploaderOptions extends PluginOptions {
 					url: string;
 					id?: string;
 					cover?: string;
-					status?: string;
+					status?: VideoStatus;
 					name?: string;
 					width?: number;
 					height?: number;
@@ -100,7 +100,7 @@ export interface VideoUploaderOptions extends PluginOptions {
 }
 
 export default class extends Plugin<VideoUploaderOptions> {
-	private cardComponents: { [key: string]: VideoComponent } = {};
+	private cardComponents: { [key: string]: VideoComponent<VideoValue> } = {};
 
 	static get pluginName() {
 		return 'video-uploader';
@@ -197,11 +197,14 @@ export default class extends Plugin<VideoUploaderOptions> {
 						!!this.cardComponents[fileInfo.uid]
 					)
 						return;
-					const component = card.insert('video', {
+					const component = card.insert<
+						VideoValue,
+						VideoComponent<VideoValue>
+					>('video', {
 						status: 'uploading',
 						name: fileInfo.name,
 						size: fileInfo.size,
-					}) as VideoComponent;
+					});
 					this.cardComponents[fileInfo.uid] = component;
 				},
 				onUploading: (file, { percent }) => {
@@ -228,7 +231,7 @@ export default class extends Plugin<VideoUploaderOptions> {
 					const height: number =
 						response.height ||
 						(response.data && response.data.height);
-					let status: string =
+					let status: VideoStatus =
 						response.status ||
 						(response.data && response.data.status);
 					status = status === 'transcoding' ? 'transcoding' : 'done';
@@ -240,7 +243,7 @@ export default class extends Plugin<VideoUploaderOptions> {
 									video_id?: string;
 									cover?: string;
 									download?: string;
-									status?: string;
+									status?: VideoStatus;
 									width?: number;
 									height?: number;
 							  }
@@ -265,7 +268,7 @@ export default class extends Plugin<VideoUploaderOptions> {
 								video_id?: string;
 								cover?: string;
 								download?: string;
-								status?: string;
+								status?: VideoStatus;
 								name?: string;
 								width?: number;
 								height?: number;
@@ -305,19 +308,20 @@ export default class extends Plugin<VideoUploaderOptions> {
 					}
 					//失败
 					if (!result.result) {
-						card.update(component.id, {
+						card.update<VideoValue>(component.id, {
 							status: 'error',
 							message:
-								result.data ||
-								this.editor.language.get(
-									'video',
-									'uploadError',
-								),
+								typeof result.data === 'string'
+									? result.data
+									: this.editor.language.get<string>(
+											'video',
+											'uploadError',
+									  ),
 						});
 					}
 					//成功
 					else {
-						this.editor.card.update(
+						this.editor.card.update<VideoValue>(
 							component.id,
 							typeof result.data === 'string'
 								? { url: result.data }
@@ -333,11 +337,14 @@ export default class extends Plugin<VideoUploaderOptions> {
 				onError: (error, file) => {
 					const component = this.cardComponents[file.uid || ''];
 					if (!component) return;
-					card.update(component.id, {
+					card.update<VideoValue>(component.id, {
 						status: 'error',
 						message:
 							error.message ||
-							this.editor.language.get('video', 'uploadError'),
+							this.editor.language.get<string>(
+								'video',
+								'uploadError',
+							),
 					});
 					delete this.cardComponents[file.uid || ''];
 				},
@@ -355,7 +362,7 @@ export default class extends Plugin<VideoUploaderOptions> {
 			name?: string;
 			cover?: string;
 			download?: string;
-			status?: string;
+			status?: VideoStatus;
 		}) => void,
 		failed: (message: string) => void = () => {},
 	) {

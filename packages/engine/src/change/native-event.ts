@@ -343,7 +343,7 @@ class NativeEvent {
 			change.onSelect();
 		});
 
-		change.event.onDocument('mousedown', (e: MouseEvent | TouchEvent) => {
+		change.event.onDocument('mousedown', (e: MouseEvent) => {
 			if (!e.target) return;
 			const targetNode = $(e.target);
 			// 点击元素已被移除
@@ -363,7 +363,7 @@ class NativeEvent {
 				}
 				node = node.parent();
 			}
-			card.activate(targetNode, CardActiveTrigger.MOUSE_DOWN);
+			card.activate(targetNode, CardActiveTrigger.MOUSE_DOWN, e);
 		});
 
 		change.event.onDocument('copy', (event) => {

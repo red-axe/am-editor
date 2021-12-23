@@ -15,10 +15,13 @@ import {
 	READY_CARD_KEY,
 	decodeCardValue,
 } from '@aomao/engine';
-import CodeBlockComponent, { CodeBlockEditor } from './component';
+import CodeBlockComponent, {
+	CodeBlockEditor,
+	CodeBlockValue,
+} from './component';
 import locales from './locales';
 
-export interface Options extends PluginOptions {
+export interface CodeBlockOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
@@ -37,7 +40,7 @@ const MODE_ALIAS = {
 	'c++': 'cpp',
 };
 
-export default class extends Plugin<Options> {
+export default class<T extends CodeBlockOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'codeblock';
 	}
@@ -62,12 +65,15 @@ export default class extends Plugin<Options> {
 	execute(mode: string, value: string) {
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
-		const component = card.insert(CodeBlockComponent.cardName, {
+		const component = card.insert<
+			CodeBlockValue,
+			CodeBlockComponent<CodeBlockValue>
+		>(CodeBlockComponent.cardName, {
 			mode,
 			code: value,
 		});
 		setTimeout(() => {
-			(component as CodeBlockComponent).focusEditor();
+			component.focusEditor();
 		}, 200);
 	}
 
@@ -205,7 +211,7 @@ export default class extends Plugin<Options> {
 			}
 			let code = new Parser(node, this.editor).toText();
 			code = unescape(code.replace(/\u200b/g, ''));
-			this.editor.card.replaceNode(node, 'codeblock', {
+			this.editor.card.replaceNode<CodeBlockValue>(node, 'codeblock', {
 				mode: syntax || 'plain',
 				code,
 			});
@@ -253,10 +259,14 @@ export default class extends Plugin<Options> {
 
 			if (code.endsWith('\n')) code = code.substr(0, code.length - 2);
 			const tempNode = $('<div></div>');
-			const carNode = card.replaceNode(tempNode, 'codeblock', {
-				mode,
-				code,
-			});
+			const carNode = card.replaceNode<CodeBlockValue>(
+				tempNode,
+				'codeblock',
+				{
+					mode,
+					code,
+				},
+			);
 			tempNode.remove();
 
 			return carNode.get<Element>()?.outerHTML;
@@ -307,7 +317,9 @@ export default class extends Plugin<Options> {
 			`[${CARD_KEY}="${CodeBlockComponent.cardName}"],[${READY_CARD_KEY}="${CodeBlockComponent.cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find(node) as CodeBlockComponent;
+			const card = this.editor.card.find(
+				node,
+			) as CodeBlockComponent<CodeBlockValue>;
 			const value =
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));

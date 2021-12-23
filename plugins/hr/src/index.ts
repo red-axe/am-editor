@@ -8,13 +8,13 @@ import {
 	SchemaInterface,
 	PluginOptions,
 } from '@aomao/engine';
-import HrComponent from './component';
+import HrComponent, { HrValue } from './component';
 
-export interface Options extends PluginOptions {
+export interface HrOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
-export default class extends Plugin<Options> {
+export default class<T extends HrOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'hr';
 	}
@@ -143,3 +143,4 @@ export default class extends Plugin<Options> {
 	}
 }
 export { HrComponent };
+export type { HrValue };

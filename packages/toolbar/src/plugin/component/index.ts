@@ -6,6 +6,7 @@ import {
 	isHotkey,
 	CardType,
 	isServer,
+	CardValue,
 } from '@aomao/engine';
 import { CollapseGroupProps } from '../../collapse/group';
 import { CollapseItemProps } from '../../collapse/item';
@@ -14,9 +15,12 @@ import { CollapseProps } from '../../types';
 import CollapseComponent, { CollapseComponentInterface } from './collapse';
 import './index.css';
 
-export type Data = Array<CollapseGroupProps>;
+type Data = Array<CollapseGroupProps>;
+export interface ToolbarValue extends CardValue {
+	data: Data;
+}
 
-class ToolbarComponent extends Card {
+class ToolbarComponent<T extends ToolbarValue> extends Card<T> {
 	private keyword?: NodeInterface;
 	private placeholder?: NodeInterface;
 	private component?: CollapseComponentInterface;
@@ -95,7 +99,7 @@ class ToolbarComponent extends Card {
 								? collapseItem.onDisabled()
 								: !this.editor.command.queryEnabled(name),
 						});
-					}
+					} else if (typeof item === 'object') items.push(item);
 				});
 				data.push({
 					title,

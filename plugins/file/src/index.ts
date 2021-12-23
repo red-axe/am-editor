@@ -12,12 +12,15 @@ import {
 	PluginEntry,
 	READY_CARD_KEY,
 	SchemaInterface,
+	PluginOptions,
 } from '@aomao/engine';
 import FileComponent, { FileValue } from './component';
 import FileUploader from './uploader';
 import locales from './locales';
 
-export default class extends Plugin {
+export interface FileOptions extends PluginOptions {}
+
+export default class<T extends FileOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'file';
 	}
@@ -52,7 +55,7 @@ export default class extends Plugin {
 			value.url = '';
 			value.message = url;
 		}
-		this.editor.card.insert('file', value) as FileComponent;
+		this.editor.card.insert<FileValue>('file', value);
 	}
 
 	async waiting(
@@ -67,26 +70,23 @@ export default class extends Plugin {
 		const check = (component: CardInterface) => {
 			return (
 				component.root.inEditor() &&
-				(component.constructor as CardEntry).cardName ===
-					FileComponent.cardName &&
-				(component as FileComponent).getValue()?.status === 'uploading'
+				component.name === FileComponent.cardName &&
+				(component as FileComponent<FileValue>).getValue()?.status ===
+					'uploading'
 			);
 		};
 		// 找到不合格的组件
-		const find = (): CardInterface | undefined => {
+		const find = () => {
 			return card.components.find(check);
 		};
 		const waitCheck = (component: CardInterface): Promise<void> => {
 			let time = 60000;
 			return new Promise((resolve, reject) => {
 				if (callback) {
-					const result = callback(
-						(this.constructor as PluginEntry).pluginName,
-						component,
-					);
+					const result = callback(this.name, component);
 					if (result === false) {
 						return reject({
-							name: (this.constructor as PluginEntry).pluginName,
+							name: this.name,
 							card: component,
 						});
 					} else if (typeof result === 'number') {
@@ -160,7 +160,9 @@ export default class extends Plugin {
 			`[${CARD_KEY}="${FileComponent.cardName}"],[${READY_CARD_KEY}="${FileComponent.cardName}"`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find(node) as FileComponent;
+			const card = this.editor.card.find(
+				node,
+			) as FileComponent<FileValue>;
 			const value =
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
@@ -182,3 +184,4 @@ export default class extends Plugin {
 }
 
 export { FileComponent, FileUploader };
+export type { FileValue };

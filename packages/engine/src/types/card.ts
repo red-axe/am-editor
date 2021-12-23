@@ -7,19 +7,18 @@ import {
 	DropdownSwitchOptions,
 	ToolbarItemOptions,
 } from './toolbar';
-import { CardActiveTrigger, CardType } from '../card/enum';
+import { CardActiveTrigger, CardType, SelectStyleType } from '../card/enum';
 import { Placement } from './position';
 
-export type CardOptions = {
+export interface CardOptions<T extends CardValue = {}> {
 	editor: EditorInterface;
-	value?: CardValue;
+	value?: T;
 	root?: NodeInterface;
-};
+}
 
 export type CardValue = {
 	id?: string;
 	type?: CardType;
-	[key: string]: any;
 };
 
 export interface CardToolbarInterface {
@@ -85,9 +84,9 @@ export type CardToolbarItemOptions =
 			items: Array<DropdownSwitchOptions | DropdownButtonOptions>;
 	  };
 
-export interface CardEntry {
+export interface CardEntry<T extends CardValue = {}> {
 	prototype: CardInterface;
-	new (options: CardOptions): CardInterface;
+	new (options: CardOptions<T>): CardInterface;
 	/**
 	 * 卡片名称
 	 */
@@ -119,7 +118,7 @@ export interface CardEntry {
 	/**
 	 * 卡片选中后的样式效果，默认为 border
 	 */
-	readonly selectStyleType: 'border' | 'background';
+	readonly selectStyleType: SelectStyleType;
 	/**
 	 * toolbar 跟随鼠标点击位置
 	 */
@@ -130,7 +129,7 @@ export interface CardEntry {
 	readonly lazyRender: boolean;
 }
 
-export interface CardInterface {
+export interface CardInterface<T extends CardValue = {}> {
 	/**
 	 * 初始化调用
 	 */
@@ -286,11 +285,11 @@ export interface CardInterface {
 	 * 设置卡片值
 	 * @param value 值
 	 */
-	setValue(value: Partial<CardValue>): void;
+	setValue(value: Partial<T>): void;
 	/**
 	 * 获取卡片值
 	 */
-	getValue(): CardValue | undefined;
+	getValue(): T;
 	/**
 	 * 工具栏配置项
 	 */
@@ -351,6 +350,16 @@ export interface CardInterface {
 	 * 获取可编辑区域选中的所有节点
 	 */
 	getSelectionNodes?(): Array<NodeInterface>;
+	/**
+	 * 卡片自行处理mark样式
+	 * @param mark 如果为空，则移除所有mark样式
+	 * @param warp 如果为true，则将mark样式添加到卡片节点,否则移除
+	 */
+	executeMark?(mark?: NodeInterface, warp?: boolean): void;
+	/**
+	 * 查询当前卡片包含的所有mark样式
+	 */
+	queryMarks?(): NodeInterface[];
 }
 
 export interface CardModel {
@@ -402,36 +411,57 @@ export interface CardModelInterface {
 	 * @param selector 卡片ID，或者子节点
 	 * @param ignoreEditable 是否忽略可编辑节点
 	 */
-	find(
+	find<
+		E extends CardValue = {},
+		T extends CardInterface<E> = CardInterface<E>,
+	>(
 		selector: NodeInterface | Node | string,
 		ignoreEditable?: boolean,
-	): CardInterface | undefined;
+	): T | undefined;
 	/**
 	 * 根据选择器查找Block 类型 Card
 	 * @param selector 卡片ID，或者子节点
 	 */
-	findBlock(selector: Node | NodeInterface): CardInterface | undefined;
+	findBlock<
+		E extends CardValue = {},
+		T extends CardInterface<E> = CardInterface<E>,
+	>(
+		selector: Node | NodeInterface,
+	): T | undefined;
 	/**
 	 * 获取单个卡片
 	 * @param range 光标范围
 	 */
-	getSingleCard(range: RangeInterface): CardInterface | undefined;
+	getSingleCard<
+		E extends CardValue = {},
+		T extends CardInterface<E> = CardInterface<E>,
+	>(
+		range: RangeInterface,
+	): T | undefined;
 	/**
 	 * 获取选区选中一个节点时候的卡片
 	 * @param rang 选区
 	 */
-	getSingleSelectedCard(rang: RangeInterface): CardInterface | undefined;
+	getSingleSelectedCard<
+		E extends CardValue = {},
+		T extends CardInterface<E> = CardInterface<E>,
+	>(
+		rang: RangeInterface,
+	): T | undefined;
 	/**
 	 * 插入卡片
 	 * @param range 选区
 	 * @param card 卡片
 	 * @param args 插入时渲染时额外的参数
 	 */
-	insertNode(
+	insertNode<
+		E extends CardValue = {},
+		T extends CardInterface<E> = CardInterface<E>,
+	>(
 		range: RangeInterface,
-		card: CardInterface,
+		card: T,
 		...args: any
-	): CardInterface;
+	): T;
 	/**
 	 * 移除卡片节点
 	 * @param card 卡片
@@ -443,10 +473,10 @@ export interface CardModelInterface {
 	 * @param name 卡片名称
 	 * @param value 卡片值
 	 */
-	replaceNode(
+	replaceNode<V extends CardValue>(
 		node: NodeInterface,
 		name: string,
-		value?: CardValue,
+		value?: Partial<V>,
 	): NodeInterface;
 	/**
 	 * 更新卡片重新渲染
@@ -454,7 +484,14 @@ export interface CardModelInterface {
 	 * @param value 值
 	 * @param args 更新时渲染时额外的参数
 	 */
-	updateNode(card: CardInterface, value: CardValue, ...args: any): void;
+	updateNode<
+		E extends CardValue = {},
+		T extends CardInterface<E> = CardInterface<E>,
+	>(
+		card: T,
+		value: Partial<E>,
+		...args: any
+	): void;
 	/**
 	 * 激活卡片节点所在的卡片
 	 * @param node 节点
@@ -483,16 +520,23 @@ export interface CardModelInterface {
 	 * @param value 卡片值
 	 * @param args 插入时渲染时额外的参数
 	 */
-	insert(name: string, value?: CardValue, ...args: any): CardInterface;
+	insert<
+		E extends CardValue = {},
+		T extends CardInterface<E> = CardInterface<E>,
+	>(
+		name: string,
+		value?: Partial<E>,
+		...args: any
+	): T;
 	/**
 	 * 更新卡片
 	 * @param selector 卡片选择器
 	 * @param value 要更新的卡片值
 	 * @param args 更新时渲染时额外的参数
 	 */
-	update(
+	update<V extends CardValue = {}>(
 		selector: NodeInterface | Node | string,
-		value: CardValue,
+		value: Partial<V>,
 		...args: any
 	): void;
 	/**
@@ -502,12 +546,15 @@ export interface CardModelInterface {
 	 * @param value 新卡片值
 	 * @param args 替换时渲染时额外的参数
 	 */
-	replace(
+	replace<
+		E extends CardValue = {},
+		T extends CardInterface<E> = CardInterface<E>,
+	>(
 		source: CardInterface,
 		name: string,
-		value?: CardValue,
+		value?: Partial<E>,
 		...args: any
-	): CardInterface;
+	): T;
 	/**
 	 * 移除卡片
 	 * @param selector 卡片选择器
@@ -523,13 +570,16 @@ export interface CardModelInterface {
 	 * @param name 插件名称
 	 * @param options 选项
 	 */
-	create(
+	create<
+		E extends CardValue = {},
+		T extends CardInterface<E> = CardInterface<E>,
+	>(
 		name: string,
 		options?: {
-			value?: CardValue;
+			value?: Partial<E>;
 			root?: NodeInterface;
 		},
-	): CardInterface;
+	): T;
 	/**
 	 * 渲染
 	 * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点

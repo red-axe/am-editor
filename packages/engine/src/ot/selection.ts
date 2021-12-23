@@ -1,6 +1,6 @@
 import { EngineInterface } from '../types/engine';
 import { Attribute, Member, SelectionInterface } from '../types/ot';
-import { RangePath } from '..';
+import { isTransientElement, RangePath } from '..';
 import { CardType } from '../card/enum';
 
 class OTSelection implements SelectionInterface {
@@ -67,7 +67,15 @@ class OTSelection implements SelectionInterface {
 		const activeCard = card.active;
 		if (activeCard && !activeCard.isEditable) {
 			const center = activeCard.getCenter();
-			if (center && center.length > 0) {
+			if (isTransientElement(activeCard.root)) {
+				const prev = activeCard.root.prev();
+				if (prev) {
+					range.select(prev, true).collapse(false);
+				} else {
+					range.setStartBefore(activeCard.root);
+					range.collapse(true);
+				}
+			} else if (center && center.length > 0) {
 				range.select(center.get()!, true);
 			}
 		} else if (

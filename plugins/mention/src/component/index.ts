@@ -10,17 +10,20 @@ import {
 	DATA_ELEMENT,
 	UI,
 	CardInterface,
+	SelectStyleType,
+	CardValue,
 } from '@aomao/engine';
 import CollapseComponent, { CollapseComponentInterface } from './collapse';
 import { MentionItem } from '../types';
 import './index.css';
-
-export type MentionValue = {
+1;
+export interface MentionValue extends CardValue {
 	key?: string;
 	name?: string;
-};
+	marks?: string[];
+}
 
-class Mention extends Card<MentionValue> {
+class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 	private component?: CollapseComponentInterface;
 	#container?: NodeInterface;
 	#keyword?: NodeInterface;
@@ -40,6 +43,10 @@ class Mention extends Card<MentionValue> {
 
 	static get autoSelected() {
 		return false;
+	}
+
+	static get selectStyleType() {
+		return SelectStyleType.NONE;
 	}
 
 	/**
@@ -65,7 +72,7 @@ class Mention extends Card<MentionValue> {
 	 */
 	static itemClick?: (
 		node: NodeInterface,
-		data: { [key: string]: string },
+		data: { [key: string]: any },
 	) => void;
 
 	/**
@@ -76,7 +83,7 @@ class Mention extends Card<MentionValue> {
 	 */
 	static mouseEnter?: (
 		node: NodeInterface,
-		data: { [key: string]: string },
+		data: { [key: string]: any },
 	) => void;
 
 	/**
@@ -89,7 +96,7 @@ class Mention extends Card<MentionValue> {
 			data: MentionItem[],
 			bindItem: (
 				node: NodeInterface,
-				data: { [key: string]: string },
+				data: { [key: string]: any },
 			) => NodeInterface,
 		) => Promise<string | NodeInterface | void>,
 	) {
@@ -97,8 +104,8 @@ class Mention extends Card<MentionValue> {
 	}
 
 	static onSelect?: (data: {
-		[key: string]: string;
-	}) => void | { [key: string]: string };
+		[key: string]: any;
+	}) => void | { [key: string]: any };
 
 	static onInsert?: (card: CardInterface) => void;
 
@@ -145,12 +152,14 @@ class Mention extends Card<MentionValue> {
 					delete newValue['id'];
 				}
 				const { card } = this.editor;
+				const value = this.getValue();
 				this.component?.remove();
 				this.component = undefined;
 				this.#keyword?.remove();
 				card.focus(this, false);
-				const component = card.insert(Mention.cardName, {
+				const component = card.insert<MentionValue>(Mention.cardName, {
 					...data,
+					marks: value.marks,
 					...newValue,
 				});
 				card.removeNode(this);
@@ -268,6 +277,47 @@ class Mention extends Card<MentionValue> {
 		}, 200);
 	};
 
+	executeMark(mark?: NodeInterface, warp?: boolean) {
+		if (!this.#container) return;
+
+		const children = this.#container.children();
+		if (!mark) {
+			// 移除所有标记
+			this.editor.mark.unwrapByNodes(this.queryMarks());
+			this.setValue({
+				marks: [] as string[],
+			} as T);
+		} else if (warp) {
+			// 增加标记
+			children.each((_, index) => {
+				const child = children.eq(index);
+				if (child) this.editor.mark.wrapByNode(child, mark);
+			});
+			const marks = this.queryMarks().map(
+				(child) => child.get<HTMLElement>()?.outerHTML || '',
+			);
+			this.setValue({
+				marks,
+			} as T);
+		} else {
+			// 移除标记
+			this.editor.mark.unwrapByNodes(this.queryMarks(), mark);
+			const marks = this.queryMarks().map(
+				(child) => child.get<HTMLElement>()?.outerHTML || '',
+			);
+			this.setValue({
+				marks,
+			} as T);
+		}
+	}
+
+	queryMarks() {
+		if (!this.#container) return [];
+		return this.#container
+			.allChildren()
+			.filter((child) => child.isElement());
+	}
+
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
 		// 有值的情况、展示模式
@@ -278,9 +328,12 @@ class Mention extends Card<MentionValue> {
 					name,
 				)}</span>`,
 			);
-
+			(value.marks || []).forEach((mark) => {
+				this.executeMark($(mark), true);
+			});
 			this.#container.on('click', () => {
 				if (!this.#container) return;
+
 				this.editor.trigger('mention:item-click', this.#container, {
 					key: unescape(key || ''),
 					name: unescape(name),
@@ -297,6 +350,12 @@ class Mention extends Card<MentionValue> {
 			this.#container.on('mouseenter', this.showEnter);
 			this.#container.on('mouseleave', this.hideEnter);
 		} else if (this.#container) {
+			if (value) {
+				this.#container.html(`@${unescape(value.name || '')}`);
+				(value?.marks || []).forEach((mark) => {
+					this.executeMark($(mark), true);
+				});
+			}
 			return;
 		}
 

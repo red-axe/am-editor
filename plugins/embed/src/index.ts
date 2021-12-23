@@ -18,11 +18,11 @@ import EmbedComponent, {
 } from './component';
 import locales from './locales';
 
-export interface Options extends PluginOptions {
+export interface EmbedOptions extends PluginOptions {
 	renderBefore?: EmbedRenderBeforeEvent;
 }
 
-class Embed extends Plugin<Options> {
+class Embed<T extends EmbedOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'embed';
 	}
@@ -41,7 +41,7 @@ class Embed extends Plugin<Options> {
 	execute(...args: any): void {
 		const { renderBefore } = this.options;
 		const { card } = this.editor;
-		const cardComponent = card.insert(
+		const cardComponent = card.insert<EmbedValue>(
 			EmbedComponent.cardName,
 			{
 				url: args[0] || '',
@@ -95,12 +95,10 @@ class Embed extends Plugin<Options> {
 			`[${CARD_KEY}="${EmbedComponent.cardName}"],[${READY_CARD_KEY}="${EmbedComponent.cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find(node) as EmbedComponent;
+			const card = this.editor.card.find<EmbedValue>(node);
 			const value =
 				card?.getValue() ||
-				(decodeCardValue(
-					node.attributes(CARD_VALUE_KEY),
-				) as EmbedValue);
+				decodeCardValue<EmbedValue>(node.attributes(CARD_VALUE_KEY));
 			if (value && value.url) {
 				const iframe = $(
 					`<iframe frameborder="0" allowfullscreen="true" style="height: ${value?.height}px;width: 100%;margin:0;padding:0;"></iframe>`,

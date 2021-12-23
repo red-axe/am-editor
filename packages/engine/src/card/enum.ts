@@ -11,3 +11,9 @@ export enum CardActiveTrigger {
 	CLICK = 'click',
 	MOUSE_DOWN = 'mouse_down',
 }
+
+export enum SelectStyleType {
+	NONE = 'none',
+	BACKGROUND = 'background',
+	BORDER = 'border',
+}

@@ -376,6 +376,7 @@ class Inline implements InlineModelInterface {
 			change.delete(safeRange);
 		}
 		mark.split(safeRange);
+		this.split(safeRange);
 		// 插入新 Inline
 		node.insert(inline, safeRange)?.select(inline).collapse(false);
 
@@ -515,12 +516,36 @@ class Inline implements InlineModelInterface {
 				rightNodes[0].remove();
 				rightNodes.splice(0, 1);
 			}
+			if (rightNodes.filter((child) => !child.isCursor()).length > 0) {
+				let rightContainer = rightNodes[0];
+				for (let i = 0; i < rightNodes.length - 1; i++) {
+					rightContainer = rightNodes[i];
+					if (!rightContainer.isCursor()) break;
+				}
+				range.setStartBefore(rightContainer);
+				range.collapse(true);
+			} else if (
+				leftNodes.filter((childNode) => !childNode.isCursor()).length >
+				0
+			) {
+				let leftContainer = leftNodes[leftNodes.length - 1];
+				for (let i = leftNodes.length - 1; i >= 0; i--) {
+					leftContainer = leftNodes[i];
+					if (!leftContainer.isCursor()) break;
+				}
+				range.setStartAfter(leftContainer);
+				range.collapse(true);
+			} else {
+				range.select(parent, true).collapse(true);
+			}
+
 			parent.traverse((child) => {
 				if (node.isInline(child)) {
 					this.repairCursor(child);
 				}
 			});
 		}
+		range.enlargeToElementNode();
 		return keelpNode;
 	}
 	/**

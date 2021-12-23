@@ -4,15 +4,16 @@ import {
 	$,
 	Card,
 	CardType,
+	CardValue,
 	isEngine,
 	NodeInterface,
 	Parser,
 } from '@aomao/engine';
 import GraphEditor from './editor';
 
-export type MindValue = {
+export interface MindValue extends CardValue {
 	data: Array<ShapeData>;
-};
+}
 
 export default class MindCard extends Card<MindValue> {
 	private graphEditor?: GraphEditor;

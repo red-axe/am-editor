@@ -16,6 +16,7 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 	}
 	static readonly pluginName: string;
 	readonly kind: string = 'plugin';
+	readonly name = (this.constructor as typeof PluginEntry).pluginName;
 	disabled?: boolean;
 	// TODO:disabledPlugins: Array<string> = [];
 	/**

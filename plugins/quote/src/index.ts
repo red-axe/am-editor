@@ -8,11 +8,11 @@ import {
 } from '@aomao/engine';
 import './index.css';
 
-export interface Options extends PluginOptions {
+export interface QuoteOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
-export default class extends BlockPlugin<Options> {
+export default class<T extends QuoteOptions> extends BlockPlugin<T> {
 	tagName: string = 'blockquote';
 
 	canMerge = true;

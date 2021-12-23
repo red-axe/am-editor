@@ -17,9 +17,9 @@ import {
 import TableComponent, { Template } from './component';
 import locales from './locale';
 import './index.css';
-import { TableInterface } from './types';
+import { TableInterface, TableValue } from './types';
 
-export interface Options extends PluginOptions {
+export interface TableOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	overflow?: {
 		maxLeftWidth?: () => number;
@@ -28,7 +28,7 @@ export interface Options extends PluginOptions {
 	markdown?: boolean;
 }
 
-class Table extends Plugin<Options> {
+class Table<T extends TableOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'table';
 	}
@@ -266,10 +266,10 @@ class Table extends Plugin<Options> {
 		const range = change.range.get();
 		if (range.startNode.closest(EDITABLE_SELECTOR).length > 0) return;
 		//插入表格
-		this.editor.card.insert(TableComponent.cardName, {
+		this.editor.card.insert<TableValue>(TableComponent.cardName, {
 			rows: rows || 3,
 			cols: cols || 3,
-			overflow: this.options.overflow,
+			overflow: !!this.options.overflow,
 		});
 	}
 
@@ -360,12 +360,16 @@ class Table extends Plugin<Options> {
 				if (background) tds?.css('background', background);
 			});
 			this.editor.nodeId.generateAll(node, true);
-			this.editor.card.replaceNode(node, TableComponent.cardName, {
-				html: node
-					.get<HTMLElement>()!
-					.outerHTML.replace(/\n|\r\n/g, '')
-					.replace(/>\s+</g, '><'),
-			});
+			this.editor.card.replaceNode<TableValue>(
+				node,
+				TableComponent.cardName,
+				{
+					html: node
+						.get<HTMLElement>()!
+						.outerHTML.replace(/\n|\r\n/g, '')
+						.replace(/>\s+</g, '><'),
+				},
+			);
 		});
 	}
 
@@ -374,7 +378,7 @@ class Table extends Plugin<Options> {
 			`[${CARD_KEY}="${TableComponent.cardName}"],[${READY_CARD_KEY}="${TableComponent.cardName}"]`,
 		).each((tableNode) => {
 			const node = $(tableNode);
-			const card = this.editor.card.find(node) as TableComponent;
+			const card = this.editor.card.find<TableValue>(node);
 			const value =
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
@@ -541,3 +545,4 @@ class Table extends Plugin<Options> {
 export default Table;
 
 export { TableComponent };
+export type { TableValue };

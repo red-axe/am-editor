@@ -8,7 +8,6 @@
     ],
     "scripts": {
         "start": "dumi dev",
-        "ssr": "cd site-ssr && yarn dev",
         "docs:build": "dumi build",
         "docs:deploy": "gh-pages -d docs-dist",
         "build": "node ./scripts/build",

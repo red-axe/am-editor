@@ -12,9 +12,9 @@ import {
 	encodeCardValue,
 } from '@aomao/engine';
 
-import FileComponent from './component';
+import FileComponent, { FileValue } from './component';
 
-export interface Options extends PluginOptions {
+export interface FileUploaderOptions extends PluginOptions {
 	/**
 	 * 文件上传地址
 	 */
@@ -75,8 +75,8 @@ export interface Options extends PluginOptions {
 	};
 }
 
-export default class extends Plugin<Options> {
-	private cardComponents: { [key: string]: FileComponent } = {};
+export default class<T extends FileUploaderOptions> extends Plugin<T> {
+	private cardComponents: { [key: string]: FileComponent<FileValue> } = {};
 
 	static get pluginName() {
 		return 'file-uploader';
@@ -171,11 +171,14 @@ export default class extends Plugin<Options> {
 						!!this.cardComponents[fileInfo.uid]
 					)
 						return;
-					const component = card.insert('file', {
+					const component = card.insert<
+						FileValue,
+						FileComponent<FileValue>
+					>('file', {
 						status: 'uploading',
 						name: fileInfo.name,
 						size: fileInfo.size,
-					}) as FileComponent;
+					});
 					this.cardComponents[fileInfo.uid] = component;
 				},
 				onUploading: (file, { percent }) => {
@@ -256,11 +259,15 @@ export default class extends Plugin<Options> {
 						result = { result: false, data: response.data };
 					}
 					if (!result.result) {
-						card.update(component.id, {
+						card.update<FileValue>(component.id, {
 							status: 'error',
 							message:
-								result.data ||
-								this.editor.language.get('file', 'uploadError'),
+								typeof result.data === 'string'
+									? result.data
+									: this.editor.language.get<string>(
+											'file',
+											'uploadError',
+									  ),
 						});
 					} else {
 						const value: any =
@@ -276,11 +283,14 @@ export default class extends Plugin<Options> {
 				onError: (error, file) => {
 					const component = this.cardComponents[file.uid || ''];
 					if (!component) return;
-					card.update(component.id, {
+					card.update<FileValue>(component.id, {
 						status: 'error',
 						message:
 							error.message ||
-							this.editor.language.get('file', 'uploadError'),
+							this.editor.language.get<string>(
+								'file',
+								'uploadError',
+							),
 					});
 					delete this.cardComponents[file.uid || ''];
 				},

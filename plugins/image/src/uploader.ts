@@ -18,7 +18,7 @@ import {
 } from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 
-export interface Options extends PluginOptions {
+export interface ImageUploaderOptions extends PluginOptions {
 	/**
 	 * 文件上传配置
 	 */
@@ -122,8 +122,8 @@ export interface Options extends PluginOptions {
 	isRemote?: (src: string) => boolean;
 }
 
-export default class extends Plugin<Options> {
-	private cardComponents: { [key: string]: ImageComponent } = {};
+export default class<T extends ImageUploaderOptions> extends Plugin<T> {
+	private cardComponents: { [key: string]: ImageComponent<ImageValue> } = {};
 	private loadCounts: { [key: string]: number } = {};
 
 	static get pluginName() {
@@ -304,7 +304,10 @@ export default class extends Plugin<Options> {
 							  )
 							: src;
 					const insertCard = (value: Partial<ImageValue>) => {
-						const component = card.insert(
+						const component = card.insert<
+							ImageValue,
+							ImageComponent<ImageValue>
+						>(
 							'image',
 							{
 								...value,
@@ -312,7 +315,7 @@ export default class extends Plugin<Options> {
 								//fileInfo.src, 再协作中，如果大图片使用base64加载图片预览会造成很大资源浪费
 							},
 							base64String,
-						) as ImageComponent;
+						);
 						this.cardComponents[fileInfo.uid] = component;
 					};
 					return new Promise<void>((resolve) => {
@@ -355,11 +358,11 @@ export default class extends Plugin<Options> {
 						? { result: true, data: src }
 						: { result: false };
 					if (!result.result) {
-						card.update(component.id, {
+						card.update<ImageValue>(component.id, {
 							status: 'error',
 							message:
 								result.data ||
-								this.editor.language.get(
+								this.editor.language.get<string>(
 									'image',
 									'uploadError',
 								),
@@ -379,11 +382,14 @@ export default class extends Plugin<Options> {
 				onError: (error, file) => {
 					const component = this.cardComponents[file.uid || ''];
 					if (!component) return;
-					card.update(component.id, {
+					card.update<ImageValue>(component.id, {
 						status: 'error',
 						message:
 							error.message ||
-							this.editor.language.get('image', 'uploadError'),
+							this.editor.language.get<string>(
+								'image',
+								'uploadError',
+							),
 					});
 					delete this.cardComponents[file.uid || ''];
 				},
@@ -564,11 +570,14 @@ export default class extends Plugin<Options> {
 					? { result: true, data: src }
 					: { result: false };
 				if (!result.result) {
-					this.editor.card.update(component.id, {
+					this.editor.card.update<ImageValue>(component.id, {
 						status: 'error',
 						message:
 							result.data ||
-							this.editor.language.get('image', 'uploadError'),
+							this.editor.language.get<string>(
+								'image',
+								'uploadError',
+							),
 					});
 				} else {
 					src = result.data;
@@ -583,18 +592,21 @@ export default class extends Plugin<Options> {
 				}
 			},
 			error: (error) => {
-				this.editor.card.update(component.id, {
+				this.editor.card.update<ImageValue>(component.id, {
 					status: 'error',
 					message:
 						error.message ||
-						this.editor.language.get('image', 'uploadError'),
+						this.editor.language.get<string>(
+							'image',
+							'uploadError',
+						),
 				});
 			},
 		});
 	}
 
 	insertRemote(src: string, alt?: string) {
-		const value = {
+		const value: ImageValue = {
 			src,
 			alt,
 			status: 'uploading',
@@ -602,10 +614,10 @@ export default class extends Plugin<Options> {
 		const { isRemote } = this.options;
 		//上传第三方图片
 		if (isRemote && isRemote(src)) {
-			const component = this.editor.card.insert(
-				'image',
-				value,
-			) as ImageComponent;
+			const component = this.editor.card.insert<
+				ImageValue,
+				ImageComponent<ImageValue>
+			>('image', value);
 			this.uploadAddress(src, component);
 			return;
 		}
@@ -724,7 +736,7 @@ export default class extends Plugin<Options> {
 			const src = match[4] || match[8];
 			const link = isLink ? match[5] : '';
 
-			const cardNode = card.replaceNode($(regNode), 'image', {
+			const cardNode = card.replaceNode<ImageValue>($(regNode), 'image', {
 				src,
 				status:
 					(isRemote && isRemote(src)) || /^data:image\//i.test(src)

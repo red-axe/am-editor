@@ -4,9 +4,12 @@ import {
 	CardType,
 	isEngine,
 	ToolbarItemOptions,
+	SelectStyleType,
+	CardValue,
 } from '@aomao/engine';
 import './index.css';
-class Hr extends Card {
+export interface HrValue extends CardValue {}
+class Hr<T extends HrValue = HrValue> extends Card<T> {
 	static get cardName() {
 		return 'hr';
 	}
@@ -19,8 +22,8 @@ class Hr extends Card {
 		return false;
 	}
 
-	static get selectStyleType(): 'background' {
-		return 'background';
+	static get selectStyleType() {
+		return SelectStyleType.BACKGROUND;
 	}
 
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {

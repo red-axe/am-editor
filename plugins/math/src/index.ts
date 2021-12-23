@@ -15,10 +15,10 @@ import {
 	READY_CARD_KEY,
 	CARD_VALUE_KEY,
 } from '@aomao/engine';
-import MathComponent from './component';
+import MathComponent, { MathValue } from './component';
 import locales from './locales';
 
-export interface Options extends PluginOptions {
+export interface MathOptions extends PluginOptions {
 	/**
 	 * 请求生成公式svg地址
 	 */
@@ -44,7 +44,7 @@ export interface Options extends PluginOptions {
 	};
 }
 
-export default class Math extends Plugin<Options> {
+export default class Math<T extends MathOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'math';
 	}
@@ -63,13 +63,16 @@ export default class Math extends Plugin<Options> {
 
 	execute(...args: any): void {
 		const { card } = this.editor;
-		const cardComponent = card.insert(MathComponent.cardName, {
-			code: args[0] || '',
-			url: args[1] || '',
-		});
+		const cardComponent = card.insert<MathValue, MathComponent<MathValue>>(
+			MathComponent.cardName,
+			{
+				code: args[0] || '',
+				url: args[1] || '',
+			},
+		);
 		card.activate(cardComponent.root);
 		window.setTimeout(() => {
-			(cardComponent as MathComponent).focusTextarea();
+			cardComponent.focusTextarea();
 		}, 10);
 	}
 
@@ -171,9 +174,8 @@ export default class Math extends Plugin<Options> {
 		const check = (component: CardInterface) => {
 			return (
 				component.root.inEditor() &&
-				(component.constructor as CardEntry).cardName ===
-					MathComponent.cardName &&
-				(component as MathComponent).isSaving
+				component.name === MathComponent.cardName &&
+				(component as MathComponent<MathValue>).isSaving
 			);
 		};
 		// 找到不合格的组件
@@ -266,7 +268,10 @@ export default class Math extends Plugin<Options> {
 			`[${CARD_KEY}="${MathComponent.cardName}"],[${READY_CARD_KEY}="${MathComponent.cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find(node) as MathComponent;
+			const card = this.editor.card.find<
+				MathValue,
+				MathComponent<MathValue>
+			>(node);
 			const value =
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
@@ -289,3 +294,4 @@ export default class Math extends Plugin<Options> {
 }
 
 export { MathComponent };
+export type { MathValue };

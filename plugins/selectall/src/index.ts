@@ -1,12 +1,13 @@
 import {
-	$,
 	isEngine,
 	Plugin,
 	EDITABLE_SELECTOR,
-	NodeInterface,
+	PluginOptions,
 } from '@aomao/engine';
 
-export default class extends Plugin {
+export interface SelectAllOptions extends PluginOptions {}
+
+export default class<T extends SelectAllOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'selectall';
 	}

@@ -13,7 +13,7 @@ import Outline from './outline';
 import type { OutlineData } from './outline';
 import './index.css';
 
-export interface Options extends PluginOptions {
+export interface HeadingOptions extends PluginOptions {
 	hotkey?: {
 		h1?: string;
 		h2?: string;
@@ -28,7 +28,7 @@ export interface Options extends PluginOptions {
 	enableTypes?: Array<string>;
 	disableMark?: Array<string>;
 }
-export default class extends BlockPlugin<Options> {
+export default class<T extends HeadingOptions> extends BlockPlugin<T> {
 	attributes = {
 		id: '@var0',
 	};

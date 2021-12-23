@@ -2,7 +2,7 @@
   "name": "@aomao/plugin-link-vue",
   "version": "2.6.23",
   "description": "> TODO: description",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
   "files": [

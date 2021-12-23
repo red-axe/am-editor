@@ -1,4 +1,3 @@
-'use strict';
 const path = require('path');
 module.exports = (appInfo, appConfig = {}) => {
 	const assetsDir = (appConfig.assets && appConfig.assets.assetsDir) || '../';
@@ -15,20 +14,6 @@ module.exports = (appInfo, appConfig = {}) => {
 	config.multipart = {
 		fileSize: '20mb',
 		whitelist: files.split(',').map((name) => name.trim()),
-	};
-	config.assets = {
-		publicPath: '/public',
-		devServer: {
-			command: 'yarn start-doc',
-			env: {
-				APP_ROOT: path.join(appInfo.baseDir, assetsDir),
-				PORT: '{port}',
-				BROWSER: 'none',
-				ESLINT: 'none',
-				SOCKET_SERVER: 'http://127.0.0.1:{port}',
-				PUBLIC_PATH: 'http://127.0.0.1:{port}',
-			},
-		},
 	};
 	config.static = {
 		prefix: '/',

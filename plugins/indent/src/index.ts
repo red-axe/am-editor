@@ -12,7 +12,7 @@ import {
 	ConversionToValue,
 } from '@aomao/engine';
 
-export interface Options extends PluginOptions {
+export interface IndentOptions extends PluginOptions {
 	hotkey?: {
 		in?: string;
 		out?: string;
@@ -20,9 +20,9 @@ export interface Options extends PluginOptions {
 	maxPadding?: number;
 }
 
-const TEXT_INENT_KEY = 'text-indent';
+export const TEXT_INENT_KEY = 'text-indent';
 
-export default class extends Plugin<Options> {
+export default class<T extends IndentOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'indent';
 	}

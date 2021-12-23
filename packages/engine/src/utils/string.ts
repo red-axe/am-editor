@@ -198,26 +198,25 @@ export const removeUnit = (value: string) => {
  * Card组件值编码
  * @param value 需要编码的字符串
  */
-export const encodeCardValue = (value: any): string => {
+export const encodeCardValue = <T = Record<string, any>>(value: T): string => {
+	let str = '';
 	try {
-		value = encodeURIComponent(JSON.stringify(value || ''));
-	} catch (e) {
-		value = '';
-	}
+		str = encodeURIComponent(JSON.stringify(value || ''));
+	} catch (e) {}
 
-	return 'data:'.concat(value);
+	return 'data:'.concat(str);
 };
 
 /**
  * Card组件值解码
  * @param value 需要解码的字符串
  */
-export const decodeCardValue = (value: string): any => {
+export const decodeCardValue = <T = Record<string, any>>(value: string): T => {
 	try {
 		value = value.substr(5);
 		return JSON.parse(decodeURIComponent(value));
 	} catch (e) {
-		return {};
+		return {} as T;
 	}
 };
 

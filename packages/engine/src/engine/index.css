@@ -661,11 +661,20 @@
 	vertical-align: bottom;
 }
 
-.am-engine span[data-card-type="inline"] span[data-card-element="left"],.am-engine-view span[data-card-type="inline"] span[data-card-element="left"],.am-engine span[data-card-type="inline"] span[data-card-element="right"],.am-engine-view span[data-card-type="inline"] span[data-card-element="right"] {
+.am-engine span[data-card-type="inline"] span[data-card-element="left"],
+.am-engine-view span[data-card-type="inline"] span[data-card-element="left"],
+.am-engine span[data-card-type="inline"] span[data-card-element="right"],.am-engine-view span[data-card-type="inline"] span[data-card-element="right"] {
 	min-width: 1px;
 	text-align: left;
 	-webkit-user-select: text;
 	user-select: text;
+}
+
+.am-engine span[data-card-type="inline"].card-selected span[data-card-element="left"],
+.am-engine-view span[data-card-type="inline"].card-selected span[data-card-element="left"],
+.am-engine span[data-card-type="inline"].card-selected span[data-card-element="right"],
+.am-engine-view span[data-card-type="inline"].card-selected span[data-card-element="right"] {
+  background: rgba(180, 213, 254, 0.5) !important;
 }
 
 .am-engine div[data-card-type="block"],.am-engine-view div[data-card-type="block"],.am-engine span[data-card-type="inline"].data-card-block,.am-engine-view span[data-card-type="inline"].data-card-block {

@@ -10,10 +10,12 @@ import {
 	getFileSize,
 	isEngine,
 	Tooltip,
+	SelectStyleType,
+	CardValue,
 } from '@aomao/engine';
 import './index.css';
 
-export type FileValue = {
+export interface FileValue extends CardValue {
 	/**
 	 *  文件名称
 	 */
@@ -48,9 +50,9 @@ export type FileValue = {
 	 * 错误状态下的错误信息
 	 */
 	message?: string;
-};
+}
 
-export default class FileCard extends Card<FileValue> {
+export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 	static get cardName() {
 		return 'file';
 	}
@@ -59,8 +61,8 @@ export default class FileCard extends Card<FileValue> {
 		return CardType.INLINE;
 	}
 
-	static get selectStyleType(): 'background' {
-		return 'background';
+	static get selectStyleType() {
+		return SelectStyleType.BACKGROUND;
 	}
 
 	static get autoSelected() {
@@ -230,7 +232,7 @@ export default class FileCard extends Card<FileValue> {
 		this.container?.find('.percent').html(`${percent}%`);
 		this.setValue({
 			percent,
-		});
+		} as V);
 	}
 
 	onActivate(activated: boolean) {

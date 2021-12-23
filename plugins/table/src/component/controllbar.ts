@@ -738,6 +738,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		} else if (this.dragging.x > -1) {
 			this.onChangeColWidth(event);
 		}
+		this.emit('sizeChanging');
 	};
 	/**
 	 * 列宽度改变

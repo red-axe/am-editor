@@ -6,7 +6,7 @@ import {
 	PluginOptions,
 } from '@aomao/engine';
 
-export interface Options extends PluginOptions {
+export interface AlignmentOptions extends PluginOptions {
 	hotkey?: {
 		left?: string;
 		center?: string;
@@ -14,7 +14,7 @@ export interface Options extends PluginOptions {
 		justify?: string;
 	};
 }
-export default class extends ElementPlugin<Options> {
+export default class<T extends AlignmentOptions> extends ElementPlugin<T> {
 	kind = 'block';
 
 	style = {

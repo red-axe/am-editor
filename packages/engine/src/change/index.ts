@@ -329,6 +329,7 @@ class ChangeModel implements ChangeInterface {
 				mark.repairCursor(markNode),
 			);
 			selection.move();
+			range.shrinkToTextNode();
 			this.range.select(range);
 		}
 		this.change();

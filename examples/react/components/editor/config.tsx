@@ -1,21 +1,31 @@
-import {
+import { $ } from '@aomao/engine';
+import type {
 	PluginEntry,
 	CardEntry,
 	PluginOptions,
 	NodeInterface,
-	$,
 } from '@aomao/engine';
 //引入插件 begin
 import Redo from '@aomao/plugin-redo';
+import type { RedoOptions } from '@aomao/plugin-redo';
 import Undo from '@aomao/plugin-undo';
+import type { UndoOptions } from '@aomao/plugin-undo';
 import Bold from '@aomao/plugin-bold';
+import type { BoldOptions } from '@aomao/plugin-bold';
 import Code from '@aomao/plugin-code';
+import type { CodeOptions } from '@aomao/plugin-code';
 import Backcolor from '@aomao/plugin-backcolor';
+import type { BackcolorOptions } from '@aomao/plugin-backcolor';
 import Fontcolor from '@aomao/plugin-fontcolor';
+import type { FontcolorOptions } from '@aomao/plugin-fontcolor';
 import Fontsize from '@aomao/plugin-fontsize';
+import type { FontsizeOptions } from '@aomao/plugin-fontsize';
 import Italic from '@aomao/plugin-italic';
+import type { ItalicOptions } from '@aomao/plugin-italic';
 import Underline from '@aomao/plugin-underline';
+import type { UnderlineOptions } from '@aomao/plugin-underline';
 import Hr, { HrComponent } from '@aomao/plugin-hr';
+import type { HrOptions } from '@aomao/plugin-hr';
 import Tasklist, { CheckboxComponent } from '@aomao/plugin-tasklist';
 import Orderedlist from '@aomao/plugin-orderedlist';
 import Unorderedlist from '@aomao/plugin-unorderedlist';
@@ -49,7 +59,6 @@ import {
 	ToolbarComponent,
 	fontFamilyDefaultData,
 } from '@aomao/toolbar';
-import { DOMAIN } from '../../config';
 import ReactDOM from 'react-dom';
 import Loading from '../loading';
 import Empty from 'antd/es/empty';
@@ -159,20 +168,19 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 	},
 	[ImageUploader.pluginName]: {
 		file: {
-			action: `${DOMAIN}/upload/image`,
+			action: '/api/upload/image',
 			headers: { Authorization: 213434 },
 		},
 		remote: {
-			action: `${DOMAIN}/upload/image`,
+			action: '/api/upload/image',
 		},
-		isRemote: (src: string) =>
-			src.indexOf(DOMAIN) < 0 && src.indexOf('192.168') < 0,
+		isRemote: (src: string) => false,
 	},
 	[FileUploader.pluginName]: {
-		action: `${DOMAIN}/upload/file`,
+		action: '/api/upload/file',
 	},
 	[VideoUploader.pluginName]: {
-		action: `${DOMAIN}/upload/video`,
+		action: '/api/upload/video',
 		limitSize: 1024 * 1024 * 50,
 	},
 	[Video.pluginName]: {
@@ -181,14 +189,14 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 		},
 	},
 	[Math.pluginName]: {
-		action: `https://g.aomao.com/latex`,
+		action: '/api/latex',
 		parse: (res: any) => {
 			if (res.success) return { result: true, data: res.svg };
 			return { result: false };
 		},
 	},
 	[Mention.pluginName]: {
-		action: `${DOMAIN}/user/search`,
+		action: '/api/user/search',
 		onLoading: (root: NodeInterface) => {
 			return ReactDOM.render(<Loading />, root.get<HTMLElement>()!);
 		},

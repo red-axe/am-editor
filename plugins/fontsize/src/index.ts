@@ -5,13 +5,13 @@ import {
 	PluginOptions,
 } from '@aomao/engine';
 
-export interface Options extends PluginOptions {
+export interface FontsizeOptions extends PluginOptions {
 	hotkey?: { key: string; args: Array<string> };
 	defaultSize?: string;
 	filter?: (fontSize: string) => string | boolean;
 }
 
-export default class extends MarkPlugin<Options> {
+export default class<T extends FontsizeOptions> extends MarkPlugin<T> {
 	static get pluginName() {
 		return 'fontsize';
 	}

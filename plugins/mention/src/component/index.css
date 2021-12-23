@@ -7,6 +7,10 @@
     outline: 0 none;
 }
 
+.am-engine [data-card-key="mention"].card-activated ::selection {
+    background: transparent !important;
+}
+
 .data-mention-component-list {
     position: absolute;
     font-size: 12px;

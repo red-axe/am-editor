@@ -3,7 +3,6 @@ import {
 	Card,
 	CardToolbarItemOptions,
 	CardType,
-	CardValue,
 	EDITABLE_SELECTOR,
 	isEngine,
 	isMobile,
@@ -12,6 +11,7 @@ import {
 	RangeInterface,
 	removeUnit,
 	Scrollbar,
+	SelectStyleType,
 	ToolbarItemOptions,
 } from '@aomao/engine';
 import {
@@ -31,7 +31,10 @@ import TableSelection from './selection';
 import TableCommand from './command';
 import { ColorTool, Palette } from './toolbar';
 
-class TableComponent extends Card<TableValue> implements TableInterface {
+class TableComponent<V extends TableValue = TableValue>
+	extends Card<V>
+	implements TableInterface
+{
 	readonly contenteditable: string[] = [
 		`div${Template.TABLE_TD_CONTENT_CLASS}`,
 	];
@@ -44,8 +47,8 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		return CardType.BLOCK;
 	}
 
-	static get selectStyleType(): 'background' {
-		return 'background';
+	static get selectStyleType() {
+		return SelectStyleType.BACKGROUND;
 	}
 
 	static get autoSelected() {
@@ -227,7 +230,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			onChange: (color: string) => {
 				this.setValue({
 					color,
-				});
+				} as V);
 				this.conltrollBar.drawBackgroundColor(color);
 			},
 		});
@@ -270,7 +273,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 					const value = this.getValue();
 					this.setValue({
 						noBorder: !value?.noBorder,
-					});
+					} as V);
 					const table = this.wrapper?.find('.data-table');
 					if (value?.noBorder === true) {
 						table?.removeAttributes('data-table-no-border');
@@ -346,7 +349,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 	}
 
 	getValue() {
-		const value = super.getValue() as TableValue;
+		const value = super.getValue();
 		if (!this.wrapper) return value;
 		const tableRoot = this.wrapper.find(Template.TABLE_CLASS);
 		if (!tableRoot) return value;
@@ -370,7 +373,7 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 			height,
 			width,
 			html,
-		};
+		} as V;
 	}
 
 	updateBackgroundSelection?(range: RangeInterface): void {
@@ -607,6 +610,9 @@ class TableComponent extends Card<TableValue> implements TableInterface {
 		this.conltrollBar.on('sizeChanged', () => {
 			this.selection.refreshModel();
 			this.onChange();
+			this.scrollbar?.refresh();
+		});
+		this.conltrollBar.on('sizeChanging', () => {
 			this.scrollbar?.refresh();
 		});
 		this.command.on('actioned', (action, silence) => {

@@ -6,6 +6,7 @@ import {
 	isHotkey,
 	CardType,
 	isServer,
+	CardValue,
 } from '@aomao/engine';
 import {
 	CollapseGroupProps,
@@ -16,9 +17,13 @@ import { getToolbarDefaultConfig } from '../../config';
 import CollapseComponent, { CollapseComponentInterface } from './collapse';
 import './index.css';
 
-export type Data = Array<CollapseGroupProps>;
+type Data = Array<CollapseGroupProps>;
 
-class ToolbarComponent extends Card<{ data: Data }> {
+export interface ToolbarValue extends CardValue {
+	data: Data;
+}
+
+class ToolbarComponent<V extends ToolbarValue> extends Card<V> {
 	private keyword?: NodeInterface;
 	private placeholder?: NodeInterface;
 	private component?: CollapseComponentInterface;

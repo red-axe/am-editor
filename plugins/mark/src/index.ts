@@ -1,11 +1,11 @@
 import { MarkPlugin, PluginOptions } from '@aomao/engine';
 import './index.css';
 
-export interface Options extends PluginOptions {
+export interface MarkOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 }
-export default class extends MarkPlugin<Options> {
+export default class<T extends MarkOptions> extends MarkPlugin<T> {
 	tagName = 'mark';
 
 	static get pluginName() {

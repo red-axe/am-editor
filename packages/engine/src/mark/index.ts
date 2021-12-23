@@ -742,6 +742,130 @@ class Mark implements MarkModelInterface {
 	}
 
 	/**
+	 *
+	 * @param node 包裹一个节点
+	 * @param mark 包裹的样式
+	 * @param plugin 包裹的样式节点所属mark插件，如果循环传入可提高效率，否则每次都需要查找。需要使用插件的级别和是否合并等属性
+	 * @returns 未处理返回 void，因为某些原因不能包裹返回 false，包裹成功返回 NodeInterface
+	 */
+	wrapByNode(
+		node: NodeInterface,
+		mark: NodeInterface,
+		plugin: MarkInterface | undefined = this.findPlugin(mark),
+	) {
+		const nodeApi = this.editor.node;
+		// 要包裹的节点是mark
+		if (nodeApi.isMark(node)) {
+			if (!nodeApi.isEmpty(node)) {
+				//找到最底层mark标签添加包裹，<strong><span style="font-size:16px">abc</span></strong> ，在 span 节点中的text再添加包裹，不在strong外添加包裹
+				let targetNode = node;
+				let targetChildrens = targetNode.children();
+				const curPlugin = this.findPlugin(targetNode);
+				while (
+					nodeApi.isMark(targetNode) &&
+					targetChildrens.length === 1 &&
+					plugin &&
+					curPlugin &&
+					plugin.mergeLeval <= curPlugin.mergeLeval
+				) {
+					const targetChild = targetChildrens.eq(0)!;
+					if (nodeApi.isMark(targetChild)) {
+						targetNode = targetChild;
+						targetChildrens = targetNode.children();
+					} else if (targetChild.isText()) {
+						targetNode = targetChild;
+					} else break;
+				}
+
+				nodeApi.removeZeroWidthSpace(targetNode);
+				let parent = targetNode.parent();
+				//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
+				if (targetNode.isText()) {
+					let result = false;
+					while (parent && nodeApi.isMark(parent)) {
+						if (this.compare(parent.clone(), mark, true)) {
+							result = true;
+							break;
+						} else if (
+							parent
+								.children()
+								.toArray()
+								.filter((node) => !node.isCursor()).length === 1
+						) {
+							const curPlugin = this.findPlugin(parent);
+							//插件一样，并且并表明要合并值
+							if (
+								plugin &&
+								plugin === curPlugin &&
+								plugin.combineValueByWrap === true
+							) {
+								nodeApi.wrap(parent, mark, true);
+								result = true;
+								break;
+							}
+							//插件一样，不合并，直接移除
+							else if (plugin && plugin === curPlugin) {
+								nodeApi.unwrap(parent);
+								result = false;
+								break;
+							}
+						}
+						parent = parent.parent();
+					}
+					if (result) return false;
+				}
+				// 移除目标子级内相同的插件
+				const allChildren = targetNode.allChildren();
+				allChildren.forEach((children) => {
+					if (children.type === getDocument().TEXT_NODE) return;
+					if (nodeApi.isMark(children)) {
+						const childPlugin = this.findPlugin(children);
+						if (
+							childPlugin === plugin &&
+							!plugin?.combineValueByWrap
+						)
+							nodeApi.unwrap(children);
+					}
+				});
+				nodeApi.wrap(targetNode, mark);
+				return targetNode;
+			} else if (node.name !== mark.name) {
+				node.remove();
+			}
+		} else if (node.isCard()) {
+			const cardComponent = this.editor.card.find(node);
+			if (cardComponent && cardComponent.executeMark) {
+				return cardComponent.executeMark(mark, true);
+			}
+		} else if (node.isText() && !nodeApi.isEmpty(node)) {
+			nodeApi.removeZeroWidthSpace(node);
+			const parent = node.parent();
+			//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
+			if (parent && nodeApi.isMark(parent)) {
+				if (this.compare(parent.clone(), mark, true)) return false;
+				if (parent.children().length === 1) {
+					const plugin = this.findPlugin(mark);
+					const curPlugin = this.findPlugin(parent);
+					//插件一样，并且并表明要合并值
+					if (
+						plugin &&
+						plugin === curPlugin &&
+						plugin.combineValueByWrap === true
+					) {
+						nodeApi.wrap(parent, mark, true);
+						return parent;
+					}
+					//插件一样，不合并，直接移除
+					else if (plugin && plugin === curPlugin)
+						nodeApi.unwrap(parent);
+				}
+			}
+			nodeApi.wrap(node, mark);
+			return node;
+		}
+		return;
+	}
+	/**
 	 * 在当前光标选区包裹mark标签
 	 * @param mark mark标签
 	 * @param both mark标签两侧节点
@@ -875,160 +999,30 @@ class Mark implements MarkModelInterface {
 								started = false;
 								return false;
 							}
+							const childIsMark = nodeApi.isMark(child);
+							const result = this.wrapByNode(child, mark, plugin);
 							// 要包裹的节点是mark
-							if (nodeApi.isMark(child)) {
-								if (!nodeApi.isEmpty(child)) {
-									//找到最底层mark标签添加包裹，<strong><span style="font-size:16px">abc</span></strong> ，在 span 节点中的text再添加包裹，不在strong外添加包裹
-									let targetNode = child;
-									let targetChildrens = targetNode.children();
-									const curPlugin =
-										this.findPlugin(targetNode);
-									while (
-										nodeApi.isMark(targetNode) &&
-										targetChildrens.length === 1 &&
-										plugin &&
-										curPlugin &&
-										plugin.mergeLeval <=
-											curPlugin.mergeLeval
-									) {
-										const targetChild =
-											targetChildrens.eq(0)!;
-										if (nodeApi.isMark(targetChild)) {
-											targetNode = targetChild;
-											targetChildrens =
-												targetNode.children();
-										} else if (targetChild.isText()) {
-											targetNode = targetChild;
-										} else break;
-									}
-
-									nodeApi.removeZeroWidthSpace(targetNode);
-									let parent = targetNode.parent();
-									//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
-									if (targetNode.isText()) {
-										let result = false;
-										while (
-											parent &&
-											nodeApi.isMark(parent)
-										) {
-											if (
-												this.compare(
-													parent.clone(),
-													mark,
-													true,
-												)
-											) {
-												result = true;
-												break;
-											} else if (
-												parent
-													.children()
-													.toArray()
-													.filter(
-														(node) =>
-															!node.isCursor(),
-													).length === 1
-											) {
-												const curPlugin =
-													this.findPlugin(parent);
-												//插件一样，并且并表明要合并值
-												if (
-													plugin &&
-													plugin === curPlugin &&
-													plugin.combineValueByWrap ===
-														true
-												) {
-													nodeApi.wrap(
-														parent,
-														mark,
-														true,
-													);
-													result = true;
-													break;
-												}
-												//插件一样，不合并，直接移除
-												else if (
-													plugin &&
-													plugin === curPlugin
-												) {
-													nodeApi.unwrap(parent);
-													result = false;
-													break;
-												}
-											}
-											parent = parent.parent();
-										}
-										if (result) return true;
-									}
-									// 移除目标子级内相同的插件
-									const allChildren =
-										targetNode.allChildren();
-									allChildren.forEach((children) => {
-										if (
-											children.type ===
-											getDocument().TEXT_NODE
+							if (
+								result &&
+								typeof result !== 'boolean' &&
+								childIsMark
+							) {
+								if (
+									!isEditable &&
+									selection?.focus &&
+									result
+										.find(
+											`[data-element="${selection.focus.attributes(
+												DATA_ELEMENT,
+											)}"]`,
 										)
-											return;
-										if (nodeApi.isMark(children)) {
-											const childPlugin =
-												this.findPlugin(children);
-											if (
-												childPlugin === plugin &&
-												!plugin?.combineValueByWrap
-											)
-												nodeApi.unwrap(children);
-										}
-									});
-									nodeApi.wrap(targetNode, mark);
-									if (
-										!isEditable &&
-										selection?.focus &&
-										targetNode
-											.find(
-												`[data-element="${selection.focus.attributes(
-													DATA_ELEMENT,
-												)}"]`,
-											)
-											.equal(selection.focus)
-									) {
-										started = false;
-										return false;
-									}
-									return true;
-								} else if (child.name !== mark.name) {
-									child.remove();
+										.equal(selection.focus)
+								) {
+									started = false;
+									return false;
 								}
 							}
-
-							if (child.isText() && !nodeApi.isEmpty(child)) {
-								nodeApi.removeZeroWidthSpace(child);
-								const parent = child.parent();
-								//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
-								if (parent && nodeApi.isMark(parent)) {
-									if (
-										this.compare(parent.clone(), mark, true)
-									)
-										return true;
-									if (parent.children().length === 1) {
-										const plugin = this.findPlugin(mark);
-										const curPlugin =
-											this.findPlugin(parent);
-										//插件一样，并且并表明要合并值
-										if (
-											plugin &&
-											plugin === curPlugin &&
-											plugin.combineValueByWrap === true
-										) {
-											nodeApi.wrap(parent, mark, true);
-											return true;
-										}
-										//插件一样，不合并，直接移除
-										else if (plugin && plugin === curPlugin)
-											nodeApi.unwrap(parent);
-									}
-								}
-								nodeApi.wrap(child, mark);
-							}
+							if (typeof result !== 'undefined') return true;
 						}
 					} else {
 						started = true;
@@ -1110,7 +1104,7 @@ class Mark implements MarkModelInterface {
 	 */
 	merge(range?: RangeInterface): void {
 		if (!isEngine(this.editor)) return;
-		const { change, node } = this.editor;
+		const { change } = this.editor;
 		const safeRange = range || change.range.toTrusty();
 		const marks = this.findMarks(safeRange);
 		if (marks.length === 0) {
@@ -1121,6 +1115,73 @@ class Mark implements MarkModelInterface {
 		selection.move();
 		safeRange.handleBr();
 		if (!range) change.apply(safeRange);
+	}
+	/**
+	 * 移除多个节点的mark
+	 * @param nodes 要移除的节点集合
+	 * @param removeMark 要移除的mark样式
+	 */
+	unwrapByNodes(
+		nodes: NodeInterface[],
+		removeMark?: NodeInterface | Array<NodeInterface>,
+	) {
+		// 清除 Mark
+		const nodeApi = this.editor.node;
+		nodes.forEach((node) => {
+			removeMark = removeMark as
+				| NodeInterface
+				| NodeInterface[]
+				| undefined;
+			if (
+				!removeMark ||
+				(!node.isCard() &&
+					(Array.isArray(removeMark)
+						? removeMark
+						: [removeMark]
+					).some((m) => this.compare(node, m)))
+			) {
+				nodeApi.unwrap(node);
+			} else if (removeMark) {
+				(Array.isArray(removeMark) ? removeMark : [removeMark]).forEach(
+					(m) => {
+						const styleMap = m.css();
+						Object.keys(styleMap).forEach((key) => {
+							node.css(key, '');
+						});
+						//移除符合规则的class
+						const removeClass = m
+							.get<Element>()
+							?.className.split(/\s+/);
+						if (removeClass) {
+							const { schema } = this.editor;
+							const schemas = schema.find(
+								(rule) => rule.name === node.name,
+							);
+							for (let i = 0; i < schemas.length; i++) {
+								const schemaRule = schemas[i];
+								removeClass.forEach((className) => {
+									className = className.trim();
+									if (className === '') return;
+									if (
+										schemaRule.attributes &&
+										schema.checkValue(
+											schemaRule.attributes,
+											'class',
+											className,
+										)
+									) {
+										node.removeClass(className);
+									}
+								});
+							}
+						}
+					},
+				);
+			} else {
+				node.removeAttributes('class');
+				node.removeAttributes('style');
+			}
+		});
 	}
 	/**
 	 * 去掉mark包裹
@@ -1208,6 +1269,23 @@ class Mark implements MarkModelInterface {
 										safeRange.isPointInRange(child, 0))
 								) {
 									markNodes.push(child);
+								} else if (child.isCard()) {
+									const cardComponent =
+										this.editor.card.find(child);
+									if (
+										cardComponent &&
+										cardComponent.executeMark
+									) {
+										(Array.isArray(removeMark)
+											? removeMark
+											: [removeMark as NodeInterface]
+										).forEach((mark) => {
+											cardComponent.executeMark!(
+												mark,
+												false,
+											);
+										});
+									}
 								}
 							}
 						}
@@ -1237,52 +1315,7 @@ class Mark implements MarkModelInterface {
 				true,
 			);
 		});
-		// 清除 Mark
-		const nodeApi = node;
-		markNodes.forEach((node) => {
-			removeMark = removeMark as NodeInterface | undefined;
-			if (
-				!removeMark ||
-				(!node.isCard() && this.compare(node, removeMark))
-			) {
-				nodeApi.unwrap(node);
-			} else if (removeMark) {
-				const styleMap = removeMark.css();
-				Object.keys(styleMap).forEach((key) => {
-					node.css(key, '');
-				});
-				//移除符合规则的class
-				const removeClass = removeMark
-					.get<Element>()
-					?.className.split(/\s+/);
-				if (removeClass) {
-					const { schema } = this.editor;
-					const schemas = schema.find(
-						(rule) => rule.name === node.name,
-					);
-					for (let i = 0; i < schemas.length; i++) {
-						const schemaRule = schemas[i];
-						removeClass.forEach((className) => {
-							className = className.trim();
-							if (className === '') return;
-							if (
-								schemaRule.attributes &&
-								schema.checkValue(
-									schemaRule.attributes,
-									'class',
-									className,
-								)
-							) {
-								node.removeClass(className);
-							}
-						});
-					}
-				}
-			} else {
-				node.removeAttributes('class');
-				node.removeAttributes('style');
-			}
-		});
+		this.unwrapByNodes(markNodes, removeMark);
 		selection?.move();
 		if (isEditable) {
 			const markNodes: NodeInterface[] = [];
@@ -1468,6 +1501,11 @@ class Mark implements MarkModelInterface {
 					!node.attributes(CARD_ELEMENT_KEY)
 				) {
 					nodes.push(node);
+				} else if (node.isCard()) {
+					const cardComponent = this.editor.card.find(node);
+					if (cardComponent?.queryMarks) {
+						nodes.push(...cardComponent.queryMarks());
+					}
 				}
 				const parent = node.parent();
 				if (!parent) break;
@@ -1514,6 +1552,16 @@ class Mark implements MarkModelInterface {
 										!child.attributes(CARD_ELEMENT_KEY)
 									) {
 										addNode(nodes, child);
+									} else if (child.isCard()) {
+										const cardComponent =
+											this.editor.card.find(child);
+										if (cardComponent?.queryMarks) {
+											cardComponent
+												.queryMarks()
+												.forEach((mark) => {
+													addNode(nodes, mark);
+												});
+										}
 									}
 								}
 							} else {

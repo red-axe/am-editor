@@ -8,12 +8,12 @@ import {
 	PluginOptions,
 } from '@aomao/engine';
 
-export interface Options extends PluginOptions {
+export interface OrderedListOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
 
-export default class extends ListPlugin<Options> {
+export default class<T extends OrderedListOptions> extends ListPlugin<T> {
 	tagName = 'ol';
 
 	attributes = {
