@@ -135,6 +135,7 @@ export default class<T extends PaintformatOptions> extends Plugin<T> {
 				});
 			}
 		}
+		this.editor.mark.merge(range);
 	}
 
 	paintMarks(activeMarks: NodeInterface[]) {
