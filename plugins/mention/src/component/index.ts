@@ -402,6 +402,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 			setTimeout(() => {
 				if (isEngine(this.editor)) {
 					const range = this.editor.change.range.get();
+					this.#keyword = this.#container?.eq(0);
 					range.select(this.#keyword!, true).collapse(false);
 					const selection = window.getSelection();
 					selection?.removeAllRanges();

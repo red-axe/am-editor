@@ -899,6 +899,7 @@ class Mark implements MarkModelInterface {
 							mark,
 						);
 					} else {
+						targetChild = nodeApi.wrap(targetChild, cloneMark);
 						nodeApi.wrap(targetChild, mark);
 					}
 				});

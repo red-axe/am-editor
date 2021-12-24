@@ -26,6 +26,7 @@ class ChangeEvent implements ChangeEventInterface {
 	private dragoverHelper: DragoverHelper;
 	private options: ChangeEventOptions;
 	private keydownRange: RangeInterface | null = null;
+	private inputAtBeforeText = '';
 
 	constructor(engine: EngineInterface, options: ChangeEventOptions = {}) {
 		this.engine = engine;
@@ -103,15 +104,26 @@ class ChangeEvent implements ChangeEventInterface {
 		this.onContainer('beforeinput', (event: InputEvent) => {
 			if (this.engine.readonly) return;
 			// safari 组合输入法会直接插入@字符，这里统一全部拦截输入@字符的时候再去触发@事件
+			const { change, card, node, block, list } = this.engine;
 			if (event.data === '@') {
+				const { startNode } = change.range.get();
+				// 搜狗这种输入法，中文状态下会触发两次，第二次的text是单独的@节点
+				const text = startNode.text();
+				let isHandleAt = false;
+				if (startNode.isText()) {
+					if (this.inputAtBeforeText !== text && text === '@') {
+						event.preventDefault();
+						isHandleAt = true;
+					}
+				}
 				// 如果没有要对 @ 字符处理的就不拦截
-				const result = this.engine.trigger('keydown:at', event);
+				const result = !isHandleAt
+					? this.engine.trigger('keydown:at', event)
+					: true;
 				if (result === false) {
 					event.preventDefault();
-					return;
 				}
 			}
-			const { change, card, node, block, list } = this.engine;
 			if (!change.rangePathBeforeCommand)
 				change.cacheRangeBeforeCommand();
 			const sourceRange = change.range.get();
@@ -286,8 +298,21 @@ class ChangeEvent implements ChangeEventInterface {
 				return callback(e);
 			}, 10);
 		});
-		this.onContainer('keydown', () => {
+		this.onContainer('keydown', (event: KeyboardEvent) => {
 			const range = Range.from(this.engine);
+			if (
+				range &&
+				(event.key === '@' ||
+					(event.shiftKey &&
+						event.keyCode === 229 &&
+						event.code === 'Digit2'))
+			) {
+				const { startNode } = range;
+				if (startNode.isText()) {
+					const text = startNode.text();
+					this.inputAtBeforeText = text;
+				}
+			}
 			this.keydownRange = range;
 		});
 		// 补齐通过键盘选中的情况
