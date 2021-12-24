@@ -479,7 +479,8 @@ class Inline implements InlineModelInterface {
 			let appendChild: NodeInterface | undefined | null = undefined;
 			const appendToParent = (childrenNodes: NodeInterface) => {
 				childrenNodes.each((child, index) => {
-					if (childrenNodes.eq(index)?.isCard()) {
+					const childNode = childrenNodes.eq(index);
+					if (childNode?.isCard()) {
 						appendChild = appendChild
 							? appendChild.next()
 							: parent.first();
@@ -488,9 +489,9 @@ class Inline implements InlineModelInterface {
 					}
 					if (appendChild) {
 						appendChild.after(child);
-						appendChild = childrenNodes.eq(index);
+						appendChild = childNode;
 					} else {
-						appendChild = childrenNodes.eq(index);
+						appendChild = childNode;
 						parent.prepend(child);
 					}
 				});
@@ -499,13 +500,14 @@ class Inline implements InlineModelInterface {
 			const leftNodes = leftChildren.toArray();
 			appendToParent(leftChildren);
 			const rightChildren = right.children();
-			const rightNodes = rightChildren.toArray();
+			let rightNodes = rightChildren.toArray();
 			// 根据跟踪节点的root节点和path获取其在rightNodes中的新节点
 			if (keelpRoot)
 				keelpNode = rightNodes
 					.find((node) => node.equal(keelpRoot!))
 					?.getChildByPath(keelpPath);
 			appendToParent(rightChildren);
+			rightNodes = rightChildren.toArray();
 			// 重新设置范围
 			//移除左右两边的 br 标签
 			if (leftNodes.length === 1 && leftNodes[0].name === 'br') {

@@ -21,6 +21,7 @@ import { Backspace, Enter } from './typing';
 import { $ } from '../node';
 import { isBlockPlugin } from '../plugin';
 import { isNode } from '../node/utils';
+import { CardType } from '../card/enum';
 
 class Block implements BlockModelInterface {
 	private editor: EditorInterface;
@@ -855,7 +856,7 @@ class Block implements BlockModelInterface {
 		if (range.startNode.isRoot()) range.shrinkToElementNode();
 		if (
 			!range.startNode.inEditor() ||
-			this.editor.card.find(range.startNode)
+			this.editor.card.find(range.startNode)?.type === CardType.BLOCK
 		)
 			return [];
 		const sc = range.startContainer;

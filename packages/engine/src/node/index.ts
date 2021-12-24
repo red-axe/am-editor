@@ -464,6 +464,9 @@ class NodeModel implements NodeModelInterface {
 			clone.append(childNode);
 			childNode = nextNode;
 		}
+		if (source.isText()) {
+			clone.append(source.clone());
+		}
 
 		return source.replaceWith(clone);
 	}

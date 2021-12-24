@@ -358,14 +358,14 @@ class Mark implements MarkModelInterface {
 			const leftNodes = leftChildren.toArray();
 			appendToParent(leftChildren);
 			const rightChildren = right.children();
-			const rightNodes = rightChildren.toArray();
+			let rightNodes = rightChildren.toArray();
 			// 根据跟踪节点的root节点和path获取其在rightNodes中的新节点
 			if (keelpRoot)
 				keelpNode = rightNodes
 					.find((node) => node.equal(keelpRoot!))
 					?.getChildByPath(keelpPath);
 			appendToParent(rightChildren);
-
+			rightNodes = rightChildren.toArray();
 			let zeroWidthNode = $('\u200b', null);
 
 			// 重新设置范围
@@ -842,7 +842,7 @@ class Mark implements MarkModelInterface {
 			}
 		} else if (node.isText() && !nodeApi.isEmpty(node)) {
 			nodeApi.removeZeroWidthSpace(node);
-			const parent = node.parent();
+			let parent = node.parent();
 			//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
 			if (parent && nodeApi.isMark(parent)) {
 				if (this.compare(parent.clone(), mark, true)) return false;
@@ -859,11 +859,53 @@ class Mark implements MarkModelInterface {
 						return parent;
 					}
 					//插件一样，不合并，直接移除
-					else if (plugin && plugin === curPlugin)
+					else if (plugin && plugin === curPlugin) {
 						nodeApi.unwrap(parent);
+						parent = node.parent();
+					}
 				}
 			}
-			nodeApi.wrap(node, mark);
+			let targetNode = parent;
+			let curPlugin = targetNode
+				? this.findPlugin(targetNode)
+				: undefined;
+			/**
+			 * <span>123</span> -> <strong><span>123</span></strong>
+			 * <strong><span>123</span><b>123</b></strong> -> <font><strong><span>123</span></span></font><strong><b>123</b></strong>
+			 */
+			let isHandle = false;
+			while (
+				targetNode &&
+				nodeApi.isMark(targetNode) &&
+				plugin &&
+				curPlugin &&
+				plugin.mergeLeval > curPlugin.mergeLeval
+			) {
+				isHandle = true;
+				const targetChildrens = targetNode.children().toArray();
+				const cloneMark = targetNode.clone();
+				targetChildrens.forEach((targetChild) => {
+					// 零宽字符的文本跳过
+					if (
+						targetChild.isCursor() ||
+						(targetChild.type === 3 &&
+							/^\u200b$/.test(targetChild.text() || ''))
+					) {
+						return;
+					}
+					if (node.equal(targetChild) || targetChild.contains(node)) {
+						node = nodeApi.wrap(
+							nodeApi.replace(node, cloneMark),
+							mark,
+						);
+					} else {
+						nodeApi.wrap(targetChild, mark);
+					}
+				});
+				nodeApi.unwrap(targetNode);
+				targetNode = this.closest(node);
+			}
+			if (!isHandle) nodeApi.wrap(node, mark);
 			return node;
 		}
 		return;
