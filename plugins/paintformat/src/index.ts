@@ -6,6 +6,8 @@ import {
 	Plugin,
 	RangeInterface,
 	PluginOptions,
+	DATA_ELEMENT,
+	UI,
 } from '@aomao/engine';
 import './index.css';
 
@@ -99,7 +101,9 @@ export default class<T extends PaintformatOptions> extends Plugin<T> {
 		const removeCommand = this.options.removeCommand || 'removeformat';
 		// 选择范围为折叠状态，应用在整个段落，包括段落自己的样式
 		if (range.collapsed) {
-			const dummy = $('<img style="display: none;" />');
+			let dummy = $(
+				`<img ${DATA_ELEMENT}="${UI}" role="format-dummy" style="display: none;" />`,
+			);
 			range.insertNode(dummy[0]);
 			const currentBlock = block.closest(range.startNode);
 			range.select(currentBlock, true);
@@ -114,6 +118,7 @@ export default class<T extends PaintformatOptions> extends Plugin<T> {
 					this.paintBlocks(block, activeBlocks);
 				});
 			}
+			dummy = currentBlock.find(`img[role="format-dummy"]`);
 			range.select(dummy);
 			range.collapse(true);
 			dummy.remove();
