@@ -88,7 +88,7 @@ export default class Clipboard implements ClipboardInterface {
 	) {
 		if (!range) range = Range.from(this.editor);
 		if (!range) throw 'Range is null';
-		range = range.cloneRange().shrinkToElementNode();
+		range = range.cloneRange(); //.shrinkToElementNode();
 		let card = range.startNode.closest(`[${CARD_KEY}]`, (node) => {
 			return $(node).isEditable()
 				? undefined
