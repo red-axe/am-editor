@@ -208,7 +208,11 @@ export default class<T extends CodeblockOptions> extends Plugin<T> {
 					}
 				}
 			}
-			let code = new Parser(node, this.editor).toText();
+			let code = new Parser(node, this.editor).toText(
+				undefined,
+				undefined,
+				false,
+			);
 			code = unescape(code.replace(/\u200b/g, ''));
 			this.editor.card.replaceNode<CodeBlockValue>(node, 'codeblock', {
 				mode: syntax || 'plain',
