@@ -139,9 +139,10 @@ export default class<T extends PaintformatOptions> extends Plugin<T> {
 
 	paintMarks(activeMarks: NodeInterface[]) {
 		const { mark } = this.editor!;
-		activeMarks.forEach((node) => {
+		for (let i = activeMarks.length - 1; i >= 0; i--) {
+			const node = activeMarks[i];
 			mark.wrap(this.editor.node.clone(node, false, false));
-		});
+		}
 	}
 
 	paintBlocks(currentBlock: NodeInterface, activeBlocks: NodeInterface[]) {

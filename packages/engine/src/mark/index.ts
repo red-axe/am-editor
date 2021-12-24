@@ -759,19 +759,22 @@ class Mark implements MarkModelInterface {
 			if (!nodeApi.isEmpty(node)) {
 				//找到最底层mark标签添加包裹，<strong><span style="font-size:16px">abc</span></strong> ，在 span 节点中的text再添加包裹，不在strong外添加包裹
 				let targetNode = node;
-				let targetChildrens = targetNode.children();
+				let targetChildrens = targetNode.children().toArray();
 				const curPlugin = this.findPlugin(targetNode);
 				while (
 					nodeApi.isMark(targetNode) &&
-					targetChildrens.length === 1 &&
+					targetChildrens.filter((child) => !child.isCursor())
+						.length === 1 &&
 					plugin &&
 					curPlugin &&
 					plugin.mergeLeval <= curPlugin.mergeLeval
 				) {
-					const targetChild = targetChildrens.eq(0)!;
+					const targetChild = targetChildrens.find(
+						(child) => !child.isCursor(),
+					)!;
 					if (nodeApi.isMark(targetChild)) {
 						targetNode = targetChild;
-						targetChildrens = targetNode.children();
+						targetChildrens = targetNode.children().toArray();
 					} else if (targetChild.isText()) {
 						targetNode = targetChild;
 					} else break;

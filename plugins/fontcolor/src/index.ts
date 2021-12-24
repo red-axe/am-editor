@@ -7,7 +7,7 @@ export default class<T extends FontcolorOptions> extends MarkPlugin<T> {
 	static get pluginName() {
 		return 'fontcolor';
 	}
-
+	readonly mergeLeval = 3;
 	tagName = 'span';
 
 	style = {
