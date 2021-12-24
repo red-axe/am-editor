@@ -607,6 +607,18 @@ class Parser implements ParserInterface {
 							schema || this.editor.schema,
 						)
 					) {
+						const children = node.children().toArray();
+						// 子节点还有block节点，则不换行
+						if (
+							children.some((child) => child.name === 'br') ||
+							children.some((child) =>
+								this.editor.node.isBlock(
+									child,
+									schema || this.editor.schema,
+								),
+							)
+						)
+							return;
 						result.push('\n');
 					}
 				},

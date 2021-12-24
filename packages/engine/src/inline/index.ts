@@ -1065,15 +1065,17 @@ class Inline implements InlineModelInterface {
 			else {
 				let parentMark: NodeInterface | undefined =
 					markApi.closest(node);
+
+				const element = node as NodeInterface;
 				while (
 					parentMark &&
 					!parentMark.equal(node) &&
 					nodeApi.isMark(parentMark, schema)
 				) {
 					const cloneMark = parentMark.clone();
-					const inlineMark = node.clone();
+					const cloneInline = node.clone();
 					const children = parentMark.children();
-					children.each((markChild) => {
+					children.each((markChild, index) => {
 						// 零宽字符的文本跳过
 						if (
 							markChild.nodeType === 3 &&
@@ -1081,13 +1083,13 @@ class Inline implements InlineModelInterface {
 						) {
 							return;
 						}
-						if ((node as NodeInterface).equal(markChild)) {
+						if (
+							element.equal(markChild) ||
+							children.eq(index)?.contains(element)
+						) {
 							node = nodeApi.wrap(
-								nodeApi.replace(
-									node as NodeInterface,
-									cloneMark,
-								),
-								inlineMark,
+								nodeApi.replace(element, cloneMark),
+								cloneInline,
 							);
 							this.repairBoth(node);
 						} else {
