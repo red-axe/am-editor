@@ -122,7 +122,7 @@ export default class<T extends PaintformatOptions> extends Plugin<T> {
 			range.select(dummy);
 			range.collapse(true);
 			dummy.remove();
-			change.range.select(range);
+			change.apply(range);
 		} else {
 			// 选择范围为展开状态
 			if (typeof removeCommand === 'function') removeCommand(range);
