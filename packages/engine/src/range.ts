@@ -299,8 +299,12 @@ class Range implements RangeInterface {
 	 * <p>[<strong><span>123</span>abc</strong>]def</p>
 	 * @param range 选区
 	 * @param toBlock 是否扩大到块级节点
+	 * @param toTop 是否尽可能扩大的可编辑节点下
 	 */
-	enlargeToElementNode = (toBlock?: boolean) => {
+	enlargeToElementNode = (
+		toBlock: boolean = false,
+		toTop: boolean = true,
+	) => {
 		const range = this.enlargeFromTextNode();
 		const nodeApi = this.editor.node;
 		const enlargePosition = (
@@ -326,6 +330,10 @@ class Range implements RangeInterface {
 					if (!parent.inEditor() || parent.isEditable()) {
 						break;
 					}
+					if (!toTop) {
+						if (!toBlock && parent.isElement()) break;
+						if (toBlock && nodeApi.isBlock(parent)) break;
+					}
 					domNode = parent;
 				}
 				if (isStart) {
@@ -341,6 +349,10 @@ class Range implements RangeInterface {
 					}
 					if (!parent.inEditor() || parent.isEditable()) {
 						break;
+					}
+					if (!toTop) {
+						if (!toBlock && parent.isElement()) break;
+						if (toBlock && nodeApi.isBlock(parent)) break;
 					}
 					domNode = parent;
 				}

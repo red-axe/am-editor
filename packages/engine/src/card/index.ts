@@ -265,6 +265,10 @@ class CardModel implements CardModelInterface {
 		if (isInline) {
 			if (isEngine(editor) && card.executeMark) {
 				marks = editor.change.marks.map((mark) => mark.clone());
+				const cardComponent = editor.card.find(range.startNode);
+				if (cardComponent?.queryMarks) {
+					marks.push(...cardComponent.queryMarks());
+				}
 			}
 			inline.insert(card.root, range);
 		} else {
@@ -404,6 +408,8 @@ class CardModel implements CardModelInterface {
 					card.activate(true);
 				} else if (card.isEditable) {
 					card.select(false);
+				} else if (trigger === CardActiveTrigger.MOUSE_DOWN) {
+					event?.preventDefault();
 				}
 				if (
 					!isCurrentActiveCard &&

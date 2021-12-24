@@ -200,8 +200,9 @@ export interface RangeInterface {
 	 * <p>[<strong><span>123</span>abc</strong>]def</p>
 	 * @param range 选区
 	 * @param toBlock 是否扩大到块级节点
+	 * @param toTop 是否尽可能扩大的可编辑节点下
 	 */
-	enlargeToElementNode(toBlock?: boolean): RangeInterface;
+	enlargeToElementNode(toBlock?: boolean, toTop?: boolean): RangeInterface;
 	/**
 	 * 缩小边界
 	 * <body>[<p><strong>123</strong></p>]</body>

@@ -545,7 +545,7 @@ class Inline implements InlineModelInterface {
 				}
 			});
 		}
-		range.enlargeToElementNode();
+		range.enlargeToElementNode(!node.isBlock(range.startNode), false);
 		return keelpNode;
 	}
 	/**
@@ -929,8 +929,21 @@ class Inline implements InlineModelInterface {
 	repairCursor(node: NodeInterface | Node) {
 		const nodeApi = this.editor.node;
 		if (isNode(node)) node = $(node);
-		if (!nodeApi.isInline(node) || nodeApi.isVoid(node) || node.isCard())
+		if (!nodeApi.isInline(node) || nodeApi.isVoid(node) || node.isCard()) {
+			const prev = node.prev();
+			const prevText = prev?.isText() ? prev.text() : undefined;
+			if (prevText && /\u200b$/.test(prevText)) {
+				const pPrev = prev?.prev();
+				if (!pPrev || !nodeApi.isInline(pPrev)) {
+					if (prevText.length === 1) {
+						prev?.remove();
+					} else {
+						prev?.text(prevText.slice(0, -1));
+					}
+				}
+			}
 			return;
+		}
 		const childrenNodes = node.children();
 		childrenNodes.each((_, index) => {
 			const child = childrenNodes.eq(index);
