@@ -11,6 +11,10 @@
     border-radius: 2px;
 }
 
+.am-engine [data-card-key="status"].card-activated ::selection {
+    background: transparent !important;
+}
+
 .data-label-container {
     overflow: hidden;
     max-width: 200px;
