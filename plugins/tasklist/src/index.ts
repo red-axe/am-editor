@@ -114,7 +114,7 @@ export default class<T extends TasklistOptions> extends ListPlugin<T> {
 		const range = change.range.get();
 		const activeBlocks = block.findBlocks(range);
 		if (activeBlocks) {
-			const selection = range.createSelection();
+			const selection = range.createSelection('tasklist-execute');
 			if (list.isSpecifiedType(activeBlocks, 'ul', 'checkbox')) {
 				list.unwrap(activeBlocks);
 			} else {
