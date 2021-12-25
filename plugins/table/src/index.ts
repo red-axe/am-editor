@@ -14,11 +14,10 @@ import {
 	decodeCardValue,
 	CARD_VALUE_KEY,
 } from '@aomao/engine';
-import TableComponent, { Template } from './component';
+import TableComponent, { Template, Helper } from './component';
 import locales from './locale';
-import './index.css';
 import { TableInterface, TableValue } from './types';
-
+import './index.css';
 export interface TableOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	overflow?: {
@@ -295,9 +294,11 @@ class Table<T extends TableOptions> extends Plugin<T> {
 			if (width.endsWith('pt')) node.css(type, this.convertToPX(width));
 		};
 		const tables = root.find('table');
+		const helper = new Helper();
 		tables.each((_, index) => {
-			const node = tables.eq(index);
+			let node = tables.eq(index);
 			if (!node) return;
+			node = helper.normalizeTable(node);
 			clearWH(node);
 			clearWH(node, 'height');
 			// 表头放在tbody最前面
@@ -343,11 +344,19 @@ class Table<T extends TableOptions> extends Plugin<T> {
 			if (background) tds.css('background', background);
 
 			const trs = node.find('tr');
+			let rowSpan = 1;
 			trs.each((_, index) => {
 				const element = trs.eq(index);
 
 				const tds = element?.find('td');
-				if (tds?.length === 0) element?.remove();
+				if (tds?.length === 0 && rowSpan < 2) {
+					element?.remove();
+				}
+				if (tds && tds?.length > 0) {
+					rowSpan = (tds[0] as HTMLTableCellElement).rowSpan;
+				} else {
+					rowSpan = 1;
+				}
 
 				if (element) {
 					clearWH(element);

@@ -721,4 +721,4 @@ class TableComponent<V extends TableValue = TableValue>
 
 export default TableComponent;
 
-export { Template };
+export { Template, Helper };
