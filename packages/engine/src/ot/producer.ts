@@ -474,7 +474,7 @@ class Producer extends EventEmitter2 {
 										ldOp.oldPath || [],
 									);
 								}
-								const strP = op.p.join(',');
+								const strP = aOp.p.join(',');
 								const strLdP = ldOp.p.join(',');
 								// 相等，不需要增加
 								if (!has && strP === strLdP) {
