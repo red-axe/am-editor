@@ -261,7 +261,6 @@ class Producer extends EventEmitter2 {
 									? removedNode['__index']
 									: this.getRemoveNodeIndex(record, records);
 							const rIndex = _index + JSON0_INDEX.ELEMENT;
-							console.log(removedNode, removedNode['test']);
 							// 删除的情况下，目标节点也应该获取 __index ，不然在还有新增的情况会导致path不正确
 							const newPath = path?.concat();
 							if (newPath && newPath.length > 0) {

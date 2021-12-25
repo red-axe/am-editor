@@ -227,7 +227,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			)
 			.on('click', (event) => this.onClickRowsHeader(event))
 			.on('dragstart', (event) => this.onDragStartRowsHeader(event));
-		this.tableHeader?.on('click', (event) =>
+		this.tableHeader?.on('mousedown', (event) =>
 			this.onClickTableHeader(event),
 		);
 		this.table.wrapper?.on('contextmenu', (event) =>
@@ -524,6 +524,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @param event 事件
 	 */
 	onClickTableHeader(event: MouseEvent) {
+		event.preventDefault();
 		const { selection } = this.table;
 		if (this.tableHeader?.hasClass('selected')) {
 			selection.clearSelect();

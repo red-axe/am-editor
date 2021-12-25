@@ -431,7 +431,10 @@ class CardModel implements CardModelInterface {
 		) {
 			const range = editor.change.range.get().cloneRange();
 			if (
-				range.startNode.closest(EDITABLE_SELECTOR).length > 0 ||
+				(range.startNode.closest(EDITABLE_SELECTOR).length > 0 &&
+					(!event ||
+						!event?.target ||
+						!this.closest(event.target as Node, false))) ||
 				(card.isEditable && range.collapsed) ||
 				card.isMaximize
 			)
@@ -659,14 +662,27 @@ class CardModel implements CardModelInterface {
 		this.gc();
 
 		const asyncRenderCards: Array<CardInterface> = [];
-		cards.each((node) => {
-			const cardNode = $(node);
-			cardNode.find(`${CARD_SELECTOR},${READY_CARD_SELECTOR}`).remove();
-			cardNode.empty();
+		const readyCards: NodeInterface[] = [];
+		const allCards = cards.toArray();
+		// 卡片内的子节点卡片移除
+		allCards.forEach((cardNode) => {
+			if (!readyCards.find((node) => node.equal(cardNode))) {
+				readyCards.push(cardNode);
+			}
+			const childCards = cardNode
+				.find(`${CARD_SELECTOR},${READY_CARD_SELECTOR}`)
+				.toArray();
+			childCards.forEach((childCard) => {
+				if (childCard.equal(cardNode)) return;
+				const index = readyCards.findIndex((node) =>
+					node.equal(childCard),
+				);
+				if (index > -1) {
+					readyCards.splice(index, 1);
+				}
+			});
 		});
-		cards.each((node) => {
-			const cardNode = $(node);
-			if (cardNode.length === 0 || !cardNode[0].parentNode) return;
+		readyCards.forEach((cardNode) => {
 			const readyKey = cardNode.attributes(READY_CARD_KEY);
 			const key = cardNode.attributes(CARD_KEY);
 			const name = readyKey || key;
