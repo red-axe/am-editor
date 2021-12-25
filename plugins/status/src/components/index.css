@@ -1,4 +1,4 @@
-.am-engine [data-card-key="status"].card-selected [data-card-element="center"] .data-label-container::before
+.am-engine [data-card-key="status"].card-selected:not(.card-activated) [data-card-element="center"] .data-label-container::before
 {
     content: "";
     position: absolute;
