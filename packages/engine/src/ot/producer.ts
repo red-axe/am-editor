@@ -157,7 +157,13 @@ class Producer extends EventEmitter2 {
 	): Array<Op> {
 		const addNodes: Array<Node> = [];
 		const allOps: Array<
-			Op & { id?: string; bi?: number; addNode?: NodeInterface }
+			Op & {
+				id?: string;
+				bi?: number;
+				addNode?: NodeInterface;
+				childIds?: string[];
+				oldPath?: Path;
+			}
 		> = [];
 		let ops: Array<RepairOp> = [];
 		let attrOps: Array<any> = [];
@@ -281,10 +287,22 @@ class Producer extends EventEmitter2 {
 							p = p.concat([...newPath!], [rIndex]);
 							let op: Path = [];
 							op = op.concat([...newOldPath], [rIndex]);
+							let childIds: string[] = [];
+							if (removedNode.nodeType === Node.ELEMENT_NODE) {
+								$(removedNode)
+									.allChildren()
+									.forEach((child) => {
+										const dataId = child.isElement()
+											? child.attributes(DATA_ID)
+											: undefined;
+										if (dataId) childIds.push(dataId);
+									});
+							}
 							const newOp = {
 								id: rootId,
 								bi: beginIndex,
 								ld: true,
+								childIds,
 								p,
 								newPath: p.slice(),
 								oldPath: op,
@@ -391,22 +409,78 @@ class Producer extends EventEmitter2 {
 						op.oldPath || [],
 					);
 					if (pathValue !== undefined) {
+						const childIds = op.childIds || [];
+						const opDataId =
+							Array.isArray(pathValue) && pathValue[1]
+								? pathValue[1][DATA_ID]
+								: undefined;
+						const loopValue = (value: any) => {
+							if (Array.isArray(value)) {
+								const attr = value[1];
+								if (
+									attr &&
+									attr[DATA_ID] &&
+									attr[DATA_ID] !== op.id &&
+									(!opDataId || attr[DATA_ID] !== opDataId)
+								) {
+									childIds.push(attr[DATA_ID]);
+								}
+								for (let i = 2; i < value.length; i++) {
+									loopValue(value[i]);
+								}
+							}
+						};
+						loopValue(pathValue);
+						op.childIds = childIds;
 						const ldOp = {
 							id: op.id,
 							bi: beginIndex,
 							ld: pathValue,
 							p: op.p,
 							nl: op['nl'],
+							childIds,
+							oldPath: op.oldPath,
 						};
-						// 比较删除深度，当前删除深度比已有的要深就忽略，当前删除的深度比已有的要浅就替换
-						const findResult = allOps.find((op, index) => {
-							if ('ld' in op) {
+						let has = false;
+						// 修复index
+						// 如果删除后合并，__index 可能会发生变化，如果 <ul></ul> 被删除了，那么里面的 li 就取ul的路径组合当前li的路径
+						allOps.forEach((aOp) => {
+							if ('ld' in aOp) {
+								if (aOp.id && op.childIds?.includes(aOp.id)) {
+									aOp.p = op.p.concat(
+										aOp.p.slice(op.p.length),
+									);
+									aOp.oldPath = op.oldPath?.concat(
+										aOp.oldPath?.slice(op.oldPath.length) ||
+											[],
+									);
+									aOp.ld = getValue(
+										this.doc?.data,
+										aOp.oldPath || [],
+									);
+								} else if (
+									op.id &&
+									aOp.childIds?.includes(op.id)
+								) {
+									ldOp.p = aOp.p.concat(
+										op.p.slice(aOp.p.length),
+									);
+									ldOp.oldPath = aOp.oldPath?.concat(
+										op.oldPath?.slice(aOp.oldPath.length) ||
+											[],
+									);
+									ldOp.ld = getValue(
+										this.doc?.data,
+										ldOp.oldPath || [],
+									);
+								}
 								const strP = op.p.join(',');
 								const strLdP = ldOp.p.join(',');
 								// 相等，不需要增加
-								if (strP === strLdP) {
-									return true;
+								if (!has && strP === strLdP) {
+									has = true;
 								}
+								// 比较删除深度，当前删除深度比已有的要深就忽略，当前删除的深度比已有的要浅就替换
 								// 删除深度比已有的要深，忽略
 								// if(strLdP.startsWith(strP)) {
 								// 	return true
@@ -417,9 +491,8 @@ class Producer extends EventEmitter2 {
 								// 	return true
 								// }
 							}
-							return false;
 						});
-						if (!findResult) allOps.push(ldOp);
+						if (!has) allOps.push(ldOp);
 					}
 				}
 				if ('li' in op) {
@@ -439,6 +512,9 @@ class Producer extends EventEmitter2 {
 		return allOps.map((op) => {
 			if ('li' in op) {
 				delete op.addNode;
+			} else if ('ld' in op) {
+				delete op.childIds;
+				delete op.oldPath;
 			}
 			return op;
 		});

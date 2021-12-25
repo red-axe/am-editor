@@ -268,6 +268,7 @@ export type TargetOp = Op & {
 export type RepairOp = TargetOp & {
 	oldPath?: Path;
 	newPath: Path;
+	childIds?: string[];
 };
 
 export interface MutationInterface extends EventEmitter2 {

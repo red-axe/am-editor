@@ -284,7 +284,11 @@ export const opsSort = (ops: Op[]) => {
 		}
 		// 都是删除节点，越大排越前面
 		else if (isLd) {
-			if (op1.p.length < op2.p.length) return 1;
+			if (
+				op1.p.length < op2.p.length &&
+				op1.p.every((p, i) => p <= op2.p[i])
+			)
+				return 1;
 			if (diff === -1) return 1;
 			if (diff === 1) return -1;
 		}
