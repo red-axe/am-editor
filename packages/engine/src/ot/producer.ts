@@ -31,6 +31,7 @@ import {
 	DATA_ID,
 	DATA_TRANSIENT_ELEMENT,
 	JSON0_INDEX,
+	ROOT,
 	UI,
 	UI_SELECTOR,
 } from '../constants';
@@ -254,9 +255,13 @@ class Producer extends EventEmitter2 {
 							!cacheNodes.find((n) => n === removedNode)
 						) {
 							// 获取移除节点在编辑器中的索引
-							const rIndex =
-								removedNode['__index'] + JSON0_INDEX.ELEMENT;
 
+							const _index =
+								removedNode['__index'] !== undefined
+									? removedNode['__index']
+									: this.getRemoveNodeIndex(record, records);
+							const rIndex = _index + JSON0_INDEX.ELEMENT;
+							console.log(removedNode, removedNode['test']);
 							// 删除的情况下，目标节点也应该获取 __index ，不然在还有新增的情况会导致path不正确
 							const newPath = path?.concat();
 							if (newPath && newPath.length > 0) {
@@ -696,6 +701,71 @@ class Producer extends EventEmitter2 {
 
 	setDoc(doc: DocInterface | Doc) {
 		this.doc = doc;
+	}
+
+	/**
+	 * 获取要移除节点的索引
+	 * @param record 当前记录
+	 * @param records 记录集合
+	 * @returns
+	 */
+	getRemoveNodeIndex(
+		record: MutationRecord,
+		records: MutationRecord[],
+	): number {
+		const { target, nextSibling, previousSibling, addedNodes } = record;
+		const targetElement = target as Element;
+		// 获取目标节点的过滤后非协同节点后的所有子节点
+		const childNodes =
+			target.nodeType === getDocument().ELEMENT_NODE &&
+			targetElement.getAttribute(DATA_ELEMENT) === ROOT
+				? Array.from(target.childNodes)
+				: Array.from(target.childNodes).filter(
+						(node) =>
+							!isTransientElement(
+								$(node),
+								this.cacheTransientElements,
+							),
+				  );
+		const addedIndex = childNodes.indexOf(addedNodes[0] as ChildNode);
+		const prevIndex = childNodes.indexOf(previousSibling as ChildNode);
+		const nextIndex = childNodes.indexOf(nextSibling as ChildNode);
+		let index;
+		if (prevIndex !== -1) {
+			index = prevIndex + 1;
+		} else if (nextIndex !== -1) {
+			index = nextIndex;
+		} else if (addedIndex !== -1) {
+			index = addedIndex;
+		} else if (previousSibling) {
+			if (nextSibling) {
+				if (previousSibling) {
+					index = this.getRemoveNodeIndexFromMutation(
+						previousSibling,
+						target,
+						records,
+					);
+				}
+			} else {
+				index = target.childNodes.length;
+			}
+		} else index = 0;
+		return index !== undefined ? index : 0;
+	}
+
+	getRemoveNodeIndexFromMutation(
+		node: Node,
+		target: Node,
+		records: MutationRecord[],
+	) {
+		const record = records.find(
+			(record) =>
+				record.target === target && record.removedNodes[0] === node,
+		);
+		if (record) {
+			return this.getRemoveNodeIndex(record, records);
+		}
+		return 0;
 	}
 }
 export default Producer;
