@@ -47,7 +47,7 @@ export default class Paste {
 			let parent = node.parent();
 			// 跳过已被删除的节点
 			if (!parent || node.isCard() || node.fragment === fragment) {
-				return;
+				return undefined;
 			}
 			if (node.isText()) {
 				let text = node.text();
@@ -73,7 +73,7 @@ export default class Paste {
 						node.text(text);
 					}
 				}
-				return;
+				return undefined;
 			}
 			const styles = node.css();
 			defautlStyleKeys.forEach((key) => {
@@ -87,7 +87,7 @@ export default class Paste {
 			let type = this.schema.getType(node);
 			if (!type) {
 				nodeApi.unwrap(node);
-				return;
+				return undefined;
 			}
 			nodeApi.removeMinusStyle(node, 'text-indent');
 			if (nodeApi.isList(node)) {
@@ -113,17 +113,17 @@ export default class Paste {
 				}
 				parent = node.parent();
 				node.remove();
-				if (!parent) return;
+				if (!parent) return undefined;
 				node = parent;
 				parent = node.parent();
-				if (!parent) return;
+				if (!parent) return undefined;
 				type = undefined;
 				attributes = undefined;
 			}
 			if (!attributes) attributes = node.attributes();
 			// 跳过Card
 			if (attributes[READY_CARD_KEY]) {
-				return;
+				return undefined;
 			}
 			const nodeIsBlock = type
 				? type === 'block'
@@ -140,7 +140,7 @@ export default class Paste {
 				nodeApi.html(node) === ''
 			) {
 				node.remove();
-				return;
+				return undefined;
 			}
 			// 段落
 			if (attributes['data-type'] === 'p') {
@@ -160,7 +160,7 @@ export default class Paste {
 				const ul = $('<ul />');
 				node.before(ul);
 				ul.append(node);
-				return;
+				return undefined;
 			}
 			if (nodeApi.isList(node) && parent && nodeApi.isList(parent)) {
 				// 分割付节点list
@@ -218,7 +218,7 @@ export default class Paste {
 				const li = $('<li />');
 				node.before(li);
 				li.append(node);
-				return;
+				return undefined;
 			}
 			// <li>two<ol><li>three</li></ol>four</li>
 			/**
@@ -238,7 +238,7 @@ export default class Paste {
 				const rootListElement = parent?.parent();
 				if (!rootListElement) {
 					nodeApi.unwrap(parent);
-					return;
+					return undefined;
 				}
 				// 分割付节点list
 				const leftList = rootListElement.clone();
@@ -305,13 +305,13 @@ export default class Paste {
 				return (
 					(next as NodeInterface | null)?.next() ||
 					leftList.next() ||
-					void 0
+					undefined
 				);
 			}
 			// p 改成 li
 			if (node.name === 'p' && parentIsList) {
 				nodeApi.replace(node, $('<li />'));
-				return;
+				return undefined;
 			}
 			// 处理空 Block
 			if (
@@ -339,7 +339,7 @@ export default class Paste {
 					node.after('<br />');
 				}
 				nodeApi.unwrap(node);
-				return;
+				return undefined;
 			}
 			if (
 				!nodeIsBlock &&
@@ -404,6 +404,7 @@ export default class Paste {
 					nodeParent = nodeParent.parent();
 				}
 			}
+			return undefined;
 		});
 	}
 
