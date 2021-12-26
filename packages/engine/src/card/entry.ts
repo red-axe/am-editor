@@ -50,7 +50,6 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface<T> {
 	static readonly collab: boolean = true;
 	static readonly focus: boolean;
 	static readonly selectStyleType: SelectStyleType = SelectStyleType.BORDER;
-	static readonly toolbarFollowMouse: boolean = false;
 	static readonly lazyRender: boolean = false;
 	private defaultMaximize: MaximizeInterface;
 	isMaximize: boolean = false;

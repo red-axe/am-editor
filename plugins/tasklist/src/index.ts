@@ -27,6 +27,7 @@ export default class<T extends TasklistOptions> extends ListPlugin<T> {
 
 	attributes = {
 		class: '@var0',
+		'data-indent': '@var1',
 	};
 
 	variable = {
@@ -34,6 +35,7 @@ export default class<T extends TasklistOptions> extends ListPlugin<T> {
 			required: true,
 			value: [this.editor.list.CUSTOMZIE_UL_CLASS, 'data-list-task'],
 		},
+		'@var1': '@number',
 	};
 
 	allowIn = ['blockquote', '$root'];
@@ -244,12 +246,15 @@ export default class<T extends TasklistOptions> extends ListPlugin<T> {
 
 		const { list, card } = this.editor;
 
-		const createList = (nodes: Array<string>) => {
+		const createList = (nodes: Array<string>, indent?: number) => {
 			const listNode = $(
 				`<${this.tagName} class="${
 					list.CUSTOMZIE_UL_CLASS
 				} data-list-task">${nodes.join('')}</${this.tagName}>`,
 			);
+			if (indent) {
+				listNode.attributes(this.editor.list.INDENT_KEY, indent);
+			}
 			list.addBr(listNode);
 			return listNode.get<Element>()?.outerHTML;
 		};
@@ -257,8 +262,9 @@ export default class<T extends TasklistOptions> extends ListPlugin<T> {
 		let newText = '';
 		const rows = text.split(/\n|\r\n/);
 		let nodes: Array<string> = [];
+		let indent = 0;
 		rows.forEach((row) => {
-			const match = /^(-\s*)?(\[[\sx]{0,1}\])/.exec(row);
+			const match = /^(\s*)(-\s*)?(\[[\sx]{0,1}\])/.exec(row);
 			if (match && !/(\[(.*)\]\(([\S]+?)\))/.test(row)) {
 				const codeLength = match[0].length;
 				const content = row.substr(
@@ -275,20 +281,25 @@ export default class<T extends TasklistOptions> extends ListPlugin<T> {
 					},
 				);
 				tempNode.remove();
+				if (match[1].length !== indent && nodes.length > 0) {
+					newText += createList(nodes, indent);
+					nodes = [];
+					indent = Math.ceil(match[1].length / 2);
+				}
 				nodes.push(
 					`<li class="${list.CUSTOMZIE_LI_CLASS}">${
 						cardNode.get<Element>()?.outerHTML
 					}${content}</li>`,
 				);
 			} else if (nodes.length > 0) {
-				newText += createList(nodes) + '\n' + row + '\n';
+				newText += createList(nodes, indent) + '\n' + row + '\n';
 				nodes = [];
 			} else {
 				newText += row + '\n';
 			}
 		});
 		if (nodes.length > 0) {
-			newText += createList(nodes) + '\n';
+			newText += createList(nodes, indent) + '\n';
 		}
 		node.text(newText);
 	}

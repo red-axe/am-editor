@@ -939,7 +939,7 @@ class NodeEntry implements NodeInterface {
 	}
 
 	traverse(
-		callback: (node: NodeInterface) => boolean | void,
+		callback: (node: NodeInterface) => boolean | void | NodeInterface,
 		order: boolean = true,
 		includeEditableCard: boolean = false,
 	) {
@@ -962,8 +962,10 @@ class NodeEntry implements NodeInterface {
 				if (result === false) {
 					return;
 				}
-
 				if (result !== true) {
+					if (result && typeof result !== 'boolean') {
+						child = result;
+					}
 					if (includeEditableCard && child.isEditableCard()) {
 						const editableElements = child.find(EDITABLE_SELECTOR);
 						editableElements.each((_, index) => {

@@ -477,7 +477,7 @@ export interface NodeInterface {
 	 * @param includeEditableCard 是否包含可编辑器卡片
 	 */
 	traverse(
-		callback: (node: NodeInterface) => boolean | void,
+		callback: (node: NodeInterface) => boolean | void | NodeInterface,
 		order?: boolean,
 		includeEditableCard?: boolean,
 	): void;

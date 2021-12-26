@@ -120,7 +120,7 @@ export default class<T extends UnorderedlistOptions> extends ListPlugin<T> {
 		const text = node.text();
 		if (!text) return;
 
-		const reg = /(^|\r\n|\n)([\*\-\+]{1,}\s+)/g;
+		const reg = /(^|\r\n|\n)\s*([\*\-\+]{1,}\s+)/g;
 		const match = reg.exec(text);
 		return {
 			reg,
@@ -137,12 +137,20 @@ export default class<T extends UnorderedlistOptions> extends ListPlugin<T> {
 
 		const { list } = this.editor;
 
-		const createList = (nodes: Array<string>, start?: number) => {
+		const createList = (
+			nodes: Array<string>,
+			start?: number,
+			indent?: number,
+		) => {
 			const listNode = $(
-				`<${this.tagName} start="${start || 1}">${nodes.join('')}</${
-					this.tagName
-				}>`,
+				`<${this.tagName}>${nodes.join('')}</${this.tagName}>`,
 			);
+			if (start) {
+				listNode.attributes('start', start);
+			}
+			if (indent) {
+				listNode.attributes(this.editor.list.INDENT_KEY, indent);
+			}
 			list.addBr(listNode);
 			return listNode.get<Element>()?.outerHTML;
 		};
@@ -150,21 +158,28 @@ export default class<T extends UnorderedlistOptions> extends ListPlugin<T> {
 		let newText = '';
 		const rows = text.split(/\n|\r\n/);
 		let nodes: Array<string> = [];
+		let indent = 0;
 		rows.forEach((row) => {
-			const match = /^([\*\-\+]{1,}\s+)/.exec(row);
+			const match = /^(\s*)([\*\-\+]{1,}\s+)/.exec(row);
 			if (match) {
-				const codeLength = match[1].length;
-				const content = row.substr(codeLength);
+				const codeLength = match[2].length;
+				const content = row.substr(codeLength + match[1].length);
+				if (match[1].length !== indent && nodes.length > 0) {
+					newText += createList(nodes, undefined, indent);
+					nodes = [];
+					indent = Math.ceil(match[1].length / 2);
+				}
 				nodes.push(`<li>${content}</li>`);
 			} else if (nodes.length > 0) {
-				newText += createList(nodes) + '\n' + row + '\n';
+				newText +=
+					createList(nodes, undefined, indent) + '\n' + row + '\n';
 				nodes = [];
 			} else {
 				newText += row + '\n';
 			}
 		});
 		if (nodes.length > 0) {
-			newText += createList(nodes) + '\n';
+			newText += createList(nodes, undefined, indent) + '\n';
 		}
 		node.text(newText);
 	}

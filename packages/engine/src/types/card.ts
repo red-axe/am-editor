@@ -120,10 +120,6 @@ export interface CardEntry<T extends CardValue = {}> {
 	 */
 	readonly selectStyleType: SelectStyleType;
 	/**
-	 * toolbar 跟随鼠标点击位置
-	 */
-	readonly toolbarFollowMouse: boolean;
-	/**
 	 * 是否在卡片处于视图内时才渲染，默认 false
 	 */
 	readonly lazyRender: boolean;

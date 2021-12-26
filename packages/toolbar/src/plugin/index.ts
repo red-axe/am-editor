@@ -51,9 +51,19 @@ class ToolbarPlugin<T extends ToolbarOptions> extends Plugin<T> {
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:slash', (event) => this.onSlash(event));
 			this.editor.on('parse:value', (node) => this.paserValue(node));
+			//this.editor.on('select', this.onSelect)
 		}
 		this.editor.language.add(locales);
 	}
+
+	// onSelect = () => {
+	// 	if (!isEngine(this.editor)) return;
+	// 	const { change, card } = this.editor;
+	// 	if(card.active) return
+	// 	const range = change.range.get().cloneRange().shrinkToTextNode();
+	// 	if(range.collapsed) return
+	// 	const { startNode, endNode } = range
+	// }
 
 	paserValue(node: NodeInterface) {
 		if (

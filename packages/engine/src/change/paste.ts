@@ -162,6 +162,57 @@ export default class Paste {
 				ul.append(node);
 				return;
 			}
+			if (nodeApi.isList(node) && parent && nodeApi.isList(parent)) {
+				// 分割付节点list
+				const leftList: NodeInterface[] = [];
+				const rightList: NodeInterface[] = [];
+				let isLeft = true;
+				const rootChildren = parent.children().toArray();
+				let tempList = parent.clone();
+				const appendToTemp = () => {
+					if (tempList.children().length > 0) {
+						if (isLeft) leftList.push(tempList);
+						else rightList.push(tempList);
+						tempList = parent!.clone();
+						return true;
+					}
+					return false;
+				};
+				rootChildren.forEach((child) => {
+					if (!child) return;
+					if (child.equal(node)) {
+						isLeft = false;
+						return;
+					}
+					if (child.name === 'li') {
+						tempList.append(child);
+						return;
+					} else {
+						appendToTemp();
+					}
+					if (isLeft) leftList.push(child);
+					else rightList.push(child);
+				});
+				appendToTemp();
+				const indent = parent.attributes('data-indent') || '0';
+				this.engine.list.addIndent(node, parseInt(indent, 10));
+				leftList.push(node);
+				let prev = parent;
+				leftList.forEach((childNode) => {
+					const child = $(childNode);
+					if (!child || child.children().length === 0) return;
+					prev.after(child);
+					prev = child;
+				});
+				rightList.forEach((childNode) => {
+					const child = $(childNode);
+					if (!child || child.children().length === 0) return;
+					prev.after(child);
+					prev = child;
+				});
+				parent.remove();
+				return node.next() || undefined;
+			}
 			// 补齐 li
 			if (node.name !== 'li' && parentIsList) {
 				const li = $('<li />');
@@ -170,33 +221,92 @@ export default class Paste {
 				return;
 			}
 			// <li>two<ol><li>three</li></ol>four</li>
-			if (
-				nodeApi.isList(node) &&
-				parent?.name === 'li' &&
-				(node.prev() || node.next())
-			) {
-				let li: NodeInterface | null;
+			/**
+			 * <ul>
+					<li>缺少用户添加问题输入框说明/placeholder的功能</li>
+					<li>缺少拖动添加功能</li>
+					<li>填空式
+						<ul><li>调整填空题类型（名字、电话等），如标题为空的情况下，应该自动换成对应类型的标题</li></ul>
+					</li>
+					<li>选择式
+						<ul><li>体验优化：回车键自动添加新选项</li></ul>
+					</li>
+				</ul>
+			 */
+			if (nodeApi.isList(node) && parent?.name === 'li') {
+				// li没有父节点就移除包裹
+				const rootListElement = parent?.parent();
+				if (!rootListElement) {
+					nodeApi.unwrap(parent);
+					return;
+				}
+				// 分割付节点list
+				const leftList = rootListElement.clone();
+				const rightList = rootListElement.clone();
+				let isLeft = true;
+				const rootChildren = rootListElement.children().toArray();
+
+				rootChildren.forEach((child) => {
+					if (!child) return;
+					if (child.equal(parent!)) {
+						isLeft = false;
+						return;
+					}
+					if (isLeft) leftList.append(child);
+					else rightList.append(child);
+				});
 				const isCustomizeList = parent?.parent()?.hasClass('data-list');
 				const children = parent?.children();
+				let li: NodeInterface | null = null;
+				let next: NodeInterface | null = null;
 				children.each((child, index) => {
 					const node = children.eq(index);
 					if (!node || nodeApi.isEmptyWithTrim(node)) {
 						return;
 					}
 					const isList = nodeApi.isList(node);
-					if (!li || isList) {
+					const leftLast = leftList[leftList.length - 1];
+					if (isList) {
+						const indent =
+							$(leftLast)?.attributes('data-indent') || '0';
+						this.engine.list.addIndent(node, parseInt(indent, 10));
+						leftList[leftList.length] = node[0];
+						li = null;
+						return;
+					}
+					if (!li) {
 						li = isCustomizeList
 							? $('<li class="data-list-item" />')
 							: $('<li />');
-						parent?.before(li);
+						const last = $(leftLast)?.last();
+						if (last) last?.after(li);
+						else $(leftLast).append(li);
 					}
 					li.append(child);
-					if (isList) {
-						li = null;
+					if (!next) {
+						next = li;
 					}
 				});
 				parent?.remove();
-				return;
+				let prev = rootListElement;
+				leftList.each((childNode) => {
+					const child = $(childNode);
+					if (!child || child.children().length === 0) return;
+					prev.after(child);
+					prev = child;
+				});
+				rightList.each((childNode) => {
+					const child = $(childNode);
+					if (!child || child.children().length === 0) return;
+					prev.after(child);
+					prev = child;
+				});
+				rootListElement.remove();
+				return (
+					(next as NodeInterface | null)?.next() ||
+					leftList.next() ||
+					void 0
+				);
 			}
 			// p 改成 li
 			if (node.name === 'p' && parentIsList) {

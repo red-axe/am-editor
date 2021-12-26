@@ -945,10 +945,6 @@ The style of the selected yes, the default is the border change, optional values
 -   `border` border changes
 -   `background` background color change
 
-### `toolbarFollowMouse`
-
-Whether the card toolbar follows the mouse position, the default flase
-
 ### `lazyRender`
 
 Whether to enable lazy loading, the rendering is triggered when the card node is visible in the view

@@ -946,10 +946,6 @@ export default class extends Plugin {
 -   `border` 边框变化
 -   `background` 背景颜色变化
 
-### `toolbarFollowMouse`
-
-卡片工具栏是否跟随鼠标位置，默认 flase
-
 ### `lazyRender`
 
 是否启用懒加载，卡片节点在视图内可见时触发渲染

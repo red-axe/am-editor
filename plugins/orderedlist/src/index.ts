@@ -118,7 +118,7 @@ export default class<T extends OrderedListOptions> extends ListPlugin<T> {
 		const text = node.text();
 		if (!text) return;
 
-		const reg = /(^|\r\n|\n)(\d{1,9}\.)/;
+		const reg = /(^|\r\n|\n)\s*(\d{1,9}\.)/;
 		const match = reg.exec(text);
 		return {
 			reg,
@@ -134,12 +134,20 @@ export default class<T extends OrderedListOptions> extends ListPlugin<T> {
 
 		const { list } = this.editor;
 
-		const createList = (nodes: Array<string>, start?: number) => {
+		const createList = (
+			nodes: Array<string>,
+			start?: number,
+			indent?: number,
+		) => {
 			const listNode = $(
-				`<${this.tagName} start="${start || 1}">${nodes.join('')}</${
-					this.tagName
-				}>`,
+				`<${this.tagName}>${nodes.join('')}</${this.tagName}>`,
 			);
+			if (start) {
+				listNode.attributes('start', start);
+			}
+			if (indent) {
+				listNode.attributes(this.editor.list.INDENT_KEY, indent);
+			}
 			list.addBr(listNode);
 			return listNode.get<Element>()?.outerHTML;
 		};
@@ -147,21 +155,27 @@ export default class<T extends OrderedListOptions> extends ListPlugin<T> {
 		let newText = '';
 		const rows = text.split(/\n|\r\n/);
 		let nodes: Array<string> = [];
+		let indent = 0;
 		let start: number | undefined = undefined;
 		rows.forEach((row) => {
-			const match = /^(\d{1,9}\.)/.exec(row);
+			const match = /^(\s*)(\d{1,9}\.)/.exec(row);
 			if (match) {
-				const codeLength = match[1].length;
+				const codeLength = match[2].length;
 				if (start === undefined)
-					start = parseInt(match[1].substr(0, codeLength - 1), 10);
+					start = parseInt(match[2].substr(0, codeLength - 1), 10);
 				const content = row.substr(
-					/^\s+/.test(row.substr(codeLength))
+					(/^\s+/.test(row.substr(codeLength))
 						? codeLength + 1
-						: codeLength,
+						: codeLength) + match[1].length,
 				);
+				if (match[1].length !== indent && nodes.length > 0) {
+					newText += createList(nodes, undefined, indent);
+					nodes = [];
+					indent = Math.ceil(match[1].length / 2);
+				}
 				nodes.push(`<li>${content}</li>`);
 			} else if (nodes.length > 0) {
-				newText += createList(nodes, start) + '\n' + row + '\n';
+				newText += createList(nodes, start, indent) + '\n' + row + '\n';
 				nodes = [];
 				start = undefined;
 			} else {
@@ -169,7 +183,7 @@ export default class<T extends OrderedListOptions> extends ListPlugin<T> {
 			}
 		});
 		if (nodes.length > 0) {
-			newText += createList(nodes, start) + '\n';
+			newText += createList(nodes, start, indent) + '\n';
 		}
 		node.text(newText);
 	}
