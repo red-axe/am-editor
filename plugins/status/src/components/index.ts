@@ -192,7 +192,7 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 				if (child) this.editor.mark.wrapByNode(child, mark);
 			});
 			const marks = this.queryMarks().map(
-				(child) => child.get<HTMLElement>()?.outerHTML || '',
+				(child) => child.clone().get<HTMLElement>()?.outerHTML || '',
 			);
 			this.setValue({
 				marks,
@@ -214,7 +214,8 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 		if (!this.#container) return [];
 		return this.#container
 			.allChildren()
-			.filter((child) => child.isElement());
+			.filter((child) => child.isElement())
+			.map((c) => c.clone());
 	}
 
 	focusEditor() {

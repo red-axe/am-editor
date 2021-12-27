@@ -295,7 +295,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 			subRanges.forEach((subRange) => {
 				//如果是卡片，就给卡片加上预览样式
 				const cardComponent = card.find(subRange.startNode);
-				if (cardComponent) {
+				if (cardComponent && !cardComponent.executeMark) {
 					text += `[card:${
 						(cardComponent.constructor as CardEntry).cardName
 					},${cardComponent.id}]`;
@@ -670,8 +670,17 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 					const rangeClone = range.cloneRange();
 
 					if (childNode.isCard()) {
+						const cardComponent = card.find(childNode);
+						if (cardComponent && cardComponent.executeMark) {
+							const idName = this.getIdName(key);
+							const markNode = cardComponent.root.find(
+								`[${idName}="${id}"]`,
+							);
+							cardComponent.executeMark(markNode.clone(), false);
+						} else {
+							childNode.removeAttributes(this.getIdName(key));
+						}
 						rangeClone.select(childNode);
-						childNode.removeAttributes(this.getIdName(key));
 					} else {
 						rangeClone.select(childNode, true);
 						const selection = rangeClone.createSelection();
@@ -765,7 +774,21 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 			elements.forEach((element) => {
 				const node = $(element);
 				if (node.isCard()) {
-					node.attributes(this.getIdName(key), id.join(','));
+					const cardComponent = card.find(node);
+					if (cardComponent && cardComponent.executeMark) {
+						cardComponent.executeMark(
+							$(
+								`<${this.tagName} ${
+									this.MARK_KEY
+								}="${key}" ${this.getIdName(key)}="${id.join(
+									',',
+								)}" />`,
+							),
+							true,
+						);
+					} else {
+						node.attributes(this.getIdName(key), id.join(','));
+					}
 				}
 			});
 			this.editor.mark.wrap(
