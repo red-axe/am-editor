@@ -358,7 +358,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	onTableMouseDown(event: MouseEvent) {
 		if (!event.target) return;
 		const td = $(event.target).closest('td');
-		if (td.length > 0 && event.button === 2) {
+		if (td.length > 0 && event.button === 2 && this.table.activated) {
 			this.showContextMenu(event);
 		} else {
 			this.hideContextMenu();
