@@ -69,8 +69,7 @@ export default class<T extends StatusOptions> extends Plugin<T> {
 			const type = attributes['data-type'];
 			if (type === StatusComponent.cardName) {
 				const value = attributes['data-value'];
-				const cardValue = decodeCardValue(value);
-				if (!cardValue.name) return;
+				const cardValue = decodeCardValue<StatusValue>(value);
 				this.editor.card.replaceNode(
 					node,
 					StatusComponent.cardName,
