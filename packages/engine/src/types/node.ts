@@ -21,7 +21,11 @@ export interface EventInterface {
 	 * @param listener 事件处理方法
 	 * @param rewrite 是否重写事件
 	 */
-	on(eventType: string, listener: EventListener, rewrite?: boolean): void;
+	on<F extends EventListener = EventListener>(
+		eventType: string,
+		listener: F,
+		rewrite?: boolean,
+	): void;
 	/**
 	 * 解除绑定
 	 * @param eventType
@@ -33,7 +37,7 @@ export interface EventInterface {
 	 * @param eventType 事件类型
 	 * @param args 事件参数
 	 */
-	trigger<T = any>(eventType: string, ...args: any): T;
+	trigger<R = any>(eventType: string, ...args: any): R;
 }
 export type Selector =
 	| string
@@ -274,7 +278,10 @@ export interface NodeInterface {
 	 * @param {Function} listener 事件函数
 	 * @return {NodeInterface} 返回当前实例
 	 */
-	on(eventType: string, listener: EventListener): NodeInterface;
+	on<F extends EventListener = EventListener>(
+		eventType: string,
+		listener: F,
+	): NodeInterface;
 
 	/**
 	 * 移除当前元素节点事件

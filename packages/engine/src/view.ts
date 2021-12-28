@@ -131,7 +131,11 @@ class View implements ViewInterface {
 		return this.#_scrollNode;
 	}
 
-	on(eventType: string, listener: EventListener, rewrite?: boolean) {
+	on<F extends EventListener = EventListener>(
+		eventType: string,
+		listener: F,
+		rewrite?: boolean,
+	) {
 		this.event.on(eventType, listener, rewrite);
 		return this;
 	}
@@ -141,8 +145,8 @@ class View implements ViewInterface {
 		return this;
 	}
 
-	trigger(eventType: string, ...args: any) {
-		return this.event.trigger(eventType, ...args);
+	trigger<R = any>(eventType: string, ...args: any): R {
+		return this.event.trigger<R>(eventType, ...args);
 	}
 
 	render(content: string, trigger: boolean = true) {

@@ -143,7 +143,11 @@ export interface EditorInterface {
 	 * @param listener 事件回调
 	 * @param rewrite 是否重写
 	 */
-	on(eventType: string, listener: EventListener, rewrite?: boolean): void;
+	on<F extends EventListener = EventListener>(
+		eventType: string,
+		listener: F,
+		rewrite?: boolean,
+	): void;
 	/**
 	 * 全选ctrl+a键按下，返回false，终止处理其它监听
 	 * @param eventType
@@ -597,7 +601,11 @@ export interface EngineInterface extends EditorInterface {
 	 * @param listener 事件回调
 	 * @param rewrite 是否重写
 	 */
-	on(eventType: string, listener: EventListener, rewrite?: boolean): void;
+	on<F extends EventListener = EventListener>(
+		eventType: string,
+		listener: F,
+		rewrite?: boolean,
+	): void;
 	/**
 	 * 全选ctrl+a键按下，返回false，终止处理其它监听
 	 * @param eventType

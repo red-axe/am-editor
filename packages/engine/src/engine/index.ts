@@ -262,7 +262,11 @@ class Engine implements EngineInterface {
 		this.change.range.blur();
 	}
 
-	on(eventType: string, listener: EventListener, rewrite?: boolean) {
+	on<F extends EventListener = EventListener>(
+		eventType: string,
+		listener: F,
+		rewrite?: boolean,
+	) {
 		this.event.on(eventType, listener, rewrite);
 		return this;
 	}
@@ -272,7 +276,7 @@ class Engine implements EngineInterface {
 		return this;
 	}
 
-	trigger(eventType: string, ...args: any) {
+	trigger<R = any>(eventType: string, ...args: any): R {
 		return this.event.trigger(eventType, ...args);
 	}
 

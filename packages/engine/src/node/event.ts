@@ -12,7 +12,11 @@ class Event implements EventInterface {
 	 * @param {Function} listener 事件处理方法
 	 * @param {boolean} rewrite 是否重写事件
 	 */
-	on(eventType: string, listener: EventListener, rewrite?: boolean): void {
+	on<F extends EventListener = EventListener>(
+		eventType: string,
+		listener: F,
+		rewrite?: boolean,
+	): void {
 		if (!this.listeners[eventType] || rewrite) {
 			this.listeners[eventType] = [];
 		}
@@ -45,18 +49,18 @@ class Event implements EventInterface {
 	 * @param eventType 事件类型
 	 * @param args 事件参数
 	 */
-	trigger(eventType: string, ...args: any) {
+	trigger<R = any>(eventType: string, ...args: any): R {
 		const listeners = this.listeners[eventType];
 		if (listeners) {
-			let result;
+			let result: R = undefined as any;
 			listeners.every((listener) => {
-				result = listener(...args);
-				return result !== false;
+				result = listener(...args) as R;
+				return typeof result !== 'boolean' || result !== false;
 			});
 
 			return result;
 		}
-		return;
+		return undefined as any;
 	}
 }
 
