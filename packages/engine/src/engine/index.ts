@@ -1,4 +1,4 @@
-import { merge } from 'lodash-es';
+import { merge } from 'lodash';
 import NodeModel, { Event, $ } from '../node';
 import language from '../locales';
 import Change from '../change';

@@ -1,4 +1,4 @@
-import { merge, omit } from 'lodash-es';
+import { merge, omit } from 'lodash';
 import React, {
 	useCallback,
 	useEffect,

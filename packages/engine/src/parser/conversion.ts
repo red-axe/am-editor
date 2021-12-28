@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep } from 'lodash';
 import { getStyleMap } from '../utils';
 import { DATA_ELEMENT } from '../constants';
 import {

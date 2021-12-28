@@ -4,7 +4,7 @@ import {
 	TableModelCol,
 	TableModelEmptyCol,
 } from '../types';
-import isInteger from 'lodash-es/isInteger';
+import isInteger from 'lodash/isInteger';
 import {
 	$,
 	EDITABLE_SELECTOR,

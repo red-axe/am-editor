@@ -37,7 +37,7 @@
     eventemitter2 "^6.4.4"
     filesize "^6.3.0"
     is-hotkey "^0.2.0"
-    lodash-es "^4.17.21"
+    lodash "^4.17.21"
     ot-json0 "^1.1.0"
     tinycolor2 "^1.4.2"
 
@@ -82,7 +82,7 @@
     "@babel/runtime" "^7.13.10"
     ant-design-vue "^2.2.6"
     codemirror "^5.60.0"
-    lodash-es "^4.17.21"
+    lodash "^4.17.21"
     vue "^3.2.9"
 
 "@aomao/plugin-file@^2.4.19":
@@ -341,7 +341,7 @@
     "@babel/runtime" "^7.13.10"
     ant-design-vue "^2.2.6"
     keymaster "^1.6.2"
-    lodash-es "^4.17.21"
+    lodash "^4.17.21"
     tinycolor2 "^1.4.2"
     vue "^3.2.9"
 
@@ -2151,7 +2151,7 @@ ant-design-vue@^2.2.6:
     dom-align "^1.12.1"
     dom-scroll-into-view "^2.0.0"
     lodash "^4.17.21"
-    lodash-es "^4.17.15"
+    lodash "^4.17.15"
     moment "^2.27.0"
     omit.js "^2.0.0"
     resize-observer-polyfill "^1.5.1"
@@ -5691,9 +5691,9 @@ locate-path@^5.0.0:
   dependencies:
     p-locate "^4.1.0"
 
-lodash-es@^4.17.15, lodash-es@^4.17.21:
+lodash@^4.17.15, lodash@^4.17.21:
   version "4.17.21"
-  resolved "https://registry.npmjs.org/lodash-es/-/lodash-es-4.17.21.tgz#43e626c46e6591b7750beb2b50117390c609e3ee"
+  resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz#43e626c46e6591b7750beb2b50117390c609e3ee"
   integrity sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==
 
 lodash.camelcase@^4.3.0:

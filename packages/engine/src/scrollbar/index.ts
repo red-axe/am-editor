@@ -1,5 +1,5 @@
 import { EventEmitter2 } from 'eventemitter2';
-import { debounce, throttle } from 'lodash-es';
+import { debounce, throttle } from 'lodash';
 import { DATA_ELEMENT, UI } from '../constants';
 import { NodeInterface } from '../types';
 import { $ } from '../node';

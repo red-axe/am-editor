@@ -32,12 +32,12 @@
     "@babel/runtime": "^7.13.10",
     "ant-design-vue": "^2.2.6",
     "codemirror": "^5.60.0",
-    "lodash-es": "^4.17.21",
+    "lodash": "^4.17.21",
     "vue": "^3.2.9"
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.0",
-    "@types/lodash-es": "^4.17.4",
+    "@types/lodash": "^4.17.4",
     "@vue/compiler-sfc": "^3.2.9"
   }
 }

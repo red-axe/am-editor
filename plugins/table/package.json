@@ -24,6 +24,10 @@
     "@aomao/engine": "^2.7.3",
     "@babel/runtime": "^7.13.10",
     "eventemitter2": "^6.4.4",
-    "tinycolor2": "^1.4.2"
+    "tinycolor2": "^1.4.2",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.4"
   }
 }

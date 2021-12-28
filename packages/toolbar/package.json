@@ -25,13 +25,13 @@
         "antd": "^4.12.3",
         "classnames-es-ts": "^2.2.7",
         "keymaster": "^1.6.2",
-        "lodash-es": "^4.17.21",
+        "lodash": "^4.17.21",
         "react": "^17.0.1",
         "react-dom": "^17.0.1",
         "tinycolor2": "^1.4.2"
     },
     "devDependencies": {
         "@types/keymaster": "^1.6.28",
-        "@types/lodash-es": "^4.17.4"
+        "@types/lodash": "^4.17.4"
     }
 }

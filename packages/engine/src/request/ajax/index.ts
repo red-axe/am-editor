@@ -1,4 +1,4 @@
-import { startsWith } from 'lodash-es';
+import { startsWith } from 'lodash';
 import { getDocument } from '../../utils';
 import { AjaxInterface, AjaxOptions, SetupOptions } from '../../types/request';
 import { isFormData, toQueryString, urlAppend } from './utils';

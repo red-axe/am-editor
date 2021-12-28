@@ -1,4 +1,4 @@
-import { cloneDeep, debounce } from 'lodash-es';
+import { cloneDeep, debounce } from 'lodash';
 import { Op } from 'sharedb';
 import OTJSON from 'ot-json0';
 import { Operation, TargetOp } from './types/ot';

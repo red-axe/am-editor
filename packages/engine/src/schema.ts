@@ -1,4 +1,4 @@
-import { cloneDeep, isEqual, merge, omit } from 'lodash-es';
+import { cloneDeep, isEqual, merge, omit } from 'lodash';
 import {
 	NodeInterface,
 	SchemaAttributes,

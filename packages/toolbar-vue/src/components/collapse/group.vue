@@ -12,7 +12,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { omit } from 'lodash-es';
+import { omit } from 'lodash';
 import { collapseGroupProps } from '../../types'
 import AmCollapseItem from './item.vue'
 

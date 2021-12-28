@@ -17,7 +17,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref, reactive } from 'vue'
-import { merge, omit } from 'lodash-es';
+import { merge, omit } from 'lodash';
 import { isMobile } from '@aomao/engine'
 import { ToolbarButtonProps, CollapseItemProps, ToolbarColorProps, ToolbarDropdownProps, GroupDataProps, ToolbarCollapseGroupProps, toolbarProps } from '../types'
 import AmGroup from './group.vue'
