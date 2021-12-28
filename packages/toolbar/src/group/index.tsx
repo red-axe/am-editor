@@ -32,6 +32,7 @@ export type GroupProps = {
 	>;
 	icon?: React.ReactNode;
 	content?: React.ReactNode | (() => React.ReactNode);
+	popup?: boolean;
 };
 
 const ToolbarGroup: React.FC<GroupProps> = ({
@@ -39,6 +40,7 @@ const ToolbarGroup: React.FC<GroupProps> = ({
 	items,
 	icon,
 	content,
+	popup,
 }) => {
 	const renderItems = () => {
 		return items.map((item, index) => {
@@ -76,7 +78,8 @@ const ToolbarGroup: React.FC<GroupProps> = ({
 					content={
 						<div
 							className={classNames('editor-toolbar', {
-								'editor-toolbar-mobile': isMobile,
+								'editor-toolbar-mobile': isMobile && !popup,
+								'editor-toolbar-popup': popup,
 							})}
 							data-element="ui"
 						>

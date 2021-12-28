@@ -293,6 +293,10 @@ export const groupProps = {
 		>,
 		default: [],
 	},
+	popup: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
 	icon: collapseItemProps.icon,
 	content: buttonProps.content,
 };
@@ -326,7 +330,7 @@ export type GroupItemDataProps = {
 	items: Array<ToolbarItemProps | string>;
 };
 
-type GroupItemProps =
+export type GroupItemProps =
 	| Array<
 			| ToolbarItemProps
 			| string

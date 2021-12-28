@@ -1,15 +1,18 @@
 import React from 'react';
 import {
 	DATA_TRANSIENT_ELEMENT,
-	EditorInterface,
 	isEngine,
 	isSafari,
-	NodeInterface,
 	Plugin,
+} from '@aomao/engine';
+import type {
+	EditorInterface,
+	NodeInterface,
 	PluginOptions,
 } from '@aomao/engine';
-import { CollapseItemProps } from '../collapse/item';
-import ToolbarComponent, { ToolbarValue } from './component';
+import type { CollapseItemProps } from '../collapse/item';
+import ToolbarComponent, { ToolbarPopup } from './component';
+import type { ToolbarValue, GroupItemProps } from './component';
 import locales from '../locales';
 
 type Config = Array<{
@@ -18,6 +21,9 @@ type Config = Array<{
 }>;
 export interface ToolbarOptions extends PluginOptions {
 	config: Config;
+	popup?: {
+		items: GroupItemProps[];
+	};
 }
 
 const defaultConfig = (editor: EditorInterface): Config => {
@@ -36,7 +42,6 @@ const defaultConfig = (editor: EditorInterface): Config => {
 				'video-uploader',
 				'math',
 				'status',
-				//'mind'
 			],
 		},
 	];
@@ -51,19 +56,12 @@ class ToolbarPlugin<T extends ToolbarOptions> extends Plugin<T> {
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:slash', (event) => this.onSlash(event));
 			this.editor.on('parse:value', (node) => this.paserValue(node));
-			//this.editor.on('select', this.onSelect)
 		}
 		this.editor.language.add(locales);
+		if (this.options.popup) {
+			new ToolbarPopup(this.editor);
+		}
 	}
-
-	// onSelect = () => {
-	// 	if (!isEngine(this.editor)) return;
-	// 	const { change, card } = this.editor;
-	// 	if(card.active) return
-	// 	const range = change.range.get().cloneRange().shrinkToTextNode();
-	// 	if(range.collapsed) return
-	// 	const { startNode, endNode } = range
-	// }
 
 	paserValue(node: NodeInterface) {
 		if (
@@ -117,6 +115,6 @@ class ToolbarPlugin<T extends ToolbarOptions> extends Plugin<T> {
 		throw new Error('Method not implemented.');
 	}
 }
-export { ToolbarComponent };
+export { ToolbarComponent, ToolbarPopup };
 export type { ToolbarValue };
 export default ToolbarPlugin;

@@ -32,3 +32,13 @@
     max-height: calc(80vh);
     overflow: auto;
 }
+/** ------------------- popup ---------------------- **/
+.data-toolbar-popup-wrapper {
+    position: absolute;
+    z-index: 9999;
+    padding: 4px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #dee0e3;
+    box-shadow: 0 4px 8px 0 rgba(31, 35, 41, 0.1);
+}

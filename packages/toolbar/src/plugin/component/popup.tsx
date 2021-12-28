@@ -1,0 +1,145 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { $, EngineInterface, isEngine, isMobile, Range } from '@aomao/engine';
+import type { NodeInterface, EditorInterface } from '@aomao/engine';
+import Toolbar from '../../Toolbar';
+import type { GroupItemProps } from '../../Toolbar';
+
+type PopupOptions = {
+	items?: GroupItemProps[];
+};
+
+export default class Popup {
+	#editor: EditorInterface;
+	#root: NodeInterface;
+	#point: Record<'left' | 'top', number> = { left: 0, top: -9999 };
+	#align: 'top' | 'bottom' = 'bottom';
+	#options: PopupOptions = {};
+
+	constructor(editor: EditorInterface, options: PopupOptions = {}) {
+		this.#options = options;
+		this.#editor = editor;
+		this.#root = $(`<div class="data-toolbar-popup-wrapper">Test</div>`);
+		document.body.append(this.#root[0]);
+		if (isEngine(editor)) {
+			this.#editor.on('select', this.onSelect);
+		} else {
+			document.addEventListener('selectionchange', this.onSelect);
+		}
+		if (!isMobile) window.addEventListener('scroll', this.onSelect);
+		window.addEventListener('resize', this.onSelect);
+		this.#editor.scrollNode?.on('scroll', this.onSelect);
+	}
+
+	onSelect = () => {
+		const range = Range.from(this.#editor)
+			?.cloneRange()
+			.shrinkToTextNode();
+		const selection = window.getSelection();
+		if (
+			!range ||
+			!selection ||
+			!selection.focusNode ||
+			range.collapsed ||
+			(!range.commonAncestorNode.inEditor() &&
+				!range.commonAncestorNode.isRoot())
+		) {
+			this.hide();
+			return;
+		}
+		const subRanges = range.getSubRanges();
+		if (
+			subRanges.length === 0 ||
+			(this.#editor.card.active && !this.#editor.card.active.isEditable)
+		) {
+			this.hide();
+			return;
+		}
+		const topRange = subRanges[0];
+		const bottomRange = subRanges[subRanges.length - 1];
+		const topRect = topRange.getBoundingClientRect();
+		const bottomRect = bottomRange.getBoundingClientRect();
+
+		let rootRect: DOMRect | undefined = undefined;
+		this.showContent(() => {
+			rootRect = this.#root.get<HTMLElement>()?.getBoundingClientRect();
+			console.log(rootRect);
+			if (!rootRect) {
+				this.hide();
+				return;
+			}
+			this.#align =
+				bottomRange.startNode.equal(selection.focusNode!) &&
+				!topRange.startNode.equal(selection.focusNode!)
+					? 'bottom'
+					: 'top';
+			const space = 12;
+			let targetRect = this.#align === 'bottom' ? bottomRect : topRect;
+			if (
+				this.#align === 'top' &&
+				targetRect.top - rootRect.height - space <
+					window.innerHeight -
+						(this.#editor.scrollNode?.height() || 0)
+			) {
+				this.#align = 'bottom';
+			} else if (
+				this.#align === 'bottom' &&
+				targetRect.bottom + rootRect.height + space > window.innerHeight
+			) {
+				this.#align = 'top';
+			}
+			targetRect = this.#align === 'bottom' ? bottomRect : topRect;
+			const top =
+				this.#align === 'top'
+					? targetRect.top - rootRect.height - space
+					: targetRect.bottom + space;
+			this.#point = {
+				left: targetRect.left + targetRect.width - rootRect.width / 2,
+				top,
+			};
+			this.#root.css({
+				left: `${this.#point.left}px`,
+				top: `${this.#point.top}px`,
+			});
+		});
+	};
+
+	showContent(callback?: () => void) {
+		const result = this.#editor.trigger('toolbar-render', this.#options);
+		ReactDOM.render(
+			typeof result === 'object' ? (
+				result
+			) : (
+				<Toolbar
+					popup={true}
+					engine={this.#editor as EngineInterface}
+					items={this.#options.items || []}
+				/>
+			),
+			this.#root.get<HTMLDivElement>()!,
+			() => {
+				if (callback) callback();
+			},
+		);
+	}
+
+	hide() {
+		this.#root.css({
+			left: '0px',
+			top: '-9999px',
+		});
+	}
+
+	destroy() {
+		this.#root.remove();
+		if (isEngine(this.#editor)) {
+			this.#editor.on('select', this.onSelect);
+		} else {
+			document.removeEventListener('selectionchange', this.onSelect);
+		}
+		if (!isMobile) window.removeEventListener('scroll', this.onSelect);
+		window.removeEventListener('resize', this.onSelect);
+		this.#editor.scrollNode?.off('scroll', this.onSelect);
+	}
+}
+export type { GroupItemProps };

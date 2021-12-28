@@ -1,5 +1,5 @@
 import { h } from 'vue';
-import { CARD_SELECTOR, EngineInterface } from '@aomao/engine';
+import { CARD_SELECTOR, EngineInterface, isEngine, Range } from '@aomao/engine';
 import { ToolbarItemProps } from '../types';
 import TableSelector from '../components/table.vue';
 import fontfamily, { defaultData as fontFamilyDefaultData } from './fontfamily';
@@ -716,8 +716,11 @@ export const getToolbarDefaultConfig = (
 			command: { name: 'link', args: ['_blank'] },
 			title: language['link']['title'],
 			onDisabled: () => {
-				const { change, card } = engine;
-				const range = change.range.get();
+				const { card } = engine;
+				const range = isEngine(engine)
+					? engine.change.range.get()
+					: Range.from(engine);
+				if (!range) return !engine.command.queryEnabled('link');
 				const cardComponent = card.find(range.startNode);
 				return (
 					(!!cardComponent &&

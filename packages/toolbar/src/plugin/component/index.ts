@@ -11,8 +11,11 @@ import {
 import { CollapseGroupProps } from '../../collapse/group';
 import { CollapseItemProps } from '../../collapse/item';
 import { getToolbarDefaultConfig } from '../../config/toolbar';
-import { CollapseProps } from '../../types';
-import CollapseComponent, { CollapseComponentInterface } from './collapse';
+import type { CollapseProps } from '../../types';
+import CollapseComponent from './collapse';
+import type { CollapseComponentInterface } from './collapse';
+import ToolbarPopup from './popup';
+import type { GroupItemProps } from './popup';
 import './index.css';
 
 type Data = Array<CollapseGroupProps>;
@@ -20,7 +23,7 @@ export interface ToolbarValue extends CardValue {
 	data: Data;
 }
 
-class ToolbarComponent<T extends ToolbarValue> extends Card<T> {
+class ToolbarComponent<T extends ToolbarValue = ToolbarValue> extends Card<T> {
 	private keyword?: NodeInterface;
 	private placeholder?: NodeInterface;
 	private component?: CollapseComponentInterface;
@@ -259,3 +262,5 @@ class ToolbarComponent<T extends ToolbarValue> extends Card<T> {
 }
 
 export default ToolbarComponent;
+export { ToolbarPopup };
+export type { GroupItemProps };

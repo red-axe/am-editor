@@ -15,6 +15,7 @@ import {
 } from '../../types';
 import { getToolbarDefaultConfig } from '../../config';
 import CollapseComponent, { CollapseComponentInterface } from './collapse';
+import ToolbarPopup from './popup';
 import './index.css';
 
 type Data = Array<CollapseGroupProps>;
@@ -23,7 +24,7 @@ export interface ToolbarValue extends CardValue {
 	data: Data;
 }
 
-class ToolbarComponent<V extends ToolbarValue> extends Card<V> {
+class ToolbarComponent<V extends ToolbarValue = ToolbarValue> extends Card<V> {
 	private keyword?: NodeInterface;
 	private placeholder?: NodeInterface;
 	private component?: CollapseComponentInterface;
@@ -265,3 +266,4 @@ class ToolbarComponent<V extends ToolbarValue> extends Card<V> {
 }
 
 export default ToolbarComponent;
+export { ToolbarPopup };

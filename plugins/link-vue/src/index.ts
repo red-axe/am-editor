@@ -15,7 +15,9 @@ export interface LinkOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 }
-export default class<T extends LinkOptions> extends InlinePlugin<T> {
+export default class<
+	T extends LinkOptions = LinkOptions,
+> extends InlinePlugin<T> {
 	private toolbar?: Toolbar;
 
 	static get pluginName() {

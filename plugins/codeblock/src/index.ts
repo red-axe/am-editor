@@ -376,3 +376,4 @@ export default class<T extends CodeBlockOptions> extends Plugin<T> {
 	}
 }
 export { CodeBlockComponent };
+export type { CodeBlockValue };

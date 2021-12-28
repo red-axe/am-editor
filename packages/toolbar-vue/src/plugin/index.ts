@@ -6,9 +6,10 @@ import {
 	Plugin,
 	PluginOptions,
 } from '@aomao/engine';
-import { CollapseItemProps } from '../types';
+import { CollapseItemProps, GroupItemProps } from '../types';
 import locales from '../locales';
-import ToolbarComponent, { ToolbarValue } from './component';
+import ToolbarComponent, { ToolbarPopup } from './component';
+import type { ToolbarValue } from './component';
 
 type Config = Array<{
 	title: string;
@@ -16,6 +17,9 @@ type Config = Array<{
 }>;
 export interface ToolbarOptions extends PluginOptions {
 	config: Config;
+	popup?: {
+		items: GroupItemProps[];
+	};
 }
 
 const defaultConfig = (editor: EditorInterface): Config => {
@@ -39,7 +43,9 @@ const defaultConfig = (editor: EditorInterface): Config => {
 	];
 };
 
-class ToolbarPlugin<T extends ToolbarOptions> extends Plugin<T> {
+class ToolbarPlugin<
+	T extends ToolbarOptions = ToolbarOptions,
+> extends Plugin<T> {
 	static get pluginName() {
 		return 'toolbar';
 	}
@@ -50,6 +56,9 @@ class ToolbarPlugin<T extends ToolbarOptions> extends Plugin<T> {
 			this.editor.on('parse:value', (node) => this.paserValue(node));
 		}
 		this.editor.language.add(locales);
+		if (this.options.popup) {
+			new ToolbarPopup(this.editor);
+		}
 	}
 
 	paserValue(node: NodeInterface) {

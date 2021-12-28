@@ -131,3 +131,4 @@ class Embed<T extends EmbedOptions> extends Plugin<T> {
 
 export default Embed;
 export { EmbedComponent };
+export type { EmbedValue };

@@ -8,7 +8,8 @@
         :placement="isMobile ? 'topRight' : 'bottom'"
         >
             <template #content>
-                <div :class="['editor-toolbar', {'editor-toolbar-mobile': isMobile}]" data-element="ui">
+                <div :class="['editor-toolbar', {'editor-toolbar-mobile': isMobile && !popup,
+								'editor-toolbar-popup': popup,}]" data-element="ui">
                     <template v-for="(item , index) in items" :key="index">
                         <am-button v-if="item.type === 'button'" :key="index" v-bind="item" :engine="engine" />
                         <am-dropdown v-if="item.type === 'dropdown'" :key="index" v-bind="item" :engine="engine" />

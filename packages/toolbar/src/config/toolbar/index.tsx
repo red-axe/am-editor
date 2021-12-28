@@ -1,19 +1,20 @@
 import React from 'react';
-import { CARD_SELECTOR, EngineInterface } from '@aomao/engine';
-import {
+import { CARD_SELECTOR, isEngine, Range } from '@aomao/engine';
+import type { EditorInterface } from '@aomao/engine';
+import type {
 	ButtonProps,
 	DropdownProps,
 	ColorProps,
 	CollapseProps,
 } from '../../types';
 import TableSelector from '../../table';
-import './index.css';
 import fontfamily, { defaultData as fontFamilyDefaultData } from './fontfamily';
+import './index.css';
 
 export { fontfamily, fontFamilyDefaultData };
 
 export const getToolbarDefaultConfig = (
-	engine: EngineInterface,
+	engine: EditorInterface,
 ): Array<ButtonProps | DropdownProps | ColorProps | CollapseProps> => {
 	const language = engine.language.get('toolbar');
 	const headingLanguage = language['heading'];
@@ -867,8 +868,11 @@ export const getToolbarDefaultConfig = (
 			command: { name: 'link', args: ['_blank'] },
 			title: language['link']['title'],
 			onDisabled: () => {
-				const { change, card } = engine;
-				const range = change.range.get();
+				const { card } = engine;
+				const range = isEngine(engine)
+					? engine.change.range.get()
+					: Range.from(engine);
+				if (!range) return !engine.command.queryEnabled('link');
 				const cardComponent = card.find(range.startNode);
 				return (
 					(!!cardComponent &&

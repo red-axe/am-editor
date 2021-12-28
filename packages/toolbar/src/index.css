@@ -36,13 +36,26 @@
     box-shadow: none;
 }
 
+.editor-toolbar.editor-toolbar-popup {
+    position: initial;
+    box-shadow: none;
+    top: 0;
+    left: 0;
+    border: 0 none;
+}
+
 .editor-toolbar-mobile .editor-toolbar-content {
     text-align: left;
     padding: 0 12px;
 }
 
-.editor-toolbar-mobile .editor-toolbar-group {
+.editor-toolbar-mobile .editor-toolbar-group,.editor-toolbar-popup .editor-toolbar-group {
     border: 0 none;
+    padding: 0;
+}
+
+.editor-toolbar-popup .editor-toolbar-content {
+    text-align: center;
     padding: 0;
 }
 
