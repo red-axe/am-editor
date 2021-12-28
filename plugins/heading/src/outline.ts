@@ -39,7 +39,7 @@ class Outline {
 		if (!children) return [];
 		let headings: Array<Element> = [];
 		children.each((child) => {
-			if (!filter[child.nodeName]) return;
+			if (!filter[child.nodeName.toLowerCase()]) return;
 			headings.push(child as Element);
 		});
 		return headings;

@@ -86,6 +86,7 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 	}
 	#viewAutoWrap?: boolean = undefined;
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
+		if (this.loading) return [];
 		if (!isEngine(this.editor) || this.editor.readonly) {
 			return [
 				{ type: 'copy' },

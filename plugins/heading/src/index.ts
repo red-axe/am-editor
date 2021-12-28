@@ -114,11 +114,6 @@ export default class<T extends HeadingOptions> extends BlockPlugin<T> {
 			this.editor.on('paste:markdown', (child) =>
 				this.pasteMarkdown(child),
 			);
-			this.editor.on('paste:each', (node) => {
-				if (this.tagName.indexOf(node.name) > -1) {
-					node.attributes('id', '');
-				}
-			});
 		}
 		//引擎处理
 		if (!isEngine(this.editor) || this.options.showAnchor === false) return;
