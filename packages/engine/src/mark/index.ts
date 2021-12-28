@@ -844,10 +844,17 @@ class Mark implements MarkModelInterface {
 			nodeApi.removeZeroWidthSpace(node);
 			let parent = node.parent();
 			//父级和当前要包裹的节点，属性和值都相同，那就不包裹。只有属性一样，并且父节点只有一个节点那就移除父节点包裹,然后按插件情况合并值
-			if (parent && nodeApi.isMark(parent)) {
-				if (this.compare(parent.clone(), mark, true)) return false;
-				if (parent.children().length === 1) {
-					const plugin = this.findPlugin(mark);
+			let result = false;
+			while (parent && nodeApi.isMark(parent)) {
+				if (this.compare(parent.clone(), mark, true)) {
+					result = true;
+					break;
+				} else if (
+					parent
+						.children()
+						.toArray()
+						.filter((node) => !node.isCursor()).length === 1
+				) {
 					const curPlugin = this.findPlugin(parent);
 					//插件一样，并且并表明要合并值
 					if (
@@ -856,15 +863,20 @@ class Mark implements MarkModelInterface {
 						plugin.combineValueByWrap === true
 					) {
 						nodeApi.wrap(parent, mark, true);
-						return parent;
+						result = true;
+						break;
 					}
 					//插件一样，不合并，直接移除
 					else if (plugin && plugin === curPlugin) {
 						nodeApi.unwrap(parent);
-						parent = node.parent();
+						result = false;
+						break;
 					}
 				}
+				parent = parent.parent();
 			}
+			if (result) return false;
+
 			let targetNode = parent;
 			let curPlugin = targetNode
 				? this.findPlugin(targetNode)
