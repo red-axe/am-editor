@@ -151,8 +151,7 @@ export default class<T extends HeadingOptions> extends BlockPlugin<T> {
 			}
 
 			let id = node.attributes('id');
-			const dataId = node.attributes(DATA_ID);
-			if (!id || dataId !== id) {
+			if (!id || $(`[id="${id}"]`).length > 1) {
 				id = node.attributes(DATA_ID) || getHashId(node);
 				node.attributes('id', id);
 			}
