@@ -3,7 +3,9 @@ import { isEngine, Plugin, PluginOptions } from '@aomao/engine';
 export interface RemoveformatOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 }
-export default class<T extends RemoveformatOptions> extends Plugin<T> {
+export default class<
+	T extends RemoveformatOptions = RemoveformatOptions,
+> extends Plugin<T> {
 	static get pluginName() {
 		return 'removeformat';
 	}

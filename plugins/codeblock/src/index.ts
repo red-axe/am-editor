@@ -40,7 +40,9 @@ const MODE_ALIAS = {
 	'c++': 'cpp',
 };
 
-export default class<T extends CodeBlockOptions> extends Plugin<T> {
+export default class<
+	T extends CodeBlockOptions = CodeBlockOptions,
+> extends Plugin<T> {
 	static get pluginName() {
 		return 'codeblock';
 	}

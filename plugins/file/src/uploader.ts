@@ -76,7 +76,9 @@ export interface FileUploaderOptions extends PluginOptions {
 	};
 }
 
-export default class<T extends FileUploaderOptions> extends Plugin<T> {
+export default class<
+	T extends FileUploaderOptions = FileUploaderOptions,
+> extends Plugin<T> {
 	private cardComponents: { [key: string]: FileComponent<FileValue> } = {};
 
 	static get pluginName() {

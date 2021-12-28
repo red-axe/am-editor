@@ -73,7 +73,9 @@ export interface MentionOptions extends PluginOptions {
 	};
 }
 
-class MentionPlugin<T extends MentionOptions> extends Plugin<T> {
+class MentionPlugin<
+	T extends MentionOptions = MentionOptions,
+> extends Plugin<T> {
 	#request?: AjaxInterface;
 	static get pluginName() {
 		return 'mention';

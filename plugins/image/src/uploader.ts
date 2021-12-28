@@ -122,7 +122,9 @@ export interface ImageUploaderOptions extends PluginOptions {
 	isRemote?: (src: string) => boolean;
 }
 
-export default class<T extends ImageUploaderOptions> extends Plugin<T> {
+export default class<
+	T extends ImageUploaderOptions = ImageUploaderOptions,
+> extends Plugin<T> {
 	private cardComponents: { [key: string]: ImageComponent<ImageValue> } = {};
 	private loadCounts: { [key: string]: number } = {};
 

@@ -11,7 +11,9 @@ export interface LineHeightOptions extends PluginOptions {
 	filter?: (lineHeight: string) => string | boolean;
 }
 
-export default class<T extends LineHeightOptions> extends Plugin<T> {
+export default class<
+	T extends LineHeightOptions = LineHeightOptions,
+> extends Plugin<T> {
 	static get pluginName() {
 		return 'line-height';
 	}

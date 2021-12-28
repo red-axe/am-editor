@@ -21,7 +21,9 @@ export interface PaintformatOptions extends PluginOptions {
 
 const PAINTFORMAT_CLASS = 'data-paintformat-mode';
 
-export default class<T extends PaintformatOptions> extends Plugin<T> {
+export default class<
+	T extends PaintformatOptions = PaintformatOptions,
+> extends Plugin<T> {
 	private activeMarks?: NodeInterface[];
 	private activeBlocks?: NodeInterface[];
 	private type?: string;

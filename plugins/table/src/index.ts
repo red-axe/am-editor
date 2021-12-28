@@ -27,7 +27,7 @@ export interface TableOptions extends PluginOptions {
 	markdown?: boolean;
 }
 
-class Table<T extends TableOptions> extends Plugin<T> {
+class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'table';
 	}

@@ -14,7 +14,7 @@ export interface HrOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
-export default class<T extends HrOptions> extends Plugin<T> {
+export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'hr';
 	}

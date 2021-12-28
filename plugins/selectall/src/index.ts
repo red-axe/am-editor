@@ -7,7 +7,9 @@ import {
 
 export interface SelectAllOptions extends PluginOptions {}
 
-export default class<T extends SelectAllOptions> extends Plugin<T> {
+export default class<
+	T extends SelectAllOptions = SelectAllOptions,
+> extends Plugin<T> {
 	static get pluginName() {
 		return 'selectall';
 	}

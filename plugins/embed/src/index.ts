@@ -22,7 +22,7 @@ export interface EmbedOptions extends PluginOptions {
 	renderBefore?: EmbedRenderBeforeEvent;
 }
 
-class Embed<T extends EmbedOptions> extends Plugin<T> {
+class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'embed';
 	}

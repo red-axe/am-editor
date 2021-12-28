@@ -3,7 +3,7 @@ import { isEngine, Plugin, PluginOptions } from '@aomao/engine';
 export interface RedoOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 }
-export default class<T extends RedoOptions> extends Plugin<T> {
+export default class<T extends RedoOptions = RedoOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'redo';
 	}

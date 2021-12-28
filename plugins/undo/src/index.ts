@@ -3,7 +3,7 @@ import { isEngine, Plugin, PluginOptions } from '@aomao/engine';
 export interface UndoOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 }
-export default class<T extends UndoOptions> extends Plugin<T> {
+export default class<T extends UndoOptions = UndoOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'undo';
 	}
