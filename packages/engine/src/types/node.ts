@@ -5,7 +5,7 @@ import { SchemaInterface, SchemaRule } from './schema';
 /**
  * 事件方法
  */
-export type EventListener = (...args: Array<Event | any>) => boolean | void;
+export type EventListener<R = any> = (...args: Array<Event | any>) => R;
 
 /**
  * 事件接口
