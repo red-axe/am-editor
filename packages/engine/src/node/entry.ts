@@ -438,7 +438,7 @@ class NodeEntry implements NodeInterface {
 	 * @param {Function} listener 事件函数
 	 * @return 返回当前实例
 	 */
-	on<F extends EventListener = EventListener>(
+	on<R = any, F extends EventListener = EventListener<R>>(
 		eventType: string,
 		listener: F,
 	): NodeInterface {

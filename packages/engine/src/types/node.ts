@@ -21,7 +21,7 @@ export interface EventInterface {
 	 * @param listener 事件处理方法
 	 * @param rewrite 是否重写事件
 	 */
-	on<F extends EventListener = EventListener>(
+	on<R = any, F extends EventListener = EventListener<R>>(
 		eventType: string,
 		listener: F,
 		rewrite?: boolean,
@@ -278,7 +278,7 @@ export interface NodeInterface {
 	 * @param {Function} listener 事件函数
 	 * @return {NodeInterface} 返回当前实例
 	 */
-	on<F extends EventListener = EventListener>(
+	on<R = any, F extends EventListener = EventListener<R>>(
 		eventType: string,
 		listener: F,
 	): NodeInterface;

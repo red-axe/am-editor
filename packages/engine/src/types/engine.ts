@@ -143,7 +143,7 @@ export interface EditorInterface {
 	 * @param listener 事件回调
 	 * @param rewrite 是否重写
 	 */
-	on<F extends EventListener = EventListener>(
+	on<R = any, F extends EventListener = EventListener<R>>(
 		eventType: string,
 		listener: F,
 		rewrite?: boolean,
@@ -601,7 +601,7 @@ export interface EngineInterface extends EditorInterface {
 	 * @param listener 事件回调
 	 * @param rewrite 是否重写
 	 */
-	on<F extends EventListener = EventListener>(
+	on<R = any, F extends EventListener = EventListener<R>>(
 		eventType: string,
 		listener: F,
 		rewrite?: boolean,

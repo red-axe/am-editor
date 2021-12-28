@@ -131,7 +131,7 @@ class View implements ViewInterface {
 		return this.#_scrollNode;
 	}
 
-	on<F extends EventListener = EventListener>(
+	on<R = any, F extends EventListener = EventListener<R>>(
 		eventType: string,
 		listener: F,
 		rewrite?: boolean,
