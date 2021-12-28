@@ -344,7 +344,7 @@ export interface EditorInterface {
 	 * @param eventType 事件名称
 	 * @param args 触发参数
 	 */
-	trigger(eventType: string, ...args: any): any;
+	trigger<R = any>(eventType: string, ...args: any): R;
 	/**
 	 * 全选ctrl+a键按下，返回false，终止处理其它监听
 	 * @param eventType
@@ -946,7 +946,7 @@ export interface EngineInterface extends EditorInterface {
 	 * @param eventType 事件名称
 	 * @param args 触发参数
 	 */
-	trigger(eventType: string, ...args: any): any;
+	trigger<R = any>(eventType: string, ...args: any): R;
 	/**
 	 * 全选ctrl+a键按下，返回false，终止处理其它监听
 	 * @param eventType

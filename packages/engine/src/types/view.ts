@@ -18,7 +18,7 @@ export interface ViewInterface extends EditorInterface {
 	 * @param eventType 事件名称
 	 * @param args 参数
 	 */
-	trigger(eventType: string, ...args: any): any;
+	trigger<R = any>(eventType: string, ...args: any): R;
 	/**
 	 * 触发render事件
 	 * @param eventType render

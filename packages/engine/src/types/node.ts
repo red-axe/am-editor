@@ -33,7 +33,7 @@ export interface EventInterface {
 	 * @param eventType 事件类型
 	 * @param args 事件参数
 	 */
-	trigger(eventType: string, ...args: any): any;
+	trigger<T = any>(eventType: string, ...args: any): T;
 }
 export type Selector =
 	| string
