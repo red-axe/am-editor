@@ -1691,7 +1691,7 @@ class Mark implements MarkModelInterface {
 			const childrenNodes = mark.children();
 			childrenNodes.each((_, index) => {
 				const child = childrenNodes.eq(index);
-				if (child?.isText()) {
+				if (child?.isText() && !child.next()?.isCursor()) {
 					const text = child.text();
 					if (text.length === 1 && /\u200b/.test(text)) {
 						child.remove();
