@@ -17,7 +17,7 @@ export interface MathValue extends CardValue {
 	url: string;
 }
 
-export default class MathCard<T extends MathValue> extends Card<T> {
+export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 	#position?: Position;
 
 	static get cardName() {

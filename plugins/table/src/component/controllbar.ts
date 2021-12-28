@@ -76,22 +76,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.viewport = wrapper.find(Template.VIEWPORT);
 		this.menuBar = wrapper.find(Template.MENUBAR_CLASS);
 		this.placeholder = wrapper.find(Template.PLACEHOLDER_CLASS);
-		this.rowDeleteButton = this.rowsHeader?.find(
-			Template.ROW_DELETE_BUTTON_CLASS,
-		);
-		this.colDeleteButton = wrapper.find(Template.COL_DELETE_BUTTON_CLASS);
-		this.colAddButton = this.colsHeader?.find(
-			Template.COL_ADD_BUTTON_CLASS,
-		);
-		this.colAddButtonSplit = this.colAddButton.find(
-			Template.COL_ADD_BUTTON_SPLIT_CLASS,
-		);
-		this.rowAddButton = this.rowsHeader?.find(
-			Template.ROW_ADD_BUTTON_CLASS,
-		);
-		this.rowAddButtonSplit = this.rowAddButton.find(
-			Template.ROW_ADD_BUTTON_SPLIT_CLASS,
-		);
 		this.renderRowBars();
 		this.renderColBars();
 		this.bindEvents();
@@ -100,6 +84,47 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	renderRowBars(start: number = 0, end?: number) {
 		const table = this.tableRoot?.get<HTMLTableElement>();
 		if (!table) return;
+		//行删除按钮
+		this.rowDeleteButton?.removeAllEvents();
+		this.rowDeleteButton = this.rowsHeader?.find(
+			Template.ROW_DELETE_BUTTON_CLASS,
+		);
+		//行增加按钮
+		this.rowAddButton?.removeAllEvents();
+		this.rowAddButton = this.rowsHeader?.find(
+			Template.ROW_ADD_BUTTON_CLASS,
+		);
+		this.rowAddButtonSplit = this.rowAddButton?.find(
+			Template.ROW_ADD_BUTTON_SPLIT_CLASS,
+		);
+		this.rowDeleteButton
+			?.on('mouseover', (event) => this.handleHighlightRow())
+			.on('mouseleave', (event) => this.hideHighlight(event))
+			.on('mousedown', (event: MouseEvent) => {
+				event.preventDefault();
+				this.table.command['removeRow']();
+			});
+		this.rowAddButton
+			?.on('mouseenter', () => {
+				if (this.hideRowAddButtonTimeount)
+					clearTimeout(this.hideRowAddButtonTimeount);
+				this.rowsHeader?.css('z-index', 126);
+			})
+			.on('mouseleave', () => {
+				this.hideRowAddButtonTimeount = setTimeout(() => {
+					this.rowAddButton?.hide();
+					this.rowsHeader?.css('z-index', 1);
+					this.moveRowIndex = -1;
+				}, 200);
+			})
+			.on('mousedown', (event: MouseEvent) => {
+				event.preventDefault();
+				this.table.command.insertRowAt(
+					this.moveRowIndex,
+					1,
+					this.rowAddAlign === 'down' ? false : true,
+				);
+			});
 		const trs = table.rows;
 		end = end || trs.length;
 		const rowBars = this.rowsHeader?.find(Template.ROWS_HEADER_ITEM_CLASS);
@@ -122,6 +147,48 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const table = this.tableRoot?.get<HTMLTableElement>();
 		if (!table) return;
 		const tableWidth = table.offsetWidth;
+		//列删除按钮
+		this.colDeleteButton?.removeAllEvents();
+		this.colDeleteButton = this.table.wrapper?.find(
+			Template.COL_DELETE_BUTTON_CLASS,
+		);
+		//列增加按钮
+		this.colAddButton?.removeAllEvents();
+		this.colAddButton = this.colsHeader?.find(
+			Template.COL_ADD_BUTTON_CLASS,
+		);
+		this.colAddButtonSplit = this.colAddButton?.find(
+			Template.COL_ADD_BUTTON_SPLIT_CLASS,
+		);
+
+		this.colDeleteButton
+			?.on('mouseover', (event) => this.handleHighlightCol())
+			.on('mouseleave', (event) => this.hideHighlight(event))
+			.on('mousedown', (event: MouseEvent) => {
+				event.preventDefault();
+				this.table.command['removeCol']();
+			});
+
+		this.colAddButton
+			?.on('mouseenter', () => {
+				if (this.hideColAddButtonTimeount)
+					clearTimeout(this.hideColAddButtonTimeount);
+			})
+			.on('mouseleave', () => {
+				this.hideColAddButtonTimeount = setTimeout(() => {
+					this.colAddButton?.hide();
+					this.moveColIndex = -1;
+				}, 200);
+			})
+			.on('mousedown', (event: MouseEvent) => {
+				event.preventDefault();
+				if (this.moveColIndex > -1)
+					this.table.command.insertColAt(
+						this.moveColIndex,
+						1,
+						this.colAddAlign === 'right' ? false : true,
+					);
+			});
 		this.tableRoot?.css('width', `${tableWidth}px`);
 		this.colsHeader?.css('width', `${tableWidth}px`);
 
@@ -216,20 +283,20 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 */
 	bindEvents() {
 		this.colsHeader
-			?.on(isMobile ? 'touchstart' : 'mousedown', (event) =>
-				this.onMouseDownColsHeader(event),
+			?.on(
+				isMobile ? 'touchstart' : 'mousedown',
+				this.onMouseDownColsHeader,
 			)
-			.on('click', (event) => this.onClickColsHeader(event))
-			.on('dragstart', (event) => this.onDragStartColsHeader(event));
+			.on('click', this.onClickColsHeader)
+			.on('dragstart', this.onDragStartColsHeader);
 		this.rowsHeader
-			?.on(isMobile ? 'touchstart' : 'mousedown', (event) =>
-				this.onMouseDownRowsHeader(event),
+			?.on(
+				isMobile ? 'touchstart' : 'mousedown',
+				this.onMouseDownRowsHeader,
 			)
-			.on('click', (event) => this.onClickRowsHeader(event))
-			.on('dragstart', (event) => this.onDragStartRowsHeader(event));
-		this.tableHeader?.on('mousedown', (event) =>
-			this.onClickTableHeader(event),
-		);
+			.on('click', this.onClickRowsHeader)
+			.on('dragstart', this.onDragStartRowsHeader);
+		this.tableHeader?.on('mousedown', this.onClickTableHeader);
 		this.table.wrapper?.on('contextmenu', (event) =>
 			event.preventDefault(),
 		);
@@ -266,40 +333,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				this.editor.focus();
 			},
 		);
-		//行删除按钮
-		this.rowDeleteButton
-			?.on('mouseover', (event) => this.handleHighlightRow())
-			.on('mouseleave', (event) => this.hideHighlight(event))
-			.on('click', (event) => {
-				this.table.command['removeRow']();
-			});
-		//列删除按钮
-		this.colDeleteButton
-			?.on('mouseover', (event) => this.handleHighlightCol())
-			.on('mouseleave', (event) => this.hideHighlight(event))
-			.on('click', (event) => {
-				this.table.command['removeCol']();
-			});
-		//列增加按钮
-		this.colAddButton
-			?.on('mouseenter', () => {
-				if (this.hideColAddButtonTimeount)
-					clearTimeout(this.hideColAddButtonTimeount);
-			})
-			.on('mouseleave', () => {
-				this.hideColAddButtonTimeount = setTimeout(() => {
-					this.colAddButton?.hide();
-					this.moveColIndex = -1;
-				}, 200);
-			})
-			.on('click', () => {
-				if (this.moveColIndex > -1)
-					this.table.command.insertColAt(
-						this.moveColIndex,
-						1,
-						this.colAddAlign === 'right' ? false : true,
-					);
-			});
+
 		this.colsHeader
 			?.on('mouseenter', () => {
 				if (this.hideColAddButtonTimeount)
@@ -312,27 +346,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				this.hideColAddButtonTimeount = setTimeout(() => {
 					this.colAddButton?.hide();
 				}, 200);
-			});
-		//行增加按钮
-		this.rowAddButton
-			?.on('mouseenter', () => {
-				if (this.hideRowAddButtonTimeount)
-					clearTimeout(this.hideRowAddButtonTimeount);
-				this.rowsHeader?.css('z-index', 126);
-			})
-			.on('mouseleave', () => {
-				this.hideRowAddButtonTimeount = setTimeout(() => {
-					this.rowAddButton?.hide();
-					this.rowsHeader?.css('z-index', 1);
-					this.moveRowIndex = -1;
-				}, 200);
-			})
-			.on('click', () => {
-				this.table.command.insertRowAt(
-					this.moveRowIndex,
-					1,
-					this.rowAddAlign === 'down' ? false : true,
-				);
 			});
 
 		this.rowsHeader
@@ -442,7 +455,8 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @param event 事件
 	 * @returns
 	 */
-	onMouseDownColsHeader(event: MouseEvent | TouchEvent) {
+	onMouseDownColsHeader = (event: MouseEvent | TouchEvent) => {
+		event.preventDefault();
 		const trigger = $(event.target || []).closest(
 			Template.COLS_HEADER_TRIGGER_CLASS,
 		);
@@ -456,13 +470,14 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		}
 		//开始调整列宽度
 		this.startChangeCol(trigger, event);
-	}
+	};
 	/**
 	 * 鼠标在行头部按下
 	 * @param event 事件
 	 * @returns
 	 */
-	onMouseDownRowsHeader(event: MouseEvent | TouchEvent) {
+	onMouseDownRowsHeader = (event: MouseEvent | TouchEvent) => {
+		event.preventDefault();
 		const trigger = $(event.target || []).closest(
 			Template.ROWS_HEADER_TRIGGER_CLASS,
 		);
@@ -476,12 +491,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		}
 		//开始调整行高度
 		this.startChangeRow(trigger, event);
-	}
+	};
 	/**
 	 * 鼠标在列头部单击
 	 * @param event 事件
 	 */
-	onClickColsHeader(event: MouseEvent) {
+	onClickColsHeader = (event: MouseEvent) => {
 		const { selection } = this.table;
 		const trigger = $(event.target || []).closest(
 			Template.COLS_HEADER_TRIGGER_CLASS,
@@ -497,12 +512,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			.findIndex((item) => item.equal(colHeader));
 		if (index === undefined) return;
 		selection.selectCol(index);
-	}
+	};
 	/**
 	 * 鼠标在行头部单击
 	 * @param event 事件
 	 */
-	onClickRowsHeader(event: MouseEvent) {
+	onClickRowsHeader = (event: MouseEvent) => {
 		const { selection } = this.table;
 		const trigger = $(event.target || []).closest(
 			Template.ROWS_HEADER_TRIGGER_CLASS,
@@ -518,12 +533,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			.findIndex((item) => item.equal(rowHeader));
 		if (index === undefined) return;
 		selection.selectRow(index);
-	}
+	};
 	/**
 	 * 鼠标在表格左上角头部单击
 	 * @param event 事件
 	 */
-	onClickTableHeader(event: MouseEvent) {
+	onClickTableHeader = (event: MouseEvent) => {
 		event.preventDefault();
 		const { selection } = this.table;
 		if (this.tableHeader?.hasClass('selected')) {
@@ -536,7 +551,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				{ row: tableModel.rows - 1, col: tableModel.cols - 1 },
 			);
 		}
-	}
+	};
 	/**
 	 * 激活表头状态
 	 * @returns
@@ -861,7 +876,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		}
 	};
 
-	onDragStartColsHeader(event: DragEvent) {
+	onDragStartColsHeader = (event: DragEvent) => {
 		event.stopPropagation();
 		const { selection } = this.table;
 		const selectArea = selection.getSelectArea();
@@ -893,9 +908,9 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.colsHeader?.addClass('dragging');
 		this.table.helper.fixDragEvent(event);
 		this.bindDragColEvent();
-	}
+	};
 
-	onDragStartRowsHeader(event: DragEvent) {
+	onDragStartRowsHeader = (event: DragEvent) => {
 		event.stopPropagation();
 		const { selection } = this.table;
 		const selectArea = selection.getSelectArea();
@@ -928,7 +943,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.rowsHeader?.addClass('dragging');
 		this.table.helper.fixDragEvent(event);
 		this.bindDragRowEvent();
-	}
+	};
 
 	bindDragColEvent() {
 		const { wrapper } = this.table;

@@ -16,7 +16,9 @@ export interface TasklistOptions extends PluginOptions {
 	markdown?: boolean | string[];
 }
 
-export default class<T extends TasklistOptions> extends ListPlugin<T> {
+export default class<
+	T extends TasklistOptions = TasklistOptions,
+> extends ListPlugin<T> {
 	static get pluginName() {
 		return 'tasklist';
 	}

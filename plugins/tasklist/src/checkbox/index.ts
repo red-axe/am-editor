@@ -17,7 +17,7 @@ export interface CheckboxValue extends CardValue {
 	checked: boolean;
 }
 
-class Checkbox extends Card<CheckboxValue> {
+class Checkbox<V extends CheckboxValue = CheckboxValue> extends Card<V> {
 	#container?: NodeInterface;
 
 	static get cardName() {
@@ -69,7 +69,7 @@ class Checkbox extends Card<CheckboxValue> {
 		const checked = this.update();
 		this.setValue({
 			checked: !checked,
-		});
+		} as V);
 	};
 
 	onActivateByOther() {}

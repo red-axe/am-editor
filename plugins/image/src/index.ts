@@ -15,13 +15,14 @@ import {
 } from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 import ImageUploader from './uploader';
+import { ImageUploaderOptions } from './uploader';
 import locales from './locales';
 
 export interface ImageOptions extends PluginOptions {
 	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
 }
 
-export default class<T extends ImageOptions> extends Plugin<T> {
+export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'image';
 	}
@@ -156,4 +157,4 @@ export default class<T extends ImageOptions> extends Plugin<T> {
 }
 
 export { ImageComponent, ImageUploader };
-export type { ImageValue };
+export type { ImageValue, ImageUploaderOptions };

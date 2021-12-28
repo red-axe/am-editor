@@ -44,7 +44,9 @@ export interface MathOptions extends PluginOptions {
 	};
 }
 
-export default class Math<T extends MathOptions> extends Plugin<T> {
+export default class Math<
+	T extends MathOptions = MathOptions,
+> extends Plugin<T> {
 	static get pluginName() {
 		return 'math';
 	}

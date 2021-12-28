@@ -653,17 +653,31 @@ class TableComponent<V extends TableValue = TableValue>
 		) {
 			// 重新绘制列头部和行头部
 			const colsHeader = this.wrapper.find(Template.COLS_HEADER_CLASS);
-			if (value?.cols) {
-				colsHeader.replaceWith(
-					$(this.template.renderColsHeader(value?.cols || 0)),
-				);
+			const superValue = super.getValue();
+			if (superValue?.cols) {
+				colsHeader
+					.empty()
+					.append(
+						$(
+							this.template.renderColsHeader(
+								superValue?.cols || 0,
+							),
+						).children(),
+					);
 			}
 			const rowsHeader = this.wrapper.find(Template.ROWS_HEADER_CLASS);
-			if (value?.rows) {
-				rowsHeader.replaceWith(
-					$(this.template.renderRowsHeader(value?.rows || 0)),
-				);
+			if (superValue?.rows) {
+				rowsHeader
+					.empty()
+					.append(
+						$(
+							this.template.renderRowsHeader(
+								superValue?.rows || 0,
+							),
+						).children(),
+					);
 			}
+			this.conltrollBar.refresh();
 			setTimeout(() => {
 				// 找到所有可编辑节点，对没有 contenteditable 属性的节点添加contenteditable一下
 				this.wrapper?.find(EDITABLE_SELECTOR).each((editableNode) => {

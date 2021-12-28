@@ -12,7 +12,7 @@ import { Placement } from './position';
 
 export interface CardOptions<T extends CardValue = {}> {
 	editor: EditorInterface;
-	value?: T;
+	value?: Partial<T>;
 	root?: NodeInterface;
 }
 

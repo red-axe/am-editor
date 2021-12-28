@@ -441,7 +441,7 @@ class NodeEntry implements NodeInterface {
 	on(eventType: string, listener: EventListener): NodeInterface {
 		this.each((node, i) => {
 			node.addEventListener(eventType, listener, false);
-			if (i < this.events.length) this.events[i].on(eventType, listener);
+			if (this.events[i]) this.events[i].on(eventType, listener);
 		});
 		return this;
 	}
@@ -455,7 +455,7 @@ class NodeEntry implements NodeInterface {
 	off(eventType: string, listener: EventListener): NodeInterface {
 		this.each((node, i) => {
 			node.removeEventListener(eventType, listener, false);
-			if (i < this.events.length) this.events[i].off(eventType, listener);
+			if (this.events[i]) this.events[i].off(eventType, listener);
 		});
 		return this;
 	}
@@ -511,11 +511,12 @@ class NodeEntry implements NodeInterface {
 			Object.keys(this.events[i].listeners).forEach((eventType) => {
 				const listeners = this.events[i].listeners[eventType];
 				for (let _i = 0; _i < listeners.length; _i++) {
+					this.off(eventType, listeners[_i]);
+					this.events[i].off(eventType, listeners[_i]);
 					node.removeEventListener(eventType, listeners[_i], false);
 				}
 			});
 		});
-		this.events = [];
 		return this;
 	}
 

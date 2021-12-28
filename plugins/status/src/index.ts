@@ -16,7 +16,9 @@ import locales from './locales';
 export interface StatusOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 }
-export default class<T extends StatusOptions> extends Plugin<T> {
+export default class<
+	T extends StatusOptions = StatusOptions,
+> extends Plugin<T> {
 	static get pluginName() {
 		return 'status';
 	}

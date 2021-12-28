@@ -15,8 +15,10 @@ import {
 	sanitizeUrl,
 	SchemaInterface,
 } from '@aomao/engine';
-import VideoComponent, { VideoValue, VideoStatus } from './component';
+import VideoComponent from './component';
+import type { VideoValue, VideoStatus } from './component';
 import VideoUploader from './uploader';
+import type { VideoUploaderOptions } from './uploader';
 import locales from './locales';
 
 export interface VideoOptions extends PluginOptions {
@@ -27,7 +29,9 @@ export interface VideoOptions extends PluginOptions {
 	showTitle?: boolean;
 }
 
-export default class VideoPlugin<T extends VideoOptions> extends Plugin<T> {
+export default class VideoPlugin<
+	T extends VideoOptions = VideoOptions,
+> extends Plugin<T> {
 	static get pluginName() {
 		return 'video';
 	}
@@ -210,4 +214,4 @@ export default class VideoPlugin<T extends VideoOptions> extends Plugin<T> {
 }
 
 export { VideoComponent, VideoUploader };
-export type { VideoValue, VideoStatus };
+export type { VideoValue, VideoStatus, VideoUploaderOptions };

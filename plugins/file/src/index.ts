@@ -14,13 +14,15 @@ import {
 	SchemaInterface,
 	PluginOptions,
 } from '@aomao/engine';
-import FileComponent, { FileValue } from './component';
+import FileComponent from './component';
+import type { FileValue } from './component';
 import FileUploader from './uploader';
+import type { FileUploaderOptions } from './uploader';
 import locales from './locales';
 
 export interface FileOptions extends PluginOptions {}
 
-export default class<T extends FileOptions> extends Plugin<T> {
+export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'file';
 	}
@@ -184,4 +186,4 @@ export default class<T extends FileOptions> extends Plugin<T> {
 }
 
 export { FileComponent, FileUploader };
-export type { FileValue };
+export type { FileValue, FileUploaderOptions };

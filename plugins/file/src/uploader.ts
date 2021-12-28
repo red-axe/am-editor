@@ -12,7 +12,8 @@ import {
 	encodeCardValue,
 } from '@aomao/engine';
 
-import FileComponent, { FileValue } from './component';
+import FileComponent from './component';
+import type { FileValue } from './component';
 
 export interface FileUploaderOptions extends PluginOptions {
 	/**
