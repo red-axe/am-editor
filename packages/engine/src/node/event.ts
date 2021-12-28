@@ -12,7 +12,7 @@ class Event implements EventInterface {
 	 * @param {Function} listener 事件处理方法
 	 * @param {boolean} rewrite 是否重写事件
 	 */
-	on<R = any, F extends EventListener = EventListener<R>>(
+	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,
 		listener: F,
 		rewrite?: boolean,
