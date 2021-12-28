@@ -10,28 +10,40 @@
 
 body {
 	.am-engine h1,
+	.am-engine-view h1,
 	.am-engine h2,
+	.am-engine-view h2,
 	.am-engine h3,
+	.am-engine-view h3,
 	.am-engine h4,
+	.am-engine-view h4,
 	.am-engine h5,
-	.am-engine h6 {
+	.am-engine-view h5,
+	.am-engine h6.am-engine-view h6 {
 		margin-top: 1em;
 		margin-bottom: 8px;
 	}
 
 	.am-engine > [data-id],
-	.am-engine > div[data-card-key] {
+	.am-engine > div[data-card-key],
+	.am-engine-view > [data-id],
+	.am-engine-view > div[data-card-key] {
 		margin: 8px 0;
 	}
 
 	.am-engine table,
 	.am-engine tbody,
 	.am-engine tr,
-	.am-engine td {
+	.am-engine td,
+	.am-engine-view table,
+	.am-engine-view tbody,
+	.am-engine-view tr,
+	.am-engine-view td {
 		margin: 0;
 	}
 
-	.am-engine > ul > li {
+	.am-engine > ul > li,
+	.am-engine-view > ul > li {
 		margin-top: 4px;
 		margin-bottom: 4px;
 	}

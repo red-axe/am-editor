@@ -1,6 +1,7 @@
 import {
 	$,
 	ClipboardData,
+	DATA_ID,
 	DATA_TRANSIENT_ATTRIBUTES,
 	EditorInterface,
 	isEngine,
@@ -90,6 +91,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 				: widths;
 			cloneColHeader.css({ width: `${width}px` });
 			const insertCloneCol = cloneNode?.clone();
+			insertCloneCol.removeAttributes(DATA_ID);
 			insertCloneCol.attributes('width', width);
 			insertCloneCol.attributes(
 				DATA_TRANSIENT_ATTRIBUTES,
@@ -98,6 +100,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			if (insertCloneCol.find(Template.TABLE_TD_BG_CLASS).length === 0) {
 				insertCloneCol.append($(Template.CellBG));
 			}
+			this.editor.nodeId.create(insertCloneCol);
 			const baseCol = cols[index];
 			if (insertMethod === 'after') $(baseCol).after(insertCloneCol);
 			else colgroup[0].insertBefore(insertCloneCol[0], baseCol);

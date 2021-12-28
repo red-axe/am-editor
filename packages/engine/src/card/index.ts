@@ -435,7 +435,7 @@ class CardModel implements CardModelInterface {
 					(!event ||
 						!event?.target ||
 						!this.closest(event.target as Node, false))) ||
-				(card.isEditable && range.collapsed) ||
+				card.isEditable ||
 				card.isMaximize
 			)
 				return;

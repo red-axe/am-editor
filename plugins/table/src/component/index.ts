@@ -654,30 +654,55 @@ class TableComponent<V extends TableValue = TableValue>
 			// 重新绘制列头部和行头部
 			const colsHeader = this.wrapper.find(Template.COLS_HEADER_CLASS);
 			const superValue = super.getValue();
-			if (superValue?.cols) {
-				colsHeader
-					.empty()
-					.append(
-						$(
-							this.template.renderColsHeader(
-								superValue?.cols || 0,
-							),
-						).children(),
-					);
+			let colItems = colsHeader.find(Template.COLS_HEADER_ITEM_CLASS);
+			const colCount = colItems.length;
+			if (superValue.cols > colCount) {
+				colsHeader.append(
+					$(
+						this.template.renderColsHeader(
+							superValue.cols - colCount,
+						),
+					).children(),
+				);
+				colItems = colsHeader.find(Template.COLS_HEADER_ITEM_CLASS);
+			} else if (superValue.cols < colCount) {
+				for (let i = colCount; i > superValue.cols; i--) {
+					colItems.eq(i - 1)?.remove();
+				}
 			}
+			const table = superValue.html
+				? $(superValue.html)
+				: this.wrapper.find('table');
+			const colElements = table.find('col').toArray();
+			colElements.forEach((colElement, index) => {
+				const width = colElement.attributes('width');
+				colItems.eq(index)?.css('width', `${width}px`);
+			});
+
 			const rowsHeader = this.wrapper.find(Template.ROWS_HEADER_CLASS);
-			if (superValue?.rows) {
-				rowsHeader
-					.empty()
-					.append(
-						$(
-							this.template.renderRowsHeader(
-								superValue?.rows || 0,
-							),
-						).children(),
-					);
+			let rowItems = rowsHeader.find(Template.ROWS_HEADER_ITEM_CLASS);
+			const rowCount = rowItems.length;
+			if (superValue.rows > rowCount) {
+				rowsHeader.append(
+					$(
+						this.template.renderRowsHeader(
+							superValue.rows - rowCount,
+						),
+					).children(),
+				);
+				rowItems = rowsHeader.find(Template.ROWS_HEADER_ITEM_CLASS);
+			} else if (superValue.rows < rowCount) {
+				for (let i = rowCount; i > superValue.rows; i--) {
+					rowItems.eq(i - 1)?.remove();
+				}
 			}
+			const rowElements = table.find('tr').toArray();
+			rowElements.forEach((rowElement, index) => {
+				const height = rowElement.css('height');
+				rowItems.eq(index)?.css('height', height);
+			});
 			this.conltrollBar.refresh();
+			this.scrollbar?.refresh();
 			setTimeout(() => {
 				// 找到所有可编辑节点，对没有 contenteditable 属性的节点添加contenteditable一下
 				this.wrapper?.find(EDITABLE_SELECTOR).each((editableNode) => {

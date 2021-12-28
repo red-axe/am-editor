@@ -589,10 +589,6 @@
     line-height: 1;
 }
 
-*, *::before, *::after {
-    box-sizing: border-box;
-}
-
 .am-engine {
     position: relative;
     background-color: #FFFFFF;

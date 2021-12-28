@@ -128,6 +128,9 @@ export default class<T extends HeadingOptions> extends BlockPlugin<T> {
 		this.editor.on('select', () => {
 			this.showAnchor();
 		});
+		this.editor.on('blur', () => {
+			this.showAnchor();
+		});
 		window.addEventListener(
 			'resize',
 			() => {
@@ -202,13 +205,18 @@ export default class<T extends HeadingOptions> extends BlockPlugin<T> {
 		if (
 			block.length === 0 ||
 			(button.length > 0 &&
-				button.find('.data-icon-'.concat(block.name)).length === 0)
+				button.find('.data-icon-'.concat(block.name)).length === 0) ||
+			!this.editor.isFocus()
 		) {
 			button.remove();
 			Tooltip.hide();
 		}
 
-		if (block.length === 0 || card.closest(block, true)) {
+		if (
+			block.length === 0 ||
+			card.closest(block, true) ||
+			!this.editor.isFocus()
+		) {
 			return;
 		}
 

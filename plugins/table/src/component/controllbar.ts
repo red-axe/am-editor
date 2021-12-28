@@ -871,9 +871,9 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			this.dragging = undefined;
 			// 拖完再渲染一次，行高会受内容限制，无法拖到你想要的高度
 			this.renderRowBars();
-			this.unbindChangeSizeEvent();
 			this.emit('sizeChanged');
 		}
+		this.unbindChangeSizeEvent();
 	};
 
 	onDragStartColsHeader = (event: DragEvent) => {

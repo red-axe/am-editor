@@ -38,6 +38,7 @@ import Block from './block';
 import Command from './command';
 import Request from './request';
 import NodeId from './node/id';
+import { DATA_ELEMENT, ROOT } from './constants';
 
 class View implements ViewInterface {
 	private options: ContentViewOptions = {
@@ -89,6 +90,7 @@ class View implements ViewInterface {
 			this.options.root || this.container.parent() || document.body,
 		);
 		this.container.addClass('am-engine-view');
+		this.container.attributes(DATA_ELEMENT, ROOT);
 		this.mark.init();
 		this.inline.init();
 		this.block.init();

@@ -326,7 +326,7 @@ class Scrollbar extends EventEmitter2 {
 				containerElement.scrollLeft = left;
 			}
 		},
-		isMacos ? 100 : 0,
+		isMacos ? 50 : 0,
 		{ trailing: true },
 	);
 
