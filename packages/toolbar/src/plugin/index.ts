@@ -59,7 +59,9 @@ class ToolbarPlugin<T extends ToolbarOptions> extends Plugin<T> {
 		}
 		this.editor.language.add(locales);
 		if (this.options.popup) {
-			new ToolbarPopup(this.editor);
+			new ToolbarPopup(this.editor, {
+				items: this.options.popup.items,
+			});
 		}
 	}
 

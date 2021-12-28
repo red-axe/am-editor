@@ -1,7 +1,8 @@
 <template>
     <div
     ref="toolbarRef"
-    :class="['editor-toolbar', className, {'editor-toolbar-mobile': isMobile }]"
+    :class="['editor-toolbar', className, {'editor-toolbar-mobile': isMobile && !popup,
+				'editor-toolbar-popup': popup,}]"
     :style="isMobile ? { top: `${mobileView.top}px` } : {}"
     data-element="ui"
     @mousedown="triggerMouseDown"
@@ -31,6 +32,7 @@ export default defineComponent({
         AmGroup
     },
     props:toolbarProps,
+    
     setup(props){
         let groups = ref<Array<GroupDataProps>>([])
         const update = () => {
@@ -178,7 +180,7 @@ export default defineComponent({
             }
             updateByTimeout()
         })
-
+        
         onUnmounted(() => {
             props.engine.off("select",updateByTimeout)
             props.engine.off("change",updateByTimeout)

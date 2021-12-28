@@ -360,6 +360,11 @@ export const toolbarProps = {
 		default: [],
 	},
 	className: String,
+	popup: {
+		type: [Boolean, undefined] as PropType<boolean | undefined>,
+		default: undefined,
+	},
+	onLoad: Function,
 };
 
 export type ToolbarProps = ExtractPropTypes<typeof toolbarProps>;

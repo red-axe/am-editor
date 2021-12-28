@@ -63,7 +63,6 @@ export default class Popup {
 		let rootRect: DOMRect | undefined = undefined;
 		this.showContent(() => {
 			rootRect = this.#root.get<HTMLElement>()?.getBoundingClientRect();
-			console.log(rootRect);
 			if (!rootRect) {
 				this.hide();
 				return;
@@ -106,14 +105,16 @@ export default class Popup {
 
 	showContent(callback?: () => void) {
 		const result = this.#editor.trigger('toolbar-render', this.#options);
-		this.#vm = createApp(
-			typeof result === 'object' ? result : Toolbar,
-			this.#options,
-		);
+		if (this.#vm) this.#vm.unmount();
+		this.#vm = createApp(typeof result === 'object' ? result : Toolbar, {
+			...this.#options,
+			engine: this.#editor,
+			popup: true,
+		});
 		this.#vm.mount(this.#root.get<HTMLDivElement>()!);
 		setTimeout(() => {
 			if (callback) callback();
-		}, 100);
+		}, 200);
 	}
 
 	hide() {
