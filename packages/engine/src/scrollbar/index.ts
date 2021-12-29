@@ -246,7 +246,7 @@ class Scrollbar extends EventEmitter2 {
 				this.reRenderY(scrollTop);
 			}
 		},
-		50,
+		0,
 		{ leading: true },
 	);
 

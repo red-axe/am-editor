@@ -405,6 +405,10 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 					if (cardComponent && cardComponent.onChange)
 						cardComponent.onChange('local', cardComponent.root);
 				}
+				const cardComponent = this.editor.card.find(mark);
+				if (cardComponent && cardComponent.executeMark) {
+					cardComponent.executeMark(mark.clone(), false);
+				}
 			});
 		this.#isApply = true;
 	}
