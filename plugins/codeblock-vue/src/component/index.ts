@@ -174,7 +174,7 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 		if (!this.codeEditor.container.inEditor()) {
 			this.codeEditor.container = $(this.codeEditor.renderTemplate());
 			this.mirror = undefined;
-			this.getCenter().append(this.codeEditor.container);
+			this.getCenter().empty().append(this.codeEditor.container);
 		}
 		const value = this.getValue();
 

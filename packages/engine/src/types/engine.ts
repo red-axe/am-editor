@@ -137,6 +137,12 @@ export interface EditorInterface {
 	 * 剪切板
 	 */
 	clipboard: ClipboardInterface;
+
+	/**
+	 * 设置滚动节点
+	 * @param node 节点
+	 */
+	setScrollNode(node: HTMLElement): void;
 	/**
 	 * 绑定事件
 	 * @param eventType 事件类型
@@ -532,11 +538,6 @@ export interface EngineInterface extends EditorInterface {
 	 * 是否为空内容
 	 */
 	isEmpty(): boolean;
-	/**
-	 * 设置滚动节点
-	 * @param node 节点
-	 */
-	setScrollNode(node: HTMLElement): void;
 	/**
 	 * 获取编辑器值
 	 * @param ignoreCursor 是否包含光标位置信息

@@ -115,7 +115,7 @@ class View implements ViewInterface {
 		// 查找父级样式 overflow 或者 overflow-y 为 auto 或者 scroll 的节点
 		const targetValues = ['auto', 'scroll'];
 		let parent = this.container.parent();
-		while (parent && parent.length > 0 && parent.name !== 'body') {
+		while (!sn && parent && parent.length > 0 && parent.name !== 'body') {
 			if (
 				targetValues.includes(parent.css('overflow')) ||
 				targetValues.includes(parent.css('overflow-y'))

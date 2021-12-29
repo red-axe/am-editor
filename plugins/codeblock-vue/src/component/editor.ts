@@ -155,7 +155,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			'readOnly',
 			!isEngine(this.editor) || this.editor.readonly ? true : false,
 		);
-		if (code !== undefined) this.save();
+		this.save();
 	}
 
 	render(mode: string, value: string, options?: EditorConfiguration) {
