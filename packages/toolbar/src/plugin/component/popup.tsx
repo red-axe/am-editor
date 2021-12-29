@@ -63,7 +63,6 @@ export default class Popup {
 		let rootRect: DOMRect | undefined = undefined;
 		this.showContent(() => {
 			rootRect = this.#root.get<HTMLElement>()?.getBoundingClientRect();
-			console.log(rootRect);
 			if (!rootRect) {
 				this.hide();
 				return;
