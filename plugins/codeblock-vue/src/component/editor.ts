@@ -4,6 +4,7 @@ import {
 	$,
 	EditorInterface,
 	isEngine,
+	isHotkey,
 	isMobile,
 	NodeInterface,
 } from '@aomao/engine';
@@ -130,7 +131,47 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				mirror.execCommand('newlineAndIndent');
 			},
 		});
-
+		this.codeMirror.on('keydown', (editor, event) => {
+			console.log(editor.getCursor(), editor.lineCount());
+			const lineCount = editor.lineCount();
+			const { line, ch } = editor.getCursor();
+			const { onUpFocus, onDownFocus, onLeftFocus, onRightFocus } =
+				this.options;
+			// 在最后一行
+			if (line === lineCount - 1) {
+				const content = editor.getLine(line);
+				if (ch !== content.length) return;
+				// 按下下键
+				if (isHotkey('down', event) || isHotkey('ctrl+n', event)) {
+					if (onDownFocus) onDownFocus(event);
+				}
+				// 按下右键
+				else if (
+					isHotkey('right', event) ||
+					isHotkey('shift+right', event) ||
+					isHotkey('ctrl+e', event) ||
+					isHotkey('ctrl+f', event)
+				) {
+					if (onRightFocus) onRightFocus(event);
+				}
+			}
+			// 在第一行按下上键
+			else if (line === 0 && ch === 0) {
+				// 按下上键
+				if (isHotkey('up', event) || isHotkey('ctrl+p', event)) {
+					if (onUpFocus) onUpFocus(event);
+				}
+				// 按下左键
+				else if (
+					isHotkey('left', event) ||
+					isHotkey('shift+left', event) ||
+					isHotkey('ctrl+b', event) ||
+					isHotkey('ctrl+a', event)
+				) {
+					if (onLeftFocus) onLeftFocus(event);
+				}
+			}
+		});
 		this.container.on('mousedown', (event: MouseEvent) => {
 			if (!this.codeMirror?.hasFocus()) {
 				setTimeout(() => {

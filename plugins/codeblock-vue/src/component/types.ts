@@ -8,6 +8,10 @@ export type Options = {
 	onMouseDown?: (event: MouseEvent | TouchEvent) => void;
 	container?: NodeInterface;
 	synatxMap: { [key: string]: string };
+	onDownFocus?: (event: KeyboardEvent) => void;
+	onUpFocus?: (event: KeyboardEvent) => void;
+	onLeftFocus?: (event: KeyboardEvent) => void;
+	onRightFocus?: (event: KeyboardEvent) => void;
 };
 
 export interface CodeBlockEditor {

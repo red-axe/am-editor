@@ -133,6 +133,8 @@ class TableComponent<V extends TableValue = TableValue>
 							this.selection.focusCell(next);
 							return false;
 						}
+					} else if (td.length > 0) {
+						this.scrollbar?.refresh();
 					}
 					return;
 				},
@@ -181,6 +183,8 @@ class TableComponent<V extends TableValue = TableValue>
 							return false;
 						}
 					}
+				} else if (td.length > 0) {
+					this.scrollbar?.refresh();
 				}
 				return;
 			});
@@ -227,6 +231,8 @@ class TableComponent<V extends TableValue = TableValue>
 							return false;
 						}
 					}
+				} else if (td.length > 0) {
+					this.scrollbar?.refresh();
 				}
 				return;
 			});

@@ -82,6 +82,46 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 						CardActiveTrigger.MOUSE_DOWN,
 					);
 			},
+			onUpFocus: (event) => {
+				if (!isEngine(this.editor)) return;
+				event.preventDefault();
+				const { change, card } = this.editor;
+				const range = change.range.get().cloneRange();
+				card.focusPrevBlock(this, range, true);
+				change.range.select(range);
+				this.activate(false);
+				this.toolbarModel?.hide();
+			},
+			onDownFocus: (event) => {
+				if (!isEngine(this.editor)) return;
+				event.preventDefault();
+				const { change, card } = this.editor;
+				const range = change.range.get().cloneRange();
+				card.focusNextBlock(this, range, true);
+				change.range.select(range);
+				this.activate(false);
+				this.toolbarModel?.hide();
+			},
+			onLeftFocus: (event) => {
+				if (!isEngine(this.editor)) return;
+				event.preventDefault();
+				const { change } = this.editor;
+				const range = change.range.get().cloneRange();
+				this.focus(range, true);
+				change.range.select(range);
+				this.activate(false);
+				this.toolbarModel?.hide();
+			},
+			onRightFocus: (event) => {
+				if (!isEngine(this.editor)) return;
+				event.preventDefault();
+				const { change } = this.editor;
+				const range = change.range.get().cloneRange();
+				this.focus(range, false);
+				change.range.select(range);
+				this.activate(false);
+				this.toolbarModel?.hide();
+			},
 		});
 	}
 	#viewAutoWrap?: boolean = undefined;
@@ -164,6 +204,38 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 	focusEditor() {
 		this.codeEditor?.focus();
 		this.editor.card.activate(this.root);
+	}
+
+	onSelectLeft(event: KeyboardEvent) {
+		if (!this.codeEditor) return;
+		event.preventDefault();
+		this.codeEditor.focus();
+		this.activate(true);
+		this.toolbarModel?.show();
+	}
+
+	onSelectRight(event: KeyboardEvent) {
+		if (!this.codeEditor) return;
+		event.preventDefault();
+		this.codeEditor.focus();
+		this.activate(true);
+		this.toolbarModel?.show();
+	}
+
+	onSelectDown(event: KeyboardEvent) {
+		if (!this.codeEditor) return;
+		event.preventDefault();
+		this.codeEditor.focus();
+		this.activate(true);
+		this.toolbarModel?.show();
+	}
+
+	onSelectUp(event: KeyboardEvent) {
+		if (!this.codeEditor) return;
+		event.preventDefault();
+		this.codeEditor.focus();
+		this.activate(true);
+		this.toolbarModel?.show();
 	}
 
 	render() {
