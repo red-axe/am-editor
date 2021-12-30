@@ -41,11 +41,34 @@ export default class Popup {
 			!selection ||
 			!selection.focusNode ||
 			range.collapsed ||
+			this.#editor.card.getSingleSelectedCard(range) ||
 			(!range.commonAncestorNode.inEditor() &&
 				!range.commonAncestorNode.isRoot())
 		) {
 			this.hide();
 			return;
+		}
+		const next = range.startNode.next();
+		if (
+			next?.isElement() &&
+			Math.abs(range.endOffset - range.startOffset) === 1
+		) {
+			const component = this.#editor.card.closest(next);
+			if (component) {
+				this.hide();
+				return;
+			}
+		}
+		const prev = range.startNode.prev();
+		if (
+			prev?.isElement() &&
+			Math.abs(range.startOffset - range.endOffset) === 1
+		) {
+			const component = this.#editor.card.closest(prev);
+			if (component) {
+				this.hide();
+				return;
+			}
 		}
 		const subRanges = range.getSubRanges();
 		if (
