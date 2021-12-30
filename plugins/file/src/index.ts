@@ -126,7 +126,7 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 	pasteSchema(schema: SchemaInterface) {
 		schema.add({
 			type: 'inline',
-			name: 'a',
+			name: 'span',
 			attributes: {
 				'data-type': {
 					required: true,
