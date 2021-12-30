@@ -177,7 +177,19 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 		const children = this.#container.children();
 		if (!mark) {
 			// 移除所有标记
-			this.editor.mark.unwrapByNodes(this.queryMarks(false));
+			const marks = this.queryMarks(false);
+			let hasBg = false;
+			this.editor.mark.unwrapByNodes(
+				marks.filter((unmark) => {
+					if (hasBg) return true;
+					const plugin = this.editor.mark.findPlugin(unmark);
+					if (plugin?.name === 'backcolor') {
+						hasBg = true;
+						return false;
+					}
+					return true;
+				}),
+			);
 			this.setValue({
 				marks: [] as string[],
 			} as T);
@@ -198,6 +210,10 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 				marks,
 			} as T);
 		} else {
+			const backgroundPlugin = this.editor.mark.findPlugin(mark);
+			if (backgroundPlugin?.name === 'backcolor') {
+				return;
+			}
 			// 移除标记
 			this.editor.mark.unwrapByNodes(this.queryMarks(false), mark);
 			const marks = this.queryMarks().map(
@@ -215,7 +231,14 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 		return this.#container
 			.allChildren()
 			.filter((child) => child.isElement())
-			.map((c) => (clone ? c.clone() : c));
+			.map((c) => {
+				if (clone) {
+					const child = c.clone();
+					child.removeClass('data-label-background');
+					return child;
+				}
+				return c;
+			});
 	}
 
 	focusEditor() {
