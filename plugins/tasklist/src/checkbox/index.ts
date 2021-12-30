@@ -65,7 +65,9 @@ class Checkbox<V extends CheckboxValue = CheckboxValue> extends Card<V> {
 		return !!this.#container?.hasClass(CHECKBOX_CHECKED_CLASS);
 	};
 
-	onClick = () => {
+	onClick = (event: MouseEvent) => {
+		event.preventDefault();
+		event.stopPropagation();
 		const checked = this.update();
 		this.setValue({
 			checked: !checked,
@@ -92,11 +94,11 @@ class Checkbox<V extends CheckboxValue = CheckboxValue> extends Card<V> {
 		if (!isEngine(this.editor) || this.editor.readonly) {
 			return;
 		}
-		this.#container.on('click', this.onClick);
+		this.#container.on('mousedown', this.onClick);
 	}
 
 	destroy() {
-		this.#container?.off('click', this.onClick);
+		this.#container?.off('mousedown', this.onClick);
 	}
 }
 export default Checkbox;
