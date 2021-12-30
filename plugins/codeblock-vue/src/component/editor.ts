@@ -143,6 +143,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				// 按下下键
 				if (isHotkey('down', event) || isHotkey('ctrl+n', event)) {
 					if (onDownFocus) onDownFocus(event);
+					return;
 				}
 				// 按下右键
 				else if (
@@ -152,10 +153,11 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 					isHotkey('ctrl+f', event)
 				) {
 					if (onRightFocus) onRightFocus(event);
+					return;
 				}
 			}
 			// 在第一行按下上键
-			else if (line === 0 && ch === 0) {
+			if (line === 0 && ch === 0) {
 				// 按下上键
 				if (isHotkey('up', event) || isHotkey('ctrl+p', event)) {
 					if (onUpFocus) onUpFocus(event);
