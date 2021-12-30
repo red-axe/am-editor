@@ -19,7 +19,7 @@ export default class Popup {
 	constructor(editor: EditorInterface, options: PopupOptions = {}) {
 		this.#options = options;
 		this.#editor = editor;
-		this.#root = $(`<div class="data-toolbar-popup-wrapper">Test</div>`);
+		this.#root = $(`<div class="data-toolbar-popup-wrapper"></div>`);
 		document.body.append(this.#root[0]);
 		if (isEngine(editor)) {
 			this.#editor.on('select', this.onSelect);
@@ -127,7 +127,7 @@ export default class Popup {
 	destroy() {
 		this.#root.remove();
 		if (isEngine(this.#editor)) {
-			this.#editor.on('select', this.onSelect);
+			this.#editor.off('select', this.onSelect);
 		} else {
 			document.removeEventListener('selectionchange', this.onSelect);
 		}

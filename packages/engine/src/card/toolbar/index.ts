@@ -1,15 +1,13 @@
 import Toolbar, { Tooltip } from '../../toolbar';
-import {
+import type {
+	EditorInterface,
 	CardEntry,
 	CardInterface,
 	CardToolbarInterface,
 	CardToolbarItemOptions,
-} from '../../types/card';
-import {
 	ToolbarItemOptions,
 	ToolbarInterface as ToolbarBaseInterface,
-} from '../../types/toolbar';
-import { EditorInterface } from '../../types/engine';
+} from '../../types';
 import { DATA_ELEMENT, TRIGGER_CARD_ID, UI } from '../../constants';
 import { $ } from '../../node';
 import { isEngine, isMobile } from '../../utils';

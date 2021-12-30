@@ -3,6 +3,7 @@ import {
 	TableModel,
 	TableModelCol,
 	TableModelEmptyCol,
+	TableOptions,
 } from '../types';
 import isInteger from 'lodash/isInteger';
 import {
@@ -12,6 +13,7 @@ import {
 	isNode,
 	NodeInterface,
 	transformCustomTags,
+	EditorInterface,
 } from '@aomao/engine';
 import Template from './template';
 
@@ -20,6 +22,12 @@ class Helper implements HelperInterface {
 		html: string;
 		text: string;
 	};
+
+	#editor: EditorInterface;
+
+	constructor(editor: EditorInterface) {
+		this.#editor = editor;
+	}
 
 	isEmptyModelCol(
 		model: TableModelCol | TableModelEmptyCol,
@@ -251,7 +259,11 @@ class Helper implements HelperInterface {
 			const $tr = trs.eq(index);
 			if (!$tr) return;
 			let height = parseInt($tr.css('height'));
-			height = height || 35;
+			height =
+				height ||
+				this.#editor.plugin.findPlugin<TableOptions>('table')?.options
+					.rowMinHeight ||
+				0;
 			$tr.css('height', height + 'px');
 		});
 		//补充可编辑器区域
@@ -603,7 +615,11 @@ class Helper implements HelperInterface {
 			const $tr = trs.eq(index);
 			if (!$tr) return;
 			let height = parseInt($tr.css('height'));
-			height = height || 35;
+			height =
+				height ||
+				this.#editor.plugin.findPlugin<TableOptions>('table')?.options
+					.rowMinHeight ||
+				0;
 			$tr.css('height', height + 'px');
 		});
 		return table;

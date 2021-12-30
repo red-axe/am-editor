@@ -1,30 +1,9 @@
-import {
-	EngineInterface,
-	EventListener,
-	TypingHandleInterface,
-} from '../../types';
+import { TypingHandleInterface } from '../../types';
+import DefaultKeyup from './default';
 
-class Backspace implements TypingHandleInterface {
+class Backspace extends DefaultKeyup implements TypingHandleInterface {
 	type: 'keydown' | 'keyup' = 'keyup';
 	hotkey: Array<string> | string = 'backspace';
-	private engine: EngineInterface;
-	listeners: Array<EventListener> = [];
-	constructor(engine: EngineInterface) {
-		this.engine = engine;
-	}
-
-	on(listener: EventListener) {
-		this.listeners.push(listener);
-	}
-
-	off(listener: EventListener) {
-		for (let i = 0; i < this.listeners.length; i++) {
-			if (this.listeners[i] === listener) {
-				this.listeners.splice(i, 1);
-				break;
-			}
-		}
-	}
 
 	trigger(event: KeyboardEvent) {
 		const { change } = this.engine;
@@ -40,10 +19,6 @@ class Backspace implements TypingHandleInterface {
 			result = listener(event);
 			if (result === false) break;
 		}
-	}
-
-	destroy() {
-		this.listeners = [];
 	}
 }
 

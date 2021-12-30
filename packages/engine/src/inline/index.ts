@@ -4,10 +4,13 @@ import {
 	CARD_SELECTOR,
 	CARD_TYPE_KEY,
 } from '../constants';
-import { EditorInterface, EngineInterface } from '../types/engine';
-import { InlineModelInterface } from '../types/inline';
-import { NodeInterface } from '../types/node';
-import { RangeInterface } from '../types/range';
+import {
+	EditorInterface,
+	EngineInterface,
+	InlineModelInterface,
+	NodeInterface,
+	RangeInterface,
+} from '../types';
 import { getDocument, isEngine } from '../utils';
 import { Backspace, Left, Right } from './typing';
 import { $ } from '../node';

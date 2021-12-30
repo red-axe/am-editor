@@ -17,7 +17,7 @@ import {
 } from './constants/root';
 import Selection from './selection';
 import { SelectionInterface } from './types/selection';
-import { EditorInterface } from './types/engine';
+import { EditorInterface } from './types/editor';
 import { Path } from 'sharedb';
 import { $ } from './node';
 import { CardEntry } from './types/card';

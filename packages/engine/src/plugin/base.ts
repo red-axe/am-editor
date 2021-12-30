@@ -1,8 +1,8 @@
 import { CardInterface } from '../types/card';
-import { EditorInterface } from '../types/engine';
+import { EditorInterface } from '../types/editor';
 import { PluginOptions, PluginInterface } from '../types/plugin';
 
-abstract class PluginEntry<T extends PluginOptions = {}>
+abstract class PluginEntry<T extends PluginOptions = PluginOptions>
 	implements PluginInterface<T>
 {
 	protected readonly editor: EditorInterface;
@@ -55,6 +55,7 @@ abstract class PluginEntry<T extends PluginOptions = {}>
 			...args: any
 		) => boolean | number | void,
 	): Promise<void>;
+	destroy?(): void;
 }
 
 export default PluginEntry;

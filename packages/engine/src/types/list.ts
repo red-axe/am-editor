@@ -2,6 +2,7 @@ import { CardInterface } from './card';
 import { NodeInterface } from './node';
 import { BlockInterface } from './block';
 import { RangeInterface } from './range';
+import { PluginOptions } from './plugin';
 
 /**
  * 列表删除键处理器
@@ -12,7 +13,8 @@ export interface BackspaceInterface {
 /**
  * 列表接口
  */
-export interface ListInterface extends BlockInterface {
+export interface ListInterface<T extends PluginOptions = PluginOptions>
+	extends BlockInterface<T> {
 	/**
 	 * 自定义列表卡片名称
 	 */

@@ -27,16 +27,28 @@ class Up {
 	}
 
 	trigger(event: KeyboardEvent) {
-		const { change } = this.engine;
+		const { change, card, block } = this.engine;
 		const range = change.range.get();
-		const card = this.engine.card.getSingleCard(range);
-		if (!card) return true;
+		const singleCard = card.getSingleCard(range);
+		if (!singleCard) {
+			if (range.collapsed) {
+				const closetBlock = block.closest(range.startNode);
+				const prev = closetBlock.prev();
+				if (prev?.isCard()) {
+					const cardComponent = card.find(prev);
+					if (cardComponent && cardComponent.onSelectUp) {
+						return cardComponent.onSelectUp(event);
+					}
+				}
+			}
+			return true;
+		}
 		if (isHotkey('shift+up', event)) {
 			return;
 		}
-		return card.type === CardType.INLINE
-			? this.inline(card, event)
-			: this.block(card, event);
+		return singleCard.type === CardType.INLINE
+			? this.inline(singleCard, event)
+			: this.block(singleCard, event);
 	}
 }
 export default Up;

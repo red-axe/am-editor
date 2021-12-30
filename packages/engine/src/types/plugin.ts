@@ -1,7 +1,7 @@
 import { BlockInterface, InlineInterface, MarkInterface } from '.';
 import { CardInterface } from './card';
 import { ConversionData } from './conversion';
-import { EditorInterface } from './engine';
+import { EditorInterface } from './editor';
 import { NodeInterface } from './node';
 import { SchemaGlobal, SchemaRule, SchemaValue } from './schema';
 
@@ -26,7 +26,7 @@ export interface PluginEntry {
 	readonly pluginName: string;
 }
 
-export interface PluginInterface<T extends PluginOptions = {}> {
+export interface PluginInterface<T extends PluginOptions = PluginOptions> {
 	readonly kind: string;
 	readonly name: string;
 	/**
@@ -77,9 +77,12 @@ export interface PluginInterface<T extends PluginOptions = {}> {
 			...args: any
 		) => boolean | number | void,
 	): Promise<void>;
+
+	destroy?(): void;
 }
 
-export interface ElementPluginInterface extends PluginInterface {
+export interface ElementPluginInterface<T extends PluginOptions = PluginOptions>
+	extends PluginInterface<T> {
 	/**
 	 * 标签名称
 	 */
@@ -190,9 +193,21 @@ export interface PluginModelInterface {
 	 * 获取一个插件
 	 * @param pluginName 插件名称
 	 */
-	findPlugin(pluginName: string): PluginInterface | undefined;
-	findElementPlugin(pluginName: string): ElementPluginInterface | undefined;
-	findMarkPlugin(pluginName: string): MarkInterface | undefined;
-	findInlinePlugin(pluginName: string): InlineInterface | undefined;
-	findBlockPlugin(pluginName: string): BlockInterface | undefined;
+	findPlugin<T extends PluginOptions = PluginOptions>(
+		pluginName: string,
+	): PluginInterface<T> | undefined;
+	findElementPlugin<T extends PluginOptions = PluginOptions>(
+		pluginName: string,
+	): ElementPluginInterface<T> | undefined;
+	findMarkPlugin<T extends PluginOptions = PluginOptions>(
+		pluginName: string,
+	): MarkInterface<T> | undefined;
+	findInlinePlugin<T extends PluginOptions = PluginOptions>(
+		pluginName: string,
+	): InlineInterface<T> | undefined;
+	findBlockPlugin<T extends PluginOptions = PluginOptions>(
+		pluginName: string,
+	): BlockInterface<T> | undefined;
+
+	destroy(): void;
 }

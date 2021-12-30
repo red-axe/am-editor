@@ -1,17 +1,18 @@
 import ElementPluginEntry from './element';
 
-import {
+import type {
 	InlineInterface,
 	NodeInterface,
 	PluginEntry as PluginEntryType,
 	PluginInterface,
+	PluginOptions,
 } from '../types';
 import { $ } from '../node';
 import { isEngine } from '../utils';
 
-abstract class InlineEntry<T extends {} = {}>
+abstract class InlineEntry<T extends PluginOptions = PluginOptions>
 	extends ElementPluginEntry<T>
-	implements InlineInterface
+	implements InlineInterface<T>
 {
 	readonly kind: string = 'inline';
 	/**

@@ -1,35 +1,12 @@
-import {
-	EngineInterface,
-	EventListener,
-	RangeInterface,
-	TypingHandleInterface,
-} from '../../types';
+import { RangeInterface, TypingHandleInterface } from '../../types';
 import { CARD_KEY } from '../../constants';
 import Range from '../../range';
 import { $ } from '../../node';
+import DefaultKeydown from './default';
 
-class Delete implements TypingHandleInterface {
-	private engine: EngineInterface;
+class Delete extends DefaultKeydown implements TypingHandleInterface {
 	type: 'keydown' | 'keyup' = 'keydown';
 	hotkey: string | string[] | ((event: KeyboardEvent) => boolean) = 'delete';
-	listeners: Array<EventListener> = [];
-
-	constructor(engine: EngineInterface) {
-		this.engine = engine;
-	}
-
-	on(listener: EventListener) {
-		this.listeners.push(listener);
-	}
-
-	off(listener: EventListener) {
-		for (let i = 0; i < this.listeners.length; i++) {
-			if (this.listeners[i] === listener) {
-				this.listeners.splice(i, 1);
-				break;
-			}
-		}
-	}
 
 	getNext(node: Node): Node | null {
 		return $(node).isEditable()
@@ -152,9 +129,6 @@ class Delete implements TypingHandleInterface {
 			const result = listener(event);
 			if (result === false) break;
 		}
-	}
-	destroy(): void {
-		this.listeners = [];
 	}
 }
 export default Delete;

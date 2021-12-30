@@ -49,21 +49,22 @@ class ToolbarPlugin<
 	static get pluginName() {
 		return 'toolbar';
 	}
+	private popup?: ToolbarPopup;
 
 	init() {
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:slash', (event) => this.onSlash(event));
-			this.editor.on('parse:value', (node) => this.paserValue(node));
+			this.editor.on('keydown:slash', this.onSlash);
+			this.editor.on('parse:value', this.paserValue);
 		}
 		this.editor.language.add(locales);
 		if (this.options.popup) {
-			new ToolbarPopup(this.editor, {
+			this.popup = new ToolbarPopup(this.editor, {
 				items: this.options.popup.items,
 			});
 		}
 	}
 
-	paserValue(node: NodeInterface) {
+	paserValue = (node: NodeInterface) => {
 		if (
 			node.isCard() &&
 			node.attributes('name') === ToolbarComponent.cardName
@@ -71,9 +72,9 @@ class ToolbarPlugin<
 			return false;
 		}
 		return true;
-	}
+	};
 
-	onSlash(event: KeyboardEvent) {
+	onSlash = (event: KeyboardEvent) => {
 		if (!isEngine(this.editor)) return;
 		const { change } = this.editor;
 		let range = change.range.get();
@@ -108,10 +109,16 @@ class ToolbarPlugin<
 				change.range.select(range);
 			}
 		}
-	}
+	};
 
 	execute(...args: any): void {
 		throw new Error('Method not implemented.');
+	}
+
+	destroy() {
+		this.popup?.destroy();
+		this.editor.off('keydown:slash', this.onSlash);
+		this.editor.off('parse:value', this.paserValue);
 	}
 }
 export { ToolbarComponent };

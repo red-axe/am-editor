@@ -1,7 +1,5 @@
 import { isMarkPlugin } from './plugin';
-import { ChangeInterface } from './types';
-import { CommandInterface } from './types/command';
-import { EditorInterface } from './types/engine';
+import { ChangeInterface, EditorInterface, CommandInterface } from './types';
 import { isEngine } from './utils';
 
 /**

@@ -21,6 +21,11 @@ class Right {
 			event.preventDefault();
 			if (isCenter) {
 				card.select(false);
+			} else if (range.collapsed) {
+				const cardComponent = this.engine.card.find(range.startNode);
+				if (cardComponent && cardComponent.onSelectRight) {
+					return cardComponent.onSelectRight(event);
+				}
 			}
 			if (!isCenter && singleSelectable !== false) {
 				this.engine.card.select(card);
@@ -51,6 +56,12 @@ class Right {
 		// 左侧光标
 		const cardLeft = range.commonAncestorNode.closest(CARD_LEFT_SELECTOR);
 		if (cardLeft.length > 0) {
+			if (range.collapsed) {
+				const cardComponent = this.engine.card.find(range.startNode);
+				if (cardComponent && cardComponent.onSelectRight) {
+					return cardComponent.onSelectRight(event);
+				}
+			}
 			event.preventDefault();
 			card.select(component);
 			return false;

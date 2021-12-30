@@ -1,5 +1,9 @@
 import { NodeInterface } from './node';
-import { ElementPluginInterface, PluginInterface } from './plugin';
+import {
+	ElementPluginInterface,
+	PluginInterface,
+	PluginOptions,
+} from './plugin';
 import { RangeInterface } from './range';
 import { SchemaMark } from './schema';
 
@@ -115,7 +119,8 @@ export interface MarkModelInterface {
 	repairCursor(node: NodeInterface | Node): void;
 }
 
-export interface MarkInterface extends ElementPluginInterface {
+export interface MarkInterface<T extends PluginOptions = PluginOptions>
+	extends ElementPluginInterface<T> {
 	readonly kind: string;
 	/**
 	 * 标签名称

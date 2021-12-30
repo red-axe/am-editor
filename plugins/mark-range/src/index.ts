@@ -1,4 +1,4 @@
-import {
+import Engine, {
 	$,
 	CardEntry,
 	DATA_TRANSIENT_ATTRIBUTES,
@@ -16,6 +16,9 @@ import {
 	EDITABLE_SELECTOR,
 	CARD_SELECTOR,
 	transformCustomTags,
+	isView,
+	View,
+	EditorInterface,
 } from '@aomao/engine';
 import { Path } from 'sharedb';
 
@@ -93,7 +96,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 			this.editor.on('change', (_, trigger) => {
 				this.triggerChange(trigger !== 'local');
 			});
-			this.editor.on('select', () => this.onSelectionChange());
+			this.editor.on('select', this.onSelectionChange);
 			this.editor.on('parse:value', (node, atts) => {
 				const key = node.attributes(this.MARK_KEY);
 				if (!!key) {
@@ -129,10 +132,10 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 				}
 				return;
 			});
-		} else {
+		} else if (isView(this.editor)) {
 			this.editor.container.document?.addEventListener(
 				'selectionchange',
-				() => this.onSelectionChange(),
+				this.onSelectionChange,
 			);
 		}
 	}
@@ -553,7 +556,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 	 * 光标选择改变触发
 	 * @returns
 	 */
-	onSelectionChange() {
+	onSelectionChange = () => {
 		if (this.executeBySelf) return;
 		const { window } = this.editor.container;
 		const selection = window?.getSelection();
@@ -577,7 +580,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		const selectInfo = this.getSelectInfo(range, true);
 		this.editor.trigger(`${PLUGIN_NAME}:select`, range, selectInfo);
 		this.range = range;
-	}
+	};
 
 	triggerChange(remote: boolean = false) {
 		const addIds: { [key: string]: Array<string> } = {};
@@ -635,7 +638,6 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		value: string;
 		paths: Array<{ id: Array<string>; path: Array<Path> }>;
 	} {
-		const { node, card } = this.editor;
 		const container = this.editor.container.clone(value ? false : true);
 		container.css({
 			position: 'fixed',
@@ -643,20 +645,23 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 			clip: 'rect(0, 0, 0, 0)',
 		});
 		$(document.body).append(container);
+
+		const editor: EditorInterface = isEngine(this.editor)
+			? new Engine(container, this.editor.options)
+			: new View(container, this.editor.options);
+
+		const { node, card } = editor;
 		if (value) container.html(transformCustomTags(value));
-
 		card.render(container, undefined, false);
-
 		const selection = container.window?.getSelection();
 		const range = (
 			selection
-				? Range.from(this.editor, selection) ||
-				  Range.create(this.editor)
-				: Range.create(this.editor)
+				? Range.from(editor, selection) || Range.create(editor)
+				: Range.create(editor)
 		).cloneRange();
 
-		const parser = new Parser(container, this.editor, undefined, false);
-		const { schema, conversion } = this.editor;
+		const parser = new Parser(container, editor, undefined, false);
+		const { schema, conversion } = editor;
 		if (!range) {
 			container.remove();
 			return {
@@ -710,7 +715,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		cardNodes.each((_, index) => {
 			const cardNode = cardNodes.eq(index);
 			if (cardNode?.isEditableCard()) {
-				const card = this.editor.card.find(cardNode);
+				const card = editor.card.find(cardNode);
 				if (card) {
 					const value = card.getValue();
 					card.setValue(value || {});
@@ -718,6 +723,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 			}
 		});
 		value = parser.toValue(schema, conversion);
+		editor.destroy();
 		container.remove();
 		return {
 			value,
@@ -735,7 +741,6 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		paths: Array<{ id: Array<string>; path: Array<Path> }>,
 		value?: string,
 	): string {
-		const { card } = this.editor;
 		const container = this.editor.container.clone(value ? false : true);
 		if (value) value = Selection.removeTags(value);
 		container.css({
@@ -744,19 +749,21 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 			clip: 'rect(0, 0, 0, 0)',
 		});
 		$(document.body).append(container);
+		const editor: EditorInterface = isEngine(this.editor)
+			? new Engine(container, this.editor.options)
+			: new View(container, this.editor.options);
+		const { card } = editor;
 		if (value) container.html(transformCustomTags(value));
-
 		card.render(container, undefined, false);
 		const selection = container.window?.getSelection();
 		const range = (
 			selection
-				? Range.from(this.editor, selection) ||
-				  Range.create(this.editor)
-				: Range.create(this.editor)
+				? Range.from(editor, selection) || Range.create(editor)
+				: Range.create(editor)
 		).cloneRange();
 
-		const parser = new Parser(container, this.editor, undefined, false);
-		const { schema, conversion } = this.editor;
+		const parser = new Parser(container, editor, undefined, false);
+		const { schema, conversion } = editor;
 		if (!range) {
 			container.remove();
 			return value ? value : parser.toValue(schema, conversion);
@@ -766,7 +773,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 
 		(paths || []).forEach(({ id, path }) => {
 			const pathRange = Range.fromPath(
-				this.editor,
+				editor,
 				{
 					start: { path: path[0] as number[], id: '', bi: -1 },
 					end: { path: path[1] as number[], id: '', bi: -1 },
@@ -795,7 +802,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 					}
 				}
 			});
-			this.editor.mark.wrap(
+			editor.mark.wrap(
 				`<${this.tagName} ${this.MARK_KEY}="${key}" ${this.getIdName(
 					key,
 				)}="${id.join(',')}" />`,
@@ -806,7 +813,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		cardNodes.each((_, index) => {
 			const cardNode = cardNodes.eq(index);
 			if (cardNode?.isEditableCard()) {
-				const card = this.editor.card.find(cardNode);
+				const card = editor.card.find(cardNode);
 				if (card) {
 					const value = card.getValue();
 					card.setValue(value || {});
@@ -814,7 +821,16 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 			}
 		});
 		value = parser.toValue(schema, conversion);
+		editor.destroy();
 		container.remove();
 		return value;
+	}
+
+	destroy() {
+		this.editor.off('select', this.onSelectionChange);
+		this.editor.container.document?.removeEventListener(
+			'selectionchange',
+			this.onSelectionChange,
+		);
 	}
 }

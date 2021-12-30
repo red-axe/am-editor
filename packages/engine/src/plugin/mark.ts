@@ -1,17 +1,18 @@
 import ElementPluginEntry from './element';
-import {
+import type {
 	MarkInterface,
 	NodeInterface,
 	SchemaMark,
 	PluginEntry as PluginEntryType,
 	PluginInterface,
+	PluginOptions,
 } from '../types';
 import { $ } from '../node';
 import { isEngine } from '../utils';
 
-abstract class MarkEntry<T extends {} = {}>
+abstract class MarkEntry<T extends PluginOptions = PluginOptions>
 	extends ElementPluginEntry<T>
-	implements MarkInterface
+	implements MarkInterface<T>
 {
 	readonly kind: string = 'mark';
 	/**

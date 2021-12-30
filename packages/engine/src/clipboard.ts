@@ -1,7 +1,6 @@
 import copyTo from 'copy-to-clipboard';
 import Parser from './parser';
-import { ClipboardInterface } from './types/clipboard';
-import { EditorInterface, EngineInterface } from './types/engine';
+import { EditorInterface, EngineInterface, ClipboardInterface } from './types';
 import { RangeInterface } from './types/range';
 import { isEngine, isSafari } from './utils';
 import { $ } from './node';

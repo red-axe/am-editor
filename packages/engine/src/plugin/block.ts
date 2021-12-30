@@ -1,14 +1,15 @@
 import ElementPluginEntry from './element';
-import {
+import type {
 	SchemaBlock,
 	BlockInterface,
 	NodeInterface,
 	PluginInterface,
+	PluginOptions,
 } from '../types';
 
-abstract class BlockEntry<T extends {} = {}>
+abstract class BlockEntry<T extends PluginOptions = PluginOptions>
 	extends ElementPluginEntry<T>
-	implements BlockInterface
+	implements BlockInterface<T>
 {
 	readonly kind: string = 'block';
 	/**

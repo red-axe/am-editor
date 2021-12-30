@@ -21,7 +21,7 @@ import {
 } from '../types/card';
 import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
-import { EditorInterface } from '../types/engine';
+import { EditorInterface } from '../types/editor';
 import {
 	decodeCardValue,
 	encodeCardValue,
@@ -104,7 +104,7 @@ class CardModel implements CardModelInterface {
 		cards.forEach((card) => {
 			this.classes[card.cardName] = card;
 		});
-
+		if (!this.lazyRender) return;
 		window.addEventListener('resize', this.renderAsyncComponents);
 		this.editor.scrollNode
 			?.get<HTMLElement>()

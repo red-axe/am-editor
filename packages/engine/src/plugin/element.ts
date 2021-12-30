@@ -1,11 +1,11 @@
-import {
+import type {
 	PluginOptions,
 	ElementPluginInterface,
 	NodeInterface,
 	ConversionData,
 	PluginInterface,
 } from '../types';
-import {
+import type {
 	SchemaAttributes,
 	SchemaGlobal,
 	SchemaRule,
@@ -17,9 +17,9 @@ import { $ } from '../node';
 import PluginEntry from './base';
 import { isNode } from '../node/utils';
 
-abstract class ElementPluginEntry<T extends PluginOptions>
+abstract class ElementPluginEntry<T extends PluginOptions = PluginOptions>
 	extends PluginEntry<T>
-	implements ElementPluginInterface
+	implements ElementPluginInterface<T>
 {
 	readonly kind: string = 'element';
 	/**

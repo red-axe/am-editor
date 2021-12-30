@@ -1,24 +1,28 @@
 import {
 	EngineInterface,
-	EventListener,
+	TypingEventListener,
 	TypingHandleInterface,
 } from '../../types';
 
 class DefaultKeydown implements TypingHandleInterface {
 	type: 'keydown' | 'keyup' = 'keydown';
 	hotkey: string | string[] | ((event: KeyboardEvent) => boolean) = '';
-	listeners: Array<EventListener> = [];
-	private engine: EngineInterface;
+	listeners: Array<TypingEventListener> = [];
+	engine: EngineInterface;
 
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
 	}
 
-	on(listener: EventListener) {
+	on(listener: TypingEventListener) {
 		this.listeners.push(listener);
 	}
 
-	off(listener: EventListener) {
+	unshiftOn(listener: TypingEventListener) {
+		this.listeners.unshift(listener);
+	}
+
+	off(listener: TypingEventListener) {
 		for (let i = 0; i < this.listeners.length; i++) {
 			if (this.listeners[i] === listener) {
 				this.listeners.splice(i, 1);

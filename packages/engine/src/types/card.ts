@@ -1,4 +1,4 @@
-import { EditorInterface } from './engine';
+import { EditorInterface } from './editor';
 import { NodeInterface } from './node';
 import { TinyCanvasInterface } from './tiny-canvas';
 import { RangeInterface } from './range';
@@ -10,7 +10,7 @@ import {
 import { CardActiveTrigger, CardType, SelectStyleType } from '../card/enum';
 import { Placement } from './position';
 
-export interface CardOptions<T extends CardValue = {}> {
+export interface CardOptions<T extends CardValue = CardValue> {
 	editor: EditorInterface;
 	value?: Partial<T>;
 	root?: NodeInterface;
@@ -84,7 +84,7 @@ export type CardToolbarItemOptions =
 			items: Array<DropdownSwitchOptions | DropdownButtonOptions>;
 	  };
 
-export interface CardEntry<T extends CardValue = {}> {
+export interface CardEntry<T extends CardValue = CardValue> {
 	prototype: CardInterface;
 	new (options: CardOptions<T>): CardInterface;
 	/**
@@ -125,7 +125,7 @@ export interface CardEntry<T extends CardValue = {}> {
 	readonly lazyRender: boolean;
 }
 
-export interface CardInterface<T extends CardValue = {}> {
+export interface CardInterface<T extends CardValue = CardValue> {
 	/**
 	 * 初始化调用
 	 */
@@ -158,6 +158,9 @@ export interface CardInterface<T extends CardValue = {}> {
 	 * 可编辑的节点
 	 */
 	readonly contenteditable: Array<string>;
+	/**
+	 * 卡片是否处于懒加载中
+	 */
 	readonly loading: boolean;
 	/**
 	 * 卡片类型，设置卡片类型会触发card重新渲染
@@ -254,6 +257,22 @@ export interface CardInterface<T extends CardValue = {}> {
 			rgb: string;
 		},
 	): NodeInterface | void;
+	/**
+	 * 在卡片右侧光标容器位置按下左键触发，可以实现如何选中卡片内部自定义操作
+	 */
+	onSelectLeft?(event: KeyboardEvent): boolean | void;
+	/**
+	 * 在卡片左侧光标容器位置按下右键触发，可以实现如何选中卡片内部自定义操作
+	 */
+	onSelectRight?(event: KeyboardEvent): boolean | void;
+	/**
+	 * 在卡片下方按下上键触发(block类型有效)，可以实现如何选中卡片内部自定义操作
+	 */
+	onSelectUp?(event: KeyboardEvent): boolean | void;
+	/**
+	 * 在卡片上方按下下键触发(block类型有效)，可以实现如何选中卡片内部自定义操作
+	 */
+	onSelectDown?(event: KeyboardEvent): boolean | void;
 	/**
 	 * 激活状态变化时触发
 	 * @param activated 是否激活
@@ -530,7 +549,7 @@ export interface CardModelInterface {
 	 * @param value 要更新的卡片值
 	 * @param args 更新时渲染时额外的参数
 	 */
-	update<V extends CardValue = {}>(
+	update<V extends CardValue = CardValue>(
 		selector: NodeInterface | Node | string,
 		value: Partial<V>,
 		...args: any

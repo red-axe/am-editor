@@ -16,17 +16,8 @@ import {
 } from '@aomao/engine';
 import TableComponent, { Template, Helper } from './component';
 import locales from './locale';
-import { TableInterface, TableValue } from './types';
+import { TableInterface, TableOptions, TableValue } from './types';
 import './index.css';
-export interface TableOptions extends PluginOptions {
-	hotkey?: string | Array<string>;
-	overflow?: {
-		maxLeftWidth?: () => number;
-		maxRightWidth?: () => number;
-	};
-	markdown?: boolean;
-}
-
 class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'table';
@@ -294,7 +285,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			if (width.endsWith('pt')) node.css(type, this.convertToPX(width));
 		};
 		const tables = root.find('table');
-		const helper = new Helper();
+		const helper = new Helper(this.editor);
 		tables.each((_, index) => {
 			let node = tables.eq(index);
 			if (!node) return;
@@ -554,4 +545,4 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 export default Table;
 
 export { TableComponent };
-export type { TableValue };
+export type { TableValue, TableOptions };

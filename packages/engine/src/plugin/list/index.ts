@@ -1,4 +1,4 @@
-import { NodeInterface } from '../../types';
+import { NodeInterface, PluginOptions } from '../../types';
 import { CARD_KEY, READY_CARD_KEY } from '../../constants';
 import { ListInterface } from '../../types/list';
 import { PluginEntry as PluginEntryType } from '../../types/plugin';
@@ -7,9 +7,9 @@ import { $ } from '../../node';
 import { isEngine } from '../../utils';
 import './index.css';
 
-abstract class ListEntry<T extends {} = {}>
+abstract class ListEntry<T extends PluginOptions = PluginOptions>
 	extends BlockEntry<T>
-	implements ListInterface
+	implements ListInterface<T>
 {
 	cardName?: string;
 	private isPasteList: boolean = false;

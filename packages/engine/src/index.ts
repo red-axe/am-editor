@@ -13,6 +13,7 @@ import {
 	isMarkPlugin,
 } from './plugin';
 import Card from './card/entry';
+import CardManage from './card';
 import View from './view';
 import Toolbar, { Tooltip } from './toolbar';
 import Range, { isRangeInterface, isRange, isSelection } from './range';
@@ -71,4 +72,5 @@ export {
 	isRange,
 	isSelection,
 	Resizer,
+	CardManage,
 };

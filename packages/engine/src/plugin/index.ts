@@ -1,4 +1,4 @@
-import { EditorInterface } from '../types/engine';
+import { EditorInterface } from '../types/editor';
 import {
 	ElementPluginInterface,
 	PluginEntry,
@@ -45,37 +45,52 @@ class PluginModel implements PluginModelInterface {
 		}
 	}
 
-	findPlugin(pluginName: string) {
+	findPlugin<T extends PluginOptions = PluginOptions>(
+		pluginName: string,
+	): PluginInterface<T> | undefined {
 		const plugin = this.components[pluginName];
-		return plugin;
+		if (!plugin) return;
+		return plugin as PluginInterface<T>;
 	}
 
-	findElementPlugin(pluginName: string) {
-		const plugin = this.findPlugin(pluginName);
+	findElementPlugin<T extends PluginOptions = PluginOptions>(
+		pluginName: string,
+	): ElementPluginInterface<T> | undefined {
+		const plugin = this.findPlugin<T>(pluginName);
+		if (!plugin) return;
 		if (isElementPlugin(plugin)) {
-			return plugin as ElementPluginInterface;
+			return plugin as ElementPluginInterface<T>;
 		}
 		return;
 	}
-	findMarkPlugin(pluginName: string) {
+	findMarkPlugin<T extends PluginOptions = PluginOptions>(
+		pluginName: string,
+	): MarkInterface<T> | undefined {
 		const plugin = this.findPlugin(pluginName);
+		if (!plugin) return;
 		if (isMarkPlugin(plugin)) {
-			return plugin as MarkInterface;
+			return plugin as MarkInterface<T>;
 		}
 		return;
 	}
-	findInlinePlugin(pluginName: string) {
+	findInlinePlugin<T extends PluginOptions = PluginOptions>(
+		pluginName: string,
+	): InlineInterface<T> | undefined {
 		const plugin = this.findPlugin(pluginName);
+		if (!plugin) return;
 		if (isInlinePlugin(plugin)) {
-			return plugin as InlineInterface;
+			return plugin as InlineInterface<T>;
 		}
 		return;
 	}
 
-	findBlockPlugin(pluginName: string) {
+	findBlockPlugin<T extends PluginOptions = PluginOptions>(
+		pluginName: string,
+	): BlockInterface<T> | undefined {
 		const plugin = this.findPlugin(pluginName);
+		if (!plugin) return;
 		if (isBlockPlugin(plugin)) {
-			return plugin as BlockInterface;
+			return plugin as BlockInterface<T>;
 		}
 		return;
 	}
@@ -90,6 +105,13 @@ class PluginModel implements PluginModelInterface {
 		Object.keys(this.data).forEach((name, index) => {
 			if (callback && callback(name, this.data[name], index) === false)
 				return;
+		});
+	}
+
+	destroy() {
+		Object.keys(this.components).forEach((pluginName) => {
+			const plugin = this.components[pluginName];
+			if (plugin.destroy) plugin.destroy();
 		});
 	}
 }

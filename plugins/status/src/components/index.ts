@@ -177,7 +177,7 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 		const children = this.#container.children();
 		if (!mark) {
 			// 移除所有标记
-			this.editor.mark.unwrapByNodes(this.queryMarks());
+			this.editor.mark.unwrapByNodes(this.queryMarks(false));
 			this.setValue({
 				marks: [] as string[],
 			} as T);
@@ -199,7 +199,7 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 			} as T);
 		} else {
 			// 移除标记
-			this.editor.mark.unwrapByNodes(this.queryMarks(), mark);
+			this.editor.mark.unwrapByNodes(this.queryMarks(false), mark);
 			const marks = this.queryMarks().map(
 				(child) => child.get<HTMLElement>()?.outerHTML || '',
 			);
@@ -210,12 +210,12 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 		this.#statusEditor?.updateActive(this.getColor());
 	}
 
-	queryMarks() {
+	queryMarks(clone: boolean = true) {
 		if (!this.#container) return [];
 		return this.#container
 			.allChildren()
 			.filter((child) => child.isElement())
-			.map((c) => c.clone());
+			.map((c) => (clone ? c.clone() : c));
 	}
 
 	focusEditor() {

@@ -1,6 +1,6 @@
 import { NodeInterface } from '../types/node';
 import { DATA_ELEMENT, DATA_ID, EDITABLE } from '../constants/root';
-import { EditorInterface } from '../types/engine';
+import { EditorInterface } from '../types/editor';
 import {
 	SchemaInterface,
 	ParserInterface,

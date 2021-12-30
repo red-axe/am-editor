@@ -34,7 +34,11 @@ export default class<T extends AlignmentOptions> extends ElementPlugin<T> {
 
 	init() {
 		super.init();
-		this.editor.on('keydown:backspace', (event) => this.onBackspace(event));
+		this.editor.on('keydown:backspace', this.onBackspace);
+	}
+
+	destroy() {
+		this.editor.off('keydown:backspace', this.onBackspace);
 	}
 
 	execute(align?: 'left' | 'center' | 'right' | 'justify') {
@@ -93,7 +97,7 @@ export default class<T extends AlignmentOptions> extends ElementPlugin<T> {
 		];
 	}
 
-	onBackspace(event: KeyboardEvent) {
+	onBackspace = (event: KeyboardEvent) => {
 		if (!isEngine(this.editor)) return;
 		const { change, block } = this.editor;
 		const range = change.range.get();
@@ -123,5 +127,5 @@ export default class<T extends AlignmentOptions> extends ElementPlugin<T> {
 			return false;
 		}
 		return;
-	}
+	};
 }

@@ -1,10 +1,10 @@
 import { EngineInterface } from './engine';
-import { EventListener } from './node';
 
 export interface TypingHandle {
 	prototype: TypingHandleInterface;
 	new (engine: EngineInterface): TypingHandleInterface;
 }
+export type TypingEventListener = (event: KeyboardEvent) => boolean | void;
 /**
  * 按键处理接口
  */
@@ -12,7 +12,7 @@ export interface TypingHandleInterface {
 	/**
 	 * 事件集合
 	 */
-	listeners: Array<EventListener>;
+	listeners: Array<TypingEventListener>;
 	/**
 	 * 按键类型 键盘按下 | 键盘弹起
 	 */
@@ -25,12 +25,17 @@ export interface TypingHandleInterface {
 	 * 绑定事件
 	 * @param listener 事件方法
 	 */
-	on(listener: EventListener): void;
+	on(listener: TypingEventListener): void;
+	/**
+	 * 绑定到第一个事件
+	 * @param listener 事件方法
+	 */
+	unshiftOn(listener: TypingEventListener): void;
 	/**
 	 * 移除事件
 	 * @param listener 事件方法
 	 */
-	off(listener: EventListener): void;
+	off(listener: TypingEventListener): void;
 	/**
 	 * 触发事件
 	 * @param event 键盘事件

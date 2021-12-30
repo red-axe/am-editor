@@ -220,11 +220,11 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 			this.component?.render(this.root, defaultData);
 			return;
 		}
-		//if (Mention.renderLoading) {
+		// if (Mention.renderLoading) {
 		CollapseComponent.renderLoading = Mention.renderLoading;
-		this.component?.render(this.root, []);
+		this.component?.render(this.root, true);
 		CollapseComponent.renderLoading = undefined;
-		//}
+		// }
 		Mention.search(keyword).then((data) => {
 			this.component?.render(this.root, data);
 		});
@@ -283,7 +283,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		const children = this.#container.children();
 		if (!mark) {
 			// 移除所有标记
-			this.editor.mark.unwrapByNodes(this.queryMarks());
+			this.editor.mark.unwrapByNodes(this.queryMarks(false));
 			this.setValue({
 				marks: [] as string[],
 			} as T);
@@ -301,7 +301,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 			} as T);
 		} else {
 			// 移除标记
-			this.editor.mark.unwrapByNodes(this.queryMarks(), mark);
+			this.editor.mark.unwrapByNodes(this.queryMarks(false), mark);
 			const marks = this.queryMarks().map(
 				(child) => child.get<HTMLElement>()?.outerHTML || '',
 			);
@@ -311,12 +311,12 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		}
 	}
 
-	queryMarks() {
+	queryMarks(clone: boolean = true) {
 		if (!this.#container) return [];
 		return this.#container
 			.allChildren()
 			.filter((child) => child.isElement())
-			.map((c) => c.clone());
+			.map((c) => (clone ? c.clone() : c));
 	}
 
 	render(): string | void | NodeInterface {

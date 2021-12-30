@@ -1,6 +1,9 @@
-import { NodeInterface } from '../../types/node';
-import { CardInterface, MaximizeInterface } from '../../types/card';
-import { EditorInterface } from '../../types/engine';
+import {
+	CardInterface,
+	MaximizeInterface,
+	EditorInterface,
+	NodeInterface,
+} from '../../types';
 import { $ } from '../../node';
 import { DATA_ELEMENT, DATA_TRANSIENT_ELEMENT, UI } from '../../constants';
 import { isEngine } from '../../utils';

@@ -19,7 +19,7 @@ export default class Popup {
 	constructor(editor: EditorInterface, options: PopupOptions = {}) {
 		this.#options = options;
 		this.#editor = editor;
-		this.#root = $(`<div class="data-toolbar-popup-wrapper">Test</div>`);
+		this.#root = $(`<div class="data-toolbar-popup-wrapper"></div>`);
 		document.body.append(this.#root[0]);
 		if (isEngine(editor)) {
 			this.#editor.on('select', this.onSelect);
@@ -32,6 +32,7 @@ export default class Popup {
 	}
 
 	onSelect = () => {
+		if (this.#root.length === 0) return;
 		const range = Range.from(this.#editor)
 			?.cloneRange()
 			.shrinkToTextNode();
@@ -48,10 +49,8 @@ export default class Popup {
 			return;
 		}
 		const subRanges = range.getSubRanges();
-		if (
-			subRanges.length === 0 ||
-			(this.#editor.card.active && !this.#editor.card.active.isEditable)
-		) {
+		const activeCard = this.#editor.card.active;
+		if (subRanges.length === 0 || (activeCard && !activeCard.isEditable)) {
 			this.hide();
 			return;
 		}
@@ -132,7 +131,7 @@ export default class Popup {
 	destroy() {
 		this.#root.remove();
 		if (isEngine(this.#editor)) {
-			this.#editor.on('select', this.onSelect);
+			this.#editor.off('select', this.onSelect);
 		} else {
 			document.removeEventListener('selectionchange', this.onSelect);
 		}

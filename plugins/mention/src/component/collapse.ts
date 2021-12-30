@@ -23,7 +23,7 @@ export interface CollapseComponentInterface {
 	unbindEvents(): void;
 	bindEvents(): void;
 	remove(): void;
-	render(target: NodeInterface, data: Array<MentionItem>): void;
+	render(target: NodeInterface, data: Array<MentionItem> | true): void;
 }
 
 class CollapseComponent implements CollapseComponentInterface {
@@ -221,7 +221,7 @@ class CollapseComponent implements CollapseComponentInterface {
 		return this.root?.find('.data-mention-component-body');
 	}
 
-	render(target: NodeInterface, data: Array<MentionItem>) {
+	render(target: NodeInterface, data: Array<MentionItem> | true) {
 		this.remove();
 		this.root = $(
 			`<div class="data-mention-component-list" ${DATA_ELEMENT}="${UI}"><div class="data-mention-component-body"></div></div>`,
@@ -232,13 +232,10 @@ class CollapseComponent implements CollapseComponentInterface {
 		let body = this.getBody();
 		let result = null;
 
-		if (
-			CollapseComponent.renderLoading ||
-			(result = this.engine.trigger('mention:loading', this.root))
-		) {
+		if (typeof data === 'boolean' && data === true) {
 			result = CollapseComponent.renderLoading
 				? CollapseComponent.renderLoading(this.root)
-				: result;
+				: this.engine.trigger('mention:loading', this.root);
 			body = this.getBody();
 			if (result) body?.append(result);
 		} else if (data.filter((item) => !!item.key).length === 0) {

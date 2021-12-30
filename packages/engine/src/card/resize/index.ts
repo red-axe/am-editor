@@ -63,7 +63,7 @@ class Resize implements ResizeInterface {
 				if (start) {
 					this.card.setValue({
 						height: container.height(),
-					});
+					} as any);
 					start = false;
 				}
 			},

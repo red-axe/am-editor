@@ -18,7 +18,7 @@ import {
 	ResizeInterface,
 	CardValue,
 } from '../types/card';
-import { EditorInterface } from '../types/engine';
+import { EditorInterface } from '../types/editor';
 import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { ToolbarItemOptions } from '../types/toolbar';
@@ -31,7 +31,9 @@ import { $ } from '../node';
 import { CardType, SelectStyleType } from './enum';
 import { DATA_ELEMENT, UI } from '../constants';
 
-abstract class CardEntry<T extends CardValue = {}> implements CardInterface<T> {
+abstract class CardEntry<T extends CardValue = CardValue>
+	implements CardInterface<T>
+{
 	protected readonly editor: EditorInterface;
 	readonly root: NodeInterface;
 	toolbarModel?: CardToolbarInterface;
@@ -323,6 +325,10 @@ abstract class CardEntry<T extends CardValue = {}> implements CardInterface<T> {
 		else this.root.removeClass(className);
 		return center;
 	}
+	onSelectLeft?(event: KeyboardEvent): boolean | void;
+	onSelectRight?(event: KeyboardEvent): boolean | void;
+	onSelectUp?(event: KeyboardEvent): boolean | void;
+	onSelectDown?(event: KeyboardEvent): boolean | void;
 	onActivate(activated: boolean) {
 		if (!this.resize) return;
 		if (activated) this.resizeModel?.show();

@@ -62,6 +62,14 @@ class Event implements EventInterface {
 		}
 		return undefined as any;
 	}
+
+	destroy() {
+		Object.keys(this.listeners).forEach((type) => {
+			this.listeners[type].forEach((listener) => {
+				this.off(type, listener);
+			});
+		});
+	}
 }
 
 export default Event;

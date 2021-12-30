@@ -38,6 +38,10 @@ export interface EventInterface {
 	 * @param args 事件参数
 	 */
 	trigger<R = any>(eventType: string, ...args: any): R;
+	/**
+	 * 注销事件
+	 */
+	destroy(): void;
 }
 export type Selector =
 	| string

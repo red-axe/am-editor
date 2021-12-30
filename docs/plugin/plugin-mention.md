@@ -195,9 +195,7 @@ this.engine.on('mention:render-item', (data, root) => {
 `mention:loading`: custom rendering loading status
 
 ```ts
-this.engine.on('mention:loading', (data, root) => {
-	root.html(`<div>${data}</div>`);
-	// or
+this.engine.on('mention:loading', (root) => {
 	ReactDOM.render(
 		<div className="data-mention-loading">Loading...</div>,
 		root.get<HTMLElement>()!,

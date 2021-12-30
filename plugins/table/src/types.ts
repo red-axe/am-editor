@@ -3,6 +3,7 @@ import {
 	CardValue,
 	ClipboardData,
 	NodeInterface,
+	PluginOptions,
 } from '@aomao/engine';
 import { EventEmitter2 } from 'eventemitter2';
 
@@ -149,17 +150,31 @@ export type TableModel = {
 	table: Array<Array<TableModelCol | TableModelEmptyCol>>;
 };
 
-export interface TableInterface extends CardInterface {
+export interface TableInterface<V extends TableValue = TableValue>
+	extends CardInterface<V> {
 	wrapper?: NodeInterface;
 	helper: HelperInterface;
 	template: TemplateInterface;
 	selection: TableSelectionInterface;
 	conltrollBar: ControllBarInterface;
 	command: TableCommandInterface;
+	colMinWidth: number;
+	rowMinHeight: number;
 	/**
 	 * 渲染
 	 */
 	render(): string | NodeInterface | void;
+}
+
+export interface TableOptions extends PluginOptions {
+	hotkey?: string | Array<string>;
+	overflow?: {
+		maxLeftWidth?: () => number;
+		maxRightWidth?: () => number;
+	};
+	colMinWidth?: number;
+	rowMinHeight?: number;
+	markdown?: boolean;
 }
 
 export type ControllOptions = {

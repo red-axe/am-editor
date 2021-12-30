@@ -19,6 +19,7 @@ import {
 	HelperInterface,
 	TableCommandInterface,
 	TableInterface,
+	TableOptions,
 	TableSelectionInterface,
 	TableValue,
 	TemplateInterface,
@@ -33,7 +34,7 @@ import { ColorTool, Palette } from './toolbar';
 
 class TableComponent<V extends TableValue = TableValue>
 	extends Card<V>
-	implements TableInterface
+	implements TableInterface<V>
 {
 	readonly contenteditable: string[] = [
 		`div${Template.TABLE_TD_CONTENT_CLASS}`,
@@ -65,13 +66,20 @@ class TableComponent<V extends TableValue = TableValue>
 		}),
 	);
 
+	colMinWidth =
+		this.editor.plugin.findPlugin<TableOptions>('table')?.options
+			.colMinWidth || 40;
+	rowMinHeight =
+		this.editor.plugin.findPlugin<TableOptions>('table')?.options
+			.rowMinHeight || 35;
+
 	wrapper?: NodeInterface;
-	helper: HelperInterface = new Helper();
+	helper: HelperInterface = new Helper(this.editor);
 	template: TemplateInterface = new Template(this);
 	selection: TableSelectionInterface = new TableSelection(this.editor, this);
 	conltrollBar: ControllBarInterface = new ControllBar(this.editor, this, {
-		col_min_width: 40,
-		row_min_height: 35,
+		col_min_width: this.colMinWidth,
+		row_min_height: this.rowMinHeight,
 	});
 	command: TableCommandInterface = new TableCommand(this.editor, this);
 	scrollbar?: Scrollbar;
@@ -337,6 +345,38 @@ class TableComponent<V extends TableValue = TableValue>
 		return toolbars;
 	}
 
+	onSelectLeft(event: KeyboardEvent) {
+		const { tableModel } = this.selection;
+		if (!tableModel) return;
+		for (let r = tableModel.rows - 1; r >= 0; r--) {
+			for (let c = tableModel.cols - 1; c >= 0; c--) {
+				const cell = tableModel.table[r][c];
+				if (!this.helper.isEmptyModelCol(cell) && cell.element) {
+					event.preventDefault();
+					this.selection.focusCell(cell.element, false);
+					return false;
+				}
+			}
+		}
+		return;
+	}
+
+	onSelectRight(event: KeyboardEvent) {
+		const { tableModel } = this.selection;
+		if (!tableModel) return;
+		for (let r = 0; r < tableModel.rows; r++) {
+			for (let c = 0; c < tableModel.cols; c++) {
+				const cell = tableModel.table[r][c];
+				if (!this.helper.isEmptyModelCol(cell) && cell.element) {
+					event.preventDefault();
+					this.selection.focusCell(cell.element);
+					return false;
+				}
+			}
+		}
+		return;
+	}
+
 	updateAlign(event: MouseEvent, align: 'top' | 'middle' | 'bottom' = 'top') {
 		event.preventDefault();
 		this.conltrollBar.setAlign(align);
@@ -530,6 +570,7 @@ class TableComponent<V extends TableValue = TableValue>
 		const tablePlugin = this.editor.plugin.components['table'];
 		const tableOptions = tablePlugin?.options['overflow'] || {};
 		if (this.viewport) {
+			this.selection.refreshModel();
 			const overflowLeftConfig = tableOptions['maxLeftWidth']
 				? {
 						onScrollX: (x: number) => {

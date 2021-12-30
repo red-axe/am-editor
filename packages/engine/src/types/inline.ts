@@ -1,5 +1,9 @@
 import { NodeInterface } from './node';
-import { PluginInterface, ElementPluginInterface } from './plugin';
+import {
+	PluginInterface,
+	ElementPluginInterface,
+	PluginOptions,
+} from './plugin';
 import { RangeInterface } from './range';
 import { SchemaInterface } from './schema';
 
@@ -60,7 +64,8 @@ export interface InlineModelInterface {
 	flat(node: NodeInterface | RangeInterface, schema?: SchemaInterface): void;
 }
 
-export interface InlineInterface extends ElementPluginInterface {
+export interface InlineInterface<T extends PluginOptions = PluginOptions>
+	extends ElementPluginInterface<T> {
 	readonly kind: string;
 	/**
 	 * 标签名称

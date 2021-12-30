@@ -1,20 +1,7 @@
-import { merge } from 'lodash';
-import NodeModel, { Event, $ } from '../node';
-import language from '../locales';
 import Change from '../change';
 import { DATA_ELEMENT } from '../constants/root';
-import schemaDefaultData from '../constants/schema';
-import conversionDefault from '../constants/conversion';
-import Schema from '../schema';
 import OT from '../ot';
-import {
-	Selector,
-	NodeInterface,
-	EventInterface,
-	EventListener,
-	NodeModelInterface,
-	NodeIdInterface,
-} from '../types/node';
+import { Selector, NodeInterface } from '../types/node';
 import { ChangeInterface } from '../types/change';
 import {
 	ContainerInterface,
@@ -23,110 +10,40 @@ import {
 } from '../types/engine';
 import { HistoryInterface } from '../types/history';
 import { OTInterface } from '../types/ot';
-import { SchemaInterface } from '../types/schema';
-import { ConversionInterface } from '../types/conversion';
-import { CommandInterface } from '../types/command';
-import { PluginModelInterface } from '../types/plugin';
 import { HotkeyInterface } from '../types/hotkey';
-import { CardInterface, CardModelInterface } from '../types/card';
-import { ClipboardInterface } from '../types/clipboard';
-import { LanguageInterface } from '../types/language';
-import { MarkModelInterface } from '../types/mark';
-import { ListModelInterface } from '../types/list';
-import { InlineModelInterface } from '../types/inline';
-import { BlockModelInterface } from '../types/block';
-import { RequestInterface } from '../types/request';
-import Conversion from '../parser/conversion';
+import { CardInterface } from '../types/card';
 import History from '../history';
-import Command from '../command';
 import Hotkey from '../hotkey';
-import Plugin from '../plugin';
-import CardModel from '../card';
 import { getDocument } from '../utils';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import { toJSON0, toDOM } from '../ot/utils';
-import Clipboard from '../clipboard';
 import Parser from '../parser';
-import Language from '../language';
-import Mark from '../mark';
-import List from '../list';
 import { TypingInterface } from '../types';
 import Typing from '../typing';
 import Container from './container';
-import Inline from '../inline';
-import Block from '../block';
 import Selection from '../selection';
-import Request from '../request';
-import NodeId from '../node/id';
+import Editor from '../editor';
+import { $ } from '../node';
 import './index.css';
 
-class Engine implements EngineInterface {
+class Engine<T extends EngineOptions = EngineOptions>
+	extends Editor<T>
+	implements EngineInterface<T>
+{
 	private _readonly: boolean = false;
 	private _container: ContainerInterface;
 	readonly kind = 'engine';
-	options: EngineOptions = {
-		lang: 'zh-CN',
-		locale: {},
-		plugins: [],
-		cards: [],
-		config: {},
-	};
-	language: LanguageInterface;
-	root: NodeInterface;
-	change: ChangeInterface;
-	card: CardModelInterface;
-	plugin: PluginModelInterface;
-	node: NodeModelInterface;
-	nodeId: NodeIdInterface;
-	list: ListModelInterface;
-	mark: MarkModelInterface;
-	inline: InlineModelInterface;
-	block: BlockModelInterface;
-	event: EventInterface;
+
 	typing: TypingInterface;
 	ot: OTInterface;
-	schema: SchemaInterface;
-	conversion: ConversionInterface;
+	change: ChangeInterface;
 	history: HistoryInterface;
-	command: CommandInterface;
 	hotkey: HotkeyInterface;
-	clipboard: ClipboardInterface;
-	request: RequestInterface;
-	#_scrollNode: NodeInterface | null = null;
 
-	get container(): NodeInterface {
-		return this._container.getNode();
-	}
+	readonly container: NodeInterface;
 
 	get readonly(): boolean {
 		return this._readonly;
-	}
-
-	get scrollNode(): NodeInterface | null {
-		if (this.#_scrollNode) return this.#_scrollNode;
-		const { scrollNode } = this.options;
-		let sn = scrollNode
-			? typeof scrollNode === 'function'
-				? scrollNode()
-				: scrollNode
-			: null;
-		// 查找父级样式 overflow 或者 overflow-y 为 auto 或者 scroll 的节点
-		const targetValues = ['auto', 'scroll'];
-		let parent = this.container.parent();
-		while (!sn && parent && parent.length > 0 && parent.name !== 'body') {
-			if (
-				targetValues.includes(parent.css('overflow')) ||
-				targetValues.includes(parent.css('overflow-y'))
-			) {
-				sn = parent.get<HTMLElement>();
-				break;
-			} else {
-				parent = parent.parent();
-			}
-		}
-		if (sn === null) sn = document.documentElement;
-		this.#_scrollNode = sn ? $(sn) : null;
-		return this.#_scrollNode;
 	}
 
 	set readonly(readonly: boolean) {
@@ -145,45 +62,10 @@ class Engine implements EngineInterface {
 	}
 
 	constructor(selector: Selector, options?: EngineOptions) {
+		super(selector, options);
 		this.options = { ...this.options, ...options };
-		// 多语言
-		this.language = new Language(
-			this.options.lang || 'zh-CN',
-			merge(language, options?.locale),
-		);
-		// 事件管理
-		this.event = new Event();
-		// 命令
-		this.command = new Command(this);
-		// 节点规则
-		this.schema = new Schema();
-		this.schema.add(schemaDefaultData);
-		// 节点转换规则
-		this.conversion = new Conversion(this);
-		conversionDefault.forEach((rule) =>
-			this.conversion.add(rule.from, rule.to),
-		);
 		// 历史
 		this.history = new History(this);
-		// 卡片
-		this.card = new CardModel(this, this.options.lazyRender);
-		// 剪贴板
-		this.clipboard = new Clipboard(this);
-		// http请求
-		this.request = new Request();
-		// 插件
-		this.plugin = new Plugin(this);
-		// 节点管理
-		this.node = new NodeModel(this);
-		this.nodeId = new NodeId(this);
-		// 列表
-		this.list = new List(this);
-		// 样式标记
-		this.mark = new Mark(this);
-		// 行内样式
-		this.inline = new Inline(this);
-		// 块级节点
-		this.block = new Block(this);
 		// 编辑器容器
 		this._container = new Container(selector, {
 			engine: this,
@@ -192,6 +74,7 @@ class Engine implements EngineInterface {
 			tabIndex: this.options.tabIndex,
 			placeholder: this.options.placeholder,
 		});
+		this.container = this._container.getNode();
 		// 编辑器父节点
 		this.root = $(
 			this.options.root || this.container.parent() || getDocument().body,
@@ -223,16 +106,9 @@ class Engine implements EngineInterface {
 		this._readonly =
 			this.options.readonly === undefined ? false : this.options.readonly;
 		this._container.setReadonly(this._readonly);
-		// 实例化插件
-		this.mark.init();
-		this.inline.init();
-		this.block.init();
-		this.list.init();
 		// 快捷键
 		this.hotkey = new Hotkey(this);
-		this.card.init(this.options.cards || []);
-		this.plugin.init(this.options.plugins || [], this.options.config || {});
-		this.nodeId.init();
+		this.init();
 		// 协同
 		this.ot = new OT(this);
 
@@ -240,10 +116,6 @@ class Engine implements EngineInterface {
 			this._container.showPlaceholder();
 		}
 		this.ot.initLocal();
-	}
-
-	setScrollNode(node?: HTMLElement) {
-		this.#_scrollNode = node ? $(node) : null;
 	}
 
 	isFocus() {
@@ -260,24 +132,6 @@ class Engine implements EngineInterface {
 
 	blur() {
 		this.change.range.blur();
-	}
-
-	on<R = any, F extends EventListener<R> = EventListener<R>>(
-		eventType: string,
-		listener: F,
-		rewrite?: boolean,
-	) {
-		this.event.on(eventType, listener, rewrite);
-		return this;
-	}
-
-	off(eventType: string, listener: EventListener) {
-		this.event.off(eventType, listener);
-		return this;
-	}
-
-	trigger<R = any>(eventType: string, ...args: any): R {
-		return this.event.trigger(eventType, ...args);
 	}
 
 	getValue(ignoreCursor: boolean = false) {
@@ -420,19 +274,6 @@ class Engine implements EngineInterface {
 		});
 	}
 
-	messageSuccess(message: string) {
-		console.log(`success:${message}`);
-	}
-
-	messageError(error: string) {
-		console.log(`error:${error}`);
-	}
-
-	messageConfirm(message: string): Promise<boolean> {
-		console.log(`confirm:${message}`);
-		return Promise.reject(false);
-	}
-
 	showPlaceholder() {
 		this._container.showPlaceholder();
 	}
@@ -445,10 +286,10 @@ class Engine implements EngineInterface {
 		this._container.destroy();
 		this.change.destroy();
 		this.hotkey.destroy();
-		this.card.destroy();
 		if (this.ot) {
 			this.ot.destroy();
 		}
+		super.destroy();
 	}
 }
 

@@ -1,5 +1,5 @@
 import { Path } from 'sharedb';
-import { EditorInterface } from './engine';
+import { EditorInterface } from './editor';
 import { NodeInterface } from './node';
 import { SelectionInterface } from './selection';
 

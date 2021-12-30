@@ -1,29 +1,15 @@
-import {
-	EventInterface,
-	NodeInterface,
-	Selector,
-	EventListener,
-	NodeModelInterface,
-} from './node';
+import { NodeInterface, Selector, EventListener } from './node';
 import { ChangeInterface } from './change';
 import { OTInterface } from './ot';
 import { SchemaInterface } from './schema';
-import { ConversionInterface } from './conversion';
 import { HistoryInterface } from './history';
-import { PluginEntry, PluginModelInterface, PluginOptions } from './plugin';
-import { CommandInterface } from './command';
-import { CardEntry, CardInterface, CardModelInterface } from './card';
-import { ClipboardData, ClipboardInterface } from './clipboard';
-import { LanguageInterface } from './language';
-import { MarkModelInterface } from './mark';
-import { ListModelInterface } from './list';
+import { CardInterface } from './card';
+import { ClipboardData } from './clipboard';
 import { TypingInterface } from './typing';
-import { InlineModelInterface } from './inline';
-import { BlockModelInterface } from './block';
-import { RequestInterface } from './request';
 import { RangeInterface } from './range';
 import { Op } from 'sharedb';
-import { HotkeyInterface, NodeIdInterface } from './';
+import { EditorInterface, EditorOptions } from './editor';
+import { HotkeyInterface } from './hotkey';
 
 /**
  * 编辑器容器接口
@@ -59,390 +45,7 @@ export interface ContainerInterface {
 	 */
 	destroy(): void;
 }
-
-export interface EditorInterface {
-	/**
-	 * 类型
-	 */
-	readonly kind: 'engine' | 'view';
-	/**
-	 * 语言
-	 */
-	language: LanguageInterface;
-	/**
-	 * 编辑器节点
-	 */
-	container: NodeInterface;
-	/**
-	 * 滚动条节点
-	 */
-	readonly scrollNode: NodeInterface | null;
-	/**
-	 * 编辑器根节点，默认为编辑器父节点
-	 */
-	root: NodeInterface;
-	/**
-	 * 编辑器命令
-	 */
-	command: CommandInterface;
-	/**
-	 * 请求
-	 */
-	request: RequestInterface;
-	/**
-	 * 卡片
-	 */
-	card: CardModelInterface;
-	/**
-	 * 插件
-	 */
-	plugin: PluginModelInterface;
-	/**
-	 * 节点管理
-	 */
-	node: NodeModelInterface;
-	/**
-	 * 节点id管理器
-	 */
-	nodeId: NodeIdInterface;
-	/**
-	 * List 列表标签管理
-	 */
-	list: ListModelInterface;
-	/**
-	 * Mark 标签管理
-	 */
-	mark: MarkModelInterface;
-	/**
-	 * inline 标签管理
-	 */
-	inline: InlineModelInterface;
-	/**
-	 * block 标签管理
-	 */
-	block: BlockModelInterface;
-	/**
-	 * 事件
-	 */
-	event: EventInterface;
-	/**
-	 * 标签过滤规则
-	 */
-	schema: SchemaInterface;
-	/**
-	 * 标签转换规则
-	 */
-	conversion: ConversionInterface;
-	/**
-	 * 剪切板
-	 */
-	clipboard: ClipboardInterface;
-
-	/**
-	 * 设置滚动节点
-	 * @param node 节点
-	 */
-	setScrollNode(node: HTMLElement): void;
-	/**
-	 * 绑定事件
-	 * @param eventType 事件类型
-	 * @param listener 事件回调
-	 * @param rewrite 是否重写
-	 */
-	on<R = any, F extends EventListener<R> = EventListener<R>>(
-		eventType: string,
-		listener: F,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 全选ctrl+a键按下，返回false，终止处理其它监听
-	 * @param eventType
-	 * @param listener
-	 * @param rewrite
-	 */
-	on(
-		eventType: 'keydown:all',
-		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 卡片最小化时触发
-	 * @param eventType
-	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
-	 */
-	on(
-		eventType: 'card:minimize',
-		listener: (card: CardInterface) => void,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 卡片最大化时触发
-	 * @param eventType
-	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
-	 */
-	on(
-		eventType: 'card:maximize',
-		listener: (card: CardInterface) => void,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML 代码之前触发
-	 * @param root DOM节点
-	 */
-	on(
-		eventType: 'parse:value-before',
-		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
-	 * @param node 当前遍历的节点
-	 * @param attributes 当前节点已过滤后的属性
-	 * @param styles 当前节点已过滤后的样式
-	 * @param value 当前已经生成的xml代码
-	 */
-	on(
-		eventType: 'parse:value',
-		listener: (
-			node: NodeInterface,
-			attributes: { [key: string]: string },
-			styles: { [key: string]: string },
-			value: Array<string>,
-		) => boolean | void,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML。生成xml代码结束后触发
-	 * @param value xml代码
-	 */
-	on(
-		eventType: 'parse:value-after',
-		listener: (value: Array<string>) => void,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 转换为HTML代码之前触发
-	 * @param root 需要转换的根节点
-	 */
-	on(
-		eventType: 'parse:html-before',
-		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 转换为HTML代码
-	 * @param root 需要转换的根节点
-	 */
-	on(
-		eventType: 'parse:html',
-		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 转换为HTML代码之后触发
-	 * @param root 需要转换的根节点
-	 */
-	on(
-		eventType: 'parse:html-after',
-		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 复制DOM节点时触发
-	 * @param node 当前遍历的子节点
-	 */
-	on(
-		eventType: 'copy',
-		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
-	): void;
-	/**
-	 * 移除绑定事件
-	 * @param eventType 事件类型
-	 * @param listener 事件回调
-	 */
-	off(eventType: string, listener: EventListener): void;
-	/**
-	 * 全选ctrl+a键按下，返回false，终止处理其它监听
-	 * @param eventType
-	 * @param listener
-	 */
-	off(
-		eventType: 'keydown:all',
-		listener: (event: KeyboardEvent) => boolean | void,
-	): void;
-	/**
-	 * 卡片最小化时触发
-	 * @param eventType
-	 * @param listener name:插件名称、args:参数
-	 */
-	off(
-		eventType: 'card:minimize',
-		listener: (card: CardInterface) => void,
-	): void;
-	/**
-	 * 卡片最大化时触发
-	 * @param eventType
-	 * @param listener name:插件名称、args:参数
-	 */
-	off(
-		eventType: 'card:maximize',
-		listener: (card: CardInterface) => void,
-	): void;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML 代码之前触发
-	 * @param root DOM节点
-	 */
-	off(
-		eventType: 'parse:value-before',
-		listener: (root: NodeInterface) => void,
-	): void;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
-	 * @param node 当前遍历的节点
-	 * @param attributes 当前节点已过滤后的属性
-	 * @param styles 当前节点已过滤后的样式
-	 * @param value 当前已经生成的xml代码
-	 */
-	off(
-		eventType: 'parse:value',
-		listener: (
-			node: NodeInterface,
-			attributes: { [key: string]: string },
-			styles: { [key: string]: string },
-			value: Array<string>,
-		) => boolean | void,
-	): void;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML。生成xml代码结束后触发
-	 * @param value xml代码
-	 */
-	off(
-		eventType: 'parse:value-after',
-		listener: (value: Array<string>) => void,
-	): void;
-	/**
-	 * 转换为HTML代码之前触发
-	 * @param root 需要转换的根节点
-	 */
-	off(
-		eventType: 'parse:html-before',
-		listener: (root: NodeInterface) => void,
-	): void;
-	/**
-	 * 转换为HTML代码
-	 * @param root 需要转换的根节点
-	 */
-	off(eventType: 'parse:html', listener: (root: NodeInterface) => void): void;
-	/**
-	 * 转换为HTML代码之后触发
-	 * @param root 需要转换的根节点
-	 */
-	off(
-		eventType: 'parse:html-after',
-		listener: (root: NodeInterface) => void,
-	): void;
-	/**
-	 * 复制DOM节点时触发
-	 * @param node 当前遍历的子节点
-	 */
-	off(eventType: 'copy', listener: (root: NodeInterface) => void): void;
-	/**
-	 * 触发事件
-	 * @param eventType 事件名称
-	 * @param args 触发参数
-	 */
-	trigger<R = any>(eventType: string, ...args: any): R;
-	/**
-	 * 全选ctrl+a键按下，返回false，终止处理其它监听
-	 * @param eventType
-	 * @param listener
-	 */
-	trigger(eventType: 'keydown:all', event: KeyboardEvent): boolean | void;
-	/**
-	 * 卡片最小化时触发
-	 * @param eventType
-	 * @param listener name:插件名称、args:参数
-	 */
-	trigger(eventType: 'card:minimize', card: CardInterface): void;
-	/**
-	 * 卡片最大化时触发
-	 * @param eventType
-	 * @param listener name:插件名称、args:参数
-	 */
-	trigger(eventType: 'card:maximize', card: CardInterface): void;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML 代码之前触发
-	 * @param root DOM节点
-	 */
-	trigger(eventType: 'parse:value-before', root: NodeInterface): void;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
-	 * @param node 当前遍历的节点
-	 * @param attributes 当前节点已过滤后的属性
-	 * @param styles 当前节点已过滤后的样式
-	 * @param value 当前已经生成的xml代码
-	 */
-	trigger(
-		eventType: 'parse:value',
-		node: NodeInterface,
-		attributes: { [key: string]: string },
-		styles: { [key: string]: string },
-		value: Array<string>,
-	): boolean | void;
-	/**
-	 * 解析DOM节点，生成符合标准的 XML。生成xml代码结束后触发
-	 * @param value xml代码
-	 */
-	trigger(eventType: 'parse:value-after', value: Array<string>): void;
-	/**
-	 * 转换为HTML代码之前触发
-	 * @param root 需要转换的根节点
-	 */
-	trigger(eventType: 'parse:html-before', root: NodeInterface): void;
-	/**
-	 * 转换为HTML代码
-	 * @param root 需要转换的根节点
-	 */
-	trigger(eventType: 'parse:html', root: NodeInterface): void;
-	/**
-	 * 转换为HTML代码之后触发
-	 * @param root 需要转换的根节点
-	 */
-	trigger(eventType: 'parse:html-after', root: NodeInterface): void;
-	/**
-	 * 复制DOM节点时触发
-	 * @param node 当前遍历的子节点
-	 */
-	trigger(eventType: 'copy', root: NodeInterface): void;
-	/**
-	 * 显示成功的信息
-	 * @param message 信息
-	 */
-	messageSuccess(message: string): void;
-	/**
-	 * 显示错误信息
-	 * @param error 错误信息
-	 */
-	messageError(error: string): void;
-	/**
-	 * 消息确认
-	 * @param message 消息
-	 */
-	messageConfirm(message: string): Promise<boolean>;
-}
-
-export type EngineOptions = {
-	/**
-	 * 本地化语言，默认 zh-CN
-	 */
-	lang?: string;
-	/**
-	 * 本地化语言
-	 */
-	locale?: { [key: string]: {} };
+export interface EngineOptions extends EditorOptions {
 	/**
 	 * 样式名称
 	 */
@@ -452,26 +55,6 @@ export type EngineOptions = {
 	 */
 	tabIndex?: number;
 	/**
-	 * 根节点
-	 */
-	root?: Node;
-	/**
-	 * 滚动条节点，查找父级样式 overflow 或者 overflow-y 为 auto 或者 scroll 的节点
-	 */
-	scrollNode?: Node | (() => Node | null);
-	/**
-	 * 插件配置
-	 */
-	plugins?: Array<PluginEntry>;
-	/**
-	 * 卡片配置
-	 */
-	cards?: Array<CardEntry>;
-	/**
-	 * 插件的可选项
-	 */
-	config?: { [k: string]: PluginOptions };
-	/**
 	 * 占位内容
 	 */
 	placeholder?: string;
@@ -479,24 +62,21 @@ export type EngineOptions = {
 	 * 是否只读
 	 */
 	readonly?: boolean;
-	/**
-	 * 懒惰渲染卡片（仅限已启用 lazyRender 的卡片），默认为 true
-	 */
-	lazyRender?: boolean;
-};
+}
 
-export interface Engine {
+export interface Engine<T extends EngineOptions = EngineOptions> {
 	/**
 	 * 构造函数
 	 */
-	new (selector: Selector, options?: EngineOptions): EngineInterface;
+	new (selector: Selector, options?: T): EngineInterface<T>;
 }
 
-export interface EngineInterface extends EditorInterface {
+export interface EngineInterface<T extends EngineOptions = EngineOptions>
+	extends EditorInterface<T> {
 	/**
 	 * 选项
 	 */
-	options: EngineOptions;
+	options: T;
 	/**
 	 * 是否只读
 	 */

@@ -23,3 +23,4 @@ export * from './tiny-canvas';
 export * from './parser';
 export * from './resizer';
 export * from './position';
+export * from './editor';

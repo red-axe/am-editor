@@ -37,6 +37,11 @@ class Left {
 			event.preventDefault();
 			if (isCenter) {
 				card.select(false);
+			} else if (range.collapsed) {
+				const cardComponent = this.engine.card.find(range.startNode);
+				if (cardComponent && cardComponent.onSelectLeft) {
+					return cardComponent.onSelectLeft(event);
+				}
 			}
 			if (!isCenter && singleSelectable !== false) {
 				this.engine.card.select(card);
@@ -63,6 +68,12 @@ class Left {
 		// 右侧光标
 		const cardRight = range.commonAncestorNode.closest(CARD_RIGHT_SELECTOR);
 		if (cardRight.length > 0) {
+			if (range.collapsed) {
+				const cardComponent = card.find(range.startNode);
+				if (cardComponent && cardComponent.onSelectLeft) {
+					return cardComponent.onSelectLeft(event);
+				}
+			}
 			event.preventDefault();
 			card.select(component);
 			return false;
