@@ -422,7 +422,7 @@ class CardModel implements CardModelInterface {
 		}
 	}
 
-	select(card: CardInterface, event?: MouseEvent) {
+	select(card: CardInterface, event?: MouseEvent | KeyboardEvent) {
 		const editor = this.editor;
 		if (!isEngine(editor)) return;
 		if (
@@ -433,8 +433,12 @@ class CardModel implements CardModelInterface {
 			if (
 				(range.startNode.closest(EDITABLE_SELECTOR).length > 0 &&
 					(!event ||
-						!event?.target ||
-						!this.closest(event.target as Node, false))) ||
+						(event instanceof MouseEvent &&
+							(!event.target ||
+								!this.closest(
+									event.target as Node,
+									false,
+								))))) ||
 				card.isEditable ||
 				card.isMaximize
 			)

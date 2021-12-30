@@ -656,6 +656,13 @@ class NodeModel implements NodeModelInterface {
 				if (nodeDom.length === 0) return range;
 			} else range.insertNode(node);
 		}
+		if (
+			node.nodeType === Node.ELEMENT_NODE &&
+			((node as Element).hasAttribute(READY_CARD_KEY) ||
+				(node as Element).hasAttribute(CARD_KEY))
+		) {
+			return range.collapse(false);
+		}
 		return range
 			.select(
 				node,

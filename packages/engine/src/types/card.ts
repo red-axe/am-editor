@@ -521,8 +521,9 @@ export interface CardModelInterface {
 	/**
 	 * 选中卡片
 	 * @param card 卡片
+	 * @param event 触发事件
 	 */
-	select(card: CardInterface): void;
+	select(card: CardInterface, event?: MouseEvent | KeyboardEvent): void;
 	/**
 	 * 聚焦卡片
 	 * @param card 卡片

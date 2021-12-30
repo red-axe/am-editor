@@ -108,7 +108,7 @@ class Range implements RangeInterface {
 		} else if (startNode.name === 'br') {
 			startNode.remove();
 		}
-		return this.base.insertNode(node);
+		this.base.insertNode(node);
 	}
 
 	isPointInRange(node: Node | NodeInterface, offset: number): boolean {

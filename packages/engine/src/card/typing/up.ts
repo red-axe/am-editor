@@ -11,36 +11,44 @@ class Up {
 	inline(component: CardInterface, event: KeyboardEvent) {
 		const { change, card } = this.engine;
 		const range = change.range.get();
-		event.preventDefault();
-		card.focusPrevBlock(component, range, false);
-		change.range.select(range);
-		return false;
+		const prev = component.root.prev();
+		if (prev) {
+			event.preventDefault();
+			card.focusPrevBlock(component, range, false);
+			change.range.select(range);
+			return false;
+		}
+		return;
 	}
 
 	block(component: CardInterface, event: KeyboardEvent) {
 		const { change, card } = this.engine;
 		const range = change.range.get();
-		event.preventDefault();
-		card.focusPrevBlock(component, range, false);
-		change.range.select(range);
-		return false;
+		const prev = component.root.prev();
+		if (prev) {
+			event.preventDefault();
+			card.focusPrevBlock(component, range, false);
+			change.range.select(range);
+			return false;
+		}
+		return;
 	}
 
 	trigger(event: KeyboardEvent) {
 		const { change, card, block } = this.engine;
 		const range = change.range.get();
-		const singleCard = card.getSingleCard(range);
-		if (!singleCard) {
-			if (range.collapsed) {
-				const closetBlock = block.closest(range.startNode);
-				const prev = closetBlock.prev();
-				if (prev?.isCard()) {
-					const cardComponent = card.find(prev);
-					if (cardComponent && cardComponent.onSelectUp) {
-						return cardComponent.onSelectUp(event);
-					}
+		if (range.collapsed) {
+			const closetBlock = block.closest(range.startNode);
+			const prev = closetBlock.prev();
+			if (prev?.isCard()) {
+				const cardComponent = card.find(prev);
+				if (cardComponent && cardComponent.onSelectUp) {
+					return cardComponent.onSelectUp(event);
 				}
 			}
+		}
+		const singleCard = card.getSingleCard(range);
+		if (!singleCard) {
 			return true;
 		}
 		if (isHotkey('shift+up', event)) {

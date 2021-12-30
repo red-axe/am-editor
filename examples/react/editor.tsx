@@ -98,17 +98,7 @@ export default () => {
 				readonly={isReadonly}
 				onLoad={setEngine}
 				toc={true}
-				ot={{
-					url: `${wsUrl}${member ? '?uid=' + member.id : ''}`,
-					docId: 'demo',
-					onReady: (member) => {
-						if (member)
-							localStorage.setItem(
-								'member',
-								JSON.stringify(member),
-							);
-					},
-				}}
+				ot={false}
 				onSave={onSave}
 			/>
 		</Context.Provider>

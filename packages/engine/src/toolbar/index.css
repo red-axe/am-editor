@@ -238,6 +238,7 @@
 	align-items: center;
     padding: 0 4px;
     cursor: pointer;
+    width: max-content;
 }
 
 .data-toolbar-switch:hover {

@@ -38,7 +38,10 @@ class Tooltip {
 		const left = Math.round(
 			window.pageXOffset + nodeRect.left + nodeWidth / 2 - width / 2,
 		);
-		const top = Math.round(window.pageYOffset + nodeRect.top - height - 2);
+		let top = Math.round(window.pageYOffset + nodeRect.top - height - 2);
+		if (options.placement === 'bottom') {
+			top += nodeRect.height + height + 2;
+		}
 		root.css({
 			left: left + 'px',
 			top: top + 'px',

@@ -100,11 +100,13 @@ class TableComponent<V extends TableValue = TableValue>
 			this.editor.event.listeners['keydown:tab'].unshift(
 				(event: KeyboardEvent) => {
 					if (!isEngine(this.editor)) return;
-					const { change, block, node } = this.editor;
+					const { change, block, node, card } = this.editor;
 
 					const range = change.range.get();
 					const td = range.endNode.closest('td');
 					if (td.length === 0) return;
+					const component = card.closest(td, true);
+					if (!component?.equal(this.root)) return;
 					const closestBlock = block.closest(range.endNode);
 					if (
 						td.length > 0 &&
@@ -150,6 +152,8 @@ class TableComponent<V extends TableValue = TableValue>
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
 				if (td.length === 0) return;
+				const component = card.closest(td, true);
+				if (!component?.equal(this.root)) return;
 				const contentElement = td.find('.table-main-content');
 				if (!contentElement) return;
 				const tdRect = contentElement
@@ -216,6 +220,8 @@ class TableComponent<V extends TableValue = TableValue>
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
 				if (td.length === 0) return;
+				const component = card.closest(td, true);
+				if (!component?.equal(this.root)) return;
 				const contentElement = td.find('.table-main-content');
 				if (!contentElement) return;
 				const tdRect = contentElement
@@ -276,11 +282,13 @@ class TableComponent<V extends TableValue = TableValue>
 			// 左键选择
 			this.editor.on('keydown:left', () => {
 				if (!isEngine(this.editor)) return;
-				const { change } = this.editor;
+				const { change, card } = this.editor;
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
 				if (td.length === 0) return;
+				const component = card.closest(td, true);
+				if (!component?.equal(this.root)) return;
 				const contentElement = td.find('.table-main-content');
 				if (!contentElement) return;
 				if (td.length > 0) {
@@ -292,11 +300,13 @@ class TableComponent<V extends TableValue = TableValue>
 			// 右键选择
 			this.editor.on('keydown:right', () => {
 				if (!isEngine(this.editor)) return;
-				const { change } = this.editor;
+				const { change, card } = this.editor;
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
 				if (td.length === 0) return;
+				const component = card.closest(td, true);
+				if (!component?.equal(this.root)) return;
 				const contentElement = td.find('.table-main-content');
 				if (!contentElement) return;
 				if (td.length > 0) {

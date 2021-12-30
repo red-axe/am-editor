@@ -469,12 +469,15 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 
 .table-wrapper .table-main-content {
-    margin: 4px 8px;
+    margin: 4px 4px;
+    padding: 0 2px;
     position: relative;
     z-index: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.table-wrapper .table-main-content * {
+.table-wrapper .table-main-content [data-card-key] {
     max-width: 100%;
 }
 

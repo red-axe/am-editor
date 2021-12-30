@@ -36,19 +36,44 @@ export default class Popup {
 		const range = Range.from(this.#editor)
 			?.cloneRange()
 			.shrinkToTextNode();
+
 		const selection = window.getSelection();
 		if (
 			!range ||
 			!selection ||
 			!selection.focusNode ||
 			range.collapsed ||
+			this.#editor.card.getSingleSelectedCard(range) ||
 			(!range.commonAncestorNode.inEditor() &&
 				!range.commonAncestorNode.isRoot())
 		) {
 			this.hide();
 			return;
 		}
-		const subRanges = range.getSubRanges();
+		const next = range.startNode.next();
+		if (
+			next?.isElement() &&
+			Math.abs(range.endOffset - range.startOffset) === 1
+		) {
+			const component = this.#editor.card.closest(next);
+			if (component) {
+				this.hide();
+				return;
+			}
+		}
+		const prev = range.startNode.prev();
+		if (
+			prev?.isElement() &&
+			Math.abs(range.startOffset - range.endOffset) === 1
+		) {
+			const component = this.#editor.card.closest(prev);
+			if (component) {
+				this.hide();
+				return;
+			}
+		}
+
+		const subRanges = range.getSubRanges(true);
 		const activeCard = this.#editor.card.active;
 		if (subRanges.length === 0 || (activeCard && !activeCard.isEditable)) {
 			this.hide();

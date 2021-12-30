@@ -94,9 +94,13 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 				const cardComponent = prev ? card.find(prev) : undefined;
 				if (cardComponent?.onSelectUp) {
 					cardComponent.onSelectUp(event);
-				} else {
+				} else if (prev) {
 					card.focusPrevBlock(this, range, false);
 					change.range.select(range);
+				} else {
+					this.focus(range, true);
+					change.range.select(range);
+					return;
 				}
 				this.activate(false);
 				this.toolbarModel?.hide();
@@ -110,9 +114,13 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 				const cardComponent = next ? card.find(next) : undefined;
 				if (cardComponent?.onSelectDown) {
 					cardComponent.onSelectDown(event);
-				} else {
+				} else if (next) {
 					card.focusNextBlock(this, range, false);
 					change.range.select(range);
+				} else {
+					this.focus(range, false);
+					change.range.select(range);
+					return;
 				}
 				this.activate(false);
 				this.toolbarModel?.hide();

@@ -37,6 +37,8 @@ class Left {
 			event.preventDefault();
 			if (isCenter) {
 				card.select(false);
+				card.toolbarModel?.hide();
+				card.activate(false);
 			} else if (range.collapsed) {
 				const cardComponent = this.engine.card.find(range.startNode);
 				if (cardComponent && cardComponent.onSelectLeft) {
@@ -44,9 +46,11 @@ class Left {
 				}
 			}
 			if (!isCenter && singleSelectable !== false) {
-				this.engine.card.select(card);
+				this.engine.card.select(card, event);
 			} else {
 				card.focus(range, true);
+				card.select(false);
+				card.toolbarModel?.hide();
 				change.range.select(range);
 			}
 			return false;
@@ -60,10 +64,14 @@ class Left {
 		// 左侧光标
 		const cardLeft = range.commonAncestorNode.closest(CARD_LEFT_SELECTOR);
 		if (cardLeft.length > 0) {
-			event.preventDefault();
-			card.focusPrevBlock(component, range, false);
-			change.range.select(range);
-			return false;
+			const prev = component.root.prev();
+			if (prev) {
+				event.preventDefault();
+				card.focusPrevBlock(component, range, false);
+				change.range.select(range);
+				return false;
+			}
+			return;
 		}
 		// 右侧光标
 		const cardRight = range.commonAncestorNode.closest(CARD_RIGHT_SELECTOR);
@@ -75,12 +83,14 @@ class Left {
 				}
 			}
 			event.preventDefault();
-			card.select(component);
+			card.select(component, event);
 			return false;
 		}
 		if (card.getSingleSelectedCard(range)) {
 			event.preventDefault();
 			component.focus(range, true);
+			component.select(false);
+			component.toolbarModel?.hide();
 			change.range.select(range);
 			return false;
 		}

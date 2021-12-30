@@ -226,8 +226,9 @@ class ChangeRange implements ChangeRangeInterface {
 		if (node.isCustomize(endNode) && endOffset === 0) {
 			range.setEnd(endNode, 1);
 		}
+		const otStopped = this.engine.ot.isStopped();
 		// 空节点添加br
-		if (startNode.name === 'p') {
+		if (startNode.name === 'p' && !otStopped) {
 			if (startChildNodes.length === 0) startNode.append('<br />');
 			else if (
 				startChildNodes.length > 1 &&
@@ -239,6 +240,7 @@ class ChangeRange implements ChangeRangeInterface {
 		}
 		if (
 			!range.collapsed &&
+			!otStopped &&
 			endNode.name === 'p' &&
 			endNode.children().length === 0
 		) {
@@ -248,6 +250,7 @@ class ChangeRange implements ChangeRangeInterface {
 		// 列表节点没有子节点
 		if (
 			node.isList(startNode) &&
+			!otStopped &&
 			(startChildren.length === 0 || startChildren[0].nodeName === 'BR')
 		) {
 			const newNode = $('<p><br /></p>');
@@ -257,7 +260,7 @@ class ChangeRange implements ChangeRangeInterface {
 			startNode = newNode;
 		}
 		// 空列表添加br
-		if (startNode.name === 'li') {
+		if (startNode.name === 'li' && !otStopped) {
 			if (startChildNodes.length === 0) {
 				startNode.append('<br />');
 			} else if (
@@ -281,7 +284,7 @@ class ChangeRange implements ChangeRangeInterface {
 				startNode.last()?.remove();
 			}
 		}
-		if (!range.collapsed && endNode.name === 'li') {
+		if (!range.collapsed && endNode.name === 'li' && !otStopped) {
 			const endChildNodes = endNode.children();
 			if (endChildNodes.length === 0) {
 				endNode.append('<br />');
@@ -309,6 +312,7 @@ class ChangeRange implements ChangeRangeInterface {
 
 		if (
 			startNode.isEditable() &&
+			!otStopped &&
 			startNode.children().length === 0 &&
 			!this.engine.ot.isStopped
 		) {

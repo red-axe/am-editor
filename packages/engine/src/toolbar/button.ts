@@ -28,15 +28,26 @@ export default class Button implements ButtonInterface {
 		}
 	}
 
+	getPlacement() {
+		const dataPlacement =
+			this.root.closest('.data-toolbar').attributes('data-placement') ||
+			'top';
+		return dataPlacement.startsWith('top') ? 'top' : 'bottom';
+	}
+
 	render(container: NodeInterface) {
 		const { title, didMount, onClick } = this.options;
 		container.append(this.root);
 
 		if (title) {
 			this.root.on('mouseenter', () => {
+				const placement = this.getPlacement();
 				Tooltip.show(
 					this.root,
 					typeof title === 'function' ? title() : title,
+					{
+						placement,
+					},
 				);
 			});
 			this.root.on('mouseleave', () => {

@@ -93,6 +93,7 @@ class Position {
 					points[0] === rect.points[0] && points[1] === rect.points[1]
 				);
 			});
+			this.#container.attributes('data-placement', align);
 			this.#onUpdate({ ...rect, align });
 		}
 	};

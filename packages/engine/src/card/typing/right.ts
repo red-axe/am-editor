@@ -21,6 +21,8 @@ class Right {
 			event.preventDefault();
 			if (isCenter) {
 				card.select(false);
+				card.select(false);
+				card.toolbarModel?.hide();
 			} else if (range.collapsed) {
 				const cardComponent = this.engine.card.find(range.startNode);
 				if (cardComponent && cardComponent.onSelectRight) {
@@ -28,9 +30,11 @@ class Right {
 				}
 			}
 			if (!isCenter && singleSelectable !== false) {
-				this.engine.card.select(card);
+				this.engine.card.select(card, event);
 			} else {
 				card.focus(range, false);
+				card.select(false);
+				card.toolbarModel?.hide();
 				change.range.select(range);
 			}
 			return false;
@@ -63,20 +67,26 @@ class Right {
 				}
 			}
 			event.preventDefault();
-			card.select(component);
+			card.select(component, event);
 			return false;
 		}
 		// 右侧光标
 		const cardRight = range.commonAncestorNode.closest(CARD_RIGHT_SELECTOR);
 		if (cardRight.length > 0) {
-			event.preventDefault();
-			card.focusNextBlock(component, range, false);
-			change.range.select(range);
-			return false;
+			const next = component.root.next();
+			if (next) {
+				event.preventDefault();
+				card.focusNextBlock(component, range, false);
+				change.range.select(range);
+				return false;
+			}
+			return;
 		}
 		if (this.engine.card.getSingleSelectedCard(range)) {
 			event.preventDefault();
 			component.focus(range, false);
+			component.select(false);
+			component.toolbarModel?.hide();
 			change.range.select(range);
 			return false;
 		}

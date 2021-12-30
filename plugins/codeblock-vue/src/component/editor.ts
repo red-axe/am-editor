@@ -132,15 +132,14 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			},
 		});
 		this.codeMirror.on('keydown', (editor, event) => {
-			console.log(editor.getCursor(), editor.lineCount());
 			const lineCount = editor.lineCount();
 			const { line, ch } = editor.getCursor();
 			const { onUpFocus, onDownFocus, onLeftFocus, onRightFocus } =
 				this.options;
+
+			const content = editor.getLine(line);
 			// 在最后一行
-			if (line === lineCount - 1) {
-				const content = editor.getLine(line);
-				if (ch !== content.length) return;
+			if (line === lineCount - 1 && ch === content.length) {
 				// 按下下键
 				if (isHotkey('down', event) || isHotkey('ctrl+n', event)) {
 					if (onDownFocus) onDownFocus(event);

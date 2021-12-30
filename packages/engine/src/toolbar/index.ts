@@ -32,6 +32,11 @@ class Toolbar implements ToolbarInterface {
 		this.root = $(template());
 	}
 
+	getPlacement() {
+		const dataPlacement = this.root.attributes('data-placement') || 'top';
+		return dataPlacement.startsWith('top') ? 'top' : 'bottom';
+	}
+
 	addItems(node: NodeInterface) {
 		this.options.items.forEach((options) => {
 			let item;
@@ -59,9 +64,13 @@ class Toolbar implements ToolbarInterface {
 				const { title } = nodeOptions;
 				if (title) {
 					nodeItem.on('mouseenter', () => {
+						const placement = this.getPlacement();
 						Tooltip.show(
 							nodeItem,
 							typeof title === 'function' ? title() : title,
+							{
+								placement,
+							},
 						);
 					});
 					nodeItem.on('mouseleave', () => {
