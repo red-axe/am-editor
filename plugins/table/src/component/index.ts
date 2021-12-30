@@ -133,8 +133,11 @@ class TableComponent<V extends TableValue = TableValue>
 							this.selection.focusCell(next);
 							return false;
 						}
-					} else if (td.length > 0) {
-						this.scrollbar?.refresh();
+					}
+					if (td.length > 0) {
+						setTimeout(() => {
+							this.scrollbar?.refresh();
+						}, 0);
 					}
 					return;
 				},
@@ -142,7 +145,7 @@ class TableComponent<V extends TableValue = TableValue>
 			// 下键选择
 			this.editor.on('keydown:down', (event) => {
 				if (!isEngine(this.editor)) return;
-				const { change } = this.editor;
+				const { change, card } = this.editor;
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
@@ -182,16 +185,33 @@ class TableComponent<V extends TableValue = TableValue>
 							this.selection.focusCell(nextTd, true);
 							return false;
 						}
+					} else {
+						event.preventDefault();
+						const cloneRange = range.cloneRange();
+						const next = this.root.next();
+						const cardComponent = next
+							? card.find(next)
+							: undefined;
+						if (cardComponent?.onSelectDown) {
+							cardComponent.onSelectDown(event);
+						} else {
+							card.focusNextBlock(this, cloneRange, false);
+							change.range.select(cloneRange);
+						}
+						return false;
 					}
-				} else if (td.length > 0) {
-					this.scrollbar?.refresh();
+				}
+				if (td.length > 0) {
+					setTimeout(() => {
+						this.scrollbar?.refresh();
+					}, 0);
 				}
 				return;
 			});
 			// 上键选择
 			this.editor.on('keydown:up', (event) => {
 				if (!isEngine(this.editor)) return;
-				const { change } = this.editor;
+				const { change, card } = this.editor;
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
@@ -230,11 +250,60 @@ class TableComponent<V extends TableValue = TableValue>
 							this.selection.focusCell(prevTd);
 							return false;
 						}
+					} else {
+						event.preventDefault();
+						const cloneRange = range.cloneRange();
+						const prev = this.root.prev();
+						const cardComponent = prev
+							? card.find(prev)
+							: undefined;
+						if (cardComponent?.onSelectUp) {
+							cardComponent.onSelectUp(event);
+						} else {
+							card.focusPrevBlock(this, cloneRange, false);
+							change.range.select(cloneRange);
+						}
+						return false;
 					}
-				} else if (td.length > 0) {
-					this.scrollbar?.refresh();
+				}
+				if (td.length > 0) {
+					setTimeout(() => {
+						this.scrollbar?.refresh();
+					}, 0);
 				}
 				return;
+			});
+			// 左键选择
+			this.editor.on('keydown:left', () => {
+				if (!isEngine(this.editor)) return;
+				const { change } = this.editor;
+
+				const range = change.range.get();
+				const td = range.endNode.closest('td');
+				if (td.length === 0) return;
+				const contentElement = td.find('.table-main-content');
+				if (!contentElement) return;
+				if (td.length > 0) {
+					setTimeout(() => {
+						this.scrollbar?.refresh();
+					}, 0);
+				}
+			});
+			// 右键选择
+			this.editor.on('keydown:right', () => {
+				if (!isEngine(this.editor)) return;
+				const { change } = this.editor;
+
+				const range = change.range.get();
+				const td = range.endNode.closest('td');
+				if (td.length === 0) return;
+				const contentElement = td.find('.table-main-content');
+				if (!contentElement) return;
+				if (td.length > 0) {
+					setTimeout(() => {
+						this.scrollbar?.refresh();
+					}, 0);
+				}
 			});
 		}
 		if (this.colorTool) return;
@@ -368,6 +437,38 @@ class TableComponent<V extends TableValue = TableValue>
 	}
 
 	onSelectRight(event: KeyboardEvent) {
+		const { tableModel } = this.selection;
+		if (!tableModel) return;
+		for (let r = 0; r < tableModel.rows; r++) {
+			for (let c = 0; c < tableModel.cols; c++) {
+				const cell = tableModel.table[r][c];
+				if (!this.helper.isEmptyModelCol(cell) && cell.element) {
+					event.preventDefault();
+					this.selection.focusCell(cell.element);
+					return false;
+				}
+			}
+		}
+		return;
+	}
+
+	onSelectUp(event: KeyboardEvent) {
+		const { tableModel } = this.selection;
+		if (!tableModel) return;
+		for (let r = tableModel.rows - 1; r >= 0; r--) {
+			for (let c = 0; c < tableModel.cols; c++) {
+				const cell = tableModel.table[r][c];
+				if (!this.helper.isEmptyModelCol(cell) && cell.element) {
+					event.preventDefault();
+					this.selection.focusCell(cell.element, false);
+					return false;
+				}
+			}
+		}
+		return;
+	}
+
+	onSelectDown(event: KeyboardEvent) {
 		const { tableModel } = this.selection;
 		if (!tableModel) return;
 		for (let r = 0; r < tableModel.rows; r++) {

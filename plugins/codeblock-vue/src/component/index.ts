@@ -90,8 +90,14 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 				event.preventDefault();
 				const { change, card } = this.editor;
 				const range = change.range.get().cloneRange();
-				card.focusPrevBlock(this, range, true);
-				change.range.select(range);
+				const prev = this.root.prev();
+				const cardComponent = prev ? card.find(prev) : undefined;
+				if (cardComponent?.onSelectUp) {
+					cardComponent.onSelectUp(event);
+				} else {
+					card.focusPrevBlock(this, range, false);
+					change.range.select(range);
+				}
 				this.activate(false);
 				this.toolbarModel?.hide();
 			},
@@ -100,8 +106,14 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 				event.preventDefault();
 				const { change, card } = this.editor;
 				const range = change.range.get().cloneRange();
-				card.focusNextBlock(this, range, true);
-				change.range.select(range);
+				const next = this.root.next();
+				const cardComponent = next ? card.find(next) : undefined;
+				if (cardComponent?.onSelectDown) {
+					cardComponent.onSelectDown(event);
+				} else {
+					card.focusNextBlock(this, range, false);
+					change.range.select(range);
+				}
 				this.activate(false);
 				this.toolbarModel?.hide();
 			},
