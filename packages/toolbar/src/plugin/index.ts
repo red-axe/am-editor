@@ -20,7 +20,7 @@ type Config = Array<{
 	items: Array<Omit<CollapseItemProps, 'engine'> | string>;
 }>;
 export interface ToolbarOptions extends PluginOptions {
-	config: Config;
+	config?: Config;
 	popup?: {
 		items: GroupItemProps[];
 	};

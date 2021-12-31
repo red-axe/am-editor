@@ -9,14 +9,14 @@ import {
 	Position,
 	DATA_ELEMENT,
 	UI,
-	CardInterface,
 	SelectStyleType,
 	CardValue,
+	AjaxInterface,
 } from '@aomao/engine';
 import CollapseComponent, { CollapseComponentInterface } from './collapse';
 import { MentionItem } from '../types';
 import './index.css';
-1;
+import { MentionOptions } from '../types';
 export interface MentionValue extends CardValue {
 	key?: string;
 	name?: string;
@@ -32,6 +32,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 	#showTimeout?: NodeJS.Timeout;
 	#hideTimeout?: NodeJS.Timeout;
 	#enterLayout?: NodeInterface;
+	#request?: AjaxInterface;
 
 	static get cardName() {
 		return 'mention';
@@ -49,88 +50,41 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		return SelectStyleType.NONE;
 	}
 
-	/**
-	 * 默认数据
-	 */
-	static defaultData?: Array<MentionItem>;
+	getPluginOptions = () => {
+		const mentionOptions =
+			this.editor.plugin.findPlugin<MentionOptions>('mention');
+		return mentionOptions?.options;
+	};
 
-	/**
-	 * 查询
-	 * @param keyword 关键字
-	 * @returns
-	 */
-	static search(keyword: string) {
-		return new Promise<Array<MentionItem>>((resolve) => {
-			resolve([]);
+	search = (keyword: string): Promise<MentionItem[]> => {
+		const options = this.getPluginOptions();
+		if (options && options.onSearch) return options.onSearch(keyword);
+		const reuslt = this.editor.trigger('mention:search', keyword);
+		if (reuslt !== undefined) return reuslt;
+		const { request } = this.editor;
+		return new Promise((resolve) => {
+			if (options?.action) {
+				const { type, contentType, parse } = options;
+				this.#request?.abort();
+				this.#request = request.ajax({
+					url: options.action,
+					contentType: contentType || '',
+					type: type === undefined ? 'json' : type,
+					data: {
+						keyword,
+					},
+					success: (response: any) => {
+						const { result, data } = parse
+							? parse(response)
+							: response;
+						if (!result) return;
+						resolve(data);
+					},
+					method: 'GET',
+				});
+			} else resolve([]);
 		});
-	}
-
-	/**
-	 * 单击
-	 * @param key
-	 * @param name
-	 */
-	static itemClick?: (
-		node: NodeInterface,
-		data: { [key: string]: any },
-	) => void;
-
-	/**
-	 * 鼠标移入
-	 * @param node
-	 * @param key
-	 * @param name
-	 */
-	static mouseEnter?: (
-		node: NodeInterface,
-		data: { [key: string]: any },
-	) => void;
-
-	/**
-	 * 自定义渲染列表
-	 * @param root 根节点
-	 */
-	static set render(
-		fun: (
-			root: NodeInterface,
-			data: MentionItem[],
-			bindItem: (
-				node: NodeInterface,
-				data: { [key: string]: any },
-			) => NodeInterface,
-		) => Promise<string | NodeInterface | void>,
-	) {
-		CollapseComponent.render = fun;
-	}
-
-	static onSelect?: (data: {
-		[key: string]: any;
-	}) => void | { [key: string]: any };
-
-	static onInsert?: (card: CardInterface) => void;
-
-	/**
-	 * 自定义渲染列表项
-	 * @param item 数据项
-	 */
-	static set renderItem(
-		fun: (
-			item: MentionItem,
-			root: NodeInterface,
-		) => string | NodeInterface | void,
-	) {
-		CollapseComponent.renderItem = fun;
-	}
-
-	static renderLoading?: (
-		root: NodeInterface,
-	) => string | NodeInterface | void;
-
-	static set renderEmpty(
-		fun: (root: NodeInterface) => string | NodeInterface | void,
-	) {
-		CollapseComponent.renderEmpty = fun;
-	}
+	};
 
 	init() {
 		if (!this.#position) this.#position = new Position(this.editor);
@@ -139,6 +93,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		}
 		super.init();
 		if (this.component) return;
+		const options = this.getPluginOptions();
 		this.component = new CollapseComponent(this.editor, {
 			onCancel: () => {
 				this.changeToText();
@@ -147,8 +102,8 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 				let newValue =
 					this.editor.trigger('mention:select', data) || {};
 				delete newValue['id'];
-				if (Mention.onSelect) {
-					newValue = Mention.onSelect(data) || {};
+				if (options?.onSelect) {
+					newValue = options.onSelect(data) || {};
 					delete newValue['id'];
 				}
 				const { card } = this.editor;
@@ -164,7 +119,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 				});
 				card.removeNode(this);
 				this.editor.trigger('mention:insert', component);
-				if (Mention.onInsert) Mention.onInsert(component);
+				if (options?.onInsert) options.onInsert(component);
 				card.focus(component, false);
 			},
 		});
@@ -215,17 +170,20 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		const keyword = content.substr(1);
 		// 搜索关键词为空
 		const defaultData =
-			this.editor.trigger('mention:default') || Mention.defaultData;
+			this.editor.trigger<MentionItem[]>('mention:default') ||
+			this.getPluginOptions()?.defaultData;
 		if (keyword === '' && defaultData) {
 			this.component?.render(this.root, defaultData);
 			return;
 		}
-		// if (Mention.renderLoading) {
-		CollapseComponent.renderLoading = Mention.renderLoading;
+
 		this.component?.render(this.root, true);
-		CollapseComponent.renderLoading = undefined;
-		// }
-		Mention.search(keyword).then((data) => {
+
+		const reuslt = this.editor.trigger('mention:search', keyword);
+		if (reuslt !== undefined) {
+			reuslt;
+		}
+		this.search(keyword).then((data) => {
 			this.component?.render(this.root, data);
 		});
 	}
@@ -244,7 +202,8 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 	};
 
 	showEnter = () => {
-		if (!this.#container || !Mention.mouseEnter) return;
+		const options = this.getPluginOptions();
+		if (!this.#container || !options?.mouseEnter) return;
 		const value = this.getValue();
 		if (!value?.name) return;
 		const { id, key, name, ...info } = value;
@@ -265,7 +224,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 				name: unescape(name),
 				...info,
 			});
-			Mention.mouseEnter!(this.#enterLayout, {
+			options?.mouseEnter!(this.#enterLayout, {
 				key: unescape(key || ''),
 				name: unescape(name),
 				...info,
@@ -340,8 +299,8 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 					name: unescape(name),
 					...info,
 				});
-				if (Mention.itemClick)
-					Mention.itemClick(this.#container, {
+				if (options?.itemClick)
+					options?.itemClick(this.#container, {
 						key: unescape(key || ''),
 						name: unescape(name),
 						...info,
@@ -366,6 +325,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		}
 		const language = this.editor.language.get('mention');
 		let timeout: NodeJS.Timeout | undefined = undefined;
+		const options = this.getPluginOptions();
 		// 没有值的情况下，弹出下拉框编辑模式
 		if (!this.#container) {
 			this.#container = $(
@@ -413,12 +373,12 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 			this.component?.render(
 				this.root,
 				this.editor.trigger('mention:default') ||
-					Mention.defaultData ||
+					options?.defaultData ||
 					[],
 			);
 			if (
-				!(Mention.defaultData
-					? Mention.defaultData
+				!(options?.defaultData
+					? options?.defaultData
 					: this.editor.trigger('mention:default'))
 			) {
 				setTimeout(() => {

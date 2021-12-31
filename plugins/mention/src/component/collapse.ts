@@ -10,7 +10,7 @@ import {
 	unescape,
 	escape,
 } from '@aomao/engine';
-import { MentionItem } from '../types';
+import { MentionItem, MentionOptions } from '../types';
 
 export type Options = {
 	onCancel?: () => void;
@@ -34,34 +34,23 @@ class CollapseComponent implements CollapseComponentInterface {
 	private readonly SCOPE_NAME = 'data-mention-component';
 	#position?: Position;
 	#scrollbar?: Scrollbar;
-	static renderItem?: (
-		item: MentionItem,
-		root: NodeInterface,
-	) => string | NodeInterface | void;
 
-	static renderEmpty: (root: NodeInterface) => string | NodeInterface | void =
+	renderEmpty: (root: NodeInterface) => string | NodeInterface | void =
 		() => {
 			return `<div class="data-mention-item"><span class="data-mention-item-text">Empty Data</span></div>`;
 		};
-
-	static renderLoading?: (
-		root: NodeInterface,
-	) => string | NodeInterface | void;
-
-	static render?: (
-		root: NodeInterface,
-		data: MentionItem[],
-		bindItem: (
-			node: NodeInterface,
-			data: { [key: string]: string },
-		) => NodeInterface,
-	) => Promise<string | NodeInterface | void>;
 
 	constructor(engine: EngineInterface, options: Options) {
 		this.otpions = options;
 		this.engine = engine;
 		this.#position = new Position(this.engine);
 	}
+
+	getPluginOptions = () => {
+		const mentionOptions =
+			this.engine.plugin.findPlugin<MentionOptions>('mention');
+		return mentionOptions?.options;
+	};
 
 	handlePreventDefault = (event: Event) => {
 		// Card已被删除
@@ -231,21 +220,23 @@ class CollapseComponent implements CollapseComponentInterface {
 
 		let body = this.getBody();
 		let result = null;
-
+		const options = this.getPluginOptions();
 		if (typeof data === 'boolean' && data === true) {
-			result = CollapseComponent.renderLoading
-				? CollapseComponent.renderLoading(this.root)
+			result = options?.onLoading
+				? options.onLoading(this.root)
 				: this.engine.trigger('mention:loading', this.root);
 			body = this.getBody();
 			if (result) body?.append(result);
 		} else if (data.filter((item) => !!item.key).length === 0) {
 			const result =
 				this.engine.trigger('mention:empty', this.root) ||
-				CollapseComponent.renderEmpty(this.root);
+				(options?.onEmpty
+					? options?.onEmpty(this.root)
+					: this.renderEmpty(this.root));
 			body = this.getBody();
 			if (result) body?.append(result);
 		} else if (
-			CollapseComponent.render ||
+			options?.onRender ||
 			(result = this.engine.trigger(
 				'mention:render',
 				this.root,
@@ -253,8 +244,8 @@ class CollapseComponent implements CollapseComponentInterface {
 				this.bindItem,
 			))
 		) {
-			(CollapseComponent.render
-				? CollapseComponent.render(this.root, data, this.bindItem)
+			(options?.onRender
+				? options.onRender(this.root, data, this.bindItem)
 				: result
 			).then((content: any) => {
 				const body = this.getBody();
@@ -276,8 +267,8 @@ class CollapseComponent implements CollapseComponentInterface {
 				);
 				const result = triggerResult
 					? triggerResult
-					: CollapseComponent.renderItem
-					? CollapseComponent.renderItem(data, this.root!)
+					: options?.renderItem
+					? options.renderItem(data, this.root!)
 					: this.renderTemplate(data);
 				if (!result) return;
 

@@ -19,121 +19,16 @@ import {
 } from '@aomao/engine';
 import MentionComponent, { MentionValue } from './component';
 import locales from './locales';
-import { MentionItem } from './types';
-
-export interface MentionOptions extends PluginOptions {
-	defaultData?: Array<MentionItem>;
-	onSearch?: (keyword: string) => Promise<Array<MentionItem>>;
-	onSelect?: (data: {
-		[key: string]: string;
-	}) => void | { [key: string]: string };
-	onInsert?: (card: CardInterface) => void;
-	onClick?: (node: NodeInterface, data: { [key: string]: string }) => void;
-	onMouseEnter?: (
-		node: NodeInterface,
-		data: { [key: string]: string },
-	) => void;
-	onRender?: (
-		root: NodeInterface,
-		data: MentionItem[],
-		bindItem: (
-			node: NodeInterface,
-			data: { [key: string]: string },
-		) => NodeInterface,
-	) => Promise<string | NodeInterface | void>;
-	onRenderItem?: (
-		item: MentionItem,
-		root: NodeInterface,
-	) => string | NodeInterface | void;
-	onLoading?: (root: NodeInterface) => string | NodeInterface | void;
-	onEmpty?: (root: NodeInterface) => string | NodeInterface | void;
-	spaceTrigger?: boolean;
-	/**
-	 * 查询地址
-	 */
-	action?: string;
-	/**
-	 * 数据返回类型，默认 json
-	 */
-	type?: '*' | 'json' | 'xml' | 'html' | 'text' | 'js';
-	/**
-	 * 额外携带数据上传
-	 */
-	data?: {};
-	/**
-	 * 请求类型，默认 multipart/form-data;
-	 */
-	contentType?: string;
-	/**
-	 * 解析上传后的Respone，返回 result:是否成功，data:成功：文件地址，失败：错误信息
-	 */
-	parse?: (response: any) => {
-		result: boolean;
-		data: Array<MentionItem>;
-	};
-}
+import { MentionOptions } from './types';
 
 class MentionPlugin<
 	T extends MentionOptions = MentionOptions,
 > extends Plugin<T> {
-	#request?: AjaxInterface;
 	static get pluginName() {
 		return 'mention';
 	}
 
 	init() {
-		const {
-			defaultData,
-			onSearch,
-			onSelect,
-			onInsert,
-			onClick,
-			onMouseEnter,
-			onRender,
-			onRenderItem,
-			onLoading,
-			onEmpty,
-			action,
-			contentType,
-			type,
-			parse,
-		} = this.options;
-		const { request } = this.editor;
-		if (defaultData) MentionComponent.defaultData = defaultData;
-		if (onClick) MentionComponent.itemClick = onClick;
-		if (onMouseEnter) MentionComponent.mouseEnter = onMouseEnter;
-		if (onRender) MentionComponent.render = onRender;
-		if (onRenderItem) MentionComponent.renderItem = onRenderItem;
-		if (onLoading) MentionComponent.renderLoading = onLoading;
-		if (onEmpty) MentionComponent.renderEmpty = onEmpty;
-		if (onSelect) MentionComponent.onSelect = onSelect;
-		if (onInsert) MentionComponent.onInsert = onInsert;
-		MentionComponent.search = (keyword: string) => {
-			if (onSearch) return onSearch(keyword);
-			const reuslt = this.editor.trigger('mention:search', keyword);
-			if (reuslt !== undefined) return reuslt;
-			return new Promise((resolve) => {
-				if (action) {
-					this.#request?.abort();
-					this.#request = request.ajax({
-						url: action,
-						contentType: contentType || '',
-						type: type === undefined ? 'json' : type,
-						data: {
-							keyword,
-						},
-						success: (response: any) => {
-							const { result, data } = parse
-								? parse(response)
-								: response;
-							if (!result) return;
-							resolve(data);
-						},
-						method: 'GET',
-					});
-				} else resolve([]);
-			});
-		};
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:at', (event) => this.onAt(event));
 			this.editor.on('parse:value', (node) => this.paserValue(node));
