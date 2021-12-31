@@ -1,3 +1,4 @@
+import { StatusOptions } from '@/types';
 import { CardValue } from '@aomao/engine';
 import {
 	$,
@@ -36,7 +37,7 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 		return SelectStyleType.NONE;
 	}
 
-	static colors: Array<{
+	defaultColors: Array<{
 		background: string;
 		color: string;
 	}> = [
@@ -70,13 +71,19 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 	#editorContainer?: NodeInterface;
 	#statusEditor?: StatusEditor;
 
+	getColors() {
+		const plugin = this.editor.plugin.findPlugin<StatusOptions>('status');
+		return plugin?.options.colors || this.defaultColors;
+	}
+
 	init() {
 		super.init();
 		const { card } = this.editor;
 		if (!this.#position) this.#position = new Position(this.editor);
 		if (this.#statusEditor) return;
+
 		this.#statusEditor = new StatusEditor({
-			colors: Status.colors,
+			colors: this.getColors(),
 			onChange: (
 				text: string,
 				color: {
@@ -159,8 +166,9 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 	}
 
 	getDefaultColor() {
-		return Status.colors.length > 0
-			? Status.colors[0]
+		const colors = this.getColors();
+		return colors.length > 0
+			? colors[0]
 			: {
 					background: '#FFFFFF',
 					color: '#222222',

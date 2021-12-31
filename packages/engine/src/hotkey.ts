@@ -1,6 +1,5 @@
 import isHotkey from 'is-hotkey';
-import { EngineInterface } from './types/engine';
-import { HotkeyInterface } from './types/hotkey';
+import type { EngineInterface, HotkeyInterface } from './types';
 
 /**
  * 快捷键管理器

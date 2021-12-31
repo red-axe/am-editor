@@ -12,10 +12,8 @@ import {
 } from '@aomao/engine';
 import StatusComponent, { StatusValue } from './components';
 import locales from './locales';
+import { StatusOptions } from './types';
 
-export interface StatusOptions extends PluginOptions {
-	hotkey?: string | Array<string>;
-}
 export default class<
 	T extends StatusOptions = StatusOptions,
 > extends Plugin<T> {

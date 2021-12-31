@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { LanguageInterface } from './types/language';
+import type { LanguageInterface } from './types';
 
 /**
  * 语言包管理器
