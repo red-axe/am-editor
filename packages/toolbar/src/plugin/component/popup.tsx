@@ -29,6 +29,7 @@ export default class Popup {
 		if (!isMobile) window.addEventListener('scroll', this.onSelect);
 		window.addEventListener('resize', this.onSelect);
 		this.#editor.scrollNode?.on('scroll', this.onSelect);
+		document.addEventListener('mousedown', this.hide);
 	}
 
 	onSelect = () => {
@@ -146,12 +147,19 @@ export default class Popup {
 		);
 	}
 
-	hide() {
+	hide = (event?: MouseEvent) => {
+		if (event?.target) {
+			if (
+				$(event.target).closest('.data-toolbar-popup-wrapper').length >
+				0
+			)
+				return;
+		}
 		this.#root.css({
 			left: '0px',
 			top: '-9999px',
 		});
-	}
+	};
 
 	destroy() {
 		this.#root.remove();
@@ -163,6 +171,7 @@ export default class Popup {
 		if (!isMobile) window.removeEventListener('scroll', this.onSelect);
 		window.removeEventListener('resize', this.onSelect);
 		this.#editor.scrollNode?.off('scroll', this.onSelect);
+		document.removeEventListener('mousedown', this.hide);
 	}
 }
 export type { GroupItemProps };

@@ -33,6 +33,7 @@
     overflow: auto;
 }
 /** ------------------- popup ---------------------- **/
+/** ------------------- popup ---------------------- **/
 .data-toolbar-popup-wrapper {
     position: absolute;
     z-index: 9999;
@@ -41,4 +42,19 @@
     border-radius: 4px;
     border: 1px solid #dee0e3;
     box-shadow: 0 4px 8px 0 rgba(31, 35, 41, 0.1);
+}
+
+.data-toolbar-popup-wrapper .editor-toolbar-popover {
+    width: max-content;
+}
+
+.data-toolbar-popup-wrapper .editor-toolbar-popover .ant-popover-inner-content {
+    padding: 4px 0;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #dee0e3;
+}
+
+.data-toolbar-popup-wrapper .editor-toolbar-popover .ant-popover-arrow {
+    display: none;
 }

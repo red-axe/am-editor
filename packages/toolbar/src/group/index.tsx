@@ -70,10 +70,10 @@ const ToolbarGroup: React.FC<GroupProps> = ({
 			return (
 				<Popover
 					getPopupContainer={() =>
+						document.querySelector('.data-toolbar-popup-wrapper') ||
 						document.querySelector('.editor-toolbar') ||
 						document.body
 					}
-					trigger="click"
 					overlayClassName="editor-toolbar-popover"
 					content={
 						<div
@@ -87,7 +87,7 @@ const ToolbarGroup: React.FC<GroupProps> = ({
 						</div>
 					}
 					arrowPointAtCenter
-					placement={isMobile ? 'topRight' : 'bottom'}
+					placement={isMobile ? 'topRight' : undefined}
 				>
 					<Button
 						name="group-popover"

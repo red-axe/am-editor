@@ -5,7 +5,7 @@
         trigger="click"
         overlay-class-name="editor-toolbar-popover"
         :arrow-point-at-center="true"
-        :placement="isMobile ? 'topRight' : 'bottom'"
+        :placement="isMobile ? 'topRight' : undefined"
         >
             <template #content>
                 <div :class="['editor-toolbar', {'editor-toolbar-mobile': isMobile && !popup,
@@ -58,7 +58,7 @@ export default defineComponent({
         }
     },
     methods:{
-        getPopupContainer:() => document.querySelector('.editor-toolbar') || document.body
+        getPopupContainer:() => document.querySelector('.data-toolbar-popup-wrapper') || document.querySelector('.editor-toolbar') || document.body
     }
 })
 </script>

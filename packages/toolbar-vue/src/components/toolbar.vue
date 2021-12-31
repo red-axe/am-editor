@@ -11,7 +11,7 @@
     @contextmenu="triggerContextMenu"
     >
         <div class="editor-toolbar-content">
-            <am-group v-for="(group,index) in groups" :key="index" :engine="engine" v-bind="group" />
+            <am-group v-for="(group,index) in groups" :key="index" :engine="engine" :popup="popup" v-bind="group" />
         </div>
     </div>
 </template>

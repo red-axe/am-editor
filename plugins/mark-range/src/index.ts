@@ -641,7 +641,8 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		const container = this.editor.container.clone(value ? false : true);
 		container.css({
 			position: 'fixed',
-			top: 0,
+			top: '-999px',
+			width: '100%',
 			clip: 'rect(0, 0, 0, 0)',
 		});
 		$(document.body).append(container);
@@ -745,7 +746,8 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		if (value) value = Selection.removeTags(value);
 		container.css({
 			position: 'fixed',
-			top: 0,
+			top: '-999px',
+			width: '100%',
 			clip: 'rect(0, 0, 0, 0)',
 		});
 		$(document.body).append(container);

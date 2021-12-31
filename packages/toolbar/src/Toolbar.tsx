@@ -322,7 +322,12 @@ const Toolbar: React.FC<ToolbarProps> = ({
 		>
 			<div className="editor-toolbar-content">
 				{data.map((group, index) => (
-					<ToolbarGroup key={index} engine={engine} {...group} />
+					<ToolbarGroup
+						key={index}
+						engine={engine}
+						popup={popup}
+						{...group}
+					/>
 				))}
 			</div>
 		</div>

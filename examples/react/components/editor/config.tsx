@@ -368,12 +368,12 @@ export const toolbarOptions: ToolbarOptions = {
 	// 				{
 	// 					type: 'button',
 	// 					name: 'orderedlist',
-	// 					icon: 'orderedlist',
+	// 					icon: 'ordered-list',
 	// 				},
 	// 				{
 	// 					type: 'button',
-	// 					name: 'unorderedlist',
-	// 					icon: 'unorderedlist',
+	// 					name: 'unordered-list',
+	// 					icon: 'unordered-list',
 	// 				},
 	// 				{
 	// 					type: 'button',
