@@ -41,19 +41,21 @@ new Engine(...,{
 
 可以通过 `StatusComponent.colors` 修改或增加到默认颜色列表中
 
-`colors` 是 `StatusComponent` 的静态属性，它的类型如下：
-
 ```ts
-static colors: Array<{
-    background: string,
-    color: string,
-    border?: string
-}>
+new Engine(...,{
+    config:{
+        "status":{
+            colors: Array<{
+								background: string,
+								color: string
+						}>
+        }
+    }
+})
 ```
 
 -   `background` 背景颜色
 -   `color` 字体颜色
--   `border` 可选，在颜色列表中可以设置边框颜色，除了可以美化外，在比较接近白色的色块中可能肉眼不好观察到，也可以设置边框
 
 ```ts
 //默认颜色列表
@@ -61,32 +63,26 @@ static colors: Array<{
 	{
 		background: '#FFE8E6',
 		color: '#820014',
-		border: '#FF4D4F',
 	},
 	{
 		background: '#FCFCCA',
 		color: '#614700',
-		border: '#FFEC3D',
 	},
 	{
 		background: '#E4F7D2',
 		color: '#135200',
-		border: '#73D13D',
 	},
 	{
 		background: '#E9E9E9',
 		color: '#595959',
-		border: '#E9E9E9',
 	},
 	{
 		background: '#D4EEFC',
 		color: '#003A8C',
-		border: '#40A9FF',
 	},
 	{
 		background: '#DEE8FC',
 		color: '#061178',
-		border: '#597EF7',
 	},
 ];
 ```

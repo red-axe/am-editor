@@ -2,7 +2,7 @@
 
 Status plugin
 
-## Installation
+## Install
 
 ```bash
 $ yarn add @aomao/plugin-status
@@ -41,19 +41,20 @@ new Engine(...,{
 
 Can be modified or added to the default color list through `StatusComponent.colors`
 
-`colors` is a static property of `StatusComponent`, and its type is as follows:
-
 ```ts
-static colors: Array<{
-    background: string,
-    color: string,
-    border?: string
+new Engine(...,{
+    config:{
+        "status":{
+            colors: Array<{
+background: string,
+color: string
 }>
+        }
+    }
+})
 ```
 
--   `background` background color
--   `color` font color
--   `border` is optional. You can set the border color in the color list. In addition to beautification, it may not be visible to the naked eye in a color block that is close to white, and you can also set the border
+-`background` background color -`color` font color
 
 ```ts
 //Default color list
@@ -61,37 +62,31 @@ static colors: Array<{
 	{
 		background: '#FFE8E6',
 		color: '#820014',
-		border: '#FF4D4F',
 	},
 	{
 		background: '#FCFCCA',
 		color: '#614700',
-		border: '#FFEC3D',
 	},
 	{
 		background: '#E4F7D2',
 		color: '#135200',
-		border: '#73D13D',
 	},
 	{
 		background: '#E9E9E9',
 		color: '#595959',
-		border: '#E9E9E9',
 	},
 	{
 		background: '#D4EEFC',
 		color: '#003A8C',
-		border: '#40A9FF',
 	},
 	{
 		background: '#DEE8FC',
 		color: '#061178',
-		border: '#597EF7',
 	},
 ];
 ```
 
-## Command
+## Order
 
 ```ts
 engine.command.execute('status');
