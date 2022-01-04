@@ -1,6 +1,7 @@
 import { EngineInterface } from '../types/engine';
 import { Attribute, Member, SelectionInterface } from '../types/ot';
-import { isTransientElement, RangePath } from '..';
+import { isTransientElement } from './utils';
+import { RangePath } from '../types/range';
 import { CardType } from '../card/enum';
 
 class OTSelection implements SelectionInterface {
