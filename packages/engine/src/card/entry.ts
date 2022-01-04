@@ -55,6 +55,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 	static readonly lazyRender: boolean = false;
 	private defaultMaximize: MaximizeInterface;
 	isMaximize: boolean = false;
+	private _id: string;
 
 	get isEditable() {
 		return this.contenteditable.length > 0;
@@ -81,6 +82,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 	}
 
 	get id() {
+		if (this._id) return this._id;
 		const value = this.getValue();
 		return typeof value === 'object' ? value?.id || '' : '';
 	}
@@ -122,6 +124,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		if (typeof value === 'string') value = decodeCardValue(value);
 		value = value || ({} as T);
 		value.id = this.getId(value.id);
+		this._id = value.id;
 		value.type = type;
 		this.setValue(value);
 		this.defaultMaximize = new Maximize(this.editor, this);

@@ -11,6 +11,7 @@ import {
 	UI,
 	SelectStyleType,
 	CardValue,
+	unescape,
 	AjaxInterface,
 } from '@aomao/engine';
 import CollapseComponent, { CollapseComponentInterface } from './collapse';
@@ -120,7 +121,15 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 				card.removeNode(this);
 				this.editor.trigger('mention:insert', component);
 				if (options?.onInsert) options.onInsert(component);
-				card.focus(component, false);
+				if (isEngine(this.editor)) {
+					const { change } = this.editor;
+					const range = change.range.get().cloneRange();
+					range.setStartAfter(component.root.get()!);
+					range.collapse(true);
+					change.range.select(range);
+				} else {
+					card.focus(component, false);
+				}
 			},
 		});
 	}
@@ -344,7 +353,9 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 				this.resetPlaceHolder();
 				// 在 Windows 上使用中文输入法，在 keydown 事件里无法阻止用户的输入，所以在这里删除用户的输入
 				if (Date.now() - renderTime < 200) {
-					const textNode = this.#keyword?.first();
+					const textNode = this.#keyword
+						?.allChildren()
+						.find((child) => child.isText());
 					if (
 						textNode &&
 						textNode.isText() &&
@@ -370,12 +381,6 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 					selection?.addRange(range.toRange());
 				}
 			}, 10);
-			this.component?.render(
-				this.root,
-				this.editor.trigger('mention:default') ||
-					options?.defaultData ||
-					[],
-			);
 			if (
 				!(options?.defaultData
 					? options?.defaultData
@@ -384,6 +389,13 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 				setTimeout(() => {
 					this.handleInput();
 				}, 50);
+			} else {
+				this.component?.render(
+					this.root,
+					this.editor.trigger('mention:default') ||
+						options?.defaultData ||
+						[],
+				);
 			}
 		}
 		// 可编辑下，展示模式

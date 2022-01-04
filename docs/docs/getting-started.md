@@ -14,9 +14,11 @@ The following three plugins are different
 
 -   `@aomao/plugin-link` link input, text input, using the existing UI of the front-end library is a better choice
 
-[React case](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/engine.tsx)
+**`Vue2`** example [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
 
-[Vue case](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
+**`Vue3`** example [https://github.com/yanmao-cc/am-editor/tree/master/examples/vue](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
+
+**`React`** example [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
 ### Installation
 
@@ -54,7 +56,8 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -110,7 +113,8 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -170,7 +174,8 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -253,7 +258,8 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -304,7 +310,8 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});

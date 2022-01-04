@@ -297,6 +297,16 @@ export default class<
 										...data,
 										cover: customizeResult.data.cover,
 									};
+								if (customizeResult.data.width !== undefined)
+									data = {
+										...data,
+										width: customizeResult.data.width,
+									};
+								if (customizeResult.data.height !== undefined)
+									data = {
+										...data,
+										height: customizeResult.data.height,
+									};
 								result.data = { ...data };
 							}
 						} else {

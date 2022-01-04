@@ -25,6 +25,12 @@
     max-width: 250px;
 }
 
+.data-mention-component-empty {
+    padding: 0;
+    box-shadow: none;
+    border: none;
+}
+
 .data-mention-component-body {
     max-height: calc(40vh);
     overflow: hidden;

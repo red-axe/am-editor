@@ -86,8 +86,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 		this._container.init();
 		// 编辑器改变时
 		this.change = new Change(this, {
-			onChange: (value, trigger) =>
-				this.trigger('change', value, trigger),
+			onChange: (trigger) => this.trigger('change', trigger),
 			onSelect: () => this.trigger('select'),
 			onRealtimeChange: (trigger) => {
 				if (this.isEmpty()) {

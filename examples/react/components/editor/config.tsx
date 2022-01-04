@@ -235,9 +235,9 @@ export const mathOptions: MathOptions = {
 
 export const mentionOptions: MentionOptions = {
 	action: '/api/user/search',
-	onLoading: (root: NodeInterface) => {
-		return ReactDOM.render(<Loading />, root.get<HTMLElement>()!);
-	},
+	// onLoading: (root: NodeInterface) => {
+	// 	return ReactDOM.render(<Loading />, root.get<HTMLElement>()!);
+	// },
 	onEmpty: (root: NodeInterface) => {
 		return ReactDOM.render(<Empty />, root.get<HTMLElement>()!);
 	},

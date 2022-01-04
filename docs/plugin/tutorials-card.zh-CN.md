@@ -308,7 +308,8 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});

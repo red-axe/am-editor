@@ -47,12 +47,14 @@ class MentionPlugin<
 		}
 		return true;
 	}
-
+	private renderTime = Date.now();
 	onAt(event: KeyboardEvent) {
 		if (!isEngine(this.editor)) return;
+		if (Date.now() - this.renderTime < 200) {
+			return false;
+		}
 		const { change } = this.editor;
 		let range = change.range.get();
-
 		// 空格触发
 		if (this.options.spaceTrigger) {
 			const selection = range.createSelection();
@@ -82,6 +84,7 @@ class MentionPlugin<
 			range.collapse(false);
 			change.range.select(range);
 		}
+		this.renderTime = Date.now();
 		return false;
 	}
 

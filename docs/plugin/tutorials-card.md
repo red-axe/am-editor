@@ -308,7 +308,8 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});

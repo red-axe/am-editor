@@ -1,8 +1,8 @@
 ---
-title: 快速上手
+title: 安装
 ---
 
-## 快速上手
+## 介绍
 
 除引擎库纯`javascript`编写外，我们所提供的插件中，小部分插件 UI 比较复杂，使用前端库来渲染 UI 是一项比较轻松的工作。
 
@@ -14,9 +14,11 @@ title: 快速上手
 
 -   `@aomao/plugin-link` 链接输入、文本输入，使用前端库现有的 UI 是比较好的选择
 
-[React 案例](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/engine.tsx)
+**`Vue2`** 案例 [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
 
-[Vue 案例](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
+**`Vue3`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/vue](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
+
+**`React`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
 ### 安装
 
@@ -54,7 +56,8 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -110,7 +113,8 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -170,7 +174,8 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -253,7 +258,8 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -304,7 +310,8 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});

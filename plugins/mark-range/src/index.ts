@@ -93,7 +93,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 
 		if (isEngine(this.editor)) {
 			const { change } = this.editor;
-			this.editor.on('change', (_, trigger) => {
+			this.editor.on('change', (trigger) => {
 				this.triggerChange(trigger !== 'local');
 			});
 			this.editor.on('select', this.onSelectionChange);

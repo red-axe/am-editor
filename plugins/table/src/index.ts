@@ -6,13 +6,12 @@ import {
 	NodeInterface,
 	Plugin,
 	SchemaBlock,
-	PluginOptions,
 	SchemaInterface,
 	getDocument,
-	Parser,
 	READY_CARD_KEY,
 	decodeCardValue,
 	CARD_VALUE_KEY,
+	CARD_SELECTOR,
 } from '@aomao/engine';
 import TableComponent, { Template, Helper } from './component';
 import locales from './locale';
@@ -378,10 +377,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			`[${CARD_KEY}="${TableComponent.cardName}"],[${READY_CARD_KEY}="${TableComponent.cardName}"]`,
 		).each((tableNode) => {
 			const node = $(tableNode);
-			const card = this.editor.card.find<TableValue>(node);
-			const value =
-				card?.getValue() ||
-				decodeCardValue(node.attributes(CARD_VALUE_KEY));
+			const value = decodeCardValue<TableValue>(
+				node.attributes(CARD_VALUE_KEY),
+			);
 			if (value && value.html) {
 				let table = node.find('table');
 				if (table.length === 0) {
@@ -391,7 +389,10 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 						node.remove();
 						return;
 					} else {
-						table = $(new Parser(table, this.editor).toHTML());
+						const cards = table.find(CARD_SELECTOR).toArray();
+						cards.forEach((componentNode) => {
+							this.editor.trigger('parse:html', componentNode);
+						});
 					}
 				}
 				const width = table.attributes('width') || table.css('width');

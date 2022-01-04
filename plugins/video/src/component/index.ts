@@ -204,7 +204,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 
 		const url = sanitizeUrl(this.onBeforeRender('query', value.url));
 		const video = document.createElement('video');
-		video.preload = 'none';
+		video.preload = 'metadata';
 		video.setAttribute('src', url);
 		video.setAttribute('webkit-playsinline', 'webkit-playsinline');
 		video.setAttribute('playsinline', 'playsinline');
@@ -222,7 +222,20 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		video.oncontextmenu = function () {
 			return false;
 		};
-
+		video.onloadedmetadata = () => {
+			if (!value.naturalWidth) {
+				value.naturalWidth = video.videoWidth || this.video?.width();
+				this.setValue({
+					naturalWidth: value.naturalWidth,
+				} as T);
+			}
+			if (value.naturalWidth && !value.naturalHeight) {
+				this.rate =
+					(video.videoHeight || this.video?.height() || 1) /
+					value.naturalWidth;
+			}
+			this.resetSize();
+		};
 		this.video = $(video);
 		this.title = this.container?.find('.data-video-title');
 		this.resetSize();
@@ -386,11 +399,15 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	initResizer() {
 		const value = this.getValue();
 		if (!value) return;
-		const { naturalHeight, naturalWidth, status } = value;
-		if (!naturalHeight || !naturalWidth || status !== 'done') return;
+		let { naturalHeight, naturalWidth, status } = value;
+		if (!naturalWidth || status !== 'done') return;
 		const { width, height, cover } = value;
 		this.maxWidth = this.getMaxWidth();
-		this.rate = naturalHeight / naturalWidth;
+		if (!naturalHeight) {
+			naturalHeight = Math.round(this.rate * naturalWidth);
+		} else {
+			this.rate = naturalHeight / naturalWidth;
+		}
 		window.removeEventListener('resize', this.onWindowResize);
 		window.addEventListener('resize', this.onWindowResize);
 		// 拖动调整视频大小

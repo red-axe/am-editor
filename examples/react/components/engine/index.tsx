@@ -12,7 +12,7 @@ import 'antd/es/modal/style';
 
 export type EngineProps = EngineOptions & {
 	defaultValue?: string;
-	onChange?: (content: string, trigger: 'remote' | 'local' | 'both') => void;
+	onChange?: (trigger: 'remote' | 'local' | 'both') => void;
 	ref?: React.Ref<EngineInterface | null>;
 };
 message.config({
@@ -57,8 +57,8 @@ const EngineComponent: React.FC<EngineProps> = forwardRef<
 		};
 	}, []);
 
-	const change = (value: string, trigger: 'remote' | 'local' | 'both') => {
-		if (onChange) onChange(value, trigger);
+	const change = (trigger: 'remote' | 'local' | 'both') => {
+		if (onChange) onChange(trigger);
 	};
 
 	useEffect(() => {

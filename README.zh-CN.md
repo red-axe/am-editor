@@ -1,7 +1,7 @@
 # am-editor
 
 <p align="center">
-	一个富文本<em>协同</em>编辑器框架，可以使用<em>React</em>和<em>Vue</em>自定义插件
+	一个支持协同编辑的富文本编辑器，可以自由的使用React、Vue 等前端常用库扩展定义插件。
 </p>
 
 <p align="center">
@@ -34,14 +34,6 @@
 
 `广告`：[科学上网，方便、快捷的上网冲浪](https://xiyou4you.us/r/?s=18517120) 稳定、可靠，访问 Github 或者其它外网资源很方便。
 
-使用浏览器提供的 `contenteditable` 属性让一个 DOM 节点具有可编辑能力。
-
-引擎接管了浏览器大部分光标、事件等默认行为。
-
-可编辑器区域内的节点通过 `schema` 规则，制定了 `mark` `inline` `block` `card` 4 种组合节点，他们由不同的属性、样式或 `html` 结构组成，并对它们的嵌套进行了一定的约束。
-
-通过 `MutationObserver` 监听编辑区域内的 `DOM` 树的改变，并生成 `json0` 类型的数据格式与 [ShareDB](https://github.com/share/sharedb) 库进行交互，从而达到协同编辑的需要。
-
 **`Vue2`** 案例 [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
 
 **`Vue3`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/vue](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
@@ -51,6 +43,104 @@
 **`Vue2 DEMO`** [https://github.com/yanmao-cc/am-editor-demo-vue2](https://github.com/yanmao-cc/am-editor-demo-vue2)
 
 **`Vue2 Nuxt DEMO`** [https://github.com/yanmao-cc/am-editor-nuxt](https://github.com/yanmao-cc/am-editor-nuxt)
+
+## 基本原理
+
+使用浏览器提供的 `contenteditable` 属性让一个 DOM 节点具有可编辑能力：
+
+```html
+<div contenteditable="true"></div>
+```
+
+所以它的值看起来像是这样的：
+
+```html
+<div data-element="root" contenteditable="true">
+	<p>Hello world!</p>
+	<p><br /></p>
+</div>
+```
+
+当然，有些场景下为了方便操作，也提供了转换为 JSON 类型值的 API：
+
+```json
+[
+	"div", // 节点名称
+	// 节点所有的属性
+	{
+		"data-element": "root",
+		"contenteditable": "true"
+	},
+	// 子节点1
+	[
+		// 子节点名称
+		"p",
+		// 子节点属性
+		{},
+		// 字节点的子节点
+		"Hello world!"
+	],
+	// 子节点2
+	["p", {}, ["br", {}]]
+]
+```
+
+<Alert>
+  编辑器依赖 <strong>contenteditable</strong> 属性提供的输入能力以及光标的控制能力。因此，它拥有所有的默认浏览器行为，但是浏览器的默认行为在不同的浏览器厂商实现下存在不同的处理方式，所以我们其大部分默认行为进行了拦截并进行自定义的处理。
+</Alert>
+
+比如输入的过程中 `beforeinput` `input`， 删除、回车以及快捷键涉及到的 `mousedown` `mouseup` `click` 等事件都会被拦截，并进行自定义的处理。
+
+在对事件进行接管后，编辑器所做的事情就是管理好基于 `contenteditable` 属性根节点下的所有子节点了，比如插入文本、删除文本、插入图片等等。
+
+综上所述，编辑中的数据结构是一个 DOM 树结构，所有的操作都是对 DOM 树直接进行操作，不是典型的以数据模型驱动视图渲染的 MVC 模式。
+
+## 节点约束
+
+为了更方便的管理节点，降低复杂性。编辑器抽象化了节点属性和功能，制定了 `mark` `inline` `block` `card` 4 种类型节点，他们由不同的属性、样式或 `html` 结构组成，并统一使用 `schema` 对它们进行约束。
+
+一个简单的 `schema` 看起来像是这样：
+
+```ts
+{
+  name: 'p', // 节点名称
+  type: 'block' // 节点类型
+}
+```
+
+除此之外，还可以描述属性、样式等，比如：
+
+```ts
+{
+  name: 'span', // 节点名称
+  type: 'mark', // 节点类型
+  attributes: {
+    // 节点有一个 style 属性
+    style: {
+      // 必须包含一个color的样式
+      color: {
+        required: true, // 必须包含
+        value: '@color' // 值是一个符合css规范的颜色值，@color 是编辑器内部定义的颜色效验，此处也可以使用方法、正则表达式去判断是否符合需要的规则
+      }
+    },
+    // 可选的包含一个 test 属性，他的值可以是任意的，但不是必须的
+    test: '*'
+  }
+}
+```
+
+下面这几种节点都符合上面的规则：
+
+```html
+<span style="color:#fff"></span>
+<span style="color:#fff" test="test123" test1="test1"></span>
+<span style="color:#fff;background-color:#000;"></span>
+<span style="color:#fff;background-color:#000;" test="test123"></span>
+```
+
+但是除了在 color 和 test 已经在 `schema` 中定义外，其它的属性(background-color、test1)在处理时都会被编辑器过滤掉。
+
+可编辑器区域内的节点通过 `schema` 规则，制定了 `mark` `inline` `block` `card` 4 种组合节点，他们由不同的属性、样式或 `html` 结构组成，并对它们的嵌套进行了一定的约束。
 
 ## 特性
 
@@ -149,7 +239,8 @@ const EngineDemo = () => {
 		//设置编辑器值
 		engine.setValue(content);
 		//监听编辑器值改变事件
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -247,7 +338,7 @@ return (
 
 ### 协同编辑
 
-协同编辑基于 [ShareDB](https://github.com/share/sharedb) 开源库实现，比较陌生的朋友可以先了解它。
+通过 `MutationObserver` 监听编辑区域(contenteditable 根节点)内的 `html` 结构的突变反推 OT。通过`Websocket`与 [ShareDB](https://github.com/share/sharedb) 连接，然后使用命令对 ShareDB 保存的数据进行增、删、改、查。
 
 #### 交互模式
 
@@ -287,18 +378,18 @@ otClient.connect(
 
 ### React
 
-需要在 `am-editor 根目录` `site-ssr` `ot-server` 中分别安装依赖
+需要在 `am-editor 安装依赖
 
 ```base
 //依赖安装好后，只需要在根目录执行以下命令
 
-yarn ssr
+yarn start
 ```
 
 -   `packages` 引擎和工具栏
 -   `plugins` 所有的插件
--   `site-ssr` 所有的后端 API 和 SSR 配置。使用的 egg 。在 am-editor 根目录下使用 yarn ssr 自动启动 `site-ssr`
--   `ot-server` 协同服务端。启动：yarn start
+-   `api` 支持一些插件所需要的 api 访问，默认使用 https://editor.aomao.com 作为 api 服务
+-   `ot-server` 协同服务端。启动：yarn dev
 
 启动后访问 localhost:7001
 
@@ -319,7 +410,7 @@ yarn serve
 -   在 am-editor 根目录下执行安装所有依赖命令，例如：`yarn`
 -   最后在 examples/vue 中重新启动
 
-`Vue` 案例中没有配置任何后端 API，具体可以参考 `React` 和 `site-ssr`
+`Vue` 案例中没有配置任何后端 API，具体可以参考 `React` 和 `api` 设置反向代理
 
 ## 贡献
 

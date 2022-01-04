@@ -1,7 +1,7 @@
 # am-editor
 
 <p align="center">
-	A rich text <em>collaborative</em> editor framework that can use <em>React</em> and <em>Vue</em> custom plug-ins
+	A rich text editor that supports collaborative editing, you can freely use React, Vue and other front-end common libraries to extend and define plug-ins.
 </p>
 
 <p align="center">
@@ -34,12 +34,6 @@
 
 > Thanks to Google Translate
 
-Use the `contenteditable` attribute provided by the browser to make a DOM node editable.
-
-The engine takes over most of the browser's default behaviors such as cursors and events.
-
-Monitor the changes of the `DOM` tree in the editing area through `MutationObserver`, and generate a data format of `json0` type to interact with the [ShareDB](https://github.com/share/sharedb) library to achieve collaborative editing Needs.
-
 **`Vue2`** example [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
 
 **`Vue3`** example [https://github.com/yanmao-cc/am-editor/tree/master/examples/vue](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
@@ -49,6 +43,104 @@ Monitor the changes of the `DOM` tree in the editing area through `MutationObser
 **`Vue2 DEMO`** [https://github.com/yanmao-cc/am-editor-demo-vue2](https://github.com/yanmao-cc/am-editor-demo-vue2)
 
 **`Vue2 Nuxt DEMO`** [https://github.com/yanmao-cc/am-editor-nuxt](https://github.com/yanmao-cc/am-editor-nuxt)
+
+## Fundamental
+
+Use the `contenteditable` attribute provided by the browser to make a DOM node editable:
+
+```html
+<div contenteditable="true"></div>
+```
+
+So its value looks like this:
+
+```html
+<div data-element="root" contenteditable="true">
+	<p>Hello world!</p>
+	<p><br /></p>
+</div>
+```
+
+Of course, in some scenarios, for the convenience of operation, an API that converts to a JSON type value is also provided:
+
+```json
+[
+	"div", // node name
+	// All attributes of the node
+	{
+		"data-element": "root",
+		"contenteditable": "true"
+	},
+	// child node 1
+	[
+		// child node name
+		"p",
+		// Child node attributes
+		{},
+		// child node of byte point
+		"Hello world!"
+	],
+	// child node 2
+	["p", {}, ["br", {}]]
+]
+```
+
+<Alert>
+  The editor relies on the input capabilities provided by the <strong>contenteditable</strong> attribute and cursor control capabilities. Therefore, it has all the default browser behaviors, but the default behavior of the browser has different processing methods under different browser vendors' implementations, so we intercept most of its default behaviors and customize them.
+</Alert>
+
+For example, during the input process, `beforeinput`, `input`, delete, enter, and shortcut keys related to `mousedown`, `mouseup`, `click` and other events will be intercepted and customized processing will be performed.
+
+After taking over the event, what the editor does is to manage all the child nodes under the root node based on the `contenteditable` property, such as inserting text, deleting text, inserting pictures, and so on.
+
+In summary, the data structure in editing is a DOM tree structure, and all operations are performed directly on the DOM tree, not a typical MVC mode that drives view rendering with a data model.
+
+## Node constraints
+
+In order to manage nodes more conveniently and reduce complexity. The editor abstracts node attributes and functions, and formulates four types of nodes, `mark`, `inline`, `block`, and `card`. They are composed of different attributes, styles, or `html` structures, and use the `schema` uniformly. They are constrained.
+
+A simple `schema` looks like this:
+
+```ts
+{
+  name:'p', // node name
+  type:'block' // node type
+}
+```
+
+In addition, you can also describe attributes, styles, etc., such as:
+
+```ts
+{
+  name:'span', // node name
+  type:'mark', // node type
+  attributes: {
+    // The node has a style attribute
+    style: {
+      // Must contain a color style
+      color: {
+        required: true, // must contain
+        value:'@color' // The value is a color value that conforms to the css specification. @color is the color validation defined in the editor. Here, methods and regular expressions can also be used to determine whether the required rules are met
+      }
+    },
+    // Optional include a test attribute, its value can be arbitrary, but it is not required
+    test:'*'
+  }
+}
+```
+
+The following types of nodes conform to the above rules:
+
+```html
+<span style="color:#fff"></span>
+<span style="color:#fff" test="test123" test1="test1"></span>
+<span style="color:#fff;background-color:#000;"></span>
+<span style="color:#fff;background-color:#000;" test="test123"></span>
+```
+
+But except that color and test have been defined in `schema`, other attributes (background-color, test1) will be filtered out by the editor during processing.
+
+The nodes in the editable area have four types of combined nodes of `mark`, `inline`, block`, and `card`through the`schema`rule. They are composed of different attributes, styles or`html` structures. Certain constraints are imposed on nesting.
 
 ## Features
 
@@ -147,7 +239,8 @@ const EngineDemo = () => {
 		//Set the editor value
 		engine.setValue(content);
 		//Listen to the editor value change event
-		engine.on('change', (value) => {
+		engine.on('change', () => {
+			const value = engine.getValue();
 			setContent(value);
 			console.log(`value:${value}`);
 		});
@@ -245,7 +338,7 @@ For more complex toolbar configuration, please check the document [https://edito
 
 ### Collaborative editing
 
-Collaborative editing is implemented based on the [ShareDB](https://github.com/share/sharedb) open source library. Those who are unfamiliar can learn about it first.
+Use the `MutationObserver` to monitor the mutation of the `html` structure in the editable area (contenteditable root node) to reverse infer OT. Connect to [ShareDB](https://github.com/share/sharedb) through `Websocket`, and then use commands to add, delete, modify, and check the data saved in ShareDB.
 
 #### Interactive mode
 
@@ -285,18 +378,18 @@ otClient.connect(
 
 ### React
 
-Need to install dependencies separately in `am-editor root directory` `site-ssr` `ot-server`
+Need to install dependencies in `am-editor
 
 ```base
 //After the dependencies are installed, you only need to execute the following commands in the root directory
 
-yarn ssr
+yarn start
 ```
 
 -   `packages` engine and toolbar
 -   `plugins` all plugins
--   `site-ssr` All backend API and SSR configuration. The egg used. Use yarn ssr in the am-editor root directory to automatically start `site-ssr`
--   `ot-server` collaborative server. Start: yarn start
+-   `api` supports api access required by some plugins. By default, https://editor.aomao.com is used as the api service
+-   `ot-server` collaborative server. Start: yarn dev
 
 Visit localhost:7001 after startup
 
@@ -317,7 +410,7 @@ In the Vue runtime environment, the default is the installed code that has been 
 -   Execute and install all dependent commands in the root directory of am-editor, for example: `yarn`
 -   Finally restart in examples/vue
 
-There is no backend API configured in the `Vue` case. For details, please refer to `React` and `site-ssr`
+No back-end API is configured in the `Vue` case. For details, please refer to `React` and `api` to set reverse proxy
 
 ## Contribution
 

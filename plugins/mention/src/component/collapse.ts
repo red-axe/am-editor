@@ -210,15 +210,36 @@ class CollapseComponent implements CollapseComponentInterface {
 		return this.root?.find('.data-mention-component-body');
 	}
 
-	render(target: NodeInterface, data: Array<MentionItem> | true) {
-		this.remove();
+	createRoot() {
 		this.root = $(
 			`<div class="data-mention-component-list" ${DATA_ELEMENT}="${UI}"><div class="data-mention-component-body"></div></div>`,
 		);
+	}
+
+	renderRootEmpty() {
+		const body = this.getBody();
+		const children = body?.children();
+		if (
+			body &&
+			body.length > 0 &&
+			(children?.length === 0 ||
+				(children?.length === 1 &&
+					children.eq(0)?.hasClass('data-scrollbar')))
+		) {
+			this.root?.addClass('data-mention-component-empty');
+		} else {
+			this.root?.removeClass('data-mention-component-empty');
+		}
+	}
+
+	render(target: NodeInterface, data: Array<MentionItem> | true) {
+		if (!this.root) this.createRoot();
+		if (!this.root) return;
 
 		this.target = target;
 
 		let body = this.getBody();
+
 		let result = null;
 		const options = this.getPluginOptions();
 		if (typeof data === 'boolean' && data === true) {
@@ -257,8 +278,14 @@ class CollapseComponent implements CollapseComponentInterface {
 				this.bindEvents();
 				this.#scrollbar?.refresh();
 			});
+			this.renderRootEmpty();
 			return;
 		} else {
+			if (!body || body.length === 0) {
+				this.createRoot();
+				body = this.getBody();
+			}
+			body?.empty();
 			data.forEach((data) => {
 				const triggerResult = this.engine.trigger(
 					'mention:render-item',
@@ -267,8 +294,8 @@ class CollapseComponent implements CollapseComponentInterface {
 				);
 				const result = triggerResult
 					? triggerResult
-					: options?.renderItem
-					? options.renderItem(data, this.root!)
+					: options?.onRenderItem
+					? options.onRenderItem(data, this.root!)
 					: this.renderTemplate(data);
 				if (!result) return;
 
@@ -276,6 +303,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			});
 			this.select(0);
 		}
+		this.renderRootEmpty();
 		if (body) this.#scrollbar = new Scrollbar(body, false, true, false);
 		this.bindEvents();
 		this.#scrollbar?.refresh();

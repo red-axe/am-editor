@@ -205,8 +205,8 @@ export default defineComponent({
                 }
                 
                 // 监听编辑器值改变事件
-                engineInstance.on('change', value => {
-                    console.log('value', value);
+                engineInstance.on('change', () => {
+                    console.log('value', engineInstance.getValue());
                     console.log('html:', engineInstance.getHtml());
                 });
                 

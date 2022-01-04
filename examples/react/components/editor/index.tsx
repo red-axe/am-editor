@@ -108,14 +108,15 @@ const EditorComponent: React.FC<EditorProps> = ({
 		},
 		// 编辑器值改变事件
 		onChange: useCallback(
-			(value: string, trigger: 'remote' | 'local' | 'both') => {
+			(trigger: 'remote' | 'local' | 'both') => {
 				if (loading) return;
-				setValue(value);
 				//自动保存，非远程更改，触发保存
 				if (trigger !== 'remote') autoSave();
-				if (props.onChange) props.onChange(value, trigger);
+				if (props.onChange) props.onChange(trigger);
+				const value = engine.current?.getValue();
 				// 获取编辑器的值
 				console.log(`value ${trigger} update:`, value);
+				setValue(value || '');
 				// 获取当前所有at插件中的名单
 				// console.log(
 				// 	'mention:',

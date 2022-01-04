@@ -103,7 +103,7 @@ export type ChangeOptions = {
 	/**
 	 * 值改变事件
 	 */
-	onChange?: (value: string, trigger: 'remote' | 'local' | 'both') => void;
+	onChange?: (trigger: 'remote' | 'local' | 'both') => void;
 	/**
 	 * 光标选择事件
 	 */
@@ -185,7 +185,7 @@ export interface ChangeInterface {
 	/**
 	 * 编辑器值改变触发
 	 */
-	onChange: (value: string, trigger: 'remote' | 'local' | 'both') => void;
+	onChange: (trigger: 'remote' | 'local' | 'both') => void;
 	/**
 	 * 编辑器中光标改变触发
 	 */

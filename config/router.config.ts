@@ -6,12 +6,12 @@ export default (opts: {
 		'/docs': [
 			{
 				title: 'Introduction',
-				'title_zh-CN': '介绍',
+				'title_zh-CN': '基础',
 				children: ['/docs/README', '/docs/getting-started'],
 			},
 			{
 				title: 'Basis',
-				'title_zh-CN': '基础',
+				'title_zh-CN': '概念',
 				children: [
 					'/docs/concepts-node',
 					'/docs/concepts-schema',
@@ -24,7 +24,7 @@ export default (opts: {
 			},
 			{
 				title: 'Resource',
-				'title_zh-CN': '资源文件',
+				'title_zh-CN': '资源',
 				children: ['/docs/resources-icon'],
 			},
 			{

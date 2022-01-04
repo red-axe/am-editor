@@ -24,7 +24,7 @@ class ChangeModel implements ChangeInterface {
 	private changeTimer: NodeJS.Timeout | null = null;
 	event: ChangeEvent;
 	valueCached: string | null = null;
-	onChange: (value: string, trigger: 'remote' | 'local' | 'both') => void;
+	onChange: (trigger: 'remote' | 'local' | 'both') => void;
 	onRealtimeChange: (trigger: 'remote' | 'local') => void;
 	onSelect: (range?: RangeInterface) => void;
 	onSetValue: () => void;
@@ -72,20 +72,14 @@ class ChangeModel implements ChangeInterface {
 	private _change() {
 		if (!this.isComposing()) {
 			this.engine.card.gc();
-			const value = this.getValue({
-				ignoreCursor: true,
-			});
-			if (!this.valueCached || value !== this.valueCached) {
-				const trigger =
-					this.changeTrigger.length === 2
-						? 'both'
-						: this.changeTrigger[0] === 'remote'
-						? 'remote'
-						: 'local';
-				this.onChange(value, trigger);
-				this.changeTrigger = [];
-				this.valueCached = value;
-			}
+			const trigger =
+				this.changeTrigger.length === 2
+					? 'both'
+					: this.changeTrigger[0] === 'remote'
+					? 'remote'
+					: 'local';
+			this.onChange(trigger);
+			this.changeTrigger = [];
 		}
 	}
 
