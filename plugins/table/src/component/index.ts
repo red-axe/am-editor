@@ -319,7 +319,7 @@ class TableComponent<V extends TableValue = TableValue>
 		if (this.colorTool) return;
 		this.colorTool = new ColorTool(this.editor, this.id, {
 			colors: TableComponent.colors,
-			defaultColor: this.getValue()?.color,
+			defaultColor: super.getValue()?.color,
 			onChange: (color: string) => {
 				this.setValue({
 					color,
@@ -356,14 +356,14 @@ class TableComponent<V extends TableValue = TableValue>
 				title: language['noBorder'],
 				content: '<span class="data-icon data-icon-no-border"></span>',
 				didMount: (node) => {
-					const value = this.getValue();
+					const value = super.getValue();
 					if (value?.noBorder === true) {
 						node.addClass('active');
 					}
 					this.noBorderToolButton = node;
 				},
 				onClick: (_, node) => {
-					const value = this.getValue();
+					const value = super.getValue();
 					this.setValue({
 						noBorder: !value?.noBorder,
 					} as V);
@@ -802,7 +802,6 @@ class TableComponent<V extends TableValue = TableValue>
 
 	render() {
 		Template.isReadonly = !isEngine(this.editor) || this.editor.readonly;
-		const value = this.getValue();
 		// 重新渲染
 		if (
 			this.wrapper &&
@@ -875,6 +874,7 @@ class TableComponent<V extends TableValue = TableValue>
 			}, 10);
 			return;
 		}
+		const value = this.getValue();
 		// 第一次渲染
 		if (!value) return 'Error value';
 		if (value.html) {
