@@ -17,6 +17,7 @@ import { DATA_ID } from './constants';
 /**
  * 标签规则
  */
+const SCHEMA_KEYS = ['blocks', 'inlines', 'marks', 'globals'];
 class Schema implements SchemaInterface {
 	private _all: Array<SchemaRule> = [];
 	private _typeMap: {
@@ -150,7 +151,7 @@ class Schema implements SchemaInterface {
 	 */
 	find(callback: (rule: SchemaRule) => boolean): Array<SchemaRule> {
 		const schemas: Array<SchemaRule> = [];
-		Object.keys(this.data).forEach((key) => {
+		SCHEMA_KEYS.forEach((key) => {
 			if (key !== 'globals') {
 				const rules = (this.data[key] as Array<SchemaRule>).filter(
 					callback,
@@ -368,9 +369,7 @@ class Schema implements SchemaInterface {
 		const rule = this.getRule(node);
 		if (!rule) return;
 		const { globals } = this.data;
-		const globalRule = Object.keys(globals).find(
-			(dataType) => rule.type === dataType,
-		);
+		const globalRule = globals[rule.type] ? rule.type : undefined;
 		const allRule = {
 			...omit(rule, 'attributes'),
 			attributes: merge(

@@ -12,7 +12,6 @@ import {
 	DATA_ELEMENT,
 	DATA_ID,
 	DATA_TRANSIENT_ELEMENT,
-	EDITABLE_SELECTOR,
 	UI,
 } from './constants/root';
 import Selection from './selection';

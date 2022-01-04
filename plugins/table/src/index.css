@@ -469,8 +469,8 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 
 .table-wrapper .table-main-content {
-    margin: 4px 4px;
-    padding: 0 2px;
+    margin: 2px 2px;
+    padding: 4px 4px;
     position: relative;
     z-index: 3;
     overflow: hidden;
