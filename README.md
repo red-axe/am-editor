@@ -63,26 +63,26 @@ So its value looks like this:
 
 Of course, in some scenarios, for the convenience of operation, an API that converts to a JSON type value is also provided:
 
-```json
+```ts
 [
-	"div", // node name
+	'div', // node name
 	// All attributes of the node
 	{
-		"data-element": "root",
-		"contenteditable": "true"
+		'data-element': 'root',
+		contenteditable: 'true',
 	},
 	// child node 1
 	[
 		// child node name
-		"p",
+		'p',
 		// Child node attributes
 		{},
 		// child node of byte point
-		"Hello world!"
+		'Hello world!',
 	],
 	// child node 2
-	["p", {}, ["br", {}]]
-]
+	['p', {}, ['br', {}]],
+];
 ```
 
 <Alert>

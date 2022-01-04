@@ -63,26 +63,26 @@
 
 当然，有些场景下为了方便操作，也提供了转换为 JSON 类型值的 API：
 
-```json
+```ts
 [
-	"div", // 节点名称
+	'div', // 节点名称
 	// 节点所有的属性
 	{
-		"data-element": "root",
-		"contenteditable": "true"
+		'data-element': 'root',
+		contenteditable: 'true',
 	},
 	// 子节点1
 	[
 		// 子节点名称
-		"p",
+		'p',
 		// 子节点属性
 		{},
 		// 字节点的子节点
-		"Hello world!"
+		'Hello world!',
 	],
 	// 子节点2
-	["p", {}, ["br", {}]]
-]
+	['p', {}, ['br', {}]],
+];
 ```
 
 <Alert>
