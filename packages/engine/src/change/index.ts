@@ -360,8 +360,14 @@ class ChangeModel implements ChangeInterface {
 		if (!isCollapsed) {
 			this.delete(range, onlyOne || !isBlockLast, followActiveMark);
 		} else if (range.startNode.isText()) {
+			const inlineNode = inline.closest(range.startNode);
 			const text = range.startNode.text();
-			if (/^\u200B/.test(text)) range.startNode.text(text.substr(1));
+			if (
+				inlineNode.length === 0 &&
+				!inlineNode.equal(range.startNode) &&
+				/^\u200B/.test(text)
+			)
+				range.startNode.text(text.substr(1));
 		}
 		let startRange: { node: NodeInterface; offset: number } | undefined =
 			undefined;
