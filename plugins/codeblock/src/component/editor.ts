@@ -96,6 +96,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			if (onFocus) onFocus();
 		});
 		this.codeMirror.on('keydown', (editor, event) => {
+			event.stopPropagation();
 			const lineCount = editor.lineCount();
 			const { line, ch } = editor.getCursor();
 			const { onUpFocus, onDownFocus, onLeftFocus, onRightFocus } =
