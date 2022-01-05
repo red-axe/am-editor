@@ -24,6 +24,7 @@ import locales from './locales';
 export interface CodeBlockOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
+	alias?: Record<string, string>;
 }
 
 // 缩写替换
@@ -38,6 +39,7 @@ const MODE_ALIAS = {
 	vb: 'basic',
 	md: 'markdown',
 	'c++': 'cpp',
+	'c#': 'csharp',
 };
 
 export default class<
@@ -104,7 +106,8 @@ export default class<
 			const modeText = (
 				undefined === match[1] ? '' : match[1]
 			).toLowerCase();
-			const mode = MODE_ALIAS[modeText] || modeText;
+			const alias = { ...(this.options.alias || {}), ...MODE_ALIAS };
+			const mode = alias[modeText] || modeText;
 
 			if (mode || mode === '') {
 				event.preventDefault();

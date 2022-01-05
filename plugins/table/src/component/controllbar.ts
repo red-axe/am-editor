@@ -456,7 +456,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @returns
 	 */
 	onMouseDownColsHeader = (event: MouseEvent | TouchEvent) => {
-		event.preventDefault();
 		const trigger = $(event.target || []).closest(
 			Template.COLS_HEADER_TRIGGER_CLASS,
 		);
@@ -477,7 +476,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 * @returns
 	 */
 	onMouseDownRowsHeader = (event: MouseEvent | TouchEvent) => {
-		event.preventDefault();
 		const trigger = $(event.target || []).closest(
 			Template.ROWS_HEADER_TRIGGER_CLASS,
 		);

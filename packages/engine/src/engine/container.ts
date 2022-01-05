@@ -1,4 +1,4 @@
-import { DATA_ELEMENT, ROOT } from '../constants';
+import { DATA_ELEMENT, ROOT, UI_SELECTOR } from '../constants';
 import { EngineInterface, NodeInterface, Selector } from '../types';
 import { $ } from '../node';
 import { isMobile } from '../utils';
@@ -15,6 +15,7 @@ class Container {
 	private options: Options;
 	private node: NodeInterface;
 	private _focused: boolean = false;
+	private _isMousedown = false;
 
 	constructor(selector: Selector, options: Options) {
 		this.node = $(selector);
@@ -93,29 +94,35 @@ class Container {
 				engine.change.apply(range);
 			}
 		});
-		let isMousedown = false;
+		document.addEventListener('mousedown', this.docMouseDown);
 		this.node.on(isMobile ? 'touchstart' : 'mousedown', () => {
-			isMousedown = true;
+			this._isMousedown = true;
 			setTimeout(() => {
 				if (!this._focused) {
 					this._focused = true;
 					engine.trigger('focus');
 				}
-				isMousedown = false;
+				this._isMousedown = false;
 			}, 10);
 		});
 		this.node.on('focus', () => {
-			isMousedown = false;
+			this._isMousedown = false;
 			this._focused = true;
 			engine.trigger('focus');
 		});
 		this.node.on('blur', () => {
-			if (isMousedown) return;
-			isMousedown = false;
+			if (this._isMousedown) return;
+			this._isMousedown = false;
 			this._focused = false;
 			engine.trigger('blur');
 		});
 	}
+
+	docMouseDown = (e: MouseEvent) => {
+		if (e.target && $(e.target).closest(UI_SELECTOR).length > 0) {
+			this._isMousedown = true;
+		}
+	};
 
 	isFocus() {
 		return this._focused;
@@ -148,6 +155,7 @@ class Container {
 
 	destroy() {
 		const { className, engine } = this.options;
+		document.removeEventListener('mousedown', this.docMouseDown);
 		this.node.removeAttributes(DATA_ELEMENT);
 		this.node.removeAttributes('contenteditable');
 		this.node.removeAttributes('role');

@@ -247,7 +247,7 @@ class CollapseComponent implements CollapseComponentInterface {
 				? options.onLoading(this.root)
 				: this.engine.trigger('mention:loading', this.root);
 			body = this.getBody();
-			if (result) body?.append(result);
+			if (result) body?.empty().append(result);
 		} else if (data.filter((item) => !!item.key).length === 0) {
 			const result =
 				this.engine.trigger('mention:empty', this.root) ||
@@ -255,7 +255,7 @@ class CollapseComponent implements CollapseComponentInterface {
 					? options?.onEmpty(this.root)
 					: this.renderEmpty(this.root));
 			body = this.getBody();
-			if (result) body?.append(result);
+			if (result) body?.empty().append(result);
 		} else if (
 			options?.onRender ||
 			(result = this.engine.trigger(
@@ -270,7 +270,7 @@ class CollapseComponent implements CollapseComponentInterface {
 				: result
 			).then((content: any) => {
 				const body = this.getBody();
-				if (content) body?.append(content);
+				if (content) body?.empty().append(content);
 				this.#scrollbar?.destroy();
 				if (body)
 					this.#scrollbar = new Scrollbar(body, false, true, false);
