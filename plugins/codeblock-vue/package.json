@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.0",
-    "@types/lodash": "^4.17.4",
+    "@types/lodash": "^4.14.178",
     "@vue/compiler-sfc": "^3.2.9"
   }
 }
