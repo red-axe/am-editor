@@ -29,6 +29,8 @@
         "vue": "^3.2.9"
     },
     "devDependencies": {
-        "@vue/compiler-sfc": "^3.2.9"
+        "@vue/compiler-sfc": "^3.2.9",
+        "@types/keymaster": "^1.6.28",
+        "@types/lodash": "^4.14.178"
     }
 }

@@ -178,9 +178,26 @@ export default class Paste {
 					}
 					return false;
 				};
-				rootChildren.forEach((child) => {
+				/**
+				 * <ul><ul></ul><li></li></ul>
+				 * <ul><li></li><ul></ul><li></li></ul>
+				 * <ul><li></li><ul></ul></ul>
+				 */
+				rootChildren.forEach((child, index) => {
 					if (!child) return;
 					if (child.equal(node)) {
+						// 最后一个位置加入到右边
+						if (rootChildren.length - 1 === index) {
+							appendToTemp();
+							rightList.push(node);
+						}
+						// 在第一个位置，加入到最左边
+						else if (index === 0) leftList.push(node);
+						// 中间位置，先append，然后加入到左边
+						else {
+							appendToTemp();
+							leftList.push(node);
+						}
 						isLeft = false;
 						return;
 					}
@@ -195,8 +212,8 @@ export default class Paste {
 				});
 				appendToTemp();
 				const indent = parent.attributes('data-indent') || '0';
-				this.engine.list.addIndent(node, parseInt(indent, 10));
-				leftList.push(node);
+				node.attributes('data-indent', indent);
+				this.engine.list.addIndent(node, 1);
 				let prev = parent;
 				leftList.forEach((childNode) => {
 					const child = $(childNode);
@@ -211,7 +228,7 @@ export default class Paste {
 					prev = child;
 				});
 				parent.remove();
-				return node.next() || undefined;
+				return node || undefined;
 			}
 			// 补齐 li
 			if (node.name !== 'li' && parentIsList) {
@@ -269,7 +286,8 @@ export default class Paste {
 					if (isList) {
 						const indent =
 							$(leftLast)?.attributes('data-indent') || '0';
-						this.engine.list.addIndent(node, parseInt(indent, 10));
+						node.attributes('data-indent', indent);
+						this.engine.list.addIndent(node, 1);
 						leftList[leftList.length] = node[0];
 						li = null;
 						return;
