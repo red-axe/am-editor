@@ -18,12 +18,9 @@ export type CommentItemProps = Omit<
 	onOk: (event: React.MouseEvent) => void;
 	onEdit: (itme: DataItem, info_id: number) => void;
 	onRemove: (id: string, info_id: number) => void;
-} & { ref: React.Ref<HTMLDivElement> };
+};
 
-const CommentItem: React.FC<CommentItemProps> = forwardRef<
-	HTMLDivElement,
-	CommentItemProps
->(
+const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(
 	(
 		{
 			item,

@@ -59,7 +59,7 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 		const loading = useSelector((state) => state.loading['comment/fetch']);
 		useEffect(() => {
 			if (loading) return;
-			const list: Array<DataItem> = [];
+			const tempList: Array<DataItem> = [];
 			dataSource.forEach((item: DataSourceItem) => {
 				//获取评论编号对应在编辑器中的所有节点
 				const elements: Array<NodeInterface> =
@@ -74,14 +74,14 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 				//获取目标评论在编辑器中的 top
 				const top = getRectTop(elements[0]);
 				if (top < 0) return;
-				list.push({
+				tempList.push({
 					...item,
 					top,
-					type: 'view',
+					type: list.find((c) => c.id === item.id)?.type || 'view',
 				});
 			});
 			//根据top大小排序，越小排在越前面
-			updateList(list.sort((a, b) => (a.top < b.top ? -1 : 1)));
+			updateList(tempList.sort((a, b) => (a.top < b.top ? -1 : 1)));
 		}, [loading, dataSource]);
 
 		const remove = (render_id: string, id: number) => {

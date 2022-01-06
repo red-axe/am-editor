@@ -701,7 +701,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 						.shrinkToElementNode()
 						.shrinkToTextNode()
 						.toPath(undefined, container);
-					paths.push({
+					paths.unshift({
 						id: id.split(','),
 						path: rangePath
 							? [rangePath.start.path, rangePath.end.path]
