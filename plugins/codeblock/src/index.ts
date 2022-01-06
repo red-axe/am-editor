@@ -256,6 +256,7 @@ export default class<
 		});
 		const langs = Object.keys(nameMaps)
 			.concat(Object.keys(MODE_ALIAS))
+			.concat(Object.keys(this.options.alias || {}))
 			.sort((a, b) => (a.length > b.length ? -1 : 1));
 
 		const createCodeblock = (
@@ -305,7 +306,8 @@ export default class<
 					match[1].indexOf(mode) === 0
 						? match[1].substr(mode.length + 1)
 						: match[1];
-				mode = MODE_ALIAS[mode] || mode;
+				const alias = { ...(this.options.alias || {}), ...MODE_ALIAS };
+				mode = alias[mode] || mode;
 				nodes.push(code);
 			} else if (isCode) {
 				nodes.push(row);
