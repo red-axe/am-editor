@@ -56,6 +56,37 @@ items: [
 
 如果通过 `name` 属性找到了默认配置，那么 `type` 属性是不会被覆盖的。如果配置的`name`不属于默认配置的一部分，就按照自定义按钮处理
 
+## 弹出框
+
+跟随鼠标拖蓝选中后的工具栏弹出框
+
+```ts
+import { ToolbarPlugin } from '@aomao/toolbar';
+import type { ToolbarOptions } from '@aomao/toolbar';
+const toolbarOptions: ToolbarOptions = {
+	popup: {
+		items: [
+			['undo', 'redo'],
+			{
+				icon: 'text',
+				items: [
+					'bold',
+					'italic',
+					'strikethrough',
+					'underline',
+					'backcolor',
+					'moremark',
+				],
+			},
+		],
+	},
+};
+new Engine(...,{ config: {
+    [ToolbarPlugin.pluginName]: toolbarOptions,
+} })
+
+```
+
 ## Collapse
 
 通常用于配置卡片下拉框

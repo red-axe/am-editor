@@ -52,6 +52,37 @@ items: [
 
 If the default configuration is found through the `name` attribute, the `type` attribute will not be overwritten. If the configured `name` is not part of the default configuration, it will be processed according to the custom button
 
+## pop-up windows
+
+Follow the mouse to drag the selected toolbar pop-up box
+
+```ts
+import {ToolbarPlugin} from'@aomao/toolbar';
+import type {ToolbarOptions} from'@aomao/toolbar';
+const toolbarOptions: ToolbarOptions = {
+    popup: {
+        items: [
+            ['undo','redo'],
+            {
+                icon:'text',
+                items: [
+                    'bold',
+                    'italic',
+                    'strikethrough',
+                    'underline',
+                    'backcolor',
+                    'moremark',
+                ],
+            },
+        ],
+    },
+};
+new Engine(...,{ config: {
+     [ToolbarPlugin.pluginName]: toolbarOptions,
+} })
+
+```
+
 ## Collapse
 
 Usually used to configure the card drop-down box
