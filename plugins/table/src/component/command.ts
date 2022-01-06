@@ -457,9 +457,9 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		this.editor.card.remove(this.table.id);
 	}
 
-	copy() {
+	copy(all: boolean = false) {
 		const { selection, helper } = this.table;
-		const areaHtml = selection.getSelectionHtml();
+		const areaHtml = selection.getSelectionHtml(all);
 		if (!areaHtml) return;
 		this.editor.clipboard.copy($(areaHtml)[0]);
 		helper.copyHTML(areaHtml);

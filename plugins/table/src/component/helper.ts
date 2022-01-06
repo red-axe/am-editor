@@ -32,7 +32,7 @@ class Helper implements HelperInterface {
 	isEmptyModelCol(
 		model: TableModelCol | TableModelEmptyCol,
 	): model is TableModelEmptyCol {
-		return (model as TableModelEmptyCol).isEmpty;
+		return model && (model as TableModelEmptyCol).isEmpty;
 	}
 
 	/**

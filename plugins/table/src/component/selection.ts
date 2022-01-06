@@ -369,6 +369,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		for (let row = fBeginRow; row > -1 && row <= fEndRow; row++) {
 			for (let col = fBeginCol; col > -1 && col <= fEndCol; col++) {
 				const cell = this.tableModel.table[row][col];
+				if (!cell) continue;
 				if (this.table.helper.isEmptyModelCol(cell)) {
 					if (beginRow > cell.parent.row) beginRow = cell.parent.row;
 					if (beginCol >= cell.parent.col) beginCol = cell.parent.col;
@@ -409,7 +410,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			for (let r = beginRow; r <= endRow; r++) {
 				for (let c = beginCol; c <= endCol; c++) {
 					const col = this.tableModel.table[r][c];
-					if (!this.table.helper.isEmptyModelCol(col)) {
+					if (col && !this.table.helper.isEmptyModelCol(col)) {
 						if (!isSame && col.element) {
 							$(col.element).attributes(
 								'table-cell-selection',
@@ -424,6 +425,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		if (isSame && begin.row > -1 && begin.col > -1) {
 			const cell = this.tableModel.table[begin.row][begin.col];
 			if (
+				cell &&
 				!this.table.helper.isEmptyModelCol(cell) &&
 				cell.element &&
 				!this.prevMouseDownTd?.equal(cell.element)
@@ -871,11 +873,18 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		} else this.select(begin, { ...end, row: triggerRow });
 	}
 
-	getSelectionHtml() {
+	getSelectionHtml(all: boolean = false) {
 		const { tableModel } = this;
 		const { helper } = this.table;
 		if (!tableModel || !this.tableRoot) return null;
-		const { begin, end } = this.getSelectArea();
+		let begin = { row: 0, col: 0 };
+		let end = { row: tableModel.rows - 1, col: tableModel.cols - 1 };
+		if (!all) {
+			const area = this.getSelectArea();
+			begin = area.begin;
+			end = area.end;
+		}
+
 		const colsEl = this.tableRoot.find('col');
 		let cols = [];
 		let tableWidth = 0;

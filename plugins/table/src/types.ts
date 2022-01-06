@@ -293,7 +293,7 @@ export interface TableCommandInterface extends EventEmitter2 {
 
 	removeTable(): void;
 
-	copy(): void;
+	copy(all?: boolean): void;
 
 	mockCopy(): void;
 
@@ -373,7 +373,7 @@ export interface TableSelectionInterface extends EventEmitter2 {
 
 	clearSelect(): void;
 
-	getSelectionHtml(): string | null;
+	getSelectionHtml(all?: boolean): string | null;
 
 	hasMergeCell(): boolean;
 

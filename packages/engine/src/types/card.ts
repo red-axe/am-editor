@@ -75,6 +75,7 @@ export type CardToolbarItemOptions =
 			disabled?: boolean;
 			content?: string;
 			title?: string;
+			onClick?: (event: MouseEvent, node: NodeInterface) => void;
 	  }
 	| {
 			type: 'more';

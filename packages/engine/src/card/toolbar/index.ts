@@ -119,17 +119,20 @@ class CardToolbar implements CardToolbarInterface {
 					content:
 						item.content ||
 						`<span class="data-icon data-icon-copy"></span>`,
-					title:
-						item.title || language.get('copy', 'title').toString(),
-					onClick: () => {
+					title: item.title || language.get<string>('copy', 'title'),
+					onClick: (e, node) => {
+						if (item.onClick) {
+							item.onClick(e, node);
+							return;
+						}
 						const result = clipboard.copy(this.card.root[0], true);
 						if (result)
 							editor.messageSuccess(
-								language.get('copy', 'success').toString(),
+								language.get<string>('copy', 'success'),
 							);
 						else
 							editor.messageError(
-								language.get('copy', 'error').toString(),
+								language.get<string>('copy', 'error'),
 							);
 					},
 				};
@@ -142,7 +145,11 @@ class CardToolbar implements CardToolbarInterface {
 					title:
 						item.title ||
 						language.get('delete', 'title').toString(),
-					onClick: () => {
+					onClick: (e, node) => {
+						if (item.onClick) {
+							item.onClick(e, node);
+							return;
+						}
 						card.remove(this.card.root);
 					},
 				};
@@ -155,7 +162,11 @@ class CardToolbar implements CardToolbarInterface {
 					title:
 						item.title ||
 						language.get('maximize', 'title').toString(),
-					onClick: () => {
+					onClick: (e, node) => {
+						if (item.onClick) {
+							item.onClick(e, node);
+							return;
+						}
 						this.card.maximize();
 					},
 				};

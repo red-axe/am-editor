@@ -60,7 +60,10 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		if (!isEngine(this.editor)) return true;
 		const { change, card } = this.editor;
 		const range = change.range.get();
-		const component = card.find(range.commonAncestorNode, true);
+		const component = card.find<TableValue, TableComponent>(
+			range.commonAncestorNode,
+			true,
+		);
 		if (
 			component &&
 			component.getSelectionNodes &&
@@ -69,8 +72,10 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			const nodes = component.getSelectionNodes();
 			if (nodes.length > 1) {
 				event.preventDefault();
-				const tableComponent = component as TableInterface;
-				tableComponent.command.copy();
+				component.command.copy();
+				this.editor.messageSuccess(
+					this.editor.language.get<string>('copy', 'success'),
+				);
 				return false;
 			}
 		}
@@ -81,7 +86,10 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		if (!isEngine(this.editor)) return true;
 		const { change, card } = this.editor;
 		const range = change.range.get();
-		const component = card.find(range.commonAncestorNode, true);
+		const component = card.find<TableValue, TableComponent>(
+			range.commonAncestorNode,
+			true,
+		);
 		if (
 			component &&
 			component.getSelectionNodes &&
@@ -90,8 +98,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			const nodes = component.getSelectionNodes();
 			if (nodes.length > 1) {
 				event.preventDefault();
-				const tableComponent = component as TableInterface;
-				tableComponent.command.cut();
+				component.command.cut();
 				return false;
 			}
 		}
@@ -102,19 +109,19 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		if (!isEngine(this.editor)) return true;
 		const { change, card } = this.editor;
 		const range = change.range.get();
-		const component = card.find(range.commonAncestorNode, true);
+		const component = card.find<TableValue, TableComponent>(
+			range.commonAncestorNode,
+			true,
+		);
 		if (
 			component &&
 			component.getSelectionNodes &&
-			component.name === TableComponent.cardName
+			component.name === TableComponent.cardName &&
+			component.command.hasCopyData()
 		) {
-			const nodes = component.getSelectionNodes();
-			if (nodes.length > 0) {
-				event.preventDefault();
-				const tableComponent = component as TableInterface;
-				tableComponent.command.mockPaste();
-				return false;
-			}
+			event.preventDefault();
+			component.command.mockPaste();
+			return false;
 		}
 		return true;
 	}
@@ -284,22 +291,53 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			if (width.endsWith('pt')) node.css(type, this.convertToPX(width));
 		};
 		const tables = root.find('table');
+		if (tables.length === 0) return;
 		const helper = new Helper(this.editor);
+		// 判断当前是在可编辑卡片内，在可编辑卡片内不嵌套表格
+		const { change } = this.editor;
+		const range = change.range.get();
+
+		const clearTable = (table: NodeInterface) => {
+			const thead = table.find('thead');
+			const headTds = thead.find('th,td').toArray();
+			headTds.forEach((td) => {
+				table.before(td.children());
+			});
+			const trs = table.find('tr').toArray();
+			trs.forEach((tr) => {
+				const tds = tr.find('td').toArray();
+				tds.forEach((td) => {
+					if (!this.editor.node.isEmpty(td))
+						table.before(td.children());
+				});
+			});
+			const tfoot = table.find('tfoot');
+			const footTds = tfoot.find('th,td').toArray();
+			footTds.forEach((td) => {
+				table.before(td.children());
+			});
+			table.remove();
+		};
+		const isClear = range.startNode.closest(EDITABLE_SELECTOR).length > 0;
 		tables.each((_, index) => {
 			let node = tables.eq(index);
 			if (!node) return;
+			if (isClear || node.parent()?.name === 'td') {
+				clearTable(node);
+				return;
+			}
 			node = helper.normalizeTable(node);
 			clearWH(node);
 			clearWH(node, 'height');
+			const tbody = node.find('tbody');
+
 			// 表头放在tbody最前面
 			const thead = node.find('thead');
-			if (thead && thead.length > 0)
-				node.find('tbody').prepend(thead.children());
+			if (thead && thead.length > 0) tbody.prepend(thead.children());
 			thead.remove();
 			// 表头放在tbody最前面
-			const tfoot = node.find('thead');
-			if (tfoot && tfoot.length > 0)
-				node.find('tbody').append(tfoot.children());
+			const tfoot = node.find('tfoot');
+			if (tfoot && tfoot.length > 0) tbody.append(tfoot.children());
 			tfoot.remove();
 			const ths = node.find('th');
 			ths.each((_, index) => {
