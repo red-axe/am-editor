@@ -66,6 +66,31 @@ new Engine(...,{
  })
 ```
 
+### 别名
+
+别名设置
+
+```ts
+//使用配置
+new Engine(...,{
+    config:{
+        "alias":{
+            text: 'plain',
+            sh: 'bash',
+            ts: 'typescript',
+            js: 'javascript',
+            py: 'python',
+            puml: 'plantuml',
+            uml: 'plantuml',
+            vb: 'basic',
+            md: 'markdown',
+            'c++': 'cpp',
+            'c#': 'csharp',
+        }
+    }
+ })
+```
+
 ## 命令
 
 ```ts

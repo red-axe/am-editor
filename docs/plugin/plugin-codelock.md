@@ -72,6 +72,31 @@ new Engine(...,{
  })
 ```
 
+### Alias
+
+Alias settings
+
+```ts
+//Use configuration
+new Engine(...,{
+     config:{
+         "alias":{
+             text:'plain',
+             sh:'bash',
+             ts:'typescript',
+             js:'javascript',
+             py:'python',
+             puml:'plantuml',
+             uml:'plantuml',
+             vb:'basic',
+             md:'markdown',
+             'c++':'cpp',
+             'c#':'csharp',
+         }
+     }
+  })
+```
+
 ## Command
 
 ```ts
