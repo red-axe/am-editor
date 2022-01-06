@@ -6,8 +6,9 @@ import {
 	ResizeInterface,
 } from '../../types';
 import { $ } from '../../node';
-import './index.css';
 import { isMobile } from '../../utils';
+import { DATA_ELEMENT, UI } from '../../constants';
+import './index.css';
 
 class Resize implements ResizeInterface {
 	private editor: EditorInterface;
@@ -24,7 +25,7 @@ class Resize implements ResizeInterface {
 	create(options: ResizeCreateOptions) {
 		this.options = options;
 		this.component = $(
-			'<div class="data-card-resize" draggable="true"><span class="data-card-resize-btn"><svg viewBox="0 0 3413 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="8px" height="6px"><path d="M341.333333 341.333333h2730.666667a170.666667 170.666667 0 0 0 0-341.333333H341.333333a170.666667 170.666667 0 1 0 0 341.333333zM341.333333 1024h2730.666667a170.666667 170.666667 0 0 0 0-341.333333H341.333333a170.666667 170.666667 0 0 0 0 341.333333z"></path></svg></span></div>',
+			`<div class="data-card-resize" ${DATA_ELEMENT}="${UI}" draggable="true"><span class="data-card-resize-btn"><svg viewBox="0 0 3413 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="8px" height="6px"><path d="M341.333333 341.333333h2730.666667a170.666667 170.666667 0 0 0 0-341.333333H341.333333a170.666667 170.666667 0 1 0 0 341.333333zM341.333333 1024h2730.666667a170.666667 170.666667 0 0 0 0-341.333333H341.333333a170.666667 170.666667 0 0 0 0 341.333333z"></path></svg></span></div>`,
 		);
 
 		if (isMobile) {
