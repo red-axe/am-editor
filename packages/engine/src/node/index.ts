@@ -260,7 +260,10 @@ class NodeModel implements NodeModelInterface {
 						outer.attributes(key, attributes[key]);
 					else {
 						const attributes = outer.attributes(key).split(',');
-						if (attributes.indexOf(attributes[key]) < 0)
+						if (
+							attributes[key] !== undefined &&
+							attributes.indexOf(attributes[key]) < 0
+						)
 							attributes.push(attributes[key]);
 						outer.attributes(key, attributes.join(','));
 					}
