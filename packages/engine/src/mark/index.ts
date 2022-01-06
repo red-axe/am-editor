@@ -994,6 +994,16 @@ class Mark implements MarkModelInterface {
 						//插件一样，不合并，分割后插入
 						else if (plugin && plugin === curPlugin) {
 							this.split(safeRange);
+							if (safeRange.collapsed) {
+								let markParent = parent.parent();
+								while (
+									markParent &&
+									nodeApi.isMark(markParent)
+								) {
+									mark = nodeApi.wrap(mark, markParent);
+									markParent = markParent.parent();
+								}
+							}
 							result = false;
 							break;
 						}
@@ -1687,7 +1697,7 @@ class Mark implements MarkModelInterface {
 		const { node } = this.editor;
 		mark = isNode(mark) ? $(mark) : mark;
 		const isMark = node.isMark(mark);
-		if (isMark) {
+		if (isMark && !mark.isCursor()) {
 			const childrenNodes = mark.children();
 			childrenNodes.each((_, index) => {
 				const child = childrenNodes.eq(index);
@@ -1725,6 +1735,17 @@ class Mark implements MarkModelInterface {
 				!node.isInline(nextN)
 			) {
 				next.remove();
+			}
+			const prev = mark.prev();
+			const prevP = prev?.prev();
+			if (
+				prev &&
+				prevP &&
+				prev.isText() &&
+				/^\u200b$/g.test(prev.text()) &&
+				!node.isInline(prevP)
+			) {
+				prev.remove();
 			}
 		}
 	}

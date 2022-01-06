@@ -239,19 +239,19 @@ class NodeModel implements NodeModelInterface {
 		outer: NodeInterface,
 		mergeSame: boolean = false,
 	) {
-		const { node, mark } = this.editor;
+		const { mark } = this.editor;
 		if (isNode(source)) source = $(source);
-		outer = node.clone(outer, false);
+		outer = this.clone(outer, false);
 		// 文本节点
 		if (source.isText()) {
-			outer.append(node.clone(source, false));
+			outer.append(this.clone(source, false));
 			return source.replaceWith(outer);
 		}
 
 		// 包裹样式节点
 		if (mergeSame && this.isMark(outer)) {
 			//合并属性和样式值
-			const outerClone = node.clone(outer, false, false);
+			const outerClone = this.clone(outer, false, false);
 			if (source.name === outer.name) {
 				const attributes = source.attributes();
 				delete attributes.style;
@@ -270,9 +270,9 @@ class NodeModel implements NodeModelInterface {
 				Object.keys(styles).forEach((key) => {
 					if (!outer.css(key)) outer.css(key, styles[key]);
 				});
-				outer.append(node.clone(source, true, false).children());
+				outer.append(this.clone(source, true, false).children());
 			} else {
-				outer.append(node.clone(source, true, false));
+				outer.append(this.clone(source, true, false));
 			}
 
 			const children = outer.allChildren();
@@ -288,10 +288,12 @@ class NodeModel implements NodeModelInterface {
 			return source.replaceWith(outer);
 		}
 		// 其它情况
-		const shadowNode = node.clone(source, false, false);
+		const parent = source.parent();
+		const shadowNode = this.clone(source, false, false);
 		source.after(shadowNode);
 		outer.append(source);
-		return shadowNode.replaceWith(outer);
+		// 没有父级节点就直接返回包裹后的节点
+		return parent ? shadowNode.replaceWith(outer) : outer;
 	}
 
 	/**
@@ -878,7 +880,7 @@ class NodeModel implements NodeModelInterface {
 					cloneNode.append($('<br />'));
 				}
 				if (
-					this.editor.node.isBlock(cloneNode) &&
+					this.isBlock(cloneNode) &&
 					this.isEmptyWithTrim(cloneNode)
 				) {
 					cloneNode.html('<br />');
@@ -891,10 +893,7 @@ class NodeModel implements NodeModelInterface {
 			) {
 				childNode.append($('<br />'));
 			}
-			if (
-				this.editor.node.isBlock(childNode) &&
-				this.isEmptyWithTrim(childNode)
-			) {
+			if (this.isBlock(childNode) && this.isEmptyWithTrim(childNode)) {
 				childNode.html('<br />');
 			}
 

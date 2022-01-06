@@ -254,8 +254,13 @@ export default class<T extends QuoteOptions> extends BlockPlugin<T> {
 	pasteHtml(node: NodeInterface) {
 		if (!isEngine(this.editor)) return;
 		if (node.name === this.tagName) {
+			const nodeApi = this.editor.node;
 			node.css('padding-left', '');
 			node.css('text-indent', '');
+			if (nodeApi.isEmpty(node)) {
+				node.append('<p><br/></p>');
+			}
+			this.editor.normalize(node);
 			return false;
 		}
 		return true;

@@ -226,10 +226,10 @@ class Engine<T extends EngineOptions = EngineOptions>
 		return toJSON0(this.container);
 	}
 
-	private normalize() {
+	normalize(container: NodeInterface = this.container) {
 		let block = $('<p />');
 		// 保证所有行内元素都在段落内
-		let childNodes = this.container.children();
+		let childNodes = container.children();
 		childNodes.each((_, index) => {
 			const node = childNodes.eq(index);
 			if (!node) return;
@@ -244,10 +244,10 @@ class Engine<T extends EngineOptions = EngineOptions>
 		});
 
 		if (block.get<HTMLElement>()!.childNodes.length > 0) {
-			this.container.append(block);
+			container.append(block);
 		}
 		// 处理空段落
-		childNodes = this.container.children();
+		childNodes = container.children();
 		childNodes.each((_, index) => {
 			const node = childNodes.eq(index);
 			if (!node) return;

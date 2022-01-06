@@ -177,6 +177,11 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 */
 	hidePlaceholder(): void;
 	/**
+	 * 保证所有行内元素都在段落内
+	 * @param container 容器
+	 */
+	normalize(container?: NodeInterface): void;
+	/**
 	 * 绑定事件
 	 * @param eventType 事件类型
 	 * @param listener 事件回调
