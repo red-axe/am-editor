@@ -1,5 +1,5 @@
 .editor-toolbar .toolbar-button {
-    display: inline-flex;
+    display: inline-block;
     align-items: center;
     justify-content: center;
     width: auto;
@@ -21,7 +21,6 @@
     min-width: 24px;
     line-height: 24px;
     border-radius: 4px;
-    margin: 0 4px;
 }
 
 .editor-toolbar:not(.editor-toolbar-mobile) .toolbar-button {

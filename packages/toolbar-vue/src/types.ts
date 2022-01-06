@@ -1,4 +1,4 @@
-import { EngineInterface } from '@aomao/engine';
+import type { EngineInterface, Placement } from '@aomao/engine';
 import { ExtractPropTypes, PropType, VNode } from 'vue';
 import { omit } from 'lodash';
 
@@ -7,20 +7,6 @@ export type Command =
 	| { name: string; args: Array<any> }
 	| Array<any>
 	| undefined;
-//tooltip 位置
-export type Placement =
-	| 'top'
-	| 'left'
-	| 'right'
-	| 'bottom'
-	| 'topLeft'
-	| 'topRight'
-	| 'bottomLeft'
-	| 'bottomRight'
-	| 'leftTop'
-	| 'leftBottom'
-	| 'rightTop'
-	| 'rightBottom';
 //按钮
 export const buttonProps = {
 	engine: Object as PropType<EngineInterface | undefined>,
@@ -116,6 +102,7 @@ export const dropdownProps = {
 		default: [],
 	} as const,
 	icon: String,
+	placement: String as PropType<Placement>,
 	content: [String, Function] as PropType<string | (() => string)>,
 	title: String,
 	disabled: {
@@ -195,6 +182,7 @@ export const colorPickerProps = {
 	} as const,
 	setStroke: colorPickerGroupProps.setStroke,
 	onSelect: colorPickerItemProps.onSelect,
+	placement: String as PropType<Placement>,
 };
 export type ColorPickerProps = ExtractPropTypes<typeof colorPickerProps>;
 //color

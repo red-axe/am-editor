@@ -2,6 +2,8 @@
     padding: 4px 8px;
     width: auto;
     border-left: 1px solid #e8e8e8;
+    display: flex;
+    align-items: center;
 }
 
 .editor-toolbar .editor-toolbar-group:nth-child(1) {

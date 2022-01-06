@@ -1,3 +1,4 @@
+import type { FileOptions } from '../types';
 import {
 	$,
 	Card,
@@ -71,8 +72,6 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 
 	private container?: NodeInterface;
 
-	private maxWidth: number = 752;
-
 	getLocales() {
 		return this.editor.language.get<{ [key: string]: string }>('file');
 	}
@@ -83,20 +82,20 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 	};
 
 	onWindowResize = () => {
-		this.maxWidth = this.getMaxWidth();
 		this.updateMaxWidth();
 	};
 
 	updateMaxWidth = () => {
+		const maxWidth = this.getMaxWidth();
 		this.root
 			.find('.data-file-title')
-			.css('max-width', this.maxWidth - 100 + 'px');
+			.css('max-width', maxWidth - 100 + 'px');
 	};
 
 	onBeforeRender = (action: 'preview' | 'download', url: string) => {
-		const filePlugin = this.editor.plugin.components['file'];
+		const filePlugin = this.editor.plugin.findPlugin<FileOptions>('file');
 		if (filePlugin) {
-			const { onBeforeRender } = (filePlugin['options'] || {}) as any;
+			const { onBeforeRender } = filePlugin.options || {};
 			if (onBeforeRender) return onBeforeRender(action, url);
 		}
 		return url;
@@ -259,7 +258,6 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 			this.bindErrorEvent(this.root);
 		}
 		this.container?.find('.percent').html(`${value.percent}%`);
-		this.maxWidth = this.getMaxWidth();
 		this.updateMaxWidth();
 		window.addEventListener('resize', this.onWindowResize);
 	}

@@ -19,8 +19,7 @@ import type { FileValue } from './component';
 import FileUploader from './uploader';
 import type { FileUploaderOptions } from './uploader';
 import locales from './locales';
-
-export interface FileOptions extends PluginOptions {}
+import { FileOptions } from './types';
 
 export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 	static get pluginName() {

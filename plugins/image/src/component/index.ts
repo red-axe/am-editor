@@ -1,3 +1,4 @@
+import type { ImageOptions } from '@/types';
 import {
 	Card,
 	CardToolbarItemOptions,
@@ -262,10 +263,10 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 				percent: value.percent,
 				message: value.message,
 				onBeforeRender: (status, src) => {
-					const imagePlugin = this.editor.plugin.components['image'];
+					const imagePlugin =
+						this.editor.plugin.findPlugin<ImageOptions>('image');
 					if (imagePlugin) {
-						const { onBeforeRender } = (imagePlugin['options'] ||
-							{}) as any;
+						const { onBeforeRender } = imagePlugin.options || {};
 						if (onBeforeRender) return onBeforeRender(status, src);
 					}
 					return src;

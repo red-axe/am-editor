@@ -16,6 +16,7 @@
             :title="title"
             :active="visible"
             :disabled="disabled"
+            :placement="placement"
             >
                 <template #default>
                     <slot :item="content">
@@ -144,11 +145,9 @@ export default defineComponent({
 <style>
 .toolbar-dropdown {
     position: relative;
-    display: inline-flex;
 }
 
 .toolbar-dropdown .toolbar-dropdown-trigger {
-    display: inline-flex;
     align-items: center;
 }
 
@@ -158,6 +157,7 @@ export default defineComponent({
 
 .toolbar-dropdown .toolbar-dropdown-trigger-arrow .toolbar-button{
     padding-right: 20px;
+    margin: 0;
 }
 
 .toolbar-dropdown .toolbar-dropdown-trigger-arrow .data-icon-arrow {

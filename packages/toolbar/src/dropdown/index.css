@@ -1,10 +1,8 @@
 .toolbar-dropdown {
     position: relative;
-    display: inline-flex;
 }
 
 .toolbar-dropdown .toolbar-dropdown-trigger {
-    display: inline-flex;
     align-items: center;
 }
 
@@ -14,6 +12,7 @@
 
 .toolbar-dropdown .toolbar-dropdown-trigger-arrow .toolbar-button{
     padding-right: 20px;
+    margin: 0;
 }
 
 .toolbar-dropdown .toolbar-dropdown-trigger-arrow .data-icon-arrow {
@@ -64,7 +63,7 @@
     color: #595959;
     text-align: left;
     position: relative;
-    display: block;
+    display: flex;
     white-space: nowrap;
 }
 

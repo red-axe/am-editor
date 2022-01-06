@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import classNames from 'classnames-es-ts';
-import { EngineInterface } from '@aomao/engine';
+import type { EngineInterface, Placement } from '@aomao/engine';
 import { useRight } from '../hooks';
 import Button from '../button';
 import ColorPicker, { ColorPickerProps, Palette } from './picker';
@@ -21,6 +21,7 @@ export type ColorButtonProps = {
 	autoExecute?: boolean;
 	engine?: EngineInterface;
 	disabled?: boolean;
+	placement?: Placement;
 } & ColorPickerProps;
 
 const ColorButton: React.FC<ColorButtonProps> = ({
@@ -37,6 +38,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 	defaultColor,
 	onSelect,
 	setStroke,
+	placement,
 }) => {
 	const [pickerVisible, setPickerVisible] = useState(false);
 	const [buttonContent, setButtonContent] = useState(
@@ -137,6 +139,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 					content={buttonContent}
 					disabled={disabled}
 					onClick={(event) => triggerSelect(currentColor, event)}
+					placement={placement}
 				/>
 				<Button
 					className="colorpicker-button-dropdown toolbar-dropdown-trigger-arrow"
@@ -148,6 +151,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 					}
 					content={<span className="data-icon data-icon-arrow" />}
 					onClick={toggleDropdown}
+					placement={placement}
 				/>
 			</div>
 			{pickerVisible && (

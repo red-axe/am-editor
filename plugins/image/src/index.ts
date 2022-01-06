@@ -1,6 +1,5 @@
 import {
 	$,
-	CardEntry,
 	CardInterface,
 	CardType,
 	CARD_KEY,
@@ -10,17 +9,13 @@ import {
 	NodeInterface,
 	Plugin,
 	PluginEntry,
-	PluginOptions,
 	READY_CARD_KEY,
 } from '@aomao/engine';
 import ImageComponent, { ImageValue } from './component';
 import ImageUploader from './uploader';
 import { ImageUploaderOptions } from './uploader';
 import locales from './locales';
-
-export interface ImageOptions extends PluginOptions {
-	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
-}
+import { ImageOptions } from './types';
 
 export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 	static get pluginName() {

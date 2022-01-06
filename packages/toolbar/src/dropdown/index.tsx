@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import classnames from 'classnames-es-ts';
-import { EngineInterface } from '@aomao/engine';
+import type { EngineInterface, Placement } from '@aomao/engine';
 import Button from '../button';
 import DropdownList, { DropdownListItem } from './list';
 import { useRight } from '../hooks';
@@ -11,6 +11,7 @@ export type DropdownProps = {
 	items: Array<DropdownListItem>;
 	values?: string | Array<string>;
 	engine?: EngineInterface;
+	placement?: Placement;
 	icon?: React.ReactNode;
 	content?: React.ReactNode | (() => React.ReactNode);
 	title?: string;
@@ -40,6 +41,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 	hasArrow,
 	renderContent,
 	hasDot,
+	placement,
 }) => {
 	const [visible, setVisible] = useState(false);
 
@@ -144,6 +146,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 					title={title}
 					active={visible}
 					disabled={disabled}
+					placement={placement}
 				/>
 			</div>
 			{visible && (

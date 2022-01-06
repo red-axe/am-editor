@@ -1,4 +1,4 @@
-import { NodeInterface } from '@aomao/engine';
+import { NodeInterface, PluginOptions } from '@aomao/engine';
 import { EventEmitter2 } from 'eventemitter2';
 
 export interface PswpInterface extends EventEmitter2 {
@@ -26,4 +26,8 @@ export interface PswpInterface extends EventEmitter2 {
 	open(items: Array<PhotoSwipe.Item>, index: number): void;
 	close(): void;
 	destroy(): void;
+}
+
+export interface ImageOptions extends PluginOptions {
+	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
 }

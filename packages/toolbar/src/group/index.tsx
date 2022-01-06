@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames-es-ts';
-import { EngineInterface, isMobile } from '@aomao/engine';
+import { isMobile } from '@aomao/engine';
+import type { Placement, EngineInterface } from '@aomao/engine';
 import Popover from 'antd/es/popover';
 import Button, { ButtonProps } from '../button';
 import Dropdown, { DropdownProps } from '../dropdown';
@@ -42,14 +43,26 @@ const ToolbarGroup: React.FC<GroupProps> = ({
 	content,
 	popup,
 }) => {
-	const renderItems = () => {
+	const renderItems = (placement?: Placement) => {
 		return items.map((item, index) => {
 			switch (item.type) {
 				case 'button':
-					return <Button engine={engine} key={item.name} {...item} />;
+					return (
+						<Button
+							engine={engine}
+							key={item.name}
+							{...item}
+							placement={placement}
+						/>
+					);
 				case 'dropdown':
 					return (
-						<Dropdown engine={engine} key={item.name} {...item} />
+						<Dropdown
+							engine={engine}
+							key={item.name}
+							{...item}
+							placement={placement}
+						/>
 					);
 				case 'color':
 					return (
@@ -57,6 +70,7 @@ const ToolbarGroup: React.FC<GroupProps> = ({
 							engine={engine}
 							key={item.name}
 							{...item}
+							placement={placement}
 						/>
 					);
 				case 'collapse':
@@ -83,7 +97,7 @@ const ToolbarGroup: React.FC<GroupProps> = ({
 							})}
 							data-element="ui"
 						>
-							{renderItems()}
+							{renderItems('top')}
 						</div>
 					}
 					arrowPointAtCenter

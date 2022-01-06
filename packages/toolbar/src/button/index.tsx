@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Tooltip from 'antd/es/tooltip';
 import classnames from 'classnames-es-ts';
-import { EngineInterface, formatHotkey, isMobile } from '@aomao/engine';
+import { formatHotkey, isMobile } from '@aomao/engine';
+import type { EngineInterface, Placement } from '@aomao/engine';
 import { autoGetHotkey } from '../utils';
 import 'antd/es/tooltip/style';
 import './index.css';
@@ -12,19 +13,7 @@ export type ButtonProps = {
 	icon?: React.ReactNode;
 	content?: React.ReactNode | (() => React.ReactNode);
 	title?: string;
-	placement?:
-		| 'right'
-		| 'top'
-		| 'left'
-		| 'bottom'
-		| 'topLeft'
-		| 'topRight'
-		| 'bottomLeft'
-		| 'bottomRight'
-		| 'leftTop'
-		| 'leftBottom'
-		| 'rightTop'
-		| 'rightBottom';
+	placement?: Placement;
 	hotkey?: boolean | string;
 	command?: { name: string; args: Array<any> } | Array<any>;
 	autoExecute?: boolean;

@@ -11,6 +11,7 @@
             :title="buttonTitle"
             :on-click="triggerClick"
             :disabled="disabled"
+            :placement="placement"
             >
                 <span v-html="buttonContent"></span>
             </am-button>
@@ -20,6 +21,7 @@
             :title="dropdownTitle"
             :on-click="toggleDropdown"
             :disabled="disabled"
+            :placement="placement"
             >
                 <template #icon>
                     <span class="colorpicker-button-dropdown-empty" />
@@ -151,9 +153,13 @@ export default defineComponent({
 }
 
 .colorpicker-button-group .colorpicker-button-text {
-    height: 32px;
     margin-right: 0;
     min-width: 26px;
+    border-radius: 3px 0 0 3px;
+}
+
+.editor-toolbar.editor-toolbar-popup .colorpicker-button-group .colorpicker-button-text {
+    margin: 0;
     border-radius: 3px 0 0 3px;
 }
 
@@ -162,11 +168,19 @@ export default defineComponent({
 }
 
 .colorpicker-button-group .colorpicker-button-dropdown {
-    height: 32px;
     margin-left: -1px;
     min-width: 17px;
     text-align: center;
     padding: 0 0;
+    border-radius: 0 3px 3px 0;
+}
+
+.editor-toolbar.editor-toolbar-popup .colorpicker-button-group .colorpicker-button-dropdown {
+    line-height: 24px;
+    min-width: 17px;
+    padding: 0 4px;
+    margin: 0;
+    margin-left: -1px;
     border-radius: 0 3px 3px 0;
 }
   

@@ -111,6 +111,84 @@ export const cards: Array<CardEntry> = [
 ];
 
 export const pluginConfig: { [key: string]: PluginOptions } = {
+	[ToolbarPlugin.pluginName]: {
+		popup: {
+			items: [
+				['undo', 'redo'],
+				{
+					icon: 'text',
+					items: [
+						'bold',
+						'italic',
+						'strikethrough',
+						'underline',
+						'backcolor',
+						'moremark',
+					],
+				},
+				[
+					{
+						type: 'button',
+						name: 'image-uploader',
+						icon: 'image',
+					},
+					'link',
+					'tasklist',
+					'heading',
+				],
+				{
+					icon: 'more',
+					items: [
+						{
+							type: 'button',
+							name: 'video-uploader',
+							icon: 'video',
+						},
+						{
+							type: 'button',
+							name: 'file-uploader',
+							icon: 'attachment',
+						},
+						{
+							type: 'button',
+							name: 'table',
+							icon: 'table',
+						},
+						{
+							type: 'button',
+							name: 'math',
+							icon: 'math',
+						},
+						{
+							type: 'button',
+							name: 'codeblock',
+							icon: 'codeblock',
+						},
+						{
+							type: 'button',
+							name: 'orderedlist',
+							icon: 'ordered-list',
+						},
+						{
+							type: 'button',
+							name: 'unordered-list',
+							icon: 'unordered-list',
+						},
+						{
+							type: 'button',
+							name: 'hr',
+							icon: 'hr',
+						},
+						{
+							type: 'button',
+							name: 'quote',
+							icon: 'quote',
+						},
+					],
+				},
+			],
+		},
+	},
 	[Italic.pluginName]: {
 		// 默认为 _ 下划线，这里修改为单个 * 号
 		markdown: '*',

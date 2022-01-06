@@ -298,6 +298,7 @@ export {
     border: 0 none;
     left: 0;
     top: 0;
+    display: flex;
 }
 
 .editor-toolbar-popover {

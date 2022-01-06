@@ -1,3 +1,4 @@
+import { VideoOptions } from '@/types';
 import type {
 	CardToolbarItemOptions,
 	ToolbarItemOptions,
@@ -190,9 +191,10 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	}
 
 	onBeforeRender = (action: 'query' | 'download' | 'cover', url: string) => {
-		const videoPlugin = this.editor.plugin.components['video'];
+		const videoPlugin =
+			this.editor.plugin.findPlugin<VideoOptions>('video');
 		if (videoPlugin) {
-			const { onBeforeRender } = (videoPlugin['options'] || {}) as any;
+			const { onBeforeRender } = videoPlugin.options || {};
 			if (onBeforeRender) return onBeforeRender(action, url);
 		}
 		return url;

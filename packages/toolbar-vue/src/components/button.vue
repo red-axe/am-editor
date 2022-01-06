@@ -99,7 +99,7 @@ export default defineComponent({
 </script>
 <style css>
 .editor-toolbar .toolbar-button {
-    display: inline-flex;
+    display: inline-block;
     align-items: center;
     justify-content: center;
     width: auto;
@@ -116,12 +116,13 @@ export default defineComponent({
     outline: none;
     line-height: 32px;
 }
+
 .editor-toolbar.editor-toolbar-popup .toolbar-button {
     min-width: 24px;
     line-height: 24px;
     border-radius: 4px;
-    margin: 0 4px;
 }
+
 .editor-toolbar:not(.editor-toolbar-mobile) .toolbar-button {
     padding: 0 4px;
 }

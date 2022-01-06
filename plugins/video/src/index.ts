@@ -20,14 +20,7 @@ import type { VideoValue, VideoStatus } from './component';
 import VideoUploader from './uploader';
 import type { VideoUploaderOptions } from './uploader';
 import locales from './locales';
-
-export interface VideoOptions extends PluginOptions {
-	onBeforeRender?: (
-		action: 'download' | 'query' | 'cover',
-		url: string,
-	) => string;
-	showTitle?: boolean;
-}
+import { VideoOptions } from './types';
 
 export default class VideoPlugin<
 	T extends VideoOptions = VideoOptions,
