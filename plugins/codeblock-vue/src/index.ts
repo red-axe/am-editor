@@ -100,12 +100,12 @@ export default class<
 		}
 
 		const chars = blockApi.getLeftText(block);
-		const match = /^```(.*){0,20}$/.exec(chars);
+		const match = /^`{3,}(.*){0,20}$/.exec(chars);
 
 		if (match) {
-			const modeText = (
-				undefined === match[1] ? '' : match[1]
-			).toLowerCase();
+			const modeText = (undefined === match[1] ? '' : match[1])
+				.trim()
+				.toLowerCase();
 			const alias = { ...(this.options.alias || {}), ...MODE_ALIAS };
 			const mode = alias[modeText] || modeText;
 
@@ -300,15 +300,16 @@ export default class<
 			if (match) {
 				isCode = true;
 				mode =
-					langs.find((key) => match && match[1].indexOf(key) === 0) ||
-					'text';
-				let code =
-					match[1].indexOf(mode) === 0
-						? match[1].substr(mode.length + 1)
-						: match[1];
+					langs.find(
+						(key) =>
+							match &&
+							(match[1] || '')
+								.trim()
+								.toLowerCase()
+								.indexOf(key) === 0,
+					) || 'text';
 				const alias = { ...(this.options.alias || {}), ...MODE_ALIAS };
 				mode = alias[mode] || mode;
-				nodes.push(code);
 			} else if (isCode) {
 				nodes.push(row);
 			} else {
