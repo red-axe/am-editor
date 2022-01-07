@@ -121,11 +121,11 @@ export default class<T extends QuoteOptions> extends BlockPlugin<T> {
 	pasteMarkdown(node: NodeInterface) {
 		const result = this.checkMarkdown(node);
 		if (!result) return;
-		const { reg, match } = result;
+		const { match } = result;
 		if (!match) return;
 
 		const text = node.text();
-		let newText = '';
+		let newText = match[1] || '';
 		const rows = text.split(/\n|\r\n/);
 		let nodes: Array<string> = [];
 		rows.forEach((row) => {

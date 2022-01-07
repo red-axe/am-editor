@@ -234,7 +234,7 @@ export default class<
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 		const text = node.text();
 		if (!text) return;
-		const reg = /```/;
+		const reg = /`{3,}/;
 		const match = reg.exec(text);
 		return {
 			reg,
@@ -287,7 +287,7 @@ export default class<
 		let isCode: boolean = false;
 		let mode = 'text';
 		rows.forEach((row) => {
-			let match = /^(.*)```(\s)*$/.exec(row);
+			let match = /^(.*)`{3,}(\s)*$/.exec(row);
 			if (match && isCode) {
 				nodes.push(match[1]);
 				newText += createCodeblock(nodes, mode) + '\n';
@@ -296,7 +296,7 @@ export default class<
 				nodes = [];
 				return;
 			}
-			match = /^```(.*)/.exec(row);
+			match = /^`{3,}(.*)/.exec(row);
 			if (match) {
 				isCode = true;
 				mode =

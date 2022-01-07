@@ -152,7 +152,7 @@ export default class<T extends OrderedListOptions> extends ListPlugin<T> {
 			return listNode.get<Element>()?.outerHTML;
 		};
 		const text = node.text();
-		let newText = '';
+		let newText = match[1] || '';
 		const rows = text.split(/\n|\r\n/);
 		let nodes: Array<string> = [];
 		let indent = 0;

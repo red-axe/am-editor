@@ -103,8 +103,8 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 
 			const cardNode = card.replaceNode($(regNode), 'hr');
 			regNode.remove();
-
-			newText += cardNode.get<Element>()?.outerHTML + '\n';
+			//  match[1] 把之前的换行符补上
+			newText += match[1] + cardNode.get<Element>()?.outerHTML + '\n';
 		}
 		newText += textNode.textContent;
 		node.text(newText);

@@ -407,7 +407,9 @@ export default class<T extends HeadingOptions> extends BlockPlugin<T> {
 			if (enableTypes && enableTypes.indexOf(`h${codeLength}`) < 0) {
 				newText += match[2] + match[3];
 			} else
-				newText += `<h${codeLength}>${match[3].trim()}</h${codeLength}>\n`;
+				newText +=
+					match[1] +
+					`<h${codeLength}>${match[3].trim()}</h${codeLength}>\n`;
 		}
 		newText += textNode.textContent;
 
