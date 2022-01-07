@@ -74,7 +74,7 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
 		const text = node.text();
-		const reg = /(^|\r\n|\n)([-]{3,})\s?(\r\n|\n|$)/;
+		const reg = /(^|\r\n|\n)((-\s*){3,})\s?(\r\n|\n|$)/;
 		const match = reg.exec(text);
 		return {
 			reg,
