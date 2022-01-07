@@ -31,6 +31,7 @@ export interface CodeBlockEditorInterface {
 	render(mode: string, value: string, options?: EditorConfiguration): void;
 	save(): void;
 	focus(): void;
+	select(start?: boolean): void;
 	/**
 	 * 代码来自 runmode addon
 	 * 支持行号需要考虑复制粘贴问题

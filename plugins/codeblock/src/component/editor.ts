@@ -233,6 +233,18 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		this.codeMirror.focus();
 	}
 
+	select(start: boolean = true) {
+		if (!this.codeMirror) return;
+		this.codeMirror.focus();
+		if (!start) {
+			const line = this.codeMirror.lineCount() - 1;
+			const content = this.codeMirror.getLine(line);
+			this.codeMirror.setSelection({ line, ch: content.length });
+		} else {
+			this.codeMirror.setSelection({ line: 0, ch: 0 });
+		}
+	}
+
 	/**
 	 * 代码来自 runmode addon
 	 * 支持行号需要考虑复制粘贴问题
