@@ -528,7 +528,7 @@ class TableComponent<V extends TableValue = TableValue>
 			});
 		});
 		const { rows, cols, height, width } = tableModel;
-		const html = parser.toValue(schema, conversion, false, true);
+		const html = parser.toValue(schema, conversion, false, false);
 		return {
 			...value,
 			rows,

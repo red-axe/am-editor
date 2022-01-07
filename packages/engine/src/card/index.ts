@@ -905,7 +905,7 @@ class CardModel implements CardModelInterface {
 			}
 
 			if (nextBlock.attributes(CARD_KEY)) {
-				this.editor.card.find(nextBlock)?.focus(range, false);
+				this.editor.card.find(nextBlock)?.focus(range, true);
 				return;
 			}
 		}

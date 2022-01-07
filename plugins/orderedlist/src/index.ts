@@ -118,7 +118,7 @@ export default class<T extends OrderedListOptions> extends ListPlugin<T> {
 		const text = node.text();
 		if (!text) return;
 
-		const reg = /(^|\r\n|\n)\s*(\d{1,9}\.)/;
+		const reg = /(^|\r\n|\n)\s*(\d{1,9}\.\s+)/;
 		const match = reg.exec(text);
 		return {
 			reg,
