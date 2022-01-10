@@ -43,6 +43,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, onUnmounted, ref, watch } from 'vue'
+import { $ } from '@aomao/engine'
 import { colorProps } from '../../types'
 import { useRight } from '../../hooks';
 import AmButton from '../button.vue'
@@ -94,7 +95,7 @@ export default defineComponent({
         };
 
         const hideDropdown = (event?: MouseEvent) => {
-            if (event && (event.target as Element).closest('.toolbar-dropdown-list'))
+            if (event?.target && $(event.target).closest('.toolbar-dropdown-list'))
                 return;
             document.removeEventListener('click', hideDropdown);
             visible.value = false

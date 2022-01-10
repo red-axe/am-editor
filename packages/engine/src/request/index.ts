@@ -58,7 +58,7 @@ class Request implements RequestInterface {
 					input['fireEvent'](event);
 				} else throw '';
 
-				document.addEventListener('mousedown', remove);
+				//document.addEventListener('mousedown', remove);
 			} catch (error) {
 				input.removeEventListener('change', change);
 				remove();

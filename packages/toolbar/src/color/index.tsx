@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import classNames from 'classnames-es-ts';
+import { $ } from '@aomao/engine';
 import type { EngineInterface, Placement } from '@aomao/engine';
 import { useRight } from '../hooks';
 import Button from '../button';
@@ -91,10 +92,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 	};
 
 	const hideDropdown = (event?: MouseEvent) => {
-		if (
-			event &&
-			(event.target as Element).closest('.toolbar-dropdown-list')
-		)
+		if (event?.target && $(event.target).closest('.toolbar-dropdown-list'))
 			return;
 		document.removeEventListener('click', hideDropdown);
 		setPickerVisible(false);

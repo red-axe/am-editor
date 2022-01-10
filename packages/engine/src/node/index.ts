@@ -652,7 +652,7 @@ class NodeModel implements NodeModelInterface {
 				if (isUnwrap(nodeDom)) {
 					const fragment = nodeDom.document!.createDocumentFragment();
 					nodeDom.children().each((child) => {
-						fragment.append(child);
+						fragment.appendChild(child);
 					});
 					nodeDom.remove();
 					node = fragment.childNodes[fragment.childNodes.length - 1];

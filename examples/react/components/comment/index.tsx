@@ -200,6 +200,7 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 					});
 				});
 			};
+			if (typeof ResizeObserver === 'undefined') return;
 			const resizeObserver = new ResizeObserver(update);
 			resizeObserver.observe(editor.container[0]);
 			return () => {

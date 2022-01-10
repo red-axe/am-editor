@@ -281,7 +281,9 @@ class NativeEvent {
 			card.each((card) => {
 				const center = card.getCenter();
 				if (center && center.length > 0) {
-					let isSelect = selection.containsNode(center[0]);
+					let isSelect = selection.containsNode
+						? selection.containsNode(center[0])
+						: false;
 					if (!isSelect && containsCard && selection.focusNode) {
 						const focusCard = this.engine.card.find(
 							selection.focusNode,

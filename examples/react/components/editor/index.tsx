@@ -50,7 +50,6 @@ const EditorComponent: React.FC<EditorProps> = ({
 }) => {
 	const engine = useRef<EngineInterface | null>(null);
 	const otClient = useRef<OTClient | null>(null);
-	const [value, setValue] = useState('');
 	const comment = useRef<CommentRef | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [members, setMembers] = useState<Array<Member>>([]);
@@ -67,34 +66,57 @@ const EditorComponent: React.FC<EditorProps> = ({
 	/**
 	 * 保存到服务器
 	 */
-	const save = useCallback(() => {
-		if (!engine.current || !props.onSave) return;
-		console.log('save', new Date().getTime());
-		const filterValue: Content = props.comment
-			? engine.current.command.executeMethod(
-					'mark-range',
-					'action',
-					'comment',
-					'filter',
-					value,
-			  )
-			: { value, paths: [] };
-		props.onSave(filterValue);
-	}, [props.onSave, value]);
+	const save = useCallback(
+		(value: string) => {
+			if (!engine.current || !props.onSave) return;
+			console.log('save', new Date().getTime());
+			const filterValue: Content = props.comment
+				? engine.current.command.executeMethod(
+						'mark-range',
+						'action',
+						'comment',
+						'filter',
+						value,
+				  )
+				: { value, paths: [] };
+			props.onSave(filterValue);
+		},
+		[props.onSave],
+	);
 	/**
 	 * 60秒内无更改自动保存
 	 */
 	const autoSave = useCallback(() => {
 		if (saveTimeout.current) clearTimeout(saveTimeout.current);
 		saveTimeout.current = setTimeout(() => {
-			save();
+			const value = engine.current?.getValue() || '';
+			save(value);
 		}, 60000);
 	}, [save]);
 
+	//用户主动保存
+	const userSave = useCallback(() => {
+		if (!engine.current) return;
+		//获取异步的值，有些组件可能还在处理中，比如正在上传
+		engine.current
+			.getValueAsync(false, (pluginName, card) => {
+				console.log(`${pluginName} 正在等待...`, card?.getValue());
+			})
+			.then((value) => {
+				save(value);
+			})
+			.catch((data) => {
+				console.log('终止保存：', data.name, data.card?.getValue());
+			});
+	}, [engine, save]);
+
 	useEffect(() => {
-		window.addEventListener('beforeunload', save);
+		const unloadSave = () => {
+			save(engine.current?.getValue() || '');
+		};
+		window.addEventListener('beforeunload', unloadSave);
 		return () => {
-			window.removeEventListener('beforeunload', save);
+			window.removeEventListener('beforeunload', unloadSave);
 		};
 	}, [save]);
 
@@ -113,39 +135,22 @@ const EditorComponent: React.FC<EditorProps> = ({
 				//自动保存，非远程更改，触发保存
 				if (trigger !== 'remote') autoSave();
 				if (props.onChange) props.onChange(trigger);
-				const value = engine.current?.getValue();
+				// const value = engine.current?.getValue();
 				// 获取编辑器的值
-				console.log(`value ${trigger} update:`, value);
-				setValue(value || '');
+				// console.log(`value ${trigger} update:`, value);
 				// 获取当前所有at插件中的名单
 				// console.log(
 				// 	'mention:',
 				// 	engine.current?.command.executeMethod('mention', 'getList'),
 				// );
 				// 获取编辑器的html
-				console.log('html:', engine.current?.getHtml());
+				// console.log('html:', engine.current?.getHtml());
+				// 获取编辑器的json
 				// console.log('json:', engine.current?.getJsonValue());
 			},
 			[loading, autoSave, props.onChange],
 		),
 	};
-
-	//用户主动保存
-	const userSave = useCallback(() => {
-		if (!engine.current) return;
-		//获取异步的值，有些组件可能还在处理中，比如正在上传
-		engine.current
-			.getValueAsync(false, (pluginName, card) => {
-				console.log(`${pluginName} 正在等待...`, card?.getValue());
-			})
-			.then((value) => {
-				setValue(value);
-				save();
-			})
-			.catch((data) => {
-				console.log('终止保存：', data.name, data.card?.getValue());
-			});
-	}, [engine, save]);
 
 	useEffect(() => {
 		if (!engine.current) return;
@@ -215,12 +220,11 @@ const EditorComponent: React.FC<EditorProps> = ({
 			} else {
 				// 非协同编辑，设置编辑器值，异步渲染后回调
 				engine.current.setValue(value, (count) => {
-					console.log(count);
+					console.log('setValue loaded:', count);
 					if (onLoad) onLoad(engine.current!);
 					return setLoading(false);
 				});
 			}
-			setValue(value);
 		}
 
 		return () => {

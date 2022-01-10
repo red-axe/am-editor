@@ -43,18 +43,20 @@ class Position {
 			this.#editor.scrollNode?.on('scroll', this.updateListener);
 		}
 		let size = { width: target.width(), height: target.height() };
-		this.#observer = new ResizeObserver(() => {
-			const width = target.width();
-			const height = target.height();
+		if (typeof ResizeObserver !== 'undefined') {
+			this.#observer = new ResizeObserver(() => {
+				const width = target.width();
+				const height = target.height();
 
-			if (width === size.width && height === size.height) return;
-			size = {
-				width,
-				height,
-			};
-			this.updateListener();
-		});
-		this.#observer.observe(target.get<HTMLElement>()!);
+				if (width === size.width && height === size.height) return;
+				size = {
+					width,
+					height,
+				};
+				this.updateListener();
+			});
+			this.#observer.observe(target.get<HTMLElement>()!);
+		}
 		this.update();
 	}
 

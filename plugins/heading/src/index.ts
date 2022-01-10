@@ -8,6 +8,8 @@ import {
 	PluginEntry,
 	PluginOptions,
 	DATA_ID,
+	DATA_ELEMENT,
+	UI,
 } from '@aomao/engine';
 import Outline from './outline';
 import type { OutlineData } from './outline';
@@ -64,7 +66,7 @@ export default class<T extends HeadingOptions> extends BlockPlugin<T> {
 						node.find('.data-anchor-button').remove();
 						Tooltip.hide();
 						const button = $(
-							`<a class="data-anchor-button"><span class="data-icon data-icon-${node.name}"></span></a>`,
+							`<a class="data-anchor-button" ${DATA_ELEMENT}="${UI}"><span class="data-icon data-icon-${node.name}"></span></a>`,
 						);
 						if (node.height() !== 24) {
 							button.css({
@@ -229,7 +231,7 @@ export default class<T extends HeadingOptions> extends BlockPlugin<T> {
 		}
 
 		button = $(
-			`<span class="data-anchor-button"><span class="data-icon data-icon-${block.name}"></span></span>`,
+			`<span class="data-anchor-button" ${DATA_ELEMENT}="${UI}"><span class="data-icon data-icon-${block.name}"></span></span>`,
 		);
 		root.append(button);
 		const parentRect = root.get<Element>()?.getBoundingClientRect() || {

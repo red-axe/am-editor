@@ -20,7 +20,7 @@ export default class Popup {
 		this.#options = options;
 		this.#editor = editor;
 		this.#root = $(`<div class="data-toolbar-popup-wrapper"></div>`);
-		document.body.append(this.#root[0]);
+		document.body.appendChild(this.#root[0]);
 		if (isEngine(editor)) {
 			this.#editor.on('select', this.onSelect);
 		} else {

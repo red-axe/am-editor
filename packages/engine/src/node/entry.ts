@@ -724,7 +724,8 @@ class NodeEntry implements NodeInterface {
 					child = next;
 				}
 				children.forEach((child) => {
-					(node as Element).append(child.cloneNode(true));
+					if (node.nodeType === Node.ELEMENT_NODE)
+						(node as Element).appendChild(child.cloneNode(true));
 				});
 			});
 			return this;
