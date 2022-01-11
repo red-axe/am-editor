@@ -78,7 +78,7 @@ export type Options = {
 	 * @returns 图片地址
 	 */
 	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
-	onChange?: (size?: Size) => void;
+	onChange?: (size?: Size, loaded?: boolean) => void;
 	onError?: () => void;
 };
 
@@ -240,7 +240,7 @@ class Image {
 		this.detail.css('height', '');
 		const { onChange } = this.options;
 		if (isEngine(this.editor) && onChange) {
-			onChange(this.size);
+			onChange(this.size, true);
 		}
 		window.removeEventListener('resize', this.onWindowResize);
 		window.addEventListener('resize', this.onWindowResize);
@@ -414,10 +414,10 @@ class Image {
 				const imageHeight = parseInt(image.css('height'));
 				const size = value.size;
 				const naturalWidth = size
-					? size.naturalWidth
+					? size.naturalWidth || this.size.naturalWidth
 					: imageWidth * winPixelRatio;
 				const naturalHeight = size
-					? size.naturalHeight
+					? size.naturalHeight || this.size.naturalHeight
 					: imageHeight * winPixelRatio;
 				let src = value['src'];
 				const { onBeforeRender } = this.options;

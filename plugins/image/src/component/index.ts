@@ -4,9 +4,11 @@ import {
 	CardToolbarItemOptions,
 	CardType,
 	CardValue,
+	decodeCardValue,
 	isEngine,
 	isMobile,
 	NodeInterface,
+	TargetOp,
 	ToolbarItemOptions,
 } from '@aomao/engine';
 import Image, { Size } from './image';
@@ -97,8 +99,8 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 		} as T);
 	}
 
-	setSize(size: Size) {
-		this.setValue({ size } as T);
+	setSize(size: Size, loaded?: boolean) {
+		if (!loaded) this.setValue({ size } as T);
 		if (this.widthInput) {
 			this.widthInput.get<HTMLInputElement>()!.value =
 				size.width.toString();
@@ -271,8 +273,8 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 					}
 					return src;
 				},
-				onChange: (size) => {
-					if (size) this.setSize(size);
+				onChange: (size, loaded) => {
+					if (size) this.setSize(size, loaded);
 				},
 				onError: () => {
 					this.isLocalError = true;

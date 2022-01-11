@@ -15,7 +15,7 @@ import {
 } from '@aomao/engine';
 import TableComponent, { Template, Helper } from './component';
 import locales from './locale';
-import { TableInterface, TableOptions, TableValue } from './types';
+import { TableOptions, TableValue } from './types';
 import './index.css';
 class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	static get pluginName() {
@@ -397,14 +397,21 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				if (background) tds?.css('background', background);
 			});
 			this.editor.nodeId.generateAll(node, true);
+			const children = node.allChildren();
+			children.forEach((child) => {
+				if (this.editor.node.isInline(child)) {
+					this.editor.inline.repairCursor(child);
+				}
+			});
+			const html = node
+				.get<HTMLElement>()!
+				.outerHTML.replace(/\n|\r\n/g, '')
+				.replace(/>\s+</g, '><');
 			this.editor.card.replaceNode<TableValue>(
 				node,
 				TableComponent.cardName,
 				{
-					html: node
-						.get<HTMLElement>()!
-						.outerHTML.replace(/\n|\r\n/g, '')
-						.replace(/>\s+</g, '><'),
+					html,
 				},
 			);
 		});
