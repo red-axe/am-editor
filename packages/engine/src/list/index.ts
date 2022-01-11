@@ -999,6 +999,17 @@ class List implements ListModelInterface {
 		}
 		const lasetELement = startLi;
 		if (lasetELement) {
+			if (!endNode.parent()?.fragment) {
+				let beforeElement = lasetELement;
+				let prev = endNode.prev();
+				while (prev && prev.length > 0) {
+					const pN = prev.prev();
+					beforeElement.before(prev);
+					beforeElement = prev;
+					prev = pN;
+				}
+			}
+
 			// 删除多余的br标签
 			if (endNode.name === 'br') endNode.remove();
 			else {
