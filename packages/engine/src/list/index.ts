@@ -455,7 +455,7 @@ class List implements ListModelInterface {
 		const safeRange = range || change.range.toTrusty();
 		const selection = blocks
 			? undefined
-			: safeRange.shrinkToElementNode().createSelection();
+			: safeRange.cloneRange().shrinkToElementNode().createSelection();
 		blocks = blocks || block.getBlocks(safeRange);
 		blocks.forEach((block) => {
 			block = block.closest('ul,ol');

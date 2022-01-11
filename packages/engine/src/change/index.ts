@@ -480,10 +480,13 @@ class ChangeModel implements ChangeInterface {
 				}
 				// 被删除了重新设置开始节点位置
 				if (startRange && !startRange.node[0].parentNode) {
-					startRange = {
-						node: appendNodes[0],
-						offset: 0,
-					};
+					const parent = node.parent();
+					if (parent) {
+						startRange = {
+							node: parent,
+							offset: node.index(),
+						};
+					}
 				}
 				node = next;
 			}

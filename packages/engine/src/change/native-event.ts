@@ -4,6 +4,7 @@ import {
 	CARD_RIGHT_SELECTOR,
 	CARD_SELECTOR,
 	DATA_ELEMENT,
+	DATA_ID,
 	EDITABLE,
 	ROOT,
 	ROOT_SELECTOR,
@@ -550,11 +551,27 @@ class NativeEvent {
 				range,
 				(range) => {
 					this.engine.trigger('paste:insert', range);
-					this.#lastePasteRange = range.cloneRange();
+					const cloneRange = range.cloneRange();
+					const { endNode } = cloneRange;
+					let cardId = '';
+					if (endNode.isCard() && endNode.children().length === 0) {
+						cloneRange.setEndAfter(endNode);
+						cardId = endNode.attributes(DATA_ID);
+					}
+					this.#lastePasteRange = cloneRange;
 					range.collapse(false);
 					const selection = range.createSelection();
 					this.engine.card.render(undefined, (count) => {
 						selection.move();
+						if (cardId) {
+							const newCard = this.engine.container.find(
+								`[data-id="${cardId}"]`,
+							);
+							if (newCard.length > 0) {
+								cloneRange.setEndAfter(newCard);
+								this.#lastePasteRange = cloneRange;
+							}
+						}
 						range.scrollRangeIntoView();
 						change.range.select(range);
 						if (callback) {

@@ -1057,7 +1057,10 @@ class Inline implements InlineModelInterface {
 
 	flat(node: NodeInterface | RangeInterface, schema?: SchemaInterface) {
 		if (isRangeInterface(node)) {
-			const selection = node.shrinkToElementNode().createSelection();
+			const selection = node
+				.cloneRange()
+				.shrinkToElementNode()
+				.createSelection();
 			const inlines = this.findInlines(node);
 			inlines.forEach((inline) => {
 				if (inline.isCard()) return;

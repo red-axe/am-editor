@@ -79,5 +79,9 @@ export default defineConfig({
 			pathRewrite: { '^/api': '' },
 		},
 	},
+	// scripts: [
+	//   'https://unpkg.com/vconsole/dist/vconsole.min.js',
+	//   'var vConsole = new window.VConsole();',
+	// ],
 	// more config: https://d.umijs.org/config
 });
