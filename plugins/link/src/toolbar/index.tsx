@@ -7,6 +7,8 @@ import {
 	NodeInterface,
 	isMobile,
 	Position,
+	DATA_ELEMENT,
+	UI,
 } from '@aomao/engine';
 import Editor from './editor';
 import Preview from './preview';
@@ -45,7 +47,7 @@ class Toolbar {
 		let root = $('.data-link-container');
 		if (root.length === 0) {
 			root = $(
-				`<div class="data-link-container${
+				`<div ${DATA_ELEMENT}="${UI}" class="data-link-container${
 					isMobile ? ' data-link-container-mobile' : ''
 				}"></div>`,
 			);
@@ -63,7 +65,7 @@ class Toolbar {
 
 	private async onOk(text: string, link: string) {
 		if (!this.target) return;
-		const { change, history } = this.engine;
+		const { change } = this.engine;
 		const range = change.range.get();
 		if (!change.rangePathBeforeCommand) {
 			if (!range.startNode.inEditor()) {
@@ -167,6 +169,7 @@ class Toolbar {
 	}
 
 	show(target: NodeInterface, forceEdit?: boolean) {
+		if (this.target?.equal(target) && !!this.root?.parent()?.length) return;
 		this.target = target;
 		this.create();
 		const text = target.text().replace(/\u200B/g, '');
