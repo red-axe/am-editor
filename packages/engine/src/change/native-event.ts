@@ -6,6 +6,7 @@ import {
 	DATA_ELEMENT,
 	DATA_ID,
 	EDITABLE,
+	READY_CARD_SELECTOR,
 	ROOT,
 	ROOT_SELECTOR,
 	UI_SELECTOR,
@@ -560,6 +561,13 @@ class NativeEvent {
 					}
 					this.#lastePasteRange = cloneRange;
 					range.collapse(false);
+					// 卡片会出现未渲染的情况，选中在卡片后面
+					const card = range.startNode.closest(
+						`${CARD_SELECTOR},${READY_CARD_SELECTOR}`,
+					);
+					if (card.length > 0) {
+						range.setStartAfter(card);
+					}
 					const selection = range.createSelection();
 					this.engine.card.render(undefined, (count) => {
 						selection.move();

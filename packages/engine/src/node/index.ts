@@ -556,7 +556,11 @@ class NodeModel implements NodeModelInterface {
 
 		if (this.isBlock(node)) {
 			// 如果当前光标位置的block节点是空节点，就不用分割
-			const { commonAncestorNode } = range;
+			let { commonAncestorNode } = range;
+			if (commonAncestorNode.isText()) {
+				commonAncestorNode =
+					this.editor.block.closest(commonAncestorNode);
+			}
 			let splitNode = null;
 			if (
 				this.isBlock(commonAncestorNode) &&
