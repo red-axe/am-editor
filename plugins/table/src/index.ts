@@ -24,6 +24,12 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 
 	init() {
 		const editor = this.editor;
+		if (!this.options.colMinWidth) {
+			this.options.colMinWidth = 40;
+		}
+		if (!this.options.rowMinHeight) {
+			this.options.rowMinHeight = 30;
+		}
 		editor.language.add(locales);
 		editor.schema.add(this.schema());
 		editor.conversion.add('th', 'td');

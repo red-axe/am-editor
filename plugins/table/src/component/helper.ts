@@ -503,7 +503,7 @@ class Helper implements HelperInterface {
 
 		if (parseInt(width) === 0) {
 			table.css('width', 'auto');
-		} else {
+		} else if (!width.endsWith('%')) {
 			// pt 直接转为 px, 因为 col 的 width 属性是没有单位的，会直接被理解为 px, 这里 table 的 width 也直接换成 px。
 			table.css('width', parseInt(width, 10) + 'px');
 		} // 表格 table 标签不允许有背景色，无法设置
@@ -516,7 +516,7 @@ class Helper implements HelperInterface {
 			for (let c = cols.length - 1; c >= 0; c--) {
 				const colElement = cols[c] as HTMLTableColElement;
 				const _width = cols.eq(c)?.attributes('width');
-				if (_width) {
+				if (_width && !_width.endsWith('%')) {
 					const widthValue = parseInt(_width);
 					if (widthValue !== NaN)
 						cols.eq(c)?.attributes('width', widthValue);
