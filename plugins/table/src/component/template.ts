@@ -173,9 +173,9 @@ class Template implements TemplateInterface {
 
 		if (html) {
 			const hasColGroup = html.indexOf('<colgroup') > -1;
-			html = transformCustomTags(html);
+			html = transformCustomTags(html) || html;
 			if (!hasColGroup) {
-				html = replace(/^(<table[^>]+>)/, function (match) {
+				html = html?.replace(/^(<table[^>]+>)/, function (match) {
 					return match + colgroup;
 				});
 			}
