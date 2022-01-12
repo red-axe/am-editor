@@ -9,6 +9,7 @@ import {
 	CardToolbarItemOptions,
 	ToolbarItemOptions,
 	sanitizeUrl,
+	isEngine,
 } from '@aomao/engine';
 import './index.css';
 
@@ -82,42 +83,52 @@ class EmbedComponent extends Card<EmbedValue> {
 	}
 
 	toolbar() {
-		const items: Array<CardToolbarItemOptions | ToolbarItemOptions> = [
-			{
-				type: 'dnd',
-			},
-			{
-				type: 'copy',
-			},
-			{
-				type: 'delete',
-			},
-		];
-		const value = this.getValue();
-		if (value?.url) {
-			items.push(
-				{
-					type: 'separator',
-				},
-				{
-					type: 'button',
-					content: '<span class="data-icon data-icon-expand" />',
-					title: this.editor.language.get<string>('embed', 'expand'),
-					onClick: () => this.expand(),
-				},
-				{
-					type: 'button',
-					content:
-						'<span class="data-icon data-icon-compact-display" />',
-					title: this.editor.language.get<string>(
-						'embed',
-						'collapse',
-					),
-					onClick: () => this.collapse(),
-				},
-			);
+		if (isEngine(this.editor)) {
+			const items: Array<CardToolbarItemOptions | ToolbarItemOptions> =
+				[];
+			const value = this.getValue();
+			if (value?.url) {
+				items.push(
+					{
+						type: 'button',
+						content: '<span class="data-icon data-icon-expand" />',
+						title: this.editor.language.get<string>(
+							'embed',
+							'expand',
+						),
+						onClick: () => this.expand(),
+					},
+					{
+						type: 'button',
+						content:
+							'<span class="data-icon data-icon-compact-display" />',
+						title: this.editor.language.get<string>(
+							'embed',
+							'collapse',
+						),
+						onClick: () => this.collapse(),
+					},
+				);
+			}
+			if (!this.editor.readonly) {
+				items.unshift(
+					{
+						type: 'dnd',
+					},
+					{
+						type: 'copy',
+					},
+					{
+						type: 'delete',
+					},
+					{
+						type: 'separator',
+					},
+				);
+			}
+			return items;
 		}
-		return items;
+		return [];
 	}
 
 	handleInputKeydown(e: KeyboardEvent) {
