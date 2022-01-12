@@ -133,7 +133,14 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			},
 		});
 		this.codeMirror.on('keydown', (editor, event) => {
-			event.stopPropagation();
+			// 撤销和重做使用codemirror自带的操作
+			if (
+				isHotkey('mod+z', event) ||
+				isHotkey('mod+y', event) ||
+				isHotkey('mod+shift+z', event)
+			) {
+				event.stopPropagation();
+			}
 			const lineCount = editor.lineCount();
 			const { line, ch } = editor.getCursor();
 			const { onUpFocus, onDownFocus, onLeftFocus, onRightFocus } =
