@@ -205,7 +205,7 @@ class Template implements TemplateInterface {
 			overflow !== false ? TABLE_OVERFLOW_CLASS_NAME : ''
 		}"><div class="${VIEWPORT_READER}"${
 			noBorder === true ? " data-table-no-border='true'" : ''
-		}>${transformCustomTags(html)}</div></div>`;
+		}>${transformCustomTags(html || '')}</div></div>`;
 	}
 }
 
