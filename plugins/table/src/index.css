@@ -145,7 +145,6 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     background: #f2f3f5;
     cursor: pointer;
     border-right: 0 none;
-    z-index: 1;
 }
 
 .table-wrapper .table-cols-header .table-cols-header-item:hover{

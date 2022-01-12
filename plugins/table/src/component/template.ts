@@ -4,6 +4,7 @@ import {
 	DATA_TRANSIENT_ATTRIBUTES,
 	EDITABLE,
 	UI,
+	transformCustomTags,
 } from '@aomao/engine';
 import {
 	TableValue,
@@ -172,9 +173,9 @@ class Template implements TemplateInterface {
 
 		if (html) {
 			const hasColGroup = html.indexOf('<colgroup') > -1;
-
+			html = transformCustomTags(html);
 			if (!hasColGroup) {
-				html = html.replace(/^(<table[^>]+>)/, function (match) {
+				html = replace(/^(<table[^>]+>)/, function (match) {
 					return match + colgroup;
 				});
 			}
@@ -204,7 +205,7 @@ class Template implements TemplateInterface {
 			overflow !== false ? TABLE_OVERFLOW_CLASS_NAME : ''
 		}"><div class="${VIEWPORT_READER}"${
 			noBorder === true ? " data-table-no-border='true'" : ''
-		}>${html}</div></div>`;
+		}>${transformCustomTags(html)}</div></div>`;
 	}
 }
 
