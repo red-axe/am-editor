@@ -225,11 +225,13 @@ export default class Clipboard implements ClipboardInterface {
 						}
 					}
 				}
-				const contents = range.cloneContents();
-				if (customizeStartItem) {
-					contents.removeChild(contents.childNodes[0]);
-					contents.prepend(customizeStartItem[0]);
-				}
+				const contents = range
+					.enlargeToElementNode(true)
+					.cloneContents();
+				// if (customizeStartItem) {
+				// 	contents.removeChild(contents.childNodes[0]);
+				// 	contents.prepend(customizeStartItem[0]);
+				// }
 				const listMergeBlocks: NodeInterface[] = [];
 				contents.querySelectorAll('li').forEach((child) => {
 					const childElement = $(child);
