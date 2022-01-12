@@ -531,6 +531,9 @@ class Producer extends EventEmitter2 {
 		name: string,
 		callback?: (attriables: { [key: string]: string }) => boolean,
 	): { attriables: any; rendered: boolean } | void => {
+		if (!Array.isArray(data)) {
+			return;
+		}
 		for (let i = 1; i < data.length; i++) {
 			if (i === 1) {
 				const attriables = data[i];
@@ -600,7 +603,14 @@ class Producer extends EventEmitter2 {
 			);
 			// 判断要过滤的卡片是否在协同数据中渲染成功
 			if (loadingCards.length > beginCardIndex && this.doc) {
+				// 删除卡片不需要过滤
 				const cardElement = loadingCards[loadingCards.length - 1];
+				if (
+					record.removedNodes.length === 1 &&
+					cardElement.equal(record.removedNodes[0])
+				) {
+					return true;
+				}
 				const tMapValue = cardMap.get(cardElement[0]);
 				if (tMapValue === undefined && cardElement.isEditableCard()) {
 					const cardName = cardElement.attributes(CARD_KEY);
