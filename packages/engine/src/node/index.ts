@@ -700,7 +700,7 @@ class NodeModel implements NodeModelInterface {
 			} else node.attributes(key, attrs[key].toString());
 		});
 		if (typeof style === 'number') style = {};
-		if (typeof style === 'string') style = getStyleMap(style);
+		else if (typeof style === 'string') style = getStyleMap(style);
 		style = style || {};
 		const keys = Object.keys(style);
 		keys.forEach((key) => {
