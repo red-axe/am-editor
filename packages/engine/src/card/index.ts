@@ -110,6 +110,7 @@ class CardModel implements CardModelInterface {
 			?.get<HTMLElement>()
 			?.addEventListener('scroll', this.renderAsyncComponents);
 		window.addEventListener('scroll', this.renderAsyncComponents);
+		this.editor.on('card:async-render', this.renderAsyncComponents);
 	}
 
 	renderAsyncComponents = async () => {
@@ -120,7 +121,11 @@ class CardModel implements CardModelInterface {
 				// 在视图内才渲染卡片
 				if (
 					card.root.length === 0 ||
-					this.editor.root.inViewport(card.root, true)
+					(this.editor.root.inViewport(card.root, true) &&
+						this.editor.trigger(
+							'card:async-render-component',
+							card,
+						) !== false)
 				) {
 					this.asyncComponents.splice(
 						this.asyncComponents.findIndex(
@@ -825,6 +830,7 @@ class CardModel implements CardModelInterface {
 			?.get<HTMLElement>()
 			?.removeEventListener('scroll', this.renderAsyncComponents);
 		window.removeEventListener('scroll', this.renderAsyncComponents);
+		this.editor.off('card:async-render', this.renderAsyncComponents);
 	}
 
 	// 焦点移动到上一个 Block
