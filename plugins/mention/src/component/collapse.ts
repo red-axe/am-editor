@@ -190,19 +190,27 @@ class CollapseComponent implements CollapseComponentInterface {
 		node.attributes({
 			'data-name': escape(name),
 		});
-		node.on('click', (event: MouseEvent) => {
-			if (!key) return;
-			event.stopPropagation();
-			event.preventDefault();
-			if (onSelect) onSelect(event, data);
-		});
-		node.on('mouseenter', () => {
-			if (!key) return;
-			this.root
-				?.find('.data-mention-item-active')
-				.removeClass('data-mention-item-active');
-			node.addClass('data-mention-item-active');
-		});
+		node.on(
+			'click',
+			(event: MouseEvent) => {
+				if (!key) return;
+				event.stopPropagation();
+				event.preventDefault();
+				if (onSelect) onSelect(event, data);
+			},
+			true,
+		);
+		node.on(
+			'mouseenter',
+			() => {
+				if (!key) return;
+				this.root
+					?.find('.data-mention-item-active')
+					.removeClass('data-mention-item-active');
+				node.addClass('data-mention-item-active');
+			},
+			true,
+		);
 		return node;
 	};
 

@@ -20,6 +20,7 @@ import {
 } from 'sharedb';
 import {
 	DATA_ELEMENT,
+	DATA_ID,
 	DATA_TRANSIENT_ATTRIBUTES,
 	DATA_TRANSIENT_ELEMENT,
 	UI,
@@ -243,10 +244,6 @@ export const opsSort = (ops: Op[]) => {
 			if ('sd' in op2) {
 				return 0;
 			}
-			// sd 小于ld就放在前面
-			if ('ld' in op2) {
-				return diff;
-			}
 			return -1;
 		}
 		// 属性删除，排在节点删除最前面
@@ -398,11 +395,28 @@ export const toJSON0 = (
 	return;
 };
 
-export const getValue = (data: any, path: Path) => {
+/**
+ * 根据路径获取json中的值
+ * @param data json 数据
+ * @param path 路径
+ * @param id 相对节点的id
+ * @returns
+ */
+export const getValue = (data: any, path: Path, id?: string) => {
 	if (path.length === 0) return data;
 	let value = data;
+	let hasValue = !id;
 	for (let i = 0; i < path.length && value !== undefined; i++) {
 		value = value[path[i]];
+		if (
+			!hasValue &&
+			id &&
+			Array.isArray(value) &&
+			value.length > 0 &&
+			value[1][DATA_ID] === id
+		) {
+			hasValue = true;
+		}
 	}
-	return value;
+	return hasValue ? value : undefined;
 };

@@ -359,7 +359,8 @@ class Producer extends EventEmitter2 {
 			} else if (type === 'characterData') {
 				if (!isValueString) {
 					if (
-						typeof getValue(this.doc?.data, oldPath) === 'string' &&
+						typeof getValue(this.doc?.data, oldPath, rootId) ===
+							'string' &&
 						(record['text-data'] || target['data']).length > 0
 					) {
 						const newOp = {
@@ -407,6 +408,7 @@ class Producer extends EventEmitter2 {
 					const pathValue = getValue(
 						this.doc?.data,
 						op.oldPath || [],
+						op.id,
 					);
 					if (pathValue !== undefined) {
 						const childIds = op.childIds || [];
@@ -763,7 +765,11 @@ class Producer extends EventEmitter2 {
 		let emitOps: Op[] = [];
 		ops.forEach((op) => {
 			if ('path' in op && op.newValue !== undefined) {
-				const pathValue = getValue(this.doc?.data, op.oldPath || []);
+				const pathValue = getValue(
+					this.doc?.data,
+					op.oldPath || [],
+					op.id,
+				);
 				const newOps = this.textToOps(
 					[...op.path!],
 					pathValue,

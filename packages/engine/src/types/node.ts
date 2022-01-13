@@ -285,6 +285,7 @@ export interface NodeInterface {
 	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,
 		listener: F,
+		rewrite?: boolean | undefined,
 	): NodeInterface;
 
 	/**

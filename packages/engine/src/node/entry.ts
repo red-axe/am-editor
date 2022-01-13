@@ -441,10 +441,11 @@ class NodeEntry implements NodeInterface {
 	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,
 		listener: F,
+		rewrite?: boolean | undefined,
 	): NodeInterface {
 		this.each((node, i) => {
 			node.addEventListener(eventType, listener, false);
-			if (this.events[i]) this.events[i].on(eventType, listener);
+			if (this.events[i]) this.events[i].on(eventType, listener, rewrite);
 		});
 		return this;
 	}
