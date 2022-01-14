@@ -655,6 +655,7 @@
 
 .am-engine span[data-card-type="inline"] span[data-card-element="center"],.am-engine-view span[data-card-type="inline"] span[data-card-element="center"] {
 	vertical-align: bottom;
+  border-radius: 2px;
 }
 
 .am-engine span[data-card-type="inline"] span[data-card-element="left"],
