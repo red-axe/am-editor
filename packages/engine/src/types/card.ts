@@ -374,8 +374,9 @@ export interface CardInterface<T extends CardValue = CardValue> {
 	executeMark?(mark?: NodeInterface, warp?: boolean): void;
 	/**
 	 * 查询当前卡片包含的所有mark样式
+	 * @param clone 是否克隆
 	 */
-	queryMarks?(): NodeInterface[];
+	queryMarks?(clone?: boolean): NodeInterface[];
 }
 
 export interface CardModel {

@@ -330,7 +330,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 					range.startNode,
 					CardActiveTrigger.MOUSE_DOWN,
 				);
-				this.editor.focus();
+				change.range.select(range);
 			},
 		);
 

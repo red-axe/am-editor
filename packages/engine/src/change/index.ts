@@ -135,7 +135,7 @@ class ChangeModel implements ChangeInterface {
 		this.clearChangeTimer();
 		this.changeTimer = setTimeout(() => {
 			this._change();
-		}, 200);
+		}, 50);
 	}
 
 	private clearChangeTimer() {

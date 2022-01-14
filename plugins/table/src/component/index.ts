@@ -623,7 +623,7 @@ class TableComponent<V extends TableValue = TableValue>
 				const value = this.getValue();
 				if (value) this.setValue(value);
 			}
-		}, 100);
+		}, 50);
 	};
 
 	maximize() {
@@ -677,6 +677,8 @@ class TableComponent<V extends TableValue = TableValue>
 			bottom: `${hideHeight > 0 ? hideHeight + 2 : 0}px`,
 		});
 	};
+
+	isChanged: boolean = false;
 
 	didRender() {
 		super.didRender();
@@ -762,6 +764,9 @@ class TableComponent<V extends TableValue = TableValue>
 		}
 		this.selection.on('select', () => {
 			this.conltrollBar.refresh();
+			setTimeout(() => {
+				this.isChanged = true;
+			}, 200);
 			if (!isEngine(this.editor)) return;
 			const { selectArea, tableModel } = this.selection;
 			if (selectArea && selectArea.count > 1 && tableModel) {

@@ -19,6 +19,7 @@ import Engine, {
 	isView,
 	View,
 	EditorInterface,
+	CardInterface,
 } from '@aomao/engine';
 import { Path } from 'sharedb';
 
@@ -172,18 +173,28 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		const { startNode, startOffset, endNode, endOffset, collapsed } =
 			cloneRange;
 		let startMark = startNode.closest(`[${this.MARK_KEY}]`);
-		const startChild = startNode.children().eq(startOffset);
+		const startChild = startNode.isElement()
+			? startNode.children().eq(startOffset)
+			: startNode;
+		let component: CardInterface | undefined;
 		//如果选择是块级卡片就选择在卡片根节点
 		if (startNode.type === Node.ELEMENT_NODE && startChild?.isBlockCard()) {
 			startMark = startChild;
 		} else {
-			const cardMark = card.find(startMark);
-			if (
-				cardMark &&
-				!cardMark.isEditable &&
-				cardMark.root.isBlockCard()
+			component = card.find(
+				startMark.length == 0 && startChild ? startChild : startMark,
+			);
+			if (component?.queryMarks) {
+				const cardMark = component
+					.queryMarks(false)
+					.find((mark) => !!mark.attributes(this.MARK_KEY));
+				if (cardMark) startMark = cardMark;
+			} else if (
+				component &&
+				!component.isEditable &&
+				component.root.isBlockCard()
 			) {
-				startMark = cardMark.root;
+				startMark = component.root;
 			}
 		}
 		let key = startMark.attributes(this.MARK_KEY);
@@ -193,7 +204,12 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		let selectId: string | undefined = !!startId ? startId : undefined;
 
 		//不是重合状态，并且开始节点不是块级卡片
-		if (!collapsed && !!startId && !startMark.isBlockCard()) {
+		if (
+			!collapsed &&
+			!!startId &&
+			!startMark.isBlockCard() &&
+			!component?.queryMarks
+		) {
 			let endMark = endNode.closest(`[${this.MARK_KEY}]`);
 			const endKey = endMark.attributes(this.MARK_KEY);
 			const endChild = endNode.children().eq(endOffset);
@@ -410,7 +426,7 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 				}
 				const cardComponent = this.editor.card.find(mark);
 				if (cardComponent && cardComponent.executeMark) {
-					cardComponent.executeMark(mark.clone(), false);
+					cardComponent.executeMark(mark.clone(), true);
 				}
 			});
 		this.#isApply = true;
@@ -642,14 +658,15 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		container.css({
 			position: 'fixed',
 			top: '-999px',
-			width: '100%',
+			width: this.editor.container.css('width') || '100%',
 			clip: 'rect(0, 0, 0, 0)',
 		});
 		$(document.body).append(container);
 
-		const editor: EditorInterface = isEngine(this.editor)
-			? new Engine(container, this.editor.options)
-			: new View(container, this.editor.options);
+		const editor: EditorInterface = new View(
+			container,
+			this.editor.options,
+		);
 
 		const { node, card } = editor;
 		if (value) container.html(transformCustomTags(value));
@@ -747,13 +764,14 @@ export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
 		container.css({
 			position: 'fixed',
 			top: '-999px',
-			width: '100%',
+			width: this.editor.container.css('width') || '100%',
 			clip: 'rect(0, 0, 0, 0)',
 		});
 		$(document.body).append(container);
-		const editor: EditorInterface = isEngine(this.editor)
-			? new Engine(container, this.editor.options)
-			: new View(container, this.editor.options);
+		const editor: EditorInterface = new View(
+			container,
+			this.editor.options,
+		);
 		const { card } = editor;
 		if (value) container.html(transformCustomTags(value));
 		card.render(container, undefined, false);

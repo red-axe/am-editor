@@ -191,7 +191,7 @@ class HistoryModel implements HistoryInterface {
 			if (!isCursorOp(op)) {
 				isSave = true;
 				if (this.filterEvents.some((filter) => filter(op))) {
-					if (this.actionOps.length > 0)
+					if (this.actionOps.length > 0 && !op['nl'])
 						this.actionOps[this.actionOps.length - 1].ops?.push(op);
 				} else {
 					this.currentAction.self = true;
