@@ -61,7 +61,10 @@ export interface InlineModelInterface {
 	 * 标准化inline节点，不能嵌套在mark标签内，不能嵌套inline标签
 	 * @param node
 	 */
-	flat(node: NodeInterface | RangeInterface, schema?: SchemaInterface): void;
+	flat(
+		node: NodeInterface | RangeInterface,
+		schema?: SchemaInterface,
+	): void | NodeInterface;
 }
 
 export interface InlineInterface<T extends PluginOptions = PluginOptions>

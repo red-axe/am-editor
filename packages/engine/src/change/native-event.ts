@@ -219,7 +219,7 @@ class NativeEvent {
 					textNode.remove();
 					if (node.isEmpty(parent)) parent.remove();
 					mark.unwrap(markTops.map((mark) => mark.clone()));
-					node.insertText(event.data);
+					node.insertText(event.data === '' ? '\xa0' : event.data);
 					mark.merge();
 					range = change.range.get().cloneRange().shrinkToTextNode();
 					startNode = range.startNode;

@@ -225,6 +225,9 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 			return false;
 		};
 		video.onloadedmetadata = () => {
+			const videoPlugin =
+				this.editor.plugin.findPlugin<VideoOptions>('video');
+			const fullEditor = videoPlugin?.options.fullEditor;
 			if (!value.naturalWidth) {
 				value.naturalWidth = video.videoWidth || this.video?.width();
 				this.setValue({
@@ -235,6 +238,16 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 				this.rate =
 					(video.videoHeight || this.video?.height() || 1) /
 					value.naturalWidth;
+			}
+			if (fullEditor && value.naturalWidth) {
+				const fullWidth = this.editor.container.width();
+				if (value.naturalWidth < fullWidth) {
+					const fullHeight = fullWidth * this.rate;
+					this.setValue({
+						naturalWidth: fullWidth,
+						naturalHeight: fullHeight,
+					} as T);
+				}
 			}
 			this.resetSize();
 		};

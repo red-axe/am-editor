@@ -58,12 +58,13 @@ class NodeEntry implements NodeInterface {
 		});
 
 		this.length = nodes.length;
-
-		if (this[0]) {
+		const baseNode = this[0];
+		if (baseNode) {
 			this.document = getDocument(context);
 			this.context = context;
-			this.name = this[0].nodeName.toLowerCase();
-			this.type = this[0].nodeType;
+			const { nodeName, nodeType } = baseNode;
+			this.name = nodeName.toLowerCase();
+			this.type = nodeType;
 			this.window = this.document.defaultView || window;
 		}
 	}
@@ -542,14 +543,13 @@ class NodeEntry implements NodeInterface {
 			const element = this.get<Element>();
 			if (!element) return {};
 			const attrs = {};
-			const elementAttributes = element.attributes;
-			if (!elementAttributes || elementAttributes.length === 0)
-				return attrs;
+			const elementAttributes = element.attributes || [];
+
 			let i = 0,
 				item = null;
 			while ((item = elementAttributes[i])) {
-				const { name, value } = item;
-				attrs[name] = value;
+				// const { name, value } = item;
+				attrs[item.name] = item.value;
 				i++;
 			}
 			return attrs;

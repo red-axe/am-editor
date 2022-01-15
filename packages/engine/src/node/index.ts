@@ -39,9 +39,10 @@ class NodeModel implements NodeModelInterface {
 		let name = typeof node === 'string' ? node : '';
 		if (isNode(node)) name = node.nodeName.toLowerCase();
 		else if (isNodeEntry(node)) name = node.name;
-		return schema
-			.find((rule) => rule.name === name)
-			.some((rule) => rule.isVoid);
+		return (
+			schema.find((rule) => rule.name === name && rule.isVoid === true)
+				.length > 0
+		);
 	}
 
 	isMark(

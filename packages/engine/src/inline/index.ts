@@ -1087,7 +1087,7 @@ class Inline implements InlineModelInterface {
 				let parentMark: NodeInterface | undefined =
 					markApi.closest(node);
 
-				const element = node as NodeInterface;
+				let element = node as NodeInterface;
 				while (
 					parentMark &&
 					!parentMark.equal(node) &&
@@ -1096,32 +1096,36 @@ class Inline implements InlineModelInterface {
 					const cloneMark = parentMark.clone();
 					const cloneInline = node.clone();
 					const children = parentMark.children();
-					children.each((markChild, index) => {
+					children.each((child) => {
 						// 零宽字符的文本跳过
 						if (
-							markChild.nodeType === 3 &&
-							/^\u200b$/.test(markChild.textContent || '')
+							child.nodeType === 3 &&
+							/^\u200b$/.test(child.textContent || '')
 						) {
 							return;
 						}
+
+						const childNode = $(child);
 						if (
-							element.equal(markChild) ||
-							children.eq(index)?.contains(element)
+							element.equal(childNode) ||
+							childNode.contains(element)
 						) {
-							node = nodeApi.wrap(
+							element = nodeApi.wrap(
 								nodeApi.replace(element, cloneMark),
 								cloneInline,
 							);
-							this.repairBoth(node);
+							this.repairBoth(element);
 						} else {
-							nodeApi.wrap(markChild, cloneMark);
+							nodeApi.wrap(childNode, cloneMark);
 						}
 					});
 					nodeApi.unwrap(parentMark);
-					parentMark = markApi.closest(node);
+					parentMark = markApi.closest(element);
 				}
+				return element;
 			}
 		}
+		return;
 	}
 }
 

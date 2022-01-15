@@ -5,5 +5,12 @@ export interface VideoOptions extends PluginOptions {
 		action: 'download' | 'query' | 'cover',
 		url: string,
 	) => string;
+	/**
+	 * 是否显示标题
+	 */
 	showTitle?: boolean;
+	/**
+	 * 填满编辑器宽度
+	 */
+	fullEditor?: boolean;
 }

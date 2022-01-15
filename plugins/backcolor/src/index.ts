@@ -12,6 +12,7 @@ export default class<T extends BackcolorOptions> extends MarkPlugin<T> {
 
 	style = {
 		'background-color': '@var0',
+		background: '@var1',
 	};
 
 	variable = {
@@ -19,6 +20,7 @@ export default class<T extends BackcolorOptions> extends MarkPlugin<T> {
 			required: true,
 			value: '@color',
 		},
+		'@var1': '@color',
 	};
 
 	conversion(): ConversionData {

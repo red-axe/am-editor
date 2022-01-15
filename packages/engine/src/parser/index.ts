@@ -181,6 +181,8 @@ class Parser implements ParserInterface {
 				Object.keys(style).length === 0
 			)
 				return;
+			const attrCount = Object.keys(attributes).length;
+			const styleCount = Object.keys(style).length;
 			//过滤不符合当前节点规则的属性样式
 			schema.filter(node, attributes, style);
 			//复制一个节点
@@ -206,8 +208,8 @@ class Parser implements ParserInterface {
 			});
 			// 如果这个节点过滤掉所有属性样式后还是一个有效的节点就替换掉当前节点
 			if (
-				filterAttrCount === attrKeys.length &&
-				filterStyleCount === styleKeys.length &&
+				filterAttrCount === attrCount &&
+				filterStyleCount === styleCount &&
 				schema.getType(newNode) === type
 			) {
 				node.before(newNode);
@@ -261,16 +263,34 @@ class Parser implements ParserInterface {
 								rule.type === 'mark' &&
 								oldRules.indexOf(rule) < 0,
 						);
+						if (!type) {
+							if (conversion) {
+								this.convert(conversion, newNode, schema);
+								const newChildren = newNode.children();
+								if (newChildren.length > 0) {
+									const children = node.children();
+									newChildren.append(
+										children.length > 0
+											? children
+											: $('\u200b', null),
+									);
+									node.append(newChildren);
+									return;
+								}
+							}
+						}
 
 						//如果是mark节点，使用新节点包裹旧节点子节点
+						let tempNode = node;
 						while (type === 'mark') {
-							const children = node.children();
+							const children = tempNode.children();
 							newNode.append(
 								children.length > 0
 									? children
 									: $('\u200b', null),
 							);
-							node.append(newNode);
+							tempNode.append(newNode);
+							tempNode = newNode;
 							newNode = filter(newNode);
 							if (!newNode) break;
 							//获取这个新的节点所属类型，并且不能是之前节点一样的规则
@@ -281,7 +301,18 @@ class Parser implements ParserInterface {
 									rule.type === 'mark' &&
 									oldRules.indexOf(rule) < 0,
 							);
-							if (!type) break;
+							if (!type) {
+								if (conversion) {
+									this.convert(conversion, newNode, schema);
+									const newChildren = newNode.children();
+									if (newChildren.length > 0) {
+										newNode = newChildren;
+										type = 'mark';
+										continue;
+									}
+								}
+								break;
+							}
 							rule = schema.getRule(newNode);
 							if (!rule) break;
 							oldRules.push(rule);
@@ -289,7 +320,7 @@ class Parser implements ParserInterface {
 					}
 				} else if (nodeApi.isInline(node)) {
 					//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
-					inlineApi.flat(node, schema);
+					return inlineApi.flat(node, schema);
 				}
 			}
 		});

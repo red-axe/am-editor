@@ -1,4 +1,4 @@
-import { $ } from '@aomao/engine';
+import { $, removeUnit } from '@aomao/engine';
 import type {
 	PluginEntry,
 	CardEntry,
@@ -260,6 +260,17 @@ export const mentionOptions: MentionOptions = {
 export const fontsizeOptions: FontsizeOptions = {
 	//配置粘贴后需要过滤的字体大小
 	filter: (fontSize: string) => {
+		const size = removeUnit(fontSize);
+		if (size > 48) {
+			return '48px';
+		} else if (size < 12) return '12px';
+		else if (size < 19 && size > 16) return '16px';
+		else if (size < 22 && size > 19) return '19px';
+		else if (size < 24 && size > 22) return '22px';
+		else if (size < 29 && size > 24) return '24px';
+		else if (size < 32 && size > 29) return '29px';
+		else if (size < 40 && size > 32) return '32px';
+		else if (size < 48 && size > 40) return '40px';
 		return (
 			[
 				'12px',

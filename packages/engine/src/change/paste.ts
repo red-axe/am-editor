@@ -42,6 +42,7 @@ export default class Paste {
 		const defautlStyleKeys = Object.keys(defaultStyle);
 		const { inline } = this.engine;
 		const nodeApi = this.engine.node;
+		const markApi = this.engine.mark;
 
 		$(fragment).traverse((node) => {
 			let parent = node.parent();
@@ -415,7 +416,45 @@ export default class Paste {
 				nodeApi.isMark(nodeParent, this.schema) &&
 				nodeApi.isMark(node, this.schema)
 			) {
-				if (this.engine.mark.compare(nodeParent.clone(), node, true)) {
+				const pMarkPlugin = markApi.findPlugin(nodeParent);
+				const cMarkPlugin = markApi.findPlugin(node);
+				if (
+					pMarkPlugin &&
+					cMarkPlugin &&
+					cMarkPlugin.mergeLeval > pMarkPlugin.mergeLeval
+				) {
+					const cloneParent = nodeParent.clone(false);
+					const childrenNodes = nodeParent.children().toArray();
+					const startP = cloneParent.clone();
+					const endP = cloneParent.clone();
+					let isStart = true;
+					let index = -1;
+					childrenNodes.forEach((children, i) => {
+						if (children.equal(node)) {
+							const nChildren = node.children();
+							cloneParent.append(nChildren);
+							node.append(cloneParent);
+							isStart = false;
+							index = i;
+						} else if (isStart) {
+							startP.append(children);
+						} else {
+							endP.append(children);
+						}
+					});
+					if (index > 0) {
+						nodeParent.before(startP);
+					}
+					if (index < childrenNodes.length - 1) {
+						nodeParent.after(endP);
+					}
+					if (index > -1) {
+						nodeParent.before(node);
+						nodeParent.remove();
+						return node;
+					}
+				}
+				if (markApi.compare(nodeParent.clone(), node, true)) {
 					nodeApi.unwrap(node);
 					break;
 				} else {

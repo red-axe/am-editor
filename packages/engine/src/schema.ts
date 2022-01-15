@@ -1,4 +1,4 @@
-import { cloneDeep, isEqual, merge, omit } from 'lodash';
+import { assign, cloneDeep, isEqual, merge, omit } from 'lodash';
 import {
 	NodeInterface,
 	SchemaAttributes,
@@ -370,14 +370,13 @@ class Schema implements SchemaInterface {
 		if (!rule) return;
 		const { globals } = this.data;
 		const globalRule = globals[rule.type] ? rule.type : undefined;
-		const allRule = {
-			...omit(rule, 'attributes'),
+		const allRule = Object.assign({}, rule, {
 			attributes: merge(
 				{},
 				rule.attributes,
 				globalRule ? globals[globalRule] : {},
 			),
-		};
+		});
 		this.filterAttributes(attributes, allRule);
 		this.filterStyles(styles, allRule);
 	}

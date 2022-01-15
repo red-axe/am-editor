@@ -7,7 +7,6 @@ import {
 } from '../constants/card';
 import { DATA_ELEMENT } from '../constants/root';
 import { isMacos } from './user-agent';
-import md5 from 'blueimp-md5';
 
 /**
  * 随机字符串
@@ -96,17 +95,17 @@ export const getAttrMap = (value: string): { [k: string]: string } => {
 	return map;
 };
 
-const stylesCaches: Record<string, Record<string, string>> = {};
+const stylesCaches: Map<string, Record<string, string>> = new Map();
 /**
  * 将 style 样式转换为 map 数据类型
  * @param {string} style
  */
 export const getStyleMap = (style: string): Record<string, string> => {
-	const key = md5(style);
+	const key = style.replace(/\s+/g, '');
 	const map: Record<string, string> = {};
-	if (!key) return { ...map };
-	const cacheStyle = stylesCaches[key];
-	if (cacheStyle) return { ...cacheStyle };
+	if (!key) return map;
+	const cacheStyle = stylesCaches.get(key);
+	if (cacheStyle) return Object.assign({}, cacheStyle);
 	const reg = /\s*([\w\-]+)\s*:([^;]*)(;|$)/g;
 	let match;
 
@@ -118,8 +117,8 @@ export const getStyleMap = (style: string): Record<string, string> => {
 		}
 		map[key] = val;
 	}
-	stylesCaches[key] = map;
-	return { ...map };
+	stylesCaches.set(key, map);
+	return Object.assign({}, map);
 };
 
 /**
