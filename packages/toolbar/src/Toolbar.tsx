@@ -15,7 +15,6 @@ import {
 	fontfamily,
 } from './config/toolbar';
 import { ButtonProps, DropdownProps, ColorProps, CollapseProps } from './types';
-import ToolbarPlugin, { ToolbarComponent } from './plugin';
 import { CollapseGroupProps } from './collapse/group';
 import { CollapseItemProps } from './collapse/item';
 import locales from './locales';
@@ -335,4 +334,4 @@ const Toolbar: React.FC<ToolbarProps> = ({
 };
 
 export default Toolbar;
-export { ToolbarPlugin, ToolbarComponent, fontFamilyDefaultData, fontfamily };
+export { fontFamilyDefaultData, fontfamily };
