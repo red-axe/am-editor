@@ -16,7 +16,7 @@ export default class<T extends FontsizeOptions> extends MarkPlugin<T> {
 		return 'fontsize';
 	}
 
-	readonly mergeLeval = 2;
+	readonly mergeLeval = 4;
 
 	tagName = 'span';
 

@@ -149,6 +149,7 @@ export default defineComponent({
 
 .toolbar-dropdown .toolbar-dropdown-trigger {
     align-items: center;
+    display: flex;
 }
 
 .toolbar-dropdown .toolbar-dropdown-trigger .toolbar-dropdown-button-text {

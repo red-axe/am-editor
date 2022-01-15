@@ -7,7 +7,7 @@ export default class<T extends BackcolorOptions> extends MarkPlugin<T> {
 	static get pluginName() {
 		return 'backcolor';
 	}
-	readonly mergeLeval = 4;
+	readonly mergeLeval = 2;
 	tagName = 'span';
 
 	style = {

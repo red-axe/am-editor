@@ -350,11 +350,6 @@ export const toolbarOptions: ToolbarOptions = {
 					},
 					{
 						type: 'button',
-						name: 'table',
-						icon: 'table',
-					},
-					{
-						type: 'button',
 						name: 'math',
 						icon: 'math',
 					},
@@ -370,7 +365,7 @@ export const toolbarOptions: ToolbarOptions = {
 					},
 					{
 						type: 'button',
-						name: 'unordered-list',
+						name: 'unorderedlist',
 						icon: 'unordered-list',
 					},
 					{

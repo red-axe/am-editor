@@ -8,11 +8,16 @@
 }
 
 .am-engine .data-list-task [data-card-key="checkbox"],.am-engine-view .data-list-task [data-card-key="checkbox"] {
-    position: relative;
     margin-left: -22px;
-    height: 100%;
+    height: 16px;
     display: inline-block;
     width: 22px;
-    top: -2px;
-    vertical-align: top;
+    vertical-align: middle;
+    height: 100%;
+}
+
+.am-engine .data-list-task [data-card-key="checkbox"] [data-card-element="center"],.am-engine .data-list-task [data-card-key="checkbox"] [data-card-element="body"],.am-engine-view .data-list-task [data-card-key="checkbox"] [data-card-element="center"]{
+    height: 16px;
+    width: 16px;
+    vertical-align: unset;
 }

@@ -15,7 +15,6 @@
 	display: inline-block;
 	line-height: 1;
 	position: relative;
-	vertical-align: middle;
 }
 
 .data-checkbox-checked:after {

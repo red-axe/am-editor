@@ -868,12 +868,23 @@ class Mark implements MarkModelInterface {
 					}
 					//插件一样，不合并，直接移除
 					else if (plugin && plugin === curPlugin) {
-						nodeApi.unwrap(parent);
+						const childs = nodeApi.unwrap(parent);
+						const targetMark = childs.find(
+							(child) =>
+								!child.isCursor() && nodeApi.isMark(child),
+						);
+						if (targetMark) {
+							parent = targetMark;
+						} else if (childs.length > 0) {
+							parent = childs[0].parent();
+						}
 						result = false;
 						break;
 					}
 				}
-				parent = parent.parent();
+				const newParent = parent.parent();
+				if (newParent && nodeApi.isMark(parent)) parent = newParent;
+				else break;
 			}
 			if (result) return false;
 

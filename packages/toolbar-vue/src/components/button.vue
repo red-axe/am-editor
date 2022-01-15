@@ -99,7 +99,7 @@ export default defineComponent({
 </script>
 <style css>
 .editor-toolbar .toolbar-button {
-    display: inline-block;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     width: auto;
@@ -114,7 +114,6 @@ export default defineComponent({
     cursor: pointer;
     color: #595959;
     outline: none;
-    line-height: 32px;
 }
 
 .editor-toolbar.editor-toolbar-popup .toolbar-button {

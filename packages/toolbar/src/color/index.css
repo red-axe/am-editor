@@ -10,6 +10,7 @@
     margin-right: 0;
     min-width: 26px;
     border-radius: 3px 0 0 3px;
+    display: block;
 }
 
 .editor-toolbar.editor-toolbar-popup .colorpicker-button-group .colorpicker-button-text {
@@ -27,6 +28,7 @@
     text-align: center;
     padding: 0 0;
     border-radius: 0 3px 3px 0;
+    display: block;
 }
 
 .editor-toolbar.editor-toolbar-popup .colorpicker-button-group .colorpicker-button-dropdown {

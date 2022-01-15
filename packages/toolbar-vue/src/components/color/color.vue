@@ -95,7 +95,7 @@ export default defineComponent({
         };
 
         const hideDropdown = (event?: MouseEvent) => {
-            if (event?.target && $(event.target).closest('.toolbar-dropdown-list'))
+            if (event?.target && $(event.target).closest('.toolbar-dropdown-list').length > 0)
                 return;
             document.removeEventListener('click', hideDropdown);
             visible.value = false
@@ -157,6 +157,7 @@ export default defineComponent({
     margin-right: 0;
     min-width: 26px;
     border-radius: 3px 0 0 3px;
+    display: block;
 }
 
 .editor-toolbar.editor-toolbar-popup .colorpicker-button-group .colorpicker-button-text {
@@ -174,6 +175,7 @@ export default defineComponent({
     text-align: center;
     padding: 0 0;
     border-radius: 0 3px 3px 0;
+    display: block;
 }
 
 .editor-toolbar.editor-toolbar-popup .colorpicker-button-group .colorpicker-button-dropdown {

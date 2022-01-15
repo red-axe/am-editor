@@ -103,7 +103,7 @@ export default () => {
 						? false
 						: {
 								url: `${wsUrl}${
-									member ? '?uid=' + member.id : ''
+									member?.id ? '?uid=' + member.id : ''
 								}`,
 								docId: 'demo',
 								onReady: (member) => {

@@ -72,6 +72,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 .table-wrapper.active {
     margin-top: -42px;
     width: 100%;
+    z-index: 1;
 }
 
 .table-wrapper.scrollbar-show {

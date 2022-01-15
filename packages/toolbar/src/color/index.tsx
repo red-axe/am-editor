@@ -92,7 +92,10 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 	};
 
 	const hideDropdown = (event?: MouseEvent) => {
-		if (event?.target && $(event.target).closest('.toolbar-dropdown-list'))
+		if (
+			event?.target &&
+			$(event.target).closest('.toolbar-dropdown-list').length > 0
+		)
 			return;
 		document.removeEventListener('click', hideDropdown);
 		setPickerVisible(false);
