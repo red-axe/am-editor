@@ -84,14 +84,8 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 
 		this.#statusEditor = new StatusEditor({
 			colors: this.getColors(),
-			onChange: (
-				text: string,
-				color: {
-					background: string;
-					color: string;
-				},
-			) => {
-				this.setColor(color);
+			onChange: (text, color) => {
+				if (color) this.setColor(color);
 				this.setValue({
 					text,
 				} as T);

@@ -16,7 +16,7 @@ export type Options = {
 	onBlur?: () => void;
 	onChange?: (
 		value: string,
-		color: {
+		color?: {
 			background: string;
 			color: string;
 		},
@@ -44,7 +44,7 @@ class StatusEditor {
 
 	change() {
 		const { onChange } = this.options;
-		if (onChange) onChange(this.#value!, this.#color!);
+		if (onChange) onChange(this.#value!, this.#color);
 	}
 
 	updateActive(color: { background: string; color: string }) {
@@ -55,6 +55,8 @@ class StatusEditor {
 		);
 		if (index > -1) {
 			svgElements?.eq(index)?.css('display', 'block');
+		} else {
+			this.#color = undefined;
 		}
 	}
 

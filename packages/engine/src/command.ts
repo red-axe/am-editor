@@ -1,5 +1,11 @@
+import { TRIGGER_CARD_ID, UI_SELECTOR } from './constants';
 import { isMarkPlugin } from './plugin';
-import { ChangeInterface, EditorInterface, CommandInterface } from './types';
+import {
+	ChangeInterface,
+	EditorInterface,
+	CommandInterface,
+	CardInterface,
+} from './types';
 import { isEngine } from './utils';
 
 /**
@@ -71,8 +77,21 @@ class Command implements CommandInterface {
 			if (
 				!range.commonAncestorNode.isRoot() &&
 				!range.commonAncestorNode.inEditor()
-			)
-				this.editor.focus();
+			) {
+				const uiElement = range.commonAncestorNode.closest(UI_SELECTOR);
+				let component: CardInterface | undefined = undefined;
+				if (uiElement.length > 0) {
+					const cardId = uiElement.attributes(TRIGGER_CARD_ID);
+					if (cardId) {
+						const { card } = this.editor;
+						component = card.find(cardId);
+						if (component) {
+							card.select(component);
+						}
+					}
+				}
+				if (!component) this.editor.focus();
+			}
 			change.cacheRangeBeforeCommand();
 		}
 		return change;

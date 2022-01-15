@@ -1,4 +1,10 @@
-import { $, ConversionData, MarkPlugin, PluginOptions } from '@aomao/engine';
+import {
+	$,
+	ConversionData,
+	MarkPlugin,
+	PluginOptions,
+	SchemaMark,
+} from '@aomao/engine';
 
 export interface BackcolorOptions extends PluginOptions {
 	hotkey?: { key: string; args: Array<string> };
@@ -12,7 +18,6 @@ export default class<T extends BackcolorOptions> extends MarkPlugin<T> {
 
 	style = {
 		'background-color': '@var0',
-		background: '@var1',
 	};
 
 	variable = {
@@ -20,8 +25,13 @@ export default class<T extends BackcolorOptions> extends MarkPlugin<T> {
 			required: true,
 			value: '@color',
 		},
-		'@var1': '@color',
 	};
+
+	schema(): SchemaMark | SchemaMark[] {
+		const schemas = super.schema() as SchemaMark;
+		schemas.attributes!.style['background'] = '@color';
+		return schemas;
+	}
 
 	conversion(): ConversionData {
 		return [
