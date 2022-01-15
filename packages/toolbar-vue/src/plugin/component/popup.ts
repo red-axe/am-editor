@@ -81,8 +81,14 @@ export default class Popup {
 		}
 		const topRange = subRanges[0];
 		const bottomRange = subRanges[subRanges.length - 1];
-		const topRect = topRange.getBoundingClientRect();
-		const bottomRect = bottomRange.getBoundingClientRect();
+		const topRect = topRange
+			.cloneRange()
+			.collapse(true)
+			.getBoundingClientRect();
+		const bottomRect = bottomRange
+			.cloneRange()
+			.collapse(false)
+			.getBoundingClientRect();
 
 		let rootRect: DOMRect | undefined = undefined;
 		this.showContent(() => {
@@ -93,7 +99,8 @@ export default class Popup {
 			}
 			this.#align =
 				bottomRange.startNode.equal(selection.focusNode!) &&
-				!topRange.startNode.equal(selection.focusNode!)
+				(!topRange.startNode.equal(selection.focusNode!) ||
+					selection.focusOffset > selection.anchorOffset)
 					? 'bottom'
 					: 'top';
 			const space = 12;
