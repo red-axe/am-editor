@@ -725,7 +725,7 @@ export const getToolbarDefaultConfig = (
 				return (
 					(!!cardComponent &&
 						!cardComponent.isCursor(range.startNode)) ||
-					range.commonAncestorNode.find(CARD_SELECTOR).length > 0 ||
+					range.containsCard() ||
 					!engine.command.queryEnabled('link')
 				);
 			},

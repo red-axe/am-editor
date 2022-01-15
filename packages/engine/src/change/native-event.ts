@@ -1,11 +1,13 @@
 import { isHotkey } from 'is-hotkey';
 import {
 	CARD_LEFT_SELECTOR,
+	CARD_LOADING_KEY,
 	CARD_RIGHT_SELECTOR,
 	CARD_SELECTOR,
 	DATA_ELEMENT,
 	DATA_ID,
 	EDITABLE,
+	READY_CARD_KEY,
 	READY_CARD_SELECTOR,
 	ROOT,
 	ROOT_SELECTOR,
@@ -566,7 +568,13 @@ class NativeEvent {
 						`${CARD_SELECTOR},${READY_CARD_SELECTOR}`,
 					);
 					if (card.length > 0) {
-						range.setStartAfter(card);
+						const attributes = card.attributes();
+						if (
+							attributes[CARD_LOADING_KEY] ||
+							attributes[READY_CARD_KEY]
+						) {
+							range.setStartAfter(card);
+						}
 					}
 					const selection = range.createSelection();
 					this.engine.card.render(undefined, (count) => {

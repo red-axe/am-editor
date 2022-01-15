@@ -134,7 +134,10 @@ class Toolbar {
 				language={this.engine.language}
 				defaultText={text}
 				defaultLink={href}
-				onLoad={() => (this.mouseInContainer = true)}
+				onLoad={() => {
+					this.mouseInContainer = true;
+					this.engine.trigger('select');
+				}}
 				onOk={(text: string, link: string) => this.onOk(text, link)}
 			/>
 		);

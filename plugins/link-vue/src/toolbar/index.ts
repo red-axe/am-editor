@@ -134,6 +134,7 @@ class Toolbar {
 			onLoad: () => {
 				this.mouseInContainer = true;
 				if (callback) callback();
+				this.engine.trigger('select');
 			},
 			onOk: (text: string, link: string) => this.onOk(text, link),
 		});

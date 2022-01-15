@@ -7,6 +7,7 @@ import {
 } from '../constants/card';
 import { DATA_ELEMENT } from '../constants/root';
 import { isMacos } from './user-agent';
+import md5 from 'blueimp-md5';
 
 /**
  * 随机字符串
@@ -95,30 +96,30 @@ export const getAttrMap = (value: string): { [k: string]: string } => {
 	return map;
 };
 
-const stylesCaches = new Map<string, { [k: string]: string }>();
+const stylesCaches: Record<string, Record<string, string>> = {};
 /**
  * 将 style 样式转换为 map 数据类型
  * @param {string} style
  */
-export const getStyleMap = (style: string): { [k: string]: string } => {
-	style = style.replace(/&quot;/g, '"');
-	const map: { [k: string]: string } = {};
-	if (!style) return map;
-	const cacheStyle = stylesCaches.get(style);
-	if (cacheStyle) return cacheStyle;
+export const getStyleMap = (style: string): Record<string, string> => {
+	const key = md5(style);
+	const map: Record<string, string> = {};
+	if (!key) return { ...map };
+	const cacheStyle = stylesCaches[key];
+	if (cacheStyle) return { ...cacheStyle };
 	const reg = /\s*([\w\-]+)\s*:([^;]*)(;|$)/g;
 	let match;
 
 	while ((match = reg.exec(style))) {
 		const key = match[1].toLowerCase().trim();
 		let val = match[2].trim();
-		if (val.toLowerCase().includes('rgb')) {
+		if (key.endsWith('color') || val.toLowerCase().includes('rgb')) {
 			val = toHex(val);
 		}
 		map[key] = val;
 	}
-	stylesCaches.set(style, map);
-	return map;
+	stylesCaches[key] = map;
+	return { ...map };
 };
 
 /**

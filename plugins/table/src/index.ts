@@ -12,6 +12,7 @@ import {
 	decodeCardValue,
 	CARD_VALUE_KEY,
 	CARD_SELECTOR,
+	transformCustomTags,
 } from '@aomao/engine';
 import TableComponent, { Template, Helper } from './component';
 import locales from './locale';
@@ -476,7 +477,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				);
 				if (!value || !value.html) return;
 				// 表格值里面的卡片都是没有被转换过的，所以需要先把卡片转换过来
-				table = $(value.html);
+				table = $(transformCustomTags(value.html));
 				if (table.length === 0) {
 					node.remove();
 					return;

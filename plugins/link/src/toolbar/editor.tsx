@@ -29,11 +29,9 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 	const linkRef = useRef<Input>(null);
 
 	useEffect(() => {
+		linkRef.current?.focus();
 		if (onLoad && linkRef.current) onLoad(linkRef.current);
-		setTimeout(() => {
-			linkRef.current?.focus();
-		}, 200);
-	}, []);
+	}, [linkRef]);
 
 	return (
 		<div

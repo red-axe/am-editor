@@ -54,10 +54,11 @@ abstract class MarkEntry<T extends PluginOptions = PluginOptions>
 		super.init();
 		const editor = this.editor;
 		if (isEngine(editor) && this.markdown) {
-			editor.on(
-				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child)?.match,
-			);
+			// mark 样式的粘贴的时候不检测，以免误报
+			// editor.on(
+			// 	'paste:markdown-check',
+			// 	(child) => !this.checkMarkdown(child)?.match,
+			// );
 			editor.on('paste:markdown', (node) => this.pasteMarkdown(node));
 		}
 	}

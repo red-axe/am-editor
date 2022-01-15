@@ -80,9 +80,9 @@ export default defineComponent({
         }
 
         onMounted(() => {
-            if (props.onLoad) props.onLoad();
+            linkRef.value?.focus();
             setTimeout(() => {
-              linkRef.value?.focus();
+                if (props.onLoad) props.onLoad();
             }, 200);
         })
 
