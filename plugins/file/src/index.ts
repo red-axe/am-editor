@@ -1,6 +1,5 @@
 import {
 	$,
-	CardEntry,
 	CardInterface,
 	CARD_KEY,
 	CARD_VALUE_KEY,
@@ -9,10 +8,8 @@ import {
 	isEngine,
 	NodeInterface,
 	Plugin,
-	PluginEntry,
 	READY_CARD_KEY,
 	SchemaInterface,
-	PluginOptions,
 } from '@aomao/engine';
 import FileComponent from './component';
 import type { FileValue } from './component';
@@ -185,4 +182,4 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 }
 
 export { FileComponent, FileUploader };
-export type { FileValue, FileUploaderOptions };
+export type { FileValue, FileOptions, FileUploaderOptions };

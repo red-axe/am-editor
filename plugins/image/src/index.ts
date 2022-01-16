@@ -152,4 +152,4 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 }
 
 export { ImageComponent, ImageUploader };
-export type { ImageValue, ImageUploaderOptions };
+export type { ImageValue, ImageOptions, ImageUploaderOptions };
