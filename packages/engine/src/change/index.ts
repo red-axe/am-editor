@@ -17,7 +17,7 @@ import Selection from '../selection';
 import { $ } from '../node';
 import NativeEvent from './native-event';
 import ChangeRange from './range';
-import { Range } from 'src';
+import Range from '../range';
 
 class ChangeModel implements ChangeInterface {
 	private engine: EngineInterface;
