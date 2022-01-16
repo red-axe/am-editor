@@ -17,6 +17,7 @@
             :active="visible"
             :disabled="disabled"
             :placement="placement"
+            ref="targetRef"
             >
                 <template #default>
                     <slot :item="content">
@@ -56,7 +57,8 @@ export default defineComponent({
     setup(props,cxt){
         const valuesVar = ref<string | number | string[]>("")
         let buttonContent = ref<DropdownListItem | {icon?:string,content?:string} | undefined>(undefined)
-
+        const visible = ref(false)
+        const targetRef = ref<typeof AmButton | undefined>(undefined)
         const buttonRef = ref<HTMLDivElement | null>(null)
         const isRight = useRight(buttonRef)
 
@@ -95,50 +97,52 @@ export default defineComponent({
             valuesVar.value = values ||
 						(props.icon || props.content ? '' : defaultItem?.key || '')
         }
+        
+        const triggerMouseDown = (event: MouseEvent) => {
+            event.preventDefault();
+        }
+        const triggerClick = (event: MouseEvent) =>{
+            event.preventDefault();
+            if (props.disabled) {
+                return;
+            }
+            if (visible.value) {
+                hide();
+            } else {
+                show();
+            }
+        }
+	    const show = () => {
+            visible.value = true
+        }
+        const hide = (event?: MouseEvent) => {
+            if(event && targetRef.value?.element && targetRef.value.element.contains(event.target as Node)) return;
+            visible.value = false
+        }
+
+	    const triggerSelect = (event: MouseEvent, key: string) => {
+            hide()
+		    if (props.onSelect) props.onSelect(event, key);
+	    }
         update(props.values)
         watch(() => ({...props}), (newProps) => update(newProps.values))
+        watch(() => visible.value, (value,oldValue) => {
+            if(value) document.addEventListener('click', hide);
+            else document.removeEventListener('click', hide);
+        })
         return {
             buttonRef,
             isRight,
             buttonContent,
-            valuesVar
+            valuesVar,
+            triggerMouseDown,
+            triggerClick,
+            show,
+            hide,
+            triggerSelect,
+            visible,
+            targetRef
         }
-    },
-    data(){
-        return {
-            visible:false
-        }
-    },
-    methods:{
-        triggerMouseDown(event: MouseEvent){
-            event.preventDefault();
-        },
-        triggerClick(event: MouseEvent){
-            event.preventDefault();
-            if (this.disabled) {
-                return;
-            }
-            if (this.visible) {
-                this.hide();
-            } else {
-                this.show();
-            }
-        },
-	    show(){
-            setTimeout(() => {
-              document.addEventListener('click', this.hide);
-            }, 10);
-            this.visible = true
-        },
-        hide(){
-		    document.removeEventListener('click', this.hide);
-            this.visible = false
-        },
-
-	    triggerSelect(event: MouseEvent, key: string){
-            this.hide()
-		    if (this.onSelect) this.onSelect(event, key);
-	    }
     }
 })
 </script>
@@ -148,8 +152,9 @@ export default defineComponent({
 }
 
 .toolbar-dropdown .toolbar-dropdown-trigger {
-    align-items: center;
     display: flex;
+    align-items: stretch;
+    height: 100%;
 }
 
 .toolbar-dropdown .toolbar-dropdown-trigger .toolbar-dropdown-button-text {

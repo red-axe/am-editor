@@ -114,17 +114,10 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
 	[ToolbarPlugin.pluginName]: {
 		popup: {
 			items: [
-				['undo', 'redo'],
+				['bold', 'strikethrough', 'fontcolor'],
 				{
 					icon: 'text',
-					items: [
-						'bold',
-						'italic',
-						'strikethrough',
-						'underline',
-						'backcolor',
-						'moremark',
-					],
+					items: ['italic', 'underline', 'backcolor', 'moremark'],
 				},
 				[
 					{

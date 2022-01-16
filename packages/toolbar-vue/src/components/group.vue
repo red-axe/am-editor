@@ -2,7 +2,6 @@
     <div v-if="!!icon || !!content" class="editor-toolbar-group">
         <am-popover
         :get-popup-container="getPopupContainer"
-        trigger="click"
         overlay-class-name="editor-toolbar-popover"
         :arrow-point-at-center="true"
         :placement="isMobile ? 'topRight' : undefined"
@@ -64,11 +63,11 @@ export default defineComponent({
 </script>
 <style>
 .editor-toolbar-group {
-    padding: 4px 8px;
+    padding: 4px;
     width: auto;
     border-left: 1px solid #e8e8e8;
     display: flex;
-    align-items: center;
+    align-items: stretch;
 }
 
 .editor-toolbar .editor-toolbar-group:nth-child(1) {

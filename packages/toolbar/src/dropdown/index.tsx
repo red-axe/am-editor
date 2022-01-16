@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import classnames from 'classnames-es-ts';
 import type { EngineInterface, Placement } from '@aomao/engine';
 import Button from '../button';
@@ -46,6 +46,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 	const [visible, setVisible] = useState(false);
 
 	const buttonRef = useRef<HTMLDivElement | null>(null);
+	const targetRef = useRef<HTMLButtonElement | null>(null);
 	const isRight = useRight(buttonRef);
 
 	const toggle = (event: React.MouseEvent) => {
@@ -61,19 +62,29 @@ const Dropdown: React.FC<DropdownProps> = ({
 		}
 	};
 
+	useEffect(() => {
+		if (visible) document.addEventListener('click', hide);
+		return () => {
+			document.removeEventListener('click', hide);
+		};
+	}, [visible]);
+
 	const show = () => {
-		setTimeout(() => {
-			document.addEventListener('click', hide);
-		}, 10);
 		setVisible(true);
 	};
 
-	const hide = () => {
-		document.removeEventListener('click', hide);
+	const hide = useCallback((event?: MouseEvent) => {
+		if (
+			event &&
+			targetRef.current &&
+			targetRef.current.contains(event.target as Node)
+		)
+			return;
 		setVisible(false);
-	};
+	}, []);
 
 	const triggerSelect = (event: React.MouseEvent, key: string) => {
+		hide();
 		if (onSelect) onSelect(event, key);
 	};
 
@@ -147,6 +158,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 					active={visible}
 					disabled={disabled}
 					placement={placement}
+					ref={targetRef}
 				/>
 			</div>
 			{visible && (

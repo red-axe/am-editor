@@ -830,8 +830,7 @@ class Mark implements MarkModelInterface {
 							nodeApi.unwrap(children);
 					}
 				});
-				nodeApi.wrap(targetNode, mark);
-				return targetNode;
+				return nodeApi.wrap(targetNode, mark);
 			} else if (node.name !== mark.name) {
 				node.remove();
 			}
@@ -1096,6 +1095,12 @@ class Mark implements MarkModelInterface {
 											)}"]`,
 										)
 										.equal(selection.focus)
+								) {
+									started = false;
+									return false;
+								} else if (
+									selection?.focus &&
+									result.next()?.equal(selection.focus)
 								) {
 									started = false;
 									return false;

@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import classNames from 'classnames-es-ts';
-import { $ } from '@aomao/engine';
 import type { EngineInterface, Placement } from '@aomao/engine';
 import { useRight } from '../hooks';
 import Button from '../button';
@@ -52,15 +51,9 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 			  ),
 	);
 	const [currentColor, setCurrentColor] = useState(defaultActiveColor);
-
+	const targetRef = useRef<HTMLButtonElement | null>(null);
 	const buttonRef = useRef<HTMLDivElement | null>(null);
 	const isRight = useRight(buttonRef);
-
-	useEffect(() => {
-		return () => {
-			document.removeEventListener('click', hideDropdown);
-		};
-	}, []);
 
 	useEffect(() => {
 		setButtonContent(
@@ -76,7 +69,6 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 
 	const toggleDropdown = (event: React.MouseEvent) => {
 		event.preventDefault();
-
 		if (pickerVisible) {
 			hideDropdown();
 		} else {
@@ -84,26 +76,30 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 		}
 	};
 
-	const showDropdown = () => {
-		setTimeout(() => {
-			document.addEventListener('click', hideDropdown);
-		}, 10);
-		setPickerVisible(true);
-	};
+	useEffect(() => {
+		if (pickerVisible) document.addEventListener('click', hideDropdown);
+		return () => {
+			document.removeEventListener('click', hideDropdown);
+		};
+	}, [pickerVisible]);
 
-	const hideDropdown = (event?: MouseEvent) => {
+	const showDropdown = useCallback(() => {
+		setPickerVisible(true);
+	}, []);
+
+	const hideDropdown = useCallback((event?: MouseEvent) => {
 		if (
-			event?.target &&
-			$(event.target).closest('.toolbar-dropdown-list').length > 0
+			event &&
+			targetRef.current &&
+			targetRef.current.contains(event.target as Node)
 		)
 			return;
-		document.removeEventListener('click', hideDropdown);
 		setPickerVisible(false);
-	};
+	}, []);
 
 	const triggerSelect = (color: string, event: React.MouseEvent) => {
 		setCurrentColor(color);
-
+		hideDropdown();
 		if (autoExecute !== false) {
 			let commandName = name;
 			let commandArgs = [color, defaultColor];
@@ -153,6 +149,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 					content={<span className="data-icon data-icon-arrow" />}
 					onClick={toggleDropdown}
 					placement={placement}
+					ref={targetRef}
 				/>
 			</div>
 			{pickerVisible && (

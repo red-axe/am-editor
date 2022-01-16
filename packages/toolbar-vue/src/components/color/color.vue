@@ -22,6 +22,7 @@
             :on-click="toggleDropdown"
             :disabled="disabled"
             :placement="placement"
+            ref="targetRef"
             >
                 <template #icon>
                     <span class="colorpicker-button-dropdown-empty" />
@@ -43,7 +44,6 @@
 </template>
 <script lang="ts">
 import { defineComponent, onUnmounted, ref, watch } from 'vue'
-import { $ } from '@aomao/engine'
 import { colorProps } from '../../types'
 import { useRight } from '../../hooks';
 import AmButton from '../button.vue'
@@ -62,7 +62,7 @@ export default defineComponent({
 
         const buttonRef = ref<HTMLDivElement | null>(null)
         const isRight = useRight(buttonRef)
-  
+        const targetRef = ref<typeof AmButton | undefined>(undefined)
         const currentColor = ref(props.defaultActiveColor);
 
         const getContent = () => {
@@ -88,24 +88,25 @@ export default defineComponent({
         };
 
         const showDropdown = () => {
-            setTimeout(() => {
-              document.addEventListener('click', hideDropdown);
-            }, 10);
             visible.value = true
         };
 
         const hideDropdown = (event?: MouseEvent) => {
-            if (event?.target && $(event.target).closest('.toolbar-dropdown-list').length > 0)
-                return;
-            document.removeEventListener('click', hideDropdown);
+            if(event && targetRef.value?.element && targetRef.value.element.contains(event.target as Node)) return;
             visible.value = false
         };
+
+        watch(() => visible.value, (value,oldValue) => {
+            if(value) document.addEventListener('click', hideDropdown);
+            else document.removeEventListener('click', hideDropdown);
+        })
 
         const triggerClick = (event:MouseEvent) => {
             triggerSelect(currentColor.value,event)
         }
 
         const triggerSelect = (color: string, event: MouseEvent) => {
+            hideDropdown()
             currentColor.value = color;
             buttonContent.value = typeof props.content === 'string'
                     ? props.content
@@ -139,7 +140,8 @@ export default defineComponent({
             currentColor,
             triggerSelect,
             triggerClick,
-            toggleDropdown
+            toggleDropdown,
+            targetRef
         }
     }
 })

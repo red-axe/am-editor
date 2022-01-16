@@ -41,7 +41,6 @@ export default defineComponent({
             let { hotkey } = item
             //默认获取插件的热键
             if (props.engine && (hotkey === true || hotkey === undefined)) {
-                console.log(item)
                 hotkey = autoGetHotkey(
                     props.engine,
                     command && !Array.isArray(command) ? command.name : props.name,

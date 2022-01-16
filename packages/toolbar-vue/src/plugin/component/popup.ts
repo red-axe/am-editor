@@ -30,7 +30,6 @@ export default class Popup {
 		window.addEventListener('resize', this.onSelect);
 		this.#editor.scrollNode?.on('scroll', this.onSelect);
 		document.addEventListener('mousedown', this.hide);
-		this.#editor.on('blur', this.hide);
 	}
 
 	onSelect = () => {
@@ -137,13 +136,20 @@ export default class Popup {
 
 	showContent(callback?: () => void) {
 		const result = this.#editor.trigger('toolbar-render', this.#options);
-		if (this.#vm) this.#vm.unmount();
-		this.#vm = createApp(typeof result === 'object' ? result : Toolbar, {
-			...this.#options,
-			engine: this.#editor,
-			popup: true,
-		});
-		this.#vm.mount(this.#root.get<HTMLDivElement>()!);
+		let content = Toolbar;
+		if (typeof result === 'object') {
+			this.#vm?.unmount();
+			this.#vm = undefined;
+			content = result;
+		}
+		if (!this.#vm) {
+			this.#vm = createApp(content, {
+				...this.#options,
+				engine: this.#editor,
+				popup: true,
+			});
+			this.#vm.mount(this.#root.get<HTMLDivElement>()!);
+		}
 		setTimeout(() => {
 			if (callback) callback();
 		}, 200);
@@ -174,8 +180,10 @@ export default class Popup {
 		window.removeEventListener('resize', this.onSelect);
 		this.#editor.scrollNode?.off('scroll', this.onSelect);
 		document.removeEventListener('mousedown', this.hide);
-		this.#editor.off('blur', this.hide);
-		if (this.#vm) this.#vm.unmount();
+		if (this.#vm) {
+			this.#vm.unmount();
+			this.#vm = undefined;
+		}
 	}
 }
 export type { GroupItemProps };

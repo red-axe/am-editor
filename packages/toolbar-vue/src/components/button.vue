@@ -6,6 +6,7 @@
         </template>
         <button 
         :class="['toolbar-button',className,{'toolbar-button-active': active,'toolbar-button-disabled':disabled}]" 
+        ref="element"
         @click="triggerClick" 
         @mousedown="triggerMouseDown" 
         @mouseenter="triggerMouseEnter" 
@@ -33,6 +34,7 @@ export default defineComponent({
     },
     props:buttonProps,
     setup(props){
+        const element = ref<HTMLButtonElement | undefined>()
         let hotkey = props.hotkey;
         //默认获取插件的热键
         if (props.engine && (hotkey === true || hotkey === undefined)) {
@@ -51,7 +53,8 @@ export default defineComponent({
             iconIsHtml:/^<.*>/.test(props.icon?.trim() || ""),
             isMobile,
             visible,
-            hotkeyText:hotkey
+            hotkeyText:hotkey,
+            element
         }
     },
     data(){

@@ -17,6 +17,7 @@ import Selection from '../selection';
 import { $ } from '../node';
 import NativeEvent from './native-event';
 import ChangeRange from './range';
+import { Range } from 'src';
 
 class ChangeModel implements ChangeInterface {
 	private engine: EngineInterface;
@@ -249,8 +250,8 @@ class ChangeModel implements ChangeInterface {
 		);
 	}
 
-	getOriginValue() {
-		const { container, schema, conversion } = this.engine;
+	getOriginValue(container: NodeInterface = this.engine.container) {
+		const { schema, conversion } = this.engine;
 		return new Parser(
 			container.get<HTMLElement>()?.outerHTML || '',
 			this.engine,
@@ -268,12 +269,16 @@ class ChangeModel implements ChangeInterface {
 		if (options.ignoreCursor || this.isComposing()) {
 			value = this.getOriginValue();
 		} else {
-			const range = this.range.get();
+			let range = this.range.get();
 			let selection;
+			const container = this.engine.container.clone(true);
 			if (!range.inCard()) {
+				const path = range.toPath(true);
+				if (!path) return this.getOriginValue();
+				range = Range.fromPath(this.engine, path, true, container);
 				selection = range.createSelection();
 			}
-			value = this.getOriginValue();
+			value = this.getOriginValue(container);
 			selection?.move();
 		}
 		return value;
