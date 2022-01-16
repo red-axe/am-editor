@@ -242,7 +242,7 @@ export interface ChangeInterface {
 	/**
 	 * 获取编辑器值
 	 */
-	getOriginValue(): string;
+	getOriginValue(container?: NodeInterface): string;
 	/**
 	 * 获取编辑值
 	 * @param options
