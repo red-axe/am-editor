@@ -207,4 +207,4 @@ export default class VideoPlugin<
 }
 
 export { VideoComponent, VideoUploader };
-export type { VideoValue, VideoStatus, VideoUploaderOptions };
+export type { VideoValue, VideoOptions, VideoStatus, VideoUploaderOptions };
