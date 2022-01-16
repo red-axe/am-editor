@@ -324,17 +324,10 @@ export const lineHeightOptions: LineHeightOptions = {
 export const toolbarOptions: ToolbarOptions = {
 	popup: {
 		items: [
-			['undo', 'redo'],
+			['bold', 'strikethrough', 'fontcolor'],
 			{
 				icon: 'text',
-				items: [
-					'bold',
-					'italic',
-					'strikethrough',
-					'underline',
-					'backcolor',
-					'moremark',
-				],
+				items: ['italic', 'underline', 'backcolor', 'moremark'],
 			},
 			[
 				{
