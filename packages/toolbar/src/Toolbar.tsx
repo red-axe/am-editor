@@ -43,7 +43,7 @@ export type GroupItemProps =
 					groups: Array<
 						Omit<CollapseGroupProps, 'items'> & {
 							items: Array<
-								Omit<CollapseItemProps, 'engine'> | 'string'
+								Omit<CollapseItemProps, 'engine'> | string
 							>;
 						}
 					>;
