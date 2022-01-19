@@ -94,6 +94,7 @@ class TableComponent<V extends TableValue = TableValue>
 		if (isEngine(this.editor)) {
 			this.editor.on('undo', this.doChange);
 			this.editor.on('redo', this.doChange);
+			this.editor.on('readonly', this.handleReadonly);
 			// tab 键选择
 			if (!this.editor.event.listeners['keydown:tab'])
 				this.editor.event.listeners['keydown:tab'] = [];
@@ -331,6 +332,12 @@ class TableComponent<V extends TableValue = TableValue>
 
 	doChange = () => {
 		this.onChange('remote');
+	};
+
+	handleReadonly = (readonly: boolean) => {
+		this.viewport
+			?.find('.table-main-content')
+			.attributes('contenteditable', readonly ? 'false' : 'true');
 	};
 
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
@@ -924,6 +931,7 @@ class TableComponent<V extends TableValue = TableValue>
 		this.conltrollBar.destroy();
 		this.editor.off('undo', this.doChange);
 		this.editor.off('redo', this.doChange);
+		this.editor.off('readonly', this.handleReadonly);
 	}
 }
 
