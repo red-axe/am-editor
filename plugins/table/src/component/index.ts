@@ -94,7 +94,6 @@ class TableComponent<V extends TableValue = TableValue>
 		if (isEngine(this.editor)) {
 			this.editor.on('undo', this.doChange);
 			this.editor.on('redo', this.doChange);
-			this.editor.on('readonly', this.handleReadonly);
 			// tab 键选择
 			if (!this.editor.event.listeners['keydown:tab'])
 				this.editor.event.listeners['keydown:tab'] = [];
@@ -334,12 +333,6 @@ class TableComponent<V extends TableValue = TableValue>
 		this.onChange('remote');
 	};
 
-	handleReadonly = (readonly: boolean) => {
-		this.viewport
-			?.find('.table-main-content')
-			.attributes('contenteditable', readonly ? 'false' : 'true');
-	};
-
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
 		if (!isEngine(this.editor) || this.editor.readonly)
 			return [
@@ -536,6 +529,7 @@ class TableComponent<V extends TableValue = TableValue>
 		});
 		const { rows, cols, height, width } = tableModel;
 		const html = parser.toValue(schema, conversion, false, false);
+		if (!isEngine(this.editor)) return { ...value, html };
 		return {
 			...value,
 			rows,
@@ -626,7 +620,7 @@ class TableComponent<V extends TableValue = TableValue>
 			if (oldValue?.noBorder) {
 				this.noBorderToolButton?.addClass('active');
 			} else this.noBorderToolButton?.removeClass('active');
-			if (trigger === 'local') {
+			if (trigger === 'local' && isEngine(this.editor)) {
 				const value = this.getValue();
 				if (value) this.setValue(value);
 			}
@@ -807,10 +801,10 @@ class TableComponent<V extends TableValue = TableValue>
 
 		const tableRoot = this.wrapper?.find(Template.TABLE_CLASS);
 		if (!tableRoot) return;
-		const value = this.getValue();
+		const value = super.getValue();
 		if (!value?.html) {
 			const tableValue = this.getValue();
-			if (tableValue) this.setValue(tableValue);
+			if (tableValue && isEngine(this.editor)) this.setValue(tableValue);
 			this.onChange();
 		}
 		if (tableOptions['maxRightWidth'])
@@ -931,7 +925,6 @@ class TableComponent<V extends TableValue = TableValue>
 		this.conltrollBar.destroy();
 		this.editor.off('undo', this.doChange);
 		this.editor.off('redo', this.doChange);
-		this.editor.off('readonly', this.handleReadonly);
 	}
 }
 
