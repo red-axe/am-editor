@@ -44,6 +44,7 @@ class Conversion implements ConversionInterface {
 		let name = node.name;
 		let attributes = node.attributes();
 		let style = getStyleMap(attributes.style || '');
+		let replace = false;
 		//删除属性中的style属性
 		delete attributes.style;
 		// 光标相关节点
@@ -103,18 +104,29 @@ class Conversion implements ConversionInterface {
 					style = {};
 					attributes = {};
 				} else {
-					const node =
+					const result =
 						typeof to === 'function'
 							? to(name, style, attributes)
 							: to;
-					name = node.name;
-					style = node.css();
-					attributes = node.attributes();
+					let resultNode: NodeInterface = result as NodeInterface;
+					if (result.hasOwnProperty('replace')) {
+						const newResult = result as {
+							node: NodeInterface;
+							replace: boolean;
+						};
+						resultNode = newResult.node;
+						replace = newResult.replace;
+					}
+					name = resultNode.name;
+					style = resultNode.css();
+					attributes = resultNode.attributes();
 				}
 			}
 			return result;
 		});
-		return rule ? { rule, node: { name, style, attributes } } : undefined;
+		return rule
+			? { rule, node: { name, style, attributes }, replace }
+			: undefined;
 	}
 }
 export default Conversion;

@@ -26,7 +26,7 @@ export type ConversionToValue =
 			name: string,
 			style: { [key: string]: string },
 			attributes: { [key: string]: string },
-	  ) => NodeInterface);
+	  ) => NodeInterface | { node: NodeInterface; replace: boolean });
 /**
  * 转换器规则
  */
@@ -78,6 +78,7 @@ export interface ConversionInterface {
 						[k: string]: string;
 					};
 				};
+				replace: boolean;
 		  }
 		| undefined;
 }

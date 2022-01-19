@@ -5,10 +5,10 @@ export const FOCUS = 'focus';
 export const CURSOR = 'cursor';
 export const ANCHOR_SELECTOR = 'span['
 	.concat(DATA_ELEMENT, '=')
-	.concat(ANCHOR, ']');
+	.concat(ANCHOR, '],anchor');
 export const FOCUS_SELECTOR = 'span['
 	.concat(DATA_ELEMENT, '=')
-	.concat(FOCUS, ']');
+	.concat(FOCUS, '],focus');
 export const CURSOR_SELECTOR = 'span['
 	.concat(DATA_ELEMENT, '=')
-	.concat(CURSOR, ']');
+	.concat(CURSOR, '],cursor');

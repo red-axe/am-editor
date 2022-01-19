@@ -9,7 +9,13 @@ import {
 	ConversionRule,
 	SchemaRule,
 } from '../types';
-import { CARD_ELEMENT_KEY, CARD_SELECTOR } from '../constants';
+import {
+	ANCHOR_SELECTOR,
+	CARD_ELEMENT_KEY,
+	CARD_SELECTOR,
+	CURSOR_SELECTOR,
+	FOCUS_SELECTOR,
+} from '../constants';
 import {
 	escape,
 	unescape,
@@ -127,17 +133,19 @@ class Parser implements ParserInterface {
 			//把旧节点的子节点追加到新节点下
 			newNode.append(node.children());
 			if (node.isCard()) {
-				node.before(newNode);
-				node.remove();
+				node.replaceWith(newNode);
 				return newNode;
 			} else {
 				if (!nodeApi.isBlock(newNode, schema)) {
-					//把包含旧子节点的新节点追加到旧节点下
-					node.append(newNode);
+					if (value.replace) {
+						node.replaceWith(newNode);
+					} else {
+						//把包含旧子节点的新节点追加到旧节点下
+						node.append(newNode);
+					}
 				} else {
 					// 替换
-					node.before(newNode);
-					node.remove();
+					node.replaceWith(newNode);
 					//排除之前的过滤规则后再次过滤
 					value = conversion.transform(
 						newNode,
@@ -167,6 +175,14 @@ class Parser implements ParserInterface {
 				const cardNode = cards.eq(index);
 				if (!cardNode) return;
 				this.convert(conversion, cardNode, schema);
+			});
+			const cursors = root.find(
+				`${CURSOR_SELECTOR},${ANCHOR_SELECTOR},${FOCUS_SELECTOR}`,
+			);
+			cursors.each((_, index) => {
+				const cursor = cursors.eq(index);
+				if (!cursor) return;
+				this.convert(conversion, cursor, schema);
 			});
 			return;
 		}

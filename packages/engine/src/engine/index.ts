@@ -134,7 +134,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 	}
 
 	getValue(ignoreCursor: boolean = false) {
-		const value = this.change.getValue({});
+		const value = this.change.getValue({ ignoreCursor });
 		return ignoreCursor ? Selection.removeTags(value) : value;
 	}
 

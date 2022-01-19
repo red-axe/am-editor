@@ -8,6 +8,7 @@ import {
 	READY_CARD_KEY,
 	CARD_EDITABLE_KEY,
 } from './card';
+import { ANCHOR, CURSOR, FOCUS } from '.';
 
 const defaultConversion: ConversionData = [
 	{
@@ -61,6 +62,14 @@ const defaultConversion: ConversionData = [
 				p.attributes(name, attributes[name]);
 			});
 			return p;
+		},
+	},
+	{
+		from: (name) => {
+			return [CURSOR, ANCHOR, FOCUS].includes(name);
+		},
+		to: (name) => {
+			return { node: $(`<${name} />`), replace: true };
 		},
 	},
 ];

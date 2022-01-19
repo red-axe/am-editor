@@ -9,7 +9,7 @@ import { RangeInterface, RangePath } from '../types/range';
 import ChangeEvent from './event';
 import Parser from '../parser';
 import { ANCHOR_SELECTOR, CURSOR_SELECTOR, FOCUS_SELECTOR } from '../constants';
-import { combinText } from '../utils';
+import { combinText, transformCustomTags } from '../utils';
 import { TRIGGER_CARD_ID } from '../constants/card';
 import { DATA_ID, EDITABLE_SELECTOR, UI_SELECTOR } from '../constants/root';
 import { SelectionInterface } from '../types/selection';
