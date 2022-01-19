@@ -11,7 +11,7 @@ export type CollapseItemProps = {
 	title?: React.ReactNode | (() => React.ReactNode);
 	search?: string;
 	description?: React.ReactNode | (() => React.ReactNode);
-	prompt?: React.ReactNode | (() => React.ReactNode);
+	prompt?: React.ReactNode | ((props: CollapseItemProps) => React.ReactNode);
 	command?: { name: string; args: Array<any> } | Array<any>;
 	autoExecute?: boolean;
 	disabled?: boolean;
@@ -22,20 +22,20 @@ export type CollapseItemProps = {
 	onMouseDown?: (event: React.MouseEvent) => void;
 };
 
-const CollapseItem: React.FC<CollapseItemProps> = ({
-	engine,
-	name,
-	icon,
-	title,
-	disabled,
-	description,
-	className,
-	prompt,
-	placement,
-	onMouseDown,
-	...props
-}) => {
+const CollapseItem: React.FC<CollapseItemProps> = (props) => {
 	const [active, setActive] = useState(false);
+	const {
+		engine,
+		name,
+		icon,
+		title,
+		disabled,
+		description,
+		className,
+		prompt,
+		placement,
+		onMouseDown,
+	} = props;
 	const onClick = (event: React.MouseEvent) => {
 		if (disabled) return;
 		const { command, onClick, autoExecute } = props;
@@ -99,7 +99,18 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 	return prompt ? (
 		<Popover
 			placement={placement || 'right'}
-			content={typeof prompt === 'function' ? prompt() : prompt}
+			content={
+				<div
+					onClick={(event) => {
+						if (props.onClick) {
+							event.preventDefault();
+							props.onClick(event, name);
+						}
+					}}
+				>
+					{typeof prompt === 'function' ? prompt(props) : prompt}
+				</div>
+			}
 		>
 			{render()}
 		</Popover>

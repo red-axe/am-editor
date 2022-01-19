@@ -125,19 +125,32 @@ export const getToolbarDefaultConfig = (
 							},
 							prompt:
 								!!engine.card.active ||
-								!engine.command.queryEnabled(
-									'table',
-								) ? undefined : (
-									<TableSelector
-										onSelect={(event, rows, cols) => {
-											engine.command.execute(
-												'table',
-												rows,
-												cols,
+								!engine.command.queryEnabled('table')
+									? undefined
+									: (props) => {
+											return (
+												<TableSelector
+													onSelect={(
+														event,
+														rows,
+														cols,
+													) => {
+														if (props.onClick)
+															props.onClick(
+																event,
+																'table',
+															);
+														setTimeout(() => {
+															engine.command.execute(
+																'table',
+																rows,
+																cols,
+															);
+														}, 0);
+													}}
+												/>
 											);
-										}}
-									/>
-								),
+									  },
 							icon: (
 								<span>
 									<svg

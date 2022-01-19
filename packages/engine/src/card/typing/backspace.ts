@@ -129,6 +129,9 @@ class Backspace {
 				event.preventDefault();
 				this.focusPrevBlock(card.root);
 				this.engine.card.remove(card.id, false);
+				if (change.isEmpty()) {
+					change.initValue();
+				}
 				return false;
 			}
 		}

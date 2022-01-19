@@ -5,7 +5,7 @@ import CollapseItem, { CollapseItemProps } from './item';
 export type CollapseGroupProps = {
 	engine?: EngineInterface;
 	title?: React.ReactNode;
-	items: Array<Omit<CollapseItemProps, 'engine'> | string>;
+	items: Array<Omit<CollapseItemProps, 'engine'>>;
 	onSelect?: (event: React.MouseEvent, name: string) => void | boolean;
 };
 
