@@ -102,7 +102,7 @@ class Helper implements HelperInterface {
 		const colCounts = model.map((trModel) => {
 			return trModel.length;
 		});
-		const MaxColCount = Math.max.apply(Math, [...colCounts]);
+		const MaxColCount = Math.max(...colCounts);
 		model.forEach((trModel) => {
 			if (trModel.length < MaxColCount) {
 				let addCount = MaxColCount - trModel.length;
@@ -488,7 +488,7 @@ class Helper implements HelperInterface {
 	}
 
 	/**
-	 * table 结构标准化，补齐丢掉的单元格和行
+	 * table 结构标准化，补齐丢掉的单元格和行
 	 * 场景1. number 拷贝过来的 html 中，如果这一行没有单元格，就会省掉 tr，渲染的时候会有问题
 	 * 场景2. 从网页中鼠标随意选取表格中的一部分，会丢掉没有选中的单元格，需要补齐单元格
 	 * @param {NodeInterface} table 表格 Dom
@@ -602,11 +602,11 @@ class Helper implements HelperInterface {
 			});
 			let shadowCount = shadow.length;
 			while (shadowCount--) {
-				if (r === 0) {
-					tableElement.rows[r].insertCell(0);
-				} else {
-					tableElement.rows[r].insertCell();
-				}
+				// if (r === 0) {
+				// 	tableElement.rows[r].insertCell(0);
+				// } else {
+				tableElement.rows[r].insertCell();
+				// }
 			}
 		});
 		// 修正行高

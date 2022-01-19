@@ -283,6 +283,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				width: '@length',
 				background: '@color',
 				'background-color': '@color',
+				display: '*',
 			},
 		};
 		schema.find((r) => r.name === 'td')[0].attributes = {
@@ -374,6 +375,16 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				clearTable(node);
 				return;
 			}
+			let trs = node.find('tr');
+			trs.each((child) => {
+				const tr = $(child);
+				const display = tr.css('display');
+				if (display === 'none') {
+					tr.remove();
+				} else {
+					tr.css('display', '');
+				}
+			});
 			node = helper.normalizeTable(node);
 			clearWH(node);
 			clearWH(node, 'height');
@@ -419,29 +430,29 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				node?.css('background') || node?.css('background-color');
 			if (background) tds.css('background', background);
 
-			const trs = node.find('tr');
+			trs = node.find('tr');
 			let rowSpan = 1;
-			trs.each((_, index) => {
-				const element = trs.eq(index);
+			trs.each((child) => {
+				const tr = $(child);
 
-				const tds = element?.find('td');
+				const tds = tr?.find('td');
 				if (tds?.length === 0 && rowSpan < 2) {
-					element?.remove();
+					tr?.remove();
 				}
 				if (tds && tds?.length > 0) {
-					rowSpan = (tds[0] as HTMLTableCellElement).rowSpan;
-				} else {
-					rowSpan = 1;
+					const spans = tds
+						.toArray()
+						.map((td) => (td[0] as HTMLTableCellElement).rowSpan);
+					rowSpan = Math.max(...spans);
 				}
 
-				if (element) {
-					clearWH(element);
-					clearWH(element, 'height');
+				if (tr) {
+					clearWH(tr);
+					clearWH(tr, 'height');
 				}
 
 				const background =
-					element?.css('background') ||
-					element?.css('background-color');
+					tr?.css('background') || tr?.css('background-color');
 				if (background) tds?.css('background', background);
 			});
 			this.editor.nodeId.generateAll(node, true);
