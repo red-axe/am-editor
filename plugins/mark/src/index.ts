@@ -5,7 +5,9 @@ export interface MarkOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 }
-export default class<T extends MarkOptions> extends MarkPlugin<T> {
+export default class<
+	T extends MarkOptions = MarkOptions,
+> extends MarkPlugin<T> {
 	tagName = 'mark';
 
 	static get pluginName() {

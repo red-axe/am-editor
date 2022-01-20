@@ -4,7 +4,7 @@ export interface SubOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 }
-export default class<T extends SubOptions> extends MarkPlugin<T> {
+export default class<T extends SubOptions = SubOptions> extends MarkPlugin<T> {
 	tagName = 'sub';
 
 	static get pluginName() {

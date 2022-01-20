@@ -30,7 +30,9 @@ export interface MarkRangeOptions extends PluginOptions {
 
 const PLUGIN_NAME = 'mark-range';
 
-export default class<T extends MarkRangeOptions> extends MarkPlugin<T> {
+export default class<
+	T extends MarkRangeOptions = MarkRangeOptions,
+> extends MarkPlugin<T> {
 	private range?: RangeInterface;
 	private executeBySelf: boolean = false;
 	private MARK_KEY = `data-mark-key`;

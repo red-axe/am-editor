@@ -19,7 +19,9 @@ export interface LinkOptions extends PluginOptions {
 		link: string,
 	) => Promise<{ text: string; link: string }>;
 }
-export default class<T extends LinkOptions> extends InlinePlugin<T> {
+export default class<
+	T extends LinkOptions = LinkOptions,
+> extends InlinePlugin<T> {
 	private toolbar?: Toolbar;
 
 	static get pluginName() {

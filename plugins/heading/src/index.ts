@@ -30,7 +30,9 @@ export interface HeadingOptions extends PluginOptions {
 	enableTypes?: Array<string>;
 	disableMark?: Array<string>;
 }
-export default class<T extends HeadingOptions> extends BlockPlugin<T> {
+export default class<
+	T extends HeadingOptions = HeadingOptions,
+> extends BlockPlugin<T> {
 	attributes = {
 		id: '@var0',
 	};

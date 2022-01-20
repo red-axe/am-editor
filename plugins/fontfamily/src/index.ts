@@ -10,7 +10,9 @@ export interface FontfamilyOptions extends PluginOptions {
 	hotkey?: { key: string; args: Array<string> };
 	filter?: (fontfamily: string) => string | boolean;
 }
-export default class<T extends FontfamilyOptions> extends MarkPlugin<T> {
+export default class<
+	T extends FontfamilyOptions = FontfamilyOptions,
+> extends MarkPlugin<T> {
 	static get pluginName() {
 		return 'fontfamily';
 	}

@@ -14,7 +14,9 @@ export interface AlignmentOptions extends PluginOptions {
 		justify?: string;
 	};
 }
-export default class<T extends AlignmentOptions> extends ElementPlugin<T> {
+export default class<
+	T extends AlignmentOptions = AlignmentOptions,
+> extends ElementPlugin<T> {
 	kind = 'block';
 
 	style = {

@@ -11,7 +11,9 @@ export interface FontsizeOptions extends PluginOptions {
 	filter?: (fontSize: string) => string | boolean;
 }
 
-export default class<T extends FontsizeOptions> extends MarkPlugin<T> {
+export default class<
+	T extends FontsizeOptions = FontsizeOptions,
+> extends MarkPlugin<T> {
 	static get pluginName() {
 		return 'fontsize';
 	}

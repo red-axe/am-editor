@@ -9,7 +9,9 @@ import {
 export interface BackcolorOptions extends PluginOptions {
 	hotkey?: { key: string; args: Array<string> };
 }
-export default class<T extends BackcolorOptions> extends MarkPlugin<T> {
+export default class<
+	T extends BackcolorOptions = BackcolorOptions,
+> extends MarkPlugin<T> {
 	static get pluginName() {
 		return 'backcolor';
 	}

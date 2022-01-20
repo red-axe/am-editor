@@ -22,7 +22,9 @@ export interface IndentOptions extends PluginOptions {
 
 export const TEXT_INENT_KEY = 'text-indent';
 
-export default class<T extends IndentOptions> extends Plugin<T> {
+export default class<
+	T extends IndentOptions = IndentOptions,
+> extends Plugin<T> {
 	static get pluginName() {
 		return 'indent';
 	}

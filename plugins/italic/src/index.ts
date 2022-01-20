@@ -4,7 +4,9 @@ export interface ItalicOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 }
-export default class<T extends ItalicOptions> extends MarkPlugin<T> {
+export default class<
+	T extends ItalicOptions = ItalicOptions,
+> extends MarkPlugin<T> {
 	static get pluginName() {
 		return 'italic';
 	}

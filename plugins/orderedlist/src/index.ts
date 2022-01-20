@@ -13,7 +13,9 @@ export interface OrderedListOptions extends PluginOptions {
 	markdown?: boolean;
 }
 
-export default class<T extends OrderedListOptions> extends ListPlugin<T> {
+export default class<
+	T extends OrderedListOptions = OrderedListOptions,
+> extends ListPlugin<T> {
 	tagName = 'ol';
 
 	attributes = {

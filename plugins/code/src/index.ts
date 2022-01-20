@@ -5,7 +5,9 @@ export interface CodeOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 }
-export default class<T extends CodeOptions> extends InlinePlugin<T> {
+export default class<
+	T extends CodeOptions = CodeOptions,
+> extends InlinePlugin<T> {
 	static get pluginName() {
 		return 'code';
 	}

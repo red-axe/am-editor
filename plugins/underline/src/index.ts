@@ -3,7 +3,9 @@ import { MarkPlugin, PluginOptions } from '@aomao/engine';
 export interface UnderlineOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 }
-export default class<T extends UnderlineOptions> extends MarkPlugin<T> {
+export default class<
+	T extends UnderlineOptions = UnderlineOptions,
+> extends MarkPlugin<T> {
 	tagName = 'u';
 
 	static get pluginName() {

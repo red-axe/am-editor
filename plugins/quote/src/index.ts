@@ -12,7 +12,9 @@ export interface QuoteOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
-export default class<T extends QuoteOptions> extends BlockPlugin<T> {
+export default class<
+	T extends QuoteOptions = QuoteOptions,
+> extends BlockPlugin<T> {
 	tagName: string = 'blockquote';
 
 	canMerge = true;

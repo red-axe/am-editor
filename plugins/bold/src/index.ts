@@ -4,7 +4,9 @@ export interface BoldOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 }
-export default class<T extends BoldOptions> extends MarkPlugin<T> {
+export default class<
+	T extends BoldOptions = BoldOptions,
+> extends MarkPlugin<T> {
 	static get pluginName() {
 		return 'bold';
 	}

@@ -13,7 +13,9 @@ export interface UnorderedlistOptions extends PluginOptions {
 	markdown?: boolean;
 }
 
-export default class<T extends UnorderedlistOptions> extends ListPlugin<T> {
+export default class<
+	T extends UnorderedlistOptions = UnorderedlistOptions,
+> extends ListPlugin<T> {
 	static get pluginName() {
 		return 'unorderedlist';
 	}

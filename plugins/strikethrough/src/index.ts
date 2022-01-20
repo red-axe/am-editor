@@ -4,7 +4,9 @@ export interface StrikethroughOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: string;
 }
-export default class<T extends StrikethroughOptions> extends MarkPlugin<T> {
+export default class<
+	T extends StrikethroughOptions = StrikethroughOptions,
+> extends MarkPlugin<T> {
 	tagName = 'del';
 
 	static get pluginName() {
