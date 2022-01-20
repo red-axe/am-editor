@@ -760,7 +760,7 @@ class Mark implements MarkModelInterface {
 				//找到最底层mark标签添加包裹，<strong><span style="font-size:16px">abc</span></strong> ，在 span 节点中的text再添加包裹，不在strong外添加包裹
 				let targetNode = node;
 				let targetChildrens = targetNode.children().toArray();
-				const curPlugin = this.findPlugin(targetNode);
+				let curPlugin = this.findPlugin(targetNode);
 				while (
 					nodeApi.isMark(targetNode) &&
 					targetChildrens.filter((child) => !child.isCursor())
@@ -778,6 +778,7 @@ class Mark implements MarkModelInterface {
 					} else if (targetChild.isText()) {
 						targetNode = targetChild;
 					} else break;
+					curPlugin = this.findPlugin(targetNode);
 				}
 
 				nodeApi.removeZeroWidthSpace(targetNode);
