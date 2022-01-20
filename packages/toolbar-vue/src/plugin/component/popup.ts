@@ -119,10 +119,22 @@ export default class Popup {
 				this.#align = 'top';
 			}
 			targetRect = this.#align === 'bottom' ? bottomRect : topRect;
-			const top =
+			let top =
 				this.#align === 'top'
 					? targetRect.top - rootRect.height - space
 					: targetRect.bottom + space;
+			if (this.#editor.scrollNode) {
+				const scrollNodeRect = this.#editor.scrollNode
+					.get<HTMLElement>()
+					?.getBoundingClientRect();
+				if (scrollNodeRect) {
+					if (top < scrollNodeRect.top) {
+						top = scrollNodeRect.top;
+					} else if (top > scrollNodeRect.bottom) {
+						top = scrollNodeRect.bottom - rootRect.height - space;
+					}
+				}
+			}
 			this.#point = {
 				left: targetRect.left + targetRect.width - rootRect.width / 2,
 				top,
