@@ -24,7 +24,7 @@
 	left: -1px;
 	right: auto;
 	height: 40px;
-	z-index: 125;
+	z-index: 130;
 }
 
 .data-toolbar-btn {
@@ -142,6 +142,7 @@
 	line-height: 26px;
 	color: #404040;
 	cursor: pointer;
+    display: block;
 }
 
 .data-toolbar-dropdown-item:hover {

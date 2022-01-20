@@ -1,5 +1,5 @@
 import { createApp, App } from 'vue';
-import { $, isEngine, isMobile, Range } from '@aomao/engine';
+import { $, isEngine, isMobile, Range, UI_SELECTOR } from '@aomao/engine';
 import type { NodeInterface, EditorInterface } from '@aomao/engine';
 import Toolbar from '../../components/toolbar.vue';
 import type { GroupItemProps } from '../../types';
@@ -135,8 +135,10 @@ export default class Popup {
 					}
 				}
 			}
+			let left = targetRect.left + targetRect.width - rootRect.width / 2;
+			if (left < 0) left = 16;
 			this.#point = {
-				left: targetRect.left + targetRect.width - rootRect.width / 2,
+				left,
 				top,
 			};
 			this.#root.css({
@@ -169,9 +171,10 @@ export default class Popup {
 
 	hide = (event?: MouseEvent) => {
 		if (event?.target) {
+			const target = $(event.target);
 			if (
-				$(event.target).closest('.data-toolbar-popup-wrapper').length >
-				0
+				target.closest('.data-toolbar-popup-wrapper').length > 0 ||
+				target.closest(UI_SELECTOR).length > 0
 			)
 				return;
 		}

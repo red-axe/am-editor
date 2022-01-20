@@ -35,7 +35,7 @@
 /** ------------------- popup ---------------------- **/
 .data-toolbar-popup-wrapper {
     position: absolute;
-    z-index: 9999;
+    z-index: 128;
     padding: 4px;
     background-color: #fff;
     border-radius: 4px;
