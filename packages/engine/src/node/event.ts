@@ -15,13 +15,13 @@ class Event implements EventInterface {
 	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,
 		listener: F,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void {
-		if (!this.listeners[eventType] || rewrite) {
+		if (!this.listeners[eventType]) {
 			this.listeners[eventType] = [];
 		}
-
-		this.listeners[eventType].push(listener);
+		if (typeof options !== 'object' || !options.once)
+			this.listeners[eventType].push(listener);
 	}
 
 	/**

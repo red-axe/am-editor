@@ -442,11 +442,11 @@ class NodeEntry implements NodeInterface {
 	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,
 		listener: F,
-		rewrite?: boolean | undefined,
+		options?: boolean | AddEventListenerOptions,
 	): NodeInterface {
 		this.each((node, i) => {
-			node.addEventListener(eventType, listener, false);
-			if (this.events[i]) this.events[i].on(eventType, listener, rewrite);
+			node.addEventListener(eventType, listener, options);
+			if (this.events[i]) this.events[i].on(eventType, listener, options);
 		});
 		return this;
 	}
@@ -457,10 +457,15 @@ class NodeEntry implements NodeInterface {
 	 * @param {Function} listener 事件函数
 	 * @return 返回当前实例
 	 */
-	off(eventType: string, listener: EventListener): NodeInterface {
+	off(
+		eventType: string,
+		listener: EventListener,
+		options?: boolean | EventListenerOptions,
+	): NodeInterface {
 		this.each((node, i) => {
-			node.removeEventListener(eventType, listener, false);
-			if (this.events[i]) this.events[i].off(eventType, listener);
+			node.removeEventListener(eventType, listener, options);
+			if (this.events[i])
+				this.events[i].off(eventType, listener, options);
 		});
 		return this;
 	}

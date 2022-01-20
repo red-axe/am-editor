@@ -190,6 +190,7 @@ class CollapseComponent implements CollapseComponentInterface {
 		node.attributes({
 			'data-name': escape(name),
 		});
+		node.removeAllEvents();
 		node.on(
 			'click',
 			(event: MouseEvent) => {
@@ -198,7 +199,9 @@ class CollapseComponent implements CollapseComponentInterface {
 				event.preventDefault();
 				if (onSelect) onSelect(event, data);
 			},
-			true,
+			{
+				once: true,
+			},
 		);
 		node.on(
 			'mouseenter',
@@ -209,7 +212,9 @@ class CollapseComponent implements CollapseComponentInterface {
 					.removeClass('data-mention-item-active');
 				node.addClass('data-mention-item-active');
 			},
-			true,
+			{
+				once: true,
+			},
 		);
 		return node;
 	};

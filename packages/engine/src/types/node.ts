@@ -24,14 +24,18 @@ export interface EventInterface {
 	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,
 		listener: F,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解除绑定
 	 * @param eventType
 	 * @param listener
 	 */
-	off(eventType: string, listener: EventListener): void;
+	off(
+		eventType: string,
+		listener: EventListener,
+		options?: boolean | EventListenerOptions,
+	): void;
 	/**
 	 * 触发事件
 	 * @param eventType 事件类型
@@ -285,7 +289,7 @@ export interface NodeInterface {
 	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,
 		listener: F,
-		rewrite?: boolean | undefined,
+		options?: boolean | AddEventListenerOptions,
 	): NodeInterface;
 
 	/**
@@ -294,7 +298,11 @@ export interface NodeInterface {
 	 * @param {Function} listener 事件函数
 	 * @return {NodeInterface} 返回当前实例
 	 */
-	off(eventType: string, listener: EventListener): NodeInterface;
+	off(
+		eventType: string,
+		listener: EventListener,
+		options?: boolean | EventListenerOptions,
+	): NodeInterface;
 
 	/**
 	 * 获取当前元素节点相对于视口的位置
