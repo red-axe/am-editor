@@ -416,6 +416,21 @@ export default class Paste {
 				nodeApi.isMark(nodeParent, this.schema) &&
 				nodeApi.isMark(node, this.schema)
 			) {
+				if (markApi.compare(nodeParent.clone(), node, true)) {
+					nodeApi.unwrap(node);
+					return;
+				} else {
+					nodeParent = nodeParent.parent();
+				}
+			}
+			// mark 按级别排序
+			nodeParent = parent;
+			if (
+				node.length > 0 &&
+				nodeParent &&
+				nodeApi.isMark(nodeParent, this.schema) &&
+				nodeApi.isMark(node, this.schema)
+			) {
 				const pMarkPlugin = markApi.findPlugin(nodeParent);
 				const cMarkPlugin = markApi.findPlugin(node);
 				if (
@@ -453,12 +468,6 @@ export default class Paste {
 						nodeParent.remove();
 						return node;
 					}
-				}
-				if (markApi.compare(nodeParent.clone(), node, true)) {
-					nodeApi.unwrap(node);
-					break;
-				} else {
-					nodeParent = nodeParent.parent();
 				}
 			}
 			return undefined;

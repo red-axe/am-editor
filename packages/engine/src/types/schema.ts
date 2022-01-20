@@ -147,16 +147,23 @@ export interface SchemaInterface {
 	 * 过滤节点样式
 	 * @param styles 样式
 	 * @param rule 规则
+	 * @param callback 回调
 	 */
-	filterStyles(styles: { [k: string]: string }, rule: SchemaRule): void;
+	filterStyles(
+		styles: { [k: string]: string },
+		rule: SchemaRule,
+		callback?: (name: string, value: string) => void,
+	): void;
 	/**
 	 * 过滤节点属性
 	 * @param attributes 属性
 	 * @param rule 规则
+	 * @param callback 回调
 	 */
 	filterAttributes(
 		attributes: { [k: string]: string },
 		rule: SchemaRule,
+		callback?: (name: string, value: string) => void,
 	): void;
 	/**
 	 * 过滤满足node节点规则的属性和样式
@@ -169,6 +176,7 @@ export interface SchemaInterface {
 		node: NodeInterface,
 		attributes: { [k: string]: string },
 		styles: { [k: string]: string },
+		apply?: boolean,
 	): void;
 	/**
 	 * 克隆当前schema对象

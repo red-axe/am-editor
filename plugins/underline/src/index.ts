@@ -1,4 +1,9 @@
-import { MarkPlugin, PluginOptions } from '@aomao/engine';
+import { $, MarkPlugin } from '@aomao/engine';
+import type {
+	ConversionFromValue,
+	ConversionToValue,
+	PluginOptions,
+} from '@aomao/engine';
 
 export interface UnderlineOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
@@ -16,17 +21,26 @@ export default class<
 		return this.options.hotkey || 'mod+u';
 	}
 
-	conversion() {
+	conversion(): { from: ConversionFromValue; to: ConversionToValue }[] {
 		return [
 			{
-				from: {
-					span: {
-						style: {
-							'text-decoration': 'underline',
-						},
-					},
+				from: (name, style) => {
+					return (
+						name === 'span' &&
+						(style['text-decoration'] || '').includes('underline')
+					);
 				},
-				to: this.tagName,
+				to: (_, style, attrs) => {
+					const newNode = $(`<${this.tagName} />`);
+					style['text-decoration'] = style['text-decoration']
+						.split(/\s+/)
+						.filter((value) => value !== 'underline')
+						.join(' ')
+						.trim();
+					newNode.css(style);
+					newNode.attributes(attrs);
+					return newNode;
+				},
 			},
 		];
 	}

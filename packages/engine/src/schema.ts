@@ -320,7 +320,11 @@ class Schema implements SchemaInterface {
 	 * @param styles 样式
 	 * @param rule 规则
 	 */
-	filterStyles(styles: { [k: string]: string }, rule: SchemaRule) {
+	filterStyles(
+		styles: { [k: string]: string },
+		rule: SchemaRule,
+		callback?: (name: string, value: string) => void,
+	) {
 		Object.keys(styles).forEach((styleName) => {
 			if (
 				!rule.attributes?.style ||
@@ -330,8 +334,10 @@ class Schema implements SchemaInterface {
 					styles[styleName],
 					true,
 				)
-			)
+			) {
+				if (callback) callback(styleName, styles[styleName]);
 				delete styles[styleName];
+			}
 		});
 	}
 	/**
@@ -339,7 +345,11 @@ class Schema implements SchemaInterface {
 	 * @param attributes 属性
 	 * @param rule 规则
 	 */
-	filterAttributes(attributes: { [k: string]: string }, rule: SchemaRule) {
+	filterAttributes(
+		attributes: { [k: string]: string },
+		rule: SchemaRule,
+		callback?: (name: string, value: string) => void,
+	) {
 		Object.keys(attributes).forEach((attributesName) => {
 			if (
 				!rule.attributes ||
@@ -349,8 +359,11 @@ class Schema implements SchemaInterface {
 					attributes[attributesName],
 					true,
 				)
-			)
+			) {
+				if (callback)
+					callback(attributesName, attributes[attributesName]);
 				delete attributes[attributesName];
+			}
 		});
 	}
 
@@ -359,12 +372,14 @@ class Schema implements SchemaInterface {
 	 * @param node 节点，用于获取规则
 	 * @param attributes 属性
 	 * @param styles 样式
+	 * @param apply 是否把过滤的属性和样式应用到节点上
 	 * @returns
 	 */
 	filter(
 		node: NodeInterface,
 		attributes: { [k: string]: string },
 		styles: { [k: string]: string },
+		apply: boolean = false,
 	) {
 		const rule = this.getRule(node);
 		if (!rule) return;
@@ -377,8 +392,16 @@ class Schema implements SchemaInterface {
 				globalRule ? globals[globalRule] : {},
 			),
 		});
-		this.filterAttributes(attributes, allRule);
-		this.filterStyles(styles, allRule);
+		this.filterAttributes(
+			attributes,
+			allRule,
+			apply ? (name) => node.removeAttributes(name) : undefined,
+		);
+		this.filterStyles(
+			styles,
+			allRule,
+			apply ? (name) => node.css(name, '') : undefined,
+		);
 	}
 
 	/**

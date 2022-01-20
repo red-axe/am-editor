@@ -1,4 +1,10 @@
-import { MarkPlugin, PluginOptions } from '@aomao/engine';
+import {
+	$,
+	ConversionFromValue,
+	ConversionToValue,
+	MarkPlugin,
+	PluginOptions,
+} from '@aomao/engine';
 
 export interface StrikethroughOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
@@ -20,17 +26,28 @@ export default class<
 	markdown =
 		this.options.markdown === undefined ? '~~' : this.options.markdown;
 
-	conversion() {
+	conversion(): { from: ConversionFromValue; to: ConversionToValue }[] {
 		return [
 			{
-				from: {
-					span: {
-						style: {
-							'text-decoration': 'line-through',
-						},
-					},
+				from: (name, style) => {
+					return (
+						name === 'span' &&
+						(style['text-decoration'] || '').includes(
+							'line-through',
+						)
+					);
 				},
-				to: this.tagName,
+				to: (_, style, attrs) => {
+					const newNode = $(`<${this.tagName} />`);
+					style['text-decoration'] = style['text-decoration']
+						.split(/\s+/)
+						.filter((value) => value !== 'line-through')
+						.join(' ')
+						.trim();
+					newNode.css(style);
+					newNode.attributes(attrs);
+					return newNode;
+				},
 			},
 			{
 				from: 's',

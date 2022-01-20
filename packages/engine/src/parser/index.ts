@@ -120,6 +120,7 @@ class Parser implements ParserInterface {
 		let value = conversion.transform(node);
 		const oldRules: Array<ConversionRule> = [];
 		const nodeApi = this.editor.node;
+		let convertAfterNode: NodeInterface | null = null;
 		while (value) {
 			const { rule } = value;
 			oldRules.push(rule);
@@ -139,13 +140,22 @@ class Parser implements ParserInterface {
 				if (!nodeApi.isBlock(newNode, schema)) {
 					if (value.replace) {
 						node.replaceWith(newNode);
+						node = newNode;
 					} else {
 						//把包含旧子节点的新节点追加到旧节点下
 						node.append(newNode);
 					}
+					if (!convertAfterNode || convertAfterNode.length === 0)
+						convertAfterNode = newNode;
 				} else {
-					// 替换
-					node.replaceWith(newNode);
+					if (value.replace) {
+						node.replaceWith(newNode);
+						node = newNode;
+					} else {
+						node.append(newNode);
+					}
+					if (!convertAfterNode || convertAfterNode.length === 0)
+						convertAfterNode = newNode;
 					//排除之前的过滤规则后再次过滤
 					value = conversion.transform(
 						newNode,
@@ -157,7 +167,7 @@ class Parser implements ParserInterface {
 			//排除之前的过滤规则后再次过滤
 			value = conversion.transform(node, (r) => oldRules.indexOf(r) < 0);
 		}
-		return;
+		return convertAfterNode;
 	}
 	normalize(
 		root: NodeInterface,
@@ -199,10 +209,11 @@ class Parser implements ParserInterface {
 				return;
 			const attrCount = Object.keys(attributes).length;
 			const styleCount = Object.keys(style).length;
-			//过滤不符合当前节点规则的属性样式
-			schema.filter(node, attributes, style);
+
 			//复制一个节点
 			const newNode = node.clone();
+			//过滤不符合当前节点规则的属性样式
+			schema.filter(node, attributes, style, true);
 			//移除 data-id，以免在下次判断类型的时候使用缓存
 			newNode.removeAttributes(DATA_ID);
 			//移除符合当前节点的属性样式，剩余的属性样式组成新的节点
@@ -257,8 +268,7 @@ class Parser implements ParserInterface {
 				if (conversion && (!schema.getType(node) || isCard)) {
 					const newNode = this.convert(conversion, node, schema);
 					if (newNode) {
-						this.normalize(newNode, schema, conversion);
-						return;
+						return newNode;
 					}
 				}
 				if (isCard) return;
@@ -281,16 +291,23 @@ class Parser implements ParserInterface {
 						);
 						if (!type) {
 							if (conversion) {
-								this.convert(conversion, newNode, schema);
-								const newChildren = newNode.children();
-								if (newChildren.length > 0) {
+								const newChildren = this.convert(
+									conversion,
+									newNode,
+									schema,
+								);
+								if (newChildren && newChildren.length > 0) {
 									const children = node.children();
 									newChildren.append(
 										children.length > 0
 											? children
 											: $('\u200b', null),
 									);
-									node.append(newChildren);
+									node.append(
+										newNode.length === 0
+											? newChildren
+											: newNode.children(),
+									);
 									return;
 								}
 							}
@@ -300,7 +317,16 @@ class Parser implements ParserInterface {
 						let tempNode = node;
 						while (type === 'mark') {
 							const children = tempNode.children();
-							newNode.append(
+							let appendTarget = newNode;
+							while (true) {
+								const children = appendTarget.children();
+								if (children.length > 0) {
+									appendTarget = children;
+								} else {
+									break;
+								}
+							}
+							appendTarget.append(
 								children.length > 0
 									? children
 									: $('\u200b', null),
@@ -319,10 +345,16 @@ class Parser implements ParserInterface {
 							);
 							if (!type) {
 								if (conversion) {
-									this.convert(conversion, newNode, schema);
-									const newChildren = newNode.children();
-									if (newChildren.length > 0) {
-										newNode = newChildren;
+									const newChildren = this.convert(
+										conversion,
+										newNode,
+										schema,
+									);
+									if (newChildren && newChildren.length > 0) {
+										newNode =
+											newNode.length > 0
+												? newNode.children()
+												: newChildren;
 										type = 'mark';
 										continue;
 									}
