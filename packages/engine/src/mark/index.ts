@@ -887,7 +887,7 @@ class Mark implements MarkModelInterface {
 			}
 			if (result) return false;
 
-			let targetNode = parent;
+			let targetNode = node.parent();
 			let curPlugin = targetNode
 				? this.findPlugin(targetNode)
 				: undefined;

@@ -416,7 +416,11 @@ class NodeModel implements NodeModelInterface {
 				if (!prev || prev.isText()) {
 					child.allChildren().forEach((child) => {
 						const text = child.text();
-						if (child.type === getDocument().TEXT_NODE && !!text) {
+						if (
+							child.type === getDocument().TEXT_NODE &&
+							!!text &&
+							!child.next()?.isCursor()
+						) {
 							child.text(text.replace(/\u200b/, ''));
 						}
 					});
