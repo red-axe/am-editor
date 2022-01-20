@@ -1318,7 +1318,6 @@ class Mark implements MarkModelInterface {
 			safeRange.collapsed &&
 			(!isEditable || !card?.getSelectionNodes || nodes.length === 1)
 		) {
-			this.merge(safeRange);
 			if (!range) change.apply(safeRange);
 			return;
 		}
