@@ -43,6 +43,7 @@ export default class Paste {
 		const { inline } = this.engine;
 		const nodeApi = this.engine.node;
 		const markApi = this.engine.mark;
+		const blockApi = this.engine.block;
 
 		$(fragment).traverse((node) => {
 			let parent = node.parent();
@@ -407,6 +408,21 @@ export default class Paste {
 				nodeClone.append(nodeParent);
 				node = nodeClone;
 				nodeParent = node.parent();
+			}
+
+			if (node.length > 0 && nodeApi.isMark(node, this.schema)) {
+				const block = blockApi.closest(node);
+				if (!block.equal(node)) {
+					const markPlugin = markApi.findPlugin(node);
+					const blockPlugin = blockApi.findPlugin(block);
+					if (
+						markPlugin &&
+						blockPlugin?.disableMark?.includes(markPlugin.name)
+					) {
+						nodeApi.unwrap(node);
+						return;
+					}
+				}
 			}
 			// mark 相同的嵌套
 			nodeParent = parent;
