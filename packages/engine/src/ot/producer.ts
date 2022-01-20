@@ -408,7 +408,6 @@ class Producer extends EventEmitter2 {
 					const pathValue = getValue(
 						this.doc?.data,
 						op.oldPath || [],
-						op.id,
 					);
 					if (pathValue !== undefined) {
 						const childIds = op.childIds || [];
@@ -765,11 +764,8 @@ class Producer extends EventEmitter2 {
 		let emitOps: Op[] = [];
 		ops.forEach((op) => {
 			if ('path' in op && op.newValue !== undefined) {
-				const pathValue = getValue(
-					this.doc?.data,
-					op.oldPath || [],
-					op.id,
-				);
+				const pathValue = getValue(this.doc?.data, op.oldPath || []);
+				if (!pathValue) return;
 				const newOps = this.textToOps(
 					[...op.path!],
 					pathValue,

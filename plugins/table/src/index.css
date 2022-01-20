@@ -254,7 +254,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     left: -13px;
     top: 42px;
     width: 14px;
-    z-index: 1;
+    z-index: 128;
     border-right: 0;
     display: none;
 }

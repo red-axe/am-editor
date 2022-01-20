@@ -574,7 +574,16 @@ class NodeModel implements NodeModelInterface {
 				splitNode = removeCurrentEmptyBlock
 					? commonAncestorNode
 					: undefined;
-			} else splitNode = block.split(range);
+			} else {
+				let isFirst = false;
+				if (block.isFirstOffset(range, 'start')) {
+					isFirst = true;
+				}
+				splitNode = block.split(range);
+				if (isFirst) {
+					splitNode = splitNode?.prev();
+				}
+			}
 			let blockNode = block.closest(
 				range.startNode.isEditable()
 					? range
@@ -619,6 +628,8 @@ class NodeModel implements NodeModelInterface {
 							blockNode.remove();
 					} else {
 						blockNode.before(node);
+						if (splitNode && this.isEmptyWidthChild(splitNode))
+							splitNode.remove();
 					}
 				}
 			}
