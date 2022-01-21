@@ -330,7 +330,7 @@ export default class<
 									width: image.width,
 									height: image.height,
 									naturalHeight: image.naturalHeight,
-									naturalWidth: image.naturalHeight,
+									naturalWidth: image.naturalWidth,
 								},
 							});
 							resolve();
