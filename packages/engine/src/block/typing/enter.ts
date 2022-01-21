@@ -1,6 +1,4 @@
 import { EngineInterface } from '../../types';
-import { $ } from '../../node';
-import { DATA_ID } from '../../constants';
 
 class Enter {
 	private engine: EngineInterface;
