@@ -1,10 +1,11 @@
 import { VideoOptions } from '@/types';
-import type {
+import {
 	CardToolbarItemOptions,
 	ToolbarItemOptions,
 	NodeInterface,
 	ResizerInterface,
 	CardValue,
+	removeUnit,
 } from '@aomao/engine';
 import {
 	$,
@@ -228,6 +229,11 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 			const videoPlugin =
 				this.editor.plugin.findPlugin<VideoOptions>('video');
 			const fullEditor = videoPlugin?.options.fullEditor;
+			const fullWidth =
+				this.editor.container.width() -
+				removeUnit(this.editor.container.css('padding-left')) -
+				removeUnit(this.editor.container.css('padding-right'));
+
 			if (!value.naturalWidth) {
 				value.naturalWidth = video.videoWidth || this.video?.width();
 				this.setValue({
@@ -239,9 +245,20 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 					(video.videoHeight || this.video?.height() || 1) /
 					value.naturalWidth;
 			}
+			if (typeof fullEditor === 'number') {
+				this.rate = fullEditor / fullWidth;
+			} else if (fullEditor !== true) {
+				this.rate = video.videoHeight / video.videoWidth;
+				this.setValue({
+					naturalWidth: video.videoWidth,
+					naturalHeight: video.videoHeight,
+				} as T);
+			}
 			if (fullEditor && value.naturalWidth) {
-				const fullWidth = this.editor.container.width();
-				if (value.naturalWidth < fullWidth) {
+				if (
+					value.naturalWidth < fullWidth ||
+					typeof fullEditor === 'number'
+				) {
 					const fullHeight = fullWidth * this.rate;
 					this.setValue({
 						naturalWidth: fullWidth,
@@ -321,7 +338,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		if (!value) return;
 		this.videoContainer.css({
 			width: '',
-			//height: '',
+			height: '',
 		});
 		this.container?.css({
 			width: '',
@@ -359,8 +376,11 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 			width: width > 0 ? `${width}px` : '',
 		});
 		this.videoContainer.css('width', width > 0 ? `${width}px` : '');
-
-		//this.videoContainer.css('height', `${height}px`);
+		const videoPlugin =
+			this.editor.plugin.findPlugin<VideoOptions>('video');
+		const fullEditor = videoPlugin?.options.fullEditor;
+		if (typeof fullEditor === 'number')
+			this.videoContainer.css('height', `${height}px`);
 	}
 
 	changeSize(width: number, height: number) {
@@ -383,8 +403,15 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		height = Math.round(height);
 		this.videoContainer?.css({
 			width: width > 0 ? `${width}px` : '',
-			//height: `${height}px`,
 		});
+		const videoPlugin =
+			this.editor.plugin.findPlugin<VideoOptions>('video');
+		const fullEditor = videoPlugin?.options.fullEditor;
+		if (typeof fullEditor === 'number') {
+			this.videoContainer?.css({
+				height: `${height}px`,
+			});
+		}
 		this.container?.css({
 			width: width > 0 ? `${width}px` : '',
 		});

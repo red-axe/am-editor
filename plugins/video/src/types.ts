@@ -12,5 +12,5 @@ export interface VideoOptions extends PluginOptions {
 	/**
 	 * 填满编辑器宽度
 	 */
-	fullEditor?: boolean;
+	fullEditor?: boolean | number;
 }
