@@ -13,13 +13,13 @@ import {
 	CARD_VALUE_KEY,
 	CARD_SELECTOR,
 	transformCustomTags,
+	READY_CARD_SELECTOR,
 } from '@aomao/engine';
 import TableComponent, { Template, Helper } from './component';
 import locales from './locale';
 import { TableInterface, TableOptions, TableValue } from './types';
 import './index.css';
 import { DATA_ID } from '@aomao/engine';
-import { CardInterface } from '@aomao/engine';
 class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'table';
@@ -493,10 +493,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 					node.remove();
 					return;
 				} else {
-					const cards = table.find(CARD_SELECTOR).toArray();
-					cards.forEach((componentNode) => {
-						this.editor.trigger('parse:html', componentNode);
-					});
+					this.editor.trigger('parse:html', table);
 				}
 			}
 			const width = table.attributes('width') || table.css('width');

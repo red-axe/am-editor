@@ -23,7 +23,6 @@ export default class<
 
 	init() {
 		this.editor.language.add(locales);
-		if (!isEngine(this.editor)) return;
 		this.editor.on('parse:html', (node) => this.parseHtml(node));
 		this.editor.on('paste:each', (child) => this.pasteHtml(child));
 		this.editor.on('paste:schema', (schema: SchemaInterface) =>

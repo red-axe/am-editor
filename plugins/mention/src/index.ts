@@ -24,14 +24,14 @@ class MentionPlugin<
 	}
 
 	init() {
+		this.editor.on('parse:value', (node) => this.paserValue(node));
+		this.editor.on('parse:html', (node) => this.parseHtml(node));
+		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+		this.editor.on('paste:schema', (schema: SchemaInterface) =>
+			this.pasteSchema(schema),
+		);
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:at', (event) => this.onAt(event));
-			this.editor.on('parse:value', (node) => this.paserValue(node));
-			this.editor.on('parse:html', (node) => this.parseHtml(node));
-			this.editor.on('paste:each', (child) => this.pasteHtml(child));
-			this.editor.on('paste:schema', (schema: SchemaInterface) =>
-				this.pasteSchema(schema),
-			);
 		}
 		this.editor.language.add(locales);
 	}
