@@ -1,4 +1,4 @@
-import { $, removeUnit } from '@aomao/engine';
+import { $, isMobile, removeUnit } from '@aomao/engine';
 import type {
 	PluginEntry,
 	CardEntry,
@@ -35,7 +35,7 @@ import Unorderedlist from '@aomao/plugin-unorderedlist';
 import Indent from '@aomao/plugin-indent';
 // import type { IndentOptions } from '@aomao/plugin-indent';
 import Heading from '@aomao/plugin-heading';
-// import type { HeadingOptions } from '@aomao/plugin-heading';
+import type { HeadingOptions } from '@aomao/plugin-heading';
 import Strikethrough from '@aomao/plugin-strikethrough';
 // import type { StrikethroughOptions } from '@aomao/plugin-strikethrough';
 import Sub from '@aomao/plugin-sub';
@@ -389,7 +389,12 @@ export const toolbarOptions: ToolbarOptions = {
 	},
 };
 
+const headingOptions: HeadingOptions = {
+	showAnchor: isMobile ? false : true,
+};
+
 export const pluginConfig: Record<string, PluginOptions> = {
+	[Heading.pluginName]: headingOptions,
 	[ToolbarPlugin.pluginName]: toolbarOptions,
 	[Table.pluginName]: tableOptions,
 	[MarkRange.pluginName]: markRangeOptions,

@@ -45,7 +45,7 @@ class Block implements BlockModelInterface {
 				.getHandleListener('backspace', 'keydown')
 				?.on((event) => backspace.trigger(event));
 
-			event.on('keydown:space', (event) => this.triggerMarkdown(event));
+			event.on('keyup:space', (event) => this.triggerMarkdown(event));
 		}
 	}
 
