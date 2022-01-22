@@ -60,8 +60,8 @@ export const toCamelCase = (
  */
 export const toHex = (rgb: string): string => {
 	const hex = (num: string) => {
-		const char = parseInt(num, 10).toString(16).toUpperCase();
-		return char.length > 1 ? char : '0' + char;
+		const numChar = parseInt(num, 10).toString(16).toUpperCase();
+		return numChar.length > 1 ? numChar : '0' + numChar;
 	};
 
 	const reg = /rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/gi;
