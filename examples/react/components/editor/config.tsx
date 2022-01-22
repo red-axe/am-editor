@@ -218,6 +218,7 @@ export const videoOptions: VideoOptions = {
 	onBeforeRender: (status: string, url: string) => {
 		return url;
 	},
+	fullEditor: 420,
 };
 
 export const videoUploaderOptions: VideoUploaderOptions = {
