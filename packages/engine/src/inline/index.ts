@@ -1,4 +1,5 @@
 import {
+	CARD_EDITABLE_KEY,
 	CARD_ELEMENT_KEY,
 	CARD_KEY,
 	CARD_SELECTOR,
@@ -934,7 +935,13 @@ class Inline implements InlineModelInterface {
 	repairCursor(node: NodeInterface | Node) {
 		const nodeApi = this.editor.node;
 		if (isNode(node)) node = $(node);
-		if (!nodeApi.isInline(node) || nodeApi.isVoid(node) || node.isCard()) {
+		if (
+			!nodeApi.isInline(node) ||
+			node.closest(CARD_SELECTOR).attributes(CARD_EDITABLE_KEY) ===
+				'false' ||
+			nodeApi.isVoid(node) ||
+			node.isCard()
+		) {
 			const prev = node.prev();
 			const prevText = prev?.isText() ? prev.text() : undefined;
 			if (prevText && /\u200b$/.test(prevText)) {
@@ -944,6 +951,18 @@ class Inline implements InlineModelInterface {
 						prev?.remove();
 					} else {
 						prev?.text(prevText.slice(0, -1));
+					}
+				}
+			}
+			const next = node.next();
+			const nextText = next?.isText() ? next.text() : undefined;
+			if (nextText && /^\u200b/.test(nextText)) {
+				const nNext = next?.next();
+				if (!nNext || !nodeApi.isInline(nNext)) {
+					if (nextText.length === 1) {
+						next?.remove();
+					} else {
+						next?.text(nextText.slice(1));
 					}
 				}
 			}

@@ -217,7 +217,7 @@ export default class<
 			const { node, inline } = this.editor;
 			if (
 				/^https?:\/\/\S+$/.test(text.toLowerCase().trim()) &&
-				inline.closest(child)
+				!inline.closest(child).equal(child)
 			) {
 				node.wrap(
 					child,
