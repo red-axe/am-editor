@@ -61,12 +61,12 @@ const defaultItems: ToolbarItemProps = isMobile
 					{
 						type: 'button',
 						name: 'orderedlist',
-						icon: 'orderedlist',
+						icon: 'ordered-list',
 					},
 					{
 						type: 'button',
 						name: 'unorderedlist',
-						icon: 'unorderedlist',
+						icon: 'unordered-list',
 					},
 					{
 						type: 'button',
