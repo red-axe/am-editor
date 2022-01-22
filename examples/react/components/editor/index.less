@@ -6,7 +6,7 @@
 	min-height: auto;
 
 	@media @mobile {
-		padding-top: 54px !important;
+		padding: 54px 0 0 0 !important;
 	}
 }
 
@@ -105,9 +105,8 @@
 	position: relative;
 
 	@media @mobile {
-		padding: 0;
-		height: auto;
-		overflow: inherit;
+		padding: 0 16px;
+		height: calc(100vh - 54px);
 	}
 }
 
