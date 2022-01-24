@@ -45,6 +45,7 @@ class Uploader implements UploaderInterface {
 				onUploading,
 				onSuccess,
 				onError,
+				withCredentials,
 				crossOrigin,
 				headers,
 			} = this.options;
@@ -80,7 +81,8 @@ class Uploader implements UploaderInterface {
 				data: formData,
 				contentType: this.options.contentType,
 				type: this.options.type || 'json',
-				crossOrigin: crossOrigin,
+				withCredentials,
+				crossOrigin,
 				headers: headers,
 				success: (response: any) => {
 					if (onSuccess) onSuccess(response, file);
