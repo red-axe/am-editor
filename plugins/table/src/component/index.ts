@@ -891,7 +891,17 @@ class TableComponent<V extends TableValue = TableValue>
 		// 第一次渲染
 		if (!value) return 'Error value';
 		if (value.html) {
-			const model = this.helper.getTableModel($(value.html));
+			let table = $(value.html);
+			if (table.name !== 'table') {
+				table = table.toArray().find((child) => child.name === 'table');
+				if (!table) {
+					value.html = `<table><tr><td>${value.html}</td></tr></table>`;
+					table = $(value.html);
+				} else {
+					value.html = table.get<Element>().outerHTML;
+				}
+			}
+			const model = this.helper.getTableModel(table);
 			value.rows = model.rows;
 			value.cols = model.cols;
 		}

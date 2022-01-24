@@ -126,7 +126,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				);
 			});
 		const trs = table.rows;
-		end = end || trs.length;
+		end = end || trs?.length || 0;
 		const rowBars = this.rowsHeader?.find(Template.ROWS_HEADER_ITEM_CLASS);
 		for (let i = start; i < end; i++) {
 			rowBars?.eq(i)?.css('height', `${trs[i].offsetHeight}px`);

@@ -45,7 +45,7 @@ class Helper implements HelperInterface {
 		let model: Array<Array<TableModelCol | TableModelEmptyCol>> = [];
 		const tableElement = table.get<HTMLTableElement>()!;
 		const rows = tableElement.rows;
-		const rowCount = rows.length;
+		const rowCount = rows?.length || 0;
 
 		for (let r = 0; r < rowCount; r++) {
 			const tr = rows[r];
@@ -312,7 +312,7 @@ class Helper implements HelperInterface {
 	fixNumberTr(table: NodeInterface) {
 		const tableElement = table.get<HTMLTableElement>()!;
 		const rows = tableElement.rows;
-		const rowCount = rows.length;
+		const rowCount = rows?.length || 0;
 		let colCounts: Array<number> = [];
 		let firstColCount: number = 0; // 第一列的单元格个数
 		let cellCounts = []; // 每行单元格个数
