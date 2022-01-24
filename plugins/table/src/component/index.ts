@@ -891,8 +891,8 @@ class TableComponent<V extends TableValue = TableValue>
 		// 第一次渲染
 		if (!value) return 'Error value';
 		if (value.html) {
-			let table = $(value.html);
-			if (table.name !== 'table') {
+			let table: NodeInterface | undefined = $(value.html);
+			if (table && table.name !== 'table') {
 				table = table.toArray().find((child) => child.name === 'table');
 				if (!table) {
 					value.html = `<table><tr><td>${value.html}</td></tr></table>`;
