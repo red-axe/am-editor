@@ -361,7 +361,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			const tfoot = table.find('tfoot');
 			const footTds = tfoot.find('th,td').toArray();
 			footTds.forEach((td) => {
-				table.before(td.children());
+				table.after(td.children());
 			});
 			table.remove();
 		};
@@ -382,6 +382,16 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				} else {
 					tr.css('display', '');
 				}
+				// 不是td就用td标签包裹起来
+				const childNodes = tr.children();
+				childNodes.each((tdChild) => {
+					const td = $(tdChild);
+					if (td.name !== 'td') {
+						const newTd = $(`<td></td>`);
+						newTd.append(td);
+						td.before(newTd);
+					}
+				});
 			});
 			node = helper.normalizeTable(node);
 			clearWH(node);
