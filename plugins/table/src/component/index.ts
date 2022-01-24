@@ -898,7 +898,7 @@ class TableComponent<V extends TableValue = TableValue>
 					value.html = `<table><tr><td>${value.html}</td></tr></table>`;
 					table = $(value.html);
 				} else {
-					value.html = table.get<Element>().outerHTML;
+					value.html = table.get<Element>()!.outerHTML;
 				}
 			}
 			const model = this.helper.getTableModel(table);
