@@ -90,6 +90,10 @@ export interface HelperInterface {
 
 export interface TemplateInterface {
 	/**
+	 * 是否只读
+	 */
+	isReadonly: boolean;
+	/**
 	 * 用于Card渲染
 	 * @param {object} value 参数
 	 * @param {number} value.rows 行数
@@ -98,11 +102,25 @@ export interface TemplateInterface {
 	 * @return {string} 返回 html 字符串
 	 */
 	htmlEdit(value: TableValue, menus: TableMenu): string;
-
+	/**
+	 * 阅读模式渲染
+	 * @param value
+	 */
 	htmlView(value: TableValue): string;
-
+	/**
+	 * 获取空的单元格模版
+	 */
+	getEmptyCell(): string;
+	/**
+	 * 获取指定行数的行 header
+	 * @param rows
+	 */
 	renderRowsHeader(rows: number): string;
-	renderColsHeader(rows: number): string;
+	/**
+	 * 获取指定列数的列 header
+	 * @param cols
+	 */
+	renderColsHeader(cols: number): string;
 }
 
 export interface TableValue extends CardValue {

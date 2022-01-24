@@ -11,15 +11,13 @@ import {
 	READY_CARD_KEY,
 	decodeCardValue,
 	CARD_VALUE_KEY,
-	CARD_SELECTOR,
 	transformCustomTags,
-	READY_CARD_SELECTOR,
 } from '@aomao/engine';
+import { DATA_ID } from '@aomao/engine';
 import TableComponent, { Template, Helper } from './component';
 import locales from './locale';
 import { TableInterface, TableOptions, TableValue } from './types';
 import './index.css';
-import { DATA_ID } from '@aomao/engine';
 class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'table';

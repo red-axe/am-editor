@@ -70,11 +70,14 @@ class Template implements TemplateInterface {
 	static readonly TABLE_TD_CONTENT_CLASS = `.${TABLE_TD_CONTENT_CLASS_NAME}`;
 	static readonly TABLE_TD_BG_CLASS = `.${TABLE_TD_BG_CLASS_NAME}`;
 	static readonly CellBG = `<div class="${TABLE_TD_BG_CLASS_NAME}"><div class="table-main-border-top"></div><div class="table-main-border-right"></div><div class="table-main-border-bottom"></div><div class="table-main-border-left"></div></div>`;
-	static isReadonly = false;
-	static get EmptyCell() {
+	isReadonly: boolean = false;
+	static EmptyCell(readonly: boolean = false) {
 		return `<div class="${TABLE_TD_CONTENT_CLASS_NAME}" ${DATA_TRANSIENT_ATTRIBUTES}="contenteditable" contenteditable="${
-			Template.isReadonly ? 'false' : 'true'
-		}" ${DATA_ELEMENT}="${EDITABLE}"><p><br /></p></div>${this.CellBG}`;
+			readonly ? 'false' : 'true'
+		}" ${DATA_ELEMENT}="${EDITABLE}"><p><br /></p></div>${Template.CellBG}`;
+	}
+	getEmptyCell() {
+		return Template.EmptyCell(this.isReadonly);
 	}
 	private table: TableInterface;
 
@@ -133,7 +136,7 @@ class Template implements TemplateInterface {
 		cols = cols === Infinity ? 10 : cols;
 		rows = rows === Infinity ? 10 : rows;
 		const tds =
-			`<td ${DATA_TRANSIENT_ATTRIBUTES}="table-cell-selection">${Template.EmptyCell}</td>`.repeat(
+			`<td ${DATA_TRANSIENT_ATTRIBUTES}="table-cell-selection">${this.getEmptyCell()}</td>`.repeat(
 				cols,
 			);
 		const trs = `<tr>${tds}</tr>`.repeat(rows);

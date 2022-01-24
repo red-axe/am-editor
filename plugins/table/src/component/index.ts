@@ -813,7 +813,8 @@ class TableComponent<V extends TableValue = TableValue>
 	}
 
 	render() {
-		Template.isReadonly = !isEngine(this.editor) || this.editor.readonly;
+		this.template.isReadonly =
+			!isEngine(this.editor) || this.editor.readonly;
 		// 重新渲染
 		if (
 			this.wrapper &&
@@ -879,7 +880,7 @@ class TableComponent<V extends TableValue = TableValue>
 					if (!editableElement.hasAttribute('contenteditable')) {
 						editableElement.setAttribute(
 							'contenteditable',
-							Template.isReadonly ? 'false' : 'true',
+							this.template.isReadonly ? 'false' : 'true',
 						);
 					}
 				});
