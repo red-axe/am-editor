@@ -1,3 +1,11 @@
+.am-engine [data-card-key="image"].card-selected [data-card-element="center"].data-card-border-selected {
+    outline: none;
+}
+
+.am-engine [data-card-key="image"].card-selected [data-card-element="center"].data-card-border-selected .data-image-disable-resize {
+    outline: 2px solid #1890FF;
+}
+
 .data-image {
     position: relative;
     display: inline-block;
@@ -18,8 +26,17 @@
     width: max-content;
 }
 
+.data-image-blcok.data-image-disable-resize {
+    width: 100%;
+    display: block;
+}
+
 .data-image-detail {
   display: inline-block;
+}
+
+.data-image-blcok .data-image-detail {
+    display: block;
 }
 
 .data-image-meta {
@@ -68,8 +85,16 @@
     border-color: transparent;
 }
 
+.data-image-blcok .data-image-loading, .data-image-blcok .data-image-loaded {
+    display: block;
+}
+
 .data-image-loading .data-image-meta, .data-image-loaded .data-image-meta {
     display: inline-block;
+}
+
+.data-image-blcok .data-image-loading .data-image-meta, .data-image-blcok .data-image-loaded .data-image-meta {
+    display: block;
 }
 
 .data-image-loading .data-image-meta img,.data-image-loaded .data-image-meta img {
@@ -82,7 +107,11 @@
     transition: opacity 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-.data-image-loading .data-image-meta img {
+.data-image-blcok .data-image-loading .data-image-meta img, .data-image-blcok .data-image-loaded .data-image-meta img {
+    display: block;
+}
+
+.data-image-loading .data-image-meta img , .data-image-blcok .data-image-loading .data-image-meta img {
     display: none;
 }
 
@@ -149,6 +178,10 @@
 
 .data-image-loading .data-image-bg {
     display: inline-block;
+}
+
+.data-image-blcok .data-image-loading .data-image-bg {
+    display: block;
 }
 
 .data-image-loading .data-image-maximize {

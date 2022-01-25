@@ -4,11 +4,9 @@ import {
 	CardToolbarItemOptions,
 	CardType,
 	CardValue,
-	decodeCardValue,
 	isEngine,
 	isMobile,
 	NodeInterface,
-	TargetOp,
 	ToolbarItemOptions,
 } from '@aomao/engine';
 import Image, { Size } from './image';
@@ -84,9 +82,9 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 		return CardType.INLINE;
 	}
 
-	static get autoSelected() {
-		return false;
-	}
+	// static get autoSelected() {
+	// 	return false;
+	// }
 
 	/**
 	 * 设置上传进度
@@ -152,8 +150,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 			},
 		];
 		if (isMobile) return items;
-
-		return items.concat([
+		const resizerItems: (CardToolbarItemOptions | ToolbarItemOptions)[] = [
 			{
 				type: 'input',
 				placeholder: language
@@ -200,6 +197,8 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 					);
 				},
 			},
+		];
+		const typeItems: (CardToolbarItemOptions | ToolbarItemOptions)[] = [
 			{
 				type: 'button',
 				content:
@@ -218,12 +217,17 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 					this.type = CardType.INLINE;
 				},
 			},
+		];
+		const imagePlugin =
+			this.editor.plugin.findPlugin<ImageOptions>('image');
+		return items.concat([
+			...(imagePlugin?.options?.enableResizer === false
+				? []
+				: resizerItems),
+			...(imagePlugin?.options?.enableTypeSwitch === false
+				? []
+				: typeItems),
 		]);
-	}
-
-	onSelect(selected: boolean) {
-		//选中时不使用边框样式
-		if (!this.activated) super.onSelect(selected);
 	}
 
 	onActivate(activated: boolean) {
@@ -253,6 +257,8 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 		const value = this.getValue();
 		if (!value) return;
 		if (!this.image || this.image.root.length === 0) {
+			const imagePlugin =
+				this.editor.plugin.findPlugin<ImageOptions>('image');
 			this.image = new Image(this.editor, {
 				root: this.root,
 				container: this.getCenter(),
@@ -264,6 +270,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 				display: this.type,
 				percent: value.percent,
 				message: value.message,
+				enableResizer: imagePlugin?.options?.enableResizer,
 				onBeforeRender: (status, src) => {
 					const imagePlugin =
 						this.editor.plugin.findPlugin<ImageOptions>('image');

@@ -16,6 +16,7 @@ import {
 	removeUnit,
 	CardType,
 } from '@aomao/engine';
+import { ImageOptions } from '.';
 import ImageComponent, { ImageValue } from './component';
 
 export interface ImageUploaderOptions extends PluginOptions {
@@ -306,6 +307,10 @@ export default class<
 							  )
 							: src;
 					const insertCard = (value: Partial<ImageValue>) => {
+						const imagePlugin =
+							this.editor.plugin.findPlugin<ImageOptions>(
+								'image',
+							);
 						const component = card.insert<
 							ImageValue,
 							ImageComponent<ImageValue>
@@ -314,6 +319,9 @@ export default class<
 							{
 								...value,
 								status: 'uploading',
+								type:
+									value.type ||
+									imagePlugin?.options?.defaultType,
 								//fileInfo.src, 再协作中，如果大图片使用base64加载图片预览会造成很大资源浪费
 							},
 							base64String,
@@ -502,9 +510,12 @@ export default class<
 				node.remove();
 				return;
 			}
+			const imagePlugin =
+				this.editor.plugin.findPlugin<ImageOptions>('image');
 			const width = node.css('width');
 			const height = node.css('height');
-			const dataTypeValue = attributes['data-type'];
+			const dataTypeValue =
+				attributes['data-type'] || imagePlugin?.options.defaultType;
 			let type = CardType.INLINE;
 			if (dataTypeValue === 'block') {
 				const parent = node.parent();
@@ -608,10 +619,13 @@ export default class<
 	}
 
 	insertRemote(src: string, alt?: string) {
+		const imagePlugin =
+			this.editor.plugin.findPlugin<ImageOptions>('image');
 		const value: ImageValue = {
 			src,
 			alt,
 			status: 'uploading',
+			type: imagePlugin?.options.defaultType || CardType.INLINE,
 		};
 		const { isRemote } = this.options;
 		//上传第三方图片
@@ -737,7 +751,8 @@ export default class<
 			const alt = match[2] || match[6];
 			const src = match[4] || match[8];
 			const link = isLink ? match[5] : '';
-
+			const imagePlugin =
+				this.editor.plugin.findPlugin<ImageOptions>('image');
 			const cardNode = card.replaceNode<ImageValue>($(regNode), 'image', {
 				src,
 				status:
@@ -752,6 +767,7 @@ export default class<
 							target: isRemote && isRemote(link) ? '_blank' : '',
 					  }
 					: undefined,
+				type: imagePlugin?.options.defaultType || CardType.INLINE,
 			});
 			regNode.remove();
 

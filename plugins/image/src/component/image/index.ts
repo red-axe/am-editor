@@ -1,4 +1,4 @@
-import type { PswpInterface } from '@/types';
+import type { ImageOptions, PswpInterface } from '@/types';
 import type { EditorInterface, NodeInterface } from '@aomao/engine';
 import {
 	$,
@@ -80,6 +80,7 @@ export type Options = {
 	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
 	onChange?: (size?: Size, loaded?: boolean) => void;
 	onError?: () => void;
+	enableResizer?: boolean;
 };
 
 export const winPixelRatio = window.devicePixelRatio;
@@ -332,9 +333,12 @@ class Image {
 			width = this.maxWidth;
 			height = Math.round(width * this.rate);
 		}
-
-		this.image.css('width', `${width}px`);
-		//this.image.css('height', `${height}px`);
+		if (this.options.enableResizer === false) {
+			this.image.css('width', '');
+		} else {
+			this.image.css('width', `${width}px`);
+			//this.image.css('height', `${height}px`);
+		}
 	}
 
 	changeSize(width: number, height: number) {
@@ -451,6 +455,9 @@ class Image {
 		this.maxWidth = this.getMaxWidth();
 		this.rate = clientHeight / clientWidth;
 		if (isMobile || !isEngine(this.editor) || this.editor.readonly) return;
+		if (this.options.enableResizer === false) {
+			return;
+		}
 		// 拖动调整图片大小
 		const resizer = new Resizer({
 			imgUrl: this.getSrc(),
@@ -499,9 +506,12 @@ class Image {
 
 	render(loadingBg?: string) {
 		// 阅读模式不展示错误
-		const { container, display } = this.options;
+		const { container, display, enableResizer } = this.options;
 		if (display === CardType.BLOCK) {
 			this.root.addClass('data-image-blcok');
+		}
+		if (enableResizer === false) {
+			this.root.addClass('data-image-disable-resize');
 		}
 		if (this.status === 'error' && isEngine(this.editor)) {
 			this.root = $(
@@ -543,20 +553,34 @@ class Image {
 				height = this.maxWidth / 2;
 			}
 			if (this.src) {
-				this.image.css({
-					width: width + 'px',
-					//height: height + 'px',
-				});
+				if (this.options.enableResizer === false) {
+					this.image.css({
+						width: '100%',
+					});
+				} else {
+					this.image.css({
+						width: width + 'px',
+						//height: height + 'px',
+					});
+				}
+
 				const { onChange } = this.options;
 				if (width > 0 && height > 0) {
 					this.size = { ...this.size, width, height };
 					if (onChange) onChange(this.size);
 				}
 			}
-			this.bg.css({
-				width: width + 'px',
-				height: height + 'px',
-			});
+			if (this.options.enableResizer === false) {
+				this.bg.css({
+					width: '100%',
+				});
+			} else {
+				this.bg.css({
+					width: width + 'px',
+					height: height + 'px',
+				});
+			}
+
 			if (loadingBg) {
 				this.bg.css('background-image', `url(${loadingBg})`);
 			}

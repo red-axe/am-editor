@@ -1,4 +1,4 @@
-import { NodeInterface, PluginOptions } from '@aomao/engine';
+import { CardType, NodeInterface, PluginOptions } from '@aomao/engine';
 import { EventEmitter2 } from 'eventemitter2';
 
 export interface PswpInterface extends EventEmitter2 {
@@ -29,5 +29,20 @@ export interface PswpInterface extends EventEmitter2 {
 }
 
 export interface ImageOptions extends PluginOptions {
+	/**
+	 * 图片渲染前调用，可以在这里修改图片链接
+	 */
 	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
+	/**
+	 * 是否启用大小拖动，默认为 true
+	 */
+	enableResizer?: boolean;
+	/**
+	 * 是否启用block、inline切换
+	 */
+	enableTypeSwitch?: boolean;
+	/**
+	 * 默认使用的卡片类型
+	 */
+	defaultType?: CardType;
 }
