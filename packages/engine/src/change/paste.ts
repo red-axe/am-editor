@@ -4,7 +4,6 @@ import { READY_CARD_KEY, READY_CARD_SELECTOR } from '../constants/card';
 import Parser from '../parser';
 import { EngineInterface } from '../types/engine';
 import { $ } from '../node';
-import { DATA_ID } from '../constants';
 
 export default class Paste {
 	protected source: string;
