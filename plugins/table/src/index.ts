@@ -386,7 +386,12 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				const childNodes = tr.children();
 				childNodes.each((tdChild) => {
 					const td = $(tdChild);
-					if (td.name !== 'td') {
+					const text = td.text();
+					// 排除空格
+					if (
+						td.name !== 'td' &&
+						['\n', '\r\n'].includes(text.trim())
+					) {
 						const newTd = $(`<td></td>`);
 						td.before(newTd);
 						newTd.append(td);
