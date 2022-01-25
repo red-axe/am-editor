@@ -334,4 +334,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
 };
 
 export default Toolbar;
-export { fontFamilyDefaultData, fontfamily };
+export {
+	fontFamilyDefaultData,
+	fontfamily,
+	getToolbarDefaultConfig as getDefaultConfig,
+};

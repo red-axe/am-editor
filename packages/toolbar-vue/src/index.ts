@@ -17,7 +17,7 @@ export default Toolbar;
 export {
 	ToolbarPlugin,
 	ToolbarComponent,
-	getToolbarDefaultConfig,
+	getToolbarDefaultConfig as getDefaultConfig,
 	fontFamilyDefaultData,
 	fontfamily,
 };
