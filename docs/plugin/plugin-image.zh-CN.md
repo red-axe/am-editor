@@ -27,6 +27,12 @@ new Engine(...,{ plugins:[ Image , ImageUploader ] , cards:[ ImageComponent ]})
 onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
 ```
 
+`enableResizer` 图片大小是否可以拖动修改，默认为 true
+
+`enableTypeSwitch` 是否启用 block inline 模式切换，默认为 true
+
+`defaultType` 设置默认的图片卡片类型，默认为 'inline'
+
 ## `ImageUploader` 可选项
 
 ```ts

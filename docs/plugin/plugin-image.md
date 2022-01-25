@@ -27,6 +27,12 @@ The main functions of the `ImageUploader` plugin: select images, upload images, 
 onBeforeRender?: (status:'uploading' |'done', src: string) => string;
 ```
 
+`enableResizer` Whether the image size can be modified by dragging, the default is true
+
+`enableTypeSwitch` whether to enable block inline mode switching, the default is true
+
+`defaultType` sets the default image card type, the default is 'inline'
+
 ## `ImageUploader` optional
 
 ```ts
