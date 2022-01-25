@@ -388,8 +388,8 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 					const td = $(tdChild);
 					if (td.name !== 'td') {
 						const newTd = $(`<td></td>`);
-						newTd.append(td);
 						td.before(newTd);
+						newTd.append(td);
 					}
 				});
 			});
