@@ -3,7 +3,7 @@ import { debounce, throttle } from 'lodash';
 import { DATA_ELEMENT, UI } from '../constants';
 import { NodeInterface } from '../types';
 import { $ } from '../node';
-import { isFirefox, isIos, isMacos, isMobile, removeUnit } from '../utils';
+import { isFirefox, isMacos, isMobile, removeUnit } from '../utils';
 import { isNode } from '../node/utils';
 import './index.css';
 
