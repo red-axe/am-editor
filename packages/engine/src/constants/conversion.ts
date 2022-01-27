@@ -8,7 +8,7 @@ import {
 	READY_CARD_KEY,
 	CARD_EDITABLE_KEY,
 } from './card';
-import { ANCHOR, CURSOR, FOCUS } from '.';
+import { ANCHOR, CURSOR, FOCUS } from './selection';
 
 const defaultConversion: ConversionData = [
 	{
