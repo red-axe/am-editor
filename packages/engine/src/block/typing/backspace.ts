@@ -1,3 +1,4 @@
+import { CARD_ELEMENT_KEY } from '../../constants';
 import { EngineInterface, RangeInterface } from '../../types';
 
 class Backspace {
@@ -44,12 +45,20 @@ class Backspace {
 			if (
 				cloneRange.startContainer.nodeType === Node.TEXT_NODE &&
 				(function (range: RangeInterface) {
-					const { commonAncestorContainer } = range;
+					const { commonAncestorContainer, commonAncestorNode } =
+						range;
+					const commonAncestorParent = commonAncestorNode.parent();
+					const commonAncestorAttributes =
+						commonAncestorParent?.attributes();
 					if (
 						range.collapsed &&
 						1 === range.startOffset &&
 						range.startContainer === commonAncestorContainer &&
-						commonAncestorContainer.nodeType === Node.TEXT_NODE
+						commonAncestorContainer.nodeType === Node.TEXT_NODE &&
+						(!commonAncestorAttributes ||
+							!['left', 'right'].includes(
+								commonAncestorAttributes[CARD_ELEMENT_KEY],
+							))
 					) {
 						range = range.cloneRange();
 						if (

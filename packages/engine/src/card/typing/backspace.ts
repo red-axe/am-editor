@@ -49,7 +49,11 @@ class Backspace {
 	 */
 	trigger(event: KeyboardEvent) {
 		const { change } = this.engine;
-		const range = change.range.get();
+		const range = change.range
+			.get()
+			.cloneRange()
+			.shrinkToElementNode()
+			.shrinkToTextNode();
 		if (!range.collapsed) return;
 		// 查找当前光标所在卡片
 		const card = this.engine.card.find(range.startNode);
