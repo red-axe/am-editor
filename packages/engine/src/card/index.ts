@@ -413,7 +413,10 @@ class CardModel implements CardModelInterface {
 					card.activate(true);
 				} else if (card.isEditable) {
 					card.select(false);
-				} else if (trigger === CardActiveTrigger.MOUSE_DOWN) {
+				} else if (
+					trigger === CardActiveTrigger.MOUSE_DOWN &&
+					node.name !== 'input'
+				) {
 					event?.preventDefault();
 				}
 				if (

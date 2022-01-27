@@ -16,6 +16,7 @@ class Resize implements ResizeInterface {
 	private point?: { x: number; y: number };
 	private options: ResizeCreateOptions = {};
 	private component?: NodeInterface;
+	private start: boolean = false;
 
 	constructor(editor: EditorInterface, card: CardInterface) {
 		this.editor = editor;
@@ -44,16 +45,17 @@ class Resize implements ResizeInterface {
 	}
 
 	render(container: NodeInterface = this.card.root, minHeight: number = 80) {
-		let start: boolean = false;
+		this.start = false;
 		let height: number = 0,
 			moveHeight: number = 0;
 		this.create({
 			dragStart: () => {
 				height = container.height();
-				start = true;
+				this.start = true;
+				this.card.onActivate(false);
 			},
 			dragMove: (y) => {
-				if (start) {
+				if (this.start) {
 					moveHeight = height + y;
 					moveHeight =
 						moveHeight < minHeight ? minHeight : moveHeight;
@@ -61,11 +63,12 @@ class Resize implements ResizeInterface {
 				}
 			},
 			dragEnd: () => {
-				if (start) {
+				if (this.start) {
 					this.card.setValue({
 						height: container.height(),
 					} as any);
-					start = false;
+					this.start = false;
+					this.card.onActivate(true);
 				}
 			},
 		});
@@ -128,7 +131,7 @@ class Resize implements ResizeInterface {
 	}
 
 	hide() {
-		this.component?.hide();
+		if (!this.start) this.component?.hide();
 	}
 
 	destroy() {
