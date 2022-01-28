@@ -293,8 +293,6 @@ yarn ssr
 -   `site-ssr` 所有的后端 API 和 SSR 配置。使用的 egg 。在 am-editor 根目录下使用 yarn ssr 自动启动 `site-ssr`
 -   `ot-server` 协同服务端。启动：yarn start
 
-启动后访问 localhost:7001
-
 ### Vue3
 
 只需要进入 examples/vue 目录安装依赖

@@ -59,7 +59,7 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 	onActivate(activated: boolean) {
 		super.onActivate(activated);
 		if (activated) this.#mask?.hide();
-		else this.#mask?.show();
+		else if (isEngine(this.editor)) this.#mask?.show();
 	}
 
 	collapse() {

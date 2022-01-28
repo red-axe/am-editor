@@ -6,7 +6,7 @@
 
 2、熟悉 React 技术栈，了解渲染流程和机制。
 
-3、理解 MVC设计模式、事件驱动机制、不可变数据结构。
+3、理解 MVC 设计模式、事件驱动机制、不可变数据结构。
 
 4、有使用 Websocket、Canvas 经验。
 
@@ -412,8 +412,6 @@ yarn start
 -   `plugins` 所有的插件
 -   `api` 支持一些插件所需要的 api 访问，默认使用 https://editor.aomao.com 作为 api 服务
 -   `ot-server` 协同服务端。启动：yarn dev
-
-启动后访问 localhost:7001
 
 ### Vue
 

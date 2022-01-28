@@ -21,12 +21,7 @@ $ npm install
 ### 启动项目
 
 ```bash
-//普通启动
 $ yarn start
-
-//or
-//服务端渲染模式启动，将调用 site-ssr 。要完全使用ssr模式，启动后需要主动访问 7001 端口
-$ yarn ssr
 ```
 
 ### 启动协同服务
