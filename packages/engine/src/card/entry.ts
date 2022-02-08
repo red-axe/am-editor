@@ -23,7 +23,13 @@ import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { ToolbarItemOptions } from '../types/toolbar';
 import { TinyCanvasInterface } from '../types/tiny-canvas';
-import { decodeCardValue, encodeCardValue, isEngine, random } from '../utils';
+import {
+	decodeCardValue,
+	encodeCardValue,
+	isEngine,
+	isView,
+	random,
+} from '../utils';
 import Maximize from './maximize';
 import Resize from './resize';
 import Toolbar from './toolbar';
@@ -350,8 +356,10 @@ abstract class CardEntry<T extends CardValue = CardValue>
 	destroy() {
 		this.toolbarModel?.hide();
 		this.toolbarModel?.destroy();
+		this.toolbarModel = undefined;
 		this.resizeModel?.hide();
 		this.resizeModel?.destroy();
+		this.resizeModel = undefined;
 	}
 	didInsert?(): void;
 	didUpdate?(): void;
@@ -368,7 +376,11 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		center.empty().append(loadingElement);
 	}
 	didRender() {
-		if (this.loading) this.find(`.${CARD_LOADING_KEY}`).remove();
+		if (this.loading) {
+			this.find(`.${CARD_LOADING_KEY}`).remove();
+			if (!isEngine(this.editor))
+				this.root.removeAttributes(CARD_LOADING_KEY);
+		}
 		if (this.resize) {
 			const container =
 				typeof this.resize === 'function'
@@ -387,6 +399,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		} else {
 			this.toolbarModel?.hide();
 			this.toolbarModel?.destroy();
+			this.toolbarModel = undefined;
 		}
 		if (this.isEditable) {
 			this.editor.nodeId.generateAll(this.getCenter().get<Element>()!);
