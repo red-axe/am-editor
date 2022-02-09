@@ -1,0 +1,17 @@
+node_modules
+public
+apps/modern-vue/dist
+apps/modern-vue/build
+.build/*
+.nuxt
+.history
+apps/modern-vue/static/*
+apps/modern-vue/static/js
+apps/modern-vue/static/sw.js
+apps/modern-vue/static/pdf
+apps/modern-vue/static/simple-project
+jsconfig.json
+package.json
+package-lock.json
+yarn.lock
+types/generated/*

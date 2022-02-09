@@ -1,0 +1,57 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "韩寒"
+    },
+    {
+      "id": 2,
+      "name": "王奕博"
+    },
+    {
+      "id": 3,
+      "name": "马包裹"
+    },
+    {
+      "id": 4,
+      "name": "吴一帆"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "name": "律所管理",
+      "personId": 1,
+      "organization": "南京法奔律师事务所",
+      "created": 1604989757139
+    },
+    {
+      "id": 2,
+      "name": "APP研发",
+      "personId": 2,
+      "organization": "研发组",
+      "created": 1604989757139
+    },
+    {
+      "id": 3,
+      "name": "产品管理",
+      "personId": 2,
+      "organization": "产品部门",
+      "created": 1546300800000
+    },
+    {
+      "id": 4,
+      "name": "总部管理",
+      "personId": 3,
+      "organization": "总部",
+      "created": 1604980000011
+    },
+    {
+      "id": 5,
+      "name": "销售管理",
+      "personId": 4,
+      "organization": "销售组",
+      "created": 1546900800000
+    }
+  ]
+}

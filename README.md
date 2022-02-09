@@ -412,6 +412,7 @@ In the Vue runtime environment, the default is the installed code that has been 
 
 No back-end API is configured in the `Vue` case. For details, please refer to `React` and `api` to set reverse proxy
 
+> Vue example powered by [**modern-vue-template**](https://github.com/byoungd/modern-vue-template)
 ## Contribution
 
 Thanks [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.com/Elena211314)、[zb201307](https://github.com/zb201307) for donation
