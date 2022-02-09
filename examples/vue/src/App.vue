@@ -1,29 +1,13 @@
+<script setup lang="ts">
+// https://github.com/vueuse/head
+// you can use this to manipulate the document head in any components,
+// they will be rendered correctly in the html results with vite-ssg
+useHead({
+  title: 'Modern Vue',
+  meta: [{ name: 'description', content: 'Opinionated Vite Starter Template' }],
+})
+</script>
+
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div>
-  <router-view/>
+  <router-view />
 </template>
-
-<style lang="less">
-#app{
-    padding-top: 42px;
-}
-#nav {
-    padding: 10px;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background: #fff;
-    z-index: 999;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
