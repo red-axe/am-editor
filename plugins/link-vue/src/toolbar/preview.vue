@@ -10,18 +10,20 @@
             </a>
         </a-tooltip>
         <div class="data-link-op">
-            <a-tooltip :title="editTitle">
+            <a-tooltip :title="editTitle" v-if="!isMobile">
                 <a class="data-icon data-icon-edit" @click="onEdit" />
             </a-tooltip>
-            <a-tooltip :title="removeTitle">
+            <a v-if="isMobile" class="data-icon data-icon-edit" @click="onEdit" />
+            <a-tooltip :title="removeTitle" v-if="!isMobile">
                 <a class="data-icon data-icon-unlink" @click="onRemove" />
             </a-tooltip>
+            <a v-if="isMobile" class="data-icon data-icon-unlink" @click="onRemove" />
         </div>
     </div>
 </template>
 <script lang="ts">
 import { defineComponent, onMounted, PropType } from 'vue'
-import { LanguageInterface } from '@aomao/engine'
+import { LanguageInterface, isMobile } from '@aomao/engine'
 import ATooltip from 'ant-design-vue/es/tooltip'
 import 'ant-design-vue/es/tooltip/style';
 
@@ -53,7 +55,8 @@ export default defineComponent({
         return {
             openTitle,
             editTitle,
-            removeTitle
+            removeTitle,
+            isMobile
         }
     }
 })

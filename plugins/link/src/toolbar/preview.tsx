@@ -1,6 +1,6 @@
 import React from 'react';
 import classnames from 'classnames-es-ts';
-import { LanguageInterface } from '@aomao/engine';
+import { isMobile, LanguageInterface } from '@aomao/engine';
 import Tooltip from 'antd/es/tooltip';
 import 'antd/es/tooltip/style';
 
@@ -18,6 +18,30 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({
 	onEdit,
 	onRemove,
 }) => {
+	const renderEdit = () => {
+		const editButton = (
+			<a className="data-icon data-icon-edit" onClick={onEdit} />
+		);
+		return isMobile ? (
+			editButton
+		) : (
+			<Tooltip title={language.get('link', 'link_edit')}>
+				{editButton}
+			</Tooltip>
+		);
+	};
+	const renderRemove = () => {
+		const removeButton = (
+			<a className="data-icon data-icon-unlink" onClick={onRemove} />
+		);
+		return isMobile ? (
+			removeButton
+		) : (
+			<Tooltip title={language.get('link', 'link_remove')}>
+				{removeButton}
+			</Tooltip>
+		);
+	};
 	return (
 		<div className={classnames('data-link-preview')} data-element="ui">
 			<Tooltip title={language.get('link', 'link_open')}>
@@ -30,15 +54,8 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({
 				</a>
 			</Tooltip>
 			<div className="data-link-op">
-				<Tooltip title={language.get('link', 'link_edit')}>
-					<a className="data-icon data-icon-edit" onClick={onEdit} />
-				</Tooltip>
-				<Tooltip title={language.get('link', 'link_remove')}>
-					<a
-						className="data-icon data-icon-unlink"
-						onClick={onRemove}
-					/>
-				</Tooltip>
+				{renderEdit()}
+				{renderRemove()}
 			</div>
 		</div>
 	);
