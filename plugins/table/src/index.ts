@@ -278,7 +278,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			class: ['data-table'],
 			'data-table-no-border': '*',
 			style: {
-				width: '@length',
+				height: '@length',
 				background: '@color',
 				'background-color': '@color',
 				display: '*',

@@ -901,7 +901,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 
 		for (let r = begin.row; r <= end.row; r++) {
 			let tdHtml = [];
-
+			let trHeight = undefined;
 			for (let _c2 = begin.col; _c2 <= end.col; _c2++) {
 				const tdModel = tableModel.table[r][_c2];
 				let rowRemain = undefined;
@@ -910,6 +910,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 
 				if (!helper.isEmptyModelCol(tdModel) && tdModel.element) {
 					tdClone = tdModel.element.cloneNode(true);
+					if (tdModel.element.parentElement)
+						trHeight = $(tdModel.element.parentElement).css(
+							'height',
+						);
 				}
 
 				if (!helper.isEmptyModelCol(tdModel) && tdModel.isMulti) {
@@ -982,7 +986,9 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 					}
 				}
 			}
-			trHtml.push('<tr>'.concat(tdHtml.join(''), '</tr>'));
+			const trElement = $(`<tr>${tdHtml.join('')}</tr>`);
+			if (trHeight) trElement.css('height', trHeight);
+			trHtml.push(trElement.get<HTMLElement>()!.outerHTML);
 		}
 
 		return `<table style="width:${tableWidth}px">${colgroup}${trHtml.join(
