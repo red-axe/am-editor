@@ -56,7 +56,6 @@ export type Operation = {
 	startRangePath?: { start: RangePath; end: RangePath };
 	id?: string;
 	type?: 'undo' | 'redo';
-	remoteOps?: TargetOp[];
 };
 
 export interface DocInterface<T = any> extends EventEmitter2 {

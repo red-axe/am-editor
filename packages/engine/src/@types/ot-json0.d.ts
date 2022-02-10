@@ -10,6 +10,7 @@ declare module 'ot-json0' {
 			) => Op[];
 			invert: (op: Op[]) => Op[];
 			apply: (snapshot: any, op: Op[]) => any;
+			canOpAffectPath: (op: Op, path: Path) => boolean;
 		};
 	}
 	export default OTJSON;

@@ -1,4 +1,4 @@
-import { cloneDeep, debounce } from 'lodash';
+import { cloneDeep, debounce, findLastIndex, omit } from 'lodash';
 import { Op } from 'sharedb';
 import OTJSON from 'ot-json0';
 import { Operation, TargetOp } from './types/ot';
@@ -21,7 +21,6 @@ class HistoryModel implements HistoryInterface {
 	private currentAction: Operation = {};
 	// 当前操作的索引
 	private currentActionIndex: number = 0;
-	private remoteOps: TargetOp[] = [];
 	// 监听的所有过滤事件
 	private filterEvents: ((op: Op) => boolean)[] = [];
 	// 监听的所有收集本地操作的事件
@@ -170,10 +169,8 @@ class HistoryModel implements HistoryInterface {
 			if (this.currentAction.self) {
 				this.currentAction.rangePath = this.getCurrentRangePath();
 				this.currentAction.id = random(8);
-				this.currentAction.remoteOps = this.remoteOps;
 				this.actionOps.splice(this.currentActionIndex);
 				this.actionOps.push(this.currentAction);
-				this.remoteOps = [];
 				this.currentActionIndex = this.actionOps.length;
 				this.engine.change.change();
 			}
@@ -319,81 +316,77 @@ class HistoryModel implements HistoryInterface {
 				}
 			}
 		});
-		const redoOps = this.actionOps[this.currentActionIndex]
-			? this.actionOps.slice(this.currentActionIndex)
-			: [];
-		const undoOps = this.actionOps[this.currentActionIndex - 1]
-			? this.actionOps.slice(0, this.currentActionIndex)
-			: [];
 		ops = ops.filter((o) => !isCursorOp(o));
 		ops.forEach((op) => {
 			if (isCursorOp(op)) return;
-			this.remoteOps.push(op);
-			if (this.actionOps.length > 0) {
-				// 在一个block中有操作，远程的操作索引小于撤销中的索引或者深度大于撤销中的索引，那就移除所有的撤销操作，
-				const isRemove = (historyOps: Operation[]) => {
-					return historyOps.some((uAction) => {
-						const actionRemove = uAction.ops?.some((uOp) => {
-							// 操作目标的block节点一致
-							if (uOp.id === op.id) {
-								const uPath = uOp.p.slice(uOp.bi);
-								const path = op.p.slice(op.bi);
-								// 远程操作比undo操作目标索引小或者一致
-								if (
-									uPath.some((p, index) => path[index] < p) ||
-									isReverseOp(op, uOp)
-								) {
-									return true;
-								}
-							}
-							// 里面有删除，反转后执行就是插入操作，插入需要索引，如果远程操作的 ld 或者 li 的path长度与 uOp的长度相等并且小于等于就要删除撤销
-							else if ('ld' in uOp) {
-								if (
-									op.p[0] < uOp.p[0] &&
-									op.p.length === 1 &&
-									uOp.p.length === 1
-								) {
-									return true;
-								}
-								if (
-									(op.p[0] === uOp.p[0] &&
-										op.p.length > 1 &&
-										uOp.p.some(
-											(p, index) =>
-												op.p[index] === undefined ||
-												op.p[index] < p,
-										)) ||
-									isReverseOp(op, uOp)
-								)
-									return true;
-							}
-							return false;
-						});
-
-						return actionRemove;
-					});
-				};
-				if ('li' in op || 'ld' in op || 'sd' in op || 'si' in op) {
-					if (isRemove(undoOps)) {
-						this.actionOps.splice(
-							this.currentActionIndex - 1,
-							undoOps.length,
-						);
-						this.currentActionIndex -= undoOps.length;
-					}
-					if (isRemove(redoOps)) {
-						this.actionOps.splice(this.currentActionIndex);
-						this.currentActionIndex--;
-					}
-				}
+			if (!this.currentAction.ops) {
+				this.currentAction.ops = [];
 			}
+			const lastOp =
+				this.currentAction.ops[this.currentAction.ops.length - 1];
+			if (lastOp && isReverseOp(op, lastOp)) {
+				this.currentAction.ops.pop();
+			} else {
+				this.currentAction.ops.push(op);
+			}
+			this.actionOps.some((action, index) => {
+				const affect = action.ops?.some((actionOp) => {
+					return OTJSON.type.canOpAffectPath(op, actionOp.p);
+				});
+				if (affect) {
+					// this.actionOps.splice(index, this.actionOps.length - index)
+					const removeArray = [action];
+					for (let i = index + 1; i < this.actionOps.length; i++) {
+						const nextAction = this.actionOps[i];
+						const nextAffect = nextAction.ops?.some((actionOp) => {
+							return action.ops?.some((aop) =>
+								OTJSON.type.canOpAffectPath(actionOp, aop.p),
+							);
+						});
+						if (nextAffect) {
+							removeArray.push(nextAction);
+							let j = i + 1;
+							const nextAction2 = this.actionOps[j];
+							if (
+								nextAction2 &&
+								nextAction2.ops?.some((actionOp) => {
+									return nextAction.ops?.some((aop) =>
+										OTJSON.type.canOpAffectPath(
+											actionOp,
+											aop.p,
+										),
+									);
+								})
+							) {
+								removeArray.push(nextAction2);
+							}
+						}
+					}
+					const newActionOps = this.actionOps.filter(
+						(aop) =>
+							removeArray.find((raop) => raop.id === aop.id) ===
+							undefined,
+					);
+					this.actionOps = newActionOps;
+					this.currentActionIndex = this.actionOps.length;
+					return affect;
+				}
+				return false;
+			});
 		});
 	}
 
 	getUndoOp(): Operation | undefined {
 		const prevIndex = this.currentActionIndex - 1;
 		if (this.actionOps[prevIndex]) {
-			const prevOp = cloneDeep(this.actionOps[prevIndex]);
+			let prevOp = cloneDeep(this.actionOps[prevIndex]);
+			let opIndex = findLastIndex(
+				this.actionOps,
+				(op) => op.id == prevOp.id,
+			);
+			if (opIndex !== -1) prevOp = this.actionOps[opIndex];
+			else opIndex = prevIndex;
+
 			const invertOps = OTJSON.type.invert(prevOp.ops || []);
 			invertOps.forEach((op, index) => {
 				const pOp = (prevOp.ops || [])[invertOps.length - index - 1];
