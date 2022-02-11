@@ -415,22 +415,7 @@ yarn start
 
 ### Vue
 
-只需要进入 examples/vue 目录安装依赖
-
-```base
-//依赖安装好后，在 examples/vue 目录执行以下命令
-
-yarn serve
-```
-
-在 Vue 运行环境中，默认是安装的已发布到 npm 上的代码。如果需要修改引擎或者插件的代码后立即看到效果，我们需要做以下步骤：
-
--   删除 examples/vue/node_modules/@aomao 文件夹
--   删除 examples/vue/node_modules/vue 文件夹。因为有插件依赖了 Vue，所以 Vue 的包会在项目根目录中安装。如果不删除 examples/vue 中的 Vue 包，和插件的 Vue 包不在一个环境中，就无法加载插件
--   在 am-editor 根目录下执行安装所有依赖命令，例如：`yarn`
--   最后在 examples/vue 中重新启动
-
-`Vue` 案例中没有配置任何后端 API，具体可以参考 `React` 和 `api` 设置反向代理
+[am-editor vue example](https://github.com/byoungd/am-editor-vue/blob/main/README.zh-CN.md)
 
 ## 贡献
 
