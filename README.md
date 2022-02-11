@@ -395,22 +395,7 @@ Visit localhost:7001 after startup
 
 ### Vue
 
-Just enter the examples/vue directory to install the dependencies
-
-```base
-//After the dependencies are installed, execute the following commands in the examples/vue directory
-
-yarn serve
-```
-
-In the Vue runtime environment, the default is the installed code that has been published to npm. If you need to modify the code of the engine or plug-in and see the effect immediately, we need to do the following steps:
-
--   Delete the examples/vue/node_modules/@aomao folder
--   Delete the examples/vue/node_modules/vue folder. Because there are plugins that depend on Vue, the Vue package will be installed in the project root directory. If you do not delete the Vue package in examples/vue, and the Vue package of the plugin is not in the same environment, the plugin cannot be loaded
--   Execute and install all dependent commands in the root directory of am-editor, for example: `yarn`
--   Finally restart in examples/vue
-
-No back-end API is configured in the `Vue` case. For details, please refer to `React` and `api` to set reverse proxy
+[am-editor vue example](https://github.com/byoungd/am-editor-vue)
 
 > Vue example powered by [**modern-vue-template**](https://github.com/byoungd/modern-vue-template)
 ## Contribution
