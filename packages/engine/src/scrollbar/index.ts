@@ -133,7 +133,7 @@ class Scrollbar extends EventEmitter2 {
 		() => {
 			const element = this.container.get<HTMLElement>();
 			if (element) {
-				const { offsetHeight, scrollTop } = element;
+				const { scrollTop } = element;
 				const contentElement = this.#content?.get<HTMLElement>();
 				const sPLeft = removeUnit(this.container.css('padding-left'));
 				const sPRight = removeUnit(this.container.css('padding-right'));
@@ -145,11 +145,11 @@ class Scrollbar extends EventEmitter2 {
 					? this.#content!.width() + sPLeft + sPRight
 					: element.scrollWidth;
 				const scrollHeight = contentElement
-					? contentElement.offsetHeight + sPTop + sPBottom
+					? this.#content!.height() + sPTop + sPBottom
 					: element.scrollHeight;
 				this.oWidth = this.getWidth();
 				this.oHeight =
-					offsetHeight -
+					this.container.height() -
 					removeUnit(this.container.css('border-top-width')) -
 					removeUnit(this.container.css('border-bottom-width'));
 				this.sWidth = scrollWidth;
@@ -165,8 +165,8 @@ class Scrollbar extends EventEmitter2 {
 					const display =
 						this.oWidth - sPLeft - sPRight === this.sWidth ||
 						(contentElement &&
-							this.#content!.width() <=
-								this.oWidth - sPLeft - sPRight)
+							Math.round(this.#content!.width()) <=
+								Math.round(this.oWidth - sPLeft - sPRight))
 							? 'none'
 							: 'block';
 					this.slideX?.css('display', display);
@@ -179,8 +179,8 @@ class Scrollbar extends EventEmitter2 {
 					const display =
 						this.oHeight - sPTop - sPBottom === this.sHeight ||
 						(contentElement &&
-							contentElement.offsetHeight <=
-								this.oHeight - sPTop - sPBottom)
+							Math.round(this.#content!.height()) <=
+								Math.round(this.oHeight - sPTop - sPBottom))
 							? 'none'
 							: 'block';
 					this.slideY?.css('display', display);
@@ -221,13 +221,13 @@ class Scrollbar extends EventEmitter2 {
 					this.y &&
 					contentElement &&
 					element.scrollHeight - sPTop - sPBottom !==
-						contentElement.offsetHeight
+						this.#content!.height()
 				) {
 					element.scrollTop -=
 						element.scrollHeight -
 						sPTop -
 						sPBottom -
-						contentElement.offsetHeight;
+						this.#content!.height();
 					return;
 				}
 				const left = this.#scroll?.getScrollLeft
@@ -343,7 +343,7 @@ class Scrollbar extends EventEmitter2 {
 					: 'down';
 			const containerElement = this.container.get<HTMLElement>();
 			if (!containerElement) return;
-			const containerHeight = containerElement.offsetHeight;
+			const containerHeight = this.container.height();
 			const step = Math.max(
 				containerHeight /
 					(isMacos ? 20 - Math.abs(event.wheelDelta) : 8),
