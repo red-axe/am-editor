@@ -250,6 +250,34 @@ class ChangeModel implements ChangeInterface {
 		);
 	}
 
+	setMarkdown(text: string, callback?: (count: number) => void) {
+		const textNode = $(document.createTextNode(text));
+		this.engine.trigger('paste:markdown-before', textNode);
+		this.engine.trigger('paste:markdown', textNode);
+		this.engine.trigger('paste:markdown-after', textNode);
+		const { card, container } = this.engine;
+		textNode.get<Text>()?.normalize();
+		this.#nativeEvent.paste(
+			textNode.text(),
+			undefined,
+			callback,
+			true,
+			(
+				fragment: DocumentFragment,
+				_range?: RangeInterface,
+				_rangeCallback?: (range: RangeInterface) => void,
+				_followActiveMark?: boolean,
+			) => {
+				container.empty().append(fragment);
+				card.render(undefined, (count) => {
+					this.initValue(undefined, false);
+					this.engine.trigger('paste:after');
+					if (callback) callback(count);
+				});
+			},
+		);
+	}
+
 	getOriginValue(container: NodeInterface = this.engine.container) {
 		const { schema, conversion } = this.engine;
 		return new Parser(

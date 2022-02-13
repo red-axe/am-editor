@@ -157,6 +157,15 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 */
 	setHtml(html: string, callback?: (count: number) => void): EngineInterface;
 	/**
+	 * 设置markdown，会格式化为合法的编辑器值
+	 * @param text markdown文本
+	 * @param callback 异步渲染卡片后回调
+	 */
+	setMarkdown(
+		text: string,
+		callback?: (count: number) => void,
+	): EngineInterface;
+	/**
 	 * 设置json格式值，主要用于协同
 	 * @param callback 异步渲染卡片后的回调
 	 */

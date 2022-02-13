@@ -240,6 +240,12 @@ export interface ChangeInterface {
 	 */
 	setHtml(html: string, callback?: (count: number) => void): void;
 	/**
+	 * 设置markdown，会格式化为合法的编辑器值
+	 * @param text markdown文本
+	 * @param callback 异步渲染卡片后回调
+	 */
+	setMarkdown(text: string, callback?: (count: number) => void): void;
+	/**
 	 * 获取编辑器值
 	 */
 	getOriginValue(container?: NodeInterface): string;

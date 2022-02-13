@@ -203,6 +203,22 @@ class Engine<T extends EngineOptions = EngineOptions>
 		return this;
 	}
 
+	setMarkdown(text: string, callback?: (count: number) => void) {
+		this.change.setMarkdown(text, (count) => {
+			this.normalize();
+			this.container.allChildren(true).forEach((child) => {
+				if (this.node.isInline(child)) {
+					this.inline.repairCursor(child);
+				} else if (this.node.isMark(child)) {
+					this.mark.repairCursor(child);
+				}
+			});
+			if (callback) callback(count);
+		});
+		this.nodeId.generateAll(this.container);
+		return this;
+	}
+
 	setJsonValue(value: Array<any>, callback?: (count: number) => void) {
 		const dom = $(toDOM(value));
 		const attributes = dom.get<Element>()?.attributes;
