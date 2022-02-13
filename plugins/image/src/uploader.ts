@@ -148,7 +148,7 @@ export default class<
 
 	init() {
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:enter', (event) => this.markdown(event));
+			this.editor.on('keydown:space', (event) => this.markdown(event));
 			this.editor.on('drop:files', (files) => this.dropFiles(files));
 			this.editor.on('paste:event', ({ files }) =>
 				this.pasteFiles(files),
@@ -684,20 +684,18 @@ export default class<
 		const range = change.range.get();
 
 		if (!range.collapsed || change.isComposing() || !this.markdown) return;
-		const blockApi = this.editor.block;
-		const block = blockApi.closest(range.startNode);
-
-		if (!node.isRootBlock(block)) {
-			return;
-		}
-
-		const chars = blockApi.getLeftText(block);
-		const match = /!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)/.exec(chars);
+		const cloneRange = range.cloneRange();
+		cloneRange.shrinkToTextNode();
+		const { startNode } = cloneRange;
+		if (!startNode.isText()) return;
+		const text = startNode.text();
+		const match = /!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)/.exec(text);
 		if (match) {
+			cloneRange.setStart(startNode, match.index);
+			change.range.select(cloneRange);
 			event.preventDefault();
 			const splits = match[1].split('|');
 			const src = match[2];
-			blockApi.removeLeftText(block);
 			const alignment = splits[1];
 			if (alignment === 'center' || alignment === 'right') {
 				this.editor.command.execute('alignment', alignment);

@@ -41,7 +41,7 @@ export default class<
 
 	markdown =
 		this.options.markdown === undefined
-			? '\\[(.+?)\\]\\(s*([\\S]+?)\\s*\\)$'
+			? '[^!]\\[(.+?)\\]\\(s*([\\S]+?)\\s*\\)$'
 			: this.options.markdown;
 
 	init() {
