@@ -4,6 +4,7 @@ import {
 	CardToolbarItemOptions,
 	CardType,
 	EDITABLE_SELECTOR,
+	getComputedStyle,
 	isEngine,
 	isMobile,
 	NodeInterface,
@@ -868,8 +869,17 @@ class TableComponent<V extends TableValue = TableValue>
 			}
 			const rowElements = table.find('tr').toArray();
 			rowElements.forEach((rowElement, index) => {
-				const height = rowElement.css('height');
-				rowItems.eq(index)?.css('height', height);
+				rowItems
+					.eq(index)
+					?.css(
+						'height',
+						removeUnit(
+							getComputedStyle(
+								rowElement.get<Element>()!,
+								'height',
+							),
+						),
+					);
 			});
 			this.conltrollBar.refresh();
 			this.scrollbar?.refresh();

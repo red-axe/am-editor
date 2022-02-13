@@ -252,7 +252,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 .table-wrapper .table-rows-header {
     position: absolute;
     left: -13px;
-    top: 42px;
+    top: 41px;
     width: 14px;
     z-index: 128;
     border-right: 0;
@@ -277,9 +277,9 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
     background-color: #e2e4e6;
 }
 
-.table-wrapper .table-rows-header .table-rows-header-item:nth-child(3) {
+/* .table-wrapper .table-rows-header .table-rows-header-item:nth-child(3) {
     border-top: 0 none;
-}
+} */
 
 .table-wrapper .table-rows-header .table-rows-header-item:last-child{
     border-bottom: 1px solid #dfdfdf;

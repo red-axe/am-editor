@@ -11,6 +11,7 @@ import {
 	$,
 	CardActiveTrigger,
 	EditorInterface,
+	getComputedStyle,
 	isEngine,
 	isHotkey,
 	isMobile,
@@ -129,7 +130,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		end = end || trs?.length || 0;
 		const rowBars = this.rowsHeader?.find(Template.ROWS_HEADER_ITEM_CLASS);
 		for (let i = start; i < end; i++) {
-			rowBars?.eq(i)?.css('height', `${trs[i].offsetHeight}px`);
+			rowBars?.eq(i)?.css('height', getComputedStyle(trs[i], 'height'));
 		}
 		const rowTrigger = this.rowsHeader?.find(
 			Template.ROWS_HEADER_TRIGGER_CLASS,
@@ -146,7 +147,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	renderColBars() {
 		const table = this.tableRoot?.get<HTMLTableElement>();
 		if (!table) return;
-		const tableWidth = table.offsetWidth;
+		const tableWidth = removeUnit(getComputedStyle(table, 'width'));
 		//列删除按钮
 		this.colDeleteButton?.removeAllEvents();
 		this.colDeleteButton = this.table.wrapper?.find(
@@ -204,7 +205,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			const colWidth = $(col).attributes('width');
 			if (colWidth) {
 				colWidthArray[i] = colWidth;
-				allColWidth += parseInt(colWidth);
+				allColWidth += parseFloat(colWidth);
 				isInit = false;
 			} else {
 				colIndex++;
@@ -224,7 +225,9 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 						!tdModel.isMulti &&
 						tdModel.element
 					) {
-						tdWidth[c] = tdModel.element.offsetWidth;
+						tdWidth[c] = removeUnit(
+							getComputedStyle(tdModel.element, 'width'),
+						);
 					}
 				});
 			});
@@ -250,9 +253,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				cols.eq(i)?.attributes('width', width);
 			}
 		} else if (colIndex) {
-			const averageWidth = Math.round(
-				(tableWidth - allColWidth) / colIndex,
-			);
+			const averageWidth = (tableWidth - allColWidth) / colIndex;
 			cols.each((_, index) => {
 				const width =
 					undefined === colWidthArray[index]
@@ -263,9 +264,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			});
 		} else {
 			cols.each((_, index) => {
-				const width = Math.round(
-					(tableWidth * colWidthArray[index]) / allColWidth,
-				);
+				const width = (tableWidth * colWidthArray[index]) / allColWidth;
 				colBars.eq(index)?.css('width', width + 'px');
 				cols.eq(index)?.attributes('width', width);
 			});
@@ -654,11 +653,15 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.changeSize = {
 			trigger: {
 				element: trigger,
-				height: trigger.height(),
-				width: trigger.width(),
+				height: removeUnit(
+					getComputedStyle(trigger.get<Element>()!, 'height'),
+				),
+				width: removeUnit(
+					getComputedStyle(trigger.get<Element>()!, 'width'),
+				),
 			},
 			element: col,
-			width: colElement.offsetWidth,
+			width: removeUnit(getComputedStyle(colElement, 'width')),
 			height: -1,
 			index,
 			table: {
@@ -694,12 +697,16 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.changeSize = {
 			trigger: {
 				element: trigger,
-				height: trigger.height(),
-				width: trigger.width(),
+				height: removeUnit(
+					getComputedStyle(trigger.get<Element>()!, 'height'),
+				),
+				width: removeUnit(
+					getComputedStyle(trigger.get<Element>()!, 'width'),
+				),
 			},
 			element: row,
 			width: -1,
-			height: rowElement.offsetHeight,
+			height: removeUnit(getComputedStyle(rowElement, 'height')),
 			index,
 			table: {
 				width: this.table.selection.tableModel?.width || 0,

@@ -122,9 +122,10 @@ class Scrollbar extends EventEmitter2 {
 	getWidth() {
 		const element = this.container.get<HTMLElement>();
 		if (!element) return 0;
+		const width = this.container.width();
 		const offsetWidth = this.#scroll?.getOffsetWidth
-			? this.#scroll.getOffsetWidth(element.offsetWidth)
-			: element.offsetWidth;
+			? this.#scroll.getOffsetWidth(width)
+			: width;
 		return offsetWidth;
 	}
 
@@ -141,7 +142,7 @@ class Scrollbar extends EventEmitter2 {
 					this.container.css('padding-bottom'),
 				);
 				const scrollWidth = contentElement
-					? contentElement.offsetWidth + sPLeft + sPRight
+					? this.#content!.width() + sPLeft + sPRight
 					: element.scrollWidth;
 				const scrollHeight = contentElement
 					? contentElement.offsetHeight + sPTop + sPBottom
@@ -164,7 +165,7 @@ class Scrollbar extends EventEmitter2 {
 					const display =
 						this.oWidth - sPLeft - sPRight === this.sWidth ||
 						(contentElement &&
-							contentElement.offsetWidth <=
+							this.#content!.width() <=
 								this.oWidth - sPLeft - sPRight)
 							? 'none'
 							: 'block';
@@ -190,13 +191,13 @@ class Scrollbar extends EventEmitter2 {
 					this.x &&
 					contentElement &&
 					element.scrollWidth - sPLeft - sPRight >
-						contentElement.offsetWidth
+						this.#content!.width()
 				) {
 					let left =
 						element.scrollWidth -
 						sPLeft -
 						sPRight -
-						contentElement.offsetWidth;
+						this.#content!.width();
 					if (this.#scroll) {
 						const { onScrollX, getScrollLeft } = this.#scroll;
 
@@ -295,9 +296,10 @@ class Scrollbar extends EventEmitter2 {
 					: 'down';
 			const containerElement = this.container.get<HTMLElement>();
 			if (!containerElement) return;
+			const width = this.container.width();
 			const containerWidth = this.#scroll?.getOffsetWidth
-				? this.#scroll.getOffsetWidth(containerElement.offsetWidth)
-				: containerElement.offsetWidth;
+				? this.#scroll.getOffsetWidth(width)
+				: width;
 			const step = Math.max(
 				containerWidth /
 					(isMacos ? 20 - Math.abs(event.wheelDelta) : 8),

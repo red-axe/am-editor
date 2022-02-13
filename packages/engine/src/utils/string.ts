@@ -189,8 +189,8 @@ export const addUnit = (value: string | number, unit: string = 'px') => {
  */
 export const removeUnit = (value: string) => {
 	let match;
-	return value && (match = /^(-?\d+)/.exec(value))
-		? parseInt(match[1], 10)
+	return value && (match = /^((-?\d+)(\.\d+)?)/.exec(value))
+		? parseFloat(match[1])
 		: 0;
 };
 
