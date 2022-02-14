@@ -23,13 +23,7 @@ import { NodeInterface } from '../types/node';
 import { RangeInterface } from '../types/range';
 import { ToolbarItemOptions } from '../types/toolbar';
 import { TinyCanvasInterface } from '../types/tiny-canvas';
-import {
-	decodeCardValue,
-	encodeCardValue,
-	isEngine,
-	isView,
-	random,
-} from '../utils';
+import { decodeCardValue, encodeCardValue, isEngine, random } from '../utils';
 import Maximize from './maximize';
 import Resize from './resize';
 import Toolbar from './toolbar';
@@ -353,16 +347,35 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		return this.onSelectByOther(activated, value);
 	}
 	onChange?(trigger: 'remote' | 'local', node: NodeInterface): void;
-	destroy() {
-		this.toolbarModel?.hide();
-		this.toolbarModel?.destroy();
-		this.toolbarModel = undefined;
-		this.resizeModel?.hide();
-		this.resizeModel?.destroy();
-		this.resizeModel = undefined;
+	private initToolbar() {
+		if (this.toolbar) {
+			if (!this.toolbarModel)
+				this.toolbarModel = new Toolbar(this.editor, this);
+			if (this.activated) {
+				this.toolbarModel.show();
+			}
+		} else {
+			this.toolbarModel?.hide();
+			this.toolbarModel?.destroy();
+			this.toolbarModel = undefined;
+		}
+	}
+	private initResize() {
+		if (this.resize) {
+			const container =
+				typeof this.resize === 'function'
+					? this.resize()
+					: this.findByKey('body');
+			if (container && container.length > 0) {
+				this.resizeModel?.render(container);
+			}
+		}
 	}
 	didInsert?(): void;
-	didUpdate?(): void;
+	didUpdate() {
+		this.initResize();
+		this.initToolbar();
+	}
 	beforeRender() {
 		const center = this.getCenter();
 		const loadingElement = $(
@@ -381,26 +394,8 @@ abstract class CardEntry<T extends CardValue = CardValue>
 			if (!isEngine(this.editor))
 				this.root.removeAttributes(CARD_LOADING_KEY);
 		}
-		if (this.resize) {
-			const container =
-				typeof this.resize === 'function'
-					? this.resize()
-					: this.findByKey('body');
-			if (container && container.length > 0) {
-				this.resizeModel?.render(container);
-			}
-		}
-		if (this.toolbar) {
-			if (!this.toolbarModel)
-				this.toolbarModel = new Toolbar(this.editor, this);
-			if (this.activated) {
-				this.toolbarModel.show();
-			}
-		} else {
-			this.toolbarModel?.hide();
-			this.toolbarModel?.destroy();
-			this.toolbarModel = undefined;
-		}
+		this.initResize();
+		this.initToolbar();
 		if (this.isEditable) {
 			this.editor.nodeId.generateAll(this.getCenter().get<Element>()!);
 		}
@@ -423,6 +418,15 @@ abstract class CardEntry<T extends CardValue = CardValue>
 	executeMark?(mark: NodeInterface): void;
 
 	queryMarks?(): NodeInterface[];
+
+	destroy() {
+		this.toolbarModel?.hide();
+		this.toolbarModel?.destroy();
+		this.toolbarModel = undefined;
+		this.resizeModel?.hide();
+		this.resizeModel?.destroy();
+		this.resizeModel = undefined;
+	}
 }
 
 export default CardEntry;

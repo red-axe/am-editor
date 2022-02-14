@@ -300,6 +300,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 	}
 
 	didUpdate() {
+		super.didUpdate();
 		this.toolbarModel?.getContainer()?.remove();
 		this.toolbarModel?.create();
 	}

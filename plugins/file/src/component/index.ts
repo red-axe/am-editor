@@ -268,6 +268,7 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 	}
 
 	didUpdate() {
+		super.didUpdate();
 		this.toolbarModel?.getContainer()?.remove();
 		this.toolbarModel?.create();
 	}
