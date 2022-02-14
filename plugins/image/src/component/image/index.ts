@@ -598,7 +598,7 @@ class Image {
 					this.maximize.hide();
 				});
 			}
-			if (!isEngine(this.editor)) {
+			if (!isEngine(this.editor) || this.editor.readonly) {
 				const link = this.image.closest('a');
 				if (link.length === 0) {
 					this.image.on('click', (event) => this.openZoom(event));
