@@ -5,12 +5,19 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yanmao-cc/am-editor/blob/master/README.zh-CN.md"><strong>中文</strong></a> ·
-  <a href="https://editor.aomao.com"><strong>Demo</strong></a> ·
+	<a href="https://editor.aomao.com"><strong>Demo</strong></a> ·
   <a href="https://editor.aomao.com/docs"><strong>Documentation</strong></a> ·
   <a href="#plugins"><strong>Plugins</strong></a> ·
   <a href="https://qm.qq.com/cgi-bin/qm/qr?k=Gva5NtZ2USlHSLbFOeMroysk8Uwo7fCS&jump_from=webapi"><strong>QQ-Group 907664876</strong></a> ·
 </p>
+
+<div align="center">
+  <p>
+    <a href="README.zh-CN.md">
+      <img src="https://img.shields.io/badge/lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-red.svg?longCache=true&style=flat-square">
+    </a>
+  </p>
+</div>
 
 ![aomao-preview](https://user-images.githubusercontent.com/55792257/125074830-62d79300-e0f0-11eb-8d0f-bb96a7775568.png)
 
@@ -398,6 +405,7 @@ Visit localhost:7001 after startup
 [am-editor vue example](https://github.com/byoungd/am-editor-vue)
 
 > Vue example powered by [**modern-vue-template**](https://github.com/byoungd/modern-vue-template)
+
 ## Contribution
 
 Thanks [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.com/Elena211314)、[zb201307](https://github.com/zb201307) for donation
