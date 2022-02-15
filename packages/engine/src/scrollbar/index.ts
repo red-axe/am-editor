@@ -163,7 +163,8 @@ class Scrollbar extends EventEmitter2 {
 				if (this.x) {
 					this.slideX?.css('width', this.xWidth + 'px');
 					const display =
-						this.oWidth - sPLeft - sPRight === this.sWidth ||
+						Math.round(this.oWidth) - sPLeft - sPRight ===
+							this.sWidth ||
 						(contentElement &&
 							Math.round(this.#content!.width()) <=
 								Math.round(this.oWidth - sPLeft - sPRight))
@@ -177,7 +178,8 @@ class Scrollbar extends EventEmitter2 {
 				if (this.y) {
 					this.slideY?.css('height', this.yHeight + 'px');
 					const display =
-						this.oHeight - sPTop - sPBottom === this.sHeight ||
+						Math.round(this.oHeight) - sPTop - sPBottom ===
+							this.sHeight ||
 						(contentElement &&
 							Math.round(this.#content!.height()) <=
 								Math.round(this.oHeight - sPTop - sPBottom))
