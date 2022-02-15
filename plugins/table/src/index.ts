@@ -489,16 +489,19 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		});
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml(
+		root: NodeInterface,
+		callback?: (node: NodeInterface, value: TableValue) => NodeInterface,
+	) {
 		root.find(
 			`[${CARD_KEY}="${TableComponent.cardName}"],[${READY_CARD_KEY}="${TableComponent.cardName}"]`,
 		).each((tableNode) => {
 			const node = $(tableNode);
 			let table = node.find('table');
+			const value = decodeCardValue<TableValue>(
+				node.attributes(CARD_VALUE_KEY),
+			);
 			if (table.length === 0) {
-				const value = decodeCardValue<TableValue>(
-					node.attributes(CARD_VALUE_KEY),
-				);
 				if (!value || !value.html) return;
 				// 表格值里面的卡片都是没有被转换过的，所以需要先把卡片转换过来
 				table = $(transformCustomTags(value.html));
@@ -536,6 +539,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			table.find(Template.TABLE_TD_CONTENT_CLASS).each((content) => {
 				this.editor.node.unwrap($(content));
 			});
+			if (callback) {
+				table = callback(table, value);
+			}
 			node.replaceWith(table);
 		});
 	}

@@ -7,6 +7,8 @@ import {
 	PluginEntry,
 	SchemaInterface,
 	PluginOptions,
+	CARD_VALUE_KEY,
+	decodeCardValue,
 } from '@aomao/engine';
 import HrComponent, { HrValue } from './component';
 
@@ -129,15 +131,27 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 		return true;
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml(
+		root: NodeInterface,
+		callback?: (node: NodeInterface, value: HrValue) => NodeInterface,
+	) {
 		root.find(`[${CARD_KEY}=${HrComponent.cardName}`).each((hrNode) => {
 			const node = $(hrNode);
-			const hr = node.find('hr');
+			let hr = node.find('hr');
 			hr.css({
 				'background-color': '#e8e8e8',
 				border: '1px solid transparent',
 				margin: '18px 0',
 			});
+			if (callback) {
+				const card = this.editor.card.find(
+					node,
+				) as HrComponent<HrValue>;
+				const value =
+					card?.getValue() ||
+					decodeCardValue(node.attributes(CARD_VALUE_KEY));
+				hr = callback(hr, value);
+			}
 			node.replaceWith(hr);
 		});
 	}

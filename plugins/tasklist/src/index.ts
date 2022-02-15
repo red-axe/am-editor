@@ -7,6 +7,8 @@ import {
 	isEngine,
 	PluginEntry,
 	PluginOptions,
+	decodeCardValue,
+	CARD_VALUE_KEY,
 } from '@aomao/engine';
 import CheckboxComponent, { CheckboxValue } from './checkbox';
 import './index.css';
@@ -156,7 +158,10 @@ export default class<
 		return this.options.hotkey || 'mod+shift+9';
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml(
+		root: NodeInterface,
+		callback?: (node: NodeInterface, value: CheckboxValue) => NodeInterface,
+	) {
 		const getBox = (inner: string = '') => {
 			return `<span style="${
 				inner
@@ -167,7 +172,7 @@ export default class<
 		root.find(`[${CARD_KEY}=checkbox`).each((checkboxNode) => {
 			const node = $(checkboxNode);
 
-			const checkbox = $(
+			let checkbox = $(
 				`<span>${
 					node.find('.data-checkbox-checked').length > 0
 						? getBox(
@@ -184,6 +189,16 @@ export default class<
 				color: 'color: rgba(0, 0, 0, 0.65)',
 			});
 			node.empty();
+			if (callback) {
+				const card = this.editor.card.find<
+					CheckboxValue,
+					CheckboxComponent<CheckboxValue>
+				>(node);
+				const value =
+					card?.getValue() ||
+					decodeCardValue(node.attributes(CARD_VALUE_KEY));
+				if (value) checkbox = callback(checkbox, value);
+			}
 			node.append(checkbox);
 		});
 		root.find('.data-list-task').css({

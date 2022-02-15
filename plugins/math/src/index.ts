@@ -267,7 +267,10 @@ export default class Math<
 		return true;
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml(
+		root: NodeInterface,
+		callback?: (node: NodeInterface, value: MathValue) => NodeInterface,
+	) {
 		root.find(
 			`[${CARD_KEY}="${MathComponent.cardName}"],[${READY_CARD_KEY}="${MathComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -280,7 +283,7 @@ export default class Math<
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
 			if (value) {
-				const img = $('<img />');
+				let img = $('<img />');
 				node.empty();
 				img.attributes('src', value.url);
 				img.css('visibility', 'visible');
@@ -290,6 +293,9 @@ export default class Math<
 						MathComponent.cardName
 					}" data-value="${encodeCardValue(value)}"></span>`,
 				);
+				if (callback) {
+					img = callback(img, value);
+				}
 				span.append(img);
 				node.replaceWith(span);
 			} else node.remove();

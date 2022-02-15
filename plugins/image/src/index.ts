@@ -110,7 +110,10 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 		});
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml(
+		root: NodeInterface,
+		callback?: (node: NodeInterface, value: ImageValue) => NodeInterface,
+	) {
 		root.find(
 			`[${CARD_KEY}="${ImageComponent.cardName}"],[${READY_CARD_KEY}="${ImageComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -141,15 +144,16 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 				if (size?.height) img.css('height', `${size.height}px`);
 				img.removeAttributes('class');
 				img.attributes('data-type', type);
-				if (img.length > 0) {
-					if (type === CardType.BLOCK) {
-						img = this.editor.node.wrap(
-							img,
-							$(`<p style="text-align:center;"></p>`),
-						);
-					}
-					node.replaceWith(img);
+				if (callback) {
+					img = callback(img, value);
 				}
+				if (type === CardType.BLOCK) {
+					img = this.editor.node.wrap(
+						img,
+						$(`<p style="text-align:center;"></p>`),
+					);
+				}
+				node.replaceWith(img);
 			} else node.remove();
 		});
 	}

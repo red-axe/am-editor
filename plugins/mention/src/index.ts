@@ -140,7 +140,10 @@ class MentionPlugin<
 		return true;
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml(
+		root: NodeInterface,
+		callback?: (node: NodeInterface, value: MentionValue) => NodeInterface,
+	) {
 		root.find(
 			`[${CARD_KEY}="${MentionComponent.cardName}"],[${READY_CARD_KEY}="${MentionComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -159,7 +162,11 @@ class MentionPlugin<
 					value,
 				)}" style="color:#1890ff">@${value.name}</span>`;
 				node.empty();
-				node.replaceWith($(html));
+				let newNode = $(html);
+				if (callback) {
+					newNode = callback(newNode, value);
+				}
+				node.replaceWith(newNode);
 			} else node.remove();
 		});
 	}

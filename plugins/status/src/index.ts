@@ -81,7 +81,10 @@ export default class<
 		return true;
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml(
+		root: NodeInterface,
+		callback?: (node: NodeInterface, value: StatusValue) => NodeInterface,
+	) {
 		root.find(`[${CARD_KEY}=${StatusComponent.cardName}`).each(
 			(statusNode) => {
 				const node = $(statusNode);
@@ -97,7 +100,7 @@ export default class<
 						value,
 					)}">${container.html()}</span>`;
 					node.empty();
-					const newNode = $(html);
+					let newNode = $(html);
 					newNode.css({
 						'font-weight': 400,
 						overflow: 'hidden',
@@ -108,6 +111,9 @@ export default class<
 						padding: '0 3px',
 						'text-overflow': 'ellipsis',
 					});
+					if (callback) {
+						newNode = callback(newNode, value);
+					}
 					node.replaceWith(newNode);
 				} else node.remove();
 			},

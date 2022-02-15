@@ -90,7 +90,10 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 		return true;
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml(
+		root: NodeInterface,
+		callback?: (node: NodeInterface, value: EmbedValue) => NodeInterface,
+	) {
 		root.find(
 			`[${CARD_KEY}="${EmbedComponent.cardName}"],[${READY_CARD_KEY}="${EmbedComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -111,7 +114,7 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 						value.title || '',
 					)}</a></span>
                 </div>`);
-				const contianer = $(
+				let contianer = $(
 					`<div data-type="${
 						EmbedComponent.cardName
 					}" data-value="${encodeCardValue(value)}"></span>`,
@@ -123,6 +126,9 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 				);
 				body.append(iframe);
 				if (!value.collapsed) contianer.append(body);
+				if (callback) {
+					contianer = callback(contianer, value);
+				}
 				node.replaceWith(contianer);
 			} else node.remove();
 		});

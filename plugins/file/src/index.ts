@@ -152,7 +152,10 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 		return true;
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml(
+		root: NodeInterface,
+		callback?: (node: NodeInterface, value: FileValue) => NodeInterface,
+	) {
 		root.find(
 			`[${CARD_KEY}="${FileComponent.cardName}"],[${READY_CARD_KEY}="${FileComponent.cardName}"`,
 		).each((cardNode) => {
@@ -174,7 +177,11 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 					value.name
 				}</a></span>`;
 				node.empty();
-				node.replaceWith($(html));
+				let newNode = $(html);
+				if (callback) {
+					newNode = callback(newNode, value);
+				}
+				node.replaceWith(newNode);
 			} else node.remove();
 		});
 	}

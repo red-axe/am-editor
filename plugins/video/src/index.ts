@@ -171,7 +171,10 @@ export default class VideoPlugin<
 		return true;
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml(
+		root: NodeInterface,
+		callback?: (node: NodeInterface, value: VideoValue) => NodeInterface,
+	) {
 		root.find(
 			`[${CARD_KEY}="${VideoComponent.cardName}"],[${READY_CARD_KEY}="${VideoComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -199,7 +202,11 @@ export default class VideoPlugin<
 						  )
 				}" webkit-playsinline="webkit-playsinline" playsinline="playsinline" style="outline:none;" /></div>`;
 				node.empty();
-				node.replaceWith($(html));
+				let newNode = $(html);
+				if (callback) {
+					newNode = callback(newNode, value);
+				}
+				node.replaceWith(newNode);
 			} else node.remove();
 		});
 	}

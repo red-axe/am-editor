@@ -5,7 +5,6 @@ import {
 	PluginEntry,
 	NodeInterface,
 	CARD_KEY,
-	isServer,
 	CARD_VALUE_KEY,
 	Parser,
 	SchemaInterface,
@@ -322,9 +321,13 @@ export default class<
 		node.text(newText);
 	}
 
-	parseHtml(root: NodeInterface) {
-		if (isServer) return;
-
+	parseHtml(
+		root: NodeInterface,
+		callback?: (
+			node: NodeInterface,
+			value: CodeBlockValue,
+		) => NodeInterface,
+	) {
 		root.find(
 			`[${CARD_KEY}="${CodeBlockComponent.cardName}"],[${READY_CARD_KEY}="${CodeBlockComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -379,6 +382,9 @@ export default class<
 				node.removeAttributes(CARD_VALUE_KEY);
 				node.attributes('data-syntax', value.mode || 'plain');
 				content.removeClass('am-engine-view');
+				if (callback) {
+					node.replaceWith(callback(node, value));
+				}
 			} else node.remove();
 		});
 	}
