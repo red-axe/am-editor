@@ -122,7 +122,11 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
 			if (value?.src && value.status === 'done') {
-				let img = $('<img />');
+				const currentImg = node.find('.data-image-meta img');
+				let img =
+					currentImg.length > 0
+						? currentImg.clone(true)
+						: $('<img />');
 				node.empty();
 				let src = value.src;
 				const { onBeforeRender } = this.options;
