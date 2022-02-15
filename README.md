@@ -5,10 +5,9 @@
 </p>
 
 <p align="center">
-	<a href="https://editor.aomao.com"><strong>Demo</strong></a> ·
-  <a href="https://editor.aomao.com/docs"><strong>Documentation</strong></a> ·
-  <a href="#plugins"><strong>Plugins</strong></a> ·
-  <a href="https://qm.qq.com/cgi-bin/qm/qr?k=Gva5NtZ2USlHSLbFOeMroysk8Uwo7fCS&jump_from=webapi"><strong>QQ-Group 907664876</strong></a> ·
+	<a href="https://editor.aomao.com"><strong>Preview</strong></a> ·
+  	<a href="https://editor.aomao.com/docs"><strong>Documentation</strong></a> ·
+ 	<a href="#plugins"><strong>Plugins</strong></a>
 </p>
 
 <div align="center">
@@ -39,17 +38,17 @@
   </a>
 </p>
 
-> Thanks to Google Translate
+## Example
 
-[**`Vue2`** example ](https://github.com/zb201307/am-editor-vue2)
+[**`Vue2`**](https://github.com/zb201307/am-editor-vue2)
 
-[**`Vue3`** example](https://github.com/red-axe/am-editor-vue)
+[**`Vue3`**](https://github.com/red-axe/am-editor-vue)
 
-[**`React`** example](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+[**`React`** ](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
-[**`Vue2 DEMO`** ](https://github.com/yanmao-cc/am-editor-demo-vue2)
+[**`Vue2 Demo`**](https://github.com/yanmao-cc/am-editor-demo-vue2)
 
-[**`Vue2 Nuxt DEMO`** ](https://github.com/yanmao-cc/am-editor-nuxt)
+[**`Vue2 Nuxt Demo`**](https://github.com/yanmao-cc/am-editor-nuxt)
 
 ## Fundamental
 
