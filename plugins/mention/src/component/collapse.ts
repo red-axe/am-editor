@@ -213,7 +213,7 @@ class CollapseComponent implements CollapseComponentInterface {
 				node.addClass('data-mention-item-active');
 			},
 			{
-				once: true,
+				once: false,
 			},
 		);
 		return node;
