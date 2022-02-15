@@ -203,19 +203,13 @@ class CollapseComponent implements CollapseComponentInterface {
 				once: true,
 			},
 		);
-		node.on(
-			'mouseenter',
-			() => {
-				if (!key) return;
-				this.root
-					?.find('.data-mention-item-active')
-					.removeClass('data-mention-item-active');
-				node.addClass('data-mention-item-active');
-			},
-			{
-				once: true,
-			},
-		);
+		node.on('mouseenter', () => {
+			if (!key) return;
+			this.root
+				?.find('.data-mention-item-active')
+				.removeClass('data-mention-item-active');
+			node.addClass('data-mention-item-active');
+		});
 		return node;
 	};
 
