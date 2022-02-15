@@ -50,8 +50,10 @@ export default class Math<
 	static get pluginName() {
 		return 'math';
 	}
-
-	#request?: AjaxInterface;
+	/**
+	 * 不同卡片的当前请求
+	 */
+	#request: Record<string, AjaxInterface> = {};
 
 	init() {
 		this.editor.language.add(locales);
@@ -80,20 +82,21 @@ export default class Math<
 	action(action: string, ...args: any) {
 		switch (action) {
 			case 'query':
-				const [code, success, failed] = args;
-				return this.query(code, success, failed);
+				const [key, code, success, failed] = args;
+				return this.query(key, code, success, failed);
 		}
 	}
 
 	query(
+		key: string,
 		code: string,
 		success: (url: string) => void,
 		failed: (message: string) => void,
 	) {
 		const { request } = this.editor;
 		const { action, type, contentType, data, parse } = this.options;
-		this.#request?.abort();
-		this.#request = request.ajax({
+		this.#request[key]?.abort();
+		this.#request[key] = request.ajax({
 			url: action,
 			method: 'POST',
 			contentType: contentType || 'application/json',

@@ -75,7 +75,15 @@ export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 		failed?: (message: string) => void,
 	) {
 		const { command } = this.editor;
-		command.executeMethod('math', 'action', 'query', code, success, failed);
+		command.executeMethod(
+			'math',
+			'action',
+			'query',
+			this.id,
+			code,
+			success,
+			failed,
+		);
 	}
 
 	getMaxWidth(node: NodeInterface = this.root) {
