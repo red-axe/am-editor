@@ -189,7 +189,7 @@ class Consumer implements ConsumerInterface {
 			if (domNode.isCard()) {
 				const component = card.find(domNode);
 				if (!component) return;
-				card.reRender(component);
+				if (!component.isEditable) card.reRender(component);
 				if (component.isEditable && component.onChange)
 					component.onChange(isRemote ? 'remote' : 'local', domNode);
 			}
