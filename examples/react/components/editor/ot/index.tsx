@@ -19,11 +19,15 @@ const OTComponent: React.FC<{ members: Member[] }> = ({ members }) => {
 			moreMembers.push(members[i]);
 		}
 		return (
-			<div className="editor-ot-more">
+			<div style={{ maxHeight: 'calc(60vh)', overflowY: 'scroll' }}>
 				{moreMembers.map(({ uuid, name, color }) => (
 					<div
 						key={uuid}
-						style={{ display: 'flex', alignItems: 'center' }}
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							marginBottom: 4,
+						}}
 					>
 						<Avatar size={24} style={{ backgroundColor: color }}>
 							{name}
