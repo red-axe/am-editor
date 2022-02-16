@@ -573,7 +573,10 @@ export default class Paste {
 			startNode.inEditor() &&
 			first &&
 			first.name === 'p' &&
-			!(first.length === 1 && first.first()?.name === 'br')
+			!(first.length === 1 && first.first()?.name === 'br') &&
+			!nodeApi.isEmptyWidthChild(
+				range.cloneRange().enlargeToElementNode(true, true).startNode,
+			)
 		) {
 			nodeApi.unwrap(first);
 		}
