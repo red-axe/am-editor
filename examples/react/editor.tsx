@@ -99,7 +99,7 @@ export default () => {
 				onLoad={setEngine}
 				toc={true}
 				ot={
-					false
+					IS_DEV
 						? false
 						: {
 								url: `${wsUrl}${
