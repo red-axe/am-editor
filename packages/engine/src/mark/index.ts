@@ -261,7 +261,12 @@ class Mark implements MarkModelInterface {
 				node.isMark(child) &&
 				(!callback || callback(child))
 			) {
-				node.unwrap(child);
+				const children = child.children();
+				if (children.length === 1 && children.isText()) {
+					child.remove();
+				} else {
+					node.unwrap(child);
+				}
 			}
 		});
 	}
