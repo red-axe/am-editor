@@ -38,14 +38,14 @@
 
 ## Features
 
--   🍉 **Out of the box** dozens of ready to use plug to meet most needs
--   🍋 **Extensibility** in addition to the basic plug-in of `mark`, inline`and`block`type`, we also provide`card`component combined with`React`, `Vue` and other front-end libraries to render the plug-in UI
+-   🍉 **Out of the box** - Dozens of ready to use plug to meet most needs
+-   🍋 **Extensibility** - In addition to the basic plug-in of `mark`, inline`and`block`type`, we also provide`card`component combined with`React`, `Vue` and other front-end libraries to render the plug-in UI
 -   🍎 **Markdown Support**
 -   👨‍🦳 **I18n**
--   🔥 **Zero dependency** The engine is written by pure **JavaScript** and does not rely on any front-end libraries. Plug-ins can be developed by any libraries such as `React` 、 `Vue` or `Svelte`.
--   🦔 **Collaboration** Ready to use with lightweight configuration
+-   🔥 **Zero dependency** - The engine is written by pure **JavaScript** and does not rely on any front-end libraries. Plug-ins can be developed by any libraries such as `React` 、 `Vue` or `Svelte`
+-   🦔 **Collaboration** - Ready to use with lightweight configuration
 -   Compatible with most of the latest mobile browsers
--   🦾 **TypeScript** Of course
+-   🦾 **TypeScript** - Of course
 
 ## Example
 
