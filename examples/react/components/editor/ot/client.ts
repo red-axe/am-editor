@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events';
-import { EngineInterface } from '@aomao/engine';
+import type { EngineInterface } from '@aomao/engine';
 import ReconnectingWebSocket, { ErrorEvent } from 'reconnecting-websocket';
-import { Doc } from 'sharedb';
+import type { Doc } from 'sharedb';
 import sharedb from 'sharedb/lib/client';
-import { Socket } from 'sharedb/lib/sharedb';
+import type { Socket } from 'sharedb/lib/sharedb';
 
 export type Member = {
 	avatar: string;
