@@ -953,6 +953,8 @@ class NodeEntry implements NodeInterface {
 		callback: (node: NodeInterface) => boolean | void | NodeInterface,
 		order: boolean = true,
 		includeEditableCard: boolean = false,
+		onStart?: (node: NodeInterface) => void,
+		onEnd?: (node: NodeInterface, next: NodeInterface | null) => void,
 	) {
 		const walk = (node: NodeInterface) => {
 			if (!includeEditableCard && node.isCard()) {
@@ -968,6 +970,7 @@ class NodeEntry implements NodeInterface {
 			let child = order ? node.first() : node.last();
 			while (child) {
 				const next = order ? child.next() : child.prev();
+				if (onStart) onStart(child);
 				const result = callback(child);
 
 				if (result === false) {
@@ -985,7 +988,7 @@ class NodeEntry implements NodeInterface {
 						});
 					} else if (!child.isCard()) walk(child);
 				}
-
+				if (onEnd) onEnd(child, next);
 				child = next;
 			}
 		};

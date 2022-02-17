@@ -830,6 +830,22 @@ class NodeModel implements NodeModelInterface {
 		let childNode = node.first();
 		const rootElement = root.fragment ? root.fragment : root.get();
 		const tempNode = node.fragment ? $('<p />') : this.clone(node, false);
+		const addBrForBlock = (blockNode: NodeInterface) => {
+			const children = blockNode.children().toArray();
+			if (
+				blockNode.name === 'p' &&
+				children.filter((node) => !node.isCursor()).length === 0
+			) {
+				blockNode.append($('<br />'));
+			}
+			if (
+				this.isBlock(blockNode) &&
+				this.isEmptyWithTrim(blockNode) &&
+				children.every((child) => child.isText())
+			) {
+				blockNode.html('<br />');
+			}
+		};
 		while (childNode) {
 			//获取下一个兄弟节点
 			let nextNode = childNode.next();
@@ -844,6 +860,7 @@ class NodeModel implements NodeModelInterface {
 				const cloneNode = this.clone(tempNode, false);
 				const isLI = 'li' === cloneNode.name;
 				childNode.before(cloneNode);
+
 				while (childNode) {
 					nextNode = childNode.next();
 
@@ -895,31 +912,9 @@ class NodeModel implements NodeModelInterface {
 				}
 				this.removeSide(cloneNode);
 				block.flat(cloneNode, $(rootElement || []));
-				const children = cloneNode.children().toArray();
-				if (
-					cloneNode.name === 'p' &&
-					children.filter((node) => !node.isCursor()).length === 0
-				) {
-					cloneNode.append($('<br />'));
-				}
-				if (
-					this.isBlock(cloneNode) &&
-					this.isEmptyWithTrim(cloneNode)
-				) {
-					cloneNode.html('<br />');
-				}
+				addBrForBlock(cloneNode);
 			}
-			const children = childNode.children().toArray();
-			if (
-				childNode.name === 'p' &&
-				children.filter((node) => !node.isCursor()).length === 0
-			) {
-				childNode.append($('<br />'));
-			}
-			if (this.isBlock(childNode) && this.isEmptyWithTrim(childNode)) {
-				childNode.html('<br />');
-			}
-
+			addBrForBlock(childNode);
 			this.removeSide(childNode);
 			childNode = nextNode;
 		}

@@ -219,8 +219,9 @@ export default class<
 				return;
 			} else if (!range.collapsed) return;
 		} else if (
-			(range.collapsed && blockApi.isLastOffset(range, 'end')) ||
-			!blockApi.isFirstOffset(range, 'start') ||
+			(((range.collapsed && blockApi.isLastOffset(range, 'end')) ||
+				!blockApi.isFirstOffset(range, 'start')) &&
+				!node.isEmptyWidthChild(block)) ||
 			blocks.length > 1
 		)
 			return;

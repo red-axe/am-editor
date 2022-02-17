@@ -235,8 +235,9 @@ class Parser implements ParserInterface {
 			});
 			// 如果这个节点过滤掉所有属性样式后还是一个有效的节点就替换掉当前节点
 			if (
-				filterAttrCount === attrCount &&
-				filterStyleCount === styleCount &&
+				((filterAttrCount === attrCount &&
+					filterStyleCount === styleCount) ||
+					(filterAttrCount === 0 && filterStyleCount === 0)) &&
 				schema.getType(newNode) === type
 			) {
 				node.before(newNode);
@@ -279,6 +280,9 @@ class Parser implements ParserInterface {
 					let rule = schema.getRule(node);
 					if (rule) {
 						oldRules.push(rule);
+						if (node.children().length === 0) {
+							this.editor.mark.repairCursor(node);
+						}
 						let newNode = filter(node);
 						if (!newNode) return;
 						//获取这个新的节点所属类型，并且不能是之前节点一样的规则

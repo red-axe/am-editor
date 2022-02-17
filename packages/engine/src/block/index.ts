@@ -1245,7 +1245,8 @@ class Block implements BlockModelInterface {
 			const node = first;
 			//\n换成 br
 			if (node && node.isText() && /^\n+$/g.test(node.text())) {
-				this.editor.node.replace(node, $('<br />'));
+				block.remove();
+				//this.editor.node.replace(node, $('<br />'));
 			}
 			return;
 		}

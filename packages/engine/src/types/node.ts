@@ -495,11 +495,15 @@ export interface NodeInterface {
 	 * @param callback 回调函数，false：停止遍历 ，true：停止遍历当前节点及子节点，继续遍历下一个兄弟节点
 	 * @param order true:顺序 ，false:倒序，默认 true
 	 * @param includeEditableCard 是否包含可编辑器卡片
+	 * @param onStart 开始遍历一个节点时的回调函数
+	 * @param onEnd 遍历完(包括所有子节点)一个节点时的回调函数
 	 */
 	traverse(
 		callback: (node: NodeInterface) => boolean | void | NodeInterface,
 		order?: boolean,
 		includeEditableCard?: boolean,
+		onStart?: (node: NodeInterface) => void,
+		onEnd?: (node: NodeInterface, next: NodeInterface | null) => void,
 	): void;
 	/**
 	 * 根据路径获取子节点
