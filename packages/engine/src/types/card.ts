@@ -54,6 +54,7 @@ export interface CardToolbarInterface {
 	 */
 	setOffset(offset: Array<number>): void;
 	setDefaultAlign(align: Placement): void;
+	update(): void;
 	/**
 	 * 销毁
 	 */
