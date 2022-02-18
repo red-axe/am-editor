@@ -77,8 +77,8 @@ class Container {
 				//获取到编辑器内最后一个子节点
 				const block = this.node.last();
 				if (block) {
-					//不是卡片不处理
-					if (!block.isCard()) return;
+					// 为空不处理
+					if (engine.node.isEmptyWidthChild(block)) return;
 					//节点不可见不处理
 					if (
 						(block.get<HTMLElement>()?.offsetTop || 0) +
@@ -108,6 +108,7 @@ class Container {
 		this.node.on('focus', () => {
 			this._isMousedown = false;
 			this._focused = true;
+			if (engine.isEmpty()) engine.change.initValue();
 			engine.trigger('focus');
 		});
 		this.node.on('blur', () => {

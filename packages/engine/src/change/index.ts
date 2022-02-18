@@ -179,6 +179,7 @@ class ChangeModel implements ChangeInterface {
 		if (value === '') {
 			this.engine.container.html(value);
 			this.initValue(undefined, false);
+			if (callback) callback(0);
 		} else {
 			const parser = new Parser(
 				value,
