@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-italic",
-  "version": "2.7.31",
+  "version": "2.7.32",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.7.31",
+    "@aomao/engine": "^2.7.32",
     "@babel/runtime": "^7.13.10"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-table",
-  "version": "2.7.31",
+  "version": "2.7.32",
   "description": "table plugin",
   "author": "AoMao <me@aomao.com>",
   "homepage": "https://github.com/yanmao-cc/am-editor/tree/master/plugins/plugin-table#readme",
@@ -21,7 +21,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.7.31",
+    "@aomao/engine": "^2.7.32",
     "@babel/runtime": "^7.13.10",
     "eventemitter2": "^6.4.4",
     "lodash": "^4.17.21",

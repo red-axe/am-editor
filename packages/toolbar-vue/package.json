@@ -1,6 +1,6 @@
 {
     "name": "@aomao/toolbar-vue",
-    "version": "2.7.32",
+    "version": "2.7.33",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
         "url": "https://github.com/yanmao-cc/am-editor/issues"
     },
     "dependencies": {
-        "@aomao/engine": "^2.7.31",
+        "@aomao/engine": "^2.7.32",
         "@babel/runtime": "^7.13.10",
         "ant-design-vue": "^2.2.6",
         "keymaster": "^1.6.2",
