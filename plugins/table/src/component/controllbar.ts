@@ -1312,7 +1312,13 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	}
 
 	showContextMenu(event: MouseEvent) {
-		if (!this.menuBar || !event.target) return;
+		if (
+			!this.menuBar ||
+			!event.target ||
+			!this.table.wrapper ||
+			!this.editor.scrollNode
+		)
+			return;
 		event.preventDefault();
 		const { selection } = this.table;
 		const menuItems = this.menuBar.find(Template.MENUBAR_ITEM_CLASS);
@@ -1376,6 +1382,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			top: 0,
 			left: 0,
 		};
+
 		let parentNode = tartgetNode.parent();
 		let top = 0,
 			left = 0;
@@ -1392,9 +1399,24 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			prevRect = rect;
 			parentNode = parentNode.parent();
 		}
+		const wrapperRect = this.table.wrapper
+			.get<HTMLElement>()!
+			.getBoundingClientRect();
+		const viewport = this.editor.scrollNode.getViewport();
+		top += event.offsetY;
+		const menuHeight = this.menuBar.height();
+		// 底部溢出
+		const allTop = wrapperRect.top + top + menuHeight + 4;
+		if (allTop > viewport.bottom) {
+			let diff = allTop - viewport.bottom;
+			// 如果 top 溢出上边界，则调整 top 到最高 top
+			if (top - diff < 0 && wrapperRect.top + top - diff < viewport.top) {
+				diff = wrapperRect.top + top - viewport.top;
+			}
+			top -= diff;
+		}
 		this.menuBar.css('left', left + event.offsetX + 'px');
-		this.menuBar.css('top', top + event.offsetY + 'px');
-		this.menuBar.css('display', 'block');
+		this.menuBar.css('top', top + 'px');
 		//绑定input事件
 
 		this.contextVisible = true;
@@ -1419,7 +1441,10 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			inputNode.removeAllEvents();
 		});
 		this.contextVisible = false;
-		this.menuBar?.hide();
+		this.menuBar?.css({
+			top: '-99999px',
+			left: '-99999px',
+		});
 	}
 
 	getMenuDisabled(action: string) {
