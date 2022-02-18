@@ -450,8 +450,6 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		} else {
 			this.rate = naturalHeight / naturalWidth;
 		}
-		window.removeEventListener('resize', this.onWindowResize);
-		window.addEventListener('resize', this.onWindowResize);
 		// 拖动调整视频大小
 		const resizer = new Resizer({
 			imgUrl: cover,
@@ -706,6 +704,8 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 
 	didRender() {
 		super.didRender();
+		window.addEventListener('resize', this.onWindowResize);
+		this.editor.on('editor:resize', this.onWindowResize);
 		this.toolbarModel?.setDefaultAlign('top');
 		this.container?.on('click', this.handleClick);
 	}
@@ -714,6 +714,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		super.destroy();
 		this.container?.off('click', this.handleClick);
 		window.removeEventListener('resize', this.onWindowResize);
+		this.editor.off('editor:resize', this.onWindowResize);
 	}
 }
 

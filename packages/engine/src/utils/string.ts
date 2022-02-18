@@ -190,7 +190,7 @@ export const addUnit = (value: string | number, unit: string = 'px') => {
 export const removeUnit = (value: string) => {
 	let match;
 	return value && (match = /^((-?\d+)(\.\d+)?)/.exec(value))
-		? parseFloat(match[1])
+		? Math.floor(parseFloat(match[1]) * 10000) / 10000
 		: 0;
 };
 

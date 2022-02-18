@@ -173,6 +173,22 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 		return this.#container ? [this.#container] : [];
 	}
 
+	getMaxWidth = () => {
+		const block = this.editor.block.closest(this.root);
+		return block.get<Element>()!.clientWidth - 4;
+	};
+
+	onWindowResize = () => {
+		this.updateMaxWidth();
+	};
+
+	updateMaxWidth = () => {
+		const maxWidth = this.getMaxWidth();
+		this.root
+			.find('.data-label-container')
+			.css('max-width', Math.max(maxWidth, 0) + 'px');
+	};
+
 	executeMark(mark?: NodeInterface, warp?: boolean) {
 		if (!this.#container) return;
 
@@ -286,9 +302,18 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 		return this.#container;
 	}
 
+	didRender(): void {
+		super.didRender();
+		this.updateMaxWidth();
+		window.addEventListener('resize', this.onWindowResize);
+		this.editor.on('editor:resize', this.onWindowResize);
+	}
+
 	destroy() {
 		this.#statusEditor?.destroy();
 		this.#position?.destroy();
+		window.removeEventListener('resize', this.onWindowResize);
+		this.editor.off('editor:resize', this.onWindowResize);
 	}
 }
 

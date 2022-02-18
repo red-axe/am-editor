@@ -806,10 +806,15 @@ class TableComponent<V extends TableValue = TableValue>
 		});
 		this.conltrollBar.on('sizeChanging', () => {
 			this.scrollbar?.refresh();
+			this.editor.trigger('editor:resize');
+			this.updateScrollbar();
 		});
 		this.command.on('actioned', (action, silence) => {
 			if (action === 'paste') {
 				this.editor.card.render(this.wrapper);
+			}
+			if (['splitCell', 'mergeCell'].includes(action)) {
+				this.editor.trigger('editor:resize');
 			}
 			this.selection.render(action);
 			this.toolbarModel?.update();

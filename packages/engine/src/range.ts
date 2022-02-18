@@ -476,7 +476,7 @@ class Range implements RangeInterface {
 					return;
 				const center = cardComponent.getCenter();
 				const body = center.get()?.parentNode;
-				if (!body) return;
+				if (!body || !center.inEditor()) return;
 				const offset = center.index();
 				const childNode = child.get()!;
 				const start = this.comparePoint(body, offset);

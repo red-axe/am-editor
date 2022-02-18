@@ -78,7 +78,12 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 
 	getMaxWidth = () => {
 		const block = this.editor.block.closest(this.root);
-		return block.get<Element>()!.clientWidth - 6;
+		const sizeElement = this.root.find('.data-file-size');
+		return (
+			block.get<Element>()!.clientWidth -
+			36 -
+			(sizeElement?.get<Element>()?.clientWidth || 0)
+		);
 	};
 
 	onWindowResize = () => {
@@ -89,7 +94,7 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 		const maxWidth = this.getMaxWidth();
 		this.root
 			.find('.data-file-title')
-			.css('max-width', maxWidth - 100 + 'px');
+			.css('max-width', Math.max(maxWidth, 0) + 'px');
 	};
 
 	onBeforeRender = (action: 'preview' | 'download', url: string) => {
@@ -260,6 +265,7 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 		this.container?.find('.percent').html(`${value.percent}%`);
 		this.updateMaxWidth();
 		window.addEventListener('resize', this.onWindowResize);
+		this.editor.on('editor:resize', this.onWindowResize);
 	}
 
 	renderView() {
@@ -277,5 +283,6 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 		super.destroy();
 		this.container = undefined;
 		window.removeEventListener('resize', this.onWindowResize);
+		this.editor.off('editor:resize', this.onWindowResize);
 	};
 }

@@ -245,6 +245,8 @@ class Image {
 		}
 		window.removeEventListener('resize', this.onWindowResize);
 		window.addEventListener('resize', this.onWindowResize);
+		this.editor.off('editor:resize', this.onWindowResize);
+		this.editor.on('editor:resize', this.onWindowResize);
 		// 重新调整拖动层尺寸
 		if (this.resizer) {
 			this.resizer.setSize(img.clientWidth, img.clientHeight);
@@ -481,6 +483,7 @@ class Image {
 
 	destroy() {
 		window.removeEventListener('resize', this.onWindowResize);
+		this.editor.off('editor:resize', this.onWindowResize);
 	}
 
 	focus = () => {

@@ -661,10 +661,23 @@
 .am-engine span[data-card-type="inline"] span[data-card-element="left"],
 .am-engine-view span[data-card-type="inline"] span[data-card-element="left"],
 .am-engine span[data-card-type="inline"] span[data-card-element="right"],.am-engine-view span[data-card-type="inline"] span[data-card-element="right"] {
-	min-width: 1px;
 	text-align: left;
 	-webkit-user-select: text;
 	user-select: text;
+  position: absolute;
+  width: 2px;
+  background: transparent;
+  overflow: hidden;
+  bottom: 0;
+}
+
+.am-engine span[data-card-type="inline"] span[data-card-element="left"],
+.am-engine-view span[data-card-type="inline"] span[data-card-element="left"] {
+  left: -2px;
+}
+
+.am-engine span[data-card-type="inline"] span[data-card-element="right"],.am-engine-view span[data-card-type="inline"] span[data-card-element="right"] {
+  right: -2px;
 }
 
 .am-engine span[data-card-type="inline"].card-selected:not(.card-activated) span[data-card-element="left"],

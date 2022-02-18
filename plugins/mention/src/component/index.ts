@@ -51,6 +51,20 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		return SelectStyleType.NONE;
 	}
 
+	getMaxWidth = () => {
+		const block = this.editor.block.closest(this.root);
+		return block.get<Element>()!.clientWidth - 4;
+	};
+
+	onWindowResize = () => {
+		this.updateMaxWidth();
+	};
+
+	updateMaxWidth = () => {
+		const maxWidth = this.getMaxWidth();
+		this.#container?.css('max-width', Math.max(maxWidth, 0) + 'px');
+	};
+
 	getPluginOptions = () => {
 		const mentionOptions =
 			this.editor.plugin.findPlugin<MentionOptions>('mention');
@@ -405,9 +419,18 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		}
 	}
 
+	didRender(): void {
+		super.didRender();
+		this.updateMaxWidth();
+		window.addEventListener('resize', this.onWindowResize);
+		this.editor.on('editor:resize', this.onWindowResize);
+	}
+
 	destroy() {
 		this.component?.remove();
 		this.#position?.destroy();
+		window.removeEventListener('resize', this.onWindowResize);
+		this.editor.off('editor:resize', this.onWindowResize);
 	}
 }
 

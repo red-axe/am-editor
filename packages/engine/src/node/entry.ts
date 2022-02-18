@@ -14,6 +14,7 @@ import {
 	getStyleMap,
 	getComputedStyle,
 	getDocument,
+	removeUnit,
 } from '../utils';
 import { Path } from 'sharedb';
 import {
@@ -701,7 +702,7 @@ class NodeEntry implements NodeInterface {
 			const element = this.get<HTMLElement>()!;
 			width = element.offsetWidth.toString();
 		}
-		return width ? parseFloat(width) || 0 : 0;
+		return width ? removeUnit(width) || 0 : 0;
 	}
 
 	/**

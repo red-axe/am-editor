@@ -17,7 +17,7 @@
   .data-file .data-file-title {
     flex: auto;
     font-size: 14px;
-    margin-right: 8px;
+    margin-right: 4px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
