@@ -340,6 +340,11 @@ export interface ToolbarInterface {
 	 */
 	render(container?: NodeInterface): NodeInterface;
 	/**
+	 * 更新数据
+	 * @param options 可选项
+	 */
+	update(options: ToolbarOptions): void;
+	/**
 	 * 销毁
 	 */
 	destroy(): void;

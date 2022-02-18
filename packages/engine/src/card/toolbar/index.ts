@@ -184,49 +184,65 @@ class CardToolbar implements CardToolbarInterface {
 		return;
 	}
 
-	create() {
-		if (this.card.toolbar) {
-			//获取客户端配置
-			const config = this.card.toolbar();
-			//获取渲染节点
-			const { root, language } = this.editor;
-			this.hide();
-			const items: Array<ToolbarItemOptions> = [];
-			config.forEach((item) => {
-				//默认项
-				if (isCardToolbarItemOptions(item)) {
-					switch (item.type) {
-						case 'dnd':
-							if (isMobile) return;
-							const dndNode = this.createDnd(
-								item.content ||
-									'<span class="data-icon data-icon-drag"></span>',
-								item.title ||
-									language.get('dnd', 'title').toString(),
-							);
-							root.append(dndNode);
-							break;
-						default:
-							const resultItem = this.getDefaultItem(item);
-							if (resultItem) items.push(resultItem);
-					}
-				} else {
-					items.push(item);
+	getItems() {
+		if (!this.card.toolbar) return [];
+		//获取客户端配置
+		const config = this.card.toolbar();
+		const items: Array<ToolbarItemOptions> = [];
+		config.forEach((item) => {
+			//默认项
+			if (isCardToolbarItemOptions(item)) {
+				switch (item.type) {
+					case 'dnd':
+						break;
+					default:
+						const resultItem = this.getDefaultItem(item);
+						if (resultItem) items.push(resultItem);
 				}
-			});
-
-			if (items.length > 0) {
-				const toolbar = new Toolbar({
-					items,
-				});
-				toolbar.root.addClass('data-card-toolbar');
-				toolbar.root.attributes(TRIGGER_CARD_ID, this.card.id);
-				//渲染工具栏
-				toolbar.render($(document.body));
-				toolbar.hide();
-				this.toolbar = toolbar;
+			} else {
+				items.push(item);
 			}
+		});
+		return items;
+	}
+
+	create() {
+		this.hide();
+		const items = this.getItems();
+		if (items.length > 0) {
+			const dnd: CardToolbarItemOptions | undefined = items.find(
+				(item) =>
+					isCardToolbarItemOptions(item) &&
+					(item as CardToolbarItemOptions).type === 'dnd',
+			) as CardToolbarItemOptions | undefined;
+
+			if (dnd && !isMobile && dnd.type === 'dnd') {
+				//获取渲染节点
+				const { root, language } = this.editor;
+				const dndNode = this.createDnd(
+					dnd.content ||
+						'<span class="data-icon data-icon-drag"></span>',
+					dnd.title || language.get('dnd', 'title').toString(),
+				);
+				root.append(dndNode);
+			}
+			const toolbar = new Toolbar({
+				items,
+			});
+			toolbar.root.addClass('data-card-toolbar');
+			toolbar.root.attributes(TRIGGER_CARD_ID, this.card.id);
+			//渲染工具栏
+			toolbar.render($(document.body));
+			toolbar.hide();
+			this.toolbar = toolbar;
 		}
+	}
+
+	update() {
+		const items = this.getItems();
+		this.toolbar?.update({
+			items,
+		});
 	}
 
 	hide() {

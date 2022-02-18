@@ -265,6 +265,8 @@ export interface ControllBarInterface extends EventEmitter2 {
 
 	setAlign(align?: 'top' | 'middle' | 'bottom'): void;
 
+	getMenuDisabled(action: string): boolean;
+
 	destroy(): void;
 }
 

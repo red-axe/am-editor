@@ -238,6 +238,10 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 								?.get<HTMLTableRowElement>()
 								?.insertCell(insertIndex);
 							if (!td) return;
+							td.setAttribute(
+								DATA_TRANSIENT_ATTRIBUTES,
+								'table-cell-selection',
+							);
 							td.innerHTML = this.table.template.getEmptyCell();
 							td.colSpan = tdModel.colSpan - cutCount;
 							td.rowSpan = tdModel.rowSpan;
@@ -324,6 +328,10 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			if (!tr) return;
 			insertTdProps.forEach((props) => {
 				const td = tr.insertCell();
+				td.setAttribute(
+					DATA_TRANSIENT_ATTRIBUTES,
+					'table-cell-selection',
+				);
 				td.innerHTML = this.table.template.getEmptyCell();
 				td.colSpan = props.tdBase.colSpan;
 			});
@@ -417,6 +425,10 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 							trs[end.row + 1] as HTMLTableRowElement
 						).insertCell(insertIndex);
 						const cutCount = end.row - r + 1;
+						td.setAttribute(
+							DATA_TRANSIENT_ATTRIBUTES,
+							'table-cell-selection',
+						);
 						td.innerHTML = this.table.template.getEmptyCell();
 						td.colSpan = tdModel.colSpan;
 						td.rowSpan = tdModel.rowSpan - cutCount;
@@ -735,6 +747,11 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 						const _insertIndex2 = selection.getCellIndex(r, c);
 						const _td2 = (tr as HTMLTableRowElement).insertCell(
 							_insertIndex2,
+						);
+						this.editor.nodeId.generate(_td2);
+						_td2.setAttribute(
+							DATA_TRANSIENT_ATTRIBUTES,
+							'table-cell-selection',
 						);
 						_td2.innerHTML = this.table.template.getEmptyCell();
 					}

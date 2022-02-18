@@ -104,8 +104,12 @@ class Toolbar implements ToolbarInterface {
 		this.root.addClass('data-toolbar-active');
 	}
 
+	renderGroup() {
+		return $('<div class="data-toolbar-group"></div>');
+	}
+
 	render(container?: NodeInterface) {
-		const group = $('<div class="data-toolbar-group"></div>');
+		const group = this.renderGroup();
 		this.root.append(group);
 		this.addItems(group);
 		if (container) {
@@ -113,6 +117,14 @@ class Toolbar implements ToolbarInterface {
 		}
 		this.root.addClass('data-toolbar-block');
 		return this.root;
+	}
+
+	update(options: ToolbarOptions) {
+		this.options = options;
+		this.root.empty();
+		const group = this.renderGroup();
+		this.root.append(group);
+		this.addItems(group);
 	}
 }
 

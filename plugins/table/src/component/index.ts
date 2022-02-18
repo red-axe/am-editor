@@ -406,6 +406,26 @@ class TableComponent<V extends TableValue = TableValue>
 					},
 				],
 			},
+			{
+				type: 'button',
+				title: language['mergeCell'],
+				content:
+					'<span class="data-icon data-icon-merge-cells"></span>',
+				disabled: this.conltrollBar.getMenuDisabled('mergeCell'),
+				onClick: () => {
+					this.command.mergeCell();
+				},
+			},
+			{
+				type: 'button',
+				title: language['splitCell'],
+				content:
+					'<span class="data-icon data-icon-solit-cells"></span>',
+				disabled: this.conltrollBar.getMenuDisabled('splitCell'),
+				onClick: () => {
+					this.command.splitCell();
+				},
+			},
 		];
 		if (this.isMaximize) return funBtns;
 		const toolbars: Array<ToolbarItemOptions | CardToolbarItemOptions> = [
@@ -776,6 +796,7 @@ class TableComponent<V extends TableValue = TableValue>
 			}
 			const align = this.selection.getSingleCell()?.css('vertical-align');
 			this.updateAlignText(align as any);
+			this.toolbarModel?.update();
 		});
 
 		this.conltrollBar.on('sizeChanged', () => {
@@ -791,7 +812,7 @@ class TableComponent<V extends TableValue = TableValue>
 				this.editor.card.render(this.wrapper);
 			}
 			this.selection.render(action);
-			this.toolbarModel?.showCardToolbar();
+			this.toolbarModel?.update();
 			if (!silence) {
 				this.onChange();
 			}
