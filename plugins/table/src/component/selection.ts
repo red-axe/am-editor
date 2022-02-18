@@ -582,7 +582,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 
 	removeDragEvent = () => {
 		this.tableRoot?.removeClass('drag-select');
-		this.tableRoot?.removeClass('drag-selecting');
+		this.table.wrapper?.removeClass('drag-selecting');
 		this.table.wrapper
 			?.off(isMobile ? 'touchend' : 'mouseup', this.removeDragEvent)
 			.off(isMobile ? 'touchmove' : 'mousemove', this.onDragMove);
@@ -599,10 +599,10 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			return;
 		this.prevOverTd = dragoverTd;
 		if (!this.dragging.trigger.element.equal(dragoverTd)) {
-			this.tableRoot?.addClass('drag-selecting');
+			this.table.wrapper?.addClass('drag-selecting');
 			this.selectCell(this.dragging.trigger.element, dragoverTd);
 		} else {
-			this.tableRoot?.removeClass('drag-selecting');
+			this.table.wrapper?.removeClass('drag-selecting');
 			this.clearSelect();
 		}
 	};
