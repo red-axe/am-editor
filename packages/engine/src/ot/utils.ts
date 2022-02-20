@@ -217,7 +217,12 @@ export const updateIndex = (
 
 export const opsSort = (ops: Op[]) => {
 	ops.sort((op1, op2) => {
-		let diff = 0;
+		/**
+		 *  diff > 0：op1在op2之后 [1,2,3] -> [1,2] | [2,3] -> [1,2]
+		 *  diff < 0：op1在op2之前 [1,2] -> [1,2,3] | [1,2] -> [2,3]
+		 *  diff = 0: op1和op2相同 [1,2] -> [1,2]
+		 */
+		let diff = op1.p.length < op2.p.length ? -1 : 0;
 		if (isCursorOp(op1)) return 1;
 		if (isCursorOp(op2)) return -1;
 		for (let p = 0; p < op1.p.length; p++) {
@@ -246,11 +251,24 @@ export const opsSort = (ops: Op[]) => {
 			}
 			return -1;
 		}
+		if ('sd' in op2) {
+			// 相同文字删除不处理，按原来顺序操作，textToOps 中已经计算好删除后的位置.2021-12-08
+			if ('sd' in op1) {
+				return 0;
+			}
+			return 1;
+		}
 		// 属性删除，排在节点删除最前面
 		if ('od' in op1 && diff < 1 && 'ld' in op2) {
 			return -1;
 		}
 		if ('od' in op2 && diff > 0 && 'ld' in op1) {
+			return 1;
+		}
+		if ('od' in op1 && ('li' in op2 || 'ld' in op2)) {
+			return -1;
+		}
+		if ('od' in op2 && ('li' in op1 || 'ld' in op1)) {
 			return 1;
 		}
 		if ('oi' in op1 && ('li' in op2 || 'ld' in op2)) {
@@ -272,22 +290,11 @@ export const opsSort = (ops: Op[]) => {
 			('ld' in op1 && 'ld' in op2) || ('od' in op1 && 'od' in op2);
 		// 都是新增节点，越小排越前面
 		if (isLi) {
-			if (
-				op1.p.length < op2.p.length &&
-				op1.p.every((p, i) => p <= op2.p[i])
-			)
-				return -1;
 			return diff;
 		}
 		// 都是删除节点，越大排越前面
 		else if (isLd) {
-			if (
-				op1.p.length < op2.p.length &&
-				op1.p.every((p, i) => p <= op2.p[i])
-			)
-				return 1;
-			if (diff === -1) return 1;
-			if (diff === 1) return -1;
+			return -diff;
 		}
 		return 0;
 	});

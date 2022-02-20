@@ -36,7 +36,6 @@ import {
 	UI_SELECTOR,
 } from '../constants';
 import { getDocument } from '../utils/node';
-import type { CardEntry } from '../types/card';
 
 class Producer extends EventEmitter2 {
 	private engine: EngineInterface;
