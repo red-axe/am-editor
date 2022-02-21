@@ -386,13 +386,13 @@ class HistoryModel implements HistoryInterface {
 			);
 			if (opIndex !== -1) prevOp = this.actionOps[opIndex];
 			else opIndex = prevIndex;
-
 			const invertOps = OTJSON.type.invert(prevOp.ops || []);
 			invertOps.forEach((op, index) => {
 				const pOp = (prevOp.ops || [])[invertOps.length - index - 1];
 				op['id'] = pOp.id;
 				op['bi'] = pOp.bi;
 			});
+
 			try {
 				return {
 					self: true,

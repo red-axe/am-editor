@@ -56,6 +56,7 @@ class Test extends Card {
 	}
 
 	destroy() {
+		super.destroy();
 		ReactDOM.unmountComponentAtNode(this.#container?.get<HTMLElement>()!);
 	}
 }

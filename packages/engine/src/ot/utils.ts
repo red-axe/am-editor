@@ -223,6 +223,10 @@ export const opsSort = (ops: Op[]) => {
 		 *  diff = 0: op1和op2相同 [1,2] -> [1,2]
 		 */
 		let diff = op1.p.length < op2.p.length ? -1 : 0;
+		/**
+		 * op1.p.length > op2.p.length：op1在op2之后，并且op2的每一项都与op1的固定op2的长度数据每一项相同
+		 */
+		let les = false;
 		if (isCursorOp(op1)) return 1;
 		if (isCursorOp(op2)) return -1;
 		for (let p = 0; p < op1.p.length; p++) {
@@ -232,6 +236,7 @@ export const opsSort = (ops: Op[]) => {
 			// op2 中没有这个索引路径，op1 < op2
 			if (p >= op2.p.length) {
 				diff = 1;
+				les = true;
 				break;
 			}
 			const v2 = op2.p[p];
@@ -258,12 +263,41 @@ export const opsSort = (ops: Op[]) => {
 			}
 			return 1;
 		}
-		// 属性删除，排在节点删除最前面
-		if ('od' in op1 && diff < 1 && 'ld' in op2) {
+
+		// 删除div，但是修改span属性，span的op放在前面 <div><span>修改属性</span></div>
+		if (les && 'ld' in op2 && 'od' in op1) {
 			return -1;
 		}
-		if ('od' in op2 && diff > 0 && 'ld' in op1) {
+
+		if (les && 'ld' in op1 && 'od' in op2) {
+			return -1;
+		}
+
+		if (diff === 0 && 'od' in op1 && 'ld' in op2) {
+			return -1;
+		}
+
+		if (diff === 0 && 'od' in op2 && 'ld' in op1) {
 			return 1;
+		}
+
+		if ('od' in op1 && 'ld' in op2) {
+			return 1;
+		}
+		if ('od' in op2 && 'ld' in op1) {
+			return -1;
+		}
+		if ('oi' in op1 && diff < 1 && 'li' in op2) {
+			return -1;
+		}
+		if ('oi' in op1 && diff > -1 && 'li' in op2) {
+			return 1;
+		}
+		if ('oi' in op2 && diff > -1 && 'li' in op1) {
+			return 1;
+		}
+		if ('oi' in op2 && diff < 1 && 'li' in op1) {
+			return -1;
 		}
 		if ('od' in op1 && ('li' in op2 || 'ld' in op2)) {
 			return -1;

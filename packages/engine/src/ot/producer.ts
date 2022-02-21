@@ -239,7 +239,11 @@ class Producer extends EventEmitter2 {
 					p++
 				) {
 					if (('li' in op || 'ld' in op) && op.p.length === p + 1) {
-						if (op.p[p] <= path![p]) {
+						if (
+							op.p[p] < path![p] ||
+							(op.p[p] === path![p] &&
+								op.p.length === path!.length)
+						) {
 							if ('li' in op) oldPath[p] = oldPath[p] - 1;
 							else if ('ld' in op) oldPath[p] = oldPath[p] + 1;
 						}

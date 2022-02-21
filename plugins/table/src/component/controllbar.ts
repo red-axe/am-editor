@@ -202,10 +202,10 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		let allColWidth = 0;
 		let colIndex = 0;
 		cols.each((col, i) => {
-			const colWidth = $(col).attributes('width');
+			const colWidth = removeUnit($(col).attributes('width'));
 			if (colWidth) {
 				colWidthArray[i] = colWidth;
-				allColWidth += parseFloat(colWidth);
+				allColWidth += colWidth;
 				isInit = false;
 			} else {
 				colIndex++;
@@ -243,9 +243,11 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			}
 			let averageWidth = 0;
 			if (unkownCount > 0) {
-				averageWidth = Math.round(
-					(tableWidth - knownWidth) / unkownCount,
-				);
+				averageWidth =
+					Math.round(
+						Math.round((tableWidth - knownWidth) / unkownCount) *
+							10000,
+					) / 10000;
 			}
 			for (let i = 0; i < cols.length; i++) {
 				const width = tdWidth[i] || averageWidth;
@@ -253,7 +255,9 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				cols.eq(i)?.attributes('width', width);
 			}
 		} else if (colIndex) {
-			const averageWidth = (tableWidth - allColWidth) / colIndex;
+			const averageWidth =
+				Math.round(((tableWidth - allColWidth) / colIndex) * 10000) /
+				10000;
 			cols.each((_, index) => {
 				const width =
 					undefined === colWidthArray[index]
@@ -264,7 +268,11 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			});
 		} else {
 			cols.each((_, index) => {
-				const width = (tableWidth * colWidthArray[index]) / allColWidth;
+				const width =
+					Math.round(
+						((tableWidth * colWidthArray[index]) / allColWidth) *
+							10000,
+					) / 10000;
 				colBars.eq(index)?.css('width', width + 'px');
 				cols.eq(index)?.attributes('width', width);
 			});

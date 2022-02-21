@@ -93,13 +93,6 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			const insertCloneCol = cloneNode?.clone();
 			insertCloneCol.removeAttributes(DATA_ID);
 			insertCloneCol.attributes('width', width);
-			insertCloneCol.attributes(
-				DATA_TRANSIENT_ATTRIBUTES,
-				'table-cell-selection',
-			);
-			if (insertCloneCol.find(Template.TABLE_TD_BG_CLASS).length === 0) {
-				insertCloneCol.append($(Template.CellBG));
-			}
 			this.editor.nodeId.create(insertCloneCol);
 			const baseCol = cols[index];
 			if (insertMethod === 'after') $(baseCol).after(insertCloneCol);

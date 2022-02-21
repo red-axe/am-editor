@@ -106,9 +106,10 @@ class Container {
 			}, 10);
 		});
 		this.node.on('focus', () => {
+			if (!engine.ot.isStopped() && engine.isEmpty())
+				engine.change.initValue();
 			this._isMousedown = false;
 			this._focused = true;
-			if (engine.isEmpty()) engine.change.initValue();
 			engine.trigger('focus');
 		});
 		this.node.on('blur', () => {

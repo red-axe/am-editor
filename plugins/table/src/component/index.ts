@@ -331,7 +331,7 @@ class TableComponent<V extends TableValue = TableValue>
 	}
 
 	doChange = () => {
-		this.onChange('remote');
+		this.handleChange('local');
 	};
 
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
@@ -631,19 +631,32 @@ class TableComponent<V extends TableValue = TableValue>
 		this.scrollbar?.refresh();
 	}
 
-	onChange = (trigger: 'remote' | 'local' = 'local') => {
+	handleChange = (trigger: 'remote' | 'local' = 'local') => {
 		if (!isEngine(this.editor)) return;
+		this.conltrollBar.refresh();
+		this.selection.render('change');
+		const oldValue = super.getValue();
+		if (oldValue?.noBorder) {
+			this.noBorderToolButton?.addClass('active');
+		} else this.noBorderToolButton?.removeClass('active');
+		if (trigger === 'local' && isEngine(this.editor)) {
+			const value = this.getValue();
+			if (value) this.setValue(value);
+		}
+	};
+
+	onChange = (trigger: 'remote' | 'local' = 'local') => {
+		if (
+			isEngine(this.editor) &&
+			trigger === 'local' &&
+			this.editor.ot.isStopped()
+		)
+			return;
 		if (this.#changeTimeout) clearTimeout(this.#changeTimeout);
 		this.#changeTimeout = setTimeout(() => {
-			this.conltrollBar.refresh();
-			this.selection.render('change');
-			const oldValue = super.getValue();
-			if (oldValue?.noBorder) {
-				this.noBorderToolButton?.addClass('active');
-			} else this.noBorderToolButton?.removeClass('active');
-			if (trigger === 'local' && isEngine(this.editor)) {
-				const value = this.getValue();
-				if (value) this.setValue(value);
+			this.handleChange(trigger);
+			if (trigger === 'remote') {
+				this.remoteRefresh();
 			}
 		}, 50);
 	};
@@ -839,6 +852,81 @@ class TableComponent<V extends TableValue = TableValue>
 		this.scrollbar?.refresh();
 	}
 
+	remoteRefresh() {
+		if (
+			!this.wrapper ||
+			this.wrapper.length === 0 ||
+			!this.wrapper[0].parentNode
+		)
+			return;
+		// 重新绘制列头部和行头部
+		const colsHeader = this.wrapper.find(Template.COLS_HEADER_CLASS);
+		const superValue = super.getValue();
+		let colItems = colsHeader.find(Template.COLS_HEADER_ITEM_CLASS);
+		const colCount = colItems.length;
+		if (superValue.cols > colCount) {
+			colsHeader.append(
+				$(
+					this.template.renderColsHeader(superValue.cols - colCount),
+				).children(),
+			);
+			colItems = colsHeader.find(Template.COLS_HEADER_ITEM_CLASS);
+		} else if (superValue.cols < colCount) {
+			for (let i = colCount; i > superValue.cols; i--) {
+				colItems.eq(i - 1)?.remove();
+			}
+		}
+		const table = superValue.html
+			? $(superValue.html)
+			: this.wrapper.find('table');
+		const colElements = table.find('col').toArray();
+		colElements.forEach((colElement, index) => {
+			const width = colElement.attributes('width');
+			colItems.eq(index)?.css('width', `${width}px`);
+		});
+
+		const rowsHeader = this.wrapper.find(Template.ROWS_HEADER_CLASS);
+		let rowItems = rowsHeader.find(Template.ROWS_HEADER_ITEM_CLASS);
+		const rowCount = rowItems.length;
+		if (superValue.rows > rowCount) {
+			rowsHeader.append(
+				$(
+					this.template.renderRowsHeader(superValue.rows - rowCount),
+				).children(),
+			);
+			rowItems = rowsHeader.find(Template.ROWS_HEADER_ITEM_CLASS);
+		} else if (superValue.rows < rowCount) {
+			for (let i = rowCount; i > superValue.rows; i--) {
+				rowItems.eq(i - 1)?.remove();
+			}
+		}
+		const rowElements = table.find('tr').toArray();
+		rowElements.forEach((rowElement, index) => {
+			rowItems
+				.eq(index)
+				?.css(
+					'height',
+					removeUnit(
+						getComputedStyle(rowElement.get<Element>()!, 'height'),
+					),
+				);
+		});
+		this.conltrollBar.refresh();
+		this.scrollbar?.refresh();
+		setTimeout(() => {
+			// 找到所有可编辑节点，对没有 contenteditable 属性的节点添加contenteditable一下
+			this.wrapper?.find(EDITABLE_SELECTOR).each((editableNode) => {
+				const editableElement = editableNode as Element;
+				if (!editableElement.hasAttribute('contenteditable')) {
+					editableElement.setAttribute(
+						'contenteditable',
+						this.template.isReadonly ? 'false' : 'true',
+					);
+				}
+			});
+		}, 10);
+	}
+
 	render() {
 		this.template.isReadonly =
 			!isEngine(this.editor) || this.editor.readonly;
@@ -848,79 +936,7 @@ class TableComponent<V extends TableValue = TableValue>
 			this.wrapper.length > 0 &&
 			!!this.wrapper[0].parentNode
 		) {
-			// 重新绘制列头部和行头部
-			const colsHeader = this.wrapper.find(Template.COLS_HEADER_CLASS);
-			const superValue = super.getValue();
-			let colItems = colsHeader.find(Template.COLS_HEADER_ITEM_CLASS);
-			const colCount = colItems.length;
-			if (superValue.cols > colCount) {
-				colsHeader.append(
-					$(
-						this.template.renderColsHeader(
-							superValue.cols - colCount,
-						),
-					).children(),
-				);
-				colItems = colsHeader.find(Template.COLS_HEADER_ITEM_CLASS);
-			} else if (superValue.cols < colCount) {
-				for (let i = colCount; i > superValue.cols; i--) {
-					colItems.eq(i - 1)?.remove();
-				}
-			}
-			const table = superValue.html
-				? $(superValue.html)
-				: this.wrapper.find('table');
-			const colElements = table.find('col').toArray();
-			colElements.forEach((colElement, index) => {
-				const width = colElement.attributes('width');
-				colItems.eq(index)?.css('width', `${width}px`);
-			});
-
-			const rowsHeader = this.wrapper.find(Template.ROWS_HEADER_CLASS);
-			let rowItems = rowsHeader.find(Template.ROWS_HEADER_ITEM_CLASS);
-			const rowCount = rowItems.length;
-			if (superValue.rows > rowCount) {
-				rowsHeader.append(
-					$(
-						this.template.renderRowsHeader(
-							superValue.rows - rowCount,
-						),
-					).children(),
-				);
-				rowItems = rowsHeader.find(Template.ROWS_HEADER_ITEM_CLASS);
-			} else if (superValue.rows < rowCount) {
-				for (let i = rowCount; i > superValue.rows; i--) {
-					rowItems.eq(i - 1)?.remove();
-				}
-			}
-			const rowElements = table.find('tr').toArray();
-			rowElements.forEach((rowElement, index) => {
-				rowItems
-					.eq(index)
-					?.css(
-						'height',
-						removeUnit(
-							getComputedStyle(
-								rowElement.get<Element>()!,
-								'height',
-							),
-						),
-					);
-			});
-			this.conltrollBar.refresh();
-			this.scrollbar?.refresh();
-			setTimeout(() => {
-				// 找到所有可编辑节点，对没有 contenteditable 属性的节点添加contenteditable一下
-				this.wrapper?.find(EDITABLE_SELECTOR).each((editableNode) => {
-					const editableElement = editableNode as Element;
-					if (!editableElement.hasAttribute('contenteditable')) {
-						editableElement.setAttribute(
-							'contenteditable',
-							this.template.isReadonly ? 'false' : 'true',
-						);
-					}
-				});
-			}, 10);
+			this.remoteRefresh();
 			return;
 		}
 		const value = this.getValue();
