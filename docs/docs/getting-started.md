@@ -16,7 +16,7 @@ The following three plugins are different
 
 **`Vue2`** example [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
 
-**`Vue3`** example [https://github.com/yanmao-cc/am-editor/tree/master/examples/vue](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
+**`Vue3`** example [https://github.com/red-axe/am-editor-vue](https://github.com/red-axe/am-editor-vue)
 
 **`React`** example [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 

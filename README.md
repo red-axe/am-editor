@@ -311,7 +311,7 @@ In the example, we have a relatively basic client code
 
 [View the complete React example](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
-[View the complete example of Vue3](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
+[View the complete example of Vue3](https://github.com/red-axe/am-editor-vue)
 
 [View the complete example of Vue2](https://github.com/zb201307/am-editor-vue2)
 
@@ -350,7 +350,7 @@ Visit localhost:7001 after startup
 
 ### Vue
 
-[am-editor vue example](https://github.com/byoungd/am-editor-vue)
+[am-editor vue example](https://github.com/red-axe/am-editor-vue)
 
 > Vue example powered by [**modern-vue-template**](https://github.com/byoungd/modern-vue-template)
 

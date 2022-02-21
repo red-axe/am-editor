@@ -16,7 +16,7 @@ title: 安装
 
 **`Vue2`** 案例 [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
 
-**`Vue3`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/vue](https://github.com/yanmao-cc/am-editor/tree/master/examples/vue)
+**`Vue3`** 案例 [https://github.com/red-axe/am-editor-vue](https://github.com/red-axe/am-editor-vue)
 
 **`React`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
