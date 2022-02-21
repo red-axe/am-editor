@@ -680,11 +680,10 @@
   right: -2px;
 }
 
-.am-engine span[data-card-type="inline"].card-selected:not(.card-activated) span[data-card-element="left"],
-.am-engine-view span[data-card-type="inline"].card-selected:not(.card-activated) span[data-card-element="left"],
-.am-engine span[data-card-type="inline"].card-selected:not(.card-activated) span[data-card-element="right"],
-.am-engine-view span[data-card-type="inline"].card-selected:not(.card-activated) span[data-card-element="right"] {
-  background: rgba(180, 213, 254, 0.5) !important;
+.am-engine span[data-card-type="inline"] span[data-card-element="left"]::selection,
+.am-engine-view span[data-card-type="inline"] span[data-card-element="left"]::selection,
+.am-engine span[data-card-type="inline"] span[data-card-element="right"]::selection,.am-engine-view span[data-card-type="inline"] span[data-card-element="right"]::selection {
+  background: transparent !important;
 }
 
 .am-engine div[data-card-type="block"],.am-engine-view div[data-card-type="block"],.am-engine span[data-card-type="inline"].data-card-block,.am-engine-view span[data-card-type="inline"].data-card-block {
@@ -714,6 +713,21 @@
 	right: -2px;
 	text-align: right;
 }
+
+.am-engine div[data-card-type="block"] > div[data-card-element="body"] > span[data-card-element="left"]::selection,
+.am-engine-view div[data-card-type="block"] > div[data-card-element="body"] > span[data-card-element="left"]::selection,
+.am-engine span[data-card-type="inline"].data-card-block > div[data-card-element="body"] > span[data-card-element="left"]::selection,
+.am-engine-view span[data-card-type="inline"].data-card-block > div[data-card-element="body"] > span[data-card-element="left"]::selection { 
+  background: transparent !important;
+}
+
+.am-engine div[data-card-type="block"] > div[data-card-element="body"] > span[data-card-element="right"]::selection,
+.am-engine-view div[data-card-type="block"] > div[data-card-element="body"] > span[data-card-element="right"]::selection,
+.am-engine span[data-card-type="inline"].data-card-block > div[data-card-element="body"] > span[data-card-element="right"]::selection,
+.am-engine-view span[data-card-type="inline"].data-card-block > div[data-card-element="body"] > span[data-card-element="right"]::selection {
+	background: transparent !important;
+}
+	
 
 .am-engine span[data-card-element="body"],.am-engine-view span[data-card-element="body"],.am-engine div[data-card-element="body"],.am-engine-view div[data-card-element="body"] {
 	position: relative;
