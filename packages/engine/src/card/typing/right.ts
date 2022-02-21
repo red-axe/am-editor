@@ -21,7 +21,7 @@ class Right {
 			event.preventDefault();
 			if (isCenter) {
 				card.select(false);
-				card.select(false);
+				card.activate(false);
 				card.toolbarModel?.hide();
 			} else if (range.collapsed) {
 				const cardComponent = this.engine.card.find(range.startNode);
@@ -72,6 +72,12 @@ class Right {
 		}
 		// 右侧光标
 		const cardRight = range.commonAncestorNode.closest(CARD_RIGHT_SELECTOR);
+		const isCenter = cardLeft.length === 0 && cardRight.length === 0;
+		if (isCenter) {
+			component.select(false);
+			component.toolbarModel?.hide();
+			component.activate(false);
+		}
 		if (cardRight.length > 0) {
 			const next = component.root.next();
 			if (next) {

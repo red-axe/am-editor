@@ -75,6 +75,12 @@ class Left {
 		}
 		// 右侧光标
 		const cardRight = range.commonAncestorNode.closest(CARD_RIGHT_SELECTOR);
+		const isCenter = cardLeft.length === 0 && cardRight.length === 0;
+		if (isCenter) {
+			component.select(false);
+			component.toolbarModel?.hide();
+			component.activate(false);
+		}
 		if (cardRight.length > 0) {
 			if (range.collapsed) {
 				const cardComponent = card.find(range.startNode);

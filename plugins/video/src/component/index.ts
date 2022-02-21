@@ -323,7 +323,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	getMaxWidth(node: NodeInterface = this.getCenter()) {
 		const block = this.editor.block.closest(node).get<HTMLElement>();
 		if (!block) return 0;
-		return block.clientWidth - 6;
+		return block.clientWidth;
 	}
 
 	/**
@@ -704,6 +704,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	};
 
 	didUpdate(): void {
+		super.didUpdate();
 		this.toolbarModel?.setDefaultAlign('top');
 	}
 

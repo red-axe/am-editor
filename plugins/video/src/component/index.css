@@ -14,6 +14,7 @@
     outline: none;
     position: relative;
     z-index: 1;
+    background: #000;
   }
   .data-video-uploading,
   .data-video-uploaded,
