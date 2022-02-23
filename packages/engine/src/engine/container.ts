@@ -1,4 +1,10 @@
-import { DATA_ELEMENT, ROOT, UI_SELECTOR } from '../constants';
+import {
+	DATA_ELEMENT,
+	EDITABLE_SELECTOR,
+	ROOT,
+	ROOT_SELECTOR,
+	UI_SELECTOR,
+} from '../constants';
 import { EngineInterface, NodeInterface, Selector } from '../types';
 import { $ } from '../node';
 import { isMobile } from '../utils';
@@ -73,7 +79,9 @@ class Container {
 		});
 		// 编辑器文档尾部始终保持一行
 		this.node.on('click', (event: MouseEvent) => {
-			if (event.target && $(event.target).isEditable()) {
+			if (event.target) {
+				const targetNode = $(event.target);
+				if (!targetNode.isEditable()) return;
 				//获取到编辑器内最后一个子节点
 				const block = this.node.last();
 				if (block) {
@@ -88,7 +96,10 @@ class Container {
 						return;
 				}
 				const node = $('<p><br /></p>');
-				this.node.append(node);
+				const container = targetNode.closest(
+					`${EDITABLE_SELECTOR},${ROOT_SELECTOR}`,
+				);
+				container.append(node);
 				const range = engine.change.range.get();
 				range.select(node, true).collapse(false);
 				engine.change.apply(range);

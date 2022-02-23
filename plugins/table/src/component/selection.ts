@@ -563,6 +563,29 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				event.preventDefault();
 			}
 			return;
+		} else if (target.name === 'td') {
+			const editableElement = td.find(EDITABLE_SELECTOR);
+			if (editableElement.length > 0) {
+				//获取到编辑器内最后一个子节点
+				const block = editableElement.last();
+				if (block) {
+					// 不是块级卡片不处理
+					if (!block.isBlockCard()) return;
+					//节点不可见不处理
+					if (
+						(block.get<HTMLElement>()?.offsetTop || 0) +
+							(block.get<Element>()?.clientHeight || 0) >
+						(event instanceof MouseEvent ? event : event.touches[0])
+							.clientY
+					)
+						return;
+					const node = $('<p><br /></p>');
+					editableElement.append(node);
+					const range = this.editor.change.range.get();
+					range.select(node, true).collapse(false);
+					this.editor.change.apply(range);
+				}
+			}
 		}
 		this.select({ row, col }, { row, col });
 		this.dragging = {
