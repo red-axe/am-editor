@@ -108,7 +108,7 @@ export default class<
 	}
 
 	isFile(file: File) {
-		const name = getExtensionName(file);
+		const name = getExtensionName(file) ?? '';
 		return (
 			this.extensionNames.indexOf('*') >= 0 ||
 			this.extensionNames.indexOf(name) >= 0

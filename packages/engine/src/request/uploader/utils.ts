@@ -7,16 +7,14 @@ import mime from './mime';
  * @param file 文件 或 文件名
  * @returns
  */
-export const getExtensionName = (
-	file: File | string | Blob,
-): string | undefined => {
+export const getExtensionName = (file: File | string | Blob): string => {
 	if (typeof file === 'string') {
-		return file.split('.').pop();
+		return file.split('.').pop() ?? '';
 	}
 
-	let ext: string | undefined = mime[file.type] && mime[file.type][0];
+	let ext: string = mime[file.type] ? mime[file.type][0] : '';
 	if (!ext && 'name' in file) {
-		ext = file.name.split('.').pop();
+		ext = file.name.split('.').pop() ?? '';
 	}
 	return ext;
 };
