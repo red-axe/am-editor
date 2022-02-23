@@ -11,7 +11,7 @@
 	text-indent: 0;
 	-webkit-user-select: none;
 	user-select: none;
-    z-index: 128;
+    z-index: 127;
 }
 
 .data-toolbar-active {
