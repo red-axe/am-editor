@@ -387,10 +387,11 @@ class NativeEvent {
 			)
 				return;
 			event.stopPropagation();
-			clipboard.write(event, undefined, () => {
+			const data = clipboard.write(event, undefined);
+			if (data) {
 				clipboard.cut();
 				change.change();
-			});
+			}
 		});
 
 		const parserMarkdown = (text: string) => {

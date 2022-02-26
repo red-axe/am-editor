@@ -18,6 +18,7 @@ import {
 	ClipboardInterface,
 	CardInterface,
 	PluginOptions,
+	RangeInterface,
 } from '.';
 import { ListModelInterface } from './list';
 import { EventListener } from './node';
@@ -140,6 +141,16 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 	 * @param node 节点
 	 */
 	setScrollNode(node: HTMLElement): void;
+	/**
+	 * 获取选中区域的的数据 html 和 文本
+	 * @param range 光标范围
+	 */
+	getSelectionData(
+		range?: RangeInterface,
+	): Record<'html' | 'text', string> | undefined;
+	/**
+	 * 销毁编辑器
+	 */
 	destroy(): void;
 	/**
 	 * 绑定事件

@@ -19,9 +19,8 @@ export interface ClipboardInterface {
 	 */
 	write(
 		event: ClipboardEvent,
-		range?: RangeInterface | null,
-		callback?: (data: { html: string; text: string }) => void,
-	): void;
+		range?: RangeInterface,
+	): Record<'html' | 'text', string> | undefined;
 	/**
 	 * 在当前光标位置执行剪贴操作
 	 */

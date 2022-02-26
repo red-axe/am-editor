@@ -19,6 +19,7 @@ import {
 	NodeModelInterface,
 	PluginEntry,
 	PluginModelInterface,
+	RangeInterface,
 	RequestInterface,
 	SchemaInterface,
 	Selector,
@@ -40,6 +41,10 @@ import List from './list';
 import Mark from './mark';
 import Inline from './inline';
 import Block from './block';
+import Range from './range';
+import { CARD_ELEMENT_KEY, CARD_KEY, DATA_ID } from './constants';
+import { isEngine } from './utils';
+import Parser from './parser';
 
 class Editor<T extends EditorOptions = EditorOptions>
 	implements EditorInterface<T>
@@ -191,6 +196,215 @@ class Editor<T extends EditorOptions = EditorOptions>
 	messageConfirm(message: string): Promise<boolean> {
 		console.log(`confirm:${message}`);
 		return Promise.reject(false);
+	}
+
+	getSelectionData(
+		range?: RangeInterface,
+	): Record<'html' | 'text', string> | undefined {
+		if (!range) range = Range.from(this) ?? undefined;
+		if (!range) throw 'Range is null';
+		range = range.cloneRange(); //.shrinkToElementNode();
+		let card = range.startNode.closest(`[${CARD_KEY}]`, (node) => {
+			return $(node).isEditable()
+				? undefined
+				: node.parentNode || undefined;
+		});
+		if (card.length > 0 && !range.collapsed && range.endOffset === 0) {
+			if (range.endContainer.previousSibling) {
+				range.setEndAfter(range.endContainer.previousSibling);
+			}
+			if (
+				!range.collapsed &&
+				range.endOffset > 0 &&
+				range.endContainer.childNodes[range.endOffset - 1] === card[0]
+			) {
+				const cardCenter = range.startNode.closest(
+					`[${CARD_ELEMENT_KEY}="center"]`,
+					(node) => {
+						return $(node).isEditable()
+							? undefined
+							: node.parentNode || undefined;
+					},
+				);
+				if (cardCenter.length > 0) {
+					range.setEnd(
+						cardCenter[0],
+						cardCenter[0].childNodes.length,
+					);
+				} else {
+					range.setEnd(card[0], card[0].childNodes.length);
+				}
+			}
+		}
+		let root = range.commonAncestorNode;
+		card = root.closest(`[${CARD_KEY}]`, (node) => {
+			return $(node).isEditable()
+				? undefined
+				: node.parentNode || undefined;
+		});
+		if (card.length > 0) {
+			const cardCenter = root.closest(
+				`[${CARD_ELEMENT_KEY}="center"]`,
+				(node) => {
+					return $(node).isEditable()
+						? undefined
+						: node.parentNode || undefined;
+				},
+			);
+			if (cardCenter.length === 0) {
+				range.select(card);
+				root = range.commonAncestorNode;
+			}
+		}
+		const nodes: Node[] =
+			root.name === '#text' ? [document.createElement('span')] : [];
+		card = root.closest(`[${CARD_KEY}]`, (node) => {
+			if ($(node).isEditable()) return;
+			if (node.nodeType === Node.ELEMENT_NODE) {
+				const display = window
+					.getComputedStyle(node as Element)
+					.getPropertyValue('display');
+				if (display === 'inline') {
+					nodes.push(node.cloneNode());
+				}
+			}
+			return node.parentNode || undefined;
+		});
+		if (card.length > 0) return;
+		const { node, list } = this;
+		const hasChildEngine =
+			root.find('.am-engine-view').length > 0 ||
+			root.find('.am-engine').length > 0;
+		const hasParentEngine =
+			root.closest('.am-engine-view').length > 0 ||
+			root.closest('.am-engine').length > 0;
+		if (!hasChildEngine && !hasParentEngine) return;
+		if (range.collapsed) {
+			return {
+				html: '',
+				text: '',
+			};
+		}
+		// 修复自定义列表选择范围
+		let customizeStartItem: NodeInterface | undefined;
+		const li = range.startNode.closest('li');
+
+		if (li && node.isCustomize(li)) {
+			const endLi = range.endNode.closest('li');
+			if (
+				!li.equal(endLi) ||
+				(list.isLast(range) && list.isFirst(range))
+			) {
+				if (list.isFirst(range)) {
+					const ul = li.parent();
+					const index = li.getIndex();
+					if (ul) range.setStart(ul, index < 0 ? 0 : index);
+				} else {
+					const ul = li.parent();
+					// 选在列表项靠后的节点，把剩余节点拼接成完成的列表项
+					const selection = range.createSelection();
+					const rightNode = selection.getNode(li, 'center', true);
+					selection.anchor?.remove();
+					selection.focus?.remove();
+					if (isEngine(this)) this.change.combinText();
+					if (rightNode.length > 0) {
+						let isRemove = false;
+						rightNode.each((_, index) => {
+							const item = rightNode.eq(index);
+							if (!isRemove && item?.name === 'li') {
+								isRemove = true;
+								return;
+							}
+							if (isRemove) item?.remove();
+						});
+						const card = li.first();
+						const component = card
+							? this.card.find(card)
+							: undefined;
+						if (component) {
+							customizeStartItem = rightNode;
+							this.list.addCardToCustomize(
+								customizeStartItem,
+								component.name,
+								component.getValue(),
+							);
+							if (ul) node.wrap(customizeStartItem, ul?.clone());
+						}
+					}
+				}
+			}
+		}
+		const contents = range.enlargeToElementNode(true).cloneContents();
+		// if (customizeStartItem) {
+		// 	contents.removeChild(contents.childNodes[0]);
+		// 	contents.prepend(customizeStartItem[0]);
+		// }
+		const listMergeBlocks: NodeInterface[] = [];
+		contents.querySelectorAll('li').forEach((child) => {
+			const childElement = $(child);
+			const dataId = childElement.attributes(DATA_ID);
+			if (!dataId) return;
+			const curentElement = this.container
+				.get<HTMLElement>()
+				?.querySelector(`[${DATA_ID}=${dataId}]`);
+			// 补充自定义列表丢失的卡片
+			if (
+				node.isCustomize(childElement) &&
+				!childElement.first()?.isCard() &&
+				curentElement?.firstChild
+			) {
+				childElement.prepend(
+					node.clone($(curentElement.firstChild), true, false),
+				);
+			}
+			let parent: NodeInterface | Node | null | undefined =
+				curentElement?.parentElement;
+			parent = parent ? $(parent.cloneNode(false)) : null;
+			const childParent = child.parentElement;
+			if (
+				curentElement &&
+				parent &&
+				node.isList(parent) &&
+				(!childParent || !node.isList(childParent))
+			) {
+				if (parent.name === 'ol') {
+					// 设置复制位置的 start 属性，默认不设置
+					// let start = parseInt(parent.attributes('start') || '0', 10)
+					// start = $(curentElement).index() + start
+					// if(start === 0) start = 1
+					// parent.attributes('start', start);
+					parent.removeAttributes('start');
+				}
+				node.wrap(child, parent);
+				listMergeBlocks.push(parent);
+			}
+		});
+		const setNodes = (nodes: Node[]) => {
+			if (0 === nodes.length) return {};
+			for (let i = nodes.length - 1; i > 0; i--) {
+				const node = nodes[i];
+				node.appendChild(nodes[i - 1]);
+			}
+			return {
+				inner: nodes[0],
+				outter: nodes[nodes.length - 1],
+			};
+		};
+		const { inner, outter } = setNodes(nodes);
+		const listNodes: NodeInterface[] = [];
+		contents.childNodes.forEach((child) => {
+			const childNode = $(child);
+			if (node.isList(childNode) || childNode.name === 'li') {
+				listNodes.push(childNode);
+			}
+		});
+		this.nodeId.generateAll($(contents), true);
+		// 合并列表
+		this.list.merge(listNodes);
+		const parser = new Parser(contents, this);
+		let html = parser.toHTML(inner, outter);
+		const text = new Parser(html, this).toText(this.schema, true);
+		return { html, text };
 	}
 
 	destroy() {

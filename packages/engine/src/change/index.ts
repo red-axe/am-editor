@@ -634,6 +634,14 @@ class ChangeModel implements ChangeInterface {
 		apply(range);
 	}
 
+	paste(
+		html: string,
+		range?: RangeInterface,
+		callback?: (count: number) => void,
+	) {
+		this.#nativeEvent.paste(html, range, callback, true);
+	}
+
 	/**
 	 * 删除内容
 	 * @param range 光标，默认获取当前光标
