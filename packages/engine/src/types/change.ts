@@ -281,6 +281,17 @@ export interface ChangeInterface {
 		followActiveMark?: boolean,
 	): void;
 	/**
+	 * 在当前光标位置粘贴一段html
+	 * @param html html
+	 * @param range 光标位置
+	 * @param callback 卡片渲染回调
+	 */
+	paste(
+		html: string,
+		range?: RangeInterface,
+		callback?: (count: number) => void,
+	): void;
+	/**
 	 * 删除内容
 	 * @param range 光标，默认获取当前光标
 	 * @param isDeepMerge 删除后是否合并
