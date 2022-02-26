@@ -184,6 +184,7 @@ export interface RangeColoringInterface {
 	drawCursor(
 		selector: RangeInterface | NodeInterface,
 		member: Member,
+		showInfo?: boolean,
 	): NodeInterface | undefined;
 	/**
 	 * 绘制卡片光标
@@ -209,7 +210,7 @@ export interface RangeColoringInterface {
 	 * @param range
 	 * @param member
 	 */
-	drawRange(range: RangeInterface, member: Member): void;
+	drawRange(range: RangeInterface, member: Member, showInfo?: boolean): void;
 	/**
 	 * 更新绘制的背景位置
 	 */
@@ -241,6 +242,7 @@ export interface RangeColoringInterface {
 		data: Array<Attribute>,
 		members: Array<Member>,
 		idDraw: boolean,
+		showInfo?: boolean,
 	): void;
 	/**
 	 * 销毁
@@ -532,15 +534,23 @@ export interface OTInterface extends EventEmitter2 {
 	/**
 	 * 渲染用戶選區
 	 */
-	renderSelection(attributes: Array<Attribute>, isDraw?: boolean): void;
+	renderSelection(
+		attributes: Array<Attribute>,
+		isDraw?: boolean,
+		showInfo?: boolean,
+	): void;
 	/**
 	 * 更新用户选区
 	 */
 	updateSelection(): void;
 	/**
+	 * 更新选区位置
+	 */
+	updateSelectionPosition(): void;
+	/**
 	 * 实例化选区
 	 */
-	initSelection(): void;
+	initSelection(showInfo?: boolean): void;
 	/**
 	 * 销毁
 	 */

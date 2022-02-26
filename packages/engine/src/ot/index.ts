@@ -288,12 +288,16 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		return this.currentMember;
 	}
 
-	renderSelection(attributes: Array<Attribute>, isDraw: boolean = false) {
+	renderSelection(
+		attributes: Array<Attribute>,
+		isDraw: boolean = false,
+		showInfo?: boolean,
+	) {
 		const { members, currentMember } = this;
 		attributes = attributes.filter(
 			(item) => item.uuid !== currentMember?.uuid,
 		);
-		this.rangeColoring.render(attributes, members, isDraw);
+		this.rangeColoring.render(attributes, members, isDraw, showInfo);
 		this.rangeColoring.updatePosition();
 	}
 
@@ -307,13 +311,17 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		}
 	}
 
-	initSelection() {
+	updateSelectionPosition() {
+		this.rangeColoring.updatePosition();
+	}
+
+	initSelection(showInfo?: boolean) {
 		if (!this.currentMember) return;
 		const data = this.selection.updateSelections(
 			this.currentMember,
 			this.members,
 		).data;
-		this.renderSelection(data, true);
+		this.renderSelection(data, true, showInfo);
 	}
 
 	destroy() {

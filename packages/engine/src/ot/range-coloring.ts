@@ -104,7 +104,7 @@ class RangeColoring implements RangeColoringInterface {
 		tinyColor.setAlpha(0.3);
 		let targetCanvas: TinyCanvasInterface;
 		const rgb = tinyColor.toRgbString();
-		let child = this.root.children(
+		let child = (this.engine.scrollNode ?? this.root).children(
 			`.${USER_BACKGROUND_CLASS}[${DATA_UUID}="${uuid}"]`,
 		);
 		if (child && child.length > 0) {
@@ -115,7 +115,7 @@ class RangeColoring implements RangeColoringInterface {
 			child = $(
 				`<div class="${USER_BACKGROUND_CLASS}" ${DATA_UUID}="${uuid}" ${DATA_COLOR}="${color}" />`,
 			);
-			this.root.append(child);
+			(this.engine.scrollNode ?? this.root).append(child);
 			targetCanvas = new TinyCanvas({
 				container: child.get<HTMLElement>()!,
 			});
@@ -129,7 +129,9 @@ class RangeColoring implements RangeColoringInterface {
 			'pointer-events': 'none',
 		});
 		child[0]['__range'] = range.cloneRange();
-		const parentWidth = this.root.width();
+		const parentWidth = this.engine.scrollNode
+			? this.engine.scrollNode.width()
+			: this.root.width();
 		const parentHeight = this.root.height();
 		targetCanvas.resize(parentWidth, parentHeight);
 		let cardInfo = card.find(range.commonAncestorNode, true);
@@ -298,7 +300,11 @@ class RangeColoring implements RangeColoringInterface {
 		trigger.css('background-color', bgColor);
 	}
 
-	drawCursor(selector: RangeInterface | NodeInterface, member: Member) {
+	drawCursor(
+		selector: RangeInterface | NodeInterface,
+		member: Member,
+		showInfo?: boolean,
+	) {
 		const { uuid, name, color } = member;
 		let cursorRect = this.getCursorRect(selector);
 		let childCursor = this.root.children(
@@ -373,6 +379,7 @@ class RangeColoring implements RangeColoringInterface {
 			childCursor[0]['__target'] = isRangeInterface(selector)
 				? selector.toPath(true)
 				: selector;
+			if (showInfo === false) return childCursor;
 			this.showCursorInfo(childCursor, member);
 			if (this.hideCursorInfoTimeoutMap[uuid]) {
 				clearTimeout(this.hideCursorInfoTimeoutMap[uuid]);
@@ -527,7 +534,7 @@ class RangeColoring implements RangeColoringInterface {
 		card.activatedByOther = false;
 	}
 
-	drawRange(range: RangeInterface, member: Member) {
+	drawRange(range: RangeInterface, member: Member, showInfo?: boolean) {
 		const { card } = this.engine;
 		const { uuid } = member;
 		const { commonAncestorNode } = range;
@@ -555,7 +562,7 @@ class RangeColoring implements RangeColoringInterface {
 
 			const collab = (cardInfo.constructor as CardEntry).collab;
 			if (collab === undefined || collab === true) {
-				const cursor = this.drawCursor(root, member);
+				const cursor = this.drawCursor(root, member, showInfo);
 				if (cursor) this.drawCard(root, cursor, member);
 				this.drawBackground(range, member);
 			}
@@ -605,7 +612,7 @@ class RangeColoring implements RangeColoringInterface {
 				const root =
 					this.setCardSelectedByOther(singleCard, member) ||
 					singleCard.root;
-				this.drawCursor(root, member);
+				this.drawCursor(root, member, showInfo);
 			} else {
 				range.shrinkToElementNode();
 				const ranges = this.drawBackground(range, member);
@@ -618,7 +625,7 @@ class RangeColoring implements RangeColoringInterface {
 					range.shrinkToElementNode();
 					range.collapse(false);
 				}
-				this.drawCursor(range, member);
+				this.drawCursor(range, member, showInfo);
 			}
 		}
 	}
@@ -700,7 +707,12 @@ class RangeColoring implements RangeColoringInterface {
 		});
 	}
 
-	render(data: Array<Attribute>, members: Array<Member>, idDraw: boolean) {
+	render(
+		data: Array<Attribute>,
+		members: Array<Member>,
+		idDraw: boolean,
+		showInfo?: boolean,
+	) {
 		const { engine } = this;
 		const info = {};
 		data.forEach((item) => {
@@ -709,7 +721,7 @@ class RangeColoring implements RangeColoringInterface {
 			if (member && (idDraw || active)) {
 				if (path) {
 					const range = Range.fromPath(engine, path, true);
-					this.drawRange(range, member);
+					this.drawRange(range, member, showInfo);
 				} else {
 					info[uuid] = true;
 				}

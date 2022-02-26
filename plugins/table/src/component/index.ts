@@ -781,13 +781,17 @@ class TableComponent<V extends TableValue = TableValue>
 				}
 			});
 			//this.scrollbar.disableScroll();
+			let scrollbarTimeout: NodeJS.Timeout | null = null;
 			const handleScrollbarChange = () => {
 				if (tableOptions['maxRightWidth'])
 					this.overflow(tableOptions['maxRightWidth']());
-				if (isEngine(this.editor)) {
-					this.editor.ot.initSelection();
-					this.conltrollBar.refresh();
-				}
+				if (scrollbarTimeout) clearTimeout(scrollbarTimeout);
+				scrollbarTimeout = setTimeout(() => {
+					if (isEngine(this.editor)) {
+						this.editor.ot.initSelection(false);
+						this.conltrollBar.refresh();
+					}
+				}, 20);
 			};
 			this.scrollbar.on('change', handleScrollbarChange);
 			if (!isMobile)
