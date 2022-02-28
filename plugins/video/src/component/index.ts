@@ -217,7 +217,10 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		this.maxWidth = this.getMaxWidth();
 		if (value.naturalHeight && value.naturalWidth)
 			this.rate = value.naturalHeight / value.naturalWidth;
-		this.container?.find('.data-video-content').append(video);
+		const contentElement = this.container?.find('.data-video-content');
+		if (!contentElement) return;
+		contentElement.append(video);
+		contentElement.append($('<div class="data-video-mask" />'));
 		this.videoContainer = this.container?.find('.data-video-content');
 		video.oncontextmenu = function () {
 			return false;
@@ -464,9 +467,11 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	onActivate(activated: boolean) {
 		if (activated) {
 			this.container?.addClass('data-video-active');
+			this.container?.find('.data-video-mask').hide();
 			this.initResizer();
 		} else {
 			this.container?.removeClass('data-video-active');
+			this.container?.find('.data-video-mask').show();
 			this.resizer?.destroy();
 		}
 	}
