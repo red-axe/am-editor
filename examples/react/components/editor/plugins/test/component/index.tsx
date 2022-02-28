@@ -51,6 +51,7 @@ class Test extends Card {
 	}
 
 	didRender() {
+		super.didRender();
 		// 由于项目中 vue 和 react 的混合环境导致 ts 报错
 		ReactDOM.render(<TestComponent />, this.#container?.get<HTMLElement>());
 	}
