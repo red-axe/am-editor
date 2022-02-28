@@ -377,7 +377,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 			this.editor.plugin.findPlugin<VideoOptions>('video');
 		const fullEditor = videoPlugin?.options.fullEditor;
 		if (typeof fullEditor === 'number')
-			this.videoContainer.css('height', `${height}px`);
+			this.videoContainer.css('height', height > 0 ? `${height}px` : '');
 	}
 
 	changeSize(width: number, height: number) {
