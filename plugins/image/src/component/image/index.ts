@@ -101,6 +101,7 @@ class Image {
 	status: Status;
 	size: Size;
 	maxWidth: number;
+	maxHeight: number = 600;
 	rate: number = 1;
 	isLoad: boolean = false;
 	message: string | undefined;
@@ -233,6 +234,11 @@ class Image {
 
 		if (!this.size.width) this.size.width = naturalWidth;
 		if (!this.size.height) this.size.height = naturalHeight;
+
+		if (naturalHeight > naturalWidth && this.size.height > this.maxHeight) {
+			this.size.height = this.maxHeight;
+			this.size.width = naturalWidth * (this.maxHeight / naturalHeight);
+		}
 
 		this.resetSize();
 
