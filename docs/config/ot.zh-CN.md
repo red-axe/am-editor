@@ -12,9 +12,7 @@ toc: menu
 
 在演示案例中已经有根据常用需求提供了一份编辑器通过 `WebSocket` 与 `sharedb` 使用 `json0` 协议交互的客户端代码
 
-[React](https://github.com/yanmao-cc/am-editor/blob/master/examples/react/components/editor/ot/client.ts)
-
-[Vue](https://github.com/yanmao-cc/am-editor/blob/master/examples/vue/src/components/ot-client.ts)
+[React & Vue 通用](https://github.com/yanmao-cc/am-editor/blob/master/examples/react/components/editor/ot/client.ts)
 
 ```ts
 //实例化协作编辑客户端，需要传入当前编辑器实例
@@ -31,6 +29,10 @@ ot.on('ready', (member) => {
 ```
 
 这份代码已经能满足基本的编辑需求，如果需要更多功能可自行扩展
+
+默认的演示代码是关闭协同的，需要在这里启用：
+
+https://github.com/red-axe/am-editor/blob/master/examples/react/editor.tsx#L102 这个位置需要修改 IS_DEV 为 false
 
 ## 服务端
 
