@@ -129,9 +129,10 @@ class RangeColoring implements RangeColoringInterface {
 			'pointer-events': 'none',
 		});
 		child[0]['__range'] = range.cloneRange();
-		const parentWidth = this.engine.scrollNode
-			? this.engine.scrollNode.width()
-			: this.root.width();
+		const containerElement = this.engine.scrollNode ?? this.root;
+		const parentWidth =
+			containerElement.get<Element>()?.clientWidth ||
+			containerElement.width();
 		const parentHeight = this.root.height();
 		targetCanvas.resize(parentWidth, parentHeight);
 		let cardInfo = card.find(range.commonAncestorNode, true);
