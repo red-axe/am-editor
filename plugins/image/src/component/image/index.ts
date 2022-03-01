@@ -85,6 +85,7 @@ export type Options = {
 
 export const winPixelRatio = window.devicePixelRatio;
 let pswp: PswpInterface | undefined = undefined;
+const imageMaxHeight: number = 600;
 class Image {
 	private editor: EditorInterface;
 	private options: Options;
@@ -101,7 +102,6 @@ class Image {
 	status: Status;
 	size: Size;
 	maxWidth: number;
-	maxHeight: number = 600;
 	rate: number = 1;
 	isLoad: boolean = false;
 	message: string | undefined;
@@ -235,10 +235,10 @@ class Image {
 		if (!this.size.width) this.size.width = naturalWidth;
 		if (!this.size.height) this.size.height = naturalHeight;
 
-		if (naturalHeight > naturalWidth && this.size.height > this.maxHeight) {
-			this.size.height = this.maxHeight;
-			this.size.width = naturalWidth * (this.maxHeight / naturalHeight);
-
+		if (
+			this.size.height > this.size.width &&
+			this.size.height >= imageMaxHeight
+		) {
 			const containerWidth = this.editor.container.width();
 			this.detail.css('position', 'relative');
 			this.detail.closest('.data-image-content').css({
@@ -627,4 +627,5 @@ class Image {
 	}
 }
 
+export { imageMaxHeight };
 export default Image;

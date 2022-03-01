@@ -18,6 +18,7 @@ import {
 } from '@aomao/engine';
 import { ImageOptions } from '.';
 import ImageComponent, { ImageValue } from './component';
+import { imageMaxHeight } from './component/image';
 
 export interface ImageUploaderOptions extends PluginOptions {
 	/**
@@ -331,12 +332,33 @@ export default class<
 					return new Promise<void>((resolve) => {
 						const image = new Image();
 						image.src = base64String;
+
 						image.onload = () => {
+							const {
+								naturalWidth,
+								naturalHeight,
+								height,
+								width,
+							} = image;
+
+							let imageWidth: number = width;
+							let imageHeight: number = height;
+
+							if (
+								naturalHeight > naturalWidth &&
+								height > imageMaxHeight
+							) {
+								imageHeight = imageMaxHeight;
+								imageWidth =
+									naturalWidth *
+									(imageMaxHeight / naturalHeight);
+							}
+
 							insertCard({
 								src: '',
 								size: {
-									width: image.width,
-									height: image.height,
+									width: imageWidth,
+									height: imageHeight,
 									naturalHeight: image.naturalHeight,
 									naturalWidth: image.naturalWidth,
 								},
