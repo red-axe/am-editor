@@ -32,7 +32,7 @@ class CardToolbar implements CardToolbarInterface {
 	private position: Position;
 	#hideTimeout: NodeJS.Timeout | null = null;
 	#showTimeout: NodeJS.Timeout | null = null;
-	#defaultAlign: keyof typeof placements = 'topLeft';
+	#defaultAlign: keyof typeof placements = 'top';
 
 	constructor(editor: EditorInterface, card: CardInterface) {
 		this.editor = editor;
