@@ -33,6 +33,8 @@ onBeforeRender?: (status:'uploading' |'done', src: string) => string;
 
 `defaultType` sets the default image card type, the default is 'inline'
 
+`maxHeight` sets the maximum height of the default image display, which is not limited by default
+
 ## `ImageUploader` optional
 
 ```ts

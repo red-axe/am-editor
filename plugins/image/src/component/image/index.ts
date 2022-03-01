@@ -81,13 +81,14 @@ export type Options = {
 	onChange?: (size?: Size, loaded?: boolean) => void;
 	onError?: () => void;
 	enableResizer?: boolean;
+	maxHeight?: number | undefined;
 };
 
 export const winPixelRatio = window.devicePixelRatio;
 let pswp: PswpInterface | undefined = undefined;
 class Image {
 	private editor: EditorInterface;
-	private options: Options;
+	options: Options;
 	root: NodeInterface;
 	private progress: NodeInterface;
 	private image: NodeInterface;
@@ -101,6 +102,7 @@ class Image {
 	status: Status;
 	size: Size;
 	maxWidth: number;
+	maxHeight: number | undefined;
 	rate: number = 1;
 	isLoad: boolean = false;
 	message: string | undefined;
@@ -115,6 +117,7 @@ class Image {
 			naturalHeight: 0,
 			naturalWidth: 0,
 		};
+		this.maxHeight = this.options.maxHeight;
 		this.status = this.options.status;
 		this.root = $(this.renderTemplate());
 		this.progress = this.root.find('.data-image-progress');
@@ -234,11 +237,24 @@ class Image {
 		if (!this.size.width) this.size.width = naturalWidth;
 		if (!this.size.height) this.size.height = naturalHeight;
 
+		if (
+			this.maxHeight &&
+			this.size.height > this.size.width &&
+			this.size.height >= this.maxHeight
+		) {
+			const containerWidth = this.editor.container.width();
+			this.detail.css('position', 'relative');
+			this.detail.closest('.data-image-content').css({
+				width: containerWidth ? containerWidth + 'px' : '',
+				textAlign: 'center',
+			});
+		}
+
 		this.resetSize();
 
 		this.image.css('visibility', 'visible');
-		this.detail.css('width', '');
 		this.detail.css('height', '');
+		this.detail.css('width', '');
 		const { onChange } = this.options;
 		if (isEngine(this.editor) && onChange) {
 			onChange(this.size, true);
