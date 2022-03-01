@@ -197,6 +197,7 @@ export const imageOptions: ImageOptions = {
 		if (!url || url.indexOf('http') === 0) return url;
 		return url + `?token=12323`;
 	},
+	maxHeight: 600,
 };
 
 export const imageUploaderOptions: ImageUploaderOptions = {

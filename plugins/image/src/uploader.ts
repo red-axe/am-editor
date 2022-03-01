@@ -255,6 +255,7 @@ export default class<
 		} = this.options.file;
 		const { parse } = this.options;
 		const limitSize = this.options.file.limitSize || 5 * 1024 * 1024;
+
 		if (!Array.isArray(files) && typeof files !== 'string') {
 			files = await request.getFiles({
 				event: files,
@@ -332,6 +333,10 @@ export default class<
 					return new Promise<void>((resolve) => {
 						const image = new Image();
 						image.src = base64String;
+						const imagePlugin =
+							this.editor.plugin.findPlugin<ImageOptions>(
+								'image',
+							);
 
 						image.onload = () => {
 							const {
@@ -343,15 +348,17 @@ export default class<
 
 							let imageWidth: number = width;
 							let imageHeight: number = height;
+							const maxHeight: number =
+								imagePlugin?.options?.maxHeight;
 
 							if (
+								maxHeight &&
 								naturalHeight > naturalWidth &&
-								height > imageMaxHeight
+								height > maxHeight
 							) {
-								imageHeight = imageMaxHeight;
+								imageHeight = maxHeight;
 								imageWidth =
-									naturalWidth *
-									(imageMaxHeight / naturalHeight);
+									naturalWidth * (maxHeight / naturalHeight);
 							}
 
 							insertCard({

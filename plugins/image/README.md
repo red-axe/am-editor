@@ -33,6 +33,8 @@ onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
 
 `defaultType` 设置默认的图片卡片类型，默认为 'inline'
 
+`maxHeight` 设置默认图片展示的最高高度，默认不限制
+
 ## `ImageUploader` 可选项
 
 ```ts
