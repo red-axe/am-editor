@@ -45,4 +45,8 @@ export interface ImageOptions extends PluginOptions {
 	 * 默认使用的卡片类型
 	 */
 	defaultType?: CardType;
+	/**
+	 * 最高高度，设置后默认按最高高度缩放
+	 */
+	maxHeight?: number;
 }

@@ -18,8 +18,6 @@ import {
 } from '@aomao/engine';
 import { ImageOptions } from '.';
 import ImageComponent, { ImageValue } from './component';
-import { imageMaxHeight } from './component/image';
-
 export interface ImageUploaderOptions extends PluginOptions {
 	/**
 	 * 文件上传配置
@@ -348,7 +346,7 @@ export default class<
 
 							let imageWidth: number = width;
 							let imageHeight: number = height;
-							const maxHeight: number =
+							const maxHeight: number | undefined =
 								imagePlugin?.options?.maxHeight;
 
 							if (

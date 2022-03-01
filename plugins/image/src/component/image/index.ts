@@ -237,19 +237,6 @@ class Image {
 		if (!this.size.width) this.size.width = naturalWidth;
 		if (!this.size.height) this.size.height = naturalHeight;
 
-		if (
-			this.maxHeight &&
-			this.size.height > this.size.width &&
-			this.size.height >= this.maxHeight
-		) {
-			const containerWidth = this.editor.container.width();
-			this.detail.css('position', 'relative');
-			this.detail.closest('.data-image-content').css({
-				width: containerWidth ? containerWidth + 'px' : '',
-				textAlign: 'center',
-			});
-		}
-
 		this.resetSize();
 
 		this.image.css('visibility', 'visible');
