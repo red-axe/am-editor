@@ -93,8 +93,6 @@ class TableComponent<V extends TableValue = TableValue>
 	init() {
 		super.init();
 		if (isEngine(this.editor)) {
-			this.editor.on('undo', this.doChange);
-			this.editor.on('redo', this.doChange);
 			// tab 键选择
 			if (!this.editor.event.listeners['keydown:tab'])
 				this.editor.event.listeners['keydown:tab'] = [];
@@ -331,6 +329,7 @@ class TableComponent<V extends TableValue = TableValue>
 	}
 
 	doChange = () => {
+		this.remoteRefresh();
 		this.handleChange('local');
 	};
 
@@ -717,6 +716,8 @@ class TableComponent<V extends TableValue = TableValue>
 
 	didRender() {
 		super.didRender();
+		this.editor.on('undo', this.doChange);
+		this.editor.on('redo', this.doChange);
 		this.viewport = isEngine(this.editor)
 			? this.wrapper?.find(Template.VIEWPORT)
 			: this.wrapper?.find(Template.VIEWPORT_READER);
@@ -872,7 +873,7 @@ class TableComponent<V extends TableValue = TableValue>
 			colsHeader.append(
 				$(
 					this.template.renderColsHeader(superValue.cols - colCount),
-				).children(),
+				).find(Template.COLS_HEADER_ITEM_CLASS),
 			);
 			colItems = colsHeader.find(Template.COLS_HEADER_ITEM_CLASS);
 		} else if (superValue.cols < colCount) {
@@ -896,7 +897,7 @@ class TableComponent<V extends TableValue = TableValue>
 			rowsHeader.append(
 				$(
 					this.template.renderRowsHeader(superValue.rows - rowCount),
-				).children(),
+				).find(Template.ROWS_HEADER_ITEM_CLASS),
 			);
 			rowItems = rowsHeader.find(Template.ROWS_HEADER_ITEM_CLASS);
 		} else if (superValue.rows < rowCount) {
