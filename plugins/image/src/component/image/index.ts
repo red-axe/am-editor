@@ -238,13 +238,20 @@ class Image {
 		if (naturalHeight > naturalWidth && this.size.height > this.maxHeight) {
 			this.size.height = this.maxHeight;
 			this.size.width = naturalWidth * (this.maxHeight / naturalHeight);
+
+			const containerWidth = this.editor.container.width();
+			this.detail.css('position', 'relative');
+			this.detail.closest('.data-image-content').css({
+				width: containerWidth ? containerWidth + 'px' : '',
+				textAlign: 'center',
+			});
 		}
 
 		this.resetSize();
 
 		this.image.css('visibility', 'visible');
-		this.detail.css('width', '');
 		this.detail.css('height', '');
+		this.detail.css('width', '');
 		const { onChange } = this.options;
 		if (isEngine(this.editor) && onChange) {
 			onChange(this.size, true);
