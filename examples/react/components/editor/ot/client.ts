@@ -187,10 +187,16 @@ class OTClient extends EventEmitter {
 					const { uuid, body, type } = data;
 					// 如果接收者和发送者不是同一人就触发一个message事件，外部可以监听这个事件并作出响应
 					if (uuid !== this.current?.uuid) {
-						this.emit(EVENT.message, {
-							type,
-							body,
-						});
+						switch (type) {
+							case 'select':
+								this.engine.ot.renderSelection(body);
+								break;
+							default:
+								this.emit(EVENT.message, {
+									type,
+									body,
+								});
+						}
 					}
 				}
 			});
@@ -245,7 +251,9 @@ class OTClient extends EventEmitter {
 			} else {
 				try {
 					// 实例化编辑器内部协同服务
-					this.engine.ot.initRemote(doc, defaultValue);
+					this.engine.ot.initRemote(doc, defaultValue, (paths) => {
+						this.broadcast('select', paths);
+					});
 					// 聚焦到编辑器
 					this.engine.focus();
 				} catch (err) {

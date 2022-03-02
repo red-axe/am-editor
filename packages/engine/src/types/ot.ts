@@ -73,7 +73,7 @@ export interface DocInterface<T = any> extends EventEmitter2 {
 	destroy(): void;
 }
 
-export interface SelectionInterface {
+export interface SelectionInterface extends EventEmitter2 {
 	/**
 	 * 当前光标路径
 	 */

@@ -76,8 +76,6 @@ class OTModel extends EventEmitter2 implements OTInterface {
 				}),
 			);
 			this.engine.history.handleRemoteOps(operations);
-			const selections = this.selection.getSelections();
-			this.renderSelection(selections);
 		}
 	}, 0);
 
@@ -100,7 +98,11 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.startMutation();
 	}
 
-	initRemote(doc: Doc, defaultValue?: string) {
+	initRemote(
+		doc: Doc,
+		defaultValue?: string,
+		onSelectionChange?: (paths: Attribute[]) => void,
+	) {
 		// 没有启动协同，或者当前doc对象没有注销，就去注销
 		const isDestroy = !this.doc || this.doc.type === null;
 		this.stopMutation();
@@ -120,6 +122,9 @@ class OTModel extends EventEmitter2 implements OTInterface {
 			}
 		});
 		this.initSelection();
+		this.selection.on('change', (paths) => {
+			if (onSelectionChange) onSelectionChange(paths);
+		});
 		this.startMutation();
 		if (isDestroy) {
 			this.emit('load');

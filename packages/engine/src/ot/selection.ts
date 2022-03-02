@@ -1,14 +1,16 @@
+import { EventEmitter2 } from 'eventemitter2';
 import { EngineInterface } from '../types/engine';
 import { Attribute, Member, SelectionInterface } from '../types/ot';
 import { isTransientElement } from './utils';
 import { RangePath } from '../types/range';
 import { CardType } from '../card/enum';
 
-class OTSelection implements SelectionInterface {
+class OTSelection extends EventEmitter2 implements SelectionInterface {
 	private engine: EngineInterface;
 	currentRangePath?: { start: RangePath; end: RangePath };
 
 	constructor(engine: EngineInterface) {
+		super();
 		this.engine = engine;
 	}
 
@@ -142,7 +144,7 @@ class OTSelection implements SelectionInterface {
 			});
 		}
 		if (isUpdate) {
-			this.setSelections(newData);
+			this.emit('change', newData);
 		}
 		return {
 			data: newData,
