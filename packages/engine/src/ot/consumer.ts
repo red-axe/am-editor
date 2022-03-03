@@ -336,7 +336,7 @@ class Consumer implements ConsumerInterface {
 				const applyNode = this.handleOperation(op, true);
 				if (applyNode) applyNodes.push(applyNode);
 			});
-			if (path) this.setRangeByRemotePath(path);
+			if (path && this.engine.isFocus()) this.setRangeByRemotePath(path);
 			if (ops.some((op) => !isCursorOp(op)))
 				this.engine.change.change(true, applyNodes);
 			return applyNodes;
