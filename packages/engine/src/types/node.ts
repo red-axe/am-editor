@@ -501,7 +501,7 @@ export interface NodeInterface {
 	traverse(
 		callback: (node: NodeInterface) => boolean | void | NodeInterface,
 		order?: boolean,
-		includeEditableCard?: boolean,
+		includeCard?: boolean | 'editable',
 		onStart?: (node: NodeInterface) => void,
 		onEnd?: (node: NodeInterface, next: NodeInterface | null) => void,
 	): void;
@@ -524,9 +524,9 @@ export interface NodeInterface {
 
 	/**
 	 * 获取节点下的所有子节点
-	 * @param includeEditableCard 是否包含可编辑卡片的节点
+	 * @param includeCard 是否包含卡片的节点
 	 */
-	allChildren(includeEditableCard?: boolean): Array<NodeInterface>;
+	allChildren(includeCard?: boolean | 'editable'): Array<NodeInterface>;
 
 	/**
 	 * 返回当前节点或者传入的节点所在当前节点的顶级window对象的视图边界

@@ -190,7 +190,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 	setHtml(html: string, callback?: (count: number) => void) {
 		this.change.setHtml(html, (count) => {
 			this.normalize();
-			this.container.allChildren(true).forEach((child) => {
+			this.container.allChildren('editable').forEach((child) => {
 				if (this.node.isInline(child)) {
 					this.inline.repairCursor(child);
 				} else if (this.node.isMark(child)) {
@@ -206,7 +206,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 	setMarkdown(text: string, callback?: (count: number) => void) {
 		this.change.setMarkdown(text, (count) => {
 			this.normalize();
-			this.container.allChildren(true).forEach((child) => {
+			this.container.allChildren('editable').forEach((child) => {
 				if (this.node.isInline(child)) {
 					this.inline.repairCursor(child);
 				} else if (this.node.isMark(child)) {

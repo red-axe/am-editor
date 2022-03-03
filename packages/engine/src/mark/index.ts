@@ -1126,7 +1126,7 @@ class Mark implements MarkModelInterface {
 					return;
 				},
 				true,
-				true,
+				'editable',
 			);
 		});
 
@@ -1407,7 +1407,7 @@ class Mark implements MarkModelInterface {
 					}
 				},
 				true,
-				true,
+				'editable',
 			);
 		});
 		this.unwrapByNodes(markNodes, removeMark);
@@ -1666,7 +1666,7 @@ class Mark implements MarkModelInterface {
 							return;
 						},
 						true,
-						true,
+						'editable',
 					);
 				});
 			}

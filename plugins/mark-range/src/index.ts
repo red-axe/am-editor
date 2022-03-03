@@ -729,7 +729,7 @@ export default class<
 				}
 			},
 			false,
-			true,
+			'editable',
 		);
 		const cardNodes = container.find(CARD_SELECTOR);
 		cardNodes.each((_, index) => {

@@ -265,7 +265,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 			return;
 		}
 
-		range.select(toStart ? cardLeft : cardRight, true);
+		range.select(toStart ? cardLeft : cardRight, true).shrinkToTextNode();
 		range.collapse(false);
 		if (this.onFocus) this.onFocus();
 	}

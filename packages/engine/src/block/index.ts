@@ -948,7 +948,7 @@ class Block implements BlockModelInterface {
 						}
 					},
 					true,
-					true,
+					'editable',
 				);
 			});
 		}
@@ -1070,7 +1070,7 @@ class Block implements BlockModelInterface {
 					return;
 				},
 				true,
-				true,
+				'editable',
 			);
 		});
 

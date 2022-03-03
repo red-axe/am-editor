@@ -15,7 +15,7 @@ class Left {
 
 	inline(card: CardInterface, event: KeyboardEvent) {
 		const { change } = this.engine;
-		const range = change.range.get();
+		const range = change.range.get().cloneRange();
 		const { singleSelectable } = card.constructor as CardEntry;
 		// 左侧光标
 		const cardLeft = range.commonAncestorNode.closest(CARD_LEFT_SELECTOR);

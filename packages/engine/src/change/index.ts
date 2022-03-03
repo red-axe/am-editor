@@ -186,7 +186,7 @@ class ChangeModel implements ChangeInterface {
 				this.engine,
 				(root) => {
 					mark.removeEmptyMarks(root);
-					root.allChildren(true).forEach((child) => {
+					root.allChildren('editable').forEach((child) => {
 						if (onParse) {
 							onParse(child);
 						}

@@ -953,18 +953,16 @@ class NodeEntry implements NodeInterface {
 	traverse(
 		callback: (node: NodeInterface) => boolean | void | NodeInterface,
 		order: boolean = true,
-		includeEditableCard: boolean = false,
+		includeCard: boolean | 'editable' = false,
 		onStart?: (node: NodeInterface) => void,
 		onEnd?: (node: NodeInterface, next: NodeInterface | null) => void,
 	) {
 		const walk = (node: NodeInterface) => {
-			if (!includeEditableCard && node.isCard()) {
-				return;
-			}
+			let isCard = node.isCard();
 			if (
-				includeEditableCard &&
-				node.isCard() &&
-				!node.isEditableCard()
+				isCard &&
+				(!includeCard ||
+					(includeCard === 'editable' && !node.isEditableCard()))
 			) {
 				return;
 			}
@@ -981,13 +979,24 @@ class NodeEntry implements NodeInterface {
 					if (result && typeof result !== 'boolean') {
 						child = result;
 					}
-					if (includeEditableCard && child.isEditableCard()) {
-						const editableElements = child.find(EDITABLE_SELECTOR);
-						editableElements.each((_, index) => {
-							const editableElement = editableElements.eq(index);
-							if (editableElement) walk(editableElement);
-						});
-					} else if (!child.isCard()) walk(child);
+					isCard = child.isCard();
+					if (isCard) {
+						// 遍历任意卡片
+						if (includeCard === true) {
+							walk(child);
+						} else if (
+							includeCard === 'editable' &&
+							child.isEditableCard()
+						) {
+							const editableElements =
+								child.find(EDITABLE_SELECTOR);
+							editableElements.each((_, index) => {
+								const editableElement =
+									editableElements.eq(index);
+								if (editableElement) walk(editableElement);
+							});
+						}
+					} else walk(child);
 				}
 				if (onEnd) onEnd(child, next);
 				child = next;
@@ -1037,14 +1046,14 @@ class NodeEntry implements NodeInterface {
 		return node;
 	}
 
-	allChildren(includeEditableCard: boolean = false) {
+	allChildren(includeCard: boolean | 'editable' = false) {
 		const childNodes: Array<NodeInterface> = [];
 		this.traverse(
 			(node) => {
 				childNodes.push(node);
 			},
 			undefined,
-			includeEditableCard,
+			includeCard,
 		);
 		childNodes.shift();
 		return childNodes;
