@@ -226,10 +226,10 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 
 	showEnter = () => {
 		const options = this.getPluginOptions();
-		if (!this.#container || !options?.mouseEnter) return;
+		if (!this.#container || !options?.onMouseEnter) return;
 		const value = this.getValue();
 		if (!value?.name) return;
-		const { id, key, name, ...info } = value;
+		const { id, key, name, marks, type, ...info } = value;
 		if (this.#hideTimeout) clearTimeout(this.#hideTimeout);
 		if (this.#showTimeout) clearTimeout(this.#showTimeout);
 		if (this.#enterLayout && this.#enterLayout.length > 0) return;
@@ -247,7 +247,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 				name: unescape(name),
 				...info,
 			});
-			options?.mouseEnter!(this.#enterLayout, {
+			options.onMouseEnter!(this.#enterLayout, {
 				key: unescape(key || ''),
 				name: unescape(name),
 				...info,
