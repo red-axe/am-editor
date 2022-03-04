@@ -72,7 +72,7 @@ class Typing implements TypingInterface {
 		}
 	}
 
-	bindKeydown(event: KeyboardEvent) {
+	bindKeydown = (event: KeyboardEvent) => {
 		const { readonly, card } = this.engine;
 		//只读状态
 		if (readonly) {
@@ -83,16 +83,16 @@ class Typing implements TypingInterface {
 		//跳过卡片
 		if (event.target && card.find($(event.target))) return;
 		this.trigger('keydown', event);
-	}
+	};
 
-	bindKeyup(event: KeyboardEvent) {
+	bindKeyup = (event: KeyboardEvent) => {
 		const { readonly, card } = this.engine;
 		//只读状态
 		if (readonly) return;
 		//跳过卡片
 		if (event.target && card.find($(event.target))) return;
 		this.trigger('keyup', event);
-	}
+	};
 
 	trigger(type: 'keydown' | 'keyup', event: KeyboardEvent) {
 		//循环事件
