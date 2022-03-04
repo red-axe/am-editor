@@ -449,7 +449,11 @@ export interface OTInterface extends EventEmitter2 {
 	 * @param doc 文档对象
 	 * @param defaultValue 如果文档不存在，则使用 defaultValue 初始化默认值
 	 */
-	initRemote(doc: Doc, defaultValue?: string): void;
+	initRemote(
+		doc: Doc,
+		defaultValue?: string,
+		onSelectionChange?: (paths: Attribute[]) => void,
+	): void;
 	/**
 	 * 处理操作改变
 	 * @param ops 操作集合
