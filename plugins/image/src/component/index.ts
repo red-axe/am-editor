@@ -304,6 +304,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 		super.didUpdate();
 		this.toolbarModel?.getContainer()?.remove();
 		this.toolbarModel?.create();
+		this.toolbarModel?.setDefaultAlign('top');
 	}
 
 	didRender() {
