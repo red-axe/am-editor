@@ -266,7 +266,7 @@ export default class<
 			const codeText = nodes.join('\n');
 			let code = unescape(codeText);
 
-			if (code.endsWith('\n')) code = code.substr(0, code.length - 2);
+			if (code.endsWith('\n')) code = code.substr(0, code.length - 1);
 			const tempNode = $('<div></div>');
 			const carNode = card.replaceNode<CodeBlockValue>(
 				tempNode,
