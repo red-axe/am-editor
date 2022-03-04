@@ -11,14 +11,14 @@ import { $ } from '../node';
 
 class Typing implements TypingInterface {
 	private engine: EngineInterface;
-	private handleListeners: Array<{
+	private handleListeners: {
 		name: string;
 		triggerName?: string;
 		triggerParams?:
 			| any
 			| ((engine: EngineInterface, event: KeyboardEvent) => any);
 		handle: TypingHandleInterface;
-	}> = [];
+	}[] = [];
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
 		keydownDefaultHandles.concat(keyupDefaultHandles).forEach((handle) => {
@@ -29,8 +29,8 @@ class Typing implements TypingInterface {
 			);
 		});
 		const { container } = engine;
-		container.on('keydown', (e: KeyboardEvent) => this.bindKeydown(e));
-		container.on('keyup', (e: KeyboardEvent) => this.bindKeyup(e));
+		container.on('keydown', this.bindKeydown);
+		container.on('keyup', this.bindKeyup);
 	}
 
 	addHandleListener(
@@ -123,6 +123,13 @@ class Typing implements TypingInterface {
 		if (result === false) {
 			this.getHandleListener('default', type)?.trigger(event);
 		}
+	}
+
+	destroy() {
+		const { container } = this.engine;
+		this.handleListeners = [];
+		container.off('keydown', this.bindKeydown);
+		container.off('keyup', this.bindKeyup);
 	}
 }
 export default Typing;

@@ -301,6 +301,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 		this._container.destroy();
 		this.change.destroy();
 		this.hotkey.destroy();
+		this.typing.destroy();
 		if (this.ot) {
 			this.ot.destroy();
 		}

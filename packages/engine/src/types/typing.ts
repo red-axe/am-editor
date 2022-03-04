@@ -93,4 +93,8 @@ export interface TypingInterface {
 	 * @param event 键盘事件
 	 */
 	trigger(type: 'keydown' | 'keyup', event: KeyboardEvent): void;
+	/**
+	 * 销毁
+	 */
+	destroy(): void;
 }
