@@ -155,7 +155,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			if (onCancel) onCancel();
 		});
 		this.engine.on('keydown:enter', this.handlePreventDefault);
-		if (!this.root || !this.target) return;
+		if (!this.root || !this.target || this.target.length === 0) return;
 		this.#position?.bind(this.root, this.target);
 	}
 
