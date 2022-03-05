@@ -531,7 +531,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
-		if (!value) return;
+		if (!value || (this.container && this.container.inEditor())) return;
 		const center = this.getCenter();
 		//先清空卡片内容容器
 		center.empty();

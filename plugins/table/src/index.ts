@@ -493,6 +493,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: TableValue) => NodeInterface,
 	) {
+		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${TableComponent.cardName}"],[${READY_CARD_KEY}="${TableComponent.cardName}"]`,
 		).each((tableNode) => {
@@ -543,7 +544,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				table = callback(table, value);
 			}
 			node.replaceWith(table);
+			results.push(table);
 		});
+		return results;
 	}
 
 	getMarkdownCell(match: RegExpExecArray, count?: number) {

@@ -271,6 +271,7 @@ export default class Math<
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: MathValue) => NodeInterface,
 	) {
+		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${MathComponent.cardName}"],[${READY_CARD_KEY}="${MathComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -298,8 +299,10 @@ export default class Math<
 				}
 				span.append(img);
 				node.replaceWith(span);
+				results.push(span);
 			} else node.remove();
 		});
+		return results;
 	}
 }
 

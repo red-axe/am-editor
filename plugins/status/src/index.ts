@@ -85,6 +85,7 @@ export default class<
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: StatusValue) => NodeInterface,
 	) {
+		const results: NodeInterface[] = [];
 		root.find(`[${CARD_KEY}=${StatusComponent.cardName}`).each(
 			(statusNode) => {
 				const node = $(statusNode);
@@ -115,9 +116,11 @@ export default class<
 						newNode = callback(newNode, value);
 					}
 					node.replaceWith(newNode);
+					results.push(newNode);
 				} else node.remove();
 			},
 		);
+		return results;
 	}
 }
 export { StatusComponent };

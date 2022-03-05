@@ -94,6 +94,7 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: EmbedValue) => NodeInterface,
 	) {
+		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${EmbedComponent.cardName}"],[${READY_CARD_KEY}="${EmbedComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -130,8 +131,10 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 					contianer = callback(contianer, value);
 				}
 				node.replaceWith(contianer);
+				results.push(contianer);
 			} else node.remove();
 		});
+		return results;
 	}
 }
 

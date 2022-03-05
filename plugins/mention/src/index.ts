@@ -144,6 +144,7 @@ class MentionPlugin<
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: MentionValue) => NodeInterface,
 	) {
+		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${MentionComponent.cardName}"],[${READY_CARD_KEY}="${MentionComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -167,8 +168,10 @@ class MentionPlugin<
 					newNode = callback(newNode, value);
 				}
 				node.replaceWith(newNode);
+				results.push(newNode);
 			} else node.remove();
 		});
+		return results;
 	}
 
 	execute() {}

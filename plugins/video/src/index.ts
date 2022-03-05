@@ -175,6 +175,7 @@ export default class VideoPlugin<
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: VideoValue) => NodeInterface,
 	) {
+		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${VideoComponent.cardName}"],[${READY_CARD_KEY}="${VideoComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -207,8 +208,10 @@ export default class VideoPlugin<
 					newNode = callback(newNode, value);
 				}
 				node.replaceWith(newNode);
+				results.push(newNode);
 			} else node.remove();
 		});
+		return results;
 	}
 }
 

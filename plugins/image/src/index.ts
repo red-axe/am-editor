@@ -114,6 +114,7 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: ImageValue) => NodeInterface,
 	) {
+		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${ImageComponent.cardName}"],[${READY_CARD_KEY}="${ImageComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -154,8 +155,10 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 					);
 				}
 				node.replaceWith(img);
+				results.push(img);
 			} else node.remove();
 		});
+		return results;
 	}
 }
 

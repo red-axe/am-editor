@@ -328,6 +328,7 @@ export default class<
 			value: CodeBlockValue,
 		) => NodeInterface,
 	) {
+		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${CodeBlockComponent.cardName}"],[${READY_CARD_KEY}="${CodeBlockComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -382,11 +383,15 @@ export default class<
 				node.removeAttributes(CARD_VALUE_KEY);
 				node.attributes('data-syntax', value.mode || 'plain');
 				content.removeClass('am-engine-view');
+				let newNode = node;
 				if (callback) {
-					node.replaceWith(callback(node, value));
+					newNode = callback(node, value);
+					node.replaceWith(newNode);
 				}
+				results.push(newNode);
 			} else node.remove();
 		});
+		return results;
 	}
 }
 export { CodeBlockComponent };

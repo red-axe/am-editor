@@ -156,6 +156,7 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: FileValue) => NodeInterface,
 	) {
+		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${FileComponent.cardName}"],[${READY_CARD_KEY}="${FileComponent.cardName}"`,
 		).each((cardNode) => {
@@ -182,8 +183,10 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 					newNode = callback(newNode, value);
 				}
 				node.replaceWith(newNode);
+				results.push(newNode);
 			} else node.remove();
 		});
+		return results;
 	}
 }
 

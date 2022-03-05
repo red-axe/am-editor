@@ -169,7 +169,8 @@ export default class<
 					: 'background:#fff;'
 			}width: 16px;height: 16px;display: inline-block;border: 1px solid #347eff;border-radius: 2px;transition: all 0.3s;border-collapse: separate;">${inner}</span>`;
 		};
-		root.find(`[${CARD_KEY}=checkbox`).each((checkboxNode) => {
+		const results: NodeInterface[] = [];
+		root.find(`[${CARD_KEY}="checkbox"]`).each((checkboxNode) => {
 			const node = $(checkboxNode);
 
 			let checkbox = $(
@@ -200,10 +201,12 @@ export default class<
 				if (value) checkbox = callback(checkbox, value);
 			}
 			node.append(checkbox);
+			results.push(node);
 		});
 		root.find('.data-list-task').css({
 			'list-style': 'none',
 		});
+		return results;
 	}
 
 	//设置markdown

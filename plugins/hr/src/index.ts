@@ -135,6 +135,7 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: HrValue) => NodeInterface,
 	) {
+		const results: NodeInterface[] = [];
 		root.find(`[${CARD_KEY}=${HrComponent.cardName}`).each((hrNode) => {
 			const node = $(hrNode);
 			let hr = node.find('hr');
@@ -153,7 +154,9 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 				hr = callback(hr, value);
 			}
 			node.replaceWith(hr);
+			results.push(hr);
 		});
+		return results;
 	}
 }
 export { HrComponent };
