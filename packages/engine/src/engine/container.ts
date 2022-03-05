@@ -82,27 +82,39 @@ class Container {
 			if (event.target) {
 				const targetNode = $(event.target);
 				if (!targetNode.isEditable()) return;
-				//获取到编辑器内最后一个子节点
-				const block = this.node.last();
-				if (block) {
-					// 为空不处理
-					if (engine.node.isEmptyWidthChild(block)) return;
-					//节点不可见不处理
-					if (
-						(block.get<HTMLElement>()?.offsetTop || 0) +
-							(block.get<Element>()?.clientHeight || 0) >
-						event.offsetY
-					)
-						return;
-				}
 				const node = $('<p><br /></p>');
 				const container = targetNode.closest(
 					`${EDITABLE_SELECTOR},${ROOT_SELECTOR}`,
 				);
-				container.append(node);
-				const range = engine.change.range.get();
-				range.select(node, true).collapse(false);
-				engine.change.apply(range);
+				// 获取编辑器内第一个子节点
+				const firstBlock = this.node.first();
+				//获取到编辑器内最后一个子节点
+				const lastBlock = this.node.last();
+				// 存在这个节点，并且鼠标单击位置要小于第一个节点，并且这个节点不是一个空的节点
+				if (
+					firstBlock &&
+					event.offsetY <
+						(firstBlock.get<HTMLElement>()?.offsetTop || 0) &&
+					!engine.node.isEmptyWidthChild(firstBlock)
+				) {
+					container.prepend(node);
+				}
+				// 存在这个节点，并且鼠标单击位置要大于最后一个节点，并且这个节点不是一个空的节点
+				else if (
+					lastBlock &&
+					event.offsetY >
+						(lastBlock.get<HTMLElement>()?.offsetTop || 0) +
+							(lastBlock.get<Element>()?.clientHeight || 0) &&
+					!engine.node.isEmptyWidthChild(lastBlock)
+				) {
+					container.append(node);
+				}
+				// 有父节点说明已经加到编辑器内了
+				if (node.get<HTMLElement>()?.parentElement) {
+					const range = engine.change.range.get();
+					range.select(node, true).collapse(false);
+					engine.change.apply(range);
+				}
 			}
 		});
 		document.addEventListener('mousedown', this.docMouseDown);

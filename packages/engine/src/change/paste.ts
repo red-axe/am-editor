@@ -533,7 +533,7 @@ export default class Paste {
 		);
 	}
 
-	normalize(autoAppendCurrent: boolean = true) {
+	normalize() {
 		const nodeApi = this.engine.node;
 		let fragment = this.parser();
 		this.elementNormalize(fragment);
@@ -609,27 +609,7 @@ export default class Paste {
 		const node = nodeApi.normalize($(fragment));
 		if (node.fragment) fragment = node.fragment;
 		fragment.normalize();
-		let fragmentNode = $(fragment);
-		const first = fragmentNode.first();
-		//如果光标在文本节点，并且父级节点不是根节点，移除粘贴数据的第一个节点块级节点，让其内容接在光标所在行
-		const cloneRange = range
-			.cloneRange()
-			.shrinkToElementNode()
-			.shrinkToTextNode();
-		const { startNode } = cloneRange;
-		if (
-			autoAppendCurrent &&
-			startNode.inEditor() &&
-			first &&
-			first.name === 'p' &&
-			!(first.length === 1 && first.first()?.name === 'br') &&
-			!nodeApi.isEmptyWidthChild(
-				range.cloneRange().enlargeToElementNode(true, true).startNode,
-			)
-		) {
-			nodeApi.unwrap(first);
-		}
-		fragmentNode = $(fragment);
+		const fragmentNode = $(fragment);
 		const children = fragmentNode.find('ul,ol');
 		children.each((_, index) => {
 			const child = children.eq(index);

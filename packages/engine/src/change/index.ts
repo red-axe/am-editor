@@ -391,17 +391,40 @@ class ChangeModel implements ChangeInterface {
 		const isCollapsed = range.collapsed;
 		const childNodes = fragment.childNodes;
 		const firstNode = $(fragment.firstChild || []);
+		const unwrapToFirst = () => {
+			const fragmentNode = $(fragment);
+			const first = fragmentNode.first();
+			//如果光标在文本节点，并且父级节点不是根节点，移除粘贴数据的第一个节点块级节点，让其内容接在光标所在行
+			const cloneRange = range!
+				.cloneRange()
+				.shrinkToElementNode()
+				.shrinkToTextNode();
+			const { startNode } = cloneRange;
+			if (
+				startNode.inEditor() &&
+				first &&
+				first.name === 'p' &&
+				!(first.length === 1 && first.first()?.name === 'br') &&
+				!nodeApi.isEmptyWidthChild(block.closest(startNode))
+			) {
+				nodeApi.unwrap(first);
+			}
+		};
 		if (!isCollapsed) {
 			this.delete(range, onlyOne || !isBlockLast, followActiveMark);
-		} else if (range.startNode.isText()) {
-			const inlineNode = inline.closest(range.startNode);
-			const text = range.startNode.text();
-			if (
-				inlineNode.length === 0 &&
-				!inlineNode.equal(range.startNode) &&
-				/^\u200B/.test(text)
-			)
-				range.startNode.text(text.substr(1));
+			unwrapToFirst();
+		} else {
+			unwrapToFirst();
+			if (range.startNode.isText()) {
+				const inlineNode = inline.closest(range.startNode);
+				const text = range.startNode.text();
+				if (
+					inlineNode.length === 0 &&
+					!inlineNode.equal(range.startNode) &&
+					/^\u200B/.test(text)
+				)
+					range.startNode.text(text.substr(1));
+			}
 		}
 		let startRange: { node: NodeInterface; offset: number } | undefined =
 			undefined;
