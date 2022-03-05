@@ -197,7 +197,7 @@ export interface CardInterface<T extends CardValue = CardValue> {
 	 * 通过 data-card-element 的值，获取当前Card内的 DOM 节点
 	 * @param key key
 	 */
-	findByKey(key: string): NodeInterface;
+	findByKey(key: string): NodeInterface | undefined;
 	/**
 	 * 获取卡片的中心节点
 	 */

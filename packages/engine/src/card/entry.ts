@@ -192,11 +192,16 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		const children = body.children();
 		const index = ['left', 'center', 'right'].indexOf(key);
 		if (index > -1) {
-			const child = children.eq(index);
-			if (child?.attributes(CARD_ELEMENT_KEY) === key) return child;
+			return children
+				.toArray()
+				.find((child) => child.attributes(CARD_ELEMENT_KEY) === key);
 		}
-		const tag = this.type === CardType.BLOCK ? 'div' : 'span';
-		return this.find(`${tag}[${CARD_ELEMENT_KEY}=${key}]`);
+		const tagName = this.type === CardType.BLOCK ? 'div' : 'span';
+		const targetNode = this.find(`${tagName}[${CARD_ELEMENT_KEY}=${key}]`);
+		return targetNode.name === tagName &&
+			targetNode.attributes(CARD_ELEMENT_KEY) === key
+			? targetNode
+			: undefined;
 	}
 
 	activate(activated: boolean) {
@@ -227,7 +232,9 @@ abstract class CardEntry<T extends CardValue = CardValue>
 	}
 
 	getCenter() {
-		return this.findByKey('center');
+		const center = this.findByKey('center');
+		if (!center) throw new Error('center is not found');
+		return center;
 	}
 
 	isCenter(node: NodeInterface) {
@@ -236,7 +243,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 				? `div[${CARD_ELEMENT_KEY}=center]`
 				: `span[${CARD_ELEMENT_KEY}=center]`,
 		);
-		return center.length > 0 && center.equal(this.findByKey('center'));
+		return center.length > 0 && !!this.findByKey('center')?.equal(center);
 	}
 
 	isCursor(node: NodeInterface) {
@@ -247,21 +254,26 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		if (node.isElement() && node.attributes(CARD_ELEMENT_KEY) !== 'left')
 			return false;
 		const cursor = node.closest(CARD_LEFT_SELECTOR);
-		return cursor.length > 0 && cursor.equal(this.findByKey('left'));
+		return cursor.length > 0 && !!this.findByKey('left')?.equal(cursor);
 	}
 
 	isRightCursor(node: NodeInterface) {
 		if (node.isElement() && node.attributes(CARD_ELEMENT_KEY) !== 'right')
 			return false;
 		const cursor = node.closest(CARD_RIGHT_SELECTOR);
-		return cursor.length > 0 && cursor.equal(this.findByKey('right'));
+		return cursor.length > 0 && !!this.findByKey('right')?.equal(cursor);
 	}
 
 	focus(range: RangeInterface, toStart?: boolean) {
 		const cardLeft = this.findByKey('left');
 		const cardRight = this.findByKey('right');
 
-		if (cardLeft.length === 0 || cardRight.length === 0) {
+		if (
+			!cardLeft ||
+			cardLeft.length === 0 ||
+			!cardRight ||
+			cardRight.length === 0
+		) {
 			return;
 		}
 

@@ -58,7 +58,7 @@ class Maximize implements MaximizeInterface {
 		});
 
 		const body = this.card.findByKey('body');
-		body.prepend(node);
+		body?.prepend(node);
 
 		if (isEngine(editor)) {
 			editor.trigger('card:maximize', this.card);

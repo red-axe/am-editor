@@ -12,6 +12,7 @@ import {
 	DATA_TRANSIENT_ELEMENT,
 	DATA_TRANSIENT_ATTRIBUTES,
 	CARD_LOADING_KEY,
+	DATA_CONTENTEDITABLE_KEY,
 } from '../constants';
 import {
 	CardEntry,
@@ -327,14 +328,12 @@ class CardModel implements CardModelInterface {
 	// 更新Card
 	updateNode(card: CardInterface, value: CardValue, ...args: any) {
 		if (card.destroy) card.destroy();
-		const container = card.findByKey('center');
-		container.empty();
+		const center = card.getCenter();
+		center?.empty();
 		card.setValue(value);
 		const result = card.render(...args);
 		if (result !== undefined) {
-			card.getCenter().append(
-				typeof result === 'string' ? $(result) : result,
-			);
+			center.append(typeof result === 'string' ? $(result) : result);
 		}
 		if (card.didUpdate) {
 			card.didUpdate();
@@ -598,11 +597,7 @@ class CardModel implements CardModelInterface {
 		component.root.attributes(CARD_TYPE_KEY, type);
 		component.root.attributes(CARD_KEY, name);
 		component.root.attributes(CARD_LOADING_KEY, 'true');
-		//如果没有指定是否能聚集，那么当card不是只读的时候就可以聚焦
-		const hasFocus =
-			clazz.focus !== undefined
-				? clazz.focus
-				: isEngine(this.editor) && !this.editor.readonly;
+
 		const tagName = type === CardType.INLINE ? 'span' : 'div';
 		//center
 		const center = $(
@@ -612,44 +607,61 @@ class CardModel implements CardModelInterface {
 		);
 		center.attributes(CARD_ELEMENT_KEY, 'center');
 
-		if (hasFocus) {
-			center.attributes('contenteditable', 'false');
-		} else {
-			component.root.attributes('contenteditable', 'false');
-		}
 		//body
 		const body = $(
 			'<'.concat(tagName, ' ').concat(CARD_ELEMENT_KEY, '="body" />'),
 		);
+		// center
+		body.append(center);
+		component.root.append(body);
 		//可以聚焦的情况下，card左右两边添加光标位置
-		if (hasFocus) {
-			//left
-			const left = $(
-				`<span ${CARD_ELEMENT_KEY}="left" ${DATA_TRANSIENT_ELEMENT}="true">&#8203;</span>`,
-			);
-			//right
-			const right = $(
-				`<span ${CARD_ELEMENT_KEY}="right" ${DATA_TRANSIENT_ELEMENT}="true">&#8203;</span>`,
-			);
-			body.append(left);
-			body.append(center);
-			body.append(right);
-		} else {
-			body.append(center);
-		}
+		this.createCursor(component);
 		if (type === CardType.BLOCK) {
 			this.editor.nodeId.generate(component.root);
 		}
-
-		component.root.append(body);
 		component.init();
 		return component;
+	}
+
+	createCursor(component: CardInterface) {
+		const cardClazz = component.constructor as CardEntry;
+		const hasFocus =
+			cardClazz.focus !== undefined
+				? cardClazz.focus
+				: isEngine(this.editor) && !this.editor.readonly;
+		const center = component.getCenter();
+		center.removeAttributes(DATA_CONTENTEDITABLE_KEY);
+		component.root.removeAttributes(DATA_CONTENTEDITABLE_KEY);
+		const left = component.findByKey('left');
+		const right = component.findByKey('right');
+		if (hasFocus) {
+			center.attributes(DATA_CONTENTEDITABLE_KEY, 'false');
+			if (!left) {
+				center.before(
+					$(
+						`<span ${CARD_ELEMENT_KEY}="left" ${DATA_TRANSIENT_ELEMENT}="true">&#8203;</span>`,
+					),
+				);
+			}
+			if (!right) {
+				center.after(
+					$(
+						`<span ${CARD_ELEMENT_KEY}="right" ${DATA_TRANSIENT_ELEMENT}="true">&#8203;</span>`,
+					),
+				);
+			}
+		} else {
+			left?.remove();
+			right?.remove();
+			component.root.attributes(DATA_CONTENTEDITABLE_KEY, 'false');
+		}
 	}
 
 	reRender(...cards: Array<CardInterface>) {
 		if (cards.length === 0) cards = this.components;
 		cards.forEach((card) => {
 			if (card.destroy) card.destroy();
+			this.createCursor(card);
 			card.init();
 			this.renderComponent(card);
 		});
