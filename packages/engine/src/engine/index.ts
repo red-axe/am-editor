@@ -24,6 +24,7 @@ import Container from './container';
 import Selection from '../selection';
 import Editor from '../editor';
 import { $ } from '../node';
+import { DATA_CONTENTEDITABLE_KEY } from '../constants';
 import './index.css';
 
 class Engine<T extends EngineOptions = EngineOptions>
@@ -169,7 +170,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 
 	getHtml(): string {
 		const node = $(this.container[0].cloneNode(true));
-		node.removeAttributes('contenteditable');
+		node.removeAttributes(DATA_CONTENTEDITABLE_KEY);
 		node.removeAttributes('tabindex');
 		node.removeAttributes('autocorrect');
 		node.removeAttributes('autocomplete');

@@ -790,9 +790,9 @@ class CardModel implements CardModelInterface {
 		if (card.contenteditable.length > 0) {
 			center.find(card.contenteditable.join(',')).each((node) => {
 				const child = $(node);
-				if (child.attributes('contenteditable') !== undefined)
+				if (child.attributes(DATA_CONTENTEDITABLE_KEY) !== undefined)
 					child.attributes(
-						'contenteditable',
+						DATA_CONTENTEDITABLE_KEY,
 						!isEngine(this.editor) || this.editor.readonly
 							? 'false'
 							: 'true',

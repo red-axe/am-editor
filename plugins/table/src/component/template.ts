@@ -5,6 +5,7 @@ import {
 	EDITABLE,
 	UI,
 	transformCustomTags,
+	DATA_CONTENTEDITABLE_KEY,
 } from '@aomao/engine';
 import {
 	TableValue,
@@ -72,7 +73,7 @@ class Template implements TemplateInterface {
 	static readonly CellBG = `<div class="${TABLE_TD_BG_CLASS_NAME}"><div class="table-main-border-top"></div><div class="table-main-border-right"></div><div class="table-main-border-bottom"></div><div class="table-main-border-left"></div></div>`;
 	isReadonly: boolean = false;
 	static EmptyCell(readonly: boolean = false) {
-		return `<div class="${TABLE_TD_CONTENT_CLASS_NAME}" ${DATA_TRANSIENT_ATTRIBUTES}="contenteditable" contenteditable="${
+		return `<div class="${TABLE_TD_CONTENT_CLASS_NAME}" ${DATA_TRANSIENT_ATTRIBUTES}="${DATA_CONTENTEDITABLE_KEY}" ${DATA_CONTENTEDITABLE_KEY}="${
 			readonly ? 'false' : 'true'
 		}" ${DATA_ELEMENT}="${EDITABLE}"><p><br /></p></div>${Template.CellBG}`;
 	}

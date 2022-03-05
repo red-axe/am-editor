@@ -13,12 +13,12 @@ import Dropdown from './dropdown';
 import Input from './input';
 import Tooltip from './tooltip';
 import Switch from './switch';
-import { DATA_ELEMENT } from '../constants';
+import { DATA_CONTENTEDITABLE_KEY, DATA_ELEMENT } from '../constants';
 import { $ } from '../node';
 import './index.css';
 
 const template = () => {
-	return `<div ${DATA_ELEMENT}="ui" class="data-toolbar data-toolbar-active" contenteditable="false"></div>`;
+	return `<div ${DATA_ELEMENT}="ui" class="data-toolbar data-toolbar-active" ${DATA_CONTENTEDITABLE_KEY}="false"></div>`;
 };
 
 class Toolbar implements ToolbarInterface {

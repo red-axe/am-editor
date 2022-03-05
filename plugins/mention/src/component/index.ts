@@ -13,6 +13,7 @@ import {
 	CardValue,
 	unescape,
 	AjaxInterface,
+	DATA_CONTENTEDITABLE_KEY,
 } from '@aomao/engine';
 import CollapseComponent, { CollapseComponentInterface } from './collapse';
 import { MentionItem } from '../types';
@@ -352,7 +353,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		// 没有值的情况下，弹出下拉框编辑模式
 		if (!this.#container) {
 			this.#container = $(
-				`<span class="data-mention-component-keyword data-mention-component" contenteditable="true">@</span><span class="data-mention-component-placeholder">${language['placeholder']}</span>`,
+				`<span class="data-mention-component-keyword data-mention-component" ${DATA_CONTENTEDITABLE_KEY}="true">@</span><span class="data-mention-component-placeholder">${language['placeholder']}</span>`,
 			);
 			this.#keyword = this.#container.eq(0);
 			this.#placeholder = this.#container.eq(1);

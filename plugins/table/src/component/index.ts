@@ -3,6 +3,7 @@ import {
 	Card,
 	CardToolbarItemOptions,
 	CardType,
+	DATA_CONTENTEDITABLE_KEY,
 	EDITABLE_SELECTOR,
 	getComputedStyle,
 	isEngine,
@@ -922,9 +923,9 @@ class TableComponent<V extends TableValue = TableValue>
 			// 找到所有可编辑节点，对没有 contenteditable 属性的节点添加contenteditable一下
 			this.wrapper?.find(EDITABLE_SELECTOR).each((editableNode) => {
 				const editableElement = editableNode as Element;
-				if (!editableElement.hasAttribute('contenteditable')) {
+				if (!editableElement.hasAttribute(DATA_CONTENTEDITABLE_KEY)) {
 					editableElement.setAttribute(
-						'contenteditable',
+						DATA_CONTENTEDITABLE_KEY,
 						this.template.isReadonly ? 'false' : 'true',
 					);
 				}

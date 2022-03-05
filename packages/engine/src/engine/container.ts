@@ -1,4 +1,5 @@
 import {
+	DATA_CONTENTEDITABLE_KEY,
 	DATA_ELEMENT,
 	EDITABLE_SELECTOR,
 	ROOT,
@@ -17,6 +18,8 @@ export type Options = {
 	placeholder?: string;
 };
 
+const DATA_PLACEHOLDER = 'data-placeholder';
+const DATA_PLACEHOLDER_CLASS = 'am-engine-placeholder';
 class Container {
 	private options: Options;
 	private node: NodeInterface;
@@ -36,7 +39,7 @@ class Container {
 		const { lang, tabIndex, className } = this.options;
 		this.node.attributes(DATA_ELEMENT, ROOT);
 		this.node.attributes({
-			contenteditable: 'true',
+			[DATA_CONTENTEDITABLE_KEY]: 'true',
 			role: 'textbox',
 			autocorrect: lang === 'en-US' ? 'on' : 'off',
 			autocomplete: 'off',
@@ -90,6 +93,7 @@ class Container {
 				const firstBlock = this.node.first();
 				//获取到编辑器内最后一个子节点
 				const lastBlock = this.node.last();
+				let isHandle = false;
 				// 存在这个节点，并且鼠标单击位置要小于第一个节点，并且这个节点不是一个空的节点
 				if (
 					firstBlock &&
@@ -98,6 +102,7 @@ class Container {
 					!engine.node.isEmptyWidthChild(firstBlock)
 				) {
 					container.prepend(node);
+					isHandle = true;
 				}
 				// 存在这个节点，并且鼠标单击位置要大于最后一个节点，并且这个节点不是一个空的节点
 				else if (
@@ -108,9 +113,10 @@ class Container {
 					!engine.node.isEmptyWidthChild(lastBlock)
 				) {
 					container.append(node);
+					isHandle = true;
 				}
 				// 有父节点说明已经加到编辑器内了
-				if (node.get<HTMLElement>()?.parentElement) {
+				if (isHandle) {
 					const range = engine.change.range.get();
 					range.select(node, true).collapse(false);
 					engine.change.apply(range);
@@ -158,7 +164,10 @@ class Container {
 	}
 
 	setReadonly(readonly: boolean) {
-		this.node.attributes('contenteditable', readonly ? 'false' : 'true');
+		this.node.attributes(
+			DATA_CONTENTEDITABLE_KEY,
+			readonly ? 'false' : 'true',
+		);
 	}
 
 	showPlaceholder() {
@@ -167,29 +176,29 @@ class Container {
 			//const left = this.node.css('padding-left');
 			//const top = this.node.css('padding-top');
 			this.node.attributes({
-				'data-placeholder': placeholder,
+				[DATA_PLACEHOLDER]: placeholder,
 			});
-			this.node.addClass('am-engine-placeholder');
+			this.node.addClass(DATA_PLACEHOLDER_CLASS);
 		}
 	}
 
 	hidePlaceholder() {
-		this.node.removeAttributes('data-placeholder');
-		this.node.removeClass('am-engine-placeholder');
+		this.node.removeAttributes(DATA_PLACEHOLDER);
+		this.node.removeClass(DATA_PLACEHOLDER_CLASS);
 	}
 
 	destroy() {
 		const { className, engine } = this.options;
 		document.removeEventListener('mousedown', this.docMouseDown);
 		this.node.removeAttributes(DATA_ELEMENT);
-		this.node.removeAttributes('contenteditable');
+		this.node.removeAttributes(DATA_CONTENTEDITABLE_KEY);
 		this.node.removeAttributes('role');
 		this.node.removeAttributes('autocorrect');
 		this.node.removeAttributes('autocomplete');
 		this.node.removeAttributes('spellcheck');
 		this.node.removeAttributes('data-gramm');
 		this.node.removeAttributes('tabindex');
-		this.node.removeAttributes('data-placeholder');
+		this.node.removeAttributes(DATA_PLACEHOLDER);
 		if (this.options.className) {
 			(Array.isArray(className)
 				? className

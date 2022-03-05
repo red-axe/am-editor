@@ -7,6 +7,7 @@ import {
 	CardType,
 	isServer,
 	CardValue,
+	DATA_CONTENTEDITABLE_KEY,
 } from '@aomao/engine';
 import { CollapseGroupProps } from '../../collapse/group';
 import { CollapseItemProps } from '../../collapse/item';
@@ -219,10 +220,10 @@ class ToolbarComponent<T extends ToolbarValue = ToolbarValue> extends Card<T> {
 		if (!isEngine(editor) || isServer) return;
 		const language = editor.language.get('toolbar', 'component');
 		this.root.attributes('data-transient', 'true');
-		this.root.attributes('contenteditable', 'false');
+		this.root.attributes(DATA_CONTENTEDITABLE_KEY, 'false');
 		// 编辑模式
 		const container = $(
-			`<span class="data-toolbar-component-keyword" contenteditable="true">/</span><span class="data-toolbar-component-placeholder">${language['placeholder']}</span>`,
+			`<span class="data-toolbar-component-keyword" ${DATA_CONTENTEDITABLE_KEY}="true">/</span><span class="data-toolbar-component-placeholder">${language['placeholder']}</span>`,
 		);
 		const center = this.getCenter();
 		center.empty().append(container);

@@ -8,7 +8,12 @@ import type {
 	ToolbarItemOptions,
 	ToolbarInterface as ToolbarBaseInterface,
 } from '../../types';
-import { DATA_ELEMENT, TRIGGER_CARD_ID, UI } from '../../constants';
+import {
+	DATA_CONTENTEDITABLE_KEY,
+	DATA_ELEMENT,
+	TRIGGER_CARD_ID,
+	UI,
+} from '../../constants';
 import { $ } from '../../node';
 import { isEngine, isMobile } from '../../utils';
 import Position from '../../position';
@@ -363,7 +368,9 @@ class CardToolbar implements CardToolbarInterface {
 		const dndNode = $(
 			`<div ${DATA_ELEMENT}="${UI}" class="data-card-dnd" draggable="true" dnd-trigger-key="${
 				(this.card.constructor as CardEntry).cardName
-			}" drag-card-trigger="${this.card.id}" contenteditable="false">
+			}" drag-card-trigger="${
+				this.card.id
+			}" ${DATA_CONTENTEDITABLE_KEY}="false">
                 <div class="data-card-dnd-trigger">
                     ${content}
                 </div>
