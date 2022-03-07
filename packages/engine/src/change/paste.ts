@@ -607,6 +607,7 @@ export default class Paste {
 			}
 			// 如果这个节点被移除了，直接遍历他的子节点
 			if (node.length === 0) return first;
+			return undefined;
 		});
 		this.engine.trigger('paste:each-after', $(fragment));
 
