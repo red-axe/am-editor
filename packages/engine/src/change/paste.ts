@@ -568,7 +568,7 @@ export default class Paste {
 		}
 
 		$(fragment).traverse((node) => {
-			if (node.fragment === fragment) return;
+			if (node.fragment === fragment) return undefined;
 			const first = node.first();
 			if (node.length > 0 && node[0].parentNode)
 				this.engine.trigger('paste:each', node);
