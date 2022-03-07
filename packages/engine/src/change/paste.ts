@@ -96,8 +96,9 @@ export default class Paste {
 				//处理后如果不是一个有效的节点就移除包裹
 				let type = this.schema.getType(node);
 				if (!type) {
+					const first = node.first();
 					nodeApi.unwrap(node);
-					return undefined;
+					return first;
 				}
 				nodeApi.removeMinusStyle(node, 'text-indent');
 				if (nodeApi.isList(node)) {
@@ -568,6 +569,7 @@ export default class Paste {
 
 		$(fragment).traverse((node) => {
 			if (node.fragment === fragment) return;
+			const first = node.first();
 			if (node.length > 0 && node[0].parentNode)
 				this.engine.trigger('paste:each', node);
 			// 删除非block节点的换行 \r\n\r\n<span
@@ -603,6 +605,8 @@ export default class Paste {
 			) {
 				nodeApi.unwrap(node);
 			}
+			// 如果这个节点被移除了，直接遍历他的子节点
+			if (node.length === 0) return first;
 		});
 		this.engine.trigger('paste:each-after', $(fragment));
 

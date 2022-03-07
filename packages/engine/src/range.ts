@@ -654,21 +654,31 @@ class Range implements RangeInterface {
 				domBr.remove();
 			}
 		});
-
+		const first = block.first();
+		const children = block.children();
 		if (
-			!block.first() ||
-			(block.children().length === 1 &&
+			!first ||
+			(children.length === 1 &&
 				block.hasClass('data-list-item') &&
-				block.first()?.isCard())
+				first?.isCard())
 		) {
 			block.append($('<br />'));
 			return this;
 		}
 
 		if (
-			block.children().length === 2 &&
+			children.length === 1 &&
+			first.isText() &&
+			first.text().replace(/\r\n|\n|\t|\u200b/g, '').length === 0
+		) {
+			block.html('<br />');
+			return this;
+		}
+
+		if (
+			children.length === 2 &&
 			block.hasClass('data-list-item') &&
-			block.first()?.isCard() &&
+			first?.isCard() &&
 			['cursor', 'anchor', 'focus'].includes(
 				block.last()?.attributes(DATA_ELEMENT) || '',
 			)

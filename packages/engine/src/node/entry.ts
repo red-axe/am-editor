@@ -951,7 +951,9 @@ class NodeEntry implements NodeInterface {
 	}
 
 	traverse(
-		callback: (node: NodeInterface) => boolean | void | NodeInterface,
+		callback: (
+			node: NodeInterface,
+		) => boolean | void | null | NodeInterface,
 		order: boolean = true,
 		includeCard: boolean | 'editable' = false,
 		onStart?: (node: NodeInterface) => void,
@@ -976,13 +978,15 @@ class NodeEntry implements NodeInterface {
 					return;
 				}
 				if (result !== true) {
-					if (result && typeof result !== 'boolean') {
+					const isResultChild = result && typeof result !== 'boolean';
+					if (isResultChild) {
 						child = result;
 					}
 					isCard = child.isCard();
 					if (isCard) {
 						// 遍历任意卡片
 						if (includeCard === true) {
+							if (isResultChild) callback(child);
 							walk(child);
 						} else if (
 							includeCard === 'editable' &&
@@ -996,7 +1000,10 @@ class NodeEntry implements NodeInterface {
 								if (editableElement) walk(editableElement);
 							});
 						}
-					} else walk(child);
+					} else {
+						if (isResultChild) callback(child);
+						walk(child);
+					}
 				}
 				if (onEnd) onEnd(child, next);
 				child = next;

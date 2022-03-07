@@ -499,7 +499,9 @@ export interface NodeInterface {
 	 * @param onEnd 遍历完(包括所有子节点)一个节点时的回调函数
 	 */
 	traverse(
-		callback: (node: NodeInterface) => boolean | void | NodeInterface,
+		callback: (
+			node: NodeInterface,
+		) => boolean | void | null | NodeInterface,
 		order?: boolean,
 		includeCard?: boolean | 'editable',
 		onStart?: (node: NodeInterface) => void,

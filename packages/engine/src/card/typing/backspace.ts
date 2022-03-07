@@ -72,8 +72,8 @@ class Backspace {
 				cloneRange.setStartBefore(prevNode);
 				cloneRange.collapse(true);
 				this.engine.card.remove(prevNode);
-				cloneRange.handleBr();
 				change.range.select(cloneRange.shrinkToTextNode());
+				cloneRange.handleBr();
 				return false;
 			}
 			return true;
@@ -110,8 +110,8 @@ class Backspace {
 				cloneRange.setStartBefore(card.root);
 				cloneRange.collapse(true);
 				this.engine.card.remove(card.id);
-				cloneRange.handleBr();
 				change.range.select(cloneRange.shrinkToTextNode());
+				cloneRange.handleBr();
 				return false;
 			}
 		} else {
