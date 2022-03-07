@@ -88,6 +88,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	container?: NodeInterface;
 	videoContainer?: NodeInterface;
 	title?: NodeInterface;
+	mask?: NodeInterface;
 	static get cardName() {
 		return 'video';
 	}
@@ -220,7 +221,8 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		const contentElement = this.container?.find('.data-video-content');
 		if (!contentElement) return;
 		contentElement.append(video);
-		contentElement.append($('<div class="data-video-mask" />'));
+		this.mask = $('<div class="data-video-mask" />');
+		contentElement.append(this.mask);
 		this.videoContainer = this.container?.find('.data-video-content');
 		video.oncontextmenu = function () {
 			return false;
@@ -467,11 +469,11 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	onActivate(activated: boolean) {
 		if (activated) {
 			this.container?.addClass('data-video-active');
-			this.container?.find('.data-video-mask').hide();
+			this.mask?.hide();
 			this.initResizer();
 		} else {
 			this.container?.removeClass('data-video-active');
-			this.container?.find('.data-video-mask').show();
+			this.mask?.show();
 			this.resizer?.destroy();
 		}
 	}
@@ -719,6 +721,9 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		this.editor.on('editor:resize', this.onWindowResize);
 		this.toolbarModel?.setDefaultAlign('top');
 		this.container?.on('mousedown', this.handleClick);
+		if (!isEngine(this.editor) || this.editor.readonly) {
+			this.mask?.hide();
+		}
 	}
 
 	destroy() {
