@@ -5,7 +5,8 @@ export interface PswpInterface extends EventEmitter2 {
 	root: NodeInterface;
 	barUI: NodeInterface;
 	closeUI: NodeInterface;
-	hoverControllerFadeInAndOut(): void;
+	bindControllerFadeInAndOut(): void;
+	unbindControllerFadeInAndOut(): void;
 	removeFadeOut(node: NodeInterface, id: string): void;
 	fadeOut(node: NodeInterface, id: string): void;
 	prev(): void;
@@ -24,6 +25,7 @@ export interface PswpInterface extends EventEmitter2 {
 	afterChange(): void;
 	setWhiteBackground(): void;
 	open(items: Array<PhotoSwipe.Item>, index: number): void;
+	reset: () => void;
 	close(): void;
 	destroy(): void;
 }

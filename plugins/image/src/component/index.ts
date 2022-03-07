@@ -281,7 +281,8 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 					return src;
 				},
 				onChange: (size, loaded) => {
-					if (size) this.setSize(size, loaded);
+					if (isEngine(this.editor) && !this.editor.readonly && size)
+						this.setSize(size, loaded);
 				},
 				onError: () => {
 					this.isLocalError = true;

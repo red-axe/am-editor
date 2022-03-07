@@ -400,7 +400,7 @@ class Image {
 		);
 	}
 
-	openZoom(event: MouseEvent | TouchEvent) {
+	openZoom = (event: MouseEvent | TouchEvent) => {
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -443,7 +443,7 @@ class Image {
 				}
 			});
 		this.pswp.open(imageArray, rootIndex);
-	}
+	};
 
 	closeZoom() {
 		this.pswp?.close();
@@ -475,18 +475,21 @@ class Image {
 		const resizerNode = resizer.render();
 		this.root.find('.data-image-detail').append(resizerNode);
 		this.resizer = resizer;
-		this.resizer.on('dblclick', (event: MouseEvent) =>
-			this.openZoom(event),
-		);
+		this.resizer.on('dblclick', this.openZoom);
 	}
 
 	destroyEditor() {
+		this.resizer?.off('dblclick', this.openZoom);
 		this.resizer?.destroy();
 	}
 
 	destroy() {
 		window.removeEventListener('resize', this.onWindowResize);
 		this.editor.off('editor:resize', this.onWindowResize);
+		this.destroyEditor();
+		this.image.off('click', this.openZoom);
+		this.image.off('dblclick', this.openZoom);
+		this.maximize.off('click', this.openZoom);
 	}
 
 	focus = () => {
@@ -607,12 +610,12 @@ class Image {
 			if (!isEngine(this.editor) || this.editor.readonly) {
 				const link = this.image.closest('a');
 				if (link.length === 0) {
-					this.image.on('click', (event) => this.openZoom(event));
+					this.image.on('click', this.openZoom);
 				}
 			}
 			// 无链接
-			this.image.on('dblclick', (event) => this.openZoom(event));
-			this.maximize.on('click', (event) => this.openZoom(event));
+			this.image.on('dblclick', this.openZoom);
+			this.maximize.on('click', this.openZoom);
 		}
 	}
 }
