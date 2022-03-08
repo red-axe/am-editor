@@ -52,11 +52,9 @@ export default class<
 				onConfirm: this.options.onConfirm,
 			});
 		}
-		editor.on('paste:each', (child) => this.pasteHtml(child));
-		editor.on('parse:html', (node) => this.parseHtml(node));
-		editor.on('select', () => {
-			this.query();
-		});
+		editor.on('paste:each', this.pasteHtml);
+		editor.on('parse:html', this.parseHtml);
+		editor.on('select', this.bindQuery);
 		editor.language.add(locales);
 	}
 
@@ -91,7 +89,11 @@ export default class<
 		}
 	}
 
-	query() {
+	bindQuery = () => {
+		this.query();
+	};
+
+	query = () => {
 		if (!isEngine(this.editor)) return;
 		const { change } = this.editor;
 		const inlineNode = change.inlines.find((node) => this.isSelf(node));
@@ -110,7 +112,7 @@ export default class<
 			}
 		}
 		return false;
-	}
+	};
 
 	queryState() {
 		return this.query();
@@ -143,7 +145,7 @@ export default class<
 		return;
 	}
 
-	checkMarkdown(node: NodeInterface) {
+	checkMarkdown = (node: NodeInterface) => {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
 		const text = node.text();
@@ -155,9 +157,9 @@ export default class<
 			reg,
 			match,
 		};
-	}
+	};
 
-	pasteMarkdown(node: NodeInterface) {
+	pasteMarkdown = (node: NodeInterface) => {
 		const result = this.checkMarkdown(node);
 		if (!result) return;
 		let { reg, match } = result;
@@ -195,9 +197,9 @@ export default class<
 		}
 		newText += textNode.textContent;
 		node.text(newText);
-	}
+	};
 
-	parseHtml(root: NodeInterface) {
+	parseHtml = (root: NodeInterface) => {
 		root.find(this.tagName).css({
 			'font-family': 'monospace',
 			'font-size': 'inherit',
@@ -209,9 +211,9 @@ export default class<
 			'overflow-wrap': 'break-word',
 			'text-indent': '0',
 		});
-	}
+	};
 
-	pasteHtml(child: NodeInterface) {
+	pasteHtml = (child: NodeInterface) => {
 		if (child.isText()) {
 			const text = child.text();
 			const { node, inline } = this.editor;
@@ -227,5 +229,12 @@ export default class<
 			}
 		}
 		return true;
+	};
+
+	destroy(): void {
+		super.destroy();
+		this.editor.off('paste:each', this.pasteHtml);
+		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off('select', this.bindQuery);
 	}
 }

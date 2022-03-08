@@ -14,7 +14,7 @@ export default class<
 
 	init() {
 		super.init();
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
+		this.editor.on('parse:html', this.parseHtml);
 	}
 
 	tagName = 'code';
@@ -26,7 +26,7 @@ export default class<
 		return this.options.hotkey || 'mod+e';
 	}
 
-	parseHtml(root: NodeInterface) {
+	parseHtml = (root: NodeInterface) => {
 		root.find(this.tagName).css({
 			'font-family': 'monospace',
 			'font-size': 'inherit',
@@ -37,5 +37,10 @@ export default class<
 			'overflow-wrap': 'break-word',
 			'text-indent': '0',
 		});
+	};
+
+	destroy() {
+		super.destroy();
+		this.editor.off('parse:html', this.parseHtml);
 	}
 }

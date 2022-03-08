@@ -1,9 +1,9 @@
-import tinycolor2 from 'tinycolor2';
-import { MarkInterface, NodeInterface, SchemaInterface } from '../types';
+import type { MarkInterface, NodeInterface, SchemaInterface } from '../types';
 import { READY_CARD_KEY, READY_CARD_SELECTOR } from '../constants/card';
 import Parser from '../parser';
 import { EngineInterface } from '../types/engine';
 import { $ } from '../node';
+import { toHex } from '../utils';
 
 export default class Paste {
 	protected source: string;
@@ -25,13 +25,11 @@ export default class Paste {
 		return parser.toDOM(this.schema, conversion);
 	}
 
-	getDefaultStyle() {
+	getDefaultStyle(container = this.engine.container) {
 		const defaultStyle = {
-			color: tinycolor2(this.engine.container.css('color')).toHexString(),
-			'background-color': tinycolor2(
-				this.engine.container.css('background-color'),
-			).toHexString(),
-			'font-size': this.engine.container.css('font-size'),
+			color: toHex(container.css('color')),
+			'background-color': toHex(container.css('background-color')),
+			'font-size': container.css('font-size'),
 		};
 		return defaultStyle;
 	}
@@ -85,8 +83,11 @@ export default class Paste {
 				}
 				const styles = node.css();
 				defautlStyleKeys.forEach((key) => {
-					const value = styles[key];
+					let value = styles[key];
 					if (!value) return;
+					if (['color', 'background-color'].includes(key)) {
+						value = toHex(value);
+					}
 					if (
 						value.toLowerCase() === defaultStyle[key].toLowerCase()
 					) {

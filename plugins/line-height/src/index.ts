@@ -23,7 +23,7 @@ export default class<
 	init() {
 		this.editor.schema.add(this.schema());
 		if (isEngine(this.editor)) {
-			this.editor.on('paste:each', (node) => this.pasteEach(node));
+			this.editor.on('paste:each', this.pasteEach);
 		}
 	}
 
@@ -104,7 +104,7 @@ export default class<
 		return value;
 	}
 
-	pasteEach(node: NodeInterface) {
+	pasteEach = (node: NodeInterface) => {
 		//pt 转为px
 		if (!node.isCard() && this.editor.node.isBlock(node)) {
 			const lineHeightSource = node.css(this.#styleName);
@@ -124,6 +124,12 @@ export default class<
 			} else node.css(this.#styleName, '');
 			const nodeApi = this.editor.node;
 			if (!nodeApi.isBlock(node)) nodeApi.unwrap(node);
+		}
+	};
+
+	destroy() {
+		if (isEngine(this.editor)) {
+			this.editor.off('paste:each', this.pasteEach);
 		}
 	}
 }

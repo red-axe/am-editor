@@ -22,18 +22,13 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 	}
 
 	init() {
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
-		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
-		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+		this.editor.on('parse:html', this.parseHtml);
+		this.editor.on('paste:schema', this.pasteSchema);
+		this.editor.on('paste:each', this.pasteHtml);
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:enter', (event) => this.markdown(event));
-			this.editor.on(
-				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child)?.match,
-			);
-			this.editor.on('paste:markdown', (child) =>
-				this.pasteMarkdown(child),
-			);
+			this.editor.on('keydown:enter', this.markdown);
+			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.on('paste:markdown', this.pasteMarkdown);
 		}
 	}
 
@@ -47,7 +42,7 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 		return this.options.hotkey || 'mod+shift+e';
 	}
 
-	markdown(event: KeyboardEvent) {
+	markdown = (event: KeyboardEvent) => {
 		if (!isEngine(this.editor) || this.options.markdown === false) return;
 		const { change, command, node } = this.editor;
 		const range = change.range.get();
@@ -70,9 +65,13 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 			return false;
 		}
 		return;
-	}
+	};
 
-	checkMarkdown(node: NodeInterface) {
+	checkMarkdownMath = (child: NodeInterface) => {
+		return !this.checkMarkdown(child)?.match;
+	};
+
+	checkMarkdown = (node: NodeInterface) => {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
 		const text = node.text();
@@ -82,9 +81,9 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 			reg,
 			match,
 		};
-	}
+	};
 
-	pasteMarkdown(node: NodeInterface) {
+	pasteMarkdown = (node: NodeInterface) => {
 		const result = this.checkMarkdown(node);
 		if (!result) return;
 		let { reg, match } = result;
@@ -110,9 +109,9 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 		}
 		newText += textNode.textContent;
 		node.text(newText);
-	}
+	};
 
-	pasteSchema(schema: SchemaInterface) {
+	pasteSchema = (schema: SchemaInterface) => {
 		schema.add([
 			{
 				type: 'block',
@@ -120,21 +119,21 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 				isVoid: true,
 			},
 		]);
-	}
+	};
 
-	pasteHtml(node: NodeInterface) {
+	pasteHtml = (node: NodeInterface) => {
 		if (!isEngine(this.editor)) return;
 		if (node.name === 'hr') {
 			this.editor.card.replaceNode(node, HrComponent.cardName);
 			return false;
 		}
 		return true;
-	}
+	};
 
-	parseHtml(
+	parseHtml = (
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: HrValue) => NodeInterface,
-	) {
+	) => {
 		const results: NodeInterface[] = [];
 		root.find(`[${CARD_KEY}=${HrComponent.cardName}`).each((hrNode) => {
 			const node = $(hrNode);
@@ -157,6 +156,17 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 			results.push(hr);
 		});
 		return results;
+	};
+
+	destroy() {
+		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off('paste:schema', this.pasteSchema);
+		this.editor.off('paste:each', this.pasteHtml);
+		if (isEngine(this.editor)) {
+			this.editor.off('keydown:enter', this.markdown);
+			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.off('paste:markdown', this.pasteMarkdown);
+		}
 	}
 }
 export { HrComponent };

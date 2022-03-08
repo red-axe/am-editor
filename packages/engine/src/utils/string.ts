@@ -1,3 +1,4 @@
+import tinycolor2 from 'tinycolor2';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import {
 	CARD_EDITABLE_KEY,
@@ -55,19 +56,11 @@ export const toCamelCase = (
 };
 
 /**
- * RGB 颜色转换为16进制颜色代码
- * @param {string} rgb
+ * 颜色转换为16进制颜色代码
+ * @param {string} color
  */
-export const toHex = (rgb: string): string => {
-	const hex = (num: string) => {
-		const numChar = parseInt(num, 10).toString(16).toUpperCase();
-		return numChar.length > 1 ? numChar : '0' + numChar;
-	};
-
-	const reg = /rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/gi;
-	return rgb.replace(reg, ($0, $1, $2, $3) => {
-		return '#' + hex($1) + hex($2) + hex($3);
-	});
+export const toHex = (color: tinycolor2.ColorInput): string => {
+	return tinycolor2(color).toHexString();
 };
 
 /**

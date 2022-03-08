@@ -147,23 +147,14 @@ export default class<
 
 	init() {
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:space', (event) => this.markdown(event));
-			this.editor.on('drop:files', (files) => this.dropFiles(files));
-			this.editor.on('paste:event', ({ files }) =>
-				this.pasteFiles(files),
-			);
-			this.editor.on('paste:schema', (schema) =>
-				this.pasteSchema(schema),
-			);
-			this.editor.on('paste:each', (node) => this.pasteEach(node));
-			this.editor.on('paste:after', () => this.pasteAfter());
-			this.editor.on(
-				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child)?.match,
-			);
-			this.editor.on('paste:markdown', (child) =>
-				this.pasteMarkdown(child),
-			);
+			this.editor.on('keydown:space', this.markdown);
+			this.editor.on('drop:files', this.dropFiles);
+			this.editor.on('paste:event', this.pasteFiles);
+			this.editor.on('paste:schema', this.pasteSchema);
+			this.editor.on('paste:each', this.pasteEach);
+			this.editor.on('paste:after', this.pasteAfter);
+			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.on('paste:markdown', this.pasteMarkdown);
 		}
 		let { accept } = this.options.file || {};
 		const names: Array<string> = [];
@@ -437,15 +428,15 @@ export default class<
 		return;
 	}
 
-	dropFiles(files: Array<File>) {
+	dropFiles = (files: File[]) => {
 		if (!isEngine(this.editor)) return;
 		files = files.filter((file) => this.isImage(file));
 		if (files.length === 0) return;
 		this.editor.command.execute('image-uploader', files);
 		return false;
-	}
+	};
 
-	pasteSchema(schema: SchemaInterface) {
+	pasteSchema = (schema: SchemaInterface) => {
 		schema.add({
 			type: 'inline',
 			name: 'img',
@@ -470,17 +461,17 @@ export default class<
 				'data-height': '@number',
 			},
 		});
-	}
+	};
 
-	pasteFiles(files: Array<File>) {
+	pasteFiles = ({ files }: Record<'files', File[]>) => {
 		if (!isEngine(this.editor)) return;
 		files = files.filter((file) => this.isImage(file));
 		if (files.length === 0) return;
 		this.editor.command.execute('image-uploader', files);
 		return false;
-	}
+	};
 
-	pasteEach(node: NodeInterface) {
+	pasteEach = (node: NodeInterface) => {
 		const { isRemote } = this.options;
 		//是卡片，并且还没渲染
 		if (node.isCard() && node.attributes(READY_CARD_KEY)) {
@@ -569,7 +560,7 @@ export default class<
 			});
 			node.remove();
 		}
-	}
+	};
 
 	uploadAddress(src: string, component: ImageComponent) {
 		if (!isEngine(this.editor)) return;
@@ -669,7 +660,7 @@ export default class<
 		this.editor.card.insert('image', value);
 	}
 
-	pasteAfter() {
+	pasteAfter = () => {
 		this.editor.container
 			.find('[data-card-key=image]')
 			.each((node, key) => {
@@ -703,11 +694,11 @@ export default class<
 					this.uploadAddress(src, component);
 				}
 			});
-	}
+	};
 
-	markdown(event: KeyboardEvent) {
+	markdown = (event: KeyboardEvent) => {
 		if (!isEngine(this.editor) || this.options.markdown === false) return;
-		const { change, node } = this.editor;
+		const { change } = this.editor;
 		const range = change.range.get();
 
 		if (!range.collapsed || change.isComposing() || !this.markdown) return;
@@ -729,9 +720,13 @@ export default class<
 			}
 			this.insertRemote(src, splits[0]);
 		}
-	}
+	};
 
-	checkMarkdown(node: NodeInterface) {
+	checkMarkdownMath = (child: NodeInterface) => {
+		return !this.checkMarkdown(child)?.match;
+	};
+
+	checkMarkdown = (node: NodeInterface) => {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
 		const text = node.text();
@@ -751,9 +746,9 @@ export default class<
 			reg,
 			match,
 		};
-	}
+	};
 
-	pasteMarkdown(node: NodeInterface) {
+	pasteMarkdown = (node: NodeInterface) => {
 		const result = this.checkMarkdown(node);
 		if (!result) return;
 
@@ -800,5 +795,18 @@ export default class<
 		}
 		newText += textNode.textContent;
 		node.text(newText);
+	};
+
+	destroy() {
+		if (isEngine(this.editor)) {
+			this.editor.off('keydown:space', this.markdown);
+			this.editor.off('drop:files', this.dropFiles);
+			this.editor.off('paste:event', this.pasteFiles);
+			this.editor.off('paste:schema', this.pasteSchema);
+			this.editor.off('paste:each', this.pasteEach);
+			this.editor.off('paste:after', this.pasteAfter);
+			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.off('paste:markdown', this.pasteMarkdown);
+		}
 	}
 }

@@ -47,9 +47,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.mutation.on('onChange', (ops) => this.handleChange(ops));
 		this.clientId = random(8);
 		this.waitingOps = [];
-		this.engine.on('select', () => {
-			this.updateSelection();
-		});
+		this.engine.on('select', this.updateSelection);
 	}
 
 	private updateRangeColoringPosition = debounce(() => {
@@ -306,7 +304,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.rangeColoring.updatePosition();
 	}
 
-	updateSelection() {
+	updateSelection = () => {
 		if (!this.engine.change.isComposing() && this.currentMember) {
 			const range = this.selection.updateSelections(
 				this.currentMember,
@@ -314,7 +312,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 			).range;
 			this.rangeColoring.updateBackgroundAlpha(range);
 		}
-	}
+	};
 
 	updateSelectionPosition() {
 		this.rangeColoring.updatePosition();
@@ -331,6 +329,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	destroy() {
 		if (this.doc) this.doc.destroy();
+		this.engine.off('select', this.updateSelection);
 		this.stopMutation();
 		this.rangeColoring.destroy();
 		this.mutation = null;

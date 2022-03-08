@@ -35,7 +35,7 @@ export default class<
 	init() {
 		super.init();
 		if (isEngine(this.editor)) {
-			this.editor.on('paste:each', (node) => this.pasteEach(node));
+			this.editor.on('paste:each', this.pasteEach);
 		}
 	}
 
@@ -74,7 +74,7 @@ export default class<
 		return this.options.hotkey || [];
 	}
 
-	pasteEach(node: NodeInterface) {
+	pasteEach = (node: NodeInterface) => {
 		//pt 转为px
 		if (node.name === this.tagName) {
 			const styles = node.css();
@@ -91,6 +91,13 @@ export default class<
 			} else node.css(this.#styleName, '');
 			const nodeApi = this.editor.node;
 			if (!nodeApi.isMark(node)) nodeApi.unwrap(node);
+		}
+	};
+
+	destroy(): void {
+		super.destroy();
+		if (isEngine(this.editor)) {
+			this.editor.off('paste:each', this.pasteEach);
 		}
 	}
 }

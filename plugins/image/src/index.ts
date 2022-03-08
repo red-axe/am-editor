@@ -24,7 +24,7 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 
 	init() {
 		this.editor.language.add(locales);
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
+		this.editor.on('parse:html', this.parseHtml);
 	}
 
 	execute(
@@ -110,10 +110,10 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 		});
 	}
 
-	parseHtml(
+	parseHtml = (
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: ImageValue) => NodeInterface,
-	) {
+	) => {
 		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${ImageComponent.cardName}"],[${READY_CARD_KEY}="${ImageComponent.cardName}"]`,
@@ -159,6 +159,10 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 			} else node.remove();
 		});
 		return results;
+	};
+
+	destroy() {
+		this.editor.off('parse:html', this.parseHtml);
 	}
 }
 

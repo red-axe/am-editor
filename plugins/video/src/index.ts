@@ -31,11 +31,9 @@ export default class VideoPlugin<
 
 	init() {
 		this.editor.language.add(locales);
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
-		this.editor.on('paste:each', (child) => this.pasteHtml(child));
-		this.editor.on('paste:schema', (schema: SchemaInterface) =>
-			this.pasteSchema(schema),
-		);
+		this.editor.on('parse:html', this.parseHtml);
+		this.editor.on('paste:each', this.pasteHtml);
+		this.editor.on('paste:schema', this.pasteSchema);
 	}
 
 	execute(
@@ -137,7 +135,7 @@ export default class VideoPlugin<
 		});
 	}
 
-	pasteSchema(schema: SchemaInterface) {
+	pasteSchema = (schema: SchemaInterface) => {
 		schema.add({
 			type: 'block',
 			name: 'div',
@@ -149,9 +147,9 @@ export default class VideoPlugin<
 				},
 			},
 		});
-	}
+	};
 
-	pasteHtml(node: NodeInterface) {
+	pasteHtml = (node: NodeInterface) => {
 		if (!isEngine(this.editor)) return;
 		if (node.isElement()) {
 			const type = node.attributes('data-type');
@@ -169,12 +167,12 @@ export default class VideoPlugin<
 			}
 		}
 		return true;
-	}
+	};
 
-	parseHtml(
+	parseHtml = (
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: VideoValue) => NodeInterface,
-	) {
+	) => {
 		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${VideoComponent.cardName}"],[${READY_CARD_KEY}="${VideoComponent.cardName}"]`,
@@ -212,6 +210,12 @@ export default class VideoPlugin<
 			} else node.remove();
 		});
 		return results;
+	};
+
+	destroy() {
+		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off('paste:each', this.pasteHtml);
+		this.editor.off('paste:schema', this.pasteSchema);
 	}
 }
 

@@ -15,7 +15,7 @@ export default class<
 	}
 
 	init() {
-		this.editor.on('keydown:all', (event) => this.onSelectAll(event));
+		this.editor.on('keydown:all', this.onSelectAll);
 	}
 
 	execute() {
@@ -32,11 +32,13 @@ export default class<
 		this.editor.trigger('select');
 	}
 
-	onSelectAll(event: KeyboardEvent) {
-		if (!isEngine(this.editor)) return;
-
+	onSelectAll = (event: KeyboardEvent) => {
 		const { command } = this.editor;
 		event.preventDefault();
 		command.execute('selectall');
+	};
+
+	destroy() {
+		this.editor.off('keydown:all', this.onSelectAll);
 	}
 }

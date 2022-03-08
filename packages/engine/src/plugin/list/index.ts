@@ -18,9 +18,9 @@ abstract class ListEntry<T extends PluginOptions = PluginOptions>
 		super.init();
 		const editor = this.editor;
 		if (isEngine(editor)) {
-			editor.on('paste:before', (fragment) => this.pasteBefore(fragment));
-			editor.on('paste:insert', () => this.pasteInsert());
-			editor.on('paste:after', () => this.pasteAfter());
+			editor.on('paste:before', this.pasteBefore);
+			editor.on('paste:insert', this.pasteInsert);
+			editor.on('paste:after', this.pasteAfter);
 		}
 	}
 
@@ -39,7 +39,7 @@ abstract class ListEntry<T extends PluginOptions = PluginOptions>
 	 */
 	abstract isCurrent(node: NodeInterface): boolean;
 
-	pasteBefore(documentFragment: DocumentFragment) {
+	pasteBefore = (documentFragment: DocumentFragment) => {
 		if (!this.cardName || !this.editor) return;
 		const { list } = this.editor;
 		const node = $(documentFragment);
@@ -60,9 +60,9 @@ abstract class ListEntry<T extends PluginOptions = PluginOptions>
 			}
 		});
 		this.isPasteList = children.some((child) => child.name === 'li');
-	}
+	};
 
-	pasteInsert() {
+	pasteInsert = () => {
 		if (!this.cardName || !isEngine(this.editor)) return;
 		const { change, list } = this.editor;
 		const range = change.range.get();
@@ -81,11 +81,19 @@ abstract class ListEntry<T extends PluginOptions = PluginOptions>
 					list.addReadyCardToCustomize(domNode, this.cardName!);
 			});
 		}
-	}
+	};
 
-	pasteAfter() {
+	pasteAfter = () => {
 		if (this.isPasteList) {
 			this.editor?.list.merge();
+		}
+	};
+
+	destroy() {
+		if (isEngine(this.editor)) {
+			this.editor.off('paste:before', this.pasteBefore);
+			this.editor.off('paste:insert', this.pasteInsert);
+			this.editor.off('paste:after', this.pasteAfter);
 		}
 	}
 }

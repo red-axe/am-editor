@@ -35,13 +35,8 @@ export default class<
 	init() {
 		super.init();
 		if (isEngine(this.editor)) {
-			this.editor.on(
-				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child)?.match,
-			);
-			this.editor.on('paste:markdown', (child) =>
-				this.pasteMarkdown(child),
-			);
+			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.on('paste:markdown', this.pasteMarkdown);
 		}
 	}
 
@@ -130,7 +125,11 @@ export default class<
 		};
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	checkMarkdownMath = (child: NodeInterface) => {
+		return !this.checkMarkdown(child)?.match;
+	};
+
+	pasteMarkdown = (node: NodeInterface) => {
 		const result = this.checkMarkdown(node);
 		if (!result) return;
 
@@ -184,5 +183,13 @@ export default class<
 			newText += createList(nodes, undefined, indent) + '\n';
 		}
 		node.text(newText);
+	};
+
+	destroy(): void {
+		super.destroy();
+		if (isEngine(this.editor)) {
+			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.off('paste:markdown', this.pasteMarkdown);
+		}
 	}
 }

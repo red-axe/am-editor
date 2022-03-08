@@ -37,9 +37,7 @@ export default class<
 	init() {
 		super.init();
 		if (isEngine(this.editor)) {
-			this.editor.on('paste:markdown', (child) =>
-				this.pasteMarkdown(child),
-			);
+			this.editor.on('paste:markdown', this.pasteMarkdown);
 			// 有序列表原生结构和markdown结构一样，不检测，以免太多误报
 			// this.editor.on(
 			// 	'paste:markdown-check',
@@ -128,7 +126,7 @@ export default class<
 		};
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	pasteMarkdown = (node: NodeInterface) => {
 		const result = this.checkMarkdown(node);
 		if (!result) return;
 		const { match } = result;
@@ -188,5 +186,12 @@ export default class<
 			newText += createList(nodes, start, indent) + '\n';
 		}
 		node.text(newText);
+	};
+
+	destroy(): void {
+		super.destroy();
+		if (isEngine(this.editor)) {
+			this.editor.off('paste:markdown', this.pasteMarkdown);
+		}
 	}
 }

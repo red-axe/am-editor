@@ -34,32 +34,15 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		editor.language.add(locales);
 		editor.schema.add(this.schema());
 		editor.conversion.add('th', 'td');
-		editor.on('parse:html', (node) => this.parseHtml(node));
-		editor.on('paste:each-after', (root) => this.pasteHtml(root));
-		editor.on('paste:schema', (schema: SchemaInterface) =>
-			this.pasteSchema(schema),
-		);
-		editor.on(
-			'paste:markdown-check',
-			(child) => !this.checkMarkdown(child)?.match,
-		);
-		editor.on('paste:markdown-after', (child) => this.pasteMarkdown(child));
+		editor.on('parse:html', this.parseHtml);
+		editor.on('paste:each-after', this.pasteHtml);
+		editor.on('paste:schema', this.pasteSchema);
+		editor.on('paste:markdown-check', this.checkMarkdownMath);
+		editor.on('paste:markdown-after', this.pasteMarkdown);
 		if (isEngine(editor)) {
-			editor.change.event.onDocument(
-				'copy',
-				(event) => this.onCopy(event),
-				0,
-			);
-			editor.change.event.onDocument(
-				'cut',
-				(event) => this.onCut(event),
-				0,
-			);
-			editor.change.event.onDocument(
-				'paste',
-				(event) => this.onPaste(event),
-				0,
-			);
+			editor.change.event.onDocument('copy', this.onCopy, 0);
+			editor.change.event.onDocument('cut', this.onCut, 0);
+			editor.change.event.onDocument('paste', this.onPaste, 0);
 			// 过滤掉表格初始化的时候调整后的宽度作为历史记录
 			const targetTableCache: Record<string, TableInterface> = {};
 			editor.history.onFilter((op) => {
@@ -102,7 +85,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		}
 	}
 
-	onCopy(event: ClipboardEvent) {
+	onCopy = (event: ClipboardEvent) => {
 		if (!isEngine(this.editor)) return true;
 		const { change, card } = this.editor;
 		const range = change.range.get();
@@ -126,9 +109,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			}
 		}
 		return true;
-	}
+	};
 
-	onCut(event: ClipboardEvent) {
+	onCut = (event: ClipboardEvent) => {
 		if (!isEngine(this.editor)) return true;
 		const { change, card } = this.editor;
 		const range = change.range.get();
@@ -149,9 +132,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			}
 		}
 		return true;
-	}
+	};
 
-	onPaste(event: ClipboardEvent) {
+	onPaste = (event: ClipboardEvent) => {
 		if (!isEngine(this.editor)) return true;
 		const { change, card } = this.editor;
 		const range = change.range.get();
@@ -170,7 +153,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			return false;
 		}
 		return true;
-	}
+	};
 
 	hotkey() {
 		return this.options.hotkey || '';
@@ -255,7 +238,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		];
 	}
 
-	pasteSchema(schema: SchemaInterface) {
+	pasteSchema = (schema: SchemaInterface) => {
 		(schema.data.blocks as SchemaBlock[]).forEach((blockSchema) => {
 			if (!blockSchema.allowIn) {
 				blockSchema.allowIn = [];
@@ -300,7 +283,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				valign: ['top', 'middle', 'bottom'],
 			},
 		};
-	}
+	};
 
 	execute(rows?: number, cols?: number): void {
 		if (!isEngine(this.editor)) return;
@@ -326,7 +309,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		return value;
 	}
 
-	pasteHtml(root: NodeInterface) {
+	pasteHtml = (root: NodeInterface) => {
 		if (!isEngine(this.editor)) return;
 		const clearWH = (
 			node: NodeInterface,
@@ -487,12 +470,12 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				},
 			);
 		});
-	}
+	};
 
-	parseHtml(
+	parseHtml = (
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: TableValue) => NodeInterface,
-	) {
+	) => {
 		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${TableComponent.cardName}"],[${READY_CARD_KEY}="${TableComponent.cardName}"]`,
@@ -547,7 +530,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			results.push(table);
 		});
 		return results;
-	}
+	};
 
 	getMarkdownCell(match: RegExpExecArray, count?: number) {
 		const cols = match[0].split('|');
@@ -563,7 +546,11 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		return colNodes;
 	}
 
-	checkMarkdown(node: NodeInterface) {
+	checkMarkdownMath = (child: NodeInterface) => {
+		return !this.checkMarkdown(child)?.match;
+	};
+
+	checkMarkdown = (node: NodeInterface) => {
 		if (
 			!isEngine(this.editor) ||
 			this.options.markdown === false ||
@@ -580,9 +567,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			reg,
 			match: tbMatch,
 		};
-	}
+	};
 
-	pasteMarkdown(node: NodeInterface) {
+	pasteMarkdown = (node: NodeInterface) => {
 		const result = this.checkMarkdown(node);
 		if (!result) return;
 		const { reg, match } = result;
@@ -661,6 +648,14 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			parse(node);
 		};
 		parse(node);
+	};
+
+	destroy() {
+		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off('paste:each-after', this.pasteHtml);
+		this.editor.off('paste:schema', this.pasteSchema);
+		this.editor.off('paste:markdown-check', this.checkMarkdownMath);
+		this.editor.off('paste:markdown-after', this.pasteMarkdown);
 	}
 }
 

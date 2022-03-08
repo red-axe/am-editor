@@ -33,7 +33,7 @@ abstract class InlineEntry<T extends PluginOptions = PluginOptions>
 			// 	'paste:markdown-check',
 			// 	(child) => !this.checkMarkdown(child)?.match,
 			// );
-			editor.on('paste:markdown', (child) => this.pasteMarkdown(child));
+			editor.on('paste:markdown', this.pasteMarkdown);
 		}
 	}
 
@@ -143,7 +143,7 @@ abstract class InlineEntry<T extends PluginOptions = PluginOptions>
 		};
 	}
 
-	pasteMarkdown(node: NodeInterface) {
+	pasteMarkdown = (node: NodeInterface) => {
 		const result = this.checkMarkdown(node);
 		if (!result) return;
 		let { reg, match } = result;
@@ -173,6 +173,12 @@ abstract class InlineEntry<T extends PluginOptions = PluginOptions>
 		newText += textNode.textContent;
 
 		node.text(newText);
+	};
+
+	destroy() {
+		if (isEngine(this.editor) && this.markdown) {
+			this.editor.on('paste:markdown', this.pasteMarkdown);
+		}
 	}
 }
 

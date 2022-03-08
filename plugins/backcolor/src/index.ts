@@ -1,8 +1,8 @@
-import {
-	$,
-	ConversionData,
-	MarkPlugin,
+import { $, MarkPlugin, toHex } from '@aomao/engine';
+import type {
+	NodeInterface,
 	PluginOptions,
+	ConversionData,
 	SchemaMark,
 } from '@aomao/engine';
 

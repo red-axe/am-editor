@@ -34,11 +34,11 @@ export default class<
 		this.conversion().forEach(({ from, to }) => {
 			this.editor.conversion.add(from, to);
 		});
-		this.editor.on('keydown:backspace', (event) => this.onBackspace(event));
-		this.editor.on('keydown:tab', (event) => this.onTab(event));
-		this.editor.on('keydown:shift-tab', (event) => this.onShiftTab(event));
+		this.editor.on('keydown:backspace', this.onBackspace);
+		this.editor.on('keydown:tab', this.onTab);
+		this.editor.on('keydown:shift-tab', this.onShiftTab);
 		if (isEngine(this.editor)) {
-			this.editor.on('paste:each', (node) => this.pasteEach(node));
+			this.editor.on('paste:each', this.pasteEach);
 		}
 	}
 
@@ -202,7 +202,7 @@ export default class<
 		];
 	}
 
-	onBackspace(event: KeyboardEvent) {
+	onBackspace = (event: KeyboardEvent) => {
 		if (!isEngine(this.editor)) return;
 		const { change, list, node } = this.editor;
 		const blockApi = this.editor.block;
@@ -235,9 +235,9 @@ export default class<
 			return false;
 		}
 		return;
-	}
+	};
 
-	onTab(event: KeyboardEvent) {
+	onTab = (event: KeyboardEvent) => {
 		if (!isEngine(this.editor)) return;
 		const { change, list, block } = this.editor;
 		const range = change.range.get();
@@ -261,9 +261,9 @@ export default class<
 			return false;
 		}
 		return;
-	}
+	};
 
-	onShiftTab(event: KeyboardEvent) {
+	onShiftTab = (event: KeyboardEvent) => {
 		if (!isEngine(this.editor)) return;
 		event.preventDefault();
 		this.editor.command.execute(
@@ -271,7 +271,7 @@ export default class<
 			'out',
 		);
 		return false;
-	}
+	};
 
 	convertToPX(value: string) {
 		const match = /([\d\.]+)(pt|px)$/i.exec(value);
@@ -283,7 +283,7 @@ export default class<
 		return value;
 	}
 
-	pasteEach(node: NodeInterface) {
+	pasteEach = (node: NodeInterface) => {
 		//pt 转为px
 		if (
 			node.isElement() &&
@@ -330,6 +330,15 @@ export default class<
 					}
 				}
 			}
+		}
+	};
+
+	destroy() {
+		this.editor.off('keydown:backspace', this.onBackspace);
+		this.editor.off('keydown:tab', this.onTab);
+		this.editor.off('keydown:shift-tab', this.onShiftTab);
+		if (isEngine(this.editor)) {
+			this.editor.off('paste:each', this.pasteEach);
 		}
 	}
 }

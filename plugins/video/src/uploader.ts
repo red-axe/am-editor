@@ -112,11 +112,9 @@ export default class<
 
 	init() {
 		if (isEngine(this.editor)) {
-			this.editor.on('drop:files', (files) => this.dropFiles(files));
-			this.editor.on('paste:event', ({ files }) =>
-				this.pasteFiles(files),
-			);
-			this.editor.on('paste:each', (node) => this.pasteEach(node));
+			this.editor.on('drop:files', this.dropFiles);
+			this.editor.on('paste:event', this.pasteFiles);
+			this.editor.on('paste:each', this.pasteEach);
 		}
 		let { accept } = this.options;
 		const names: Array<string> = [];
@@ -423,15 +421,15 @@ export default class<
 		});
 	}
 
-	dropFiles(files: Array<File>) {
+	dropFiles = (files: File[]) => {
 		if (!isEngine(this.editor)) return;
 		files = files.filter((file) => this.isVideo(file));
 		if (files.length === 0) return;
 		this.editor.command.execute('video-uploader', files);
 		return false;
-	}
+	};
 
-	pasteFiles(files: Array<File>) {
+	pasteFiles = ({ files }: Record<'files', File[]>) => {
 		if (!isEngine(this.editor)) return;
 		files = files.filter((file) => this.isVideo(file));
 		if (files.length === 0) return;
@@ -441,9 +439,9 @@ export default class<
 			files,
 		);
 		return false;
-	}
+	};
 
-	pasteEach(node: NodeInterface) {
+	pasteEach = (node: NodeInterface) => {
 		//是卡片，并且还没渲染
 		if (node.isCard() && node.attributes(READY_CARD_KEY)) {
 			if (node.attributes(READY_CARD_KEY) !== 'video') return;
@@ -461,6 +459,14 @@ export default class<
 				);
 			}
 			return;
+		}
+	};
+
+	destroy() {
+		if (isEngine(this.editor)) {
+			this.editor.off('drop:files', this.dropFiles);
+			this.editor.off('paste:event', this.pasteFiles);
+			this.editor.off('paste:each', this.pasteEach);
 		}
 	}
 }

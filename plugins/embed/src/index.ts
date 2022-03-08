@@ -29,9 +29,9 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 
 	init() {
 		this.editor.language.add(locales);
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
-		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
-		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+		this.editor.on('parse:html', this.parseHtml);
+		this.editor.on('paste:schema', this.pasteSchema);
+		this.editor.on('paste:each', this.pasteHtml);
 	}
 
 	hotkey() {
@@ -55,7 +55,7 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 		card.activate(cardComponent.root);
 	}
 
-	pasteSchema(schema: SchemaInterface) {
+	pasteSchema = (schema: SchemaInterface) => {
 		schema.add({
 			type: 'block',
 			name: 'div',
@@ -67,9 +67,9 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 				'data-value': '*',
 			},
 		});
-	}
+	};
 
-	pasteHtml(node: NodeInterface) {
+	pasteHtml = (node: NodeInterface) => {
 		if (!isEngine(this.editor)) return;
 		if (node.isElement()) {
 			const attributes = node.attributes();
@@ -88,12 +88,12 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 			}
 		}
 		return true;
-	}
+	};
 
-	parseHtml(
+	parseHtml = (
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: EmbedValue) => NodeInterface,
-	) {
+	) => {
 		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${EmbedComponent.cardName}"],[${READY_CARD_KEY}="${EmbedComponent.cardName}"]`,
@@ -135,6 +135,12 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 			} else node.remove();
 		});
 		return results;
+	};
+
+	destroy() {
+		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off('paste:schema', this.pasteSchema);
+		this.editor.off('paste:each', this.pasteHtml);
 	}
 }
 

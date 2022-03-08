@@ -37,35 +37,32 @@ export default class<
 	init() {
 		if (!isEngine(this.editor)) return;
 
-		this.editor.on('beforeCommandExecute', (name) => {
-			if ('paintformat' !== name && !this.isFormat && this.event) {
-				this.removeActiveNodes(
-					this.editor!.container[0].ownerDocument!,
-				);
-			}
-		});
-
+		this.editor.on('beforeCommandExecute', this.onBeforeCommandExecute);
 		// 鼠标选中文本之后添加样式
-		this.editor.container.on('mouseup', (e) => {
-			if (!this.activeMarks) {
-				return;
-			}
-			// 在Card里不生效
-			if (this.editor!.card.closest(e.target)) {
-				this.removeActiveNodes(
-					this.editor!.container[0].ownerDocument!,
-				);
-				return;
-			}
-			this.isFormat = true;
-			this.paintFormat(this.activeMarks, this.activeBlocks);
-			this.isFormat = false;
-			if (this.type === 'single')
-				this.removeActiveNodes(
-					this.editor!.container[0].ownerDocument!,
-				);
-		});
+		this.editor.container.on('mouseup', this.onContainerMouseUp);
 	}
+
+	onBeforeCommandExecute = (name: string) => {
+		if ('paintformat' !== name && !this.isFormat && this.event) {
+			this.removeActiveNodes(this.editor!.container[0].ownerDocument!);
+		}
+	};
+
+	onContainerMouseUp = (e: MouseEvent) => {
+		if (!this.activeMarks || !e.target) {
+			return;
+		}
+		// 在Card里不生效
+		if (this.editor!.card.closest($(e.target))) {
+			this.removeActiveNodes(this.editor!.container[0].ownerDocument!);
+			return;
+		}
+		this.isFormat = true;
+		this.paintFormat(this.activeMarks, this.activeBlocks);
+		this.isFormat = false;
+		if (this.type === 'single')
+			this.removeActiveNodes(this.editor!.container[0].ownerDocument!);
+	};
 
 	removeActiveNodes(node: NodeInterface | Node) {
 		if (isNode(node)) node = $(node);
@@ -210,5 +207,10 @@ export default class<
 
 	queryState() {
 		return !!this.activeMarks;
+	}
+
+	destroy() {
+		this.editor.off('beforeCommandExecute', this.onBeforeCommandExecute);
+		this.editor.container.off('mouseup', this.onContainerMouseUp);
 	}
 }

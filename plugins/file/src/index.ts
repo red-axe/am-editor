@@ -25,11 +25,9 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 
 	init() {
 		this.editor.language.add(locales);
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
-		this.editor.on('paste:each', (child) => this.pasteHtml(child));
-		this.editor.on('paste:schema', (schema: SchemaInterface) =>
-			this.pasteSchema(schema),
-		);
+		this.editor.on('parse:html', this.parseHtml);
+		this.editor.on('paste:each', this.pasteHtml);
+		this.editor.on('paste:schema', this.pasteSchema);
 	}
 
 	execute(
@@ -118,7 +116,7 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 		});
 	}
 
-	pasteSchema(schema: SchemaInterface) {
+	pasteSchema = (schema: SchemaInterface) => {
 		schema.add({
 			type: 'inline',
 			name: 'span',
@@ -130,9 +128,9 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 				'data-value': '*',
 			},
 		});
-	}
+	};
 
-	pasteHtml(node: NodeInterface) {
+	pasteHtml = (node: NodeInterface) => {
 		if (!isEngine(this.editor)) return;
 		if (node.isElement()) {
 			const type = node.attributes('data-type');
@@ -150,12 +148,12 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 			}
 		}
 		return true;
-	}
+	};
 
-	parseHtml(
+	parseHtml = (
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: FileValue) => NodeInterface,
-	) {
+	) => {
 		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${FileComponent.cardName}"],[${READY_CARD_KEY}="${FileComponent.cardName}"`,
@@ -187,6 +185,12 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 			} else node.remove();
 		});
 		return results;
+	};
+
+	destroy() {
+		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off('paste:each', this.pasteHtml);
+		this.editor.off('paste:schema', this.pasteSchema);
 	}
 }
 

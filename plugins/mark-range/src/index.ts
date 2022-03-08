@@ -87,29 +87,14 @@ export default class<
 			);
 		});
 		this.editor.schema.add(globals);
-		this.editor.on('beforeCommandExecute', (name: string) => {
-			this.executeBySelf = name === PLUGIN_NAME;
-		});
-		this.editor.on('afterCommandExecute', (name: string) => {
-			this.executeBySelf = false;
-		});
+		this.editor.on('beforeCommandExecute', this.onBeforeCommandExecute);
+		this.editor.on('afterCommandExecute', this.onAfterCommandExecute);
 
 		if (isEngine(this.editor)) {
-			const { change } = this.editor;
-			this.editor.on('change', (trigger) => {
-				this.triggerChange(trigger !== 'local');
-			});
+			this.editor.on('change', this.onChange);
 			this.editor.on('select', this.onSelectionChange);
-			this.editor.on('parse:value', (node, atts) => {
-				const key = node.attributes(this.MARK_KEY);
-				if (!!key) {
-					atts[DATA_TRANSIENT_ATTRIBUTES] = this.getPreviewName(key);
-				}
-			});
-			this.editor.on('afterSetValue', () => {
-				this.range = change.range.get();
-				this.ids = this.getIds();
-			});
+			this.editor.on('parse:value', this.parseValue);
+			this.editor.on('afterSetValue', this.onAfterSetValue);
 			const keys = this.options.keys.map((key) =>
 				this.getPreviewName(key),
 			);
@@ -142,6 +127,31 @@ export default class<
 			);
 		}
 	}
+
+	onBeforeCommandExecute = (name: string) => {
+		this.executeBySelf = name === PLUGIN_NAME;
+	};
+
+	onAfterCommandExecute = (name: string) => {
+		this.executeBySelf = false;
+	};
+
+	onChange = (trigger: 'local' | 'remote') => {
+		this.triggerChange(trigger !== 'local');
+	};
+
+	parseValue = (node: NodeInterface, atts: Record<string, string>) => {
+		const key = node.attributes(this.MARK_KEY);
+		if (!!key) {
+			atts[DATA_TRANSIENT_ATTRIBUTES] = this.getPreviewName(key);
+		}
+	};
+
+	onAfterSetValue = () => {
+		if (!isEngine(this.editor)) return;
+		this.range = this.editor.change.range.get();
+		this.ids = this.getIds();
+	};
 
 	schema() {
 		const rules: Array<SchemaMark> = this.options.keys.map((key) => {
@@ -849,10 +859,19 @@ export default class<
 	}
 
 	destroy() {
-		this.editor.off('select', this.onSelectionChange);
-		this.editor.container.document?.removeEventListener(
-			'selectionchange',
-			this.onSelectionChange,
-		);
+		this.editor.off('beforeCommandExecute', this.onBeforeCommandExecute);
+		this.editor.off('afterCommandExecute', this.onAfterCommandExecute);
+
+		if (isEngine(this.editor)) {
+			this.editor.off('change', this.onChange);
+			this.editor.off('select', this.onSelectionChange);
+			this.editor.off('parse:value', this.parseValue);
+			this.editor.off('afterSetValue', this.onAfterSetValue);
+		} else if (isView(this.editor)) {
+			this.editor.container.document?.removeEventListener(
+				'selectionchange',
+				this.onSelectionChange,
+			);
+		}
 	}
 }

@@ -57,11 +57,9 @@ export default class Math<
 
 	init() {
 		this.editor.language.add(locales);
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
-		this.editor.on('paste:each', (child) => this.pasteHtml(child));
-		this.editor.on('paste:schema', (schema: SchemaInterface) =>
-			this.pasteSchema(schema),
-		);
+		this.editor.on('parse:html', this.parseHtml);
+		this.editor.on('paste:each', this.pasteHtml);
+		this.editor.on('paste:schema', this.pasteSchema);
 	}
 
 	execute(...args: any): void {
@@ -232,7 +230,7 @@ export default class Math<
 		});
 	}
 
-	pasteSchema(schema: SchemaInterface) {
+	pasteSchema = (schema: SchemaInterface) => {
 		schema.add({
 			type: 'inline',
 			name: 'span',
@@ -244,9 +242,9 @@ export default class Math<
 				'data-value': '*',
 			},
 		});
-	}
+	};
 
-	pasteHtml(node: NodeInterface) {
+	pasteHtml = (node: NodeInterface) => {
 		if (!isEngine(this.editor)) return;
 		if (node.isElement()) {
 			const attributes = node.attributes();
@@ -265,12 +263,12 @@ export default class Math<
 			}
 		}
 		return true;
-	}
+	};
 
-	parseHtml(
+	parseHtml = (
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: MathValue) => NodeInterface,
-	) {
+	) => {
 		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${MathComponent.cardName}"],[${READY_CARD_KEY}="${MathComponent.cardName}"]`,
@@ -303,6 +301,12 @@ export default class Math<
 			} else node.remove();
 		});
 		return results;
+	};
+
+	destroy() {
+		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off('paste:each', this.pasteHtml);
+		this.editor.off('paste:schema', this.pasteSchema);
 	}
 }
 

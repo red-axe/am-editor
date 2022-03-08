@@ -46,42 +46,11 @@ export default class<
 
 	init() {
 		super.init();
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
+		this.editor.on('parse:html', this.parseHtml);
 		if (isEngine(this.editor)) {
-			this.editor.on(
-				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child)?.match,
-			);
-			this.editor.on('paste:markdown', (child) =>
-				this.pasteMarkdown(child),
-			);
-			this.editor.on('paste:each-after', (root) => {
-				const liNodes = root.find(
-					`li.${this.editor.list.CUSTOMZIE_LI_CLASS}`,
-				);
-				liNodes.each((_, index) => {
-					const child = liNodes.eq(index);
-					if (!child) return;
-					const firstChild = child.first();
-					if (
-						firstChild &&
-						firstChild.name === CheckboxComponent.cardName
-					) {
-						const card =
-							this.editor.card.find<CheckboxValue>(firstChild);
-						if (card) {
-							const parent = child.parent();
-							parent?.addClass('data-list-task');
-							const value = card.getValue();
-							if (value && value.checked) {
-								parent?.attributes('checked', 'true');
-							} else {
-								parent?.removeAttributes('checked');
-							}
-						}
-					}
-				});
-			});
+			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.on('paste:markdown', this.pasteMarkdown);
+			this.editor.on('paste:each-after', this.pasteEachAfter);
 		}
 	}
 
@@ -158,10 +127,10 @@ export default class<
 		return this.options.hotkey || 'mod+shift+9';
 	}
 
-	parseHtml(
+	parseHtml = (
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: CheckboxValue) => NodeInterface,
-	) {
+	) => {
 		const getBox = (inner: string = '') => {
 			return `<span style="${
 				inner
@@ -207,10 +176,10 @@ export default class<
 			'list-style': 'none',
 		});
 		return results;
-	}
+	};
 
 	//设置markdown
-	markdown(event: KeyboardEvent, text: string, block: NodeInterface) {
+	markdown = (event: KeyboardEvent, text: string, block: NodeInterface) => {
 		const { markdown } = this.options;
 		if (!isEngine(this.editor) || markdown === false) return;
 		const { node, command } = this.editor;
@@ -242,9 +211,13 @@ export default class<
 			text === '[x]' ? { checked: true } : undefined,
 		);
 		return false;
-	}
+	};
 
-	checkMarkdown(node: NodeInterface) {
+	checkMarkdownMath = (child: NodeInterface) => {
+		return !this.checkMarkdown(child)?.match;
+	};
+
+	checkMarkdown = (node: NodeInterface) => {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
 		const text = node.text();
@@ -256,9 +229,31 @@ export default class<
 			reg,
 			match,
 		};
-	}
+	};
 
-	pasteMarkdown(node: NodeInterface) {
+	pasteEachAfter = (root: NodeInterface) => {
+		const liNodes = root.find(`li.${this.editor.list.CUSTOMZIE_LI_CLASS}`);
+		liNodes.each((_, index) => {
+			const child = liNodes.eq(index);
+			if (!child) return;
+			const firstChild = child.first();
+			if (firstChild && firstChild.name === CheckboxComponent.cardName) {
+				const card = this.editor.card.find<CheckboxValue>(firstChild);
+				if (card) {
+					const parent = child.parent();
+					parent?.addClass('data-list-task');
+					const value = card.getValue();
+					if (value && value.checked) {
+						parent?.attributes('checked', 'true');
+					} else {
+						parent?.removeAttributes('checked');
+					}
+				}
+			}
+		});
+	};
+
+	pasteMarkdown = (node: NodeInterface) => {
 		const result = this.checkMarkdown(node);
 		if (!result) return;
 		const { match } = result;
@@ -322,6 +317,16 @@ export default class<
 			newText += createList(nodes, indent) + '\n';
 		}
 		node.text(newText);
+	};
+
+	destroy(): void {
+		super.destroy();
+		this.editor.off('parse:html', this.parseHtml);
+		if (isEngine(this.editor)) {
+			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.off('paste:markdown', this.pasteMarkdown);
+			this.editor.off('paste:each-after', this.pasteEachAfter);
+		}
 	}
 }
 export { CheckboxComponent };

@@ -55,96 +55,76 @@ export default class<
 
 	init() {
 		super.init();
-		const { language } = this.editor;
 		//阅读模式处理
 		if (!isEngine(this.editor) && this.options.showAnchor !== false) {
-			this.editor.on('render', (root: Node) => {
-				const container = $(root);
-				if (this.tagName.length === 0) return;
-				container.find(this.tagName.join(',')).each((heading) => {
-					const node = $(heading);
-					const id = node.attributes('id');
-					if (id) {
-						node.find('.data-anchor-button').remove();
-						Tooltip.hide();
-						const button = $(
-							`<a class="data-anchor-button" ${DATA_ELEMENT}="${UI}"><span class="data-icon data-icon-${node.name}"></span></a>`,
-						);
-						if (node.height() !== 24) {
-							button.css({
-								top: (node.height() - 24) / 2 + 'px',
-							});
-						}
-						button.on('mouseenter', () => {
-							Tooltip.show(
-								button,
-								language.get('copyAnchor', 'title').toString(),
-							);
-						});
-						button.on('mouseleave', () => {
-							Tooltip.hide();
-						});
-
-						button.on('click', (e) => {
-							e.preventDefault();
-							e.stopPropagation();
-							const url = this.options.anchorCopy
-								? this.options.anchorCopy(id)
-								: window.location.href + '/' + id;
-
-							if (this.editor.clipboard.copy(url)) {
-								this.editor.messageSuccess(
-									language.get('copy', 'success').toString(),
-								);
-							} else {
-								this.editor.messageError(
-									language.get('copy', 'error').toString(),
-								);
-							}
-						});
-						node.prepend(button);
-					}
-				});
-			});
+			this.editor.on('render', this.onRender);
 		}
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:backspace', (event) =>
-				this.onBackspace(event),
-			);
-			this.editor.on(
-				'paste:markdown-check',
-				(child) => !this.checkMarkdown(child)?.match,
-			);
-			this.editor.on('paste:markdown', (child) =>
-				this.pasteMarkdown(child),
-			);
+			this.editor.on('keydown:backspace', this.onBackspace);
+			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.on('paste:markdown', this.pasteMarkdown);
 		}
 		//引擎处理
 		if (!isEngine(this.editor) || this.options.showAnchor === false) return;
 
-		this.editor.on('setValue', () => {
-			this.updateId();
-		});
-		this.editor.on('realtimeChange', () => {
-			this.updateId();
-			this.showAnchor();
-		});
-		this.editor.on('select', () => {
-			this.showAnchor();
-		});
-		this.editor.on('blur', () => {
-			this.showAnchor();
-		});
-		window.addEventListener(
-			'resize',
-			() => {
-				this.updateAnchorPosition();
-			},
-			false,
-		);
+		this.editor.on('setValue', this.updateId);
+		this.editor.on('realtimeChange', this.realtimeChange);
+		this.editor.on('select', this.showAnchor);
+		this.editor.on('blur', this.showAnchor);
+		window.addEventListener('resize', this.updateAnchorPosition);
 	}
 
-	updateId() {
+	onRender = (root: Node) => {
+		const { language } = this.editor;
+		const container = $(root);
+		if (this.tagName.length === 0) return;
+		container.find(this.tagName.join(',')).each((heading) => {
+			const node = $(heading);
+			const id = node.attributes('id');
+			if (id) {
+				node.find('.data-anchor-button').remove();
+				Tooltip.hide();
+				const button = $(
+					`<a class="data-anchor-button" ${DATA_ELEMENT}="${UI}"><span class="data-icon data-icon-${node.name}"></span></a>`,
+				);
+				if (node.height() !== 24) {
+					button.css({
+						top: (node.height() - 24) / 2 + 'px',
+					});
+				}
+				button.on('mouseenter', () => {
+					Tooltip.show(
+						button,
+						language.get('copyAnchor', 'title').toString(),
+					);
+				});
+				button.on('mouseleave', () => {
+					Tooltip.hide();
+				});
+
+				button.on('click', (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					const url = this.options.anchorCopy
+						? this.options.anchorCopy(id)
+						: window.location.href + '/' + id;
+
+					if (this.editor.clipboard.copy(url)) {
+						this.editor.messageSuccess(
+							language.get('copy', 'success').toString(),
+						);
+					} else {
+						this.editor.messageError(
+							language.get('copy', 'error').toString(),
+						);
+					}
+				});
+				node.prepend(button);
+			}
+		});
+	};
+
+	updateId = () => {
 		if (this.tagName.length === 0) return;
 		this.editor.container.find(this.tagName.join(',')).each((titleNode) => {
 			const node = $(titleNode);
@@ -160,9 +140,14 @@ export default class<
 				node.attributes('id', id);
 			}
 		});
-	}
+	};
 
-	updateAnchorPosition() {
+	realtimeChange = () => {
+		this.updateId();
+		this.showAnchor();
+	};
+
+	updateAnchorPosition = () => {
 		if (!isEngine(this.editor)) return;
 		const { change, root } = this.editor;
 		const button = root.find('.data-anchor-button');
@@ -196,9 +181,9 @@ export default class<
 			top: `${top}px`,
 			left: `${left}px`,
 		});
-	}
+	};
 
-	showAnchor() {
+	showAnchor = () => {
 		if (!isEngine(this.editor) || this.tagName.length === 0) return;
 		const { change, root, clipboard, language, card } = this.editor;
 		const range = change.range.get();
@@ -286,7 +271,7 @@ export default class<
 				);
 			}
 		});
-	}
+	};
 
 	execute(type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p') {
 		if (!isEngine(this.editor)) return;
@@ -374,7 +359,11 @@ export default class<
 		return false;
 	}
 
-	checkMarkdown(node: NodeInterface) {
+	checkMarkdownMath = (child: NodeInterface) => {
+		return !this.checkMarkdown(child)?.match;
+	};
+
+	checkMarkdown = (node: NodeInterface) => {
 		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
 
 		const text = node.text();
@@ -384,9 +373,9 @@ export default class<
 			reg,
 			match,
 		};
-	}
+	};
 
-	pasteMarkdown(node: NodeInterface) {
+	pasteMarkdown = (node: NodeInterface) => {
 		const result = this.checkMarkdown(node);
 		if (!result) return;
 		let { reg, match } = result;
@@ -418,9 +407,9 @@ export default class<
 		newText += textNode.textContent;
 
 		node.text(newText);
-	}
+	};
 
-	onBackspace(event: KeyboardEvent) {
+	onBackspace = (event: KeyboardEvent) => {
 		if (!isEngine(this.editor)) return;
 		const { change, node } = this.editor;
 		const range = change.range.get();
@@ -448,6 +437,26 @@ export default class<
 			return false;
 		}
 		return;
+	};
+
+	destroy() {
+		//阅读模式处理
+		if (!isEngine(this.editor) && this.options.showAnchor !== false) {
+			this.editor.off('render', this.onRender);
+		}
+		if (isEngine(this.editor)) {
+			this.editor.off('keydown:backspace', this.onBackspace);
+			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.off('paste:markdown', this.pasteMarkdown);
+		}
+		//引擎处理
+		if (!isEngine(this.editor) || this.options.showAnchor === false) return;
+
+		this.editor.off('setValue', this.updateId);
+		this.editor.off('realtimeChange', this.realtimeChange);
+		this.editor.off('select', this.showAnchor);
+		this.editor.off('blur', this.showAnchor);
+		window.removeEventListener('resize', this.updateAnchorPosition);
 	}
 }
 

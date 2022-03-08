@@ -24,19 +24,17 @@ class MentionPlugin<
 	}
 
 	init() {
-		this.editor.on('parse:value', (node) => this.paserValue(node));
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
-		this.editor.on('paste:each', (child) => this.pasteHtml(child));
-		this.editor.on('paste:schema', (schema: SchemaInterface) =>
-			this.pasteSchema(schema),
-		);
+		this.editor.on('parse:value', this.paserValue);
+		this.editor.on('parse:html', this.parseHtml);
+		this.editor.on('paste:each', this.pasteHtml);
+		this.editor.on('paste:schema', this.pasteSchema);
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:at', (event) => this.onAt(event));
+			this.editor.on('keydown:at', this.onAt);
 		}
 		this.editor.language.add(locales);
 	}
 
-	paserValue(node: NodeInterface) {
+	paserValue = (node: NodeInterface) => {
 		if (
 			node.isCard() &&
 			node.attributes('name') === MentionComponent.cardName
@@ -46,9 +44,9 @@ class MentionPlugin<
 			if (!cardValue || !cardValue['name']) return false;
 		}
 		return true;
-	}
+	};
 	private renderTime = Date.now();
-	onAt(event: KeyboardEvent) {
+	onAt = (event: KeyboardEvent) => {
 		if (!isEngine(this.editor)) return;
 		if (Date.now() - this.renderTime < 200) {
 			return false;
@@ -86,7 +84,7 @@ class MentionPlugin<
 		}
 		this.renderTime = Date.now();
 		return false;
-	}
+	};
 
 	getList() {
 		const values: Array<MentionValue> = [];
@@ -105,7 +103,7 @@ class MentionPlugin<
 		return values;
 	}
 
-	pasteSchema(schema: SchemaInterface) {
+	pasteSchema = (schema: SchemaInterface) => {
 		schema.add({
 			type: 'inline',
 			name: 'span',
@@ -117,9 +115,9 @@ class MentionPlugin<
 				'data-value': '*',
 			},
 		});
-	}
+	};
 
-	pasteHtml(node: NodeInterface) {
+	pasteHtml = (node: NodeInterface) => {
 		if (!isEngine(this.editor)) return;
 		if (node.isElement()) {
 			const attributes = node.attributes();
@@ -138,12 +136,12 @@ class MentionPlugin<
 			}
 		}
 		return true;
-	}
+	};
 
-	parseHtml(
+	parseHtml = (
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: MentionValue) => NodeInterface,
-	) {
+	) => {
 		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${MentionComponent.cardName}"],[${READY_CARD_KEY}="${MentionComponent.cardName}"]`,
@@ -162,8 +160,16 @@ class MentionPlugin<
 				}" data-value="${encodeCardValue(
 					value,
 				)}" style="color:#1890ff">@${value.name}</span>`;
+				const marks = value.marks || [];
+				const rootWrapNode = $(`<div>@${value.name}</div>`);
+				let wrapNode = rootWrapNode.first()!;
+				marks.forEach((mark) => {
+					const outerNode = $(mark);
+					wrapNode = this.editor.node.wrap(wrapNode, outerNode);
+				});
 				node.empty();
 				let newNode = $(html);
+				newNode.append(wrapNode);
 				if (callback) {
 					newNode = callback(newNode, value);
 				}
@@ -172,9 +178,19 @@ class MentionPlugin<
 			} else node.remove();
 		});
 		return results;
-	}
+	};
 
 	execute() {}
+
+	destroy() {
+		this.editor.off('parse:value', this.paserValue);
+		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off('paste:each', this.pasteHtml);
+		this.editor.off('paste:schema', this.pasteSchema);
+		if (isEngine(this.editor)) {
+			this.editor.off('keydown:at', this.onAt);
+		}
+	}
 }
 export { MentionComponent };
 export type { MentionValue };

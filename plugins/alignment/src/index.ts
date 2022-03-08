@@ -39,10 +39,6 @@ export default class<
 		this.editor.on('keydown:backspace', this.onBackspace);
 	}
 
-	destroy() {
-		this.editor.off('keydown:backspace', this.onBackspace);
-	}
-
 	execute(align?: 'left' | 'center' | 'right' | 'justify') {
 		if (!isEngine(this.editor) || this.editor.readonly) return;
 		const { change, block } = this.editor;
@@ -130,4 +126,8 @@ export default class<
 		}
 		return;
 	};
+
+	destroy() {
+		this.editor.off('keydown:backspace', this.onBackspace);
+	}
 }
