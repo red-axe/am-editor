@@ -1,3 +1,4 @@
+import tinycolor from 'tinycolor2';
 import type {
 	PluginOptions,
 	ElementPluginInterface,
@@ -12,7 +13,6 @@ import type {
 	SchemaStyle,
 	SchemaValue,
 } from '../types/schema';
-import { toHex } from '../utils';
 import { $ } from '../node';
 import PluginEntry from './base';
 import { isNode } from '../node/utils';
@@ -131,7 +131,7 @@ abstract class ElementPluginEntry<T extends PluginOptions = PluginOptions>
 				node = node as NodeInterface;
 				let value =
 					styleName.toLowerCase().indexOf('color') > -1
-						? toHex(node.css(styleName) || '')
+						? tinycolor(node.css(styleName) || '').toHexString()
 						: node.css(styleName);
 				let styleValue = this.style![styleName];
 				if (typeof styleValue === 'object') {

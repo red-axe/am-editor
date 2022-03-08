@@ -1,9 +1,9 @@
+import tinycolor2 from 'tinycolor2';
 import type { MarkInterface, NodeInterface, SchemaInterface } from '../types';
 import { READY_CARD_KEY, READY_CARD_SELECTOR } from '../constants/card';
 import Parser from '../parser';
 import { EngineInterface } from '../types/engine';
 import { $ } from '../node';
-import { toHex } from '../utils';
 
 export default class Paste {
 	protected source: string;
@@ -27,8 +27,10 @@ export default class Paste {
 
 	getDefaultStyle(container = this.engine.container) {
 		const defaultStyle = {
-			color: toHex(container.css('color')),
-			'background-color': toHex(container.css('background-color')),
+			color: tinycolor2(container.css('color')).toHexString(),
+			'background-color': tinycolor2(
+				container.css('background-color'),
+			).toHexString(),
 			'font-size': container.css('font-size'),
 		};
 		return defaultStyle;
@@ -85,8 +87,8 @@ export default class Paste {
 				defautlStyleKeys.forEach((key) => {
 					let value = styles[key];
 					if (!value) return;
-					if (['color', 'background-color'].includes(key)) {
-						value = toHex(value);
+					if (key.endsWith('color')) {
+						value = tinycolor2(value).toHexString();
 					}
 					if (
 						value.toLowerCase() === defaultStyle[key].toLowerCase()

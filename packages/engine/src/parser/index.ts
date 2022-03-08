@@ -1,3 +1,4 @@
+import tinycolor from 'tinycolor2';
 import { NodeInterface } from '../types/node';
 import { DATA_ELEMENT, DATA_ID, EDITABLE } from '../constants/root';
 import { EditorInterface } from '../types/editor';
@@ -20,7 +21,6 @@ import {
 	escape,
 	unescape,
 	removeUnit,
-	toHex,
 	transformCustomTags,
 	getListStyle,
 	getStyleMap,
@@ -44,6 +44,7 @@ const attrsToString = (attributes: { [k: string]: string }) => {
 const stylesToString = (styles: { [k: string]: string }) => {
 	let stylesString = '';
 	Object.keys(styles).forEach((key) => {
+		key = key.toLowerCase();
 		let val = escape(styles[key]);
 
 		if (
@@ -53,8 +54,8 @@ const stylesToString = (styles: { [k: string]: string }) => {
 			return;
 		}
 
-		if (/[^a-z]color$/.test(key)) {
-			val = toHex(val);
+		if (key.endsWith('color')) {
+			val = tinycolor(val).toHexString();
 		}
 
 		stylesString += ' '.concat(key, ': ').concat(val, ';');
