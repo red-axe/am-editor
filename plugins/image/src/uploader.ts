@@ -46,7 +46,7 @@ export interface ImageUploaderOptions extends PluginOptions {
 		/**
 		 * 图片接收的格式，默认 "svg","png","bmp","jpg","jpeg","gif","tif","tiff","emf","webp"
 		 */
-		accept?: string | Array<string>;
+		accept?: string | string[] | Record<string, string>;
 		/**
 		 * 是否跨域
 		 */
@@ -132,18 +132,18 @@ export default class<
 		return 'image-uploader';
 	}
 
-	extensionNames = [
-		'svg',
-		'png',
-		'bmp',
-		'jpg',
-		'jpeg',
-		'gif',
-		'tif',
-		'tiff',
-		'emf',
-		'webp',
-	];
+	extensionNames: Record<string, string> | string[] = {
+		svg: 'image/svg+xml',
+		png: 'image/png',
+		bmp: 'image/bmp',
+		jpg: 'image/jpeg',
+		jpeg: 'image/jpeg',
+		gif: 'image/gif',
+		tif: 'image/tiff',
+		tiff: 'image/tiff',
+		emf: 'image/emf',
+		webp: 'image/webp',
+	};
 
 	init() {
 		if (isEngine(this.editor)) {
@@ -157,20 +157,26 @@ export default class<
 			this.editor.on('paste:markdown', this.pasteMarkdown);
 		}
 		let { accept } = this.options.file || {};
-		const names: Array<string> = [];
 		if (typeof accept === 'string') accept = accept.split(',');
-
-		(accept || []).forEach((name) => {
-			name = name.trim();
-			const newName = name.split('.').pop();
-			if (newName) names.push(newName);
-		});
-		if (names.length > 0) this.extensionNames = names;
+		if (Array.isArray(accept)) {
+			const names: string[] = [];
+			(accept || []).forEach((name) => {
+				name = name.trim();
+				const newName = name.split('.').pop();
+				if (newName) names.push(newName);
+			});
+			if (names.length > 0) this.extensionNames = names;
+		} else if (typeof accept === 'object') {
+			this.extensionNames = accept;
+		}
 	}
 
 	isImage(file: File) {
 		const name = getExtensionName(file);
-		return this.extensionNames.indexOf(name) >= 0;
+		const names = Array.isArray(this.extensionNames)
+			? this.extensionNames
+			: Object.keys(this.extensionNames);
+		return names.indexOf('*') >= 0 || names.indexOf(name) >= 0;
 	}
 
 	dataURIToFile(dataURI: string) {
@@ -246,12 +252,15 @@ export default class<
 		const limitSize = this.options.file.limitSize || 5 * 1024 * 1024;
 
 		if (!Array.isArray(files) && typeof files !== 'string') {
+			const accepts = Array.isArray(this.extensionNames)
+				? '.' + this.extensionNames.join(',.')
+				: Object.values(this.extensionNames).join(',');
 			files = await request.getFiles({
 				event: files,
 				accept: isAndroid
 					? 'image/*'
-					: this.extensionNames.length > 0
-					? '.' + this.extensionNames.join(',.')
+					: accepts.length > 0
+					? accepts
 					: '',
 				multiple,
 			});

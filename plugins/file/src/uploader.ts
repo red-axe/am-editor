@@ -51,7 +51,7 @@ export interface FileUploaderOptions extends PluginOptions {
 	/**
 	 * 文件接收的格式，默认 "*"
 	 */
-	accept?: string | Array<string>;
+	accept?: string | string[] | Record<string, string>;
 	/**
 	 * 文件选择限制数量
 	 */
@@ -85,7 +85,7 @@ export default class<
 		return 'file-uploader';
 	}
 
-	extensionNames = ['*'];
+	extensionNames: Record<string, string> | string[] = ['*'];
 
 	init() {
 		if (isEngine(this.editor)) {
@@ -93,24 +93,27 @@ export default class<
 			this.editor.on('paste:event', this.pasteFiles);
 			this.editor.on('paste:each', this.pasteEach);
 		}
-		let { accept } = this.options;
-		const names: Array<string> = [];
+		let { accept } = this.options.file || {};
 		if (typeof accept === 'string') accept = accept.split(',');
-
-		(accept || []).forEach((name) => {
-			name = name.trim();
-			const newName = name.split('.').pop();
-			if (newName) names.push(newName);
-		});
-		if (names.length > 0) this.extensionNames = names;
+		if (Array.isArray(accept)) {
+			const names: string[] = [];
+			(accept || []).forEach((name) => {
+				name = name.trim();
+				const newName = name.split('.').pop();
+				if (newName) names.push(newName);
+			});
+			if (names.length > 0) this.extensionNames = names;
+		} else if (typeof accept === 'object') {
+			this.extensionNames = accept;
+		}
 	}
 
 	isFile(file: File) {
 		const name = getExtensionName(file) ?? '';
-		return (
-			this.extensionNames.indexOf('*') >= 0 ||
-			this.extensionNames.indexOf(name) >= 0
-		);
+		const names = Array.isArray(this.extensionNames)
+			? this.extensionNames
+			: Object.keys(this.extensionNames);
+		return names.indexOf('*') >= 0 || names.indexOf(name) >= 0;
 	}
 
 	async execute(files?: Array<File> | MouseEvent) {
@@ -130,14 +133,12 @@ export default class<
 		const { parse } = this.options;
 		const limitSize = this.options.limitSize || 5 * 1024 * 1024;
 		if (!Array.isArray(files)) {
+			const accepts = Array.isArray(this.extensionNames)
+				? '.' + this.extensionNames.join(',.')
+				: Object.values(this.extensionNames).join(',');
 			files = await request.getFiles({
 				event: files,
-				accept:
-					isAndroid || this.extensionNames.indexOf('*') > -1
-						? '*'
-						: this.extensionNames.length > 0
-						? '.' + this.extensionNames.join(',.')
-						: '',
+				accept: isAndroid ? '*' : accepts.length > 0 ? accepts : '',
 				multiple,
 			});
 		}
