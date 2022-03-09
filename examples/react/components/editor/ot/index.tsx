@@ -3,7 +3,7 @@ import Avatar from 'antd/es/avatar';
 import Space from 'antd/es/space';
 import { isMobile } from '@aomao/engine';
 import OTClient, { STATUS, EVENT } from './client';
-import type { Member, ERROR } from './client';
+import type { Member, ERROR } from './types';
 import 'antd/es/avatar/style';
 import 'antd/es/space/style';
 import 'antd/es/badge/style';

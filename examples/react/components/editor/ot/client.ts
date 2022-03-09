@@ -1,16 +1,11 @@
 import { EventEmitter } from 'events';
 import type { EngineInterface } from '@aomao/engine';
-import ReconnectingWebSocket, { ErrorEvent } from 'reconnecting-websocket';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 import type { Doc } from 'sharedb';
 import sharedb from 'sharedb/lib/client';
 import type { Socket } from 'sharedb/lib/sharedb';
+import { Member, ERROR } from './types';
 
-export type Member = {
-	avatar: string;
-	name: string;
-	uuid: string;
-	color?: string;
-};
 export const STATUS = {
 	init: 'init',
 	loaded: 'loaded',
@@ -25,13 +20,6 @@ export const EVENT = {
 	membersChange: 'membersChange',
 	statusChange: 'statusChange',
 	message: 'message',
-};
-
-export type ERROR = {
-	code: string;
-	level: string;
-	message: string;
-	error?: ErrorEvent;
 };
 
 export const ERROR_CODE = {
@@ -221,7 +209,7 @@ class OTClient extends EventEmitter {
 				code: ERROR_CODE.CONNECTION_ERROR,
 				level: ERROR_LEVEL.FATAL,
 				message: '协作服务异常，无法继续编辑！正在为您重新连接中...',
-				error,
+				error: error as ErrorEvent,
 			});
 		});
 	}
@@ -251,9 +239,13 @@ class OTClient extends EventEmitter {
 			} else {
 				try {
 					// 实例化编辑器内部协同服务
-					this.engine.ot.initRemote(doc, defaultValue, (paths) => {
-						this.broadcast('select', paths);
-					});
+					this.engine.ot.initRemote(
+						doc,
+						defaultValue,
+						(paths: any) => {
+							this.broadcast('select', paths);
+						},
+					);
 					// 聚焦到编辑器
 					this.engine.focus();
 				} catch (err) {
@@ -333,7 +325,7 @@ class OTClient extends EventEmitter {
 		const members = [];
 		const colorMap: any = {};
 		const users = this.engine.ot.getMembers();
-		users.forEach((user) => {
+		users.forEach((user: Member) => {
 			colorMap[user.uuid] = user.color;
 		});
 		const memberMap: any = {};

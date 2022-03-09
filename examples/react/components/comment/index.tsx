@@ -18,7 +18,7 @@ import {
 import Loading from '../loading';
 import CommentButton from './button';
 import { CommentContent, DataItem, DataSourceItem } from './types';
-import { Member } from '../editor/ot/client';
+import { Member } from '../editor/ot/types';
 import CommentItem from './item';
 import context from '../../context';
 import { useDispatch, useSelector } from '../../hooks';
