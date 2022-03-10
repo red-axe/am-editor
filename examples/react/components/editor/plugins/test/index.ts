@@ -21,11 +21,11 @@ export default class extends Plugin<Options> {
 	// 插件初始化
 	init() {
 		// 监听解析成html的事件
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
+		this.editor.on('parse:html', this.parseHtml);
 		// 监听粘贴时候设置schema规则的入口
-		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
+		this.editor.on('paste:schema', this.pasteSchema);
 		// 监听粘贴时候的节点循环
-		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+		this.editor.on('paste:each', this.pasteHtml);
 	}
 	// 执行方法
 	execute() {
@@ -38,7 +38,7 @@ export default class extends Plugin<Options> {
 		return this.options.hotkey || 'mod+shift+f';
 	}
 	// 粘贴的时候添加需要的 schema
-	pasteSchema(schema: SchemaInterface) {
+	pasteSchema = (schema: SchemaInterface) => {
 		schema.add({
 			type: 'block',
 			name: 'div',
@@ -50,9 +50,9 @@ export default class extends Plugin<Options> {
 				'data-value': '*',
 			},
 		});
-	}
+	};
 	// 解析粘贴过来的html
-	pasteHtml(node: NodeInterface) {
+	pasteHtml = (node: NodeInterface) => {
 		if (!isEngine(this.editor)) return;
 		if (node.isElement()) {
 			const type = node.attributes('data-type');
@@ -69,9 +69,9 @@ export default class extends Plugin<Options> {
 			}
 		}
 		return true;
-	}
+	};
 	// 解析成html
-	parseHtml(root: NodeInterface) {
+	parseHtml = (root: NodeInterface) => {
 		root.find(`[${CARD_KEY}=${TestComponent.cardName}`).each((cardNode) => {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as TestComponent;
@@ -86,6 +86,15 @@ export default class extends Plugin<Options> {
 				node.replaceWith(div);
 			} else node.remove();
 		});
+	};
+
+	destroy() {
+		// 监听解析成html的事件
+		this.editor.off('parse:html', this.parseHtml);
+		// 监听粘贴时候设置schema规则的入口
+		this.editor.off('paste:schema', this.pasteSchema);
+		// 监听粘贴时候的节点循环
+		this.editor.off('paste:each', this.pasteHtml);
 	}
 }
 export { TestComponent };
