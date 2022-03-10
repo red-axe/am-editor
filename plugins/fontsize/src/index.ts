@@ -39,6 +39,11 @@ export default class<
 		super.init();
 		if (isEngine(this.editor)) {
 			this.editor.on('paste:each', this.pasteEach);
+			if (this.options.defaultSize)
+				this.editor.container.css(
+					this.#styleName,
+					this.options.defaultSize,
+				);
 		}
 	}
 
