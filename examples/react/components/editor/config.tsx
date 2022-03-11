@@ -225,6 +225,7 @@ export const videoOptions: VideoOptions = {
 export const videoUploaderOptions: VideoUploaderOptions = {
 	action: '/api/upload/video',
 	limitSize: 1024 * 1024 * 50,
+	accept: ['.mp4', '.mov', '.avi', '.wmv'],
 };
 
 export const mathOptions: MathOptions = {
@@ -324,6 +325,20 @@ export const lineHeightOptions: LineHeightOptions = {
 };
 
 export const toolbarOptions: ToolbarOptions = {
+	// 快捷键mod+/弹出菜单配置  默认使用系统配置
+	// config: [
+	// 	{
+	// 		title: "常用插件",
+	// 		items: [
+	// 			{
+	// 				name: "image-uploader",
+	// 				icon: 'image',
+	// 				title: "图片",
+	// 				search: "图片,tupian,image,img"
+	// 			},
+	// 		]
+	// 	}
+	// ],
 	popup: {
 		items: [
 			['bold', 'strikethrough', 'fontcolor'],
