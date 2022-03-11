@@ -8,7 +8,7 @@ import {
 } from '../constants';
 import { EngineInterface, NodeInterface, Selector } from '../types';
 import { $ } from '../node';
-import { isMobile } from '../utils';
+import { isEngine, isMobile } from '../utils';
 
 export type Options = {
 	engine: EngineInterface;
@@ -82,7 +82,7 @@ class Container {
 		});
 		// 编辑器文档尾部始终保持一行
 		this.node.on('click', (event: MouseEvent) => {
-			if (event.target) {
+			if (event.target && !engine.readonly && isEngine(engine)) {
 				const targetNode = $(event.target);
 				if (!targetNode.isEditable()) return;
 				const node = $('<p><br /></p>');
