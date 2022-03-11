@@ -8,6 +8,7 @@ import {
 	PluginOptions,
 	decodeCardValue,
 	encodeCardValue,
+	READY_CARD_KEY,
 } from '@aomao/engine';
 import TestComponent from './component';
 
@@ -72,7 +73,9 @@ export default class extends Plugin<Options> {
 	};
 	// 解析成html
 	parseHtml = (root: NodeInterface) => {
-		root.find(`[${CARD_KEY}=${TestComponent.cardName}`).each((cardNode) => {
+		root.find(
+			`[${CARD_KEY}="${TestComponent.cardName}"],[${READY_CARD_KEY}="${TestComponent.cardName}"]`,
+		).each((cardNode) => {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as TestComponent;
 			const value = card?.getValue();
