@@ -22,6 +22,7 @@ import Consumer from './consumer';
 import Mutation from './mutation';
 import { toJSON0, isCursorOp } from './utils';
 import { random } from '../utils';
+import { READY_CARD_KEY } from '../constants';
 import './index.css';
 
 class OTModel extends EventEmitter2 implements OTInterface {
@@ -131,7 +132,9 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	handleChange(ops: Op[]) {
 		this.submitOps(ops);
-		this.engine.history.handleSelfOps(ops.filter((op) => !op['nl']));
+		this.engine.history.handleSelfOps(
+			ops.filter((op) => !op['nl'] && !op.p.includes(READY_CARD_KEY)),
+		);
 		if (this.doc && this.doc?.type !== null) {
 			this.updateRangeColoringPosition();
 		}
