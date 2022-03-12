@@ -225,7 +225,6 @@ export const videoOptions: VideoOptions = {
 export const videoUploaderOptions: VideoUploaderOptions = {
 	action: '/api/upload/video',
 	limitSize: 1024 * 1024 * 50,
-	accept: ['.mp4', '.mov', '.avi', '.wmv'],
 };
 
 export const mathOptions: MathOptions = {
