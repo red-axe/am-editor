@@ -601,9 +601,12 @@ class Range implements RangeInterface {
 		}
 	};
 
-	scrollIntoViewIfNeeded = (view: NodeInterface) => {
+	scrollIntoViewIfNeeded = (
+		container = this.editor.container,
+		view: NodeInterface,
+	) => {
 		if (this.collapsed) {
-			this.editor.container.scrollIntoView($(this.getEndOffsetNode()));
+			container.scrollIntoView($(this.getEndOffsetNode()));
 		} else {
 			const startNode = this.getStartOffsetNode();
 			const endNode = this.getEndOffsetNode();

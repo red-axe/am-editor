@@ -1072,7 +1072,16 @@ class NodeEntry implements NodeInterface {
 			innerWidth: 0,
 		};
 
-		const element = this.get<Element>()!;
+		const element = this.isText()
+			? this.parent()?.get<Element>()
+			: this.get<Element>();
+		if (!element)
+			return {
+				top: 0,
+				left: 0,
+				bottom: 0,
+				right: 0,
+			};
 		const rect = element.getBoundingClientRect();
 		const { top, left, bottom, right } = rect;
 
@@ -1096,7 +1105,8 @@ class NodeEntry implements NodeInterface {
 			}
 			view = new NodeEntry(viewNode);
 		}
-		const viewElement = view[0] as Element;
+		const viewElement = view.get<Element>();
+		if (!viewElement) return true;
 		const { top, left, right, bottom } =
 			viewElement.getBoundingClientRect();
 		const vp = this.getViewport();
