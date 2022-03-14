@@ -145,6 +145,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 					('od' in op || 'oi' in op) && op.p.includes(CARD_VALUE_KEY),
 			)
 		) {
+			this.engine.trigger('realtimeChange', 'local');
 			this.engine.trigger('change', 'local');
 		}
 	}

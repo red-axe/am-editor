@@ -90,11 +90,6 @@ class Engine<T extends EngineOptions = EngineOptions>
 			onChange: (trigger) => this.trigger('change', trigger),
 			onSelect: () => this.trigger('select'),
 			onRealtimeChange: (trigger) => {
-				if (this.isEmpty()) {
-					this._container.showPlaceholder();
-				} else {
-					this._container.hidePlaceholder();
-				}
 				this.trigger('realtimeChange', trigger);
 			},
 			onSetValue: () => this.trigger('afterSetValue'),

@@ -69,17 +69,8 @@ class Container {
 
 	init() {
 		const { engine } = this.options;
-		this.node.on('input', (e) => {
-			if (engine.readonly) {
-				return;
-			}
-
-			if (engine.card.find(e.target)) {
-				return;
-			}
-			const range = engine.change.range.get();
-			range.handleBr(true);
-		});
+		this.node.on('input', this.onInput);
+		engine.on('realtimeChange', this.onRealtimeChange);
 		// 编辑器文档尾部始终保持一行
 		this.node.on('click', (event: MouseEvent) => {
 			if (event.target && !engine.readonly && isEngine(engine)) {
@@ -149,6 +140,28 @@ class Container {
 		});
 	}
 
+	onInput = (e: InputEvent) => {
+		const { engine } = this.options;
+		if (engine.readonly) {
+			return;
+		}
+
+		if (e.target && engine.card.find($(e.target))) {
+			return;
+		}
+		const range = engine.change.range.get();
+		range.handleBr(true);
+	};
+
+	onRealtimeChange = () => {
+		const { engine } = this.options;
+		if (engine.isEmpty()) {
+			engine.showPlaceholder();
+		} else {
+			engine.hidePlaceholder();
+		}
+	};
+
 	docMouseDown = (e: MouseEvent) => {
 		if (e.target && $(e.target).closest(UI_SELECTOR).length > 0) {
 			this._isMousedown = true;
@@ -189,6 +202,7 @@ class Container {
 
 	destroy() {
 		const { className, engine } = this.options;
+		engine.off('realtimeChange', this.onRealtimeChange);
 		document.removeEventListener('mousedown', this.docMouseDown);
 		this.node.removeAttributes(DATA_ELEMENT);
 		this.node.removeAttributes(DATA_CONTENTEDITABLE_KEY);
