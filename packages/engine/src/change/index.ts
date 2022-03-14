@@ -247,6 +247,7 @@ class ChangeModel implements ChangeInterface {
 					this.engine.trigger('paste:after');
 					if (callback) callback(count);
 				});
+				this.change();
 			},
 		);
 	}
@@ -275,6 +276,7 @@ class ChangeModel implements ChangeInterface {
 					this.engine.trigger('paste:after');
 					if (callback) callback(count);
 				});
+				this.change();
 			},
 		);
 	}

@@ -159,7 +159,7 @@ class MentionPlugin<
 					MentionComponent.cardName
 				}" data-value="${encodeCardValue(
 					value,
-				)}" style="color:#1890ff">@${value.name}</span>`;
+				)}" style="color:#1890ff"></span>`;
 				const marks = value.marks || [];
 				const rootWrapNode = $(`<div>@${value.name}</div>`);
 				let wrapNode = rootWrapNode.first()!;
