@@ -22,7 +22,7 @@ import Consumer from './consumer';
 import Mutation from './mutation';
 import { toJSON0, isCursorOp } from './utils';
 import { random } from '../utils';
-import { READY_CARD_KEY } from '../constants';
+import { CARD_VALUE_KEY, READY_CARD_KEY } from '../constants';
 import './index.css';
 
 class OTModel extends EventEmitter2 implements OTInterface {
@@ -139,6 +139,14 @@ class OTModel extends EventEmitter2 implements OTInterface {
 			this.updateRangeColoringPosition();
 		}
 		this.engine.trigger('ops', ops);
+		if (
+			ops.find(
+				(op) =>
+					('od' in op || 'oi' in op) && op.p.includes(CARD_VALUE_KEY),
+			)
+		) {
+			this.engine.trigger('change', 'local');
+		}
 	}
 
 	submitOps(ops: Op[]) {
