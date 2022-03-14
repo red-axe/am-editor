@@ -43,9 +43,10 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	destroy() {
-		this.root.children(`.${USER_BACKGROUND_CLASS}`).remove();
-		this.root.children(`.${USER_CURSOR_CLASS}`).remove();
-		this.root.children(`.${USER_MASK_CLASS}`).remove();
+		const body = $((this.root.document || document).body);
+		body.find(`.${USER_BACKGROUND_CLASS}`).remove();
+		body.find(`.${USER_CURSOR_CLASS}`).remove();
+		body.find(`.${USER_MASK_CLASS}`).remove();
 	}
 
 	getRectWithRange(node: NodeInterface, range: RangeInterface) {
