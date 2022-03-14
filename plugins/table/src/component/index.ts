@@ -321,10 +321,9 @@ class TableComponent<V extends TableValue = TableValue>
 			colors: TableComponent.colors,
 			defaultColor: super.getValue()?.color,
 			onChange: (color: string) => {
-				this.setValue({
-					color,
-				} as V);
 				this.conltrollBar.drawBackgroundColor(color);
+				const value = this.getValue();
+				this.setValue({ ...value, color });
 			},
 		});
 	}
