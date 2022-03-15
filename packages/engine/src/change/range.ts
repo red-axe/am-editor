@@ -323,7 +323,8 @@ class ChangeRange implements ChangeRangeInterface {
 			selection &&
 			(range.collapsed ||
 				(selection.rangeCount > 0 &&
-					!range.equal(selection.getRangeAt(0))))
+					!range.equal(selection.getRangeAt(0)))) &&
+			range.startNode.get<Node>()?.isConnected
 		) {
 			selection.removeAllRanges();
 			selection.addRange(range.toRange());

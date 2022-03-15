@@ -256,35 +256,19 @@ class Editor<T extends EditorOptions = EditorOptions>
 				root = range.commonAncestorNode;
 			}
 		}
-		const nodes: Node[] =
-			root.name === '#text' ? [document.createElement('span')] : [];
-		card = root.closest(`[${CARD_KEY}]`, (node) => {
-			if ($(node).isEditable()) return;
-			if (node.nodeType === Node.ELEMENT_NODE) {
-				const display = window
-					.getComputedStyle(node as Element)
-					.getPropertyValue('display');
-				if (display === 'inline') {
-					nodes.push(node.cloneNode());
-				}
-			}
-			return node.parentNode || undefined;
-		});
-		if (card.length > 0) return;
-		const { node, list } = this;
-		const hasChildEngine =
-			root.find('.am-engine-view').length > 0 ||
-			root.find('.am-engine').length > 0;
-		const hasParentEngine =
-			root.closest('.am-engine-view').length > 0 ||
-			root.closest('.am-engine').length > 0;
-		if (!hasChildEngine && !hasParentEngine) return;
+		if (!root.inEditor()) return;
 		if (range.collapsed) {
 			return {
 				html: '',
 				text: '',
 			};
 		}
+		card = root.closest(`[${CARD_KEY}]`, (node) => {
+			if ($(node).isEditable()) return;
+			return node.parentNode || undefined;
+		});
+		if (card.length > 0) return;
+		const { node, list } = this;
 		// 修复自定义列表选择范围
 		let customizeStartItem: NodeInterface | undefined;
 		const li = range.startNode.closest('li');
@@ -335,6 +319,20 @@ class Editor<T extends EditorOptions = EditorOptions>
 			}
 		}
 		const contents = range.enlargeToElementNode(true).cloneContents();
+
+		// 复制纯文本，获取外层的样式包裹层
+		const nodes: Node[] = [];
+		if (
+			root.isText() &&
+			contents.childNodes.length === 1 &&
+			contents.firstChild?.nodeType === Node.TEXT_NODE
+		) {
+			let parent = root.parent();
+			while (parent && (node.isMark(parent) || node.isInline(parent))) {
+				nodes.push(parent.clone(false).get<Node>()!);
+				parent = parent.parent();
+			}
+		}
 		// if (customizeStartItem) {
 		// 	contents.removeChild(contents.childNodes[0]);
 		// 	contents.prepend(customizeStartItem[0]);

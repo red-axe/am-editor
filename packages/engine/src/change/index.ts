@@ -431,7 +431,7 @@ class ChangeModel implements ChangeInterface {
 		let startRange: { node: NodeInterface; offset: number } | undefined =
 			undefined;
 		const apply = (range: RangeInterface) => {
-			if (startRange && startRange.node.parent()) {
+			if (startRange && startRange.node[0].isConnected) {
 				range
 					.shrinkToElementNode()
 					.setStart(startRange.node, startRange.offset);
@@ -533,12 +533,16 @@ class ChangeModel implements ChangeInterface {
 				} else {
 					nodeApi.insert(node, range, true);
 				}
-				prev = node;
+				if (!this.engine.node.isBlock(node)) {
+					prev = null;
+				} else {
+					prev = node;
+				}
 				if (!next) {
 					range.select(node, true).collapse(false);
 				}
 				// 被删除了重新设置开始节点位置
-				if (startRange && !startRange.node[0].parentNode) {
+				if (startRange && !startRange.node[0].isConnected) {
 					const parent = node.parent();
 					if (parent) {
 						startRange = {
