@@ -81,9 +81,9 @@ class Container {
 					`${EDITABLE_SELECTOR},${ROOT_SELECTOR}`,
 				);
 				// 获取编辑器内第一个子节点
-				const firstBlock = this.node.first();
+				const firstBlock = container.first();
 				//获取到编辑器内最后一个子节点
-				const lastBlock = this.node.last();
+				const lastBlock = container.last();
 				let isHandle = false;
 				// 存在这个节点，并且鼠标单击位置要小于第一个节点，并且这个节点不是一个空的节点
 				if (
