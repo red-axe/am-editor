@@ -256,7 +256,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 				root = range.commonAncestorNode;
 			}
 		}
-		if (!root.inEditor()) return;
+		if (!root.inEditor() && !root.isRoot()) return;
 		if (range.collapsed) {
 			return {
 				html: '',
