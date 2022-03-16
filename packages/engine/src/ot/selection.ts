@@ -8,60 +8,11 @@ import { CardType } from '../card/enum';
 class OTSelection extends EventEmitter2 implements SelectionInterface {
 	private engine: EngineInterface;
 	currentRangePath?: { start: RangePath; end: RangePath };
+	data: Attribute[] = [];
 
 	constructor(engine: EngineInterface) {
 		super();
 		this.engine = engine;
-	}
-
-	getSelections() {
-		const { container } = this.engine;
-		const data: Array<Attribute> = [];
-		const attributes = container.get<Element>()?.attributes;
-		if (!attributes) return data;
-		for (let i = 0; i < attributes.length; i++) {
-			const item = attributes.item(i);
-			if (!item) continue;
-			const { nodeName, nodeValue } = item;
-			if (/^data-selection-/.test(nodeName) && nodeValue) {
-				const value = JSON.parse(decodeURIComponent(nodeValue));
-				if (value) {
-					data.push(value);
-				}
-			}
-		}
-		return data;
-	}
-
-	setSelections(data: Array<Attribute>) {
-		const { container } = this.engine;
-		const dataState: { [key: string]: boolean } = {};
-		data.forEach((item) => {
-			if (item) {
-				const name = 'data-selection-'.concat(item.uuid);
-				dataState[name] = true;
-				const value = container.attributes(name);
-				const value_str = encodeURIComponent(JSON.stringify(item));
-				if (value !== value_str) {
-					container.attributes(name, value_str);
-				}
-			}
-		});
-		const attributes = container.get<Element>()?.attributes;
-		if (!attributes) return;
-		for (let i = 0; i < attributes.length; i++) {
-			const item = attributes.item(i);
-			if (!item) continue;
-			const { nodeName } = item;
-			if (/^data-selection-/.test(nodeName) && !dataState[nodeName]) {
-				container.removeAttributes(nodeName);
-			}
-		}
-	}
-
-	remove(uuid: string) {
-		const { container } = this.engine;
-		container.removeAttributes(`data-selection-${uuid}`);
 	}
 
 	updateSelections(currentMember: Member, members: Array<Member>) {
@@ -102,7 +53,7 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 		// 用作历史记录的不包含卡片左右光标位置
 		this.currentRangePath = range.toPath();
 		const pathString = JSON.stringify(path);
-		let data: Array<Attribute | null> = this.getSelections();
+		let data: Array<Attribute | null> = this.data;
 		let isMember = false;
 		let isUpdate = false;
 		data = data.map((attr) => {
@@ -144,6 +95,7 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 			});
 		}
 		if (isUpdate) {
+			this.data = newData;
 			this.emit('change', newData);
 		}
 		return {

@@ -789,7 +789,7 @@ class TableComponent<V extends TableValue = TableValue>
 				if (scrollbarTimeout) clearTimeout(scrollbarTimeout);
 				scrollbarTimeout = setTimeout(() => {
 					if (isEngine(this.editor)) {
-						this.editor.ot.initSelection(false);
+						this.editor.ot.refreshSelection(false);
 						this.conltrollBar.refresh();
 					}
 				}, 20);

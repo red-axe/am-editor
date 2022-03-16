@@ -7,7 +7,6 @@ import {
 	DIFF_INSERT,
 } from 'diff-match-patch';
 import {
-	isCursorOp,
 	isTransientAttribute,
 	isTransientElement,
 	filterOperations,
@@ -741,23 +740,18 @@ class Producer extends EventEmitter2 {
 		this.cacheTransientElements = undefined;
 		let ops = this.generateOps(records);
 		ops = filterOperations(ops);
-		if (!ops.every((op) => isCursorOp(op))) {
-			targetElements.forEach((element) => {
-				let node = $(element);
-				if (node.isEditable() && !node.isRoot()) {
-					const card = this.engine.card.find(node, true);
-					node = card?.root || node;
-				}
-				updateIndex(
-					node,
-					(child) =>
-						!isTransientElement(
-							$(child),
-							this.cacheTransientElements,
-						),
-				);
-			});
-		}
+		targetElements.forEach((element) => {
+			let node = $(element);
+			if (node.isEditable() && !node.isRoot()) {
+				const card = this.engine.card.find(node, true);
+				node = card?.root || node;
+			}
+			updateIndex(
+				node,
+				(child) =>
+					!isTransientElement($(child), this.cacheTransientElements),
+			);
+		});
 		if (ops.length !== 0) {
 			this.emitOps(ops);
 		}

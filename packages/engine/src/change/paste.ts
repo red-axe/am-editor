@@ -39,7 +39,7 @@ export default class Paste {
 	elementNormalize(fragment: DocumentFragment) {
 		const defaultStyle = this.getDefaultStyle();
 		const defautlStyleKeys = Object.keys(defaultStyle);
-		const { inline } = this.engine;
+		const { inline, list } = this.engine;
 		const nodeApi = this.engine.node;
 		const markApi = this.engine.mark;
 		const blockApi = this.engine.block;
@@ -225,9 +225,9 @@ export default class Paste {
 						else rightList.push(child);
 					});
 					appendToTemp();
-					const indent = parent.attributes('data-indent') || '0';
-					node.attributes('data-indent', indent);
-					this.engine.list.addIndent(node, 1);
+					const indent = parent.attributes(list.INDENT_KEY) || '0';
+					node.attributes(list.INDENT_KEY, indent);
+					list.addIndent(node, 1);
 					let prev = parent;
 					leftList.forEach((childNode) => {
 						const child = $(childNode);
@@ -301,16 +301,16 @@ export default class Paste {
 						const leftLast = leftList[leftList.length - 1];
 						if (isList) {
 							const indent =
-								$(leftLast)?.attributes('data-indent') || '0';
-							node.attributes('data-indent', indent);
-							this.engine.list.addIndent(node, 1);
+								$(leftLast)?.attributes(list.INDENT_KEY) || '0';
+							node.attributes(list.INDENT_KEY, indent);
+							list.addIndent(node, 1);
 							leftList[leftList.length] = node[0];
 							li = null;
 							return;
 						}
 						if (!li) {
 							li = isCustomizeList
-								? $('<li class="data-list-item" />')
+								? $(`<li class="${list.CUSTOMZIE_LI_CLASS}" />`)
 								: $('<li />');
 							const last = $(leftLast)?.last();
 							if (last) last?.after(li);

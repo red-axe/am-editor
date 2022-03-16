@@ -42,7 +42,13 @@ import Mark from './mark';
 import Inline from './inline';
 import Block from './block';
 import Range from './range';
-import { CARD_ELEMENT_KEY, CARD_KEY, DATA_ID } from './constants';
+import {
+	CARD_ELEMENT_KEY,
+	CARD_KEY,
+	DATA_ELEMENT,
+	DATA_ID,
+	ROOT,
+} from './constants';
 import { isEngine } from './utils';
 import Parser from './parser';
 
@@ -107,6 +113,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 	constructor(selector: Selector, options?: EditorOptions) {
 		this.options = { ...this.options, ...options };
 		this.container = $(selector);
+		this.container.attributes(DATA_ELEMENT, ROOT);
 		// 多语言
 		this.language = new Language(
 			this.options.lang || 'zh-CN',
@@ -406,6 +413,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 	}
 
 	destroy() {
+		this.container.removeAttributes(DATA_ELEMENT);
 		this.event.destroy();
 		this.plugin.destroy();
 		this.card.destroy();

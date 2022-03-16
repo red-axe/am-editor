@@ -48,7 +48,12 @@ class Client {
 					if (!doc) return;
 					//广播消息
 					if (action === 'broadcast') {
-						doc.broadcast('broadcast', data);
+						if (data.type === 'select') doc.selection = data.body;
+						doc.broadcast(
+							'broadcast',
+							data,
+							(m) => m.uuid !== uuid,
+						);
 					}
 					//心跳检测
 					else if (action === 'heartbeat') {

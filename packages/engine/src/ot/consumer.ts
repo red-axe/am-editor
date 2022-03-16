@@ -11,7 +11,7 @@ import {
 } from '../types/ot';
 import { NodeInterface } from '../types/node';
 import { getDocument } from '../utils';
-import { isCursorOp, isTransientElement, updateIndex, toDOM } from './utils';
+import { isTransientElement, updateIndex, toDOM } from './utils';
 import { $ } from '../node';
 import { CARD_LOADING_KEY, DATA_ID, EDITABLE_SELECTOR } from '../constants';
 import { RangePath } from '../types';
@@ -179,10 +179,7 @@ class Consumer implements ConsumerInterface {
 		const { card } = this.engine;
 		const { startNode } = this.getElementFromPath(root, path);
 		const domNode = $(startNode);
-		if (
-			(domNode && domNode.length > 0 && !domNode.isRoot()) ||
-			/^data-selection-/.test(attr)
-		) {
+		if (domNode && domNode.length > 0 && !domNode.isRoot()) {
 			attr = unescapeDots(attr);
 			value = unescape(value);
 			domNode.get<Element>()?.setAttribute(attr, value);
@@ -200,10 +197,7 @@ class Consumer implements ConsumerInterface {
 	removeAttribute(root: NodeInterface, path: Path, attr: string) {
 		const { startNode } = this.getElementFromPath(root, path);
 		const domNode = $(startNode);
-		if (
-			(domNode.length > 0 && !domNode.isRoot()) ||
-			/^data-selection-/.test(attr)
-		) {
+		if (domNode.length > 0 && !domNode.isRoot()) {
 			domNode.get<Element>()?.removeAttribute(attr);
 		}
 		return domNode;
@@ -337,8 +331,7 @@ class Consumer implements ConsumerInterface {
 				if (applyNode) applyNodes.push(applyNode);
 			});
 			if (path && this.engine.isFocus()) this.setRangeByRemotePath(path);
-			if (ops.some((op) => !isCursorOp(op)))
-				this.engine.change.change(true, applyNodes);
+			this.engine.change.change(true, applyNodes);
 			return applyNodes;
 		} catch (error) {
 			console.log(error);
@@ -352,42 +345,36 @@ class Consumer implements ConsumerInterface {
 			const applyNode = this.handleOperation(op);
 			if (applyNode) applyNodes.push(applyNode);
 		});
-		if (ops.some((op) => !isCursorOp(op)))
-			this.engine.change.change(false, applyNodes);
+		this.engine.change.change(false, applyNodes);
 		return applyNodes;
 	}
 
-	handleIndex(ops: Op[], applyNodes: NodeInterface[]) {
-		if (!ops.every((op) => isCursorOp(op))) {
-			const targetElements: Node[] = [];
-			applyNodes.forEach((node) => {
-				let target = node.isRoot() ? node : node.parent() || node;
-				if (target.isEditable() && !target.isRoot()) {
-					target =
-						this.engine.card.find(target, true)?.root || target;
-				}
-				if (
-					target &&
-					target.length > 0 &&
-					!targetElements.includes(target[0]) &&
-					!targetElements.find((element) =>
-						element.contains(target[0]),
-					)
+	handleIndex(applyNodes: NodeInterface[]) {
+		const targetElements: Node[] = [];
+		applyNodes.forEach((node) => {
+			let target = node.isRoot() ? node : node.parent() || node;
+			if (target.isEditable() && !target.isRoot()) {
+				target = this.engine.card.find(target, true)?.root || target;
+			}
+			if (
+				target &&
+				target.length > 0 &&
+				!targetElements.includes(target[0]) &&
+				!targetElements.find((element) => element.contains(target[0]))
+			) {
+				let index = -1;
+				while (
+					(index = targetElements.findIndex((element) =>
+						target[0].contains(element),
+					)) &&
+					index > -1
 				) {
-					let index = -1;
-					while (
-						(index = targetElements.findIndex((element) =>
-							target[0].contains(element),
-						)) &&
-						index > -1
-					) {
-						targetElements.splice(index, 1);
-					}
-					targetElements.push(target[0]);
+					targetElements.splice(index, 1);
 				}
-			});
-			targetElements.forEach((element) => updateIndex($(element)));
-		}
+				targetElements.push(target[0]);
+			}
+		});
+		targetElements.forEach((element) => updateIndex($(element)));
 	}
 
 	setRangeAfterOp(op: TargetOp) {

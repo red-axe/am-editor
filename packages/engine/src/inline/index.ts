@@ -18,7 +18,7 @@ import { $ } from '../node';
 import { isNode } from '../node/utils';
 import { isInlinePlugin } from '../plugin/inline';
 import { isRangeInterface } from '../range';
-import { SchemaInterface } from 'src';
+import type { SchemaInterface } from '../types/schema';
 
 class Inline implements InlineModelInterface {
 	private editor: EditorInterface;

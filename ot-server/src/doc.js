@@ -3,6 +3,7 @@ class Doc {
 		this.id = id.toString();
 		this.members = [];
 		this.sockets = {};
+		this.selection = [];
 		this.destroy = destroy;
 		this.indexCount = 0;
 		this.doc = undefined;
@@ -90,7 +91,19 @@ class Doc {
 				if (index > -1) {
 					const leaveMember = this.members[index];
 					this.members.splice(index, 1);
+					const sIndex = this.selection.findIndex(
+						(selection) => selection.uuid === leaveMember.uuid,
+					);
+					if (sIndex > -1) {
+						this.selection.splice(sIndex, 1);
+					}
 					this.broadcast('leave', leaveMember);
+					this.broadcast('broadcast', {
+						type: 'select',
+						body: this.selection,
+						doc_id: this.id,
+						uuid: leaveMember.uuid,
+					});
 					delete this.sockets[member.uuid];
 				}
 				if (Object.keys(this.sockets).length === 0) this.destroy();
@@ -98,12 +111,16 @@ class Doc {
 		} catch (error) {
 			console.error(error);
 		}
+		console.log(member);
 		// 广播通知用户加入了
 		this.broadcast('join', member, (m) => m.uuid !== member.uuid);
 		// 通知用户当前文档的所有用户
 		this.sendMessage(member.uuid, 'members', this.members);
 		// 通知用户准备好了
-		this.sendMessage(member.uuid, 'ready', member);
+		this.sendMessage(member.uuid, 'ready', {
+			member,
+			selection: this.selection,
+		});
 	}
 }
 

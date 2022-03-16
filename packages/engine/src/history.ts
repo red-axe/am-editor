@@ -3,7 +3,7 @@ import { Op } from 'sharedb';
 import OTJSON from 'ot-json0';
 import { Operation, TargetOp } from './types/ot';
 import { random } from './utils';
-import { isCursorOp, isReverseOp, isTransientElement } from './ot/utils';
+import { isReverseOp, isTransientElement } from './ot/utils';
 import { EngineInterface } from './types/engine';
 import { HistoryInterface } from './types/history';
 import { $ } from './node';
@@ -97,7 +97,7 @@ class HistoryModel implements HistoryInterface {
 				const applyNodes = ot.consumer.handleSelfOperations(
 					undoOp.ops!,
 				);
-				ot.consumer.handleIndex(undoOp.ops || [], applyNodes);
+				ot.consumer.handleIndex(applyNodes);
 				this.currentActionIndex--;
 				isUndo = true;
 			} catch (error) {
@@ -132,7 +132,7 @@ class HistoryModel implements HistoryInterface {
 				const applyNodes = ot.consumer.handleSelfOperations(
 					redoOp.ops!,
 				);
-				ot.consumer.handleIndex(redoOp.ops || [], applyNodes);
+				ot.consumer.handleIndex(applyNodes);
 				this.currentActionIndex++;
 				isRedo = true;
 			} catch (error) {
@@ -180,32 +180,27 @@ class HistoryModel implements HistoryInterface {
 	}
 
 	handleSelfOps(ops: Op[]) {
-		if (!this.currentAction?.self && ops.some((op) => !isCursorOp(op)))
-			this.saveOp();
+		if (!this.currentAction?.self) this.saveOp();
 		let isSave = false;
 		ops.forEach((op) => {
-			if (!isCursorOp(op)) {
-				isSave = true;
-				if (this.filterEvents.some((filter) => filter(op))) {
-					if (this.actionOps.length > 0 && !op['nl'])
-						this.actionOps[this.actionOps.length - 1].ops?.push(op);
-				} else {
-					this.currentAction.self = true;
-					if (!this.currentAction.ops) this.currentAction.ops = [];
+			isSave = true;
+			if (this.filterEvents.some((filter) => filter(op))) {
+				if (this.actionOps.length > 0 && !op['nl'])
+					this.actionOps[this.actionOps.length - 1].ops?.push(op);
+			} else {
+				this.currentAction.self = true;
+				if (!this.currentAction.ops) this.currentAction.ops = [];
 
-					if (!this.currentAction.startRangePath) {
-						this.currentAction.startRangePath =
-							this.getRangePathBeforeCommand();
-					}
-					const lastOp =
-						this.currentAction.ops[
-							this.currentAction.ops.length - 1
-						];
-					if (lastOp && isReverseOp(op, lastOp)) {
-						this.currentAction.ops.pop();
-					} else {
-						this.currentAction.ops.push(op);
-					}
+				if (!this.currentAction.startRangePath) {
+					this.currentAction.startRangePath =
+						this.getRangePathBeforeCommand();
+				}
+				const lastOp =
+					this.currentAction.ops[this.currentAction.ops.length - 1];
+				if (lastOp && isReverseOp(op, lastOp)) {
+					this.currentAction.ops.pop();
+				} else {
+					this.currentAction.ops.push(op);
 				}
 			}
 		});
@@ -315,9 +310,7 @@ class HistoryModel implements HistoryInterface {
 				}
 			}
 		});
-		ops = ops.filter((o) => !isCursorOp(o));
 		ops.forEach((op) => {
-			if (isCursorOp(op)) return;
 			if (!this.currentAction.ops) {
 				this.currentAction.ops = [];
 			}

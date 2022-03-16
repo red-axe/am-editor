@@ -1237,7 +1237,7 @@ class List implements ListModelInterface {
 		//如果选区中只有一个节点，并且是自定义列表并且第一个是Card
 		if (
 			1 === contents.childNodes.length &&
-			node.hasClass('data-list-item') &&
+			node.hasClass(this.CUSTOMZIE_LI_CLASS) &&
 			firstChild.isCard()
 		)
 			return true;
@@ -1245,7 +1245,7 @@ class List implements ListModelInterface {
 		//如果选区中只有两个节点，并且是自定义列表并且第一个是Card，最后一个为空节点
 		if (
 			2 === contents.childNodes.length &&
-			node.hasClass('data-list-item') &&
+			node.hasClass(this.CUSTOMZIE_LI_CLASS) &&
 			firstChild.isCard() &&
 			nodeApi.isEmpty(lastChild)
 		)
@@ -1284,7 +1284,7 @@ class List implements ListModelInterface {
 		//如果选区中只有一个节点，并且是自定义列表并且第一个是Card
 		if (
 			1 === contents.childNodes.length &&
-			node.hasClass('data-list-item') &&
+			node.hasClass(this.CUSTOMZIE_LI_CLASS) &&
 			firstChild.isCard()
 		)
 			return true;
@@ -1292,7 +1292,7 @@ class List implements ListModelInterface {
 		//如果选区中只有两个节点，并且是自定义列表并且第一个是Card，最后一个为空节点
 		if (
 			2 === contents.childNodes.length &&
-			node.hasClass('data-list-item') &&
+			node.hasClass(this.CUSTOMZIE_LI_CLASS) &&
 			firstChild.isCard() &&
 			nodeApi.isEmpty(lastChild)
 		)

@@ -109,7 +109,7 @@ export const isTransientElement = (
 };
 
 export const isTransientAttribute = (node: NodeInterface, attr: string) => {
-	if (node.isRoot() && !/^data-selection-/.test(attr)) return true;
+	if (node.isRoot()) return true;
 	if (
 		node.isCard() &&
 		['id', 'class', 'style', CARD_LOADING_KEY, CARD_EDITABLE_KEY].includes(
@@ -136,18 +136,6 @@ export const filterOperations = (ops: Op[]) => {
 		isReverseOp(op, next) ? i++ : data.push(op);
 	}
 	return data;
-};
-
-export const isCursorOp = (op: Op) => {
-	const insertOp = op as ObjectInsertOp;
-	const deleteOp = op as ObjectDeleteOp;
-	return (
-		(insertOp.oi || deleteOp.od) &&
-		op.p &&
-		op.p.length === 2 &&
-		op.p[0] === 1 &&
-		op.p[1].toString().startsWith('data-selection-')
-	);
 };
 
 export const isReverseOp = (op: Op, next: Op) => {
@@ -227,8 +215,6 @@ export const opsSort = (ops: Op[]) => {
 		 * op1.p.length > op2.p.length：op1在op2之后，并且op2的每一项都与op1的固定op2的长度数据每一项相同
 		 */
 		let les = false;
-		if (isCursorOp(op1)) return 1;
-		if (isCursorOp(op2)) return -1;
 		for (let p = 0; p < op1.p.length; p++) {
 			const v1 = op1.p[p];
 			// od oi 最后一个参数是属性名称

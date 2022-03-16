@@ -631,12 +631,13 @@ class Range implements RangeInterface {
 	 * @param isLeft
 	 */
 	handleBr = (isLeft?: boolean) => {
+		const { list } = this.editor;
 		const block = this.editor.block.closest(this.commonAncestorNode);
 		block.find('br').each((br) => {
 			const domBr = $(br);
 			if (
 				((!domBr.prev() ||
-					(domBr.parent()?.hasClass('data-list-item') &&
+					(domBr.parent()?.hasClass(list.CUSTOMZIE_LI_CLASS) &&
 						domBr.parent()?.first()?.equal(domBr.prev()!))) &&
 					domBr.next() &&
 					domBr.next()!.name !== 'br' &&
@@ -649,7 +650,7 @@ class Range implements RangeInterface {
 					isLeft &&
 					domBr.prev() &&
 					!(
-						domBr.parent()?.hasClass('data-list-item') &&
+						domBr.parent()?.hasClass(list.CUSTOMZIE_LI_CLASS) &&
 						domBr.parent()?.first()?.equal(domBr.prev()!)
 					)
 				)
@@ -662,7 +663,7 @@ class Range implements RangeInterface {
 		if (
 			!first ||
 			(children.length === 1 &&
-				block.hasClass('data-list-item') &&
+				block.hasClass(list.CUSTOMZIE_LI_CLASS) &&
 				first?.isCard())
 		) {
 			block.append($('<br />'));
@@ -680,7 +681,7 @@ class Range implements RangeInterface {
 
 		if (
 			children.length === 2 &&
-			block.hasClass('data-list-item') &&
+			block.hasClass(list.CUSTOMZIE_LI_CLASS) &&
 			first?.isCard() &&
 			['cursor', 'anchor', 'focus'].includes(
 				block.last()?.attributes(DATA_ELEMENT) || '',

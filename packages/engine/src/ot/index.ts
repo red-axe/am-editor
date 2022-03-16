@@ -20,7 +20,7 @@ import RangeColoring from './range-coloring';
 import OTDoc from './doc';
 import Consumer from './consumer';
 import Mutation from './mutation';
-import { toJSON0, isCursorOp } from './utils';
+import { toJSON0 } from './utils';
 import { random } from '../utils';
 import { CARD_VALUE_KEY, READY_CARD_KEY } from '../constants';
 import './index.css';
@@ -45,7 +45,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.rangeColoring = new RangeColoring(engine);
 		this.consumer = new Consumer(engine);
 		this.mutation = new Mutation(engine.container, { engine });
-		this.mutation.on('onChange', (ops) => this.handleChange(ops));
+		this.mutation.on('onChange', this.handleChange);
 		this.clientId = random(8);
 		this.waitingOps = [];
 		this.engine.on('select', this.updateSelection);
@@ -60,20 +60,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		const operations = filterOperations(this.waitingOps);
 		if (operations.length > 0) {
 			this.waitingOps = [];
-			this.apply(
-				operations.filter((op) => {
-					// 过滤掉修改自身光标位置的操作
-					if (
-						isCursorOp(op) &&
-						op.p.includes(
-							`data-selection-${this.currentMember?.uuid}`,
-						)
-					) {
-						return false;
-					}
-					return true;
-				}),
-			);
+			this.apply(operations);
 			this.engine.history.handleRemoteOps(operations);
 		}
 	}, 0);
@@ -120,7 +107,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 				this.applyWaitingOps();
 			}
 		});
-		this.initSelection();
+		this.selection.removeAllListeners();
 		this.selection.on('change', (paths) => {
 			if (onSelectionChange) onSelectionChange(paths);
 		});
@@ -130,7 +117,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		}
 	}
 
-	handleChange(ops: Op[]) {
+	handleChange = (ops: Op[]) => {
 		this.submitOps(ops);
 		this.engine.history.handleSelfOps(
 			ops.filter((op) => !op['nl'] && !op.p.includes(READY_CARD_KEY)),
@@ -148,7 +135,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 			this.engine.trigger('realtimeChange', 'local');
 			this.engine.trigger('change', 'local');
 		}
-	}
+	};
 
 	submitOps(ops: Op[]) {
 		if (!this.doc) return;
@@ -173,7 +160,6 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.stopMutation();
 		const applyNodes = this.consumer.handleRemoteOperations(ops);
 		this.consumer.handleIndex(
-			ops,
 			ops.some((op) => op['bi'] < 0)
 				? [this.engine.container]
 				: applyNodes,
@@ -286,9 +272,6 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.members = this.members.filter((m) => {
 			return m.uuid !== member.uuid;
 		});
-		this.selection.remove(member.uuid);
-		const attributes = this.selection.getSelections();
-		this.renderSelection(attributes);
 	}
 
 	setCurrentMember(member: Member) {
@@ -309,6 +292,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		showInfo?: boolean,
 	) {
 		const { members, currentMember } = this;
+		this.selection.data = attributes;
 		attributes = attributes.filter(
 			(item) => item.uuid !== currentMember?.uuid,
 		);
@@ -326,11 +310,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		}
 	};
 
-	updateSelectionPosition() {
-		this.rangeColoring.updatePosition();
-	}
-
-	initSelection(showInfo?: boolean) {
+	refreshSelection(showInfo?: boolean) {
 		if (!this.currentMember) return;
 		const data = this.selection.updateSelections(
 			this.currentMember,
@@ -341,6 +321,8 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	destroy() {
 		if (this.doc) this.doc.destroy();
+		this.mutation?.off('onChange', this.handleChange);
+		this.mutation?.destroyCache();
 		this.engine.off('select', this.updateSelection);
 		this.stopMutation();
 		this.rangeColoring.destroy();

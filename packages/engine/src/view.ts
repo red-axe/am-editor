@@ -2,6 +2,7 @@ import { ViewInterface, ViewOptions } from './types/view';
 import Parser from './parser';
 import Editor from './editor';
 import { Selector } from './types';
+import { VIEW_CLASS_NAME } from './constants';
 
 class View<T extends ViewOptions = ViewOptions>
 	extends Editor<T>
@@ -12,6 +13,9 @@ class View<T extends ViewOptions = ViewOptions>
 	constructor(selector: Selector, options?: ViewOptions) {
 		super(selector, options);
 		this.init();
+		if (!this.container.hasClass(VIEW_CLASS_NAME)) {
+			this.container.addClass(VIEW_CLASS_NAME);
+		}
 	}
 
 	render(content: string, trigger: boolean = true) {

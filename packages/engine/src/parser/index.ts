@@ -663,7 +663,9 @@ class Parser implements ParserInterface {
 						result.push('\n');
 					}
 					if (formatOL && node.name === 'li') {
-						if (node.hasClass('data-list-item')) {
+						if (
+							node.hasClass(this.editor.list.CUSTOMZIE_LI_CLASS)
+						) {
 							return;
 						}
 						const parent = node.parent();

@@ -1,8 +1,8 @@
 import {
 	DATA_CONTENTEDITABLE_KEY,
-	DATA_ELEMENT,
 	EDITABLE_SELECTOR,
-	ROOT,
+	ENGINE_CLASS_NAME,
+	ENGINE_MOBILE_CLASS_NAME,
 	ROOT_SELECTOR,
 	UI_SELECTOR,
 } from '../constants';
@@ -37,7 +37,6 @@ class Container {
 
 	_init() {
 		const { lang, tabIndex, className } = this.options;
-		this.node.attributes(DATA_ELEMENT, ROOT);
 		this.node.attributes({
 			[DATA_CONTENTEDITABLE_KEY]: 'true',
 			role: 'textbox',
@@ -51,11 +50,11 @@ class Container {
 			this.node.attributes('tabindex', tabIndex);
 		}
 
-		if (!this.node.hasClass('am-engine')) {
-			this.node.addClass('am-engine');
+		if (!this.node.hasClass(ENGINE_CLASS_NAME)) {
+			this.node.addClass(ENGINE_CLASS_NAME);
 		}
 
-		if (isMobile) this.node.addClass('am-engine-mobile');
+		if (isMobile) this.node.addClass(ENGINE_MOBILE_CLASS_NAME);
 
 		if (className !== undefined) {
 			(Array.isArray(className)
@@ -204,7 +203,6 @@ class Container {
 		const { className, engine } = this.options;
 		engine.off('realtimeChange', this.onRealtimeChange);
 		document.removeEventListener('mousedown', this.docMouseDown);
-		this.node.removeAttributes(DATA_ELEMENT);
 		this.node.removeAttributes(DATA_CONTENTEDITABLE_KEY);
 		this.node.removeAttributes('role');
 		this.node.removeAttributes('autocorrect');
@@ -222,7 +220,8 @@ class Container {
 			});
 		}
 
-		if (engine.card.closest(this.node)) this.node.removeClass('am-engine');
+		if (engine.card.closest(this.node))
+			this.node.removeClass(ENGINE_CLASS_NAME);
 		this.node.removeAllEvents();
 	}
 }

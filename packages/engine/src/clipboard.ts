@@ -1,18 +1,10 @@
 import copyTo from 'copy-to-clipboard';
-import Parser from './parser';
 import { EditorInterface, EngineInterface, ClipboardInterface } from './types';
 import { RangeInterface } from './types/range';
-import { isEngine, isSafari } from './utils';
+import { isSafari } from './utils';
 import { $ } from './node';
 import Range from './range';
-import { NodeInterface } from './types';
-import {
-	CARD_ELEMENT_KEY,
-	CARD_KEY,
-	DATA_ELEMENT,
-	DATA_ID,
-	ROOT,
-} from './constants';
+import { DATA_ELEMENT, ROOT, VIEW_CLASS_NAME } from './constants';
 
 export const isDragEvent = (
 	event: DragEvent | ClipboardEvent,
@@ -110,7 +102,7 @@ export default class Clipboard implements ClipboardInterface {
 			: Range.create(editor);
 		const cloneRange = range.cloneRange();
 		const block = $(
-			`<div class="am-engine-view" ${DATA_ELEMENT}="${ROOT}">&#8203;</div>`,
+			`<div class="${VIEW_CLASS_NAME}" ${DATA_ELEMENT}="${ROOT}">&#8203;</div>`,
 		);
 		block.css({
 			position: 'fixed',

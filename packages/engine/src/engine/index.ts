@@ -41,8 +41,6 @@ class Engine<T extends EngineOptions = EngineOptions>
 	history: HistoryInterface;
 	hotkey: HotkeyInterface;
 
-	readonly container: NodeInterface;
-
 	get readonly(): boolean {
 		return this._readonly;
 	}
@@ -68,14 +66,13 @@ class Engine<T extends EngineOptions = EngineOptions>
 		// 历史
 		this.history = new History(this);
 		// 编辑器容器
-		this._container = new Container(selector, {
+		this._container = new Container(this.container, {
 			engine: this,
 			lang: this.options.lang,
 			className: this.options.className,
 			tabIndex: this.options.tabIndex,
 			placeholder: this.options.placeholder,
 		});
-		this.container = this._container.getNode();
 		// 编辑器父节点
 		this.root = $(
 			this.options.root || this.container.parent() || getDocument().body,
@@ -217,16 +214,6 @@ class Engine<T extends EngineOptions = EngineOptions>
 
 	setJsonValue(value: Array<any>, callback?: (count: number) => void) {
 		const dom = $(toDOM(value));
-		const attributes = dom.get<Element>()?.attributes;
-		for (let i = 0; attributes && i < attributes.length; i++) {
-			const { nodeName, nodeValue } = attributes.item(i) || {};
-			if (
-				/^data-selection-/.test(nodeName || '') &&
-				nodeValue !== 'null'
-			) {
-				this.container.attributes(nodeName, nodeValue!);
-			}
-		}
 		const html = this.node.html(dom);
 		this.change.setValue(html, undefined, callback);
 		this.normalize();

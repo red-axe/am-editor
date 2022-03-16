@@ -79,19 +79,9 @@ export interface SelectionInterface extends EventEmitter2 {
 	 */
 	currentRangePath?: { start: RangePath; end: RangePath };
 	/**
-	 * 获取所有协作者的光标路径
+	 * 所有选区数据
 	 */
-	getSelections(): Array<Attribute>;
-	/**
-	 * 设置所有的协作者的光标路径
-	 * @param data
-	 */
-	setSelections(data: Array<Attribute>): void;
-	/**
-	 * 移除一个协作者的光标
-	 * @param uuid
-	 */
-	remove(uuid: string): void;
+	data: Attribute[];
 	/**
 	 * 更新协作者选区
 	 * @param currentMember
@@ -431,7 +421,7 @@ export interface ConsumerInterface {
 	 * @param ops
 	 * @param applyNodes
 	 */
-	handleIndex(ops: Op[], applyNodes: NodeInterface[]): void;
+	handleIndex(applyNodes: NodeInterface[]): void;
 }
 
 export interface OTInterface extends EventEmitter2 {
@@ -548,13 +538,9 @@ export interface OTInterface extends EventEmitter2 {
 	 */
 	updateSelection(): void;
 	/**
-	 * 更新选区位置
-	 */
-	updateSelectionPosition(): void;
-	/**
 	 * 实例化选区
 	 */
-	initSelection(showInfo?: boolean): void;
+	refreshSelection(showInfo?: boolean): void;
 	/**
 	 * 销毁
 	 */

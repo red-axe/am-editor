@@ -43,7 +43,7 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	destroy() {
-		const body = $((this.root.document || document).body);
+		const body = this.engine.scrollNode ?? this.root;
 		body.find(`.${USER_BACKGROUND_CLASS}`).remove();
 		body.find(`.${USER_CURSOR_CLASS}`).remove();
 		body.find(`.${USER_MASK_CLASS}`).remove();
@@ -105,7 +105,7 @@ class RangeColoring implements RangeColoringInterface {
 		tinyColor.setAlpha(0.3);
 		let targetCanvas: TinyCanvasInterface;
 		const rgb = tinyColor.toRgbString();
-		let child = (this.engine.scrollNode ?? this.root).children(
+		let child = (this.engine.scrollNode ?? this.root).find(
 			`.${USER_BACKGROUND_CLASS}[${DATA_UUID}="${uuid}"]`,
 		);
 		if (child && child.length > 0) {
@@ -185,10 +185,11 @@ class RangeColoring implements RangeColoringInterface {
 
 	getNodeRect(node: NodeInterface, rect: DOMRect) {
 		//自定义列表项的第一个card跳过
+		const parent = node.parent();
 		if (
 			node.isCard() &&
-			node.parent()?.hasClass('data-list-item') &&
-			node.parent()?.first()?.equal(node) &&
+			parent?.hasClass(this.engine.list.CUSTOMZIE_LI_CLASS) &&
+			parent?.first()?.equal(node) &&
 			node.next()
 		) {
 			node = node.next()!;
@@ -633,16 +634,18 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	updateBackgroundPosition() {
-		this.root.children(`.${USER_BACKGROUND_CLASS}`).each((child) => {
-			const node = $(child);
-			const range = child['__range'];
-			const uuid = node.attributes(DATA_UUID);
-			const color = node.attributes(DATA_COLOR);
-			this.drawBackground(range, {
-				uuid,
-				color,
+		(this.engine.scrollNode ?? this.root)
+			.children(`.${USER_BACKGROUND_CLASS}`)
+			.each((child) => {
+				const node = $(child);
+				const range = child['__range'];
+				const uuid = node.attributes(DATA_UUID);
+				const color = node.attributes(DATA_COLOR);
+				this.drawBackground(range, {
+					uuid,
+					color,
+				});
 			});
-		});
 	}
 
 	updateCursorPosition() {
@@ -729,25 +732,27 @@ class RangeColoring implements RangeColoringInterface {
 				}
 			}
 		});
-		this.root.children(`[${DATA_UUID}]`).each((child) => {
-			const domChild = $(child);
-			const uuid = domChild.attributes(DATA_UUID);
-			const member = members.find((m) => m.uuid === uuid);
-			if (!member || info[uuid]) {
-				if (domChild.hasClass(USER_MASK_CLASS)) {
-					const target = $(domChild[0]['__node']);
-					const component = engine.card.find(target);
-					if (
-						component &&
-						!component.isEditable &&
-						component.activatedByOther === uuid
-					) {
-						this.setCardActivatedByOther(component);
+		(this.engine.scrollNode ?? this.root)
+			.find(`[${DATA_UUID}]`)
+			.each((child) => {
+				const domChild = $(child);
+				const uuid = domChild.attributes(DATA_UUID);
+				const member = members.find((m) => m.uuid === uuid);
+				if (!member || info[uuid]) {
+					if (domChild.hasClass(USER_MASK_CLASS)) {
+						const target = $(domChild[0]['__node']);
+						const component = engine.card.find(target);
+						if (
+							component &&
+							!component.isEditable &&
+							component.activatedByOther === uuid
+						) {
+							this.setCardActivatedByOther(component);
+						}
 					}
+					domChild.remove();
 				}
-				domChild.remove();
-			}
-		});
+			});
 		engine.card.each((component) => {
 			if (component.isEditable) return;
 			const member = members.find(

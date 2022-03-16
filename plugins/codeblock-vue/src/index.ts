@@ -13,6 +13,7 @@ import {
 	PluginOptions,
 	READY_CARD_KEY,
 	decodeCardValue,
+	VIEW_CLASS_NAME,
 } from '@aomao/engine';
 import CodeBlockComponent, {
 	CodeBlockEditor,
@@ -356,7 +357,7 @@ export default class<
 					'max-width': '750px',
 				});
 				codeEditor.render(value.mode || 'plain', value.code || '');
-				content.addClass('am-engine-view');
+				content.addClass(VIEW_CLASS_NAME);
 				content.hide();
 				document.body.appendChild(content[0]);
 				content.traverse((node) => {
@@ -381,7 +382,7 @@ export default class<
 				node.removeAttributes(CARD_TYPE_KEY);
 				node.removeAttributes(CARD_VALUE_KEY);
 				node.attributes('data-syntax', value.mode || 'plain');
-				content.removeClass('am-engine-view');
+				content.removeClass(VIEW_CLASS_NAME);
 				let newNode = node;
 				if (callback) {
 					newNode = callback(node, value);

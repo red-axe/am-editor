@@ -164,8 +164,9 @@ class OTClient extends EventEmitter {
 				// 协作服务端准备好了，可以实例化编辑器内部的协同服务了
 				if ('ready' === action) {
 					// 当前协作者用户
-					this.current = data as Member;
-					this.engine.ot.setCurrentMember(data);
+					this.current = data.member as Member;
+					this.engine.ot.setCurrentMember(this.current);
+					this.engine.ot.renderSelection(data.selection, true);
 					this.emit('ready', this.engine.ot.getCurrentMember());
 					this.emit(EVENT.membersChange, this.normalizeMembers());
 					this.transmit(STATUS.active);
