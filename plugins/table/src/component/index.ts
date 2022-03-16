@@ -728,15 +728,16 @@ class TableComponent<V extends TableValue = TableValue>
 		if (!isEngine(this.editor) || this.editor.readonly)
 			this.toolbarModel?.setOffset([0, 0]);
 		else this.toolbarModel?.setOffset([0, -28, 0, -6]);
-		const tablePlugin = this.editor.plugin.components['table'];
-		const tableOptions = tablePlugin?.options['overflow'] || {};
+		const tablePlugin =
+			this.editor.plugin.findPlugin<TableOptions>('table');
+		const tableOptions = tablePlugin?.options.overflow || {};
 		if (this.viewport) {
 			this.selection.refreshModel();
-			const overflowLeftConfig = tableOptions['maxLeftWidth']
+			const overflowLeftConfig = tableOptions.maxLeftWidth
 				? {
 						onScrollX: (x: number) => {
 							if (this.isMaximize) x = 0;
-							const max = tableOptions['maxLeftWidth']();
+							const max = tableOptions.maxLeftWidth!();
 							this.wrapper?.css(
 								'margin-left',
 								`-${x > max ? max : x}px`,
@@ -784,8 +785,8 @@ class TableComponent<V extends TableValue = TableValue>
 			//this.scrollbar.disableScroll();
 			let scrollbarTimeout: NodeJS.Timeout | null = null;
 			const handleScrollbarChange = () => {
-				if (tableOptions['maxRightWidth'])
-					this.overflow(tableOptions['maxRightWidth']());
+				// if (tableOptions['maxRightWidth'])
+				// 	this.overflow(tableOptions['maxRightWidth']());
 				if (scrollbarTimeout) clearTimeout(scrollbarTimeout);
 				scrollbarTimeout = setTimeout(() => {
 					if (isEngine(this.editor)) {
@@ -839,8 +840,8 @@ class TableComponent<V extends TableValue = TableValue>
 			if (!silence) {
 				this.onChange();
 			}
-			if (tableOptions['maxRightWidth'])
-				this.overflow(tableOptions['maxRightWidth']());
+			if (tableOptions.maxRightWidth)
+				this.overflow(tableOptions.maxRightWidth());
 			this.scrollbar?.refresh();
 		});
 
@@ -852,8 +853,8 @@ class TableComponent<V extends TableValue = TableValue>
 			if (tableValue && isEngine(this.editor)) this.setValue(tableValue);
 			this.onChange();
 		}
-		if (tableOptions['maxRightWidth'])
-			this.overflow(tableOptions['maxRightWidth']());
+		if (tableOptions.maxRightWidth)
+			this.overflow(tableOptions.maxRightWidth());
 		this.scrollbar?.refresh();
 	}
 
