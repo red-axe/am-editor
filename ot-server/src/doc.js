@@ -111,7 +111,6 @@ class Doc {
 		} catch (error) {
 			console.error(error);
 		}
-		console.log(member);
 		// 广播通知用户加入了
 		this.broadcast('join', member, (m) => m.uuid !== member.uuid);
 		// 通知用户当前文档的所有用户
