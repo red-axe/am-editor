@@ -106,7 +106,7 @@ export default defineComponent({
     align-items: center;
     justify-content: center;
     width: auto;
-    min-width: 32px;
+    min-width: 26px;
     margin: 0;
     text-align: center;
     padding: 0 7px;
@@ -127,6 +127,7 @@ export default defineComponent({
 
 .editor-toolbar:not(.editor-toolbar-mobile) .toolbar-button {
     padding: 0 4px;
+    margin: 0 1px;
 }
 
 .editor-toolbar:not(.editor-toolbar-mobile) .toolbar-button:hover {

@@ -157,6 +157,10 @@ export default defineComponent({
     height: 100%;
 }
 
+.toolbar-dropdown .toolbar-dropdown-trigger .toolbar-button {
+    margin: 0;
+}
+
 .toolbar-dropdown .toolbar-dropdown-trigger .toolbar-dropdown-button-text {
     font-size: 12px;
 }
