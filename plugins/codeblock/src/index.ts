@@ -352,12 +352,10 @@ export default class<
 				const content = codeEditor.container.find(
 					'.data-codeblock-content',
 				);
-				content
-					.css({
-						border: '1px solid #e8e8e8',
-						padding: '8px',
-					})
-					.removeClass('data-codeblock-content');
+				content.css({
+					border: '1px solid #e8e8e8',
+					padding: '8px',
+				});
 				codeEditor.render(value.mode || 'plain', value.code || '');
 				content.addClass(VIEW_CLASS_NAME);
 				content.hide();
@@ -384,7 +382,9 @@ export default class<
 				node.removeAttributes(CARD_TYPE_KEY);
 				node.removeAttributes(CARD_VALUE_KEY);
 				node.attributes('data-syntax', value.mode || 'plain');
-				content.removeClass(VIEW_CLASS_NAME);
+				content
+					.removeClass(VIEW_CLASS_NAME)
+					.removeClass('data-codeblock-content');
 				let newNode = node;
 				if (callback) {
 					newNode = callback(node, value);
