@@ -352,10 +352,12 @@ export default class<
 				const content = codeEditor.container.find(
 					'.data-codeblock-content',
 				);
-				content.css({
-					border: '1px solid #e8e8e8',
-					'max-width': '750px',
-				});
+				content
+					.css({
+						border: '1px solid #e8e8e8',
+						padding: '8px',
+					})
+					.removeClass('data-codeblock-content');
 				codeEditor.render(value.mode || 'plain', value.code || '');
 				content.addClass(VIEW_CLASS_NAME);
 				content.hide();

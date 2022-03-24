@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import classnames from 'classnames-es-ts';
 import Tooltip from 'antd/es/tooltip';
 import { EngineInterface, formatHotkey, isMobile } from '@aomao/engine';
@@ -53,6 +53,20 @@ const DropdownList: React.FC<DropdownListProps> = ({
 	hasDot,
 }) => {
 	if (!direction) direction = 'vertical';
+
+	const element = useRef<HTMLDivElement>(null);
+	const [placement, setPlacement] = useState<'bottom' | 'top'>();
+
+	useEffect(() => {
+		const current = element.current;
+		if (!current) return;
+		const scrollElement = engine?.scrollNode?.get<HTMLElement>();
+		if (!scrollElement) return;
+		const rect = current.getBoundingClientRect();
+		const scrollRect = scrollElement.getBoundingClientRect();
+		if (rect.top < scrollRect.top) setPlacement('bottom');
+		if (rect.bottom > scrollRect.bottom) setPlacement('top');
+	}, [element]);
 
 	const triggerSelect = (event: React.MouseEvent, key: string) => {
 		event.preventDefault();
@@ -149,9 +163,11 @@ const DropdownList: React.FC<DropdownListProps> = ({
 
 	return (
 		<div
+			ref={element}
 			className={classnames(
 				'toolbar-dropdown-list',
 				`toolbar-dropdown-${direction}`,
+				placement ? `toolbar-dropdown-placement-${placement}` : '',
 				{ 'toolbar-dropdown-dot': hasDot !== false },
 				className,
 			)}

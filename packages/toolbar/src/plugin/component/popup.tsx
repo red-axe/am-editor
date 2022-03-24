@@ -27,7 +27,9 @@ export default class Popup {
 		this.#options = options;
 		this.#editor = editor;
 		this.#root = $(`<div class="data-toolbar-popup-wrapper"></div>`);
-		document.body.appendChild(this.#root[0]);
+		(
+			this.#editor.scrollNode?.get<HTMLElement>() || document.body
+		).appendChild(this.#root[0]);
 		if (isEngine(editor)) {
 			this.#editor.on('select', this.onSelect);
 		} else {
@@ -127,23 +129,26 @@ export default class Popup {
 				this.#align = 'top';
 			}
 			targetRect = this.#align === 'bottom' ? bottomRect : topRect;
-			let top =
+			const scrollElement = this.#editor.scrollNode?.get<HTMLElement>();
+			const scrollNodeRect = scrollElement?.getBoundingClientRect();
+			const top =
 				this.#align === 'top'
-					? targetRect.top - rootRect.height - space
-					: targetRect.bottom + space;
-			if (this.#editor.scrollNode) {
-				const scrollNodeRect = this.#editor.scrollNode
-					.get<HTMLElement>()
-					?.getBoundingClientRect();
-				if (scrollNodeRect) {
-					if (top < scrollNodeRect.top) {
-						top = scrollNodeRect.top;
-					} else if (top > scrollNodeRect.bottom) {
-						top = scrollNodeRect.bottom - rootRect.height - space;
-					}
-				}
-			}
-			let left = targetRect.left + targetRect.width - rootRect.width / 2;
+					? targetRect.top -
+					  rootRect.height -
+					  space -
+					  (scrollNodeRect?.top || 0) +
+					  (scrollElement?.scrollTop || 0)
+					: targetRect.bottom +
+					  space -
+					  (scrollNodeRect?.top || 0) +
+					  (scrollElement?.scrollTop || 0);
+
+			let left =
+				targetRect.left -
+				(scrollNodeRect?.left || 0) +
+				(scrollElement?.scrollLeft || 0) +
+				targetRect.width -
+				rootRect.width / 2;
 			if (left < 0) left = 16;
 			this.#point = {
 				left,

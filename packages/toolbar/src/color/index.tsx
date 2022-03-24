@@ -67,6 +67,20 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 		);
 	}, [content, disabled, currentColor]);
 
+	const element = useRef<HTMLDivElement>(null);
+	const [listPlacement, setListPlacement] = useState<'bottom' | 'top'>();
+
+	useEffect(() => {
+		const current = element.current;
+		if (!current || !pickerVisible) return;
+		const scrollElement = engine?.scrollNode?.get<HTMLElement>();
+		if (!scrollElement) return;
+		const rect = current.getBoundingClientRect();
+		const scrollRect = scrollElement.getBoundingClientRect();
+		if (rect.top < scrollRect.top) setListPlacement('bottom');
+		if (rect.bottom > scrollRect.bottom) setListPlacement('top');
+	}, [pickerVisible, element]);
+
 	const toggleDropdown = (event: React.MouseEvent) => {
 		event.preventDefault();
 		if (pickerVisible) {
@@ -153,7 +167,16 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 				/>
 			</div>
 			{pickerVisible && (
-				<div className="toolbar-dropdown-list" data-element="ui">
+				<div
+					ref={element}
+					className={classNames(
+						'toolbar-dropdown-list',
+						listPlacement
+							? `toolbar-dropdown-placement-${listPlacement}`
+							: '',
+					)}
+					data-element="ui"
+				>
 					<ColorPicker
 						engine={engine}
 						colors={colors}
