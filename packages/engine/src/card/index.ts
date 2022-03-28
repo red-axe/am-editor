@@ -414,7 +414,8 @@ class CardModel implements CardModelInterface {
 					card.select(false);
 				} else if (
 					trigger === CardActiveTrigger.MOUSE_DOWN &&
-					node.name !== 'input'
+					node.name !== 'input' &&
+					card.root.find('.data-drag-image').length === 0
 				) {
 					event?.preventDefault();
 				}

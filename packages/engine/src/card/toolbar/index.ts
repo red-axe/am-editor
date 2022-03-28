@@ -189,11 +189,14 @@ class CardToolbar implements CardToolbarInterface {
 		return;
 	}
 
-	getItems() {
-		if (!this.card.toolbar) return [];
+	getItems(): [
+		ToolbarItemOptions[],
+		(ToolbarItemOptions | CardToolbarItemOptions)[],
+	] {
+		if (!this.card.toolbar) return [[], []];
 		//获取客户端配置
 		const config = this.card.toolbar();
-		const items: Array<ToolbarItemOptions> = [];
+		const items: ToolbarItemOptions[] = [];
 		config.forEach((item) => {
 			//默认项
 			if (isCardToolbarItemOptions(item)) {
@@ -208,14 +211,14 @@ class CardToolbar implements CardToolbarInterface {
 				items.push(item);
 			}
 		});
-		return items;
+		return [items, config];
 	}
 
 	create() {
 		this.hide();
-		const items = this.getItems();
+		const [items, config] = this.getItems();
 		if (items.length > 0) {
-			const dnd: CardToolbarItemOptions | undefined = items.find(
+			const dnd: CardToolbarItemOptions | undefined = config.find(
 				(item) =>
 					isCardToolbarItemOptions(item) &&
 					(item as CardToolbarItemOptions).type === 'dnd',
@@ -244,7 +247,7 @@ class CardToolbar implements CardToolbarInterface {
 	}
 
 	update() {
-		const items = this.getItems();
+		const [items] = this.getItems();
 		this.toolbar?.update({
 			items,
 		});
