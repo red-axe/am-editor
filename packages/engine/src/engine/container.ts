@@ -24,7 +24,6 @@ class Container {
 	private options: Options;
 	private node: NodeInterface;
 	private _focused: boolean = false;
-	private _isMousedown = false;
 
 	constructor(selector: Selector, options: Options) {
 		this.node = $(selector);
@@ -114,30 +113,30 @@ class Container {
 			}
 		});
 		document.addEventListener('mousedown', this.docMouseDown);
-		this.node.on(isMobile ? 'touchstart' : 'mousedown', () => {
-			this._isMousedown = true;
-			setTimeout(() => {
-				if (!this._focused) {
-					this._focused = true;
-					engine.trigger('focus');
-				}
-				this._isMousedown = false;
-			}, 10);
-		});
+		this.node.on(isMobile ? 'touchstart' : 'mousedown', this.triggerFoucs);
 		this.node.on('focus', () => {
 			if (!engine.ot.isStopped() && engine.isEmpty())
 				engine.change.initValue();
-			this._isMousedown = false;
-			this._focused = true;
-			engine.trigger('focus');
-		});
-		this.node.on('blur', () => {
-			if (this._isMousedown) return;
-			this._isMousedown = false;
-			this._focused = false;
-			engine.trigger('blur');
 		});
 	}
+
+	private focusTimeout: NodeJS.Timeout | null = null;
+
+	triggerFoucs = () => {
+		const { engine } = this.options;
+		if (this.focusTimeout) clearTimeout(this.focusTimeout);
+		this.focusTimeout = setTimeout(() => {
+			if (this._focused) return;
+			const range = engine.change.range.get();
+			if (
+				range.commonAncestorNode.isRoot() ||
+				range.commonAncestorNode.inEditor()
+			) {
+				this._focused = true;
+				engine.trigger('focus');
+			}
+		}, 0);
+	};
 
 	onInput = (e: InputEvent) => {
 		const { engine } = this.options;
@@ -161,9 +160,25 @@ class Container {
 		}
 	};
 
+	private blurTimeout: NodeJS.Timeout | null = null;
+
 	docMouseDown = (e: MouseEvent) => {
-		if (e.target && $(e.target).closest(UI_SELECTOR).length > 0) {
-			this._isMousedown = true;
+		if (!e.target) return;
+		const targetNode = $(e.target);
+		if (
+			this._focused &&
+			targetNode.closest(UI_SELECTOR).length === 0 &&
+			!targetNode.inEditor()
+		) {
+			if (this.blurTimeout) clearTimeout(this.blurTimeout);
+			this.blurTimeout = setTimeout(() => {
+				const { engine } = this.options;
+				const range = engine.change.range.get();
+				if (!range.commonAncestorNode.inEditor()) {
+					this._focused = false;
+					engine.trigger('blur');
+				}
+			}, 0);
 		}
 	};
 

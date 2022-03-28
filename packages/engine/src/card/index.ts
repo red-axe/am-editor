@@ -418,12 +418,6 @@ class CardModel implements CardModelInterface {
 				) {
 					event?.preventDefault();
 				}
-				if (
-					!isCurrentActiveCard &&
-					trigger === CardActiveTrigger.MOUSE_DOWN
-				) {
-					editor.trigger('focus');
-				}
 				editor.change.onSelect();
 			}
 		}
