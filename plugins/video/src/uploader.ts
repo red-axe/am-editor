@@ -108,7 +108,7 @@ export default class<
 		return 'video-uploader';
 	}
 
-	extensionNames: string[] | Record<string, string> = { mp4: 'video/mpeg4' };
+	extensionNames: string[] | Record<string, string> = { mp4: 'video/mp4' };
 
 	init() {
 		if (isEngine(this.editor)) {
