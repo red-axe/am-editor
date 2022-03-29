@@ -177,7 +177,7 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 						}" spellcheck="false" class="data-embed-input" value="" autocomplete="off"/>
                     </span>      
                     <span class="data-embed-button">
-                        <button class="data-embed-ui-button" data-role="submit">
+                        <button type="button" class="data-embed-ui-button" data-role="submit">
                             <span>${locales['submit']}</span>
                         </button>
                     </span>

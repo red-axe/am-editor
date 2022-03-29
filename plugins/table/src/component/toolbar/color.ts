@@ -39,7 +39,7 @@ class Color {
 		this.#position = new Position(this.#editor);
 		this.#color = options.defaultColor || 'transparent';
 		this.#button = $(`<div class="table-color-dropdown-trigger">
-        <button class="table-color-dropdown-button-text">
+        <button type="button" class="table-color-dropdown-button-text">
             <svg width="16px" height="16px" viewBox="0 0 16 16" style="margin-bottom: ${
 				this.#color === 'transparent' ? -5 : -3
 			}">
@@ -51,7 +51,7 @@ class Color {
                 </g>
             </svg>
         </button>
-        <button class="table-color-dropdown-arrow">
+        <button type="button" class="table-color-dropdown-arrow">
             <span class="table-color-dropdown-empty"></span>
             <span class="data-icon data-icon-arrow"></span>
         </button>

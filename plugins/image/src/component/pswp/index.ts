@@ -73,7 +73,7 @@ class Pswp extends EventEmitter2 implements PswpInterface {
                     <div class="pswp__item"></div>
                 </div>
                 <div class="pswp__ui pswp__ui--hidden">
-                    <button class="pswp__button data-pswp-button-close" title="Close (Esc)"></button>
+                    <button type="button" class="pswp__button data-pswp-button-close" title="Close (Esc)"></button>
                     <div class="data-pswp-custom-top-bar"></div>
                 </div>
             </div>
