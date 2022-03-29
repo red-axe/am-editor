@@ -193,7 +193,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		if (td.name !== 'td') return [-1, -1];
 		const row = td.parent()?.index();
 		if (row === undefined || row < 0) return [-1, -1];
-		const col = this.tableModel?.table[row].findIndex((cell) =>
+		const col = this.tableModel?.table[row]?.findIndex((cell) =>
 			td.equal(
 				(this.table.helper.isEmptyModelCol(cell)
 					? (this.tableModel?.table[cell.parent.row][

@@ -164,11 +164,13 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		if (!tableModel || !this.tableRoot) return;
 		const table = tableModel.table;
 		const selectArea = { ...selection.getSelectArea() };
-		selection.each((cell) => {
-			if (!helper.isEmptyModelCol(cell)) {
-				selectArea.end.col += cell.colSpan - 1;
-			}
-		});
+		if (selectArea.end.col - selectArea.begin.col === 0) {
+			selection.each((cell) => {
+				if (!helper.isEmptyModelCol(cell)) {
+					selectArea.end.col += cell.colSpan - 1;
+				}
+			});
+		}
 		const count = selectArea.end.col - selectArea.begin.col + 1;
 		const colgroup = this.tableRoot.find('colgroup');
 		let trs = this.tableRoot.find('tr');
@@ -391,11 +393,15 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const table = tableModel.table;
 		const selectArea = { ...selection.getSelectArea() };
 		const { begin, end } = selectArea;
-		selection.each((cell) => {
-			if (!helper.isEmptyModelCol(cell)) {
-				end.row += cell.rowSpan - 1;
-			}
-		});
+		// 单独选中一行，就计算是否有合并的单元格
+		if (end.row - begin.row === 0) {
+			selection.each((cell) => {
+				if (!helper.isEmptyModelCol(cell)) {
+					end.row += cell.rowSpan - 1;
+				}
+			});
+		}
+
 		const count = end.row - begin.row + 1;
 		const trs = this.tableRoot.find('tr');
 
