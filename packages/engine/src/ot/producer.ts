@@ -205,7 +205,10 @@ class Producer extends EventEmitter2 {
 			// 最近的block节点
 			const blockElement = targetElement.attributes(DATA_ID)
 				? targetElement
-				: this.engine.block.closest(targetElement);
+				: this.engine.block.closest(
+						targetElement,
+						(node) => !!node.attributes(DATA_ID),
+				  );
 			// 最近的block节点id
 			const rootId = blockElement.attributes(DATA_ID);
 			let path = pathCaches.get(targetElement);

@@ -109,6 +109,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 					DATA_TRANSIENT_ATTRIBUTES,
 					'table-cell-selection',
 				);
+				this.editor.nodeId.generate(td);
 			}
 		});
 
@@ -238,6 +239,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 							td.innerHTML = this.table.template.getEmptyCell();
 							td.colSpan = tdModel.colSpan - cutCount;
 							td.rowSpan = tdModel.rowSpan;
+							this.editor.nodeId.generate(td);
 							//if(tdModel.element)
 							//    helper.copyCss(tdModel.element, td)
 						}
@@ -331,6 +333,8 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			$(baseRowBar)[insertMethod](
 				$((baseRowBar as HTMLElement).outerHTML),
 			);
+			this.editor.nodeId.generate(tr);
+			this.editor.nodeId.generateAll(tr);
 			_count--;
 		};
 
@@ -425,6 +429,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 						td.innerHTML = this.table.template.getEmptyCell();
 						td.colSpan = tdModel.colSpan;
 						td.rowSpan = tdModel.rowSpan - cutCount;
+						this.editor.nodeId.generate(td);
 					}
 				}
 

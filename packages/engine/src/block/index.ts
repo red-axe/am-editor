@@ -151,11 +151,18 @@ class Block implements BlockModelInterface {
 	/**
 	 * 获取最近的block节点，找不到返回 node
 	 * @param node 节点
+	 * @param callback 回调
 	 */
-	closest(node: NodeInterface) {
+	closest(
+		node: NodeInterface,
+		callback: (node: NodeInterface) => boolean = () => true,
+	) {
 		const originNode = node;
 		while (node) {
-			if (node.isEditable() || this.editor.node.isBlock(node)) {
+			if (
+				(node.isEditable() || this.editor.node.isBlock(node)) &&
+				callback(node)
+			) {
 				return node;
 			}
 			const parentNode = node.parent();

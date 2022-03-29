@@ -24,8 +24,12 @@ export interface BlockModelInterface {
 	/**
 	 * 获取最近的block节点，找不到返回 node
 	 * @param node 节点
+	 * @param callback 回调函数
 	 */
-	closest(node: NodeInterface): NodeInterface;
+	closest(
+		node: NodeInterface,
+		callback?: (node: NodeInterface) => boolean,
+	): NodeInterface;
 	/**
 	 * 在光标位置包裹一个block节点
 	 * @param block 节点
