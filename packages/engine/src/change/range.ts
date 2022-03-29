@@ -4,7 +4,7 @@ import {
 	RangeInterface,
 } from '../types';
 import { $ } from '../node';
-import { CARD_ELEMENT_KEY } from '../constants';
+import { CARD_ELEMENT_KEY, CARD_KEY } from '../constants';
 import Range from '../range';
 
 export type ChangeRangeOptions = {
@@ -218,6 +218,11 @@ class ChangeRange implements ChangeRangeInterface {
 		}
 		startNode = range.startNode;
 		endNode = range.endNode;
+		if (startNode.isText() || endNode.isText()) {
+			const cloneRange = range.cloneRange().enlargeFromTextNode();
+			startNode = cloneRange.startNode;
+			endNode = cloneRange.endNode;
+		}
 		const startChildNodes = startNode.children();
 		// 自定义列表节点选中卡片前面就让光标到卡片后面去
 		if (node.isCustomize(startNode) && startOffset === 0) {
@@ -261,6 +266,19 @@ class ChangeRange implements ChangeRangeInterface {
 		}
 		// 空列表添加br
 		if (startNode.name === 'li' && !otStopped) {
+			if (node.isCustomize(startNode) && !startNode.first()?.isCard()) {
+				const cardItem = startNode
+					.parent()
+					?.children()
+					.toArray()
+					.find((child) => child.first()?.isCard());
+				const cardKey = cardItem?.first()?.attributes(CARD_KEY);
+				if (cardKey) {
+					this.engine.list.addCardToCustomize(startNode, cardKey);
+				} else {
+					this.engine.list.unwrapCustomize(startNode);
+				}
+			}
 			if (startChildNodes.length === 0) {
 				startNode.append('<br />');
 			} else if (
