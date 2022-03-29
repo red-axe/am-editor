@@ -500,7 +500,10 @@ class NativeEvent {
 				this.paste(source);
 				setTimeout(() => {
 					// 如果 text 和 html 都有，就解析 text
-					pasteMarkdown(source, text || '');
+					pasteMarkdown(
+						source.replace(/\r\n/g, '\n'),
+						(text || '').replace(/\r\n/g, '\n'),
+					);
 				}, 200);
 			}
 		});
