@@ -1,6 +1,7 @@
 import { NodeInterface, TypingHandleInterface } from '../../types';
 import { $ } from '../../node';
 import DefaultKeydown from './default';
+import { CARD_CENTER_SELECTOR } from '../../constants';
 
 class Backspace extends DefaultKeydown implements TypingHandleInterface {
 	type: 'keydown' | 'keyup' = 'keydown';
@@ -71,6 +72,13 @@ class Backspace extends DefaultKeydown implements TypingHandleInterface {
 				prev.remove();
 			}
 			change.delete(range);
+			const afterPrev = range.startNode.prev();
+			if (
+				afterPrev?.isCard() &&
+				afterPrev.find(CARD_CENTER_SELECTOR).length === 0
+			) {
+				afterPrev.remove();
+			}
 			change.apply(range);
 			if (this.engine.scrollNode)
 				range.scrollIntoViewIfNeeded(

@@ -233,7 +233,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 
 	getCenter() {
 		const center = this.findByKey('center');
-		if (!center) throw new Error('center is not found');
+		if (!center) return $([]);
 		return center;
 	}
 

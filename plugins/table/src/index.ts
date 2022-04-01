@@ -591,7 +591,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			const tbRegNode = textNode.splitText(tbMatch.index);
 			// 获取表头
 			const thReg = new RegExp(
-				`(\\|?([^\\|\\n]+)\\|?){${colCount},}\\s*$`,
+				`(\\|?([^\\|\\n]{0,})\\|?){${colCount},}\\s*$`,
 			);
 			const headRows = (textNode.textContent || '').split(/\n/);
 			let match = thReg.exec(
@@ -613,7 +613,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			);
 			// 遍历剩下的行
 			const tdReg = new RegExp(
-				`^\\n*(\\|?([^\\|\\n]+)\\|?){1,${colCount}}(?:\\n|$)`,
+				`^\\n*(\\|?([^\\|\\n]{0,})\\|?){1,${colCount}}(?:\\n|$)`,
 			);
 			while (match) {
 				match = tdReg.exec(regNode.textContent || '');
