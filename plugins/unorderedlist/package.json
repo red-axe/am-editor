@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-unorderedlist",
-  "version": "2.8.12",
+  "version": "2.8.13",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.8.12",
+    "@aomao/engine": "^2.8.13",
     "@babel/runtime": "^7.13.10"
   }
 }
