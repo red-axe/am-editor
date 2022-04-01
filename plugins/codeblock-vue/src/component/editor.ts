@@ -133,6 +133,13 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			},
 		});
 		this.codeMirror.on('keydown', (editor, event) => {
+			// 复制
+			if (isHotkey('mod+c', event)) {
+				const content = this.codeMirror?.getSelection();
+				event.preventDefault();
+				this.editor.clipboard.copy(content || '', true);
+				return;
+			}
 			// 撤销和重做使用codemirror自带的操作
 			if (
 				isHotkey('mod+z', event) ||

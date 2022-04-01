@@ -173,16 +173,4 @@ export default class Clipboard implements ClipboardInterface {
 			}
 		}
 	}
-
-	private setNodes(nodes: Array<Node>) {
-		if (0 === nodes.length) return {};
-		for (let i = nodes.length - 1; i > 0; i--) {
-			const node = nodes[i];
-			node.appendChild(nodes[i - 1]);
-		}
-		return {
-			inner: nodes[0],
-			outter: nodes[nodes.length - 1],
-		};
-	}
 }
