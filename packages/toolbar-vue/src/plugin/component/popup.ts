@@ -141,6 +141,7 @@ export default class Popup {
 				(scrollElement?.scrollLeft || 0) +
 				targetRect.width -
 				rootRect.width / 2;
+			if (left < 0) left = 16;
 			this.#point = {
 				left,
 				top,
