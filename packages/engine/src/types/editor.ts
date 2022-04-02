@@ -56,6 +56,13 @@ export interface EditorOptions {
 	 * 懒惰渲染卡片（仅限已启用 lazyRender 的卡片），默认为 true
 	 */
 	lazyRender?: boolean;
+	/**
+	 * 字体图标链接
+	 * 默认： url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'),
+       url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff?t=1638071536645') format('woff'),
+       url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype');
+	 */
+	iconFonts?: Record<'url' | 'format', string>[] | string;
 }
 
 export interface EditorInterface<T extends EditorOptions = EditorOptions> {

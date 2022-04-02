@@ -62,6 +62,8 @@ class Editor<T extends EditorOptions = EditorOptions>
 		plugins: [] as PluginEntry[],
 		cards: [] as CardEntry[],
 		config: {},
+		iconFonts:
+			"url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff?t=1638071536645') format('woff'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype')",
 	} as T;
 	readonly container: NodeInterface;
 
@@ -112,6 +114,25 @@ class Editor<T extends EditorOptions = EditorOptions>
 
 	constructor(selector: Selector, options?: EditorOptions) {
 		this.options = { ...this.options, ...options };
+		let { iconFonts } = this.options;
+		let fontElement = document.querySelector('#am-iconfont');
+		if (!fontElement) {
+			fontElement = document.createElement('style');
+			fontElement.setAttribute('type', 'text/css');
+			fontElement.setAttribute('id', 'am-iconfont');
+			let fontsStyle = '@font-face { font-family: "data-icon";';
+			if (Array.isArray(iconFonts)) {
+				iconFonts = iconFonts
+					.map(
+						(font) => `url('${font.url}') format('${font.format}')`,
+					)
+					.join(',');
+			}
+			fontsStyle += `src: ${iconFonts};}`;
+			fontElement.innerHTML = fontsStyle;
+			document.head.appendChild(fontElement);
+		}
+
 		this.container = $(selector);
 		this.container.attributes(DATA_ELEMENT, ROOT);
 		// 多语言
