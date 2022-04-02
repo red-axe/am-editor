@@ -203,7 +203,9 @@ class Image {
 			event.stopPropagation();
 			event.preventDefault();
 			Tooltip.hide();
-			this.editor.clipboard.copy(this.options.message || 'Error message');
+			this.editor.clipboard.copy(
+				this.message || this.options.message || 'Error message',
+			);
 			this.editor.messageSuccess(
 				this.editor.language.get('copy', 'success').toString(),
 			);
