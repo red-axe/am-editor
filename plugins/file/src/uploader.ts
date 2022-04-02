@@ -85,7 +85,7 @@ export default class<
 		return 'file-uploader';
 	}
 
-	extensionNames: Record<string, string> | string[] = ['*'];
+	extensionNames: Record<string, string> | string[] = { '*': '*' };
 
 	init() {
 		if (isEngine(this.editor)) {
