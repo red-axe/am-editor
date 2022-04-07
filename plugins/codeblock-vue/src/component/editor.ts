@@ -137,7 +137,13 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			if (isHotkey('mod+c', event)) {
 				const content = this.codeMirror?.getSelection();
 				event.preventDefault();
-				this.editor.clipboard.copy(content || '', true);
+				this.editor.clipboard.copy(
+					(content || '')
+						.split(/(\r\n|\n)/gi)
+						.map((text) => `<p>${text}</p>`)
+						.join(''),
+					true,
+				);
 				return;
 			}
 			// 撤销和重做使用codemirror自带的操作

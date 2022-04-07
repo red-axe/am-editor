@@ -93,7 +93,9 @@ export default class Clipboard implements ClipboardInterface {
 
 	copy(data: Node | string, trigger: boolean = false) {
 		if (typeof data === 'string') {
-			return copyTo(data);
+			return copyTo(data, {
+				format: /<[^>]+>/g.test(data) ? 'text/html' : 'text/plain',
+			});
 		}
 		const editor = this.editor;
 		const selection = window.getSelection();
