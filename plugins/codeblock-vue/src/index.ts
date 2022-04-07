@@ -64,6 +64,10 @@ export default class<
 	execute(mode: string, value: string) {
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
+		if (!value) {
+			const data = this.editor.getSelectionData();
+			if (data) value = data.text;
+		}
 		const component = card.insert<
 			CodeBlockValue,
 			CodeBlockComponent<CodeBlockValue>
