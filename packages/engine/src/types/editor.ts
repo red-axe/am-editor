@@ -62,7 +62,7 @@ export interface EditorOptions {
        url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff?t=1638071536645') format('woff'),
        url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype');
 	 */
-	iconFonts?: Record<'url' | 'format', string>[] | string;
+	iconFonts?: Record<'url' | 'format', string>[] | string | false;
 }
 
 export interface EditorInterface<T extends EditorOptions = EditorOptions> {

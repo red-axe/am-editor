@@ -116,7 +116,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 		this.options = { ...this.options, ...options };
 		let { iconFonts } = this.options;
 		let fontElement = document.querySelector('#am-iconfont');
-		if (!fontElement) {
+		if (!fontElement && iconFonts !== false) {
 			fontElement = document.createElement('style');
 			fontElement.setAttribute('type', 'text/css');
 			fontElement.setAttribute('id', 'am-iconfont');

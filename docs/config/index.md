@@ -241,6 +241,6 @@ After rendering, `View` loses all editing capabilities and collaboration capabil
 
 ### iconFonts
 
--   Type: `Record<'url' | 'format', string>[] | string`
+-   Type: `Record<'url' | 'format', string>[] | string | false`
 -   Default: `url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff ?t=1638071536645') format('woff'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype')`
 -   Detailed: define the url of the iconfont file, the font file of at.alicdn.com is used by default, if you need to use the font file of other location, you can use this configuration

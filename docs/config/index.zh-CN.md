@@ -241,6 +241,6 @@ console.log(view.language.get<string>('test'));
 
 ### iconFonts
 
--   类型: `Record<'url' | 'format', string>[] | string`
+-   类型: `Record<'url' | 'format', string>[] | string | false`
 -   默认值：`url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff?t=1638071536645') format('woff'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype')`
 -   详细：定义 iconfont 文件的 url，默认使用 at.alicdn.com 的字体文件，如果需要使用其他位置的字体文件，可以使用此配置
