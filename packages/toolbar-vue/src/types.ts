@@ -15,7 +15,9 @@ export const buttonProps = {
 		required: true,
 	} as const,
 	icon: String,
-	content: [String, Function] as PropType<string | (() => string) | VNode>,
+	content: [String, Function] as PropType<
+		string | ((engine?: EngineInterface) => string) | VNode
+	>,
 	title: String,
 	placement: String as PropType<Placement>,
 	hotkey: [String, Object] as PropType<boolean | string | undefined>,
@@ -33,10 +35,18 @@ export const buttonProps = {
 		type: [Boolean, undefined] as PropType<boolean | undefined>,
 		default: undefined,
 	},
-	onClick: Function as PropType<(event: MouseEvent) => void | boolean>,
-	onMouseDown: Function as PropType<(event: MouseEvent) => void | boolean>,
-	onMouseEnter: Function as PropType<(event: MouseEvent) => void | boolean>,
-	onMouseLevel: Function as PropType<(event: MouseEvent) => void | boolean>,
+	onClick: Function as PropType<
+		(event: MouseEvent, engine?: EngineInterface) => void | boolean
+	>,
+	onMouseDown: Function as PropType<
+		(event: MouseEvent, engine?: EngineInterface) => void | boolean
+	>,
+	onMouseEnter: Function as PropType<
+		(event: MouseEvent, engine?: EngineInterface) => void | boolean
+	>,
+	onMouseLevel: Function as PropType<
+		(event: MouseEvent, engine?: EngineInterface) => void | boolean
+	>,
 };
 
 export type ButtonProps = ExtractPropTypes<typeof buttonProps>;
@@ -49,7 +59,7 @@ export type GroupButtonProps = {
 export type DropdownListItem = {
 	key: string;
 	icon?: string;
-	content?: string | (() => string);
+	content?: string | ((engine?: EngineInterface) => string);
 	hotkey?: boolean | string;
 	isDefault?: boolean;
 	disabled?: boolean;
@@ -79,7 +89,11 @@ export const dropdownListProps = {
 	} as const,
 	className: String,
 	onSelect: Function as PropType<
-		(event: MouseEvent, key: string) => void | boolean
+		(
+			event: MouseEvent,
+			key: string,
+			engine?: EngineInterface,
+		) => void | boolean
 	>,
 	hasDot: {
 		type: [Boolean, undefined] as PropType<boolean | undefined>,
@@ -103,7 +117,9 @@ export const dropdownProps = {
 	} as const,
 	icon: String,
 	placement: String as PropType<Placement>,
-	content: [String, Function] as PropType<string | (() => string)>,
+	content: [String, Function] as PropType<
+		string | ((engine?: EngineInterface) => string)
+	>,
 	title: String,
 	disabled: {
 		type: [Boolean, undefined] as PropType<boolean | undefined>,
@@ -116,7 +132,11 @@ export const dropdownProps = {
 	className: String,
 	direction: String as PropType<'vertical' | 'horizontal'>,
 	onSelect: Function as PropType<
-		(event: MouseEvent, key: string) => void | boolean
+		(
+			event: MouseEvent,
+			key: string,
+			engine?: EngineInterface,
+		) => void | boolean
 	>,
 	hasArrow: {
 		type: [Boolean, undefined] as PropType<boolean | undefined>,
@@ -226,9 +246,15 @@ export const collapseItemProps = {
 	className: buttonProps.className,
 	placement: buttonProps.placement,
 	onClick: Function as PropType<
-		(event: MouseEvent, name: string) => boolean | void
+		(
+			event: MouseEvent,
+			name: string,
+			engine?: EngineInterface,
+		) => boolean | void
 	>,
-	onMouseDown: Function as PropType<(event: MouseEvent) => void>,
+	onMouseDown: Function as PropType<
+		(event: MouseEvent, engine?: EngineInterface) => void
+	>,
 };
 export type CollapseItemProps = ExtractPropTypes<typeof collapseItemProps> & {
 	onDisabled?: () => boolean;
@@ -314,7 +340,7 @@ export type ToolbarItemProps =
 
 export type GroupItemDataProps = {
 	icon?: string;
-	content?: string | (() => string) | VNode;
+	content?: string | ((engine?: EngineInterface) => string) | VNode;
 	items: Array<ToolbarItemProps | string>;
 };
 

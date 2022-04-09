@@ -16,7 +16,7 @@
 					direction !== 'horizontal' &&
 					hasDot !== false" class="data-icon data-icon-dot"></span>
                 <slot name="icon"><span v-if="icon" :class="['data-icon',`data-icon-${icon}`]" /></slot>
-                <div v-html="typeof content === 'function' ? content() : content"></div>
+                <div v-html="typeof content === 'function' ? content(engine) : content"></div>
             </a>
         </a-tooltip>
     </div>
@@ -69,7 +69,7 @@ export default defineComponent({
             const item = this.items.find(item => item.key === key);
             if (!item || item.disabled) return;
             const { autoExecute, command } = item;
-            if (this.onSelect && this.onSelect(event, key) === false) return;
+            if (this.onSelect && this.onSelect(event, key, this.engine) === false) return;
             if (autoExecute !== false) {
                 let commandName = this.name;
                 let commandArgs = [key];

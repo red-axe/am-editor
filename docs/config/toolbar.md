@@ -52,7 +52,17 @@ items: [
 
 If the default configuration is found through the `name` attribute, the `type` attribute will not be overwritten. If the configured `name` is not part of the default configuration, it will be processed according to the custom button
 
-## pop-up windows
+## Toolbar components
+
+To use the toolbar in the form of components, you need to pass in the engine instance and items configuration items
+
+```ts
+import Toolbar from '@aomao/toolbar';
+
+<Toolbar engine={engine} items={items} />;
+```
+
+## Popup
 
 Follow the mouse to drag the selected toolbar pop-up box
 
@@ -76,6 +86,35 @@ const toolbarOptions: ToolbarOptions = {
             },
         ],
     },
+};
+new Engine(...,{ config: {
+     [ToolbarPlugin.pluginName]: toolbarOptions,
+} })
+
+```
+
+## Shortcuts popup toolbar
+
+Popup card toolbar after typing /
+
+```ts
+import { ToolbarPlugin } from '@aomao/toolbar';
+import type { ToolbarOptions } from '@aomao/toolbar';
+const toolbarOptions: ToolbarOptions = {
+    config: [
+        {
+            title: 'Group title', // optional
+            items: [
+                'image-uploader',
+                'codeblock',
+                'table',
+                'file-uploader',
+                'video-uploader',
+                'math',
+                'status',
+            ],
+        },
+    ],
 };
 new Engine(...,{ config: {
      [ToolbarPlugin.pluginName]: toolbarOptions,
@@ -112,7 +151,7 @@ It can be a React component, or it can be a string of html in Vue. Or a method, 
 List item selected event, return `false`, the default command of list item configuration will not be executed
 
 ```ts
-onSelect?: (event: React.MouseEvent, name: string) => void | boolean;
+onSelect?: (event: React.MouseEvent, name: string, engine?: EngineInterface) => void | boolean;
 ```
 
 ### groups
@@ -211,7 +250,7 @@ The effect is similar to the `table` card item. After the input is moved in, a t
 List item click event, return `false` will not execute the configured default command
 
 ```ts
-onClick?: (event: React.MouseEvent, name: string) => void | boolean;
+onClick?: (event: React.MouseEvent, name: string, engine?: EngineInterface) => void | boolean;
 ```
 
 ## Button
@@ -315,7 +354,7 @@ Mouse click event
 If it returns false, the plugin command will not be executed automatically
 
 ```ts
-onClick?: (event: React.MouseEvent) => void | boolean;
+onClick?: (event: React.MouseEvent, engine?: EngineInterface) => void | boolean;
 ```
 
 ### onMouseDown
@@ -323,7 +362,7 @@ onClick?: (event: React.MouseEvent) => void | boolean;
 Mouse button press event
 
 ```ts
-onMouseDown?: (event: React.MouseEvent) => void;
+onMouseDown?: (event: React.MouseEvent, engine?: EngineInterface) => void;
 ```
 
 ### onMouseEnter
@@ -331,7 +370,7 @@ onMouseDown?: (event: React.MouseEvent) => void;
 Mouse in button event
 
 ```ts
-onMouseEnter?: (event: React.MouseEvent) => void;
+onMouseEnter?: (event: React.MouseEvent, engine?: EngineInterface) => void;
 ```
 
 ### onMouseLeave
@@ -339,7 +378,7 @@ onMouseEnter?: (event: React.MouseEvent) => void;
 Mouse off button event
 
 ```ts
-onMouseLeave?: (event: React.MouseEvent) => void;
+onMouseLeave?: (event: React.MouseEvent, engine?: EngineInterface) => void;
 ```
 
 ### onActive
@@ -390,7 +429,7 @@ Drop-down list items, similar to buttons
 items:[{
     key: string;
     icon?: React.ReactNode;
-    content?: React.ReactNode | (() => React.ReactNode);
+    content?: React.ReactNode | ((engine?: EngineInterface) => React.ReactNode);
     hotkey?: boolean | string;
     isDefault?: boolean;
     title?: string;
@@ -471,7 +510,7 @@ direction?:'vertical' |'horizontal';
 List item selection event, return `false` will not automatically execute the command configured for the selected item
 
 ```ts
-onSelect?: (event: React.MouseEvent, key: string) => void | boolean;
+onSelect?: (event: React.MouseEvent, key: string, engine?: EngineInterface) => void | boolean;
 ```
 
 ### hasArrow
@@ -497,7 +536,7 @@ Custom render the content displayed after the drop-down list is selected, the de
 Can return React components or Vue can return html strings
 
 ```ts
-renderContent?: (item: DropdownListItem) => React.ReactNode;
+renderContent?: (item: DropdownListItem, engine?: EngineInterface) => React.ReactNode;
 ```
 
 ### onActive

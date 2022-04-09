@@ -13,16 +13,23 @@ export type DropdownProps = {
 	engine?: EngineInterface;
 	placement?: Placement;
 	icon?: React.ReactNode;
-	content?: React.ReactNode | (() => React.ReactNode);
+	content?: React.ReactNode | ((engine?: EngineInterface) => React.ReactNode);
 	title?: string;
 	disabled?: boolean;
 	single?: boolean;
 	className?: string;
 	direction?: 'vertical' | 'horizontal';
-	onSelect?: (event: React.MouseEvent, key: string) => void | boolean;
+	onSelect?: (
+		event: React.MouseEvent,
+		key: string,
+		engine?: EngineInterface,
+	) => void | boolean;
 	hasArrow?: boolean;
 	hasDot?: boolean;
-	renderContent?: (item: DropdownListItem) => React.ReactNode;
+	renderContent?: (
+		item: DropdownListItem,
+		engine?: EngineInterface,
+	) => React.ReactNode;
 };
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -85,19 +92,21 @@ const Dropdown: React.FC<DropdownProps> = ({
 
 	const triggerSelect = (event: React.MouseEvent, key: string) => {
 		hide();
-		if (onSelect) onSelect(event, key);
+		if (onSelect) onSelect(event, key, engine);
 	};
 
 	const renderCustomeContent = (
 		icon?: React.ReactNode,
-		content?: React.ReactNode,
-	) => {
+		content?:
+			| React.ReactNode
+			| ((engine?: EngineInterface) => React.ReactNode),
+	): React.ReactNode => {
 		return icon ? (
 			<span className={`data-icon data-icon-${icon}`} />
 		) : typeof content === 'string' ? (
 			<span className="toolbar-dropdown-button-text">{content}</span>
 		) : typeof content === 'function' ? (
-			content()
+			content(engine)
 		) : (
 			content
 		);
@@ -116,7 +125,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 			: null;
 	let buttonContent = item
 		? renderContent
-			? renderContent(item)
+			? renderContent(item, engine)
 			: Array.isArray(values) && values.length > 1
 			? renderCustomeContent(icon, content)
 			: renderCustomeContent(item.icon, item.content)

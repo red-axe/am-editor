@@ -15,7 +15,7 @@
                 <span v-if="iconIsHtml" v-html="icon"></span>
                 <span v-if="!iconIsHtml && icon" :class="`data-icon data-icon-${icon}`" />
             </slot>
-            <slot>{{typeof content === 'function' ? content() : content}}</slot>
+            <slot>{{typeof content === 'function' ? content(engine) : content}}</slot>
         </button>
     </a-tooltip>
 </template>
@@ -66,15 +66,15 @@ export default defineComponent({
         triggerMouseDown(event:MouseEvent){
             event.preventDefault();
             if (this.disabled) return;
-            if (this.onMouseDown) this.onMouseDown(event);
+            if (this.onMouseDown) this.onMouseDown(event, this.engine);
             this.visible = false
         },
         triggerMouseEnter(event:MouseEvent){
-            if(this.onMouseEnter) this.onMouseEnter(event)
+            if(this.onMouseEnter) this.onMouseEnter(event, this.engine)
             this.visible = true
         },
         triggerMouseLeave(event:MouseEvent){
-            if(this.onMouseLevel) this.onMouseLevel(event)
+            if(this.onMouseLevel) this.onMouseLevel(event, this.engine)
             this.visible = false
         },
         triggerClick(event: MouseEvent){
@@ -82,7 +82,7 @@ export default defineComponent({
             if (nodeName !== 'INPUT' && nodeName !== 'TEXTAREA')
                 event.preventDefault();
             if (this.disabled) return;
-            if (this.onClick && this.onClick(event) === false) return;
+            if (this.onClick && this.onClick(event, this.engine) === false) return;
             if (this.autoExecute !== false) {
                 let commandName = this.name;
                 let commandArgs = [];

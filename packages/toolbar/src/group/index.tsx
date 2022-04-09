@@ -32,7 +32,7 @@ export type GroupProps = {
 		GroupButtonProps | GroupDropdownProps | GroupColorProps | CollapseProps
 	>;
 	icon?: React.ReactNode;
-	content?: React.ReactNode | (() => React.ReactNode);
+	content?: React.ReactNode | ((engine?: EngineInterface) => React.ReactNode);
 	popup?: boolean;
 };
 

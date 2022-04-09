@@ -8,7 +8,7 @@ import 'antd/es/tooltip/style';
 export type DropdownListItem = {
 	key: string;
 	icon?: React.ReactNode;
-	content?: React.ReactNode | (() => React.ReactNode);
+	content?: React.ReactNode | ((engine?: EngineInterface) => React.ReactNode);
 	hotkey?: boolean | string;
 	isDefault?: boolean;
 	title?: string;
@@ -123,7 +123,7 @@ const DropdownList: React.FC<DropdownListProps> = ({
 				) : (
 					icon
 				)}
-				{typeof content === 'function' ? content() : content}
+				{typeof content === 'function' ? content(engine) : content}
 			</a>
 		);
 		let titleElement = title ? (

@@ -12,7 +12,7 @@ export type CollapseProps = {
 	engine?: EngineInterface;
 	className?: string;
 	icon?: React.ReactNode;
-	content?: React.ReactNode | (() => React.ReactNode);
+	content?: React.ReactNode | ((engine?: EngineInterface) => React.ReactNode);
 	onSelect?: (event: React.MouseEvent, name: string) => void | boolean;
 };
 

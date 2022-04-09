@@ -18,8 +18,12 @@ export type CollapseItemProps = {
 	onDisabled?: () => boolean;
 	className?: string;
 	placement?: Placement;
-	onClick?: (event: React.MouseEvent, name: string) => void | boolean;
-	onMouseDown?: (event: React.MouseEvent) => void;
+	onClick?: (
+		event: React.MouseEvent,
+		name: string,
+		engine?: EngineInterface,
+	) => void | boolean;
+	onMouseDown?: (event: React.MouseEvent, engine?: EngineInterface) => void;
 };
 
 const CollapseItem: React.FC<CollapseItemProps> = (props) => {
@@ -34,7 +38,6 @@ const CollapseItem: React.FC<CollapseItemProps> = (props) => {
 		className,
 		prompt,
 		placement,
-		onMouseDown,
 	} = props;
 	const onClick = (event: React.MouseEvent) => {
 		if (disabled) return;
@@ -44,7 +47,7 @@ const CollapseItem: React.FC<CollapseItemProps> = (props) => {
 		if (nodeName !== 'INPUT' && nodeName !== 'TEXTAREA')
 			event.preventDefault();
 
-		if (onClick && onClick(event, name) === false) {
+		if (onClick && onClick(event, name, engine) === false) {
 			return;
 		}
 		if (autoExecute !== false) {
@@ -60,6 +63,10 @@ const CollapseItem: React.FC<CollapseItemProps> = (props) => {
 			}
 			engine?.command.execute(commandName, ...commandArgs);
 		}
+	};
+
+	const onMouseDown = (event: React.MouseEvent) => {
+		if (props.onMouseDown) props.onMouseDown(event, engine);
 	};
 
 	const render = () => {

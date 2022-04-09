@@ -80,19 +80,19 @@ export default defineComponent({
                     buttonContent.value =  item
                 }
                 else if(typeof props.content === "function") {
-                    buttonContent.value = {icon:props.icon,content:props.content()}
+                    buttonContent.value = {icon:props.icon,content:props.content(props.engine)}
                 }
                 else if(Array.isArray(values) && values.length > 1){
                     buttonContent.value = {icon:props.icon,content: props.content}
                 }else{
-                    buttonContent.value = {icon:item.icon,content:typeof item.content === "function" ? item.content() : item.content}
+                    buttonContent.value = {icon:item.icon,content:typeof item.content === "function" ? item.content(props.engine) : item.content}
                 }
             }else if(props.icon || props.content){
                 if(!Array.isArray(values) || values.length < 1){
-                    buttonContent.value = {icon:props.icon,content:typeof props.content === "function" ? props.content() : props.content}
+                    buttonContent.value = {icon:props.icon,content:typeof props.content === "function" ? props.content(props.engine) : props.content}
                 }
             }else if(defaultItem){
-                buttonContent.value = {icon:defaultItem.icon,content:typeof defaultItem.content === "function" ? defaultItem.content() : defaultItem.content}
+                buttonContent.value = {icon:defaultItem.icon,content:typeof defaultItem.content === "function" ? defaultItem.content(props.engine) : defaultItem.content}
             }
             valuesVar.value = values ||
 						(props.icon || props.content ? '' : defaultItem?.key || '')
@@ -122,7 +122,7 @@ export default defineComponent({
 
 	    const triggerSelect = (event: MouseEvent, key: string) => {
             hide()
-		    if (props.onSelect) props.onSelect(event, key);
+		    if (props.onSelect) props.onSelect(event, key, props.engine);
 	    }
         update(props.values)
         watch(() => ({...props}), (newProps) => update(newProps.values))

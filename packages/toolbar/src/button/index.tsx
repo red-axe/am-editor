@@ -11,7 +11,7 @@ export type ButtonProps = {
 	engine?: EngineInterface;
 	name: string;
 	icon?: React.ReactNode;
-	content?: React.ReactNode | (() => React.ReactNode);
+	content?: React.ReactNode | ((engine?: EngineInterface) => React.ReactNode);
 	title?: string;
 	placement?: Placement;
 	hotkey?: boolean | string;
@@ -20,10 +20,13 @@ export type ButtonProps = {
 	className?: string;
 	active?: boolean;
 	disabled?: boolean;
-	onClick?: (event: React.MouseEvent) => void | boolean;
-	onMouseDown?: (event: React.MouseEvent) => void;
-	onMouseEnter?: (event: React.MouseEvent) => void;
-	onMouseLeave?: (event: React.MouseEvent) => void;
+	onClick?: (
+		event: React.MouseEvent,
+		engine?: EngineInterface,
+	) => void | boolean;
+	onMouseDown?: (event: React.MouseEvent, engine?: EngineInterface) => void;
+	onMouseEnter?: (event: React.MouseEvent, engine?: EngineInterface) => void;
+	onMouseLeave?: (event: React.MouseEvent, engine?: EngineInterface) => void;
 };
 
 const ToolbarButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -40,7 +43,7 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 				event.preventDefault();
 
 			if (disabled) return;
-			if (onClick && onClick(event) === false) return;
+			if (onClick && onClick(event, engine) === false) return;
 			if (autoExecute !== false) {
 				let commandName = name;
 				let commandArgs = [];
@@ -60,7 +63,7 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 			event.preventDefault();
 			const { onMouseDown, disabled } = props;
 			if (disabled) return;
-			if (onMouseDown) onMouseDown(event);
+			if (onMouseDown) onMouseDown(event, engine);
 
 			setTooltipVisible(false);
 		};
@@ -68,7 +71,7 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 		const onMouseEnter = (event: React.MouseEvent) => {
 			const { onMouseEnter } = props;
 			if (onMouseEnter) {
-				onMouseEnter(event);
+				onMouseEnter(event, engine);
 			}
 			setTooltipVisible(true);
 		};
@@ -76,7 +79,7 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 		const onMouseLeave = (event: React.MouseEvent) => {
 			const { onMouseLeave } = props;
 			if (onMouseLeave) {
-				onMouseLeave(event);
+				onMouseLeave(event, engine);
 			}
 			setTooltipVisible(false);
 		};
@@ -100,7 +103,7 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 					) : (
 						icon
 					)}
-					{typeof content === 'function' ? content() : content}
+					{typeof content === 'function' ? content(engine) : content}
 				</button>
 			);
 		};

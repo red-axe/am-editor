@@ -16,7 +16,7 @@ type Config = Array<{
 	items: Array<Omit<CollapseItemProps, 'engine'> | string>;
 }>;
 export interface ToolbarOptions extends PluginOptions {
-	config?: Config;
+	config?: Config | false;
 	popup?: {
 		items: GroupItemProps[];
 	};
@@ -90,6 +90,7 @@ class ToolbarPlugin<
 			event.ctrlKey ||
 			event.metaKey
 		) {
+			if (this.options.config === false) return;
 			range = change.range.get();
 			if (range.collapsed) {
 				event.preventDefault();
