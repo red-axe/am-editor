@@ -105,6 +105,7 @@ new Engine(...,{ config: {
 import { ToolbarPlugin } from '@aomao/toolbar';
 import type { ToolbarOptions } from '@aomao/toolbar';
 const toolbarOptions: ToolbarOptions = {
+	// 或者配置 config: false 关闭此功能
 	config: [
 		{
 			title: '分组标题',// 可选

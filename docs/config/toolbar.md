@@ -101,6 +101,7 @@ Popup card toolbar after typing /
 import { ToolbarPlugin } from '@aomao/toolbar';
 import type { ToolbarOptions } from '@aomao/toolbar';
 const toolbarOptions: ToolbarOptions = {
+    // or configure config: false to turn off this feature
     config: [
         {
             title: 'Group title', // optional
