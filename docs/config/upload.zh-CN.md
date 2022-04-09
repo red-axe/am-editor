@@ -92,51 +92,103 @@ class CustomizeImageUploader extends ImageUploader {
 		// 获取文件后缀名
 		const ext = getExtensionName(file);
 		// 异步读取文件
-		return new Promise<false | { file: File; info: FileInfo }>(
-			(resolve, reject) => {
-				const fileReader = new FileReader();
-				fileReader.addEventListener(
-					'load',
-					() => {
-						resolve({
-							file,
-							info: {
-								// 唯一编号
-								uid,
-								// Blob
-								src: fileReader.result,
-								// 文件名称
-								name,
-								// 文件大小
-								size,
-								// 文件类型
-								type,
-								// 文件后缀名
-								ext,
-							},
-						});
-					},
-					false,
-				);
-				fileReader.addEventListener('error', () => {
-					reject(false);
-				});
-				fileReader.readAsDataURL(file);
-			},
-		);
+		return new Promise<
+			| false
+			| {
+					file: File;
+					info: FileInfo;
+					base64: string;
+					size: Record<string, number>;
+			  }
+		>((resolve, reject) => {
+			const fileReader = new FileReader();
+			fileReader.addEventListener(
+				'load',
+				() => {
+					const values = {
+						file,
+						info: {
+							// 唯一编号
+							uid,
+							// Blob
+							src: fileReader.result,
+							// 文件名称
+							name,
+							// 文件大小
+							size,
+							// 文件类型
+							type,
+							// 文件后缀名
+							ext,
+						},
+					};
+					// 如果是图片，则获取图片的宽高
+					const base64 =
+						typeof values.info.src !== 'string'
+							? window.btoa(
+									String.fromCharCode(...new Uint8Array(src)),
+							  )
+							: values.info.src;
+					const image = new Image();
+					image.src = values.info.src;
+					const imagePlugin =
+						this.editor.plugin.findPlugin<ImageOptions>('image');
+
+					image.onload = () => {
+						const { naturalWidth, naturalHeight, height, width } =
+							image;
+
+						let imageWidth: number = width;
+						let imageHeight: number = height;
+						const maxHeight: number | undefined =
+							imagePlugin?.options?.maxHeight;
+
+						if (
+							maxHeight &&
+							naturalHeight > naturalWidth &&
+							height > maxHeight
+						) {
+							imageHeight = maxHeight;
+							imageWidth =
+								naturalWidth * (maxHeight / naturalHeight);
+						}
+						values.base64 = base64;
+						(values.size = {
+							width: imageWidth,
+							height: imageHeight,
+							naturalHeight: image.naturalHeight,
+							naturalWidth: image.naturalWidth,
+						}),
+							resolve(values);
+					};
+					image.onerror = () => {
+						reject(false);
+					};
+				},
+				false,
+			);
+			fileReader.addEventListener('error', () => {
+				reject(false);
+			});
+			fileReader.readAsDataURL(file);
+		});
 	}
 	// 上传前插入编辑器
-	onReady(fileInfo: FileInfo) {
+	onReady(fileInfo: FileInfo, base64: string, size: Record<string, number>) {
 		// 如果当前图片的 ImageComponent 实例存在就不处理
 		if (!isEngine(this.editor) || !!this.imageComponents[fileInfo.uid])
 			return;
 		// 插入ImageComponent 卡片
-		const component = this.editor.card.insert(ImageComponent.cardName, {
-			// 设置状态为上传中
-			status: 'uploading',
+		const component = this.editor.card.insert(
+			ImageComponent.cardName,
+			{
+				// 设置状态为上传中
+				status: 'uploading',
+				size,
+			},
 			// 显示在 handleBefore 中获取的 base64 图片，这样不会导致编辑器区域空白
-			src: fileInfo.src,
-		}) as ImageComponent;
+			base64,
+		) as ImageComponent;
 		// 记录当前上传文件的 卡片实例
 		this.imageComponents[fileInfo.uid] = component;
 	}
@@ -255,10 +307,15 @@ class CustomizeImageUploader extends ImageUploader {
 				this.editor.messageError('read image failed');
 				return;
 			}
-			const files = values as { file: File; info: FileInfo }[];
+			const files = values as {
+				file: File;
+				info: FileInfo;
+				base64: string;
+				size: Record<string, number>;
+			}[];
 			files.forEach((v) => {
 				// 插入编辑器
-				this.onReady(v.info);
+				this.onReady(v.info, v.base64, v.size);
 			});
 			// 处理上传
 			this.handleUpload(files);
@@ -322,7 +379,7 @@ export default class {
 				fileReader.addEventListener(
 					'load',
 					() => {
-						resolve({
+						const values = {
 							file,
 							info: {
 								// 唯一编号
@@ -338,7 +395,8 @@ export default class {
 								// 文件后缀名
 								ext,
 							},
-						});
+						};
+						resolve(values);
 					},
 					false,
 				);

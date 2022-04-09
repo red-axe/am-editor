@@ -92,51 +92,103 @@ class CustomizeImageUploader extends ImageUploader {
 		// Get the file extension
 		const ext = getExtensionName(file);
 		// read files asynchronously
-		return new Promise<false | { file: File; info: FileInfo }>(
-			(resolve, reject) => {
-				const fileReader = new FileReader();
-				fileReader.addEventListener(
-					'load',
-					() => {
-						resolve({
-							file,
-							info: {
-								// unique number
-								uid,
-								// Blob
-								src: fileReader.result,
-								// file name
-								name,
-								// File size
-								size,
-								// file type
-								type,
-								// File suffix
-								ext,
-							},
-						});
-					},
-					false,
-				);
-				fileReader.addEventListener('error', () => {
-					reject(false);
-				});
-				fileReader.readAsDataURL(file);
-			},
-		);
+		return new Promise<
+			| false
+			| {
+					file: File;
+					info: FileInfo;
+					base64: string;
+					size: Record<string, number>;
+			  }
+		>((resolve, reject) => {
+			const fileReader = new FileReader();
+			fileReader.addEventListener(
+				'load',
+				() => {
+					const values = {
+						file,
+						info: {
+							// unique number
+							uid,
+							// Blob
+							src: fileReader.result,
+							// file name
+							name,
+							// File size
+							size,
+							// file type
+							type,
+							// File suffix
+							ext,
+						},
+					};
+					// If it is a picture, get the width and height of the picture
+					const base64 =
+						typeof values.info.src !== 'string'
+							? window.btoa(
+									String.fromCharCode(...new Uint8Array(src)),
+							  )
+							: values.info.src;
+					const image = new Image();
+					image.src = values.info.src;
+					const imagePlugin =
+						this.editor.plugin.findPlugin<ImageOptions>('image');
+
+					image.onload = () => {
+						const { naturalWidth, naturalHeight, height, width } =
+							image;
+
+						let imageWidth: number = width;
+						let imageHeight: number = height;
+						const maxHeight: number | undefined =
+							imagePlugin?.options?.maxHeight;
+
+						if (
+							maxHeight &&
+							naturalHeight > naturalWidth &&
+							height > maxHeight
+						) {
+							imageHeight = maxHeight;
+							imageWidth =
+								naturalWidth * (maxHeight / naturalHeight);
+						}
+						values.base64 = base64;
+						(values.size = {
+							width: imageWidth,
+							height: imageHeight,
+							naturalHeight: image.naturalHeight,
+							naturalWidth: image.naturalWidth,
+						}),
+							resolve(values);
+					};
+					image.onerror = () => {
+						reject(false);
+					};
+				},
+				false,
+			);
+			fileReader.addEventListener('error', () => {
+				reject(false);
+			});
+			fileReader.readAsDataURL(file);
+		});
 	}
 	// Insert the editor before uploading
-	onReady(fileInfo: FileInfo) {
+	onReady(fileInfo: FileInfo, base64: string, size: Record<string, number>) {
 		// If the ImageComponent instance of the current picture exists, it will not be processed
 		if (!isEngine(this.editor) || !!this.imageComponents[fileInfo.uid])
 			return;
 		// Insert ImageComponent card
-		const component = this.editor.card.insert(ImageComponent.cardName, {
-			// Set the status to uploading
-			status: 'uploading',
+		const component = this.editor.card.insert(
+			ImageComponent.cardName,
+			{
+				// Set the status to uploading
+				status: 'uploading',
+				size,
+			},
 			// Display the base64 image obtained in handleBefore, so as not to cause the editor area to be blank
-			src: fileInfo.src,
-		}) as ImageComponent;
+			base64,
+		) as ImageComponent;
 		// Record the card instance of the currently uploaded file
 		this.imageComponents[fileInfo.uid] = component;
 	}
@@ -254,10 +306,15 @@ class CustomizeImageUploader extends ImageUploader {
 				this.editor.messageError('read image failed');
 				return;
 			}
-			const files = values as { file: File; info: FileInfo }[];
+			const files = values as {
+				file: File;
+				info: FileInfo;
+				base64: string;
+				size: Record<string, number>;
+			}[];
 			files.forEach((v) => {
 				// insert editor
-				this.onReady(v.info);
+				this.onReady(v.info, v.base64, v.size);
 			});
 			// Process upload
 			this.handleUpload(files);
@@ -321,7 +378,7 @@ export default class {
 				fileReader.addEventListener(
 					'load',
 					() => {
-						resolve({
+						const values = {
 							file,
 							info: {
 								// unique number
@@ -337,7 +394,8 @@ export default class {
 								// File suffix
 								ext,
 							},
-						});
+						};
+						resolve(values);
 					},
 					false,
 				);
