@@ -27,9 +27,43 @@ const qa = [
 	'vbnet',
 ];
 
+const defaultStyles = {
+	header: 'color: blue;font-weight: bold;',
+	quote: 'color: #090;',
+	negative: 'color: #d44;',
+	positive: 'color: #292;',
+	strong: 'font-weight: bold;',
+	em: 'font-style: italic;',
+	link: 'text-decoration: underline;color: #00c;',
+	strikethrough: 'text-decoration: line-through;',
+	keyword: 'color: #d73a49;',
+	atom: 'color: #905;',
+	number: 'color: #005cc5;',
+	def: 'color: #005cc5;',
+	variable: '',
+	'variable-2': 'color: #005cc5;',
+	'variable-3': 'color: #22863a;',
+	type: 'color: #22863a;',
+	comment: 'color: #6a737d;',
+	string: 'color: #690',
+	'string-2': 'color: #690;',
+	meta: 'color: #1f7f9a;',
+	qualifier: 'color: #555;',
+	builtin: 'color: #6f42c1;',
+	bracket: 'color: #997;',
+	tag: 'color: #22863a;',
+	attribute: 'color: #6f42c1;',
+	hr: 'color: #999;',
+	error: 'color: #f00;',
+	invalidchar: 'color: #f00;',
+	operator: 'color: #d73a49;',
+	property: 'color: #005cc5;',
+};
+
 class CodeBlockEditor implements CodeBlockEditorInterface {
 	private editor: EditorInterface;
 	private options: Options;
+	private styleMap: Record<string, string>;
 	codeMirror?: Editor;
 	mode: string = 'plain';
 	container: NodeInterface;
@@ -37,6 +71,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 	constructor(editor: EditorInterface, options: Options) {
 		this.editor = editor;
 		this.options = options;
+		this.styleMap = { ...defaultStyles, ...options.styleMap };
 		this.container = options.container || $(this.renderTemplate());
 	}
 
@@ -226,7 +261,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		const root = this.container.find('.data-codeblock-content');
 		mode = this.getSyntax(mode);
 		const stage = $(
-			'<div class="CodeMirror"><pre class="cm-s-default" /></div>',
+			'<div style="font-family: monospace;font-size: 13px; line-height: 21px; color: #595959; direction: ltr; height: auto; overflow: hidden;background: transparent;"><pre style="color: rgb(89, 89, 89); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);" /></div>',
 		);
 		root.append(stage);
 		const pre = stage.find('pre')[0];
@@ -263,6 +298,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			this.codeMirror.setSelection({ line: 0, ch: 0 });
 		}
 	}
+
 	/**
 	 * 代码来自 runmode addon
 	 * 支持行号需要考虑复制粘贴问题
@@ -276,11 +312,6 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 	 */
 	runMode(string: string, modespec: string, callback: any, options: any) {
 		const mode = CodeMirror.getMode(CodeMirror.defaults, modespec);
-		const ie = /MSIE \d/.test(navigator.userAgent);
-		const ie_lt9 =
-			ie &&
-			((document as any)['documentMode'] == null ||
-				(document as any)['documentMode'] < 9);
 
 		if (callback.appendChild) {
 			const tabSize =
@@ -324,8 +355,14 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				}
 
 				if (style) {
-					const sp = node.appendChild(document.createElement('span'));
-					sp.className = 'cm-' + style.replace(/ +/g, ' cm-');
+					const sp: HTMLElement = node.appendChild(
+						document.createElement('span'),
+					);
+					let styleStr = '';
+					style.split(' ').forEach((cls) => {
+						styleStr += this.styleMap[cls] ?? '';
+					});
+					sp.setAttribute('style', styleStr);
 					sp.appendChild(document.createTextNode(content));
 				} else {
 					node.appendChild(document.createTextNode(content));

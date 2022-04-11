@@ -25,6 +25,7 @@ export interface CodeBlockOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 	alias?: Record<string, string>;
+	styleMap?: Record<string, string>;
 }
 
 // 缩写替换
@@ -351,10 +352,11 @@ export default class<
 				});
 				const codeEditor = new CodeBlockEditor(this.editor, {
 					synatxMap,
+					styleMap: this.options.styleMap,
 				});
-
+				const contentClassName = 'data-codeblock-content';
 				const content = codeEditor.container.find(
-					'.data-codeblock-content',
+					`.${contentClassName}`,
 				);
 				content.css({
 					border: '1px solid #e8e8e8',
@@ -364,21 +366,6 @@ export default class<
 				content.addClass(VIEW_CLASS_NAME);
 				content.hide();
 				document.body.appendChild(content[0]);
-				content.traverse((node) => {
-					if (
-						node.type === Node.ELEMENT_NODE &&
-						(node.get<HTMLElement>()?.classList?.length || 0) > 0
-					) {
-						const element = node.get<HTMLElement>()!;
-						const style = window.getComputedStyle(element);
-						['color', 'margin', 'padding', 'background'].forEach(
-							(attr) => {
-								element.style[attr] =
-									style.getPropertyValue(attr);
-							},
-						);
-					}
-				});
 				content.show();
 				content.css('background', '#f9f9f9');
 				node.append(content);
@@ -388,7 +375,7 @@ export default class<
 				node.attributes('data-syntax', value.mode || 'plain');
 				content
 					.removeClass(VIEW_CLASS_NAME)
-					.removeClass('data-codeblock-content');
+					.removeClass(contentClassName);
 				let newNode = node;
 				if (callback) {
 					newNode = callback(node, value);
