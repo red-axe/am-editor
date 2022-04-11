@@ -334,6 +334,22 @@ export default class<
 		) => NodeInterface,
 	) => {
 		const results: NodeInterface[] = [];
+		const synatxMap = {};
+		CodeBlockComponent.getModes().forEach((item) => {
+			synatxMap[item.value] = item.syntax;
+		});
+		const codeEditor = new CodeBlockEditor(this.editor, {
+			synatxMap,
+			styleMap: this.options.styleMap,
+		});
+		const contentClassName = 'data-codeblock-content';
+		const content = codeEditor.container.find(`.${contentClassName}`);
+		content.css({
+			border: '1px solid #e8e8e8',
+			padding: '8px',
+		});
+		content.addClass(VIEW_CLASS_NAME);
+		content.css('background', '#f9f9f9');
 		root.find(
 			`[${CARD_KEY}="${CodeBlockComponent.cardName}"],[${READY_CARD_KEY}="${CodeBlockComponent.cardName}"]`,
 		).each((cardNode) => {
@@ -346,34 +362,15 @@ export default class<
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
 			if (value) {
 				node.empty();
-				const synatxMap = {};
-				CodeBlockComponent.getModes().forEach((item) => {
-					synatxMap[item.value] = item.syntax;
-				});
-				const codeEditor = new CodeBlockEditor(this.editor, {
-					synatxMap,
-					styleMap: this.options.styleMap,
-				});
-				const contentClassName = 'data-codeblock-content';
-				const content = codeEditor.container.find(
-					`.${contentClassName}`,
-				);
-				content.css({
-					border: '1px solid #e8e8e8',
-					padding: '8px',
-				});
+				content.empty();
 				codeEditor.render(value.mode || 'plain', value.code || '');
-				content.addClass(VIEW_CLASS_NAME);
-				content.hide();
-				document.body.appendChild(content[0]);
-				content.show();
-				content.css('background', '#f9f9f9');
-				node.append(content);
+				const newContent = content.clone(true);
+				node.append(newContent);
 				node.removeAttributes(CARD_KEY);
 				node.removeAttributes(CARD_TYPE_KEY);
 				node.removeAttributes(CARD_VALUE_KEY);
 				node.attributes('data-syntax', value.mode || 'plain');
-				content
+				newContent
 					.removeClass(VIEW_CLASS_NAME)
 					.removeClass(contentClassName);
 				let newNode = node;
@@ -384,6 +381,7 @@ export default class<
 				results.push(newNode);
 			} else node.remove();
 		});
+		codeEditor.destroy();
 		return results;
 	};
 

@@ -299,6 +299,48 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		}
 	}
 
+	toHtml(col: number, text: string, style: string = '', tabSize: number = 0) {
+		tabSize = tabSize || CodeMirror.defaults.tabSize;
+		let html = '';
+		let content = '';
+		// replace tabs
+
+		for (let pos = 0; ; ) {
+			const idx = text.indexOf('\t', pos);
+
+			if (idx === -1) {
+				content += text.slice(pos);
+				col += text.length - pos;
+				break;
+			} else {
+				col += idx - pos;
+				content += text.slice(pos, idx);
+				const size = tabSize - (col % tabSize);
+				col += size;
+
+				for (let i = 0; i < size; ++i) {
+					content += ' ';
+				}
+
+				pos = idx + 1;
+			}
+		}
+
+		if (style) {
+			let styleStr = '';
+			style.split(' ').forEach((cls) => {
+				styleStr += this.styleMap[cls] ?? '';
+			});
+			const spanElement = `<span ${
+				styleStr ? `style="${styleStr}"` : ''
+			}>${content}</span>`;
+			html += spanElement;
+		} else {
+			html += content;
+		}
+		return html;
+	}
+
 	/**
 	 * 代码来自 runmode addon
 	 * 支持行号需要考虑复制粘贴问题
@@ -318,70 +360,35 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		const node = callback;
 		let col = 0;
 		node.innerHTML = '';
-		let children = '';
-		callback = (text: string, style: string) => {
-			if (text === '\n') {
-				// Emitting LF or CRLF on IE8 or earlier results in an incorrect display.
-				// Emitting a carriage return makes everything ok.
-				//const lineCode = document.createElement('br');
-				children += '<br />';
-				col = 0;
-				return;
-			}
-
-			let content = '';
-			// replace tabs
-
-			for (let pos = 0; ; ) {
-				const idx = text.indexOf('\t', pos);
-
-				if (idx === -1) {
-					content += text.slice(pos);
-					col += text.length - pos;
-					break;
-				} else {
-					col += idx - pos;
-					content += text.slice(pos, idx);
-					const size = tabSize - (col % tabSize);
-					col += size;
-
-					for (let i = 0; i < size; ++i) {
-						content += ' ';
-					}
-
-					pos = idx + 1;
-				}
-			}
-
-			if (style) {
-				let styleStr = '';
-				style.split(' ').forEach((cls) => {
-					styleStr += this.styleMap[cls] ?? '';
-				});
-				const spanElement = `<span ${
-					styleStr ? `style="${styleStr}"` : ''
-				}>${content}</span>`;
-				children += spanElement;
-			} else {
-				children += content;
-			}
-		};
+		let html = '';
 
 		const lines = CodeMirror.splitLines(string);
 		const state = (options && options.state) || CodeMirror.startState(mode);
 
 		for (let i = 0, e = lines.length; i < e; ++i) {
-			if (i) callback('\n');
+			if (i) {
+				html += '<br />';
+				col = 0;
+			}
 			const stream = new CodeMirror.StringStream(lines[i]);
 			if (!stream.string && mode.blankLine) mode.blankLine(state);
 
 			while (!stream.eol()) {
 				const style = mode.token ? mode.token(stream, state) : '';
-				callback(stream.current(), style, i, stream.start, state);
+				html += this.toHtml(
+					col,
+					stream.current(),
+					style || '',
+					tabSize,
+				);
 				stream.start = stream.pos;
 			}
 		}
-		node.innerHTML = children;
+		node.innerHTML = html;
+	}
+
+	destroy() {
+		this.container.remove();
 	}
 }
 

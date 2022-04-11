@@ -50,4 +50,5 @@ export interface CodeBlockEditorInterface {
 		callback: any,
 		options: any,
 	): void;
+	destroy(): void;
 }
