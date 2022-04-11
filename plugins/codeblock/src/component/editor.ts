@@ -314,62 +314,59 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 	runMode(string: string, modespec: string, callback: any, options: any) {
 		const mode = CodeMirror.getMode(CodeMirror.defaults, modespec);
 
-		if (callback.appendChild) {
-			const tabSize =
-				(options && options.tabSize) || CodeMirror.defaults.tabSize;
-			const node = callback;
-			let col = 0;
-			node.innerHTML = '';
+		const tabSize =
+			(options && options.tabSize) || CodeMirror.defaults.tabSize;
+		const node = callback;
+		let col = 0;
+		node.innerHTML = '';
+		let children = '';
+		callback = (text: string, style: string) => {
+			if (text === '\n') {
+				// Emitting LF or CRLF on IE8 or earlier results in an incorrect display.
+				// Emitting a carriage return makes everything ok.
+				//const lineCode = document.createElement('br');
+				children += '<br />';
+				col = 0;
+				return;
+			}
 
-			callback = (text: string, style: string) => {
-				if (text === '\n') {
-					// Emitting LF or CRLF on IE8 or earlier results in an incorrect display.
-					// Emitting a carriage return makes everything ok.
-					const lineCode = document.createElement('br');
-					node.appendChild(lineCode);
-					col = 0;
-					return;
-				}
+			let content = '';
+			// replace tabs
 
-				let content = '';
-				// replace tabs
+			for (let pos = 0; ; ) {
+				const idx = text.indexOf('\t', pos);
 
-				for (let pos = 0; ; ) {
-					const idx = text.indexOf('\t', pos);
-
-					if (idx === -1) {
-						content += text.slice(pos);
-						col += text.length - pos;
-						break;
-					} else {
-						col += idx - pos;
-						content += text.slice(pos, idx);
-						const size = tabSize - (col % tabSize);
-						col += size;
-
-						for (let i = 0; i < size; ++i) {
-							content += ' ';
-						}
-
-						pos = idx + 1;
-					}
-				}
-
-				if (style) {
-					const sp: HTMLElement = node.appendChild(
-						document.createElement('span'),
-					);
-					let styleStr = '';
-					style.split(' ').forEach((cls) => {
-						styleStr += this.styleMap[cls] ?? '';
-					});
-					sp.setAttribute('style', styleStr);
-					sp.appendChild(document.createTextNode(content));
+				if (idx === -1) {
+					content += text.slice(pos);
+					col += text.length - pos;
+					break;
 				} else {
-					node.appendChild(document.createTextNode(content));
+					col += idx - pos;
+					content += text.slice(pos, idx);
+					const size = tabSize - (col % tabSize);
+					col += size;
+
+					for (let i = 0; i < size; ++i) {
+						content += ' ';
+					}
+
+					pos = idx + 1;
 				}
-			};
-		}
+			}
+
+			if (style) {
+				let styleStr = '';
+				style.split(' ').forEach((cls) => {
+					styleStr += this.styleMap[cls] ?? '';
+				});
+				const spanElement = `<span ${
+					styleStr ? `style="${styleStr}"` : ''
+				}>${content}</span>`;
+				children += spanElement;
+			} else {
+				children += content;
+			}
+		};
 
 		const lines = CodeMirror.splitLines(string);
 		const state = (options && options.state) || CodeMirror.startState(mode);
@@ -385,6 +382,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				stream.start = stream.pos;
 			}
 		}
+		node.innerHTML = children;
 	}
 }
 

@@ -610,12 +610,6 @@ class Parser implements ParserInterface {
 			element.append(this.root);
 		}
 		this.editor.trigger('parse:html-before', this.root);
-		element.traverse((domNode) => {
-			if (domNode.isText()) return;
-			if (domNode.css('user-select') === 'none') {
-				domNode.remove();
-			}
-		});
 		this.editor.trigger('parse:html', element);
 		this.editor.trigger('parse:html-after', element);
 		return element.html();
