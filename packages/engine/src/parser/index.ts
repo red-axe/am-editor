@@ -78,7 +78,6 @@ class Parser implements ParserInterface {
 	) {
 		this.editor = editor;
 		this.isNormalize = isNormalize;
-		const { node } = this.editor;
 		if (typeof source === 'string') {
 			source = source.replace(/<a\s{0,1000}\/>/gi, '<a></a>');
 			source = source.replace(/<a(\s[^>]+?)\/>/gi, (_, t) => {
@@ -93,19 +92,10 @@ class Parser implements ParserInterface {
 				.replace(/<\/p>/gi, '</paragraph>');
 			source = transformCustomTags(source);
 			const doc = new DOMParser().parseFromString(source, 'text/html');
-			this.root = $(doc.body);
-			const p = $('<p></p>');
-			const paragraphs = this.root.find('paragraph');
-			paragraphs.each((_, index) => {
-				const cNode = paragraphs.eq(index);
-				if (!cNode) return;
-				const pNode = p.clone();
-				const attributes = cNode.attributes();
-				Object.keys(attributes).forEach((name) => {
-					pNode.attributes(name, attributes[name]);
-				});
-				node.replace(cNode, pNode, true);
-			});
+			const html = doc.body.innerHTML
+				.replace(/<paragraph(>|\s+[^>]*>)/gi, '<p$1')
+				.replace(/<\/paragraph>/gi, '</p>');
+			this.root = $(`<div>${html}</div>`);
 		} else if (isNodeEntry(source)) {
 			this.root = source;
 		} else {
@@ -260,7 +250,7 @@ class Parser implements ParserInterface {
 		};
 		root.traverse((node) => {
 			if (
-				node.equal(root) ||
+				node[0] === root[0] ||
 				['style', 'script', 'meta'].includes(node.name)
 			)
 				return;
@@ -281,7 +271,7 @@ class Parser implements ParserInterface {
 					let rule = schema.getRule(node);
 					if (rule) {
 						oldRules.push(rule);
-						if (node.children().length === 0) {
+						if (node.get<Element>()?.childNodes.length === 0) {
 							this.editor.mark.repairCursor(node);
 						}
 						let newNode = filter(node);
@@ -419,8 +409,11 @@ class Parser implements ParserInterface {
 						if (
 							parent &&
 							nodeApi.isBlock(parent, schema) &&
-							parent.children().length === 1 &&
-							child.children().length === 0
+							// 子节点只有一个
+							parent.get<HTMLElement>()?.childNodes.length ===
+								1 &&
+							// 没有子节点
+							child.get<HTMLElement>()?.childNodes.length === 0
 						) {
 							const newChild = $('<br />');
 							child.before(newChild);
@@ -555,7 +548,7 @@ class Parser implements ParserInterface {
 
 				if (
 					nodeApi.isVoid(name, schema ? schema : undefined) &&
-					child.children().length === 0
+					child.get<HTMLElement>()?.childNodes.length === 0
 				) {
 					result.push(' />');
 				} else {
@@ -687,10 +680,15 @@ class Parser implements ParserInterface {
 							schema || this.editor.schema,
 						)
 					) {
-						const children = node.children().toArray();
+						const children = Array.from(
+							node.get<HTMLElement>()!.childNodes,
+						);
 						// 子节点还有block节点，则不换行
 						if (
-							children.some((child) => child.name === 'br') ||
+							(children &&
+								children.some(
+									(child) => child.nodeName === 'BR',
+								)) ||
 							children.some((child) =>
 								this.editor.node.isBlock(
 									child,

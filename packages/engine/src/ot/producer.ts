@@ -221,7 +221,10 @@ class Producer extends EventEmitter2 {
 			// block 节点在 path 中的开始位置
 			let beginIndex = -1;
 			if (!!rootId) {
-				if (targetElement.equal(blockElement)) {
+				if (
+					targetElement.length > 0 &&
+					targetElement[0] === blockElement[0]
+				) {
 					beginIndex = path.length;
 				} else {
 					let path = pathCaches.get(blockElement);
@@ -330,7 +333,7 @@ class Producer extends EventEmitter2 {
 									(op) =>
 										'li' in op &&
 										op.addNode &&
-										child.equal(op.addNode),
+										child[0] === op.addNode[0],
 								);
 								if (liIndex > -1) {
 									allOps.splice(liIndex, 1);
@@ -613,7 +616,7 @@ class Producer extends EventEmitter2 {
 				const cardElement = loadingCards[loadingCards.length - 1];
 				if (
 					record.removedNodes.length === 1 &&
-					cardElement.equal(record.removedNodes[0])
+					cardElement[0] === record.removedNodes[0]
 				) {
 					return true;
 				}

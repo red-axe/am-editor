@@ -16,6 +16,8 @@ import {
 	CARD_SELECTOR,
 	CURSOR,
 	DATA_ELEMENT,
+	DATA_ID,
+	EDITABLE,
 	EDITABLE_SELECTOR,
 	FOCUS,
 	READY_CARD_KEY,
@@ -114,20 +116,26 @@ class NodeModel implements NodeModelInterface {
 	 * @param withTrim 是否 trim
 	 */
 	isEmpty(node: NodeInterface, withTrim?: boolean) {
-		if (node.isElement()) {
+		if (node.length > 0 && node.isElement()) {
 			// 卡片不为空
+			const attributes = node.attributes();
+			const element = node.fragment ?? node.get<Element>()!;
+			const results = Array.from(
+				element.querySelectorAll(
+					`${CARD_SELECTOR},${READY_CARD_SELECTOR},${EDITABLE_SELECTOR},br`,
+				),
+			);
 			if (
-				node.attributes(CARD_KEY) ||
-				(node.find(CARD_SELECTOR).length > 0 &&
-					node.find(EDITABLE_SELECTOR).length === 0)
-			) {
-				return false;
-			}
-			// 只读卡片不为空
-			if (
-				node.attributes(READY_CARD_KEY) ||
-				(node.find(READY_CARD_SELECTOR).length > 0 &&
-					node.find(EDITABLE_SELECTOR).length === 0)
+				attributes[CARD_KEY] ||
+				attributes[READY_CARD_KEY] ||
+				(results.some(
+					(e) =>
+						e.hasAttribute(CARD_KEY) ||
+						e.hasAttribute(READY_CARD_KEY),
+				) &&
+					results.some(
+						(e) => e.getAttribute(DATA_ELEMENT) === EDITABLE,
+					))
 			) {
 				return false;
 			}
@@ -136,7 +144,7 @@ class NodeModel implements NodeModelInterface {
 				return false;
 			}
 			// 多个br节点不为空
-			if (node.find('br').length > 1) {
+			if (results.filter((e) => e.localName === 'br').length > 1) {
 				return false;
 			}
 		}
@@ -257,6 +265,7 @@ class NodeModel implements NodeModelInterface {
 			if (source.name === outer.name) {
 				const attributes = source.attributes();
 				delete attributes.style;
+				delete attributes[DATA_ID];
 				Object.keys(attributes).forEach((key) => {
 					if (!outer.attributes(key))
 						outer.attributes(key, attributes[key]);

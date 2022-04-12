@@ -6,6 +6,8 @@ import {
 	CARD_KEY,
 	CARD_LOADING_KEY,
 	CARD_SELECTOR,
+	CARD_TAG,
+	CARD_TYPE_KEY,
 	READY_CARD_KEY,
 } from '../constants/card';
 import {
@@ -52,7 +54,8 @@ export const isTransientElement = (
 		const parent = node.parent();
 		if (node.isRoot() || parent?.isRoot()) return false;
 
-		const isCard = node.isCard();
+		const isCard =
+			node.name === CARD_TAG || !!nodeAttributes[CARD_TYPE_KEY];
 		//父级是卡片，并且没有可编辑区域
 		const parentIsLoading = parent?.attributes(CARD_LOADING_KEY);
 		if (parentIsLoading && parent) loadingCards?.push(parent);

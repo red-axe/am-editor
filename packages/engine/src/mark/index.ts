@@ -4,8 +4,14 @@ import {
 	CARD_SELECTOR,
 	CARD_TYPE_KEY,
 	DATA_ELEMENT,
+	DATA_ID,
 } from '../constants';
-import { EditorInterface, NodeInterface, RangeInterface } from '../types';
+import {
+	EditorInterface,
+	NodeInterface,
+	PluginInterface,
+	RangeInterface,
+} from '../types';
 import { MarkInterface, MarkModelInterface } from '../types/mark';
 import { getDocument, isEngine } from '../utils';
 import { Backspace } from './typing';
@@ -67,15 +73,18 @@ class Mark implements MarkModelInterface {
 		if (!result) change.rangePathBeforeCommand = cacheRange;
 		return result;
 	}
-
+	pluginCaches: Map<string, MarkInterface> = new Map();
 	/**
 	 * 根据节点查找mark插件实例
 	 * @param node 节点
 	 */
 	findPlugin(mark: NodeInterface): MarkInterface | undefined {
 		const { node, plugin, schema } = this.editor;
-		if (!node.isMark(mark)) return;
-		let result: MarkInterface | undefined = undefined;
+		if (mark.length === 0 || !node.isMark(mark)) return;
+		const markClone = mark.get<Element>()!.cloneNode() as Element;
+		const key = markClone.outerHTML;
+		let result: MarkInterface | undefined = this.pluginCaches.get(key);
+		if (result) return result;
 		Object.keys(plugin.components).some((pluginName) => {
 			const markPlugin = plugin.components[pluginName];
 			if (isMarkPlugin(markPlugin) && mark.name === markPlugin.tagName) {
@@ -89,6 +98,7 @@ class Mark implements MarkModelInterface {
 				)
 					return;
 				result = markPlugin;
+				this.pluginCaches.set(key, result);
 				return true;
 			}
 			return;
@@ -137,9 +147,11 @@ class Mark implements MarkModelInterface {
 		//获取节点属性
 		const sourceAttributes = source.attributes();
 		delete sourceAttributes['style'];
+		delete sourceAttributes[DATA_ID];
 
 		const targetAttributes = target.attributes();
 		delete targetAttributes['style'];
+		delete targetAttributes[DATA_ID];
 
 		//获取节点样式属性
 		const sourceStyles = source.css();
@@ -1148,6 +1160,23 @@ class Mark implements MarkModelInterface {
 		} else this.merge(safeRange);
 		if (!range) change?.apply(safeRange);
 	}
+
+	findSameParent = (
+		parentMark: NodeInterface,
+		sourceMark: NodeInterface,
+	): boolean => {
+		const { node } = this.editor;
+		if (node.isMark(parentMark)) {
+			let parent: NodeInterface | undefined = undefined;
+			if (this.compare(parentMark, sourceMark, true)) {
+				return true;
+			} else if ((parent = parentMark.parent())) {
+				return this.findSameParent(parent, sourceMark);
+			}
+		}
+		return false;
+	};
+
 	mergeMarks(marks: Array<NodeInterface>) {
 		const { node } = this.editor;
 		marks.forEach((mark) => {
@@ -1155,22 +1184,8 @@ class Mark implements MarkModelInterface {
 			const nextMark = mark.next();
 			//查找是否有一样的父级mark
 			const parentMark = mark.parent();
-			const findSameParent = (
-				parentMark: NodeInterface,
-				sourceMark: NodeInterface,
-			): boolean => {
-				if (node.isMark(parentMark)) {
-					let parent: NodeInterface | undefined = undefined;
-					if (this.compare(parentMark, sourceMark, true)) {
-						return true;
-					} else if ((parent = parentMark.parent())) {
-						return findSameParent(parent, sourceMark);
-					}
-				}
-				return false;
-			};
 			//如果有一样的父级mark，则去除包裹
-			if (parentMark && findSameParent(parentMark, mark)) {
+			if (parentMark && this.findSameParent(parentMark, mark)) {
 				node.unwrap(mark);
 				return;
 			}
@@ -1483,13 +1498,13 @@ class Mark implements MarkModelInterface {
 				cloneRange.setEnd(startNode, startOffset);
 				cloneRange.enlargeFromTextNode();
 				cloneRange.enlargeToElementNode(true);
-				const startChildren = startNode.children();
+				const startChildren = startNode.get<Node>()!.childNodes;
 				const { endNode, endOffset } = cloneRange;
-				const endChildren = endNode.children();
-				const endOffsetNode = endChildren.eq(endOffset);
+				const endChildren = endNode.get<Node>()!.childNodes;
+				const endOffsetNode = endChildren.item(endOffset);
 				const startOffsetNode =
-					startChildren.eq(startOffset) ||
-					startChildren.eq(startOffset - 1);
+					startChildren.item(startOffset) ||
+					startChildren.item(startOffset - 1);
 				if (
 					!allowBlock &&
 					endNode.type === Node.ELEMENT_NODE &&
@@ -1512,15 +1527,16 @@ class Mark implements MarkModelInterface {
 				cloneRange.setStart(startNode, startOffset);
 				cloneRange.enlargeFromTextNode();
 				cloneRange.enlargeToElementNode(true);
-				const startChildren = startNode.children();
+				const startChildren = startNode.get<Node>()!.childNodes;
 				const startNodeClone = cloneRange.startNode;
 				const startOffsetClone = cloneRange.startOffset;
-				const startNodeCloneChildren = startNodeClone.children();
+				const startNodeCloneChildren =
+					startNodeClone.get<Node>()!.childNodes;
 				const startOffsetNode =
-					startNodeCloneChildren.eq(startOffsetClone);
+					startNodeCloneChildren.item(startOffsetClone);
 				const startChildrenOffsetNode =
-					startChildren.eq(startOffset) ||
-					startChildren.eq(startOffset - 1);
+					startChildren.item(startOffset) ||
+					startChildren.item(startOffset - 1);
 				if (
 					!allowBlock &&
 					startNodeClone.type === Node.ELEMENT_NODE &&
@@ -1582,9 +1598,9 @@ class Mark implements MarkModelInterface {
 		}
 		// 不存在时添加
 		const addNode = (nodes: Array<NodeInterface>, nodeB: NodeInterface) => {
-			if (!nodes.some((nodeA) => nodeA.equal(nodeB))) {
-				nodes.push(nodeB);
-			}
+			//if (!nodes.some((nodeA) => nodeA[0] === nodeB[0])) {
+			nodes.push(nodeB);
+			//}
 		};
 		const nodeApi = node;
 		// 向上寻找
@@ -1638,10 +1654,10 @@ class Mark implements MarkModelInterface {
 						(child) => {
 							if (isEnd) return false;
 							//节点不是开始节点
-							if (!child.equal(sc)) {
+							if (child[0] !== sc) {
 								if (isBegin) {
 									//节点是结束节点，标记为结束
-									if (child.equal(ec)) {
+									if (child[0] === ec) {
 										isEnd = true;
 										return false;
 									}
@@ -1673,6 +1689,15 @@ class Mark implements MarkModelInterface {
 						'editable',
 					);
 				});
+			}
+		}
+		for (var i = 0; i < nodes.length; i++) {
+			for (var j = i + 1; j < nodes.length; j++) {
+				if (nodes[i][0] == nodes[j][0]) {
+					//第一个等同于第二个，splice方法删除第二个
+					nodes.splice(j, 1);
+					j--;
+				}
 			}
 		}
 		return nodes;

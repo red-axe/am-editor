@@ -16,6 +16,18 @@ const defualtSchema: Array<SchemaRule | SchemaBlock | SchemaGlobal> = [
 			[DATA_ID]: '*',
 		},
 	},
+	// {
+	// 	type: 'inline',
+	// 	attributes: {
+	// 		[DATA_ID]: '*',
+	// 	},
+	// },
+	// {
+	// 	type: 'mark',
+	// 	attributes: {
+	// 		[DATA_ID]: '*',
+	// 	},
+	// },
 	{
 		name: 'p',
 		type: 'block',

@@ -87,14 +87,18 @@ class Block implements BlockModelInterface {
 		if (!result) change.rangePathBeforeCommand = cacheRange;
 		return result;
 	}
+	pluginCaches: Map<string, BlockInterface> = new Map();
 	/**
 	 * 根据节点查找block插件实例
 	 * @param node 节点
 	 */
 	findPlugin(block: NodeInterface): BlockInterface | undefined {
 		const { node, schema, plugin } = this.editor;
-		if (!node.isBlock(block)) return;
-		let result: BlockInterface | undefined = undefined;
+		if (block.length === 0 || !node.isBlock(block)) return;
+		const markClone = block.get<Element>()!.cloneNode() as Element;
+		const key = markClone.outerHTML;
+		let result: BlockInterface | undefined = this.pluginCaches.get(key);
+		if (result) return result;
 		Object.keys(plugin.components).some((pluginName) => {
 			const blockPlugin = plugin.components[pluginName];
 			if (
@@ -113,6 +117,7 @@ class Block implements BlockModelInterface {
 				)
 					return;
 				result = blockPlugin;
+				this.pluginCaches.set(key, result);
 				return true;
 			}
 			return;

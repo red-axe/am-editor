@@ -33,6 +33,7 @@ class NodeId implements NodeIdInterface {
 	 */
 	getRules() {
 		const rules: { [key: string]: SchemaRule[] } = {};
+		// const { blocks, inlines, marks } = this.editor.schema.data;
 		this.editor.schema.data.blocks.forEach((schema) => {
 			if (!Object.keys(rules).includes(schema.name)) {
 				rules[schema.name] = [];

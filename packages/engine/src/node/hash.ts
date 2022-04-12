@@ -48,12 +48,17 @@ export default (
 	unique: boolean = true,
 ) => {
 	let prefix = '';
-	if (isNode(value)) value = $(value);
-	if (isNodeEntry(value)) {
-		const attributes = value.attributes() || {};
-		delete attributes[DATA_ID];
-		prefix = value.name.substring(0, 1);
-		value = `${value.name}_${JSON.stringify(attributes)}`;
+	if (typeof value !== 'string') {
+		const node = ((value[0] ?? value) as Node).cloneNode();
+		if (node.nodeType === Node.ELEMENT_NODE) {
+			const element = node as HTMLElement;
+			element.removeAttribute(DATA_ID);
+			const name = element.localName;
+			prefix = name.substring(0, 1);
+			value = element.outerHTML;
+		} else {
+			value = node.textContent ?? '';
+		}
 	}
 	const cachePerfix = valueCaches.get(value);
 	if (!cachePerfix) {

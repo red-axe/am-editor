@@ -106,7 +106,7 @@ export const getStyleMap = (style: string): Record<string, string> => {
 	const map: Record<string, string> = {};
 	if (!key) return map;
 	const cacheStyle = stylesCaches.get(key);
-	if (cacheStyle) return Object.assign({}, cacheStyle);
+	if (cacheStyle) return { ...cacheStyle };
 	const reg = /\s*([\w\-]+)\s*:([^;]*)(;|$)/g;
 	let match;
 
@@ -119,7 +119,7 @@ export const getStyleMap = (style: string): Record<string, string> => {
 		map[key] = val;
 	}
 	stylesCaches.set(key, map);
-	return Object.assign({}, map);
+	return { ...map };
 };
 
 /**
