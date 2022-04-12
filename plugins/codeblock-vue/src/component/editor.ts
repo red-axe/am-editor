@@ -173,7 +173,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				const content = editor.getSelection();
 				event.preventDefault();
 				const start = editor.getCursor('from');
-				const end = editor.getCursor();
+				const end = editor.getCursor('to');
 				this.editor.clipboard.copy(
 					(content || '')
 						.split(/(\r\n|\n)/gi)
