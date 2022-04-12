@@ -291,6 +291,7 @@ export default class<
 				markNode.attributes(this.getPreviewName(key), 'true');
 			});
 		} else if (this.range) {
+			this.startMutation();
 			const { block, node, card } = this.editor;
 			let range = this.range;
 			//光标重合时，选择整个block块
@@ -536,6 +537,24 @@ export default class<
 
 	execute() {}
 
+	startMutation() {
+		if (isEngine(this.editor) && this.editor.ot.isStopped()) {
+			this.editor.ot.startMutation();
+		}
+	}
+
+	stopMutation() {
+		setTimeout(() => {
+			if (
+				isEngine(this.editor) &&
+				this.editor.readonly &&
+				!this.editor.ot.isStopped()
+			) {
+				this.editor.ot.stopMutation();
+			}
+		}, 10);
+	}
+
 	action(key: string, action: string, ...args: any): any {
 		const id = args[0];
 		switch (action) {
@@ -545,9 +564,11 @@ export default class<
 			case 'apply':
 				if (!id) return;
 				this.apply(key, id);
+				this.stopMutation();
 				break;
 			case 'revoke':
 				this.revoke(key, id);
+				this.stopMutation();
 				break;
 			case 'find':
 				if (!id) return [];
@@ -555,6 +576,7 @@ export default class<
 			case 'remove':
 				if (!id) return;
 				this.remove(key, id);
+				this.stopMutation();
 				break;
 			case 'filter':
 				return this.filterValue(key, id);

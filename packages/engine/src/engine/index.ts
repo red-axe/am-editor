@@ -50,9 +50,11 @@ class Engine<T extends EngineOptions = EngineOptions>
 		if (readonly) {
 			this.hotkey.disable();
 			this._container.setReadonly(true);
+			this.ot.stopMutation();
 		} else {
 			this.hotkey.enable();
 			this._container.setReadonly(false);
+			this.ot.startMutation();
 		}
 		this._readonly = readonly;
 		this.card.reRender();
