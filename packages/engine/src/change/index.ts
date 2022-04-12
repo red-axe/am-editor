@@ -533,7 +533,10 @@ class ChangeModel implements ChangeInterface {
 				} else {
 					nodeApi.insert(node, range, true);
 				}
-				if (!this.engine.node.isBlock(node)) {
+				if (!this.engine.node.isBlock(node) && !next?.isText()) {
+					if (prev) {
+						range.select(node, true).collapse(false);
+					}
 					prev = null;
 				} else {
 					prev = node;

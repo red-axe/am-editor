@@ -28,11 +28,7 @@ abstract class InlineEntry<T extends PluginOptions = PluginOptions>
 		super.init();
 		const editor = this.editor;
 		if (isEngine(editor) && this.markdown) {
-			// inline 样式的粘贴的时候不检测，以免误报
-			// editor.on(
-			// 	'paste:markdown-check',
-			// 	(child) => !this.checkMarkdown(child)?.match,
-			// );
+			editor.on('paste:markdown-check', this.checkMarkdownMath);
 			editor.on('paste:markdown', this.pasteMarkdown);
 		}
 	}
@@ -127,6 +123,15 @@ abstract class InlineEntry<T extends PluginOptions = PluginOptions>
 		return;
 	}
 
+	checkMarkdownMath = (child: NodeInterface) => {
+		const text = child.text();
+		// 含有html标签就不检测
+		if (/<.+?>.*<\/.+?>/gi.test(text)) {
+			return false;
+		}
+		return !this.checkMarkdown(child)?.match;
+	};
+
 	checkMarkdown(node: NodeInterface) {
 		if (!isEngine(this.editor) || !this.markdown) return;
 		if (!node.isText()) return;
@@ -160,7 +165,11 @@ abstract class InlineEntry<T extends PluginOptions = PluginOptions>
 			newText += textNode.textContent;
 			//从匹配结束位置分割
 			textNode = regNode.splitText(match[0].length);
-
+			// ~z</code>ad<code>a~ 这样的不做处理
+			if (/<\/.+?>.*<.+?>/gi.test(match[0])) {
+				newText += match[0];
+				continue;
+			}
 			//获取中间字符
 			const inlineNode = $(
 				`<${this.tagName}>${match[2]}</${this.tagName}>`,
@@ -177,7 +186,8 @@ abstract class InlineEntry<T extends PluginOptions = PluginOptions>
 
 	destroy() {
 		if (isEngine(this.editor) && this.markdown) {
-			this.editor.on('paste:markdown', this.pasteMarkdown);
+			this.editor.off('paste:markdown', this.pasteMarkdown);
+			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
 		}
 	}
 }
