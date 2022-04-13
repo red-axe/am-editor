@@ -179,8 +179,10 @@ abstract class MarkEntry<T extends PluginOptions = PluginOptions>
 		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
 		const reg =
 			key === '_'
-				? new RegExp(`\\s+(${key}([^${key}\\r\\n]+)${key})\\s+`)
-				: new RegExp(`(${key}([^${key}\\r\\n]+)${key})`);
+				? new RegExp(
+						`\\s+(${key}([^${key}\\r\\n%5Cr%5Cn"]+)${key})\\s+`,
+				  )
+				: new RegExp(`(${key}([^${key}\\r\\n%5Cr%5Cn"]+)${key})`);
 		let match = reg.exec(text);
 		return {
 			reg,

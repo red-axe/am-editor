@@ -140,7 +140,7 @@ abstract class InlineEntry<T extends PluginOptions = PluginOptions>
 		if (!text) return;
 
 		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
-		const reg = new RegExp(`(${key}([^${key}\r\n]+)${key})`);
+		const reg = new RegExp(`(${key}([^${key}\r\n%5Cr%5Cn"]+)${key})`);
 
 		return {
 			reg,
