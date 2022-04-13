@@ -25,7 +25,19 @@ import {
 	EventListener,
 	ElementInterface,
 } from '../types';
-import { isNode, isNodeEntry } from './utils';
+import {
+	inEditor,
+	isBlockCard,
+	isCard,
+	isCursor,
+	isEditable,
+	isEditableCard,
+	isInlineCard,
+	isMatchesSelector,
+	isNode,
+	isNodeEntry,
+	isRoot,
+} from './utils';
 
 /**
  * 扩展 Node 类
@@ -68,34 +80,6 @@ class NodeEntry implements NodeInterface {
 			this.type = nodeType;
 			this.window = this.document.defaultView || window;
 		}
-	}
-
-	/**
-	 * 如果元素被指定的选择器字符串选择，Element.matches()  方法返回true; 否则返回false。
-	 * @param element 节点
-	 * @param selector 选择器
-	 */
-	isMatchesSelector(element: ElementInterface, selector: string) {
-		if (element.nodeType !== Node.ELEMENT_NODE || !selector) {
-			return false;
-		}
-		const defaultMatches = (element: Element, selector: string) => {
-			const domNode = new NodeEntry(element);
-			let matches = domNode.document?.querySelectorAll(selector),
-				i = matches ? matches.length : 0;
-			while (--i >= 0 && matches?.item(i) !== domNode.get()) {}
-			return i > -1;
-		};
-		const matchesSelector =
-			element.matches ||
-			element.webkitMatchesSelector ||
-			element.mozMatchesSelector ||
-			element.msMatchesSelector ||
-			element.oMatchesSelector ||
-			element.matchesSelector ||
-			defaultMatches;
-
-		return matchesSelector.call(element, selector);
 	}
 
 	/**
@@ -149,32 +133,32 @@ class NodeEntry implements NodeInterface {
 	 * 判断当前节点是否为Card组件
 	 */
 	isCard() {
-		return this.name === CARD_TAG || !!this.attributes(CARD_TYPE_KEY);
+		const element = this.get<HTMLElement>();
+		return element?.nodeType === Node.ELEMENT_NODE && isCard(element);
 	}
 	/**
 	 * 判断当前节点是否为block类型的Card组件
 	 */
 	isBlockCard() {
-		return 'block' === this.attributes(CARD_TYPE_KEY);
+		const element = this.get<HTMLElement>();
+		return element?.nodeType === Node.ELEMENT_NODE && isBlockCard(element);
 	}
 	/**
 	 * 判断当前节点是否为inline类型的Card组件
 	 * @returns
 	 */
 	isInlineCard() {
-		return 'inline' === this.attributes(CARD_TYPE_KEY);
+		const element = this.get<HTMLElement>();
+		return element?.nodeType === Node.ELEMENT_NODE && isInlineCard(element);
 	}
 	/**
 	 * 是否是可编辑器卡片
 	 * @returns
 	 */
 	isEditableCard() {
-		const attributes = this.attributes();
+		const element = this.get<HTMLElement>();
 		return (
-			attributes[DATA_ELEMENT] === EDITABLE ||
-			attributes[CARD_EDITABLE_KEY] === 'true' ||
-			(this.isElement() &&
-				!!this.get<HTMLElement>()?.querySelector(EDITABLE_SELECTOR))
+			element?.nodeType === Node.ELEMENT_NODE && isEditableCard(element)
 		);
 	}
 
@@ -182,21 +166,21 @@ class NodeEntry implements NodeInterface {
 	 * 判断当前节点是否为根节点
 	 */
 	isRoot() {
-		return this.attributes(DATA_ELEMENT) === ROOT;
+		const element = this.get<HTMLElement>();
+		return element?.nodeType === Node.ELEMENT_NODE && isRoot(element);
 	}
 
 	isEditable() {
-		return this.isRoot() || this.attributes(DATA_ELEMENT) === EDITABLE;
+		const element = this.get<HTMLElement>();
+		return element?.nodeType === Node.ELEMENT_NODE && isEditable(element);
 	}
 
 	/**
 	 * 判断当前是否在根节点内
 	 */
 	inEditor() {
-		if (this.isRoot()) {
-			return false;
-		}
-		return this.closest(ROOT_SELECTOR).length > 0;
+		const element = this.get();
+		return !!element && inEditor(element);
 	}
 
 	/**
@@ -204,9 +188,8 @@ class NodeEntry implements NodeInterface {
 	 * @returns
 	 */
 	isCursor() {
-		return (
-			[ANCHOR, FOCUS, CURSOR].indexOf(this.attributes(DATA_ELEMENT)) > -1
-		);
+		const element = this.get<HTMLElement>();
+		return element?.nodeType === Node.ELEMENT_NODE && isCursor(element);
 	}
 
 	get<E extends Node>(index: number = 0): E | null {
@@ -260,7 +243,7 @@ class NodeEntry implements NodeInterface {
 			let nodes = [];
 			for (let i = 0; i < childNodes.length; i++) {
 				const node = childNodes[i];
-				if (this.isMatchesSelector(<ElementInterface>node, selector)) {
+				if (isMatchesSelector(<ElementInterface>node, selector)) {
 					nodes.push(node);
 				}
 			}
@@ -425,7 +408,7 @@ class NodeEntry implements NodeInterface {
 		const nodeList: Array<Node> = [];
 		let node: Node | undefined = this.get() || undefined;
 		while (node) {
-			if (this.isMatchesSelector(<ElementInterface>node, selector)) {
+			if (isMatchesSelector(<ElementInterface>node, selector)) {
 				nodeList.push(node);
 				return new NodeEntry(nodeList);
 			}
@@ -549,23 +532,19 @@ class NodeEntry implements NodeInterface {
 			const element = this.get<Element>();
 			if (!element) return {};
 			const attrs = {};
-			const elementAttributes = element.attributes || [];
-
-			let i = 0,
-				item = null;
-			while ((item = elementAttributes[i])) {
-				// const { name, value } = item;
+			const attributes = element.attributes;
+			for (let i = attributes.length; i--; ) {
+				const item = attributes[i];
 				attrs[item.name] = item.value;
-				i++;
 			}
 			return attrs;
 		}
 
 		if (typeof key === 'object') {
-			Object.keys(key).forEach((k) => {
+			for (const k in key) {
 				const v = key[k];
 				this.attributes(k, v);
-			});
+			}
 			return this;
 		}
 
@@ -575,10 +554,10 @@ class NodeEntry implements NodeInterface {
 				? element?.getAttribute(key) || ''
 				: '';
 		}
-
+		const isRemoveStyle = key === 'style' && val === '';
 		this.each((node) => {
 			const element = node as Element;
-			if (key === 'style' && val === '') element.removeAttribute('style');
+			if (isRemoveStyle) element.removeAttribute('style');
 			else element.setAttribute(key, val.toString());
 		});
 		return this;
@@ -663,10 +642,10 @@ class NodeEntry implements NodeInterface {
 		}
 
 		if (typeof key === 'object') {
-			Object.keys(key).forEach((attr) => {
+			for (const attr in key) {
 				const value = key[attr];
 				this.css(attr, value);
-			});
+			}
 			return this;
 		}
 
@@ -874,7 +853,7 @@ class NodeEntry implements NodeInterface {
 			for (let i = 0; i < nodes.length; i++) {
 				const child = isClone ? nodes[i].cloneNode(true) : nodes[i];
 				if (typeof selector === 'string') {
-					node.appendChild(child);
+					(node as Element).append(child);
 				} else {
 					node.appendChild(child);
 				}
@@ -1016,15 +995,19 @@ class NodeEntry implements NodeInterface {
 
 	getChildByPath(path: Path, filter?: (node: Node) => boolean): Node {
 		let node = this.get()!;
-		const getChildNodes = () => {
-			return filter
-				? Array.from(node.childNodes).filter(filter)
-				: Array.from(node.childNodes);
+		if (path.length === 0) return node;
+		const getChildNode = (index: number | string) => {
+			let i = 0;
+			for (const child of node.childNodes) {
+				if (filter && filter(child)) continue;
+				if (i == index) return child;
+			}
+			return;
 		};
-		let childNodes = getChildNodes();
-		for (let i = 0; path[i] !== undefined && childNodes[path[i]]; ) {
-			node = childNodes[path[i]];
-			childNodes = getChildNodes();
+		for (let i = 0; path[i] !== undefined; ) {
+			const childNode = getChildNode(path[i]);
+			if (!childNode) break;
+			node = childNode;
 			i++;
 		}
 		return node;
@@ -1033,24 +1016,26 @@ class NodeEntry implements NodeInterface {
 	getIndex(filter?: (node: Node) => boolean) {
 		const parent = this[0].parentNode;
 		if (!parent) return 0;
-		return (
-			filter
-				? Array.from(parent.childNodes).filter(filter)
-				: Array.from(parent.childNodes)
-		).indexOf(this.get() as ChildNode);
+		let i = 0;
+		for (const child of parent.childNodes) {
+			if (filter && !filter(child)) continue;
+			if (child === this[0]) return i;
+			i++;
+		}
+		return -1;
 	}
 
 	findParent(
 		container: Node | NodeInterface = this.closest(ROOT_SELECTOR),
 	): NodeInterface | null {
-		if (isNode(container)) container = new NodeEntry(container);
-		if (this.length === 0 || !this.parent()) return null;
-		let node: NodeInterface = this;
-		while (!node.parent()?.equal(container)) {
-			if (!node.parent()) return null;
-			node = node.parent()!;
+		const element = (container[0] ?? container) as Node;
+		if (this.length === 0 || !element.parentNode) return null;
+		let node: Node = this[0];
+		while (node.parentNode !== element) {
+			if (!node.parentNode) return null;
+			node = node.parentNode;
 		}
-		return node;
+		return new NodeEntry(node);
 	}
 
 	allChildren(includeCard: boolean | 'editable' = false) {

@@ -99,7 +99,7 @@ class Block implements BlockModelInterface {
 		const key = markClone.outerHTML;
 		let result: BlockInterface | undefined = this.pluginCaches.get(key);
 		if (result) return result;
-		Object.keys(plugin.components).some((pluginName) => {
+		for (const pluginName in plugin.components) {
 			const blockPlugin = plugin.components[pluginName];
 			if (
 				isBlockPlugin(blockPlugin) &&
@@ -109,19 +109,17 @@ class Block implements BlockModelInterface {
 			) {
 				const schemaRule = blockPlugin.schema();
 				if (
-					!(Array.isArray(schemaRule)
+					Array.isArray(schemaRule)
 						? schemaRule.find((rule) =>
 								schema.checkNode(block, rule.attributes),
 						  )
-						: schema.checkNode(block, schemaRule.attributes))
-				)
-					return;
-				result = blockPlugin;
-				this.pluginCaches.set(key, result);
-				return true;
+						: schema.checkNode(block, schemaRule.attributes)
+				) {
+					this.pluginCaches.set(key, blockPlugin);
+					return blockPlugin;
+				}
 			}
-			return;
-		});
+		}
 		return result;
 	}
 	/**
@@ -1200,12 +1198,13 @@ class Block implements BlockModelInterface {
 		const mergeTags = schema.getCanMergeTags();
 		//获取父级节点
 		let parentNode = block.parent();
-		const rootElement = root.fragment ? root[0].parentNode : root;
+		const rootElement = root.fragment ? root[0].parentNode : root.get();
+
 		//在根节点内循环
 		while (
 			parentNode &&
 			rootElement &&
-			!parentNode.equal(rootElement) &&
+			parentNode.get() !== rootElement &&
 			parentNode.inEditor()
 		) {
 			//如果是卡片节点，就在父节点前面插入

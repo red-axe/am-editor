@@ -90,12 +90,9 @@ function domParser(
 	// 片段
 	if (isNode(selector) && selector.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
 		const nodes: Node[] = [];
-		let node = selector.firstChild;
-		while (node) {
-			nodes.push(node);
-			node = node.nextSibling;
+		for (const child of selector.childNodes) {
+			nodes.push(child);
 		}
-
 		return nodes;
 	}
 	// 其他

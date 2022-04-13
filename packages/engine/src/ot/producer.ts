@@ -141,6 +141,51 @@ class Producer extends EventEmitter2 {
 		);
 	}
 
+	filter = (element: NodeInterface | Node) => {
+		//父节点就是编辑器根节点，就不需要过滤
+		return element[0]?.parentElement?.getAttribute(DATA_ELEMENT) === ROOT
+			? undefined
+			: (node: Node) => {
+					if (node['isTransient'] !== undefined)
+						return !node['isTransient'];
+					const isTransient = isTransientElement(
+						node,
+						this.cacheTransientElements,
+					);
+					node['isTransient'] = isTransient;
+					return !isTransient;
+			  };
+	};
+
+	getPath = (root: NodeInterface, node: NodeInterface) => {
+		return root.isRoot() ? [] : root.getPath(node, this.filter(root));
+	};
+	private indexCaches: Map<Node, number> = new Map();
+	getIndex = (element: NodeInterface) => {
+		const cacheIndex = this.indexCaches.get(element[0]);
+		if (cacheIndex !== undefined) return cacheIndex;
+		const parent = element[0].parentNode;
+		if (!parent) return 0;
+		const filter = this.filter(element);
+		if (filter && !filter(element[0])) return -1;
+		const prev = element[0].previousSibling;
+		if (prev) {
+			const prevIndex = this.indexCaches.get(prev);
+			if (prevIndex !== undefined) {
+				const index = prevIndex + 1;
+				this.indexCaches.set(element[0], index);
+				return index;
+			}
+		}
+		let i = 0;
+		for (const child of parent.childNodes) {
+			if (child === element[0]) return i;
+			if (filter && !filter(child)) continue;
+			this.indexCaches.set(child, i);
+			i++;
+		}
+		return -1;
+	};
 	/**
 	 * 从DOM变更记录中生产 ops
 	 * @param records DOM变更记录集合
@@ -169,24 +214,6 @@ class Producer extends EventEmitter2 {
 		// 文本数据变更标记
 		let isValueString = false;
 		const pathCaches: Map<NodeInterface, number[]> = new Map();
-		const filter = (element: NodeInterface) => {
-			//父节点就是编辑器根节点，就不需要过滤
-			return element.parent()?.isRoot()
-				? undefined
-				: (node: Node) =>
-						!isTransientElement(
-							$(node),
-							this.cacheTransientElements,
-						);
-		};
-
-		const getPath = (root: NodeInterface) => {
-			return root.isRoot() ? [] : root.getPath(node, filter(root));
-		};
-
-		const getIndex = (element: NodeInterface) => {
-			return element.getIndex(filter(element));
-		};
 		// 循环记录集合
 		for (let i = 0; records[i]; ) {
 			const record = records[i];
@@ -213,7 +240,7 @@ class Producer extends EventEmitter2 {
 			const rootId = blockElement.attributes(DATA_ID);
 			let path = pathCaches.get(targetElement);
 			if (path === undefined) {
-				path = getPath(targetElement).map(
+				path = this.getPath(targetElement, node).map(
 					(index) => index + JSON0_INDEX.ELEMENT,
 				);
 				pathCaches.set(targetElement, path);
@@ -229,7 +256,7 @@ class Producer extends EventEmitter2 {
 				} else {
 					let path = pathCaches.get(blockElement);
 					if (!path) {
-						path = getPath(blockElement);
+						path = this.getPath(blockElement, node);
 						pathCaches.set(blockElement, path);
 					}
 					beginIndex = path.length;
@@ -262,7 +289,7 @@ class Producer extends EventEmitter2 {
 				// DOM中变更为移除
 				if (removedNodes[0]) {
 					// 循环要移除的节点
-					Array.from(removedNodes).forEach((removedNode) => {
+					for (const removedNode of removedNodes) {
 						// 要移除的节点同时又在增加的就不处理
 						if (
 							!addNodes.find((n) => n === removedNode) &&
@@ -320,27 +347,34 @@ class Producer extends EventEmitter2 {
 							}
 							ops.push(newOp);
 						}
-					});
+					}
 				}
 				if (addedNodes[0]) {
-					Array.from(addedNodes).forEach((addedNode) => {
-						if (cacheNodes.includes(addedNode)) return;
+					for (const addedNode of addedNodes) {
+						if (cacheNodes.includes(addedNode)) continue;
 						const domAddedNode = $(addedNode);
 						const data = toJSON0(domAddedNode);
 						if (addedNode.parentNode === target) {
+							const addedNodes: Node[] = [];
 							domAddedNode.traverse((child) => {
-								const liIndex = allOps.findIndex(
-									(op) =>
-										'li' in op &&
-										op.addNode &&
-										child[0] === op.addNode[0],
-								);
-								if (liIndex > -1) {
-									allOps.splice(liIndex, 1);
-								}
+								addedNodes.push(child[0]);
 							});
+							for (let i = 0, len = allOps.length; i < len; i++) {
+								const op = allOps[i];
+								if (
+									'li' in op &&
+									op.addNode &&
+									addedNodes.find(
+										(child) => child === op.addNode![0],
+									)
+								) {
+									allOps.splice(i, 1);
+									i--;
+								}
+							}
 							const index =
-								getIndex(domAddedNode) + JSON0_INDEX.ELEMENT;
+								this.getIndex(domAddedNode) +
+								JSON0_INDEX.ELEMENT;
 							let p: Path = [...(path || [])];
 							// 卡片没有完全渲染就在插入body位置插入
 							p = p.concat([index]);
@@ -362,7 +396,7 @@ class Producer extends EventEmitter2 {
 						} else {
 							addNodes.push(addedNode);
 						}
-					});
+					}
 				}
 			} else if (type === 'characterData') {
 				if (!isValueString) {
@@ -744,6 +778,7 @@ class Producer extends EventEmitter2 {
 		this.clearCache();
 		//重置缓存
 		this.cacheTransientElements = undefined;
+		this.indexCaches.clear();
 		let ops = this.generateOps(records);
 		ops = filterOperations(ops);
 		targetElements.forEach((element) => {
@@ -755,7 +790,7 @@ class Producer extends EventEmitter2 {
 			updateIndex(
 				node,
 				(child) =>
-					!isTransientElement($(child), this.cacheTransientElements),
+					!isTransientElement(child, this.cacheTransientElements),
 			);
 		});
 		if (ops.length !== 0) {
@@ -813,7 +848,7 @@ class Producer extends EventEmitter2 {
 				: Array.from(target.childNodes).filter(
 						(node) =>
 							!isTransientElement(
-								$(node),
+								node,
 								this.cacheTransientElements,
 							),
 				  );

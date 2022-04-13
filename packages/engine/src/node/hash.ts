@@ -49,13 +49,18 @@ export default (
 ) => {
 	let prefix = '';
 	if (typeof value !== 'string') {
-		const node = ((value[0] ?? value) as Node).cloneNode();
+		let node = (value[0] ?? value) as Node;
 		if (node.nodeType === Node.ELEMENT_NODE) {
 			const element = node as HTMLElement;
-			element.removeAttribute(DATA_ID);
 			const name = element.localName;
 			prefix = name.substring(0, 1);
-			value = element.outerHTML;
+			value = name;
+			const attributes = element.attributes;
+			for (let i = attributes.length; i--; ) {
+				const item = attributes[i];
+				if (![DATA_ID, 'id'].includes(item.name))
+					value += `${item.name}="${item.value}"`;
+			}
 		} else {
 			value = node.textContent ?? '';
 		}

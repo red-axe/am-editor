@@ -35,7 +35,7 @@ class NodeId implements NodeIdInterface {
 		const rules: { [key: string]: SchemaRule[] } = {};
 		// const { blocks, inlines, marks } = this.editor.schema.data;
 		this.editor.schema.data.blocks.forEach((schema) => {
-			if (!Object.keys(rules).includes(schema.name)) {
+			if (!rules[schema.name]) {
 				rules[schema.name] = [];
 			}
 			rules[schema.name].push(schema);

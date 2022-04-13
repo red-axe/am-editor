@@ -85,24 +85,22 @@ class Mark implements MarkModelInterface {
 		const key = markClone.outerHTML;
 		let result: MarkInterface | undefined = this.pluginCaches.get(key);
 		if (result) return result;
-		Object.keys(plugin.components).some((pluginName) => {
+		for (const pluginName in plugin.components) {
 			const markPlugin = plugin.components[pluginName];
 			if (isMarkPlugin(markPlugin) && mark.name === markPlugin.tagName) {
 				const schemaRule = markPlugin.schema();
 				if (
-					!(Array.isArray(schemaRule)
+					Array.isArray(schemaRule)
 						? schemaRule.find((rule) =>
 								schema.checkNode(mark, rule.attributes),
 						  )
-						: schema.checkNode(mark, schemaRule.attributes))
-				)
-					return;
-				result = markPlugin;
-				this.pluginCaches.set(key, result);
-				return true;
+						: schema.checkNode(mark, schemaRule.attributes)
+				) {
+					this.pluginCaches.set(key, markPlugin);
+					return markPlugin;
+				}
 			}
-			return;
-		});
+		}
 		return result;
 	}
 	/**

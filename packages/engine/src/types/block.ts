@@ -141,7 +141,7 @@ export interface BlockModelInterface {
 	 * @param node 节点
 	 * @param root 根节点
 	 */
-	flat(node: NodeInterface, root: NodeInterface): void;
+	flat(block: NodeInterface, root: NodeInterface): void;
 	/**
 	 * br 换行改成段落
 	 * @param block 节点

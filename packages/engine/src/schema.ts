@@ -10,9 +10,10 @@ import {
 	SchemaValue,
 	SchemaValueObject,
 } from './types';
-import { validUrl } from './utils';
+import { getStyleMap, validUrl } from './utils';
 import { getHashId } from './node';
 import { DATA_ID } from './constants';
+import { isNode } from './node/utils';
 
 /**
  * 标签规则
@@ -23,7 +24,12 @@ class Schema implements SchemaInterface {
 	private _typeMap: {
 		[key: string]: SchemaRule;
 	} = {};
-
+	private _invalidKeys: string[] = [];
+	private _tagMap: Record<'blocks' | 'inlines' | 'marks', string[]> = {
+		blocks: [],
+		inlines: [],
+		marks: [],
+	};
 	data: {
 		blocks: Array<SchemaRule>;
 		inlines: Array<SchemaRule>;
@@ -85,12 +91,12 @@ class Schema implements SchemaInterface {
 				}
 			} else if (!!this.data[`${rule.type}s`]) {
 				this.data.globals[rule.type] = merge(
-					{ ...this.data.globals[rule.type] },
+					Object.assign({}, this.data.globals[rule.type]),
 					rule.attributes,
 				);
 			}
 		});
-
+		this.updateTagMap();
 		//按照必要属性个数排序
 		const getCount = (rule: SchemaRule) => {
 			const aAttributes = rule.attributes || {};
@@ -123,6 +129,32 @@ class Schema implements SchemaInterface {
 			return 1;
 		});
 	}
+
+	updateTagMap() {
+		this._tagMap.marks = [];
+		this.data.marks.forEach((mark) => {
+			if (!this._tagMap.marks.includes(mark.name)) {
+				this._tagMap.marks.push(mark.name);
+			}
+		});
+		this._tagMap.blocks = [];
+		this.data.blocks.forEach((block) => {
+			if (!this._tagMap.blocks.includes(block.name)) {
+				this._tagMap.blocks.push(block.name);
+			}
+		});
+		this._tagMap.inlines = [];
+		this.data.inlines.forEach((inline) => {
+			if (!this._tagMap.inlines.includes(inline.name)) {
+				this._tagMap.inlines.push(inline.name);
+			}
+		});
+	}
+
+	getTags(type: 'blocks' | 'inlines' | 'marks') {
+		return this._tagMap[type];
+	}
+
 	// 移除一个规则
 	remove(rule: SchemaRule) {
 		let index = this._all.findIndex((r) => isEqual(r, rule));
@@ -133,6 +165,7 @@ class Schema implements SchemaInterface {
 			if (index > -1) rules.splice(index, 1);
 		}
 		this._typeMap = {};
+		this.updateTagMap();
 	}
 	/**
 	 * 克隆当前schema对象
@@ -141,6 +174,7 @@ class Schema implements SchemaInterface {
 		const schema = new Schema();
 		schema._all = cloneDeep(this._all);
 		schema._typeMap = cloneDeep(this._typeMap);
+		schema._tagMap = cloneDeep(this._tagMap);
 		schema.data = cloneDeep(this.data);
 		return schema;
 	}
@@ -162,15 +196,21 @@ class Schema implements SchemaInterface {
 		return schemas;
 	}
 
-	getType(node: NodeInterface, filter?: (rule: SchemaRule) => boolean) {
-		if (node.type !== Node.ELEMENT_NODE) return undefined;
-		let id = node.attributes(DATA_ID);
-		if (!id) id = getHashId(node, false);
+	getType(
+		node: NodeInterface | Node,
+		filter?: (rule: SchemaRule) => boolean,
+	) {
+		const element = (isNode(node) ? node : node[0]) as Element;
+		if (!node || element.nodeType !== Node.ELEMENT_NODE) return undefined;
+		let id = element.getAttribute(DATA_ID);
+		if (!id) id = getHashId(element, false);
 		else id = id.split('-')[0];
+		if (this._invalidKeys.includes(id)) return undefined;
 		if (!!this._typeMap[id] && (!filter || filter(this._typeMap[id]!)))
 			return this._typeMap[id].type;
-		const reuslt = this.getRule(node, filter);
+		const reuslt = this.getRule(element, filter);
 		if (reuslt) this._typeMap[id] = reuslt;
+		else this._invalidKeys.push(id);
 		return reuslt?.type;
 	}
 
@@ -180,11 +220,14 @@ class Schema implements SchemaInterface {
 	 * @param filter 过滤
 	 * @returns
 	 */
-	getRule(node: NodeInterface, filter?: (rule: SchemaRule) => boolean) {
-		filter = filter || ((rule) => rule.name === node.name);
-		if (node.type !== Node.ELEMENT_NODE) return undefined;
+	getRule(
+		node: NodeInterface | Node,
+		filter?: (rule: SchemaRule) => boolean,
+	) {
+		const element = (isNode(node) ? node : node[0]) as Element;
+		filter = filter || ((rule) => rule.name === element.localName);
 		return this._all.find(
-			(rule) => filter!(rule) && this.checkNode(node, rule.attributes),
+			(rule) => filter!(rule) && this.checkNode(element, rule.attributes),
 		);
 	}
 
@@ -194,26 +237,33 @@ class Schema implements SchemaInterface {
 	 * @param attributes 属性规则
 	 */
 	checkNode(
-		node: NodeInterface,
+		node: NodeInterface | Node,
 		attributes: SchemaAttributes | SchemaStyle = {},
 	): boolean {
-		//获取节点属性
-		const nodeAttributes = node.attributes();
-		const nodeStyles = node.css();
-		const styles = (attributes.style || {}) as SchemaAttributes;
+		const element = (isNode(node) ? node : node[0]) as Element;
 		//需要属性每一项都能效验通过
-		const attrResult = Object.keys(attributes).every((attributesName) => {
-			if (attributesName === 'style') return true;
-			return this.checkValue(
-				attributes as SchemaAttributes,
-				attributesName,
-				nodeAttributes[attributesName],
-			);
-		});
-		if (!attrResult) return false;
-		return Object.keys(styles).every((styleName) => {
-			return this.checkValue(styles, styleName, nodeStyles[styleName]);
-		});
+		for (const attributesName in attributes) {
+			if (attributesName === 'style') continue;
+			const schema = attributes as SchemaAttributes;
+			if (!schema[attributesName]) return false;
+			if (
+				!this.checkValue(
+					schema,
+					attributesName,
+					element.getAttribute(attributesName) ?? undefined,
+				)
+			)
+				return false;
+		}
+
+		const nodeStyles = getStyleMap(element.getAttribute('style') || '');
+		const styles = (attributes.style || {}) as SchemaAttributes;
+		for (const styleName in styles) {
+			if (!styles[styleName]) return false;
+			if (!this.checkValue(styles, styleName, nodeStyles[styleName]))
+				return false;
+		}
+		return true;
 	}
 	/**
 	 * 检测值是否符合规则
@@ -224,7 +274,7 @@ class Schema implements SchemaInterface {
 	checkValue(
 		schema: SchemaAttributes,
 		attributesName: string,
-		attributesValue: string,
+		attributesValue?: string,
 		force?: boolean,
 	): boolean {
 		if (!schema[attributesName]) return false;

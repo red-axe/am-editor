@@ -26,7 +26,7 @@ const defaultConversion: ConversionData = [
 				editable: attributes[CARD_EDITABLE_KEY],
 			};
 			//其它 data 属性
-			Object.keys(oldAttrs).forEach((attrName) => {
+			for (const attrName in oldAttrs) {
 				if (
 					attrName !== READY_CARD_KEY &&
 					attrName.indexOf('data-') === 0 &&
@@ -34,16 +34,16 @@ const defaultConversion: ConversionData = [
 				) {
 					attributes[attrName] = oldAttrs[attrName];
 				}
-			});
+			}
 
 			if (value !== undefined) {
 				attributes.value = value;
 			}
 			style = {};
 			const card = $('<card />');
-			Object.keys(attributes).forEach((name) => {
-				card.attributes(name, attributes[name]);
-			});
+			for (const attrName in attributes) {
+				card.attributes(attrName, attributes[attrName]);
+			}
 			return card;
 		},
 	},
@@ -58,9 +58,9 @@ const defaultConversion: ConversionData = [
 		to: (_, style, attributes) => {
 			const p = $('<p />');
 			p.css(style);
-			Object.keys(attributes).forEach((name) => {
-				p.attributes(name, attributes[name]);
-			});
+			for (const attrName in attributes) {
+				p.attributes(attrName, attributes[attrName]);
+			}
 			return p;
 		},
 	},

@@ -106,20 +106,19 @@ export const getStyleMap = (style: string): Record<string, string> => {
 	const map: Record<string, string> = {};
 	if (!key) return map;
 	const cacheStyle = stylesCaches.get(key);
-	if (cacheStyle) return { ...cacheStyle };
+	if (cacheStyle) return Object.assign({}, cacheStyle);
 	const reg = /\s*([\w\-]+)\s*:([^;]*)(;|$)/g;
 	let match;
-
+	style = style.toLowerCase();
 	while ((match = reg.exec(style))) {
-		const key = match[1].toLowerCase().trim();
-		let val = match[2].trim();
-		if (key.endsWith('color') || val.toLowerCase().includes('rgb')) {
+		let [_, key, val] = match;
+		if (key.endsWith('color') || val.includes('rgb')) {
 			val = toHex(val);
 		}
-		map[key] = val;
+		map[key.trim()] = val.trim();
 	}
 	stylesCaches.set(key, map);
-	return { ...map };
+	return Object.assign({}, map);
 };
 
 /**

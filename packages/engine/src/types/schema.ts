@@ -103,12 +103,17 @@ export interface SchemaInterface {
 	 */
 	find(callback: (rule: SchemaRule) => boolean): Array<SchemaRule>;
 	/**
+	 * 获取类型有哪些标签名称
+	 * @param type
+	 */
+	getTags(type: 'blocks' | 'inlines' | 'marks'): string[];
+	/**
 	 * 获取节点类型
 	 * @param node 节点
 	 * @param filter 过滤
 	 */
 	getType(
-		node: NodeInterface,
+		node: NodeInterface | Node,
 		filter?: (rule: SchemaRule) => boolean,
 	): 'block' | 'mark' | 'inline' | undefined;
 	/**
@@ -118,7 +123,7 @@ export interface SchemaInterface {
 	 * @returns
 	 */
 	getRule(
-		node: NodeInterface,
+		node: NodeInterface | Node,
 		filter?: (rule: SchemaRule) => boolean,
 	): SchemaRule | undefined;
 	/**
@@ -127,7 +132,7 @@ export interface SchemaInterface {
 	 * @param attributes 属性规则
 	 */
 	checkNode(
-		node: NodeInterface,
+		node: NodeInterface | Node,
 		attributes?: SchemaAttributes | SchemaStyle,
 	): boolean;
 	/**

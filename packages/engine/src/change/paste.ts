@@ -38,7 +38,6 @@ export default class Paste {
 
 	elementNormalize(fragment: DocumentFragment) {
 		const defaultStyle = this.getDefaultStyle();
-		const defautlStyleKeys = Object.keys(defaultStyle);
 		const { inline, list } = this.engine;
 		const nodeApi = this.engine.node;
 		const markApi = this.engine.mark;
@@ -84,7 +83,7 @@ export default class Paste {
 					return undefined;
 				}
 				const styles = node.css();
-				defautlStyleKeys.forEach((key) => {
+				for (const key in defaultStyle) {
 					let value = styles[key];
 					if (!value) return;
 					if (key.endsWith('color')) {
@@ -95,7 +94,7 @@ export default class Paste {
 					) {
 						node.css(key, '');
 					}
-				});
+				}
 				//处理后如果不是一个有效的节点就移除包裹
 				let type = this.schema.getType(node);
 				if (!type) {
@@ -473,7 +472,7 @@ export default class Paste {
 					const pMarkPlugin = markApi.findPlugin(nodeParent);
 					const cMarkPlugin =
 						currentMarkPlugins[currentMarkPlugins.length - 1]
-							.plugin;
+							?.plugin;
 					if (
 						pMarkPlugin &&
 						cMarkPlugin &&
@@ -572,7 +571,7 @@ export default class Paste {
 
 		$(fragment).traverse((node) => {
 			if (node.fragment === fragment) return undefined;
-			const first = node.first();
+			const first = node.get<Node>()?.firstChild;
 			if (node.length > 0 && node[0].parentNode)
 				this.engine.trigger('paste:each', node);
 			// 删除非block节点的换行 \r\n\r\n<span
@@ -609,7 +608,7 @@ export default class Paste {
 				nodeApi.unwrap(node);
 			}
 			// 如果这个节点被移除了，直接遍历他的子节点
-			if (node.length === 0) return first;
+			if (node.length === 0 && first) return $(first);
 			return undefined;
 		});
 		this.engine.trigger('paste:each-after', $(fragment));

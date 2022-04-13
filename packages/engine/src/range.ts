@@ -635,23 +635,24 @@ class Range implements RangeInterface {
 		const block = this.editor.block.closest(this.commonAncestorNode);
 		block.find('br').each((br) => {
 			const domBr = $(br);
+			const prev = domBr.prev();
+			const next = domBr.next();
+			const parent = domBr.parent();
 			if (
-				((!domBr.prev() ||
-					(domBr.parent()?.hasClass(list.CUSTOMZIE_LI_CLASS) &&
-						domBr.parent()?.first()?.equal(domBr.prev()!))) &&
-					domBr.next() &&
-					domBr.next()!.name !== 'br' &&
-					![CURSOR, ANCHOR, FOCUS].includes(
-						domBr.next()!.attributes(DATA_ELEMENT),
-					)) ||
-				(!domBr.next() && domBr.prev() && domBr.prev()?.name !== 'br')
+				((!prev ||
+					(parent?.hasClass(list.CUSTOMZIE_LI_CLASS) &&
+						parent?.first()?.equal(prev))) &&
+					next &&
+					next.name !== 'br' &&
+					!next.isCursor()) ||
+				(!next && prev && prev.name !== 'br')
 			) {
 				if (
 					isLeft &&
-					domBr.prev() &&
+					prev &&
 					!(
-						domBr.parent()?.hasClass(list.CUSTOMZIE_LI_CLASS) &&
-						domBr.parent()?.first()?.equal(domBr.prev()!)
+						parent?.hasClass(list.CUSTOMZIE_LI_CLASS) &&
+						parent?.first()?.equal(domBr.prev()!)
 					)
 				)
 					return;

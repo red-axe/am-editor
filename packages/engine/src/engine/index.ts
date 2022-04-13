@@ -142,9 +142,8 @@ class Engine<T extends EngineOptions = EngineOptions>
 		) => boolean | number | void,
 	): Promise<string> {
 		return new Promise(async (resolve, reject) => {
-			const pluginNames = Object.keys(this.plugin.components);
-			for (let i = 0; i < pluginNames.length; i++) {
-				const plugin = this.plugin.components[pluginNames[i]];
+			for (const pluginName in this.plugin.components) {
+				const plugin = this.plugin.components[pluginName];
 				const result = await new Promise((resolve) => {
 					if (plugin.waiting) {
 						plugin

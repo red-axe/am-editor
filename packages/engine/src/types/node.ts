@@ -586,7 +586,7 @@ export interface NodeModelInterface {
 	/**
 	 * 判断block节点的子节点是否不包含blcok 节点
 	 */
-	isNestedBlock(node: NodeInterface): boolean;
+	isNestedBlock(node: NodeInterface | Node): boolean;
 	/**
 	 * 判断节点是否是顶级根节点，父级为编辑器根节点，且，子级节点没有block节点
 	 * @param node 节点

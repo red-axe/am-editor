@@ -31,19 +31,19 @@ import { isNodeEntry } from '../node/utils';
 
 const attrsToString = (attributes: { [k: string]: string }) => {
 	let attrsString = '';
-	Object.keys(attributes).forEach((key) => {
+	for (const key in attributes) {
 		if (key === 'style') {
-			return;
+			continue;
 		}
 		const val = escape(attributes[key]);
 		attrsString += ' '.concat(key, '="').concat(val, '"');
-	});
+	}
 	return attrsString.trim();
 };
 
 const stylesToString = (styles: { [k: string]: string }) => {
 	let stylesString = '';
-	Object.keys(styles).forEach((key) => {
+	for (let key in styles) {
 		key = key.toLowerCase();
 		let val = escape(styles[key]);
 
@@ -51,7 +51,7 @@ const stylesToString = (styles: { [k: string]: string }) => {
 			/^(padding|margin|text-indent)/.test(key) &&
 			removeUnit(val) === 0
 		) {
-			return;
+			continue;
 		}
 
 		if (key.endsWith('color')) {
@@ -59,7 +59,7 @@ const stylesToString = (styles: { [k: string]: string }) => {
 		}
 
 		stylesString += ' '.concat(key, ': ').concat(val, ';');
-	});
+	}
 	return stylesString.trim();
 };
 
@@ -117,13 +117,14 @@ class Parser implements ParserInterface {
 			oldRules.push(rule);
 			const { name, attributes, style } = value.node;
 			delete attributes[DATA_ID];
+			delete attributes['id'];
 			const newNode = $(`<${name} />`);
 			nodeApi.setAttributes(newNode, {
 				...attributes,
 				style,
 			});
 			//把旧节点的子节点追加到新节点下
-			newNode.append(node.children());
+			newNode.get<Element>()?.append(...node.get<Element>()!.childNodes);
 			if (node.isCard()) {
 				node.replaceWith(newNode);
 				return newNode;
@@ -134,7 +135,11 @@ class Parser implements ParserInterface {
 						node = newNode;
 					} else {
 						//把包含旧子节点的新节点追加到旧节点下
-						node.append(newNode);
+						node.each((childNode) => {
+							(childNode as Element).append(
+								...newNode.get<Element>()!.childNodes,
+							);
+						});
 					}
 					if (!convertAfterNode || convertAfterNode.length === 0)
 						convertAfterNode = newNode;
@@ -143,7 +148,11 @@ class Parser implements ParserInterface {
 						node.replaceWith(newNode);
 						node = newNode;
 					} else {
-						node.append(newNode);
+						node.each((childNode) => {
+							(childNode as Element).append(
+								...newNode.get<Element>()!.childNodes,
+							);
+						});
 					}
 					if (!convertAfterNode || convertAfterNode.length === 0)
 						convertAfterNode = newNode;

@@ -8,6 +8,7 @@ import {
 	SchemaInterface,
 	SchemaBlock,
 	RangeInterface,
+	ElementInterface,
 } from '../types';
 import {
 	ANCHOR,
@@ -26,7 +27,7 @@ import {
 import { getDocument, getStyleMap, isEngine } from '../utils';
 import $ from './query';
 import getHashId, { uuid } from './hash';
-import { isNode, isNodeEntry } from './utils';
+import { isMatchesSelector, isNode, isNodeEntry } from './utils';
 
 class NodeModel implements NodeModelInterface {
 	private editor: EditorInterface;
@@ -51,8 +52,15 @@ class NodeModel implements NodeModelInterface {
 		node: NodeInterface | Node,
 		schema: SchemaInterface = this.editor.schema,
 	) {
-		if (isNode(node)) node = $(node);
-		return schema.getType(node) === 'mark';
+		return (
+			schema
+				.getTags('marks')
+				.includes(
+					(
+						(node as Node).nodeName ?? (node as NodeInterface).name
+					).toLowerCase(),
+				) && schema.getType(node) === 'mark'
+		);
 	}
 
 	/**
@@ -63,8 +71,15 @@ class NodeModel implements NodeModelInterface {
 		node: NodeInterface | Node,
 		schema: SchemaInterface = this.editor.schema,
 	) {
-		if (isNode(node)) node = $(node);
-		return schema.getType(node) === 'inline';
+		return (
+			schema
+				.getTags('inlines')
+				.includes(
+					(
+						(node as Node).nodeName ?? (node as NodeInterface).name
+					).toLowerCase(),
+				) && schema.getType(node) === 'inline'
+		);
 	}
 
 	/**
@@ -75,19 +90,30 @@ class NodeModel implements NodeModelInterface {
 		node: NodeInterface | Node,
 		schema: SchemaInterface = this.editor.schema,
 	) {
-		if (isNode(node)) node = $(node);
-		return schema.getType(node) === 'block';
+		return (
+			schema
+				.getTags('blocks')
+				.includes(
+					(
+						(node as Node).nodeName ?? (node as NodeInterface).name
+					).toLowerCase(),
+				) && schema.getType(node) === 'block'
+		);
 	}
 
 	/**
 	 * 判断block节点的子节点是否不包含blcok 节点
 	 */
-	isNestedBlock(node: NodeInterface) {
+	isNestedBlock(node: NodeInterface | Node) {
 		if (!this.isBlock(node)) return false;
-		let child = node.first();
+		const element = (
+			!!(node as NodeInterface).length ? node[0] : node
+		) as Element;
+		if (!element) return false;
+		let child = element.firstChild;
 		while (child) {
 			if (this.isBlock(child)) return false;
-			child = child.next();
+			child = child.nextSibling;
 		}
 		return true;
 	}
@@ -447,11 +473,7 @@ class NodeModel implements NodeModelInterface {
 		if (toNodeLast && toNodeLast.name === 'br') {
 			let next = toNodeLast.next();
 			while (next) {
-				if (
-					[CURSOR, ANCHOR, FOCUS].indexOf(
-						next.attributes(DATA_ELEMENT),
-					)
-				) {
+				if (next.isCursor()) {
 					toNodeLast.remove();
 					break;
 				}
@@ -716,29 +738,31 @@ class NodeModel implements NodeModelInterface {
 	 */
 	setAttributes(node: NodeInterface, attrs: any) {
 		let style = attrs.style;
-		Object.keys(attrs).forEach((key) => {
-			if (key === 'style') return;
+		for (const key in attrs) {
+			if (key === 'style') continue;
 			if (key === 'className') {
 				const value = attrs[key];
 				if (Array.isArray(value)) {
 					value.forEach((name) => node.addClass(name));
 				} else node.addClass(value);
 			} else node.attributes(key, attrs[key].toString());
-		});
+		}
 		if (typeof style === 'number') style = {};
 		else if (typeof style === 'string') style = getStyleMap(style);
 		style = style || {};
 		const keys = Object.keys(style);
-		keys.forEach((key) => {
+		for (const key in style) {
 			let val = (<{ [k: string]: string | number }>style)[key];
 			if (/^0(px|em)?$/.test(val.toString())) {
 				val = '';
 			}
-
 			node.css(key, val.toString());
-		});
+		}
 
-		if (keys.length === 0 || Object.keys(node.css()).length === 0) {
+		if (
+			keys.length === 0 ||
+			Object.keys(node.attributes('style')).length === 0
+		) {
 			node.removeAttributes('style');
 		}
 
@@ -829,6 +853,43 @@ class NodeModel implements NodeModelInterface {
 			lastNode.remove();
 		}
 	}
+
+	addBrForBlock = (blockNode: NodeInterface) => {
+		const children = blockNode.get<Element>()!.childNodes;
+		// 非光标标记的字节的数量
+		let notCursorCount = 0;
+		let allText = true;
+		for (const child of children) {
+			if (allText && child.nodeType === Node.TEXT_NODE) {
+				allText = false;
+			}
+			if (
+				child.nodeType === Node.ELEMENT_NODE &&
+				[ANCHOR, FOCUS, CURSOR].indexOf(
+					(child as Element).getAttribute(DATA_ELEMENT) || '',
+				) < 1
+			) {
+				notCursorCount++;
+			}
+			if (!allText && notCursorCount > 1) {
+				break;
+			}
+		}
+		if (blockNode.name === 'p' && notCursorCount === 0) {
+			const br = document.createElement('br');
+			blockNode.each((children) => {
+				children.appendChild(br.cloneNode());
+			});
+		}
+		if (
+			this.isBlock(blockNode) &&
+			this.isEmptyWithTrim(blockNode) &&
+			allText
+		) {
+			blockNode.empty();
+			blockNode.append(document.createElement('br'));
+		}
+	};
 	/**
 	 * 扁平化节点
 	 * @param node 节点
@@ -838,34 +899,17 @@ class NodeModel implements NodeModelInterface {
 		const { block } = this.editor;
 		//第一个子节点
 		let childNode = node.first();
-		const rootElement = root.fragment ? root.fragment : root.get();
 		const tempNode = node.fragment ? $('<p />') : this.clone(node, false);
-		const addBrForBlock = (blockNode: NodeInterface) => {
-			const children = blockNode.children().toArray();
-			if (
-				blockNode.name === 'p' &&
-				children.filter((node) => !node.isCursor()).length === 0
-			) {
-				blockNode.append($('<br />'));
-			}
-			if (
-				this.isBlock(blockNode) &&
-				this.isEmptyWithTrim(blockNode) &&
-				children.every((child) => child.isText())
-			) {
-				blockNode.html('<br />');
-			}
-		};
 		while (childNode) {
 			//获取下一个兄弟节点
 			let nextNode = childNode.next();
 			//如果当前子节点是块级的Card组件，或者是简单的block
 			if (childNode.isBlockCard() || this.isNestedBlock(childNode)) {
-				block.flat(childNode, $(rootElement || []));
+				block.flat(childNode, root);
 			}
 			//如果当前是块级标签，递归循环
 			else if (this.isBlock(childNode)) {
-				childNode = this.flat(childNode, $(rootElement || []));
+				childNode = this.flat(childNode, root);
 			} else {
 				const cloneNode = this.clone(tempNode, false);
 				const isLI = 'li' === cloneNode.name;
@@ -921,10 +965,10 @@ class NodeModel implements NodeModelInterface {
 					childNode = nextNode;
 				}
 				this.removeSide(cloneNode);
-				block.flat(cloneNode, $(rootElement || []));
-				addBrForBlock(cloneNode);
+				block.flat(cloneNode, root);
+				this.addBrForBlock(cloneNode);
 			}
-			addBrForBlock(childNode);
+			this.addBrForBlock(childNode);
 			this.removeSide(childNode);
 			childNode = nextNode;
 		}
