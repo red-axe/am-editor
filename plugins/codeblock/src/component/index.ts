@@ -245,7 +245,7 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 	onSelectDown(event: KeyboardEvent) {
 		if (!this.codeEditor) return;
 		event.preventDefault();
-		this.codeEditor.focus();
+		this.codeEditor.select(true);
 		this.activate(true);
 		this.toolbarModel?.show();
 	}
@@ -253,7 +253,7 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 	onSelectUp(event: KeyboardEvent) {
 		if (!this.codeEditor) return;
 		event.preventDefault();
-		this.codeEditor.focus();
+		this.codeEditor.select(false);
 		this.activate(true);
 		this.toolbarModel?.show();
 	}

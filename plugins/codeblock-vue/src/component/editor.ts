@@ -133,7 +133,6 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 
 		this.codeMirror.on('blur', () => {
 			const { onBlur } = this.options;
-			this.codeMirror?.setCursor(this.codeMirror.lineCount() - 1, 0);
 			if (onBlur) onBlur();
 		});
 		if (isMobile) {
