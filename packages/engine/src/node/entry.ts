@@ -1,12 +1,4 @@
-import {
-	DATA_ELEMENT,
-	ROOT,
-	ROOT_SELECTOR,
-	EDITABLE,
-	EDITABLE_SELECTOR,
-} from '../constants/root';
-import { CARD_EDITABLE_KEY, CARD_TAG, CARD_TYPE_KEY } from '../constants/card';
-import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
+import { ROOT_SELECTOR, EDITABLE_SELECTOR } from '../constants/root';
 import DOMEvent from './event';
 import $ from './parse';
 import {

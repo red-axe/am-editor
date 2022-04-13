@@ -1,4 +1,3 @@
-import { isNodeEntry } from '../node/utils';
 import { DATA_ELEMENT, ROOT } from '../constants/root';
 import { NodeInterface } from '../types/node';
 
@@ -21,7 +20,7 @@ export const getDocument = (node?: Node): Document => {
  * @param node 节点
  */
 export const combinText = (node: NodeInterface | Node) => {
-	if (isNodeEntry(node)) node = node[0];
+	if (!(node instanceof Node)) node = node[0];
 	node.normalize();
 };
 

@@ -1,18 +1,14 @@
 import { getDocument } from '../utils/node';
 import { ElementInterface, NodeInterface, Selector } from '../types';
 import {
-	ANCHOR,
-	CARD_EDITABLE_KEY,
-	CARD_TAG,
-	CARD_TYPE_KEY,
-	CURSOR,
 	DATA_ELEMENT,
 	EDITABLE,
 	EDITABLE_SELECTOR,
-	FOCUS,
 	ROOT,
 	ROOT_SELECTOR,
-} from '../constants';
+} from '../constants/root';
+import { CARD_EDITABLE_KEY, CARD_TAG, CARD_TYPE_KEY } from '../constants/card';
+import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 
 export const isNodeEntry = (selector: Selector): selector is NodeInterface => {
 	return !!selector && (selector as NodeInterface).get !== undefined;
