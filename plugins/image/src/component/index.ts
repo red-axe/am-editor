@@ -69,10 +69,10 @@ export interface ImageValue extends CardValue {
 }
 
 class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
-	private image?: Image;
-	private widthInput?: NodeInterface;
-	private heightInput?: NodeInterface;
-	private isLocalError?: boolean;
+	protected image?: Image;
+	protected widthInput?: NodeInterface;
+	protected heightInput?: NodeInterface;
+	protected isLocalError?: boolean;
 
 	static get cardName() {
 		return 'image';
