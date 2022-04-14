@@ -991,8 +991,9 @@ class NodeEntry implements NodeInterface {
 		const getChildNode = (index: number | string) => {
 			let i = 0;
 			for (const child of node.childNodes) {
-				if (filter && filter(child)) continue;
+				if (filter && !filter(child)) continue;
 				if (i == index) return child;
+				i++;
 			}
 			return;
 		};

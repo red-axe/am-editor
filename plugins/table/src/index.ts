@@ -145,11 +145,19 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		if (
 			component &&
 			component.getSelectionNodes &&
-			component.name === TableComponent.cardName &&
-			component.command.hasCopyData()
+			component.name === TableComponent.cardName
 		) {
+			const data = this.editor.clipboard.getData(event);
+			if (
+				!data ||
+				!/<meta\s+name="aomao"\s+content="table"\s{0,}\/?>/gi.test(
+					data.html || '',
+				)
+			) {
+				return true;
+			}
 			event.preventDefault();
-			component.command.mockPaste();
+			component.command.paste(data);
 			return false;
 		}
 		return true;

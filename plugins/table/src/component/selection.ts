@@ -1014,9 +1014,9 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			trHtml.push(trElement.get<HTMLElement>()!.outerHTML);
 		}
 
-		return `<table style="width:${tableWidth}px">${colgroup}${trHtml.join(
+		return `<div><meta name="aomao" content="table" /><table style="width:${tableWidth}px">${colgroup}${trHtml.join(
 			'',
-		)}</table>`;
+		)}</table></div>`;
 	}
 
 	hasMergeCell() {

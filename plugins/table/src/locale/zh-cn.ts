@@ -20,6 +20,7 @@ export default {
 			nonFillText: '无填充色',
 		},
 		noBorder: '隐藏边框',
+		showBorder: '显示边框',
 		verticalAlign: {
 			title: '垂直对齐',
 			top: '顶对齐',

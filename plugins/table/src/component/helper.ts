@@ -463,6 +463,10 @@ class Helper implements HelperInterface {
 		return this.clipboard;
 	}
 
+	clearCopyData() {
+		this.clipboard = undefined;
+	}
+
 	trimBlankSpan(node: NodeInterface) {
 		const len = node.length;
 		let nodelist = [];

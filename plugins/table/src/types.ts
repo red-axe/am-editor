@@ -75,6 +75,10 @@ export interface HelperInterface {
 	 * @returns
 	 */
 	getCopyData(): { html: string; text: string } | undefined;
+	/**
+	 * 清除复制的数据
+	 */
+	clearCopyData(): void;
 
 	trimBlankSpan(node: NodeInterface): NodeInterface;
 
@@ -317,6 +321,11 @@ export interface TableCommandInterface extends EventEmitter2 {
 	copy(all?: boolean): void;
 
 	mockCopy(): void;
+
+	/**
+	 * 清除复制的数据
+	 */
+	clearCopyData(): void;
 
 	shortcutCopy(event: ClipboardEvent): void;
 

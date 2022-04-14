@@ -563,6 +563,10 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		return !!this.table.helper.getCopyData();
 	};
 
+	clearCopyData = () => {
+		this.table.helper.clearCopyData();
+	};
+
 	mockPaste(...args: any) {
 		const data = this.table.helper.getCopyData();
 		if (!data) return;

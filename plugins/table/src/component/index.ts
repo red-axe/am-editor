@@ -353,7 +353,9 @@ class TableComponent<V extends TableValue = TableValue>
 			},
 			{
 				type: 'button',
-				title: language['noBorder'],
+				title: super.getValue()?.noBorder
+					? language['showBorder']
+					: language['noBorder'],
 				content: '<span class="data-icon data-icon-no-border"></span>',
 				didMount: (node) => {
 					const value = super.getValue();

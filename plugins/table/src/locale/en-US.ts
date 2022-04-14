@@ -20,6 +20,7 @@ export default {
 			nonFillText: 'No fill color',
 		},
 		noBorder: 'Hide border',
+		showBorder: 'Show border',
 		verticalAlign: {
 			title: 'Vertical align',
 			top: 'Align top',
