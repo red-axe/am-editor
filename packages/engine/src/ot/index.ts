@@ -81,7 +81,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.stopMutation();
 		this.doc = new OTDoc(this.engine);
 		this.mutation?.setDoc(this.doc);
-		this.startMutation();
+		if (!this.engine.readonly) this.startMutation();
 	}
 
 	initRemote(
@@ -111,7 +111,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.selection.on('change', (paths) => {
 			if (onSelectionChange) onSelectionChange(paths);
 		});
-		this.startMutation();
+		if (!this.engine.readonly) this.startMutation();
 		if (isDestroy) {
 			this.emit('load');
 		}
