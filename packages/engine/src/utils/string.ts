@@ -251,7 +251,7 @@ export const transformCustomTags = (value: string) => {
 				list.push(
 					' '
 						.concat(CARD_EDITABLE_KEY, '="')
-						.concat(editable || '', '"'),
+						.concat(editable || 'false', '"'),
 				);
 			Object.keys(attributes).forEach((attrsName) => {
 				if (

@@ -159,7 +159,7 @@ class NodeModel implements NodeModelInterface {
 						e.hasAttribute(CARD_KEY) ||
 						e.hasAttribute(READY_CARD_KEY),
 				) &&
-					results.some(
+					!results.some(
 						(e) => e.getAttribute(DATA_ELEMENT) === EDITABLE,
 					))
 			) {
