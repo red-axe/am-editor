@@ -201,7 +201,8 @@ class Schema implements SchemaInterface {
 		filter?: (rule: SchemaRule) => boolean,
 	) {
 		const element = (isNode(node) ? node : node[0]) as Element;
-		if (!node || element.nodeType !== Node.ELEMENT_NODE) return undefined;
+		if (!element || element.nodeType !== Node.ELEMENT_NODE)
+			return undefined;
 		let id = element.getAttribute(DATA_ID);
 		if (!id) id = getHashId(element, false);
 		else id = id.split('-')[0];
