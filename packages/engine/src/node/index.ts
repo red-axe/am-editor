@@ -199,6 +199,7 @@ class NodeModel implements NodeModelInterface {
 	 */
 	isEmptyWidthChild(node: NodeInterface) {
 		if (node.length === 0) return true;
+		if (node.isCard()) return false;
 		if (node.isText()) return this.isEmpty(node);
 		const { childNodes } = node[0];
 		if (childNodes.length === 0) return true;
