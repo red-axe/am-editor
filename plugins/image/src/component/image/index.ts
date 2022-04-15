@@ -599,25 +599,25 @@ class Image {
 
 		this.image.on('load', () => this.imageLoadCallback());
 		this.image.on('error', () => this.imageLoadError());
+		if (!isMobile) {
+			this.root.on('mouseenter', () => {
+				this.maximize.show();
+			});
+			this.root.on('mouseleave', () => {
+				this.maximize.hide();
+			});
+		}
 
-		if (isEngine(this.editor) || !this.root.inEditor()) {
-			if (!isMobile) {
-				this.root.on('mouseenter', () => {
-					this.maximize.show();
-				});
-				this.root.on('mouseleave', () => {
-					this.maximize.hide();
-				});
-			}
-			if (!isEngine(this.editor) || this.editor.readonly) {
-				const link = this.image.closest('a');
-				if (link.length === 0) {
-					this.image.on('click', this.openZoom);
-				}
-			}
+		if (!isEngine(this.editor) || this.editor.readonly) {
+			const link = this.image.closest('a');
 			// 无链接
+			if (link.length === 0) {
+				this.image.on('click', this.openZoom);
+			}
+		}
+		this.maximize.on('click', this.openZoom);
+		if (isEngine(this.editor) || !this.root.inEditor()) {
 			this.image.on('dblclick', this.openZoom);
-			this.maximize.on('click', this.openZoom);
 		}
 	}
 }
