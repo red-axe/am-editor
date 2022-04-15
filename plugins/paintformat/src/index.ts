@@ -24,11 +24,11 @@ const PAINTFORMAT_CLASS = 'data-paintformat-mode';
 export default class<
 	T extends PaintformatOptions = PaintformatOptions,
 > extends Plugin<T> {
-	private activeMarks?: NodeInterface[];
-	private activeBlocks?: NodeInterface[];
-	private type?: string;
-	private event?: (event: KeyboardEvent) => void;
-	private isFormat: boolean = false;
+	protected activeMarks?: NodeInterface[];
+	protected activeBlocks?: NodeInterface[];
+	protected type?: string;
+	protected event?: (event: KeyboardEvent) => void;
+	protected isFormat: boolean = false;
 
 	static get pluginName() {
 		return 'paintformat';

@@ -26,8 +26,8 @@ export type Options = {
 };
 
 class StatusEditor {
-	private options: Options;
-	private container?: NodeInterface;
+	protected options: Options;
+	protected container?: NodeInterface;
 	#color?: {
 		background: string;
 		color: string;

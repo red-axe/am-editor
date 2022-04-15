@@ -22,8 +22,8 @@ import {
 import Template from './template';
 
 class TableSelection extends EventEmitter2 implements TableSelectionInterface {
-	private editor: EditorInterface;
-	private table: TableInterface;
+	protected editor: EditorInterface;
+	protected table: TableInterface;
 
 	tableRoot?: NodeInterface;
 	colsHeader?: NodeInterface;

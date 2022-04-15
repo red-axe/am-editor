@@ -27,11 +27,11 @@ export interface CollapseComponentInterface {
 }
 
 class CollapseComponent implements CollapseComponentInterface {
-	private engine: EngineInterface;
-	private root?: NodeInterface;
-	private target?: NodeInterface;
-	private otpions: Options;
-	private readonly SCOPE_NAME = 'data-mention-component';
+	protected engine: EngineInterface;
+	protected root?: NodeInterface;
+	protected target?: NodeInterface;
+	protected otpions: Options;
+	protected readonly SCOPE_NAME = 'data-mention-component';
 	#position?: Position;
 	#scrollbar?: Scrollbar;
 

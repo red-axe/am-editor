@@ -32,9 +32,9 @@ export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 		return false;
 	}
 
-	private container?: NodeInterface;
-	private editorContainer?: NodeInterface;
-	private mathEditor?: MathEditor;
+	protected container?: NodeInterface;
+	protected editorContainer?: NodeInterface;
+	protected mathEditor?: MathEditor;
 
 	isSaving: boolean = false;
 

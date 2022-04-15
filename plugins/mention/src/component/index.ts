@@ -26,7 +26,7 @@ export interface MentionValue extends CardValue {
 }
 
 class Mention<T extends MentionValue = MentionValue> extends Card<T> {
-	private component?: CollapseComponentInterface;
+	protected component?: CollapseComponentInterface;
 	#container?: NodeInterface;
 	#keyword?: NodeInterface;
 	#placeholder?: NodeInterface;

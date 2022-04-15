@@ -102,7 +102,8 @@ export interface VideoUploaderOptions extends PluginOptions {
 export default class<
 	T extends VideoUploaderOptions = VideoUploaderOptions,
 > extends Plugin<T> {
-	private cardComponents: { [key: string]: VideoComponent<VideoValue> } = {};
+	protected cardComponents: { [key: string]: VideoComponent<VideoValue> } =
+		{};
 
 	static get pluginName() {
 		return 'video-uploader';

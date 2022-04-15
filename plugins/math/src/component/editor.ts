@@ -21,9 +21,9 @@ export type Options = {
 };
 
 class MathEditor {
-	private editor: EditorInterface;
-	private options: Options;
-	private container?: NodeInterface;
+	protected editor: EditorInterface;
+	protected options: Options;
+	protected container?: NodeInterface;
 
 	constructor(editor: EditorInterface, options: Options) {
 		this.editor = editor;
