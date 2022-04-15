@@ -448,6 +448,14 @@ class ChangeModel implements ChangeInterface {
 			nodeApi.isList(range.startNode) ||
 			range.startNode.closest('li').length > 0
 		) {
+			const children = range.startNode.children();
+			startRange = {
+				node: range.startNode,
+				offset:
+					children.length === 1 && children[0].nodeName === 'BR'
+						? 0
+						: range.startOffset,
+			};
 			list.insert(fragment, range);
 			apply(range);
 			return;

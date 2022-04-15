@@ -962,7 +962,8 @@ class List implements ListModelInterface {
 						? listElements
 						: [listElements]
 					).forEach((child) => {
-						startListElment?.before(child);
+						if (this.editor.node.isList(child))
+							startListElment?.before(child);
 					});
 				}
 			}
