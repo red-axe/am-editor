@@ -19,16 +19,11 @@ class ChangeRange implements ChangeRangeInterface {
 	constructor(engine: EngineInterface, options: ChangeRangeOptions = {}) {
 		this.engine = engine;
 		this.#otpions = options;
+	}
 
-		this.engine.on('foucs', () => {
-			this.#lastBlurRange = undefined;
-		});
-
-		this.engine.on('blur', () => {
-			const range = this.get();
-			if (range.commonAncestorNode.inEditor())
-				this.#lastBlurRange = range;
-		});
+	setLastBlurRange(range?: RangeInterface) {
+		if (range?.commonAncestorNode.inEditor()) this.#lastBlurRange = range;
+		else this.#lastBlurRange = undefined;
 	}
 
 	/**

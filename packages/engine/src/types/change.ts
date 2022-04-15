@@ -149,6 +149,11 @@ export interface ChangeRangeInterface {
 	 * 取消焦点
 	 */
 	blur(): void;
+	/**
+	 * 设置最后一次失焦的range位置
+	 * @param range
+	 */
+	setLastBlurRange(range?: RangeInterface): void;
 }
 /**
  * Change 接口

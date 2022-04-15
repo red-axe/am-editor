@@ -114,11 +114,15 @@ class Container {
 		});
 		document.addEventListener('mousedown', this.docMouseDown);
 		this.node.on(isMobile ? 'touchstart' : 'mousedown', this.triggerFoucs);
-		this.node.on('focus', () => {
-			if (!engine.ot.isStopped() && engine.isEmpty())
-				engine.change.initValue();
-		});
+		this.node.on('focus', this.handleFocus);
 	}
+
+	handleFocus = () => {
+		const { engine } = this.options;
+		this.triggerFoucs();
+		if (!engine.ot.isStopped() && engine.isEmpty())
+			engine.change.initValue();
+	};
 
 	private focusTimeout: NodeJS.Timeout | null = null;
 
@@ -133,6 +137,7 @@ class Container {
 				range.commonAncestorNode.inEditor()
 			) {
 				this._focused = true;
+				engine.change.range.setLastBlurRange();
 				engine.trigger('focus');
 			}
 		}, 0);
@@ -171,11 +176,13 @@ class Container {
 			!targetNode.inEditor()
 		) {
 			if (this.blurTimeout) clearTimeout(this.blurTimeout);
+			const { engine } = this.options;
+			const lastRange = engine.change.range.get();
 			this.blurTimeout = setTimeout(() => {
-				const { engine } = this.options;
 				const range = engine.change.range.get();
 				if (!range.commonAncestorNode.inEditor()) {
 					this._focused = false;
+					engine.change.range.setLastBlurRange(lastRange);
 					engine.trigger('blur');
 				}
 			}, 0);
