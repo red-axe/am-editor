@@ -288,6 +288,9 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 					this.isLocalError = true;
 					this.didUpdate();
 				},
+				onLoad: () => {
+					if (this.activated) this.image?.focus();
+				},
 				maxHeight: imagePlugin?.options?.maxHeight,
 			});
 		} else {

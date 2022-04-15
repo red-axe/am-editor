@@ -80,6 +80,7 @@ export type Options = {
 	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
 	onChange?: (size?: Size, loaded?: boolean) => void;
 	onError?: () => void;
+	onLoad?: () => void;
 	enableResizer?: boolean;
 	maxHeight?: number | undefined;
 };
@@ -257,6 +258,9 @@ class Image {
 			this.resizer.setSize(img.clientWidth, img.clientHeight);
 		}
 		this.isLoad = true;
+		if (this.options.onLoad) {
+			this.options.onLoad();
+		}
 	}
 
 	onWindowResize = () => {
