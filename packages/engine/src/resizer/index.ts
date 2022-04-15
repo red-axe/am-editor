@@ -175,11 +175,11 @@ class Resizer implements ResizerInterface {
 	}
 
 	on(eventType: string, listener: EventListener) {
-		this.image?.on(eventType, listener);
+		this.root.on(eventType, listener);
 	}
 
 	off(eventType: string, listener: EventListener) {
-		this.image?.off(eventType, listener);
+		this.root.off(eventType, listener);
 	}
 
 	render() {
