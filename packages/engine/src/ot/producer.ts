@@ -359,7 +359,7 @@ class Producer extends EventEmitter2 {
 							domAddedNode.traverse((child) => {
 								addedNodes.push(child[0]);
 							});
-							for (let i = 0, len = allOps.length; i < len; i++) {
+							for (let i = 0, len = allOps.length; i < len; ) {
 								const op = allOps[i];
 								if (
 									'li' in op &&
@@ -369,8 +369,10 @@ class Producer extends EventEmitter2 {
 									)
 								) {
 									allOps.splice(i, 1);
-									i--;
+									len--;
+									continue;
 								}
+								i++;
 							}
 							const index =
 								this.getIndex(domAddedNode) +
