@@ -420,8 +420,15 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				const valign = element.attributes('valign');
 				if (valign) element.attributes('vertical-align', valign);
 				const children = element.children();
-				for (let i = 0; i < children.length; i++) {
+				for (let i = 0, len = children.length; i < len; i++) {
 					const child = children.eq(i);
+					// 移除单元格第一个和最后一个换行符，word 里面粘贴会存在，导致空行
+					if ((i === 0 || i === len - 1) && child?.isText()) {
+						const text = child.text();
+						if (/^\n(\s)*$/.test(text)) {
+							continue;
+						}
+					}
 					if (child) fragment.appendChild(child[0]);
 				}
 				// 对单元格内的内容标准化
