@@ -62,6 +62,14 @@ export interface EngineOptions extends EditorOptions {
 	 * 是否只读
 	 */
 	readonly?: boolean;
+	/**
+	 * 在编辑器头部单击空白处是否自动添加空行
+	 */
+	autoPrepend?: boolean;
+	/**
+	 * 在编辑器尾部单击空白处是否自动添加空行
+	 */
+	autoAppend?: boolean;
 }
 
 export interface Engine<T extends EngineOptions = EngineOptions> {

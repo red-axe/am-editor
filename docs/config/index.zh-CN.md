@@ -244,3 +244,15 @@ console.log(view.language.get<string>('test'));
 -   类型: `Record<'url' | 'format', string>[] | string | false`
 -   默认值：`url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff?t=1638071536645') format('woff'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype')`
 -   详细：定义 iconfont 文件的 url，默认使用 at.alicdn.com 的字体文件，如果需要使用其他位置的字体文件，可以使用此配置
+
+### autoPrepend
+
+-   类型：`boolean`
+-   默认值：`true`
+-   详细：在编辑器头部单击空白处是否自动添加空行（<div style="padding-top: 20px;"></div>）在 padding-top 这 20 像素内点击会添加空行
+
+### autoAppend
+
+-   类型：`boolean`
+-   默认值：`true`
+-   详细：在编辑器尾部单击空白处是否自动添加空行（<div style="padding-bottom: 20px;"></div>）在 padding-bottom 这 20 像素内点击会添加空行

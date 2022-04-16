@@ -244,3 +244,15 @@ After rendering, `View` loses all editing capabilities and collaboration capabil
 -   Type: `Record<'url' | 'format', string>[] | string | false`
 -   Default: `url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff ?t=1638071536645') format('woff'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype')`
 -   Detailed: define the url of the iconfont file, the font file of at.alicdn.com is used by default, if you need to use the font file of other location, you can use this configuration
+
+### autoPrepend
+
+-   type: `boolean`
+-   Default: `true`
+-   Details: Click on the blank space in the editor head to automatically add an empty line (<div style="padding-top: 20px;"></div>) Clicking within 20 pixels of the padding-top will add an empty line
+
+### autoAppend
+
+-   type: `boolean`
+-   Default: `true`
+-   Details: Whether to automatically add a blank line when clicking on the blank space at the end of the editor (<div style="padding-bottom: 20px;"></div>) Clicking within 20 pixels of padding-bottom will add a blank line

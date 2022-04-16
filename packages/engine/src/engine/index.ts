@@ -74,6 +74,8 @@ class Engine<T extends EngineOptions = EngineOptions>
 			className: this.options.className,
 			tabIndex: this.options.tabIndex,
 			placeholder: this.options.placeholder,
+			autoPrepend: this.options.autoPrepend,
+			autoAppend: this.options.autoAppend,
 		});
 		// 编辑器父节点
 		this.root = $(
