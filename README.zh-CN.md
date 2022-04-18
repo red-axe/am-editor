@@ -397,7 +397,7 @@ yarn start
 
 ## 贡献
 
-感谢 [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.com/Elena211314)、[zb201307](https://github.com/zb201307) 的捐赠
+感谢 [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.com/Elena211314)、[zb201307](https://github.com/zb201307)、[cheon](https://github.com/number317) 的捐赠
 
 如果您愿意，可以在这里留下你的名字。
 

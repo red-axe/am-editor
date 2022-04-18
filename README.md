@@ -356,7 +356,7 @@ Visit localhost:7001 after startup
 
 ## Contribution
 
-Thanks [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.com/Elena211314)、[zb201307](https://github.com/zb201307) for donation
+Thanks [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.com/Elena211314)、[zb201307](https://github.com/zb201307)、[cheon](https://github.com/number317) for donation
 
 ### Alipay
 
