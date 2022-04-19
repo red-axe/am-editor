@@ -617,8 +617,8 @@ export default class<
 
 		//不在编辑器内
 		if (
-			!$(range.getStartOffsetNode()).inEditor() ||
-			!$(range.getEndOffsetNode()).inEditor()
+			!$(range.getStartOffsetNode()).inEditor(this.editor.container) ||
+			!$(range.getEndOffsetNode()).inEditor(this.editor.container)
 		) {
 			this.editor.trigger(`${PLUGIN_NAME}:select`, range);
 			this.range = undefined;

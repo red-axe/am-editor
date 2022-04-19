@@ -4,7 +4,7 @@ import {
 	RangeInterface,
 } from '../types';
 import { $ } from '../node';
-import { CARD_ELEMENT_KEY, CARD_KEY } from '../constants';
+import { CARD_ELEMENT_KEY, CARD_KEY, EDITABLE_SELECTOR } from '../constants';
 import Range from '../range';
 
 export type ChangeRangeOptions = {
@@ -359,7 +359,13 @@ class ChangeRange implements ChangeRangeInterface {
 				.collapse(toStart);
 		}
 		this.select(range);
-		this.engine.container.get<HTMLElement>()?.focus();
+		const editableElement =
+			range.commonAncestorNode.closest(EDITABLE_SELECTOR);
+		editableElement?.get<HTMLElement>()?.focus();
+		if (editableElement && !this.engine.container.equal(editableElement)) {
+			const mouseEvent = new MouseEvent('mousedown');
+			this.engine.container.get<HTMLElement>()?.dispatchEvent(mouseEvent);
+		}
 	}
 
 	blur() {
