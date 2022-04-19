@@ -45,7 +45,7 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(
 				}`}
 				{...props}
 			>
-				<div className="doc-comment-item-haeder">
+				<div className="doc-comment-item-header">
 					<div className="doc-comment-item-title">{item.title}</div>
 				</div>
 				<div className="doc-comment-item-body">

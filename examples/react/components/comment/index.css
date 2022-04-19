@@ -81,14 +81,14 @@
 	margin-right: -1px;
 }
 
-.doc-comment-item-haeder {
+.doc-comment-item-header {
 	padding: 12px;
 	margin-top: 2px;
 	position: relative;
 	line-height: 18px;
 }
 
-.doc-comment-item-haeder::before {
+.doc-comment-item-header::before {
 	content: '';
 	position: absolute;
 	width: 2px;
