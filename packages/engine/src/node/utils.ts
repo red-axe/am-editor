@@ -85,8 +85,11 @@ export const isEditableCard = (element: Element) => {
 /**
  * 判断当前节点是否为根节点
  */
-export const isRoot = (element: Element) => {
-	return element.getAttribute(DATA_ELEMENT) === ROOT;
+export const isRoot = (element: Element, root?: Node) => {
+	return (
+		element.getAttribute(DATA_ELEMENT) === ROOT &&
+		(!root || element === root)
+	);
 };
 
 export const isEditable = (element: Element) => {
@@ -96,12 +99,15 @@ export const isEditable = (element: Element) => {
 /**
  * 判断当前是否在根节点内
  */
-export const inEditor = (element: Node) => {
-	if (element.nodeType === Node.ELEMENT_NODE && isRoot(element as Element)) {
+export const inEditor = (element: Node, root?: Node) => {
+	if (
+		element.nodeType === Node.ELEMENT_NODE &&
+		isRoot(element as Element, root)
+	) {
 		return false;
 	}
-	const root = closest(element, ROOT_SELECTOR);
-	return !!root;
+	const closetRoot = closest(element, ROOT_SELECTOR);
+	return !!closetRoot && (!root || closetRoot === root);
 };
 
 /**

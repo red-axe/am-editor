@@ -142,8 +142,8 @@ class Container {
 			if (this._focused) return;
 			const range = engine.change.range.get();
 			if (
-				range.commonAncestorNode.isRoot() ||
-				range.commonAncestorNode.inEditor()
+				range.commonAncestorNode.isRoot(engine.container) ||
+				range.commonAncestorNode.inEditor(engine.container)
 			) {
 				this._focused = true;
 				engine.change.range.setLastBlurRange();
@@ -179,17 +179,17 @@ class Container {
 	docMouseDown = (e: MouseEvent) => {
 		if (!e.target) return;
 		const targetNode = $(e.target);
+		const { engine } = this.options;
 		if (
 			this._focused &&
 			targetNode.closest(UI_SELECTOR).length === 0 &&
-			!targetNode.inEditor()
+			!targetNode.inEditor(engine.container)
 		) {
 			if (this.blurTimeout) clearTimeout(this.blurTimeout);
-			const { engine } = this.options;
 			const lastRange = engine.change.range.get();
 			this.blurTimeout = setTimeout(() => {
 				const range = engine.change.range.get();
-				if (!range.commonAncestorNode.inEditor()) {
+				if (!range.commonAncestorNode.inEditor(engine.container)) {
 					this._focused = false;
 					engine.change.range.setLastBlurRange(lastRange);
 					engine.trigger('blur');

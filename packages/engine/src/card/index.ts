@@ -421,6 +421,10 @@ class CardModel implements CardModelInterface {
 				}
 				editor.change.onSelect();
 			}
+		} else if (this.active) {
+			this.active.toolbarModel?.hide();
+			this.active.select(false);
+			this.active.activate(false);
 		}
 	}
 

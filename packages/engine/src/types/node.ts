@@ -156,7 +156,7 @@ export interface NodeInterface {
 	/**
 	 * 判断当前节点是否为根节点
 	 */
-	isRoot(): boolean;
+	isRoot(root?: Node | NodeInterface): boolean;
 
 	/**
 	 * 判断当前是否为可编辑节点
@@ -166,7 +166,7 @@ export interface NodeInterface {
 	/**
 	 * 判断当前是否在根节点内
 	 */
-	inEditor(): boolean;
+	inEditor(root?: Node | NodeInterface): boolean;
 	/**
 	 * 是否是光标标记节点
 	 * @returns

@@ -157,9 +157,12 @@ class NodeEntry implements NodeInterface {
 	/**
 	 * 判断当前节点是否为根节点
 	 */
-	isRoot() {
+	isRoot(root?: Node | NodeInterface) {
 		const element = this.get<HTMLElement>();
-		return element?.nodeType === Node.ELEMENT_NODE && isRoot(element);
+		return (
+			element?.nodeType === Node.ELEMENT_NODE &&
+			isRoot(element, root ? root[0] ?? root : undefined)
+		);
 	}
 
 	isEditable() {
@@ -170,9 +173,11 @@ class NodeEntry implements NodeInterface {
 	/**
 	 * 判断当前是否在根节点内
 	 */
-	inEditor() {
+	inEditor(root?: Node | NodeInterface) {
 		const element = this.get();
-		return !!element && inEditor(element);
+		return (
+			!!element && inEditor(element, root ? root[0] ?? root : undefined)
+		);
 	}
 
 	/**
