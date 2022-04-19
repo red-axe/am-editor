@@ -45,8 +45,8 @@ export default class Popup {
 			!selection.focusNode ||
 			range.collapsed ||
 			this.#editor.card.getSingleSelectedCard(range) ||
-			(!range.commonAncestorNode.inEditor(this.editor.container) &&
-				!range.commonAncestorNode.isRoot(this.editor.container))
+			(!range.commonAncestorNode.inEditor(this.#editor.container) &&
+				!range.commonAncestorNode.isRoot(this.#editor.container))
 		) {
 			this.hide();
 			return;
