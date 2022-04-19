@@ -219,12 +219,13 @@ export default class<
 			const { node, inline } = this.editor;
 			if (
 				/^https?:\/\/\S+$/.test(text.toLowerCase().trim()) &&
-				!inline.closest(child).equal(child)
+				inline.closest(child).equal(child)
 			) {
-				node.wrap(
+				const newNode = node.wrap(
 					child,
 					$(`<${this.tagName} target="_blank" href="${text}"></a>`),
 				);
+				inline.repairCursor(newNode);
 				return false;
 			}
 		}
