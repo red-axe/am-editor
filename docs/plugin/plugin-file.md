@@ -27,6 +27,18 @@ new Engine(...,{ plugins:[ File, FileUploader], cards:[ FileComponent ]})
 onBeforeRender?: (action:'download' |'preview', url: string) => string;
 ```
 
+`onDownload` Triggered when the download attachment is clicked, by default the address link is used to jump
+
+```ts
+onDownload?: (url: string, value: FileValue) => void;
+```
+
+`onPreview` Triggered when the preview attachment is clicked, the default URL link is used to jump
+
+```ts
+onPreview?: (url: string, value: FileValue) => void;
+```
+
 ## `FileUploader` optional
 
 ```ts

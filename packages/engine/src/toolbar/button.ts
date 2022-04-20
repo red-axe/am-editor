@@ -36,7 +36,7 @@ export default class Button implements ButtonInterface {
 	}
 
 	render(container: NodeInterface) {
-		const { title, didMount, onClick } = this.options;
+		const { title, didMount, onClick, link } = this.options;
 		container.append(this.root);
 
 		if (title) {
@@ -57,12 +57,13 @@ export default class Button implements ButtonInterface {
 				Tooltip.hide();
 			});
 		}
-
-		this.root.find('a').on('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			if (onClick) onClick(e, this.root);
-		});
+		if (!link && onClick) {
+			this.root.find('a').on('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				onClick(e, this.root);
+			});
+		}
 
 		if (didMount) {
 			didMount(this.root);

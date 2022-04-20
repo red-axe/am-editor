@@ -106,42 +106,42 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 		return url;
 	};
 
-	previewFile = () => {
-		const value = this.getValue();
-		if (!value?.preview) return;
-		const { preview } = value;
-		window.open(sanitizeUrl(this.onBeforeRender('preview', preview)));
-	};
-
-	downloadFile = () => {
-		const value = this.getValue();
-		if (!value?.download) return;
-		const { download } = value;
-		window.open(sanitizeUrl(this.onBeforeRender('download', download)));
-	};
-
 	toolbar() {
 		const items: Array<CardToolbarItemOptions | ToolbarItemOptions> = [];
 		const value = this.getValue();
 		if (!value) return items;
+		const options =
+			this.editor.plugin.findPlugin<FileOptions>('file')?.options ?? {};
 		const { status, preview, download } = value;
 		const locale = this.getLocales();
 		if (status === 'done') {
 			if (!!preview) {
+				const onPreview = () => {
+					if (options.onPreview) options.onPreview(preview, value);
+				};
 				items.push({
 					type: 'button',
 					content: '<span class="data-icon data-icon-preview" />',
 					title: locale.preview,
-					onClick: this.previewFile,
+					link: !options.onPreview
+						? sanitizeUrl(this.onBeforeRender('preview', preview))
+						: undefined,
+					onClick: options.onPreview ? onPreview : undefined,
 				});
 			}
 
 			if (!!download) {
+				const onDownload = () => {
+					if (options.onDownload) options.onDownload(download, value);
+				};
 				items.push({
 					type: 'button',
 					content: '<span class="data-icon data-icon-download" />',
 					title: locale.download,
-					onClick: this.downloadFile,
+					link: !options.onDownload
+						? sanitizeUrl(this.onBeforeRender('download', download))
+						: undefined,
+					onClick: options.onDownload ? onDownload : undefined,
 				});
 			}
 
@@ -197,12 +197,12 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 			percentHtml = `<span class="percent">${percent || 0}%</span>`;
 
 		return `
-        <span class="data-file data-file-${status}">
+        <a class="data-file data-file-${status}">
             <span class="data-file-icon">${icon}</span>
             ${percentHtml}
             <span class="data-file-title">${escape(name)}</span>
             ${fileSizeHtml}
-        </span>
+        </a>
         `;
 	}
 
@@ -270,7 +270,20 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 
 	renderView() {
 		// 默认点击都是下载
-		this.container?.on('click', this.downloadFile);
+		const value = this.getValue();
+		const options =
+			this.editor.plugin.findPlugin<FileOptions>('file')?.options ?? {};
+		const downloadUrl = sanitizeUrl(
+			this.onBeforeRender('download', value.download || ''),
+		);
+		if (options.onDownload) {
+			this.container?.on('click', () => {
+				options.onDownload!(downloadUrl, value);
+			});
+		} else {
+			this.container?.attributes('target', '_blank');
+			this.container?.attributes('href', downloadUrl);
+		}
 	}
 
 	didUpdate() {

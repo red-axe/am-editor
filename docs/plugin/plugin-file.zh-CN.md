@@ -27,6 +27,18 @@ new Engine(...,{ plugins:[ File , FileUploader ] , cards:[ FileComponent ]})
 onBeforeRender?: (action: 'download' | 'preview', url: string) => string;
 ```
 
+`onDownload` 点击下载附件时触发，默认使用地址链接跳转
+
+```ts
+onDownload?: (url: string, value: FileValue) => void;
+```
+
+`onPreview` 点击预览附件时触发，默认使用地址链接跳转
+
+```ts
+onPreview?: (url: string, value: FileValue) => void;
+```
+
 ## `FileUploader` 可选项
 
 ```ts
