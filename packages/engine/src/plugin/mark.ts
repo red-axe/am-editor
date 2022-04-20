@@ -154,8 +154,9 @@ abstract class MarkEntry<T extends PluginOptions = PluginOptions>
 			command.execute((this.constructor as PluginEntryType).pluginName);
 			range = change.range.get();
 			range.collapse(false);
+			range.enlargeToElementNode();
+			editor.node.insertText('\xa0', range);
 			change.range.select(range);
-			editor.node.insertText('\xa0');
 			return false;
 		}
 		return;

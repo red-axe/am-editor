@@ -116,8 +116,9 @@ abstract class InlineEntry<T extends PluginOptions = PluginOptions>
 				range.setStart(inlineNext, 1);
 				range.setEnd(inlineNext, 1);
 			}
+			range.enlargeToElementNode();
+			editor.node.insertText('\xa0', range);
 			change.range.select(range);
-			editor.node.insertText('\xa0');
 			return false;
 		}
 		return;

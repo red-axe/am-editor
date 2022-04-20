@@ -45,7 +45,7 @@ export default class<
 
 	markdown =
 		this.options.markdown === undefined
-			? '[^!]\\[(.+?)\\]\\(\\s*([\\S]+?)\\s*\\)$'
+			? '([^!]|^)\\[(.+?)\\]\\(\\s*([\\S]+?)\\s*\\)$'
 			: this.options.markdown;
 
 	init() {
@@ -129,13 +129,13 @@ export default class<
 		if (match) {
 			const { command } = editor;
 			event.preventDefault();
-			const text = match[1];
-			const url = match[2];
+			const text = match[2];
+			const url = match[3];
 			// 移除 markdown 语法
 			const markdownTextNode = node
 				.get<Text>()!
-				.splitText(node.text().length - match[0].length);
-			markdownTextNode.splitText(match[0].length);
+				.splitText(match.index + match[1].length);
+			markdownTextNode.splitText(match[0].length - match[1].length);
 			$(markdownTextNode).remove();
 			command.execute(
 				(this.constructor as PluginEntry).pluginName,
