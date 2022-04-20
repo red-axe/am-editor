@@ -378,6 +378,13 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				childNodes.each((tdChild) => {
 					const td = $(tdChild);
 					const text = td.text();
+					const childTable = td.find('table');
+					if (childTable.length > 0) {
+						childTable.after(
+							document.createTextNode(childTable.text()),
+						);
+						childTable.remove();
+					}
 					// 排除空格
 					if (
 						td.name !== 'td' &&
@@ -484,6 +491,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 					html,
 				},
 			);
+			node.remove();
 		});
 	};
 

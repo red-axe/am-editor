@@ -328,16 +328,16 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 					!this.viewport?.equal(targetNode)
 				)
 					return;
-				// event.preventDefault();
-				// event.stopPropagation();
-				// const { change } = this.editor;
-				// const range = change.range.get();
-				// this.editor.card.focusPrevBlock(this.table, range, true);
-				// this.editor.card.activate(
-				// 	range.startNode,
-				// 	CardActiveTrigger.MOUSE_DOWN,
-				// );
-				// change.range.select(range);
+				event.preventDefault();
+				event.stopPropagation();
+				const { change } = this.editor;
+				const range = change.range.get();
+				this.editor.card.focusPrevBlock(this.table, range, true);
+				this.editor.card.activate(
+					range.startNode,
+					CardActiveTrigger.MOUSE_DOWN,
+				);
+				change.range.select(range);
 			},
 		);
 

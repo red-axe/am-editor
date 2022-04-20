@@ -304,7 +304,7 @@ class Helper implements HelperInterface {
 	trimStartTr(table: NodeInterface) {
 		const tr = table.find('tr');
 		const first = tr.eq(0);
-		if (first && first.children().length === 0) {
+		if (first && first.get<Node>()?.childNodes.length === 0) {
 			first.remove();
 		}
 	}
