@@ -406,14 +406,15 @@ class ChangeModel implements ChangeInterface {
 				startNode.inEditor() &&
 				first &&
 				first.name === 'p' &&
-				!(first.length === 1 && first.first()?.name === 'br') &&
-				!nodeApi.isEmptyWidthChild(block.closest(startNode))
+				!(first.length === 1 && first.first()?.name === 'br')
 			) {
 				nodeApi.unwrap(first);
 			}
 		};
 		if (!isCollapsed) {
 			this.delete(range, onlyOne || !isBlockLast, followActiveMark);
+			if (nodeApi.isEmptyWidthChild(range.startNode))
+				range.shrinkToElementNode().shrinkToTextNode();
 			unwrapToFirst();
 		} else {
 			unwrapToFirst();
@@ -782,7 +783,12 @@ class ChangeModel implements ChangeInterface {
 		if (isMoreLine && startNode.children().length === 0) {
 			const selection = safeRange.createSelection();
 			startNode.remove();
-			selection.move();
+			if (
+				selection.anchor?.get<Node>()?.isConnected &&
+				selection.focus?.get<Node>()?.isConnected
+			) {
+				selection.move();
+			}
 			isRemoveStartNode = true;
 			startNode = safeRange.startNode;
 		}
