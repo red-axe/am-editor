@@ -15,6 +15,24 @@ new (source: string | Node | NodeInterface, editor: EditorInterface, paserBefore
 
 ## 方法
 
+### `normalize`
+
+标准化节点
+
+```ts
+/**
+* 标准化节点
+* @param root 根节点
+* @param schema Schema
+* @param conversion 转换规则
+*/
+normalize(
+    root: NodeInterface,
+    schema: SchemaInterface,
+    conversion: ConversionInterface | null,
+): void;
+```
+
 ### `traverse`
 
 遍历节点

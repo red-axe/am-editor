@@ -26,6 +26,12 @@ readonly kind: 'engine' | 'view';
 
 类型：`NodeInterface`
 
+### `scrollNode`
+
+滚动条节点
+
+类型：`NodeInterface | null`
+
 ### `root`
 
 编辑器根节点，默认为编辑器节点的父节点
@@ -37,6 +43,12 @@ readonly kind: 'engine' | 'view';
 编辑器命令
 
 类型：`CommandInterface`
+
+### `request`
+
+数据请求与上传
+
+类型：`RequestInterface`
 
 ### `card`
 
@@ -116,6 +128,43 @@ nodeId: NodeIdInterface;
 类型：`ClipboardInterface`
 
 ## 方法
+
+### `setScrollNode`
+
+设置滚动节点
+
+```ts
+/**
+ * 设置滚动节点
+ * @param node 节点
+ */
+setScrollNode(node: HTMLElement): void;
+```
+
+### `getSelectionData`
+
+获取选中区域的的数据 html 和 文本
+
+```ts
+/**
+ * 获取选中区域的的数据 html 和 文本
+ * @param range 光标范围
+ */
+getSelectionData(
+	range?: RangeInterface,
+): Record<'html' | 'text', string> | undefined;
+```
+
+### `destroy`
+
+销毁编辑器
+
+```ts
+/**
+ * 销毁编辑器
+ */
+destroy(): void;
+```
 
 ### `on`
 

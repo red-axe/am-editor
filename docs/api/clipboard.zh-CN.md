@@ -4,6 +4,12 @@
 
 类型：`ClipboardInterface`
 
+通过引擎实例获取剪贴板实例：
+
+```ts
+engine.clipboard;
+```
+
 ## 构造函数
 
 ```ts
@@ -22,6 +28,13 @@ new (editor: EditorInterface): CommandInterface
  * @param event 事件
  */
 getData(event: DragEvent | ClipboardEvent): ClipboardData;
+
+// 返回数据
+{
+    html, // 剪贴板中的html
+    text, // 剪贴板中的文本
+    files, // 剪贴板中的文件
+}
 ```
 
 ### `write`
@@ -31,14 +44,12 @@ getData(event: DragEvent | ClipboardEvent): ClipboardData;
 ```ts
 /**
  * 写入剪贴板
- * @param event 事件
+ * @param event 触发的事件
  * @param range 光标，默认获取当前光标位置
- * @param callback 回调
  */
 write(
     event: ClipboardEvent,
     range?: RangeInterface | null,
-    callback?: (data: { html: string; text: string }) => void,
 ): void;
 ```
 

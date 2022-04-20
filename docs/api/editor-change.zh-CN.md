@@ -68,6 +68,50 @@ inlines: Array<NodeInterface>;
 
 ## 方法
 
+### `onChange`
+
+编辑器值改变触发
+
+```ts
+/**
+ * 编辑器值改变触发
+ */
+onChange: (trigger: 'remote' | 'local' | 'both') => void;
+```
+
+### `onSelect`
+
+编辑器中光标改变触发
+
+```ts
+/**
+ * 编辑器中光标改变触发
+ */
+onSelect: () => void;
+```
+
+### `onSetValue`
+
+```ts
+/**
+ * 设置编辑器值后触发
+ */
+onSetValue: () => void;
+```
+
+### `change`
+
+触发一个编辑器值改变事件
+
+```ts
+/**
+ * 触发一个编辑器值改变事件
+ * @param isRemote 是否是远程操作
+ * @param node 触发后变更的节点
+ */
+change(isRemote?: boolean, node?: Array<NodeInterface>): void;
+```
+
 ### `apply`
 
 应用一个具有改变 dom 结构的操作
@@ -104,30 +148,63 @@ isComposing(): boolean;
 isSelecting(): boolean;
 ```
 
+### `initValue`
+
+初始化一个编辑器空值
+
+```ts
+/**
+ * 初始化一个编辑器空值
+ * @param range
+ */
+initValue(range?: RangeInterface): void;
+```
+
 ### `setValue`
 
 设置编辑器值
 
 ```ts
 /**
+ * 给编辑器设置一个值
  * @param value 值
- * @param onParse 在转换为符合标准的编辑器值前使用根节点解析过滤
- * @param options 异步渲染卡片回调
- * */
-setValue(value: string, onParse?: (node: Node) => void, callback?: (count: number) => void): void;
+ * @param onParse 解析回调
+ * @param callback 渲染完成后回调
+ */
+setValue(
+	value: string,
+	onParse?: (node: NodeInterface) => void,
+	callback?: (count: number) => void,
+): void;
 ```
 
 ### `setHtml`
 
-设置 html 作为编辑器值
+设置 html 作为编辑器值，会走粘贴事件及解析，可监听 paste:each 事件拦截自定义处理每个节点
 
 ```ts
 /**
  * 设置html，会格式化为合法的编辑器值
  * @param html html
- * @param options 异步渲染卡片回调
+ * @param callback 异步渲染卡片后回调
  */
-setHtml(html: string, callback?: (count: number) => void): void
+setHtml(html: string, callback?: (count: number) => void): void;
+
+```
+
+### `setMarkdown`
+
+设置 markdown，会格式化为合法的编辑器值
+
+会走粘贴 markdown 事件，可在 paste:markdown 事件中拦截自定义处理
+
+```ts
+/**
+ * 设置markdown，会格式化为合法的编辑器值
+ * @param text markdown文本
+ * @param callback 异步渲染卡片后回调
+ */
+setMarkdown(text: string, callback?: (count: number) => void): void;
 ```
 
 ### `getOriginValue`
@@ -135,7 +212,11 @@ setHtml(html: string, callback?: (count: number) => void): void
 获取编辑器原始值
 
 ```ts
-getOriginValue(): string;
+/**
+ * 获取指定容器的值
+ * @param container 指定容器的，默认为编辑器根节点
+ */
+getOriginValue(container?: NodeInterface): string;
 ```
 
 ### `getValue`
@@ -173,14 +254,6 @@ getRangePathBeforeCommand(): Path[] | null;
 isEmpty(): boolean;
 ```
 
-### `destroy`
-
-销毁
-
-```ts
-destroy(): void;
-```
-
 ### `insert`
 
 插入 Fragment
@@ -198,6 +271,24 @@ insert(
 	range?: RangeInterface,
 	callback?: (range: RangeInterface) => void,
 	followActiveMark?: boolean,
+): void;
+```
+
+### `paste`
+
+在当前光标位置粘贴一段 html
+
+```ts
+/**
+ * 在当前光标位置粘贴一段html
+ * @param html html
+ * @param range 光标位置
+ * @param callback 卡片渲染回调
+ */
+paste(
+	html: string,
+	range?: RangeInterface,
+	callback?: (count: number) => void,
 ): void;
 ```
 
@@ -241,4 +332,12 @@ unwrap(node?: NodeInterface): void;
  * @param node 节点
  */
 mergeAfterDelete(node?: NodeInterface): void;
+```
+
+### `destroy`
+
+销毁
+
+```ts
+destroy(): void;
 ```

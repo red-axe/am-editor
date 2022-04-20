@@ -63,3 +63,15 @@ focus(toStart?: boolean): void;
  */
 blur(): void;
 ```
+
+### `setLastBlurRange`
+
+设置最后一次失焦的 range 位置
+
+```ts
+/**
+ * 设置最后一次失焦的range位置
+ * @param range
+ */
+setLastBlurRange(range?: RangeInterface): void;
+```

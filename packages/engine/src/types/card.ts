@@ -53,7 +53,14 @@ export interface CardToolbarInterface {
 	 * @param offset 偏移量 [tx,ty,bx,by]
 	 */
 	setOffset(offset: Array<number>): void;
+	/**
+	 * 设置默认对齐方式
+	 * @param align
+	 */
 	setDefaultAlign(align: Placement): void;
+	/**
+	 * 更新位置
+	 */
 	update(): void;
 	/**
 	 * 销毁
@@ -577,6 +584,7 @@ export interface CardModelInterface {
 	/**
 	 * 移除卡片
 	 * @param selector 卡片选择器
+	 * @param hasModify 是否触发修改事件
 	 */
 	remove(selector: NodeInterface | Node | string, hasModify?: boolean): void;
 	/**
@@ -646,6 +654,9 @@ export interface CardModelInterface {
 		hasModify: boolean,
 	): void;
 
+	/**
+	 * 销毁
+	 */
 	destroy(): void;
 }
 

@@ -251,12 +251,13 @@ export interface ChangeInterface {
 	 */
 	setMarkdown(text: string, callback?: (count: number) => void): void;
 	/**
-	 * 获取编辑器值
+	 * 获取指定容器的值
+	 * @param container 指定容器的，默认为编辑器根节点
 	 */
 	getOriginValue(container?: NodeInterface): string;
 	/**
 	 * 获取编辑值
-	 * @param options
+	 * @param ignoreCursor 是否忽悠光标所在的记录节点
 	 */
 	getValue(options: { ignoreCursor?: boolean }): string;
 	/**

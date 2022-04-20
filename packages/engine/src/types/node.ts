@@ -155,6 +155,7 @@ export interface NodeInterface {
 	isEditableCard(): boolean;
 	/**
 	 * 判断当前节点是否为根节点
+	 * @param {Node} root 根节点
 	 */
 	isRoot(root?: Node | NodeInterface): boolean;
 
@@ -165,6 +166,7 @@ export interface NodeInterface {
 
 	/**
 	 * 判断当前是否在根节点内
+	 * @param {Node} root 根节点
 	 */
 	inEditor(root?: Node | NodeInterface): boolean;
 	/**
@@ -531,8 +533,7 @@ export interface NodeInterface {
 	allChildren(includeCard?: boolean | 'editable'): Array<NodeInterface>;
 
 	/**
-	 * 返回当前节点或者传入的节点所在当前节点的顶级window对象的视图边界
-	 * @param node 节点
+	 * 返回当前节点所在当前节点的顶级window对象的视图边界
 	 */
 	getViewport(): {
 		top: number;
@@ -584,7 +585,7 @@ export interface NodeModelInterface {
 	 */
 	isBlock(node: NodeInterface | Node, schema?: SchemaInterface): boolean;
 	/**
-	 * 判断block节点的子节点是否不包含blcok 节点
+	 * 判断block节点的子节点是否不包含blcok节点
 	 */
 	isNestedBlock(node: NodeInterface | Node): boolean;
 	/**

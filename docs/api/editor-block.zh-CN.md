@@ -4,6 +4,12 @@
 
 类型：`BlockModelInterface`
 
+通过引擎实例获取命令实例：
+
+```ts
+engine.block;
+```
+
 ## 使用
 
 ```ts
@@ -62,8 +68,12 @@ findTop(parentNode: NodeInterface, childNode: NodeInterface): NodeInterface;
 /**
  * 获取最近的block节点，找不到返回 node
  * @param node 节点
+ * @param callback 回调，可判断是否找到
  */
-closest(node: NodeInterface): NodeInterface;
+closest(
+    node: NodeInterface,
+    callback?: (node: NodeInterface) => boolean,
+): NodeInterface;
 ```
 
 ### `wrap`
@@ -116,8 +126,9 @@ getSiblings(
 /**
  * 分割当前光标选中的block节点
  * @param range 光标
+ * @returns 返回分割后的节点
  */
-split(range?: RangeInterface): void;
+split(range?: RangeInterface): NodeInterface | undefined;
 ```
 
 ### `insert`
@@ -130,11 +141,13 @@ split(range?: RangeInterface): void;
  * @param block 节点
  * @param range 光标
  * @param splitNode 分割节点，默认为光标开始位置的block节点
+ * @param removeCurrentEmptyBlock 是否移除当前空的block节点
  */
 insert(
     block: NodeInterface | Node | string,
     range?: RangeInterface,
     splitNode?: (node: NodeInterface) => NodeInterface,
+    removeCurrentEmptyBlock?: boolean,
 ): void;
 ```
 
@@ -278,18 +291,6 @@ getBlockByRange({
  * @param root 根节点
  */
 normal(node: NodeInterface, root: NodeInterface): void;
-```
-
-### `brToBlock`
-
-br 换行改成段落
-
-```ts
-/**
- * br 换行改成段落
- * @param block 节点
- */
-brToBlock(block: NodeInterface): void;
 ```
 
 ### `insertEmptyBlock`

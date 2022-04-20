@@ -280,18 +280,6 @@ Sort block-level nodes into standard editor values
 normal(node: NodeInterface, root: NodeInterface): void;
 ```
 
-### `brToBlock`
-
-br change line to paragraph
-
-```ts
-/**
- * br change lines to paragraphs
- * @param block node
- */
-brToBlock(block: NodeInterface): void;
-```
-
 ### `insertEmptyBlock`
 
 Insert an empty block node

@@ -30,7 +30,9 @@ queryState(name: string, ...args: any): any;
 
 ### `execute`
 
-Execute plugin commands
+Execute the plug-in command. The parameters are the parameters agreed by the plug-in. You can view the parameters required by each plug-in in the plug-in list.
+
+If the editor is not focused when the command is executed, it will automatically focus to the position of the last blur
 
 ```ts
 execute(name: string, ...args: any): any;

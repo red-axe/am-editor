@@ -20,6 +20,10 @@ new (editor: EditorInterface): CardModelInterface
 
 ### `classes`
 
+所有的卡片类集合
+
+### `components`
+
 已实例化的卡片集合对象
 
 ### `active`
@@ -95,10 +99,10 @@ closest(
  * @param selector 卡片ID，或者子节点
  * @param ignoreEditable 是否忽略可编辑节点
  */
-find(
+find<E extends CardValue = {}, T extends CardInterface<E> = CardInterface<E>>(
     selector: NodeInterface | Node | string,
     ignoreEditable?: boolean,
-): CardInterface | undefined;
+): T | undefined;
 ```
 
 ### `findBlock`
@@ -110,7 +114,9 @@ find(
  * 根据选择器查找Block 类型 Card
  * @param selector 卡片ID，或者子节点
  */
-findBlock(selector: Node | NodeInterface): CardInterface | undefined;
+findBlock<E extends CardValue = {}, T extends CardInterface<E> = CardInterface<E>>(
+    selector: Node | NodeInterface,
+): T | undefined;
 ```
 
 ### `getSingleCard`
@@ -122,7 +128,9 @@ findBlock(selector: Node | NodeInterface): CardInterface | undefined;
  * 获取单个卡片
  * @param range 光标范围
  */
-getSingleCard(range: RangeInterface): CardInterface | undefined;
+getSingleCard<E extends CardValue = {}, T extends CardInterface<E> = CardInterface<E>>(
+	range: RangeInterface,
+): T | undefined;
 ```
 
 ### `getSingleSelectedCard`
@@ -134,12 +142,17 @@ getSingleCard(range: RangeInterface): CardInterface | undefined;
  * 获取选区选中一个节点时候的卡片
  * @param rang 选区
  */
-getSingleSelectedCard(rang: RangeInterface): CardInterface | undefined;
+getSingleSelectedCard<
+    E extends CardValue = {},
+    T extends CardInterface<E> = CardInterface<E>,
+>(
+    rang: RangeInterface,
+): T | undefined;
 ```
 
 ### `insertNode`
 
-插入卡片
+插入卡片节点
 
 ```ts
 /**
@@ -147,7 +160,14 @@ getSingleSelectedCard(rang: RangeInterface): CardInterface | undefined;
  * @param range 选区
  * @param card 卡片
  */
-insertNode(range: RangeInterface, card: CardInterface): CardInterface;
+insertNode<
+    E extends CardValue = {},
+    T extends CardInterface<E> = CardInterface<E>,
+>(
+    range: RangeInterface,
+    card: T,
+    ...args: any
+): T;
 ```
 
 ### `removeNode`
@@ -173,10 +193,10 @@ removeNode(card: CardInterface): void;
  * @param name 卡片名称
  * @param value 卡片值
  */
-replaceNode(
+replaceNode<V extends CardValue>(
     node: NodeInterface,
     name: string,
-    value?: CardValue,
+    value?: Partial<V>,
 ): NodeInterface;
 ```
 
@@ -189,8 +209,16 @@ replaceNode(
  * 更新卡片重新渲染
  * @param card 卡片
  * @param value 值
+ * @param args 更新时渲染时额外的参数
  */
-updateNode(card: CardInterface, value: CardValue): void;
+updateNode<
+    E extends CardValue = {},
+    T extends CardInterface<E> = CardInterface<E>,
+>(
+    card: T,
+    value: Partial<E>,
+    ...args: any
+): void;
 ```
 
 ### `activate`
@@ -219,8 +247,9 @@ activate(
 /**
  * 选中卡片
  * @param card 卡片
+ * @param event 触发事件
  */
-select(card: CardInterface): void;
+select(card: CardInterface, event?: MouseEvent | KeyboardEvent): void;
 ```
 
 ### `focus`
@@ -245,8 +274,16 @@ focus(card: CardInterface, toStart?: boolean): void;
  * 插入卡片
  * @param name 卡片名称
  * @param value 卡片值
+ * @param args 插入时渲染时额外的参数
  */
-insert(name: string, value?: CardValue): CardInterface;
+insert<
+    E extends CardValue = {},
+    T extends CardInterface<E> = CardInterface<E>,
+>(
+    name: string,
+    value?: Partial<E>,
+    ...args: any
+): T;
 ```
 
 ### `update`
@@ -258,8 +295,13 @@ insert(name: string, value?: CardValue): CardInterface;
  * 更新卡片
  * @param selector 卡片选择器
  * @param value 要更新的卡片值
+ * @param args 更新时渲染时额外的参数
  */
-update(selector: NodeInterface | Node | string, value: CardValue): void;
+update<V extends CardValue = CardValue>(
+    selector: NodeInterface | Node | string,
+    value: Partial<V>,
+    ...args: any
+): void;
 ```
 
 ### `replace`
@@ -269,11 +311,20 @@ update(selector: NodeInterface | Node | string, value: CardValue): void;
 ```ts
 /**
  * 替换卡片
- * @param source 需要替换的卡片
- * @param name 新的卡片名称
- * @param value 新的卡片值
+ * @param source 源卡片
+ * @param name 新卡片名称
+ * @param value 新卡片值
+ * @param args 替换时渲染时额外的参数
  */
-replace(source: CardInterface, name: string, value?: CardValue)
+replace<
+    E extends CardValue = {},
+    T extends CardInterface<E> = CardInterface<E>,
+>(
+    source: CardInterface,
+    name: string,
+    value?: Partial<E>,
+    ...args: any
+): T;
 ```
 
 ### `remove`
@@ -284,8 +335,22 @@ replace(source: CardInterface, name: string, value?: CardValue)
 /**
  * 移除卡片
  * @param selector 卡片选择器
+ * @param hasModify 是否触发修改事件
  */
-remove(selector: NodeInterface | Node | string): void;
+remove(selector: NodeInterface | Node | string, hasModify?: boolean): void;
+
+```
+
+### `removeRemote`
+
+协作者移除卡片
+
+```ts
+/**
+* 协作者移除卡片
+* @param selector 卡片选择器
+*/
+removeRemote(selector: NodeInterface | Node | string): void;
 ```
 
 ### `create`
@@ -298,13 +363,16 @@ remove(selector: NodeInterface | Node | string): void;
  * @param name 插件名称
  * @param options 选项
  */
-create(
+create<
+    E extends CardValue = {},
+    T extends CardInterface<E> = CardInterface<E>,
+>(
     name: string,
     options?: {
-        value?: CardValue;
+        value?: Partial<E>;
         root?: NodeInterface;
     },
-): CardInterface;
+): T;
 ```
 
 ### `render`
@@ -313,10 +381,41 @@ create(
 
 ```ts
 /**
- * 渲染卡片
+ * 渲染
  * @param container 需要重新渲染包含卡片的节点，如果不传，则渲染全部待创建的卡片节点
+ * @param callback 渲染完成后回调
+ * @param lazyRender 是否懒渲染，默认取决于editor的lazyRender属性
  */
-render(container?: NodeInterface): void;
+render(
+    container?: NodeInterface,
+    callback?: (count: number) => void,
+    lazyRender?: boolean,
+): void;
+```
+
+### `renderComponent`
+
+渲染单个卡片
+
+```ts
+/**
+* 渲染单个卡片
+* @param card 卡片实例
+* @param args 渲染自定义参数
+*/
+renderComponent(card: CardInterface, ...args: any): void;
+```
+
+### `reRender`
+
+重新渲染卡片
+
+```ts
+/**
+* 重新渲染卡片
+* @param cards 卡片集合
+*/
+reRender(...cards: Array<CardInterface>): void;
 ```
 
 ### `focusPrevBlock`
@@ -356,4 +455,15 @@ focusNextBlock(card: CardInterface, range: RangeInterface, hasModify: boolean): 
  * 释放卡片
  */
 gc(): void;
+```
+
+### `destroy`
+
+销毁
+
+```ts
+/**
+ * 销毁
+ */
+destroy(): void;
 ```

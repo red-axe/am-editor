@@ -79,3 +79,49 @@ showCardToolbar(event?: MouseEvent): void;
  */
 getContainer(): NodeInterface | undefined;
 ```
+
+### `setOffset`
+
+设置工具栏偏移量[上 x，上 y，下 x，下 y]
+
+```ts
+/**
+  * 设置工具栏偏移量[上x，上y，下x，下y]
+  * @param offset 偏移量 [tx,ty,bx,by]
+  */
+setOffset(offset: Array<number>): void;
+```
+
+### `setDefaultAlign`
+
+设置默认对齐方式
+
+```ts
+/**
+  * 设置默认对齐方式
+  * @param align
+  */
+setDefaultAlign(align: Placement): void;
+```
+
+### `update`
+
+更新位置
+
+```ts
+/**
+  * 更新位置
+  */
+update(): void;
+```
+
+### `destroy`
+
+销毁
+
+```ts
+/**
+  * 销毁
+  */
+destroy(): void;
+```

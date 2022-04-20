@@ -70,11 +70,11 @@ Node 节点集合长度
 
 类型：`string | undefined`
 
-### `isFragment`
+### `fragment`
 
 当前对象中的 Node 节点集合是否是框架片段
 
-类型：`boolean`
+类型：`DocumentFragment`
 
 ### `[n: number]`
 
@@ -160,7 +160,11 @@ isEditableCard(): boolean;
 是否为根节点
 
 ```ts
-isRoot(): boolean;
+/**
+ * 判断当前节点是否为根节点
+ * @param {Node} root 根节点
+ */
+isRoot(root?: Node | NodeInterface): boolean;
 ```
 
 ### `isEditable`
@@ -176,7 +180,11 @@ isEditable(): boolean;
 是否在根节点内
 
 ```ts
-inEditor(): boolean;
+/**
+ * 判断当前是否在根节点内
+ * @param {Node} root 根节点
+ */
+inEditor(root?: Node | NodeInterface): boolean;
 ```
 
 ### `isCursor`
@@ -323,11 +331,21 @@ nextElement(): NodeInterface | null;
 
 ```ts
 /**
- * 返回节点所在根节点路径，默认根节点为 document.body
- * @param {Node} context 根节点，默认为 document.body
- * @return {number} 路径
+ * 返回元素节点所在根节点路径，默认根节点为 document.body
+ * @param context 根节点，默认为 document.body
+ * @param filter 获取index的时候过滤
+ * @param callback 获取index的时候回调
+ * @return 路径
  */
-getPath(context?: Node | NodeInterface): Array<number>;
+getPath(
+    context?: Node | NodeInterface,
+    filter?: (node: Node) => boolean,
+    callback?: (
+        index: number,
+        path: number[],
+        node: NodeInterface,
+    ) => number[] | undefined,
+): Array<number>;
 ```
 
 ### `contains`
@@ -378,12 +396,16 @@ closest(
 
 ```ts
 /**
- * 为当前节点绑定事件
+ * 为当前元素节点绑定事件
  * @param {String} eventType 事件类型
  * @param {Function} listener 事件函数
  * @return {NodeInterface} 返回当前实例
  */
-on(eventType: string, listener: EventListener): NodeInterface;
+on<R = any, F extends EventListener<R> = EventListener<R>>(
+    eventType: string,
+    listener: F,
+    options?: boolean | AddEventListenerOptions,
+): NodeInterface;
 ```
 
 ### `off`
@@ -392,12 +414,16 @@ on(eventType: string, listener: EventListener): NodeInterface;
 
 ```ts
 /**
- * 移除当前节点事件
+ * 移除当前元素节点事件
  * @param {String} eventType 事件类型
  * @param {Function} listener 事件函数
  * @return {NodeInterface} 返回当前实例
  */
-off(eventType: string, listener: EventListener): NodeInterface;
+off(
+    eventType: string,
+    listener: EventListener,
+    options?: boolean | EventListenerOptions,
+): NodeInterface;
 ```
 
 ### `getBoundingClientRect`
@@ -436,17 +462,6 @@ getBoundingClientRect(defaultValue?: {
  * @return {NodeInterface} 当前 NodeInterface 实例
  */
 removeAllEvents(): NodeInterface;
-```
-
-### `offset`
-
-获取当前节点相对父节点的偏移量
-
-```ts
-/**
- * 获取当前节点相对父节点的偏移量
- */
-offset(): number;
 ```
 
 ### `attributes`
@@ -750,10 +765,18 @@ getRoot(): NodeInterface;
  * 遍历所有子节点
  * @param callback 回调函数，false：停止遍历 ，true：停止遍历当前节点及子节点，继续遍历下一个兄弟节点
  * @param order true:顺序 ，false:倒序，默认 true
+ * @param includeEditableCard 是否包含可编辑器卡片
+ * @param onStart 开始遍历一个节点时的回调函数
+ * @param onEnd 遍历完(包括所有子节点)一个节点时的回调函数
  */
 traverse(
-    callback: (node: NodeInterface) => boolean | void,
+    callback: (
+        node: NodeInterface,
+    ) => boolean | void | null | NodeInterface,
     order?: boolean,
+    includeCard?: boolean | 'editable',
+    onStart?: (node: NodeInterface) => void,
+    onEnd?: (node: NodeInterface, next: NodeInterface | null) => void,
 ): void;
 ```
 
@@ -799,8 +822,9 @@ findParent(container?: Node | NodeInterface): NodeInterface | null;
 ```ts
 /**
  * 获取节点下的所有子节点
+ * @param includeCard 是否包含卡片的节点
  */
-allChildren(): Array<Node>;
+allChildren(includeCard?: boolean | 'editable'): Array<NodeInterface>;
 ```
 
 ### `getViewport`
@@ -809,12 +833,9 @@ allChildren(): Array<Node>;
 
 ```ts
 /**
- * 返回当前节点或者传入的节点所在当前节点的顶级window对象的视图边界
- * @param node 节点
+ * 返回当前节点所在当前节点的顶级window对象的视图边界
  */
-getViewport(
-    node?: NodeInterface,
-): { top: number; left: number; bottom: number; right: number };
+getViewport(): { top: number; left: number; bottom: number; right: number };
 ```
 
 ### `inViewport`
@@ -824,10 +845,10 @@ getViewport(
 ```ts
 /**
  * 判断view是否在node节点根据当前节点的顶级window对象计算的视图边界内
- * @param node 节点
  * @param view 是否在视图的节点
+ * @param simpleMode 简单模式，任一边界超出编辑器范围时，返回 true
  */
-inViewport(node: NodeInterface, view: NodeInterface): boolean;
+inViewport(view: NodeInterface, simpleMode?: boolean): boolean;
 ```
 
 ### `scrollIntoView`
@@ -837,12 +858,10 @@ inViewport(node: NodeInterface, view: NodeInterface): boolean;
 ```ts
 /**
  * 如果view节点不可见，将滚动到align位置，默认为nearest
- * @param node 节点
  * @param view 视图节点
  * @param align 位置
  */
 scrollIntoView(
-    node: NodeInterface,
     view: NodeInterface,
     align?: 'start' | 'center' | 'end' | 'nearest',
 ): void;

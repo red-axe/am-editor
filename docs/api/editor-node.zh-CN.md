@@ -70,15 +70,15 @@ isInline(node: NodeInterface | Node, schema?: SchemaInterface): boolean;
 isBlock(node: NodeInterface | Node, schema?: SchemaInterface): boolean;
 ```
 
-### `isSimpleBlock`
+### `isNestedBlock`
 
-判断节点是否为 block 类型的简单节点（子节点不包含 blcok 标签）
+判断 block 节点的子节点是否不包含 blco 节点
 
 ```ts
 /**
- * 判断节点是否为block类型的简单节点（子节点不包含blcok标签）
+ * 判断block节点的子节点是否不包含blco节点
  */
-isSimpleBlock(node: NodeInterface): boolean;
+isNestedBlock(node: NodeInterface | Node): boolean;
 ```
 
 ### `isRootBlock`
@@ -119,16 +119,16 @@ isEmpty(node: NodeInterface, withTrim?: boolean): boolean;
 isEmptyWithTrim(node: NodeInterface): boolean;
 ```
 
-### `isLikeEmpty`
+### `isEmptyWidthChild`
 
-判断一个节点是否为空，有卡片不算作空节点
+判断一个节点是否为空，包括子节点
 
 ```ts
 /**
  * 判断一个节点是否为空
  * @param node 节点
  */
-isLikeEmpty(node: NodeInterface): boolean;
+isEmptyWidthChild(node: NodeInterface): boolean;
 ```
 
 ### `isList`
@@ -163,8 +163,9 @@ isCustomize(node: NodeInterface): boolean;
 /**
  * 去除包裹
  * @param node 需要去除包裹的节点
+ * @returns 返回移除外层后的所有子节点
  */
-unwrap(node: NodeInterface): void;
+unwrap(node: NodeInterface): NodeInterface[];
 ```
 
 ### `wrap`
@@ -208,8 +209,13 @@ merge(source: NodeInterface, target: NodeInterface, remove?: boolean): void;
  * 将源节点的子节点追加到目标节点，并替换源节点
  * @param source 旧节点
  * @param target 新节点
+ * @param copyId 是否复制id
  */
-replace(source: NodeInterface, target: NodeInterface): NodeInterface;
+replace(
+    source: NodeInterface,
+    target: NodeInterface,
+    copyId?: boolean,
+): NodeInterface;
 ```
 
 ### `insert`
@@ -221,10 +227,12 @@ replace(source: NodeInterface, target: NodeInterface): NodeInterface;
  * 在光标位置插入一个节点
  * @param node 节点
  * @param range 光标
+ * @param removeCurrentEmptyBlock 当前光标行是空行时是否删除
  */
 insert(
     node: Node | NodeInterface,
     range?: RangeInterface,
+    removeCurrentEmptyBlock?: boolean,
 ): RangeInterface | undefined;
 ```
 
@@ -270,7 +278,7 @@ setAttributes(node: NodeInterface, attributes: any): NodeInterface;
 removeMinusStyle(node: NodeInterface, style: string): void;
 ```
 
-### `mergeAdjacent`
+### `mergeChild`
 
 合并节点下的子节点，两个相同的相邻节点的子节点，通常是 blockquote、ul、ol 标签
 
@@ -279,7 +287,7 @@ removeMinusStyle(node: NodeInterface, style: string): void;
  * 合并节点下的子节点，两个相同的相邻节点的子节点，通常是 blockquote、ul、ol 标签
  * @param node 当前节点
  */
-mergeAdjacent(node: NodeInterface): void;
+mergeChild(node: NodeInterface): void;
 ```
 
 ### `removeSide`
@@ -361,4 +369,16 @@ clone(node: NodeInterface, deep?: boolean, copyId?: boolean): NodeInterface;
  * @param appendExp 追加的节点
  */
 getBatchAppendHTML(nodes: Array<NodeInterface>, appendExp: string): string;
+```
+
+### `removeZeroWidthSpace`
+
+移除零宽字符的占位符
+
+```ts
+/**
+* 移除占位符 \u200B
+* @param node 节点
+*/
+removeZeroWidthSpace(node: NodeInterface): void;
 ```

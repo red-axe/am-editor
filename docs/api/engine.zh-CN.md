@@ -40,11 +40,16 @@
 
 类型：`HistoryInterface`
 
-### `request`
+### `hotkey`
 
-网络请求
+快捷键
 
-类型：`RequestInterface`
+```ts
+/**
+ * 快捷键
+ */
+hotkey: HotkeyInterface;
+```
 
 ## 方法
 
@@ -174,6 +179,22 @@ setValue(value: string, callback?: (count: number) => void): EngineInterface;
 setHtml(html: string, callback?: (count: number) => void): EngineInterface
 ```
 
+### `setMarkdown`
+
+设置 markdown，会格式化为合法的编辑器值
+
+```ts
+/**
+ * 设置markdown，会格式化为合法的编辑器值
+ * @param text markdown文本
+ * @param callback 异步渲染卡片后回调
+ */
+setMarkdown(
+    text: string,
+    callback?: (count: number) => void,
+): EngineInterface;
+```
+
 ### `setJsonValue`
 
 设置 json 格式值，主要用于与协同服务端的值同步
@@ -187,14 +208,6 @@ setJsonValue(
     value: Array<any>,
     callback?: (count: number) => void,
 ): EngineInterface;
-```
-
-### `setScrollNode`
-
-设置编辑器滚动条节点
-
-```ts
-setScrollNode(node?: HTMLElement)
 ```
 
 ### showPlaceholder
@@ -217,6 +230,18 @@ showPlaceholder(): void;
  * 隐藏 placeholder
  */
 hidePlaceholder(): void;
+```
+
+### `normalize`
+
+保证所有行内元素都在段落内
+
+```ts
+/**
+ * 保证所有行内元素都在段落内
+ * @param container 容器
+ */
+normalize(container?: NodeInterface): void;
 ```
 
 ### `destroy`

@@ -62,6 +62,7 @@ export interface BlockModelInterface {
 	 * @param block 节点
 	 * @param range 光标
 	 * @param splitNode 分割节点，默认为光标开始位置的block节点
+	 * @param removeCurrentEmptyBlock 是否移除当前空的block节点
 	 */
 	insert(
 		block: NodeInterface | Node | string,
