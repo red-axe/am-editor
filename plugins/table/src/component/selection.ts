@@ -143,7 +143,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		document.addEventListener('keydown', this.onShiftKeydown);
 		document.addEventListener('keyup', this.onShiftKeyup);
 		this.table.wrapper
-			?.on(isMobile ? 'touchstart' : 'mousedown', this.onTdMouseDown)
+			?.on('mousedown', this.onTdMouseDown)
 			.on('keydown', this.onKeydown);
 	}
 
@@ -151,7 +151,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		document.removeEventListener('keydown', this.onShiftKeydown);
 		document.removeEventListener('keyup', this.onShiftKeyup);
 		this.table.wrapper
-			?.off(isMobile ? 'touchstart' : 'mousedown', this.onTdMouseDown)
+			?.off('mousedown', this.onTdMouseDown)
 			.off('keydown', this.onKeydown);
 	}
 
