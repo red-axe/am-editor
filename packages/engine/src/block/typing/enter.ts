@@ -20,7 +20,7 @@ class Enter {
 		if (parent && parent.inEditor() && node.isBlock(parent)) {
 			if ('li' === parent.name && 'p' === block.name) {
 				if (
-					1 === block.children().length &&
+					1 === block.get<Node>()?.childNodes.length &&
 					'br' === block.first()?.name
 				) {
 					block.first()!.remove();

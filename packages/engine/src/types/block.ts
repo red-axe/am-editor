@@ -142,11 +142,6 @@ export interface BlockModelInterface {
 	 * @param root 根节点
 	 */
 	flat(block: NodeInterface, root: NodeInterface): void;
-	/**
-	 * br 换行改成段落
-	 * @param block 节点
-	 */
-	brToBlock(block: NodeInterface): void;
 
 	/**
 	 * 插入一个空的block节点

@@ -207,7 +207,10 @@ class Selection implements SelectionInterface {
 				cursor.remove();
 				_parent![0].normalize();
 			}
-			if (_parent.name === 'p' && _parent.children().length === 0) {
+			if (
+				_parent.name === 'p' &&
+				_parent.get<Node>()?.childNodes.length === 0
+			) {
 				_parent.append($('<br />'));
 			}
 			return;
@@ -229,7 +232,10 @@ class Selection implements SelectionInterface {
 			this.range.setEndBefore(this.focus);
 			this.focus.remove();
 			parent[0].normalize();
-			if (parent.name === 'p' && parent.children().length === 0) {
+			if (
+				parent.name === 'p' &&
+				parent.get<Node>()?.childNodes.length === 0
+			) {
 				parent.append($('<br />'));
 			}
 			if (isSafari) {
@@ -283,7 +289,7 @@ class Selection implements SelectionInterface {
 					focus.remove();
 					if (
 						parent?.name === 'p' &&
-						parent.children().length === 0
+						parent.get<Node>()?.childNodes.length === 0
 					) {
 						parent.append($('<br />'));
 					}
@@ -333,7 +339,7 @@ class Selection implements SelectionInterface {
 					anchor.remove();
 					if (
 						parent?.name === 'p' &&
-						parent.children().length === 0
+						parent.get<Node>()?.childNodes.length === 0
 					) {
 						parent.append($('<br />'));
 					}

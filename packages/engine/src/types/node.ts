@@ -69,7 +69,7 @@ export interface NodeInterface {
 	/**
 	 * Node集合长度
 	 */
-	length: number;
+	readonly length: number;
 	/**
 	 * 事件集合
 	 */

@@ -100,7 +100,7 @@ class Range implements RangeInterface {
 		const startNode = this.startNode;
 		if (
 			!$(node).isCursor() &&
-			startNode.children().length === 1 &&
+			startNode.get<Node>()?.childNodes.length === 1 &&
 			startNode.first()?.name === 'br'
 		) {
 			startNode.first()?.remove();
@@ -340,7 +340,7 @@ class Range implements RangeInterface {
 				} else {
 					range.setEndBefore(domNode[0]);
 				}
-			} else if (offset === domNode.children().length) {
+			} else if (offset === domNode.get<Node>()?.childNodes.length) {
 				while (!domNode.next()) {
 					parent = domNode.parent();
 					if (!parent || (!toBlock && nodeApi.isBlock(parent))) {

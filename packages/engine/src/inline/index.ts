@@ -387,7 +387,7 @@ class Inline implements InlineModelInterface {
 		if (inline.name !== 'br') {
 			safeRange.handleBr();
 		}
-		const hasChild = inline.children().length !== 0;
+		const hasChild = inline.get<Node>()?.childNodes.length !== 0;
 		this.repairCursor(inline);
 		//如果有内容，就让光标选择在节点外的零宽字符前
 		if (!inline.isCard() && !node.isVoid(inline)) {

@@ -43,7 +43,7 @@ class Backspace {
 						if (
 							parent &&
 							node.isCustomize(parent) &&
-							parent.children().length === 0
+							parent.get<Node>()?.childNodes.length === 0
 						) {
 							parent.remove();
 						}
@@ -65,7 +65,7 @@ class Backspace {
 					if (
 						parent &&
 						node.isList(parent) &&
-						parent.children().length === 0
+						parent.get<Node>()?.childNodes.length === 0
 					) {
 						parent.remove();
 					}
@@ -75,13 +75,13 @@ class Backspace {
 					const parent = startBlock.parent();
 					if (
 						node.isCustomize(startBlock) &&
-						startBlock.children().length === 0
+						startBlock.get<Node>()?.childNodes.length === 0
 					)
 						startBlock.remove();
 					if (
 						parent &&
 						node.isList(parent) &&
-						parent.children().length === 0
+						parent.get<Node>()?.childNodes.length === 0
 					) {
 						parent.remove();
 					}

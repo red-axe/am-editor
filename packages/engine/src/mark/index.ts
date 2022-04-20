@@ -771,7 +771,7 @@ class Mark implements MarkModelInterface {
 		const nodeApi = this.editor.node;
 		// 要包裹的节点是mark
 		if (nodeApi.isMark(node)) {
-			if (node.children().length === 0) {
+			if (node.get<Node>()?.childNodes.length === 0) {
 				node.html('&#8203;');
 			}
 			//找到最底层mark标签添加包裹，<strong><span style="font-size:16px">abc</span></strong> ，在 span 节点中的text再添加包裹，不在strong外添加包裹
@@ -1016,7 +1016,7 @@ class Mark implements MarkModelInterface {
 						break;
 					}
 					const curPlugin = this.findPlugin(parent);
-					if (parent.children().length === 1) {
+					if (parent.get<Node>()?.childNodes.length === 1) {
 						//插件一样，并且并表明要合并值
 						if (
 							plugin &&
@@ -1417,7 +1417,11 @@ class Mark implements MarkModelInterface {
 							) {
 								markNodes.push(parent);
 								parent = parent.parent();
-								if (parent && parent.children().length > 1)
+								if (
+									parent &&
+									(parent.get<Node>()?.childNodes.length ??
+										0) > 1
+								)
 									break;
 							}
 						}
@@ -1721,7 +1725,7 @@ class Mark implements MarkModelInterface {
 			// 包含光标标签
 			// <p><strong><cursor /></strong></p>
 			if (
-				node.children().length === 1 &&
+				node.get<Node>()?.childNodes.length === 1 &&
 				node.first()?.attributes(DATA_ELEMENT)
 			) {
 				if (nodeApi.isMark(node)) {

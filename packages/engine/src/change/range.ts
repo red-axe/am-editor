@@ -140,9 +140,9 @@ class ChangeRange implements ChangeRangeInterface {
 			if (
 				((startNode.isElement() &&
 					1 === startOffset &&
-					1 === startNode.children().length) ||
+					1 === startNode.get<Node>()?.childNodes.length) ||
 					(2 === startOffset &&
-						2 === startNode.children().length &&
+						2 === startNode.get<Node>()?.childNodes.length &&
 						startNode.first()?.isCard())) &&
 				'br' === startNode.last()?.name
 			) {
@@ -197,18 +197,23 @@ class ChangeRange implements ChangeRangeInterface {
 				startNode.parent()?.equal(inlineNode) &&
 				startOffset === 0
 			) {
-				range.setStart(startNode, startOffset + 1);
-				if (range.collapsed) range.collapse(true);
+				const text = startNode.text();
+				if (/^\u200B/g.test(text)) {
+					range.setStart(startNode, startOffset + 1);
+					if (range.collapsed) range.collapse(true);
+				}
 			}
 			//右侧
 			if (
 				endNode.isText() &&
 				!endNode.next() &&
-				endNode.parent()?.equal(inlineNode) &&
-				endOffset === endNode.text().length
+				endNode.parent()?.equal(inlineNode)
 			) {
-				range.setEnd(endNode, endOffset - 1);
-				if (range.collapsed) range.collapse(false);
+				const text = endNode.text();
+				if (endOffset === text.length && /\u200B$/g.test(text)) {
+					range.setEnd(endNode, endOffset - 1);
+					if (range.collapsed) range.collapse(false);
+				}
 			}
 		}
 		startNode = range.startNode;
@@ -242,7 +247,7 @@ class ChangeRange implements ChangeRangeInterface {
 			!range.collapsed &&
 			!otStopped &&
 			endNode.name === 'p' &&
-			endNode.children().length === 0
+			endNode.get<Node>()?.childNodes.length === 0
 		) {
 			endNode.append('<br />');
 		}
@@ -326,7 +331,7 @@ class ChangeRange implements ChangeRangeInterface {
 		if (
 			startNode.isEditable() &&
 			!otStopped &&
-			startNode.children().length === 0 &&
+			startNode.get<Node>()?.childNodes.length === 0 &&
 			!this.engine.ot.isStopped
 		) {
 			startNode.html('<p><br /></p>');

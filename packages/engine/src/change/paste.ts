@@ -110,14 +110,10 @@ export default class Paste {
 				let attributes: { [k: string]: string } | undefined =
 					node.attributes();
 				// 删除空 style 属性
-				if ((attributes.style || '').trim() === '') {
+				if (attributes.style && attributes.style.trim() === '') {
 					node.removeAttributes('style');
 				}
 
-				// br 换行改成正常段落
-				if (type === 'block') {
-					this.engine.block.brToBlock(node);
-				}
 				// 删除空 span
 				while (node.name === 'span' && nodeApi.isEmpty(node)) {
 					const children = node.children();
@@ -183,7 +179,9 @@ export default class Paste {
 					const rootChildren = parent.children().toArray();
 					let tempList = parent.clone();
 					const appendToTemp = () => {
-						if (tempList.children().length > 0) {
+						if (
+							(tempList.get<Node>()?.childNodes.length ?? 0) > 0
+						) {
 							if (isLeft) leftList.push(tempList);
 							else rightList.push(tempList);
 							tempList = parent!.clone();
@@ -198,7 +196,7 @@ export default class Paste {
 					 */
 					rootChildren.forEach((child, index) => {
 						if (!child) return;
-						if (child.equal(node)) {
+						if (isLeft && child.equal(node)) {
 							// 最后一个位置加入到右边
 							if (rootChildren.length - 1 === index) {
 								appendToTemp();
@@ -230,13 +228,21 @@ export default class Paste {
 					let prev = parent;
 					leftList.forEach((childNode) => {
 						const child = $(childNode);
-						if (!child || child.children().length === 0) return;
+						if (
+							!child ||
+							child.get<Node>()?.childNodes.length === 0
+						)
+							return;
 						prev.after(child);
 						prev = child;
 					});
 					rightList.forEach((childNode) => {
 						const child = $(childNode);
-						if (!child || child.children().length === 0) return;
+						if (
+							!child ||
+							child.get<Element>()?.childNodes.length === 0
+						)
+							return;
 						prev.after(child);
 						prev = child;
 					});
@@ -278,7 +284,7 @@ export default class Paste {
 
 					rootChildren.forEach((child) => {
 						if (!child) return;
-						if (child.equal(parent!)) {
+						if (isLeft && child.equal(parent!)) {
 							isLeft = false;
 							return;
 						}
@@ -293,7 +299,11 @@ export default class Paste {
 					let next: NodeInterface | null = null;
 					children.each((child, index) => {
 						const node = children.eq(index);
-						if (!node || nodeApi.isEmptyWithTrim(node)) {
+						if (
+							!node ||
+							(nodeApi.isEmptyWithTrim(node) &&
+								!nodeApi.isVoid(node))
+						) {
 							return;
 						}
 						const isList = nodeApi.isList(node);
@@ -304,6 +314,12 @@ export default class Paste {
 							node.attributes(list.INDENT_KEY, indent);
 							list.addIndent(node, 1);
 							leftList[leftList.length] = node[0];
+							li = null;
+							return;
+						} else if (nodeApi.isBlock(child, this.schema)) {
+							const len = leftList.length;
+							leftList[len] = node[0];
+							leftList[len + 1] = leftList.clone()[0];
 							li = null;
 							return;
 						}
@@ -324,13 +340,21 @@ export default class Paste {
 					let prev = rootListElement;
 					leftList.each((childNode) => {
 						const child = $(childNode);
-						if (!child || child.children().length === 0) return;
+						if (
+							!child ||
+							child.get<Node>()?.childNodes.length === 0
+						)
+							return;
 						prev.after(child);
 						prev = child;
 					});
 					rightList.each((childNode) => {
 						const child = $(childNode);
-						if (!child || child.children().length === 0) return;
+						if (
+							!child ||
+							child.get<Node>()?.childNodes.length === 0
+						)
+							return;
 						prev.after(child);
 						prev = child;
 					});
@@ -364,16 +388,54 @@ export default class Paste {
 				// <li><p>foo</p></li>
 				if (nodeIsBlock && parent?.name === 'li') {
 					// <li><p><br /></p></li>
-					if (
-						node.children().length === 1 &&
-						node.first()?.name === 'br'
-					) {
-						// nothing
+					const childNodes = node.get<Node>()?.childNodes ?? [];
+
+					if (node.name === 'p') {
+						const next = node.next();
+						if (childNodes.length === 0 && !next) {
+							node.append('<br />');
+						}
+						const first = node.first();
+						if (next && next.name === 'p') {
+							node.append('<br />');
+						}
+						nodeApi.unwrap(node);
+						return first;
 					} else {
-						node.after('<br />');
+						const pParent = parent.parent();
+						if (!pParent) return undefined;
+						const leftList = pParent.clone();
+						const rightList = pParent.clone();
+						let prev = parent.prev();
+						while (prev) {
+							leftList.prepend(prev);
+							prev = parent.prev();
+						}
+						let next = parent.next();
+						while (next) {
+							rightList.append(next);
+							next = parent.next();
+						}
+						const leftLi = parent.clone();
+						const rightLi = parent.clone();
+						let prevC = node.prev();
+						while (prevC) {
+							leftLi.prepend(prevC);
+							prevC = node.prev();
+						}
+						let nextC = node.next();
+						while (nextC) {
+							rightLi.append(nextC);
+							nextC = node.next();
+						}
+						pParent.after(node);
+						if (leftLi.first()) leftList.append(leftLi);
+						if (rightLi.first()) rightList.prepend(rightLi);
+						if (leftList.first()) pParent.before(leftList);
+						if (rightList.first()) node.after(rightList);
+						pParent.remove();
+						return undefined;
 					}
-					nodeApi.unwrap(node);
-					return undefined;
 				}
 				if (
 					!nodeIsBlock &&
@@ -452,7 +514,9 @@ export default class Paste {
 								item.node.length > 0,
 						);
 						if (plugin) {
-							if (plugin.node.children().length === 1) {
+							if (
+								plugin.node.get<Node>()?.childNodes.length === 1
+							) {
 								nodeApi.unwrap(plugin.node);
 							} else {
 								nodeApi.unwrap(node);

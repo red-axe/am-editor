@@ -448,7 +448,7 @@ class NodeModel implements NodeModelInterface {
 				}
 			}
 			// 移除mark插件下面的所有零宽字符
-			else if (markPlugin && child.children().length === 1) {
+			else if (markPlugin && child.get<Node>()?.childNodes.length === 1) {
 				const prev = child.prev();
 				if (!prev || prev.isText()) {
 					child.allChildren().forEach((child) => {
@@ -647,7 +647,7 @@ class NodeModel implements NodeModelInterface {
 				}
 				if (
 					blockNode.isEditable() &&
-					blockNode.children().length === 0
+					blockNode.get<Node>()?.childNodes.length === 0
 				) {
 					blockNode.append(node);
 				} else {

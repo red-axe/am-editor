@@ -508,7 +508,7 @@ class Block implements BlockModelInterface {
 		safeRange.select(sideBlock, true).shrinkToElementNode();
 
 		if (
-			sideBlock.children().length === 1 &&
+			sideBlock.get<Node>()?.childNodes.length === 1 &&
 			sideBlock.first()?.name === 'br'
 		) {
 			safeRange.collapse(false);
@@ -574,7 +574,7 @@ class Block implements BlockModelInterface {
 		// to
 		// <p><br /><cursor /></p>
 		if (
-			container.children().length === 1 &&
+			container.get<Node>()?.childNodes.length === 1 &&
 			container.first()?.name === 'br'
 		) {
 			safeRange.select(container, true).collapse(false);
@@ -1240,69 +1240,6 @@ class Block implements BlockModelInterface {
 	}
 
 	/**
-	 * br 换行改成段落
-	 * @param block 节点
-	 */
-	brToBlock(block: NodeInterface) {
-		const first = block.first();
-		// 没有子节点
-		if (!first) {
-			return;
-		}
-		const blockElement = block.get<Element>();
-		const children = blockElement?.childNodes || [];
-		// 只有一个节点
-		if (children.length === 1) {
-			const node = first;
-			//\n换成 br
-			if (node && node.isText() && /^\n+$/g.test(node.text())) {
-				block.remove();
-				//this.editor.node.replace(node, $('<br />'));
-			}
-			return;
-		}
-		if ('li' === block.name) return;
-		// 只有一个节点（有光标标记节点）
-		if (
-			(children.length === 2 &&
-				first?.attributes(DATA_ELEMENT) === CURSOR) ||
-			block.last()?.attributes(DATA_ELEMENT) === CURSOR
-		) {
-			return;
-		}
-		// 没有br标签
-		if (!blockElement?.querySelector('br')) return;
-
-		let container;
-		let prevContainer;
-		let node: NodeInterface | null = first;
-		while (node) {
-			const next = node.next();
-			if (!container || node.name === 'br') {
-				prevContainer = container;
-				container = this.editor.node.clone(block, false, false);
-				block.before(container);
-			}
-			if (node.name !== 'br') {
-				container.append(node);
-			}
-			if (
-				(node.name === 'br' || !next) &&
-				prevContainer &&
-				!prevContainer.first()
-			) {
-				prevContainer.append($('<br />'));
-			}
-			node = next;
-		}
-
-		if (container && !container.first()) {
-			container.remove();
-		}
-		block.remove();
-	}
-
-	/**
 	 * 插入一个空的block节点
 	 * @param range 光标所在位置
 	 * @param block 节点
@@ -1356,7 +1293,7 @@ class Block implements BlockModelInterface {
 		if (
 			this.isLastOffset(range, 'end') ||
 			(cloneRange.endNode.type === Node.ELEMENT_NODE &&
-				block.children().length > 0 &&
+				(block.get<Node>()?.childNodes.length || 0) > 0 &&
 				cloneRange.endContainer.childNodes[cloneRange.endOffset] ===
 					block.last()?.get() &&
 				'br' === block.first()?.name)

@@ -642,7 +642,7 @@ class List implements ListModelInterface {
 		const range = Range.create(this.editor);
 		//设置光标选中空的标签，在这个位置插入卡片
 		const br = $('<br />');
-		if (node.children().length > 0) {
+		if ((node.get<Node>()?.childNodes.length ?? 0) > 0) {
 			node.first()?.before(br);
 		} else {
 			node.append(br);
@@ -846,7 +846,9 @@ class List implements ListModelInterface {
 				(node.isEmpty(beforeELement) || this.isEmptyItem(beforeELement))
 			) {
 				beforeELement.remove();
-				if (beforeELement.parent()?.children().length === 0)
+				if (
+					beforeELement.parent()?.get<Node>()?.childNodes.length === 0
+				)
 					beforeELement.parent()?.remove();
 			}
 		}
@@ -863,7 +865,7 @@ class List implements ListModelInterface {
 			} else if (parent) {
 				if (
 					this.isEmptyItem(startLi) &&
-					parent.children().length === 1
+					parent.get<Node>()?.childNodes.length === 1
 				) {
 					parent.remove();
 				}
@@ -913,7 +915,7 @@ class List implements ListModelInterface {
 			const childElement = $(fragment.childNodes[0]);
 			// 如果是列表
 			if (node.isList(childElement)) {
-				if (childElement.children().length === 0) {
+				if (childElement.get<Node>()?.childNodes.length === 0) {
 					childElement.remove();
 					continue;
 				}

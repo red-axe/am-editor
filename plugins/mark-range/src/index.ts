@@ -241,7 +241,7 @@ export default class<
 						endMark,
 						endMark.isText()
 							? endMark.text().length
-							: endMark.children().length,
+							: endMark.get<Node>()?.childNodes.length ?? 0,
 					);
 					if (
 						!strictRange

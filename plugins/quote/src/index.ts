@@ -109,7 +109,7 @@ export default class<
 		const text = node.text();
 		if (!text) return;
 
-		const reg = /(^|\r\n|\n)([>]{1,})/;
+		const reg = /(^|\r\n|\n)(>\s+[^>]+)(\r\n|\n|$)/;
 		const match = reg.exec(text);
 		return {
 			reg,

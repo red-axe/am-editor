@@ -170,7 +170,7 @@ export default class Clipboard implements ClipboardInterface {
 					child.parentNode?.removeChild(child);
 				}
 			});
-			if (list.children().length === 0) {
+			if (list.get<Node>()?.childNodes.length === 0) {
 				list.remove();
 			}
 		}

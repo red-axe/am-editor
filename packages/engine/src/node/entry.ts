@@ -39,7 +39,6 @@ import {
  * @param context 节点上下文，或根节点
  */
 class NodeEntry implements NodeInterface {
-	length: number = 0;
 	events: EventInterface[] = [];
 	document: Document | null = null;
 	context: Context | undefined;
@@ -49,6 +48,15 @@ class NodeEntry implements NodeInterface {
 	display: string | undefined;
 	fragment?: DocumentFragment;
 	[n: number]: Node;
+
+	get length() {
+		let len = 0,
+			node;
+		while ((node = this[len])) {
+			len++;
+		}
+		return len;
+	}
 
 	constructor(nodes: Node | NodeList | Array<Node>, context?: Context) {
 		if (isNode(nodes)) {
@@ -62,7 +70,6 @@ class NodeEntry implements NodeInterface {
 			this.events[index] = new DOMEvent(); // 初始化事件对象
 		});
 
-		this.length = nodes.length;
 		const baseNode = this[0];
 		if (baseNode) {
 			this.document = getDocument(context);
@@ -700,6 +707,7 @@ class NodeEntry implements NodeInterface {
 		if (html !== undefined) {
 			const children = $(html);
 			this.each((node) => {
+				if (node.nodeType !== Node.ELEMENT_NODE) return;
 				let child = node.firstChild;
 				while (child) {
 					const next = child.nextSibling;
@@ -707,8 +715,7 @@ class NodeEntry implements NodeInterface {
 					child = next;
 				}
 				children.forEach((child) => {
-					if (node.nodeType === Node.ELEMENT_NODE)
-						(node as Element).appendChild(child.cloneNode(true));
+					(node as Element).appendChild(child.cloneNode(true));
 				});
 			});
 			return this;
@@ -779,7 +786,6 @@ class NodeEntry implements NodeInterface {
 			node.parentNode.removeChild(node);
 			delete this[index];
 		});
-		this.length = 0;
 		return this;
 	}
 

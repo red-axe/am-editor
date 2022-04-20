@@ -154,11 +154,14 @@ class ChangeModel implements ChangeInterface {
 	initValue(range?: RangeInterface, apply: boolean = true) {
 		const html = this.engine.container.html();
 		const defaultHtml = '<p><br /></p>';
-		if (html === defaultHtml || this.engine.container.children().length > 0)
+		if (
+			html === defaultHtml ||
+			(this.engine.container.get<Node>()?.childNodes.length || 0) > 0
+		)
 			return;
 		const emptyHtml = html || defaultHtml;
 		const node = $(emptyHtml);
-		if (node.children().length === 0) node.html('<br />');
+		if (node.get<Node>()?.childNodes.length === 0) node.html('<br />');
 		this.engine.container.empty().append(node);
 		const safeRange = range || this.range.get();
 
@@ -763,7 +766,7 @@ class ChangeModel implements ChangeInterface {
 		safeRange.extractContents();
 		if (
 			safeRange.startNode.isEditable() &&
-			safeRange.startNode.children().length === 0
+			safeRange.startNode.get<Node>()?.childNodes.length === 0
 		) {
 			safeRange.startNode.html('<p><br /></p>');
 		}
@@ -780,7 +783,7 @@ class ChangeModel implements ChangeInterface {
 			return;
 		}
 		let isRemoveStartNode = false;
-		if (isMoreLine && startNode.children().length === 0) {
+		if (isMoreLine && startNode.get<Node>()?.childNodes.length === 0) {
 			const selection = safeRange.createSelection();
 			startNode.remove();
 			if (
@@ -795,7 +798,7 @@ class ChangeModel implements ChangeInterface {
 
 		const prevNode = block;
 		const nextNode = startNode;
-		let isEmptyNode = startNode.children().length === 0;
+		let isEmptyNode = startNode.get<Node>()?.childNodes.length === 0;
 		if (!isEmptyNode && startNode.length > 0 && startNode.inEditor()) {
 			if (
 				startNode[0].childNodes.length === 1 &&
@@ -926,12 +929,18 @@ class ChangeModel implements ChangeInterface {
 				safeRange.collapse(false);
 			}
 		}
-		if (nodeApi.isBlock(startNode) && startNode.children().length === 0) {
+		if (
+			nodeApi.isBlock(startNode) &&
+			startNode.get<Node>()?.childNodes.length === 0
+		) {
 			startNode.html('<br />');
 		}
 
 		if (isRemoveStartNode) {
-			if (nodeApi.isBlock(prevNode) && prevNode.children().length === 0) {
+			if (
+				nodeApi.isBlock(prevNode) &&
+				prevNode.get<Node>()?.childNodes.length === 0
+			) {
 				prevNode.html('<br />');
 			}
 			if (prevNode.inEditor())
@@ -1029,7 +1038,7 @@ class ChangeModel implements ChangeInterface {
 			first?.remove();
 		} else if (
 			prevBlock &&
-			prevBlock.children().length === 1 &&
+			prevBlock.get<Node>()?.childNodes.length === 1 &&
 			prevBlock.first()?.name === 'br'
 		) {
 			prevBlock.first()?.remove();

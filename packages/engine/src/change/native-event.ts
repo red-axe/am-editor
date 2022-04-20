@@ -561,7 +561,10 @@ class NativeEvent {
 					const cloneRange = range.cloneRange();
 					const { endNode } = cloneRange;
 					let cardId = '';
-					if (endNode.isCard() && endNode.children().length === 0) {
+					if (
+						endNode.isCard() &&
+						endNode.get<Node>()?.childNodes.length === 0
+					) {
 						cloneRange.setEndAfter(endNode);
 						cardId = endNode.attributes(DATA_ID);
 					}
