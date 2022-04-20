@@ -85,7 +85,7 @@ export default class Paste {
 				const styles = node.css();
 				for (const key in defaultStyle) {
 					let value = styles[key];
-					if (!value) return;
+					if (!value) continue;
 					if (key.endsWith('color')) {
 						value = tinycolor2(value).toHexString();
 					}
