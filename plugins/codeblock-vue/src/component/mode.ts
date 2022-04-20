@@ -24,11 +24,13 @@ const datas = [
 	{
 		value: 'cpp',
 		syntax: 'text/x-c++src',
+		alias: ['c++'],
 		name: 'C++',
 	},
 	{
 		value: 'csharp',
 		syntax: 'text/x-csharp',
+		alias: ['c#'],
 		name: 'C#',
 	},
 	{
@@ -64,6 +66,7 @@ const datas = [
 	{
 		value: 'go',
 		syntax: 'go',
+		alias: ['golang'],
 		name: 'Go',
 	},
 	{
@@ -80,6 +83,7 @@ const datas = [
 		value: 'html',
 		syntax: 'htmlmixed',
 		name: 'HTML',
+		alias: ['html5'],
 	},
 	{
 		value: 'http',
@@ -95,6 +99,7 @@ const datas = [
 		value: 'javascript',
 		syntax: 'text/javascript',
 		name: 'JavaScript',
+		alias: ['js'],
 	},
 	{
 		value: 'json',
@@ -175,6 +180,7 @@ const datas = [
 		value: 'python',
 		syntax: 'python',
 		name: 'Python',
+		alias: ['py'],
 	},
 	{
 		value: 'r',
@@ -215,6 +221,7 @@ const datas = [
 		value: 'typescript',
 		syntax: 'text/typescript',
 		name: 'TypeScript',
+		alias: ['ts'],
 	},
 	{
 		value: 'vbnet',

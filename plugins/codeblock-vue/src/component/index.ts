@@ -64,6 +64,12 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 		modeDatas.forEach((item) => {
 			this.#modeNameMap[item.value] = item.name;
 			this.#modeSynatxMap[item.value] = item.syntax;
+			if (item.alias) {
+				item.alias.forEach((name) => {
+					this.#modeNameMap[name] = item.name;
+					this.#modeSynatxMap[name] = item.syntax;
+				});
+			}
 		});
 
 		this.codeEditor = new CodeBlockEditor(this.editor, {
@@ -192,7 +198,9 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 						renderSelect(
 							node.get<HTMLElement>()!,
 							(this.constructor as typeof CodeBlcok).getModes(),
-							this.codeEditor?.mode || 'plain',
+							this.#modeNameMap[this.codeEditor!.mode] ||
+								this.codeEditor!.mode ||
+								'plain',
 							(mode) => {
 								setTimeout(() => {
 									this.focusEditor();

@@ -14,6 +14,7 @@ import {
 	READY_CARD_KEY,
 	decodeCardValue,
 	VIEW_CLASS_NAME,
+	SchemaBlock,
 } from '@aomao/engine';
 import CodeBlockComponent, {
 	CodeBlockEditor,
@@ -160,10 +161,13 @@ export default class<
 				attributes: {
 					class: {
 						required: true,
-						value: '*',
+						value: (val) => {
+							return val.includes('language');
+						},
 					},
 				},
-			},
+				allowIn: ['pre', '$root'],
+			} as SchemaBlock,
 			{
 				type: 'block',
 				name: 'div',
