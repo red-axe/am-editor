@@ -120,12 +120,6 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				...options,
 			},
 		) as Editor;
-		this.codeMirror.on('mousedown', (_, event) => {
-			if (!isEngine(this.editor) || this.editor.readonly) {
-				event.preventDefault();
-				event.stopPropagation();
-			}
-		});
 		this.codeMirror.on('focus', () => {
 			const { onFocus } = this.options;
 			if (onFocus) onFocus();
@@ -173,6 +167,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 				event.preventDefault();
 				const start = editor.getCursor('from');
 				const end = editor.getCursor('to');
+				// 复制html
 				this.editor.clipboard.copy(
 					(content || '')
 						.split(/(\r\n|\n)/gi)
@@ -180,6 +175,8 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 						.join(''),
 					true,
 				);
+				// 复制文本
+				this.editor.clipboard.copy(content || '');
 				editor.setSelection(start, end);
 				return;
 			}
