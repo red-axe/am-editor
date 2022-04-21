@@ -465,6 +465,7 @@ export default class<
 				},
 				alt: '*',
 				title: '*',
+				'data-type': '*',
 				'data-size': '@number',
 				'data-width': '@number',
 				'data-height': '@number',
@@ -548,7 +549,7 @@ export default class<
 				const parent = node.parent();
 				// 移除转换为html的时候加载的额外p标签
 				if (parent && parent.name === 'p') {
-					this.editor.node.unwrap(node);
+					this.editor.node.unwrap(parent);
 				}
 				type = CardType.BLOCK;
 			}
