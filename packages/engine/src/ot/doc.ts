@@ -16,8 +16,8 @@ class Doc<T = any> extends EventEmitter2 implements DocInterface {
 		this.create();
 	}
 
-	create() {
-		this.data = toJSON0(this.engine.container) as any;
+	create(data: any = toJSON0(this.engine.container)) {
+		this.data = data;
 	}
 
 	apply(ops: Op[]) {

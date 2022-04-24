@@ -428,6 +428,8 @@ export interface OTInterface extends EventEmitter2 {
 	// 操作消费者
 	consumer: ConsumerInterface;
 	selection: SelectionInterface;
+	doc: DocInterface | Doc | null;
+	isRemote: boolean;
 	getColors(): string[];
 	setColors(colors: string[]): void;
 	/**

@@ -175,11 +175,22 @@ class Engine<T extends EngineOptions = EngineOptions>
 		return new Parser(node, this).toHTML();
 	}
 
+	initDocOnReadonly() {
+		if (this.readonly && !this.ot.isRemote) {
+			if (!this.ot.doc?.type) {
+				this.ot.doc?.create(toJSON0(this.container));
+			} else {
+				this.ot.doc.data = toJSON0(this.container);
+			}
+		}
+	}
+
 	setValue(value: string, callback?: (count: number) => void) {
 		value = this.trigger('beforeSetValue', value) || value;
 		this.change.setValue(value, undefined, callback);
 		this.normalize();
 		this.nodeId.generateAll(this.container);
+		this.initDocOnReadonly();
 		return this;
 	}
 
@@ -196,6 +207,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 			if (callback) callback(count);
 		});
 		this.nodeId.generateAll(this.container);
+		this.initDocOnReadonly();
 		return this;
 	}
 
@@ -212,6 +224,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 			if (callback) callback(count);
 		});
 		this.nodeId.generateAll(this.container);
+		this.initDocOnReadonly();
 		return this;
 	}
 
@@ -221,6 +234,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 		this.change.setValue(html, undefined, callback);
 		this.normalize();
 		this.nodeId.generateAll(this.container);
+		this.initDocOnReadonly();
 		return this;
 	}
 

@@ -35,7 +35,8 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	private rangeColoring: RangeColoringInterface;
 	consumer: ConsumerInterface;
 	private mutation: MutationInterface | null;
-	private doc: DocInterface | Doc | null = null;
+	doc: DocInterface | Doc | null = null;
+	isRemote: boolean = false;
 
 	constructor(engine: EngineInterface) {
 		super();
@@ -95,6 +96,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		if (!isDestroy) {
 			this.doc!.destroy();
 		}
+		this.isRemote = true;
 		// 设置文档对象
 		this.doc = doc;
 		this.mutation?.setDoc(doc);

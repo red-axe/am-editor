@@ -33,7 +33,7 @@ import { Backspace, Enter, Left, Right, Up, Down, Default } from './typing';
 import { $ } from '../node';
 import { isNode, isNodeEntry } from '../node/utils';
 import { CardActiveTrigger, CardType } from './enum';
-import { updateIndex } from '../ot/utils';
+import { toJSON0, updateIndex } from '../ot/utils';
 import './index.css';
 
 class CardModel implements CardModelInterface {
@@ -138,6 +138,21 @@ class CardModel implements CardModelInterface {
 						if (card.destroy) card.destroy();
 						card.getCenter().empty();
 						this.renderComponent(card);
+						if (
+							isEngine(this.editor) &&
+							this.editor.readonly &&
+							!this.editor.ot.isRemote
+						) {
+							if (!this.editor.ot.doc?.type) {
+								this.editor.ot.doc?.create(
+									toJSON0(this.editor.container),
+								);
+							} else {
+								this.editor.ot.doc.data = toJSON0(
+									this.editor.container,
+								);
+							}
+						}
 					}
 				}
 			});
