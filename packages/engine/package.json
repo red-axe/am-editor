@@ -37,7 +37,7 @@
     "@types/diff-match-patch": "^1.0.32",
     "@types/is-hotkey": "^0.1.2",
     "@types/lodash": "^4.14.178",
-    "@types/sharedb": "^1.0.14",
+    "@types/sharedb": "^2.2.0",
     "@types/tinycolor2": "^1.4.2"
   }
 }

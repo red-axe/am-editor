@@ -15,8 +15,8 @@
     "cross-env": "^7.0.3",
     "express": "^4.17.1",
     "nodemon": "^2.0.12",
-    "sharedb": "^1.9.2",
-    "sharedb-mongo": "^1.0.0-beta.20",
+    "sharedb": "^2.2.5",
+    "sharedb-mongo": "^1.0.0",
     "url": "^0.11.0",
     "uuid": "^8.3.2",
     "ws": "^7.4.2"
