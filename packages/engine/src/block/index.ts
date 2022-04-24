@@ -597,6 +597,7 @@ class Block implements BlockModelInterface {
 				leftNode.remove();
 			}
 		});
+
 		let rightNodes = selection.getNode(
 			container,
 			'right',
@@ -637,6 +638,7 @@ class Block implements BlockModelInterface {
 			!list.isEmptyItem(rightNodes)
 		) {
 			const right = rightNodes.clone(false);
+			this.editor.nodeId.generate(right, true);
 			const rightChildren = rightNodes.children();
 			rightChildren.each((child, index) => {
 				if (rightChildren.eq(index)?.isCard()) {
