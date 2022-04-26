@@ -76,6 +76,7 @@ export default class extends Card {
 	 * After the card is rendered successfully, the empty div node has been loaded in the editor
 	 * */
 	didRender() {
+		super.didRender();
 		if (!this.container) return;
 		// Get a node of type HTMLElement
 		const element = this.container.get<HTMLElement>()!;
@@ -193,7 +194,9 @@ export default class extends Plugin<Options> {
 				const div = $(
 					`<div data-type="${
 						TestComponent.cardName
-					}" data-value="${encodeCardValue(value)}"></div>`,
+					}" data-value="${encodeCardValue(
+						value,
+					)}">Card to html</div>`,
 				);
 				node.replaceWith(div);
 			} else node.remove();
@@ -271,6 +274,7 @@ class Test extends Card {
 	}
 
 	didRender() {
+		super.didRender();
 		ReactDOM.render(<TestComponent />, this.#container?.get<HTMLElement>());
 	}
 
@@ -365,6 +369,7 @@ export default class extends Card {
 	 * After the card is rendered successfully, the empty div node has been loaded in the editor
 	 * */
 	didRender() {
+		super.didRender();
 		if (!this.container) return;
 		// Get a node of type HTMLElement
 		const element = this.container.get<HTMLElement>()!;
@@ -443,6 +448,7 @@ export default class extends Card {
 	 * After the card is rendered successfully, the empty div node has been loaded in the editor
 	 * */
 	didRender() {
+		super.didRender();
 		if (!this.container) return;
 		// Get a node of type HTMLElement
 		const element = this.container.get<HTMLElement>()!;
@@ -648,6 +654,7 @@ class Test extends Card {
 	}
 
 	didRender() {
+		super.didRender();
 		this.#vm = createApp(TestVue, {});
 		this.#vm.mount(this.#container?.get<HTMLElement>());
 	}

@@ -11,6 +11,7 @@ import {
 	READY_CARD_KEY,
 } from '@aomao/engine';
 import TestComponent from './component';
+import type { TestValue } from './component';
 
 export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
@@ -32,7 +33,9 @@ export default class extends Plugin<Options> {
 	execute() {
 		if (!isEngine(this.editor)) return;
 		const { card } = this.editor;
-		card.insert(TestComponent.cardName);
+		card.insert<TestValue>(TestComponent.cardName, {
+			text: 'This is card value',
+		});
 	}
 	// 快捷键
 	hotkey() {
@@ -77,14 +80,16 @@ export default class extends Plugin<Options> {
 			`[${CARD_KEY}="${TestComponent.cardName}"],[${READY_CARD_KEY}="${TestComponent.cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find(node) as TestComponent;
+			const card = this.editor.card.find<TestValue, TestComponent>(node);
 			const value = card?.getValue();
 			if (value) {
 				node.empty();
 				const div = $(
 					`<div data-type="${
 						TestComponent.cardName
-					}" data-value="${encodeCardValue(value)}"></div>`,
+					}" data-value="${encodeCardValue(value)}">${
+						value.text
+					}</div>`,
 				);
 				node.replaceWith(div);
 			} else node.remove();
@@ -101,3 +106,4 @@ export default class extends Plugin<Options> {
 	}
 }
 export { TestComponent };
+export type { TestValue };

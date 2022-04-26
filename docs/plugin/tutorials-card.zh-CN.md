@@ -76,6 +76,7 @@ export default class extends Card {
 	 * 卡片渲染成功后，空的 div 节点已在编辑器中加载
 	 * */
 	didRender() {
+		super.didRender();
 		if (!this.container) return;
 		// 获取 HTMLElement 类型的节点
 		const element = this.container.get<HTMLElement>()!;
@@ -105,111 +106,28 @@ export default class extends Card {
 
 ### React 卡片插件示例
 
-卡片插件文件，主要作用：插入卡片、转换/解析卡片
+卡片值类型定义
 
-`test/index.ts`
+`test/component/types.ts`
 
 ```ts
-import {
-	$,
-	Plugin,
-	NodeInterface,
-	CARD_KEY,
-	isEngine,
-	SchemaInterface,
-	PluginOptions,
-	decodeCardValue,
-	encodeCardValue,
-} from '@aomao/engine';
-import TestComponent from './component';
+import { CardValue } from '@aomao/engine';
 
-export interface Options extends PluginOptions {
-	hotkey?: string | Array<string>;
+export interface TestValue extends CardValue {
+	text: string;
 }
-export default class extends Plugin<Options> {
-	static get pluginName() {
-		return 'test';
-	}
-	// 插件初始化
-	init() {
-		// 监听解析成html的事件
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
-		// 监听粘贴时候设置schema规则的入口
-		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
-		// 监听粘贴时候的节点循环
-		this.editor.on('paste:each', (child) => this.pasteHtml(child));
-	}
-	// 执行方法
-	execute() {
-		if (!isEngine(this.editor)) return;
-		const { card } = this.editor;
-		card.insert(TestComponent.cardName);
-	}
-	// 快捷键
-	hotkey() {
-		return this.options.hotkey || 'mod+shift+0';
-	}
-	// 粘贴的时候添加需要的 schema
-	pasteSchema(schema: SchemaInterface) {
-		schema.add({
-			type: 'block',
-			name: 'div',
-			attributes: {
-				'data-type': {
-					required: true,
-					value: TestComponent.cardName,
-				},
-				'data-value': '*',
-			},
-		});
-	}
-	// 解析粘贴过来的html
-	pasteHtml(node: NodeInterface) {
-		if (!isEngine(this.editor)) return;
-		if (node.isElement()) {
-			const type = node.attributes('data-type');
-			if (type === TestComponent.cardName) {
-				const value = node.attributes('data-value');
-				const cardValue = decodeCardValue(value);
-				this.editor.card.replaceNode(
-					node,
-					TestComponent.cardName,
-					cardValue,
-				);
-				node.remove();
-				return false;
-			}
-		}
-		return true;
-	}
-	// 解析成html
-	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${TestComponent.cardName}`).each((cardNode) => {
-			const node = $(cardNode);
-			const card = this.editor.card.find(node) as TestComponent;
-			const value = card?.getValue();
-			if (value) {
-				node.empty();
-				const div = $(
-					`<div data-type="${
-						TestComponent.cardName
-					}" data-value="${encodeCardValue(value)}"></div>`,
-				);
-				node.replaceWith(div);
-			} else node.remove();
-		});
-	}
-}
-export { TestComponent };
 ```
 
 react 组件，呈现卡片的视图和交互
 
-`test/component/test.jsx`
+`test/component/test.tsx`
 
 ```tsx | pure
 import { FC } from 'react';
-const TestComponent: FC = () => <div>This is Test Plugin</div>;
+import { TestValue } from './types';
+const TestComponent: FC<{ value: TestValue }> = ({ value }) => (
+	<div>{value.text}</div>
+);
 export default TestComponent;
 ```
 
@@ -229,8 +147,9 @@ import {
 } from '@aomao/engine';
 import ReactDOM from 'react-dom';
 import TestComponent from './test';
+import type { TestValue } from './types';
 
-class Test extends Card {
+class Test extends Card<TestValue> {
 	static get cardName() {
 		return 'test';
 	}
@@ -271,7 +190,12 @@ class Test extends Card {
 	}
 
 	didRender() {
-		ReactDOM.render(<TestComponent />, this.#container?.get<HTMLElement>());
+		super.didRender();
+		const value = this.getValue();
+		ReactDOM.render(
+			<TestComponent value={value} />,
+			this.#container?.get<HTMLElement>(),
+		);
 	}
 
 	destroy() {
@@ -280,6 +204,122 @@ class Test extends Card {
 	}
 }
 export default Test;
+export type { TestValue };
+```
+
+卡片插件文件，主要作用：插入卡片、转换/解析卡片
+
+`test/index.ts`
+
+```ts
+import {
+	$,
+	Plugin,
+	NodeInterface,
+	CARD_KEY,
+	isEngine,
+	SchemaInterface,
+	PluginOptions,
+	decodeCardValue,
+	encodeCardValue,
+} from '@aomao/engine';
+import TestComponent from './component';
+import type { TestValue } from './component';
+
+export interface Options extends PluginOptions {
+	hotkey?: string | Array<string>;
+}
+export default class extends Plugin<Options> {
+	static get pluginName() {
+		return 'test';
+	}
+	// 插件初始化
+	init() {
+		// 监听解析成html的事件
+		this.editor.on('parse:html', this.parseHtml);
+		// 监听粘贴时候设置schema规则的入口
+		this.editor.on('paste:schema', this.pasteSchema);
+		// 监听粘贴时候的节点循环
+		this.editor.on('paste:each', this.pasteHtml);
+	}
+	// 执行方法
+	execute() {
+		if (!isEngine(this.editor)) return;
+		const { card } = this.editor;
+		card.insert<TestValue>(TestComponent.cardName, {
+			text: 'This is card value',
+		});
+	}
+	// 快捷键
+	hotkey() {
+		return this.options.hotkey || 'mod+shift+0';
+	}
+	// 粘贴的时候添加需要的 schema
+	pasteSchema = (schema: SchemaInterface) => {
+		schema.add({
+			type: 'block',
+			name: 'div',
+			attributes: {
+				'data-type': {
+					required: true,
+					value: TestComponent.cardName,
+				},
+				'data-value': '*',
+			},
+		});
+	};
+	// 解析粘贴过来的html
+	pasteHtml = (node: NodeInterface) => {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === TestComponent.cardName) {
+				const value = node.attributes('data-value');
+				const cardValue = decodeCardValue(value);
+				this.editor.card.replaceNode(
+					node,
+					TestComponent.cardName,
+					cardValue,
+				);
+				node.remove();
+				return false;
+			}
+		}
+		return true;
+	};
+	// 解析成html
+	parseHtml = (root: NodeInterface) => {
+		root.find(
+			`[${CARD_KEY}="${TestComponent.cardName}"],[${READY_CARD_KEY}="${TestComponent.cardName}"]`,
+		).each((cardNode) => {
+			const node = $(cardNode);
+			const card = this.editor.card.find<TestValue, TestComponent>(node);
+			const value = card?.getValue();
+			if (value) {
+				node.empty();
+				const div = $(
+					`<div data-type="${
+						TestComponent.cardName
+					}" data-value="${encodeCardValue(value)}">${
+						value.text
+					}</div>`,
+				);
+				node.replaceWith(div);
+			} else node.remove();
+		});
+	};
+
+	destroy() {
+		// 监听解析成html的事件
+		this.editor.off('parse:html', this.parseHtml);
+		// 监听粘贴时候设置schema规则的入口
+		this.editor.off('paste:schema', this.pasteSchema);
+		// 监听粘贴时候的节点循环
+		this.editor.off('paste:each', this.pasteHtml);
+	}
+}
+export { TestComponent };
+export type { TestValue };
 ```
 
 使用卡片插件
@@ -365,6 +405,7 @@ export default class extends Card {
 	 * 卡片渲染成功后，空的 div 节点已在编辑器中加载
 	 * */
 	didRender() {
+		super.didRender();
 		if (!this.container) return;
 		// 获取 HTMLElement 类型的节点
 		const element = this.container.get<HTMLElement>()!;
@@ -443,6 +484,7 @@ export default class extends Card {
 	 * 卡片渲染成功后，空的 div 节点已在编辑器中加载
 	 * */
 	didRender() {
+		super.didRender();
 		if (!this.container) return;
 		// 获取 HTMLElement 类型的节点
 		const element = this.container.get<HTMLElement>()!;
@@ -504,11 +546,11 @@ export default class extends Plugin<Options> {
 	// 插件初始化
 	init() {
 		// 监听解析成html的事件
-		this.editor.on('parse:html', (node) => this.parseHtml(node));
+		this.editor.on('parse:html', this.parseHtml);
 		// 监听粘贴时候设置schema规则的入口
-		this.editor.on('paste:schema', (schema) => this.pasteSchema(schema));
+		this.editor.on('paste:schema', this.pasteSchema);
 		// 监听粘贴时候的节点循环
-		this.editor.on('paste:each', (child) => this.pasteHtml(child));
+		this.editor.on('paste:each', this.pasteHtml);
 	}
 	// 执行方法
 	execute() {
@@ -521,7 +563,7 @@ export default class extends Plugin<Options> {
 		return this.options.hotkey || 'mod+shift+0';
 	}
 	// 粘贴的时候添加需要的 schema
-	pasteSchema(schema: SchemaInterface) {
+	pasteSchema = (schema: SchemaInterface) => {
 		schema.add({
 			type: 'block',
 			name: 'div',
@@ -533,9 +575,9 @@ export default class extends Plugin<Options> {
 				'data-value': '*',
 			},
 		});
-	}
+	};
 	// 解析粘贴过来的html
-	pasteHtml(node: NodeInterface) {
+	pasteHtml = (node: NodeInterface) => {
 		if (!isEngine(this.editor)) return;
 		if (node.isElement()) {
 			const type = node.attributes('data-type');
@@ -552,10 +594,12 @@ export default class extends Plugin<Options> {
 			}
 		}
 		return true;
-	}
+	};
 	// 解析成html
-	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${TestComponent.cardName}`).each((cardNode) => {
+	parseHtml = (root: NodeInterface) => {
+		root.find(
+			`[${CARD_KEY}="${TestComponent.cardName}"],[${READY_CARD_KEY}="${TestComponent.cardName}"]`,
+		).each((cardNode) => {
 			const node = $(cardNode);
 			const card = this.editor.card.find(node) as TestComponent;
 			const value = card?.getValue();
@@ -564,11 +608,22 @@ export default class extends Plugin<Options> {
 				const div = $(
 					`<div data-type="${
 						TestComponent.cardName
-					}" data-value="${encodeCardValue(value)}"></div>`,
+					}" data-value="${encodeCardValue(
+						value,
+					)}">Card to html</div>`,
 				);
 				node.replaceWith(div);
 			} else node.remove();
 		});
+	};
+
+	destroy() {
+		// 监听解析成html的事件
+		this.editor.off('parse:html', this.parseHtml);
+		// 监听粘贴时候设置schema规则的入口
+		this.editor.off('paste:schema', this.pasteSchema);
+		// 监听粘贴时候的节点循环
+		this.editor.off('paste:each', this.pasteHtml);
 	}
 }
 export { TestComponent };
@@ -648,6 +703,7 @@ class Test extends Card {
 	}
 
 	didRender() {
+		super.didRender();
 		this.#vm = createApp(TestVue, {});
 		this.#vm.mount(this.#container?.get<HTMLElement>());
 	}
@@ -823,35 +879,35 @@ export default class extends Card<{ count: number }> {
 		return '卡片名称';
 	}
 
-    static get cardType() {
+  static get cardType() {
 		return CardType.BLOCK;
 	}
 
-    // 在 div 上面单击
-    onClick = () => {
-        // 获取卡片值
-        const value = this.getValue() || { count: 0}
-        // 给 count + 1
-        const count = value.count + 1
-        // 重新设置卡片值，会保存到卡片根节点上的 data-card-value 属性上面
-        this.setValue({
-            count,
-        });
-        // 设置 div 的内容
-        this.container?.html(count)
+	// 在 div 上面单击
+	onClick = () => {
+		// 获取卡片值
+		const value = this.getValue() || { count: 0}
+		// 给 count + 1
+		const count = value.count + 1
+		// 重新设置卡片值，会保存到卡片根节点上的 data-card-value 属性上面
+		this.setValue({
+				count,
+		});
+		// 设置 div 的内容
+		this.container?.html(count)
 	};
 
-    // 渲染 div 节点
-    render() {
-        // 获取卡片的值
-        const value = this.getValue() || { count: 0}
-        // 创建 div 节点
-        this.container = $(`<div>${value.count}</div>`)
-        // 绑定 click 事件
-        this.container.on("click" => ()  => this.onClick())
-        // 返回节点给容器加载
-        return this.container
-    }
+	// 渲染 div 节点
+	render() {
+		// 获取卡片的值
+		const value = this.getValue() || { count: 0}
+		// 创建 div 节点
+		this.container = $(`<div>${value.count}</div>`)
+		// 绑定 click 事件
+		this.container.on("click" => ()  => this.onClick())
+		// 返回节点给容器加载
+		return this.container
+	}
 }
 ```
 

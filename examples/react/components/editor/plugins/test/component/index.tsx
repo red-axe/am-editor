@@ -9,8 +9,9 @@ import {
 } from '@aomao/engine';
 import ReactDOM from 'react-dom';
 import TestComponent from './test';
+import type { TestValue } from './types';
 
-class Test extends Card {
+class Test extends Card<TestValue> {
 	static get cardName() {
 		return 'test';
 	}
@@ -52,8 +53,11 @@ class Test extends Card {
 
 	didRender() {
 		super.didRender();
-		// 由于项目中 vue 和 react 的混合环境导致 ts 报错
-		ReactDOM.render(<TestComponent />, this.#container?.get<HTMLElement>());
+		const value = this.getValue();
+		ReactDOM.render(
+			<TestComponent value={value} />,
+			this.#container?.get<HTMLElement>(),
+		);
 	}
 
 	destroy() {
@@ -62,3 +66,4 @@ class Test extends Card {
 	}
 }
 export default Test;
+export type { TestValue };

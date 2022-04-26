@@ -1,3 +1,6 @@
 import { FC } from 'react';
-const TestComponent: FC = () => <div>This is Test Plugin</div>;
+import { TestValue } from './types';
+const TestComponent: FC<{ value: TestValue }> = ({ value }) => (
+	<div>{value.text}</div>
+);
 export default TestComponent;
