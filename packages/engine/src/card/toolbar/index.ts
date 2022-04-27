@@ -7,6 +7,7 @@ import type {
 	CardToolbarItemOptions,
 	ToolbarItemOptions,
 	ToolbarInterface as ToolbarBaseInterface,
+	NodeInterface,
 } from '../../types';
 import {
 	DATA_CONTENTEDITABLE_KEY,
@@ -19,7 +20,6 @@ import { isEngine, isMobile } from '../../utils';
 import Position from '../../position';
 import placements from '../../position/placements';
 import './index.css';
-import { NodeInterface, removeUnit } from '@aomao/engine';
 
 export const isCardToolbarItemOptions = (
 	item: ToolbarItemOptions | CardToolbarItemOptions,
