@@ -410,7 +410,6 @@ class CardModel implements CardModelInterface {
 			if (card) {
 				if (card.activatedByOther) return;
 				if (!isCurrentActiveCard) {
-					card!.toolbarModel?.show(event);
 					if (
 						(card.constructor as CardEntry).singleSelectable !==
 							false &&
@@ -425,6 +424,7 @@ class CardModel implements CardModelInterface {
 					)
 						card.select(!card.isEditable);
 					card.activate(true);
+					card!.toolbarModel?.show(event);
 				} else if (card.isEditable) {
 					card.select(false);
 				} else if (

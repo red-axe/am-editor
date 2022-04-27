@@ -19,6 +19,7 @@ import { isEngine, isMobile } from '../../utils';
 import Position from '../../position';
 import placements from '../../position/placements';
 import './index.css';
+import { NodeInterface, removeUnit } from '@aomao/engine';
 
 export const isCardToolbarItemOptions = (
 	item: ToolbarItemOptions | CardToolbarItemOptions,
@@ -38,6 +39,7 @@ class CardToolbar implements CardToolbarInterface {
 	#hideTimeout: NodeJS.Timeout | null = null;
 	#showTimeout: NodeJS.Timeout | null = null;
 	#defaultAlign: keyof typeof placements = 'topLeft';
+	#dndNode: NodeInterface | null = null;
 
 	constructor(editor: EditorInterface, card: CardInterface) {
 		this.editor = editor;
@@ -233,6 +235,7 @@ class CardToolbar implements CardToolbarInterface {
 					dnd.title || language.get('dnd', 'title').toString(),
 				);
 				root.append(dndNode);
+				this.#dndNode = dndNode;
 			}
 			const toolbar = new Toolbar({
 				items,
@@ -254,8 +257,7 @@ class CardToolbar implements CardToolbarInterface {
 	}
 
 	hide() {
-		const { root } = this.editor;
-		root.find('.data-card-dnd').remove();
+		this.#dndNode?.remove();
 		this.hideCardToolbar();
 	}
 
@@ -268,61 +270,33 @@ class CardToolbar implements CardToolbarInterface {
 		this.position.destroy();
 	}
 
+	showDnd() {
+		const { root } = this.editor;
+		if (!this.#dndNode) return;
+		if (this.#dndNode.length === 0) return;
+		if (!this.card.isMaximize) {
+			if (this.#dndNode.length > 0) {
+				this.#dndNode.addClass('data-card-dnd-active');
+				setTimeout(() => {
+					this.position.bind(
+						this.#dndNode!,
+						this.card.root,
+						'leftTop',
+						this.offset,
+					),
+						10;
+				});
+			}
+		} else {
+			this.#dndNode.removeClass('data-card-dnd-active');
+		}
+	}
+
 	showCardToolbar(event?: MouseEvent): void {
 		this.create();
 		const container = this.getContainer();
 		if (container && container.length > 0) {
-			const element = container.get<HTMLElement>()!;
-			element.style.left = '0px';
-			if (event) {
-				const { clientX } = event;
-				const groupElement = container.first();
-				const cardRect = this.card.root
-					.get<Element>()!
-					.getBoundingClientRect();
-				if (
-					groupElement &&
-					clientX >= cardRect.left &&
-					clientX <= cardRect.right
-				) {
-					const groupRect = groupElement
-						.get<Element>()!
-						.getBoundingClientRect();
-					const space = cardRect.width - groupRect.width;
-					if (space > 0) {
-						const left =
-							clientX - cardRect.width - groupRect.width / 2;
-						element.style.left =
-							Math.max(Math.min(left, space), 0) + 'px';
-					}
-				}
-			} else {
-				const cardRect = this.card.root
-					.get<HTMLElement>()
-					?.getBoundingClientRect() || {
-					left: 0,
-					top: 0,
-				};
-				const { root } = this.editor;
-				const rootRect = root
-					.get<HTMLElement>()
-					?.getBoundingClientRect() || {
-					left: 0,
-					top: 0,
-				};
-				const top = cardRect.top - rootRect.top;
-				const left = cardRect.left - rootRect.left;
-
-				const dnd = root.find('.data-card-dnd');
-				if (dnd.length > 0) {
-					dnd.css({
-						top: `${top}px`,
-						left: `${left - dnd.width() - 4}px`,
-					});
-					dnd.addClass('data-card-dnd-active');
-				}
-			}
-
+			this.showDnd();
 			container.addClass('data-toolbar-active');
 			container.attributes(
 				'toolbar-trigger-key',

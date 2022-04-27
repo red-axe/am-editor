@@ -729,7 +729,7 @@ class TableComponent<V extends TableValue = TableValue>
 		this.command.init();
 		if (!isEngine(this.editor) || this.editor.readonly)
 			this.toolbarModel?.setOffset([0, 0]);
-		else this.toolbarModel?.setOffset([0, -28, 0, -6]);
+		else this.toolbarModel?.setOffset([13, -28, 0, -6]);
 		const tablePlugin =
 			this.editor.plugin.findPlugin<TableOptions>('table');
 		const tableOptions = tablePlugin?.options.overflow || {};
