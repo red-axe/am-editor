@@ -125,25 +125,6 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			if (onFocus) onFocus();
 		});
 		this.codeMirror.on('keydown', (editor, event) => {
-			// 复制
-			if (isHotkey('mod+c', event)) {
-				const content = editor.getSelection();
-				event.preventDefault();
-				const start = editor.getCursor('from');
-				const end = editor.getCursor('to');
-				// 复制html
-				this.editor.clipboard.copy(
-					(content || '')
-						.split(/(\r\n|\n)/gi)
-						.map((text) => `<p>${text}</p>`)
-						.join(''),
-					true,
-				);
-				// 复制文本
-				this.editor.clipboard.copy(content || '');
-				editor.setSelection(start, end);
-				return;
-			}
 			// 撤销和重做使用codemirror自带的操作
 			if (
 				isHotkey('mod+z', event) ||
@@ -205,6 +186,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 		} else {
 			this.codeMirror.on('mousedown', (_, event) => {
 				const { onMouseDown } = this.options;
+				if (event.button === 2) event.stopPropagation();
 				if (onMouseDown) onMouseDown(event);
 			});
 		}

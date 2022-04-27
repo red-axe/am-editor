@@ -230,7 +230,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 		range?: RangeInterface,
 	): Record<'html' | 'text', string> | undefined {
 		if (!range) range = Range.from(this) ?? undefined;
-		if (!range) throw 'Range is null';
+		if (!range) return;
 		range = range.cloneRange(); //.shrinkToElementNode();
 		let card = range.startNode.closest(`[${CARD_KEY}]`, (node) => {
 			return $(node).isEditable()
@@ -286,10 +286,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 		}
 		if (!root.inEditor() && !root.isRoot()) return;
 		if (range.collapsed) {
-			return {
-				html: '',
-				text: '',
-			};
+			return;
 		}
 		card = root.closest(`[${CARD_KEY}]`, (node) => {
 			if ($(node).isEditable()) return;

@@ -388,9 +388,9 @@ class NativeEvent {
 				this.engine.readonly
 			)
 				return;
-			event.stopPropagation();
 			const data = clipboard.write(event, undefined);
 			if (data) {
+				event.stopPropagation();
 				clipboard.cut();
 				change.change();
 			}
