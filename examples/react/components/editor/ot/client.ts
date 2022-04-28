@@ -126,13 +126,60 @@ class OTClient extends EventEmitter {
 			},
 			[],
 			{
-				maxReconnectionDelay: 30000,
-				minReconnectionDelay: 10000,
+				maxReconnectionDelay: 5000,
+				minReconnectionDelay: 1000,
 				reconnectionDelayGrowFactor: 10000,
-				maxRetries: 10,
+				maxRetries: 99,
 			},
 		);
-
+		const handleMessage = (event: MessageEvent) => {
+			const { data, action } = JSON.parse(event.data);
+			// 当前所有的协作用户
+			if ('members' === action) {
+				this.addMembers(data);
+				this.engine.ot.setMembers(data);
+				return;
+			}
+			// 有新的协作者加入了
+			if ('join' === action) {
+				this.addMembers([data]);
+				this.engine.ot.addMember(data);
+				return;
+			}
+			// 有协作者离开了
+			if ('leave' === action) {
+				this.engine.ot.removeMember(data);
+				this.removeMember(data);
+				return;
+			}
+			// 协作服务端准备好了，可以实例化编辑器内部的协同服务了
+			if ('ready' === action) {
+				// 当前协作者用户
+				this.current = data.member as Member;
+				this.engine.ot.setCurrentMember(this.current);
+				this.engine.ot.renderSelection(data.selection, true);
+				this.emit('ready', this.engine.ot.getCurrentMember());
+				this.emit(EVENT.membersChange, this.normalizeMembers());
+				this.transmit(STATUS.active);
+			}
+			// 广播信息，一个协作用户发送给全部协作者的广播
+			if ('broadcast' === action) {
+				const { uuid, body, type } = data;
+				// 如果接收者和发送者不是同一人就触发一个message事件，外部可以监听这个事件并作出响应
+				if (uuid !== this.current?.uuid) {
+					switch (type) {
+						case 'select':
+							this.engine.ot.renderSelection(body);
+							break;
+						default:
+							this.emit(EVENT.message, {
+								type,
+								body,
+							});
+					}
+				}
+			}
+		};
 		// ws 已链接
 		socket.addEventListener('open', () => {
 			this.socket = socket as WebSocket;
@@ -141,54 +188,8 @@ class OTClient extends EventEmitter {
 			// 标记关闭状态为false
 			this.isClosed = false;
 			// 监听协同服务端自定义消息
-			this.socket.addEventListener('message', (event) => {
-				const { data, action } = JSON.parse(event.data);
-				// 当前所有的协作用户
-				if ('members' === action) {
-					this.addMembers(data);
-					this.engine.ot.setMembers(data);
-					return;
-				}
-				// 有新的协作者加入了
-				if ('join' === action) {
-					this.addMembers([data]);
-					this.engine.ot.addMember(data);
-					return;
-				}
-				// 有协作者离开了
-				if ('leave' === action) {
-					this.engine.ot.removeMember(data);
-					this.removeMember(data);
-					return;
-				}
-				// 协作服务端准备好了，可以实例化编辑器内部的协同服务了
-				if ('ready' === action) {
-					// 当前协作者用户
-					this.current = data.member as Member;
-					this.engine.ot.setCurrentMember(this.current);
-					this.engine.ot.renderSelection(data.selection, true);
-					this.emit('ready', this.engine.ot.getCurrentMember());
-					this.emit(EVENT.membersChange, this.normalizeMembers());
-					this.transmit(STATUS.active);
-				}
-				// 广播信息，一个协作用户发送给全部协作者的广播
-				if ('broadcast' === action) {
-					const { uuid, body, type } = data;
-					// 如果接收者和发送者不是同一人就触发一个message事件，外部可以监听这个事件并作出响应
-					if (uuid !== this.current?.uuid) {
-						switch (type) {
-							case 'select':
-								this.engine.ot.renderSelection(body);
-								break;
-							default:
-								this.emit(EVENT.message, {
-									type,
-									body,
-								});
-						}
-					}
-				}
-			});
+			this.socket.removeEventListener('message', handleMessage);
+			this.socket.addEventListener('message', handleMessage);
 			// 开始检测心跳
 			this.checkHeartbeat();
 		});
