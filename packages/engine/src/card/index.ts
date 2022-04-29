@@ -346,10 +346,7 @@ class CardModel implements CardModelInterface {
 		const center = card.getCenter();
 		center?.empty();
 		card.setValue(value);
-		const result = card.render(...args);
-		if (result !== undefined) {
-			center.append(typeof result === 'string' ? $(result) : result);
-		}
+		this.renderComponent(card, ...args);
 		if (card.didUpdate) {
 			card.didUpdate();
 		}
