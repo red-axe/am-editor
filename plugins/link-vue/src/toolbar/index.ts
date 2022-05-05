@@ -179,7 +179,10 @@ class Toolbar {
 		const href = target.attributes('href');
 		const container = this.root!.get<HTMLDivElement>()!;
 
-		const name = !href || forceEdit ? 'am-link-editor' : 'am-link-preview';
+		const name =
+			(!href || forceEdit) && !this.engine.readonly
+				? 'am-link-editor'
+				: 'am-link-preview';
 		if (this.vm && this.vm._component.name === name) {
 			if (!this.root || !this.target) return;
 			this.position?.destroy();
@@ -195,7 +198,7 @@ class Toolbar {
 			this.position?.destroy();
 			this.position?.bind(this.root!, this.target!);
 			this.vm =
-				!href || forceEdit
+				(!href || forceEdit) && !this.engine.readonly
 					? this.editor(text, href, () => {
 							this.position?.update();
 					  })

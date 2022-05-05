@@ -9,6 +9,7 @@ import {
 	Position,
 	DATA_ELEMENT,
 	UI,
+	isEngine,
 } from '@aomao/engine';
 import Editor from './editor';
 import Preview from './preview';
@@ -180,7 +181,7 @@ class Toolbar {
 		const container = this.root!.get<HTMLDivElement>()!;
 		ReactDOM.render(
 			<ConfigProvider autoInsertSpaceInButton={false}>
-				{!href || forceEdit
+				{(!href || forceEdit) && !this.engine.readonly
 					? this.editor(text, href)
 					: this.preview(href)}
 			</ConfigProvider>,
