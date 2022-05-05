@@ -148,6 +148,7 @@ class Toolbar {
 		return (
 			<Preview
 				language={this.engine.language}
+				readonly={this.engine.readonly}
 				onEdit={() => {
 					if (!this.target) return;
 					this.mouseInContainer = false;

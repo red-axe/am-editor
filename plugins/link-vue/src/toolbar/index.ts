@@ -146,6 +146,7 @@ class Toolbar {
 		const vm = createApp(AmPreview, {
 			language,
 			href,
+			readonly: this.engine.readonly,
 			onLoad: () => {
 				if (callback) callback();
 			},

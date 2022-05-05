@@ -9,7 +9,7 @@
                 {{href}}
             </a>
         </a-tooltip>
-        <div class="data-link-op">
+        <div v-if="!readonly" class="data-link-op">
             <a-tooltip :title="editTitle" v-if="!isMobile">
                 <a class="data-icon data-icon-edit" @click="onEdit" />
             </a-tooltip>
@@ -35,6 +35,10 @@ export default defineComponent({
     props:{
         language:{
             type:Object as PropType<LanguageInterface>,
+            required:true
+        } as const,
+        readonly: {
+            type: Boolean,
             required:true
         } as const,
         href:String,

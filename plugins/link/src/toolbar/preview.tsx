@@ -8,12 +8,14 @@ export type LinkPreviewProps = {
 	language: LanguageInterface;
 	href?: string;
 	className?: string;
+	readonly: boolean;
 	onEdit: (event: React.MouseEvent) => void;
 	onRemove: (event: React.MouseEvent) => void;
 };
 
 const LinkPreview: React.FC<LinkPreviewProps> = ({
 	language,
+	readonly,
 	href,
 	onEdit,
 	onRemove,
@@ -53,10 +55,12 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({
 					{href}
 				</a>
 			</Tooltip>
-			<div className="data-link-op">
-				{renderEdit()}
-				{renderRemove()}
-			</div>
+			{!readonly && (
+				<div className="data-link-op">
+					{renderEdit()}
+					{renderRemove()}
+				</div>
+			)}
 		</div>
 	);
 };
