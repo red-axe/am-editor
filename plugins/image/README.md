@@ -90,7 +90,7 @@ file:{
    /**
     * 请求头
     */
-    headers?: { [key: string]: string } | (() => { [key: string]: string });
+    headers?: Record<string, string> | (() => Promise<Record<string, string>>);
     /**
      * 数据返回类型，默认 json
      */
@@ -98,7 +98,7 @@ file:{
     /**
      * 额外携带数据上传
      */
-    data?: {};
+    data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
     /**
      * 图片文件上传时 FormData 的名称，默认 file
      */
@@ -156,7 +156,7 @@ remote:{
     /**
     * 请求头
     */
-    headers?: { [key: string]: string } | (() => { [key: string]: string });
+    headers?: Record<string, string> | (() => Promise<Record<string, string>>);
     /**
      * 数据返回类型，默认 json
      */
@@ -164,7 +164,7 @@ remote:{
     /**
      * 额外携带数据上传
      */
-    data?: {};
+    data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
     /**
      * 图片文件丢之上传时请求参数的名称，默认 url
      */

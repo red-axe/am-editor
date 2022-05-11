@@ -1,6 +1,11 @@
 import { startsWith } from 'lodash';
 import { getDocument } from '../../utils';
-import { AjaxInterface, AjaxOptions, SetupOptions } from '../../types/request';
+import {
+	AjaxInterface,
+	AjaxOptions,
+	RequestHeaders,
+	SetupOptions,
+} from '../../types/request';
 import { isFormData, toQueryString, urlAppend } from './utils';
 import {
 	CONTENT_TYPE,
@@ -93,7 +98,9 @@ class Ajax implements AjaxInterface {
 		const success = (request: XMLHttpRequest) => {
 			this.triggerSuccess(request);
 		};
-		this.request = this.getRequest(success, error);
+		this.getRequest(success, error).then((res) => {
+			this.request = res;
+		});
 	}
 
 	abort() {
@@ -158,9 +165,7 @@ class Ajax implements AjaxInterface {
 		}
 	}
 
-	setHeaders(request: XMLHttpRequest) {
-		const headers = this.options.headers || {};
-		let h = undefined;
+	setHeaders(request: XMLHttpRequest, headers: Record<string, string>) {
 		headers.Accept =
 			headers.Accept || globalSetup.accept[this.options.type || '*'];
 		// breaks cross-origin requests with legacy browsers
@@ -267,17 +272,22 @@ class Ajax implements AjaxInterface {
 		} as XMLHttpRequest;
 	}
 
-	getRequest(
+	async getRequest(
 		success: (data: any) => void,
 		error: (errorMsg: string, request?: XMLHttpRequest) => void,
-	): XMLHttpRequest | undefined {
+	): Promise<XMLHttpRequest | undefined> {
 		const method = this.options.method?.toUpperCase() || 'GET';
 		// convert non-string objects to query-string form unless o.processData is false
 		const { processData, traditional, type, context, xhr, async, before } =
 			this.options;
-		if (!context) return;
+		if (!context) return Promise.resolve(undefined);
 
-		let { data, url } = this.options;
+		let { url } = this.options;
+		let data: any = this.options.data;
+		// get data
+		if (typeof data === 'function') {
+			data = await data();
+		}
 		if (
 			(this.options.contentType?.indexOf('json') || -1) > -1 &&
 			typeof data === 'object'
@@ -303,9 +313,13 @@ class Ajax implements AjaxInterface {
 		}
 
 		if (type === 'jsonp') {
-			return this.handleJsonp(url, success, error);
+			return Promise.resolve(this.handleJsonp(url, success, error));
 		}
-
+		// get headers
+		let headers: RequestHeaders = this.options.headers || {};
+		if (typeof headers === 'function') {
+			headers = await headers();
+		}
 		// get the xhr from the factory if passed
 		// if the factory returns null, fall-back to ours
 		http =
@@ -313,7 +327,7 @@ class Ajax implements AjaxInterface {
 			this.defaultXHR();
 		if (!http) return;
 		http.open(method, url, async === false ? false : true);
-		this.setHeaders(http);
+		this.setHeaders(http, headers);
 		this.setCredentials(http);
 		if (
 			context[X_DOMAIN_REQUEST] &&
@@ -342,7 +356,7 @@ class Ajax implements AjaxInterface {
 		} else {
 			http.send(data);
 		}
-		return http;
+		return Promise.resolve(http);
 	}
 
 	getType(type?: string | null) {

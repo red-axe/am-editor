@@ -80,7 +80,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		const { request } = this.editor;
 		return new Promise((resolve) => {
 			if (options?.action) {
-				const { type, contentType, parse } = options;
+				const { type, contentType, parse, headers } = options;
 				this.#request?.abort();
 				this.#request = request.ajax({
 					url: options.action,
@@ -89,6 +89,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 					data: {
 						keyword,
 					},
+					headers,
 					success: (response: any) => {
 						const { result, data } = parse
 							? parse(response)

@@ -78,7 +78,7 @@ withCredentials?: boolean;
 /**
 * 请求头
 */
-headers?: { [key: string]: string } | (() => { [key: string]: string });
+headers?: RequestHeaders;
 /**
  * 数据返回类型，默认 json
  */
@@ -90,7 +90,7 @@ name?: string
 /**
  * 额外携带数据上传
  */
-data?: {};
+data?: RequestData;
 /**
  * 请求类型，默认 multipart/form-data;
  */

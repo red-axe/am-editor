@@ -21,7 +21,7 @@ export type UploaderOptions = {
     // content type
     contentType?: string;
     // additional data
-    data?: {};
+    data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
     // cross domain
     crossOrigin?: boolean;
     // request header

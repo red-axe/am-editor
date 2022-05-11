@@ -43,7 +43,7 @@ type?:'*' |'json' |'xml' |'html' |'text' |'js';
 /**
  * Additional data upload
  */
-data?: {};
+data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
 /**
  * Request type, default multipart/form-data;
  */

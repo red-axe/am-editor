@@ -98,7 +98,7 @@ file:{
     /**
      * Additional data upload
      */
-    data?: {};
+    data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
     /**
      * The name of the FormData when the image file is uploaded, the default file
      */
@@ -164,7 +164,7 @@ remote:{
     /**
      * Additional data upload
      */
-    data?: {};
+    data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
     /**
      * The name of the request parameter when the image file is lost when uploading, the default url
      */

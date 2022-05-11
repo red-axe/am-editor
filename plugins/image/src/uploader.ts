@@ -16,6 +16,7 @@ import {
 	removeUnit,
 	CardType,
 } from '@aomao/engine';
+import type { RequestData, RequestHeaders } from '@aomao/engine';
 import { ImageOptions } from '.';
 import ImageComponent, { ImageValue } from './component';
 export interface ImageUploaderOptions extends PluginOptions {
@@ -38,7 +39,7 @@ export interface ImageUploaderOptions extends PluginOptions {
 		/**
 		 * 额外携带数据上传
 		 */
-		data?: {};
+		data?: RequestData;
 		/**
 		 * 请求类型，默认 multipart/form-data;
 		 */
@@ -58,10 +59,7 @@ export interface ImageUploaderOptions extends PluginOptions {
 		/**
 		 * 请求头
 		 */
-		headers?:
-			| { [key: string]: string }
-			| (() => { [key: string]: string })
-			| (() => { [key: string]: string });
+		headers?: RequestHeaders;
 		/**
 		 * 文件选择限制数量
 		 */
@@ -83,7 +81,7 @@ export interface ImageUploaderOptions extends PluginOptions {
 		/**
 		 * 请求头
 		 */
-		headers?: { [key: string]: string } | (() => { [key: string]: string });
+		headers?: RequestHeaders;
 		/**
 		 * 上传地址
 		 */
@@ -95,7 +93,7 @@ export interface ImageUploaderOptions extends PluginOptions {
 		/**
 		 * 额外携带数据上传
 		 */
-		data?: {};
+		data?: RequestData;
 		/**
 		 * 图片地址上传时请求参数的名称，默认 url
 		 */
@@ -274,7 +272,7 @@ export default class<
 				url: action,
 				crossOrigin,
 				withCredentials,
-				headers: typeof headers === 'function' ? headers() : headers,
+				headers,
 				data,
 				type,
 				contentType,
@@ -572,17 +570,17 @@ export default class<
 		}
 	};
 
-	uploadAddress(src: string, component: ImageComponent) {
+	async uploadAddress(src: string, component: ImageComponent) {
 		if (!isEngine(this.editor)) return;
 		const {
 			action,
 			type,
-			data,
 			contentType,
 			crossOrigin,
 			withCredentials,
 			headers,
 			name,
+			data,
 		} = this.options.remote;
 		const { parse } = this.options;
 		const addressName = name || 'url';
@@ -593,11 +591,17 @@ export default class<
 			type: type === undefined ? 'json' : type,
 			crossOrigin,
 			withCredentials,
-			headers: typeof headers === 'function' ? headers() : headers,
-			data: {
-				...data,
-				[addressName]: src,
-			},
+			headers,
+			data:
+				typeof data === 'function'
+					? async () => {
+							const newData = await data();
+							return { ...newData, [addressName]: src };
+					  }
+					: {
+							...data,
+							[addressName]: src,
+					  },
 			success: (response) => {
 				let src =
 					response.url ||

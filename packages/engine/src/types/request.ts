@@ -1,3 +1,12 @@
+export type RequestDataValue = string | number | boolean | symbol | Blob;
+export type RequestData =
+	| Record<string, RequestDataValue>
+	| FormData
+	| (() => Promise<Record<string, RequestDataValue> | FormData>);
+export type RequestHeaders =
+	| Record<string, string>
+	| (() => Promise<Record<string, string>>);
+
 export type AjaxOptions = {
 	/**
 	 * 請求地址
@@ -10,7 +19,7 @@ export type AjaxOptions = {
 	/**
 	 * 数据
 	 */
-	data?: any;
+	data?: RequestData;
 	/**
 	 * Window上下文
 	 */
@@ -21,7 +30,7 @@ export type AjaxOptions = {
 	doc?: Document;
 	crossOrigin?: boolean;
 	type?: string;
-	headers?: { [key: string]: string };
+	headers?: RequestHeaders;
 	withCredentials?: boolean;
 	jsonpCallback?: string;
 	jsonpCallbackName?: string;
@@ -54,7 +63,7 @@ export interface AjaxInterface {
 	getRequest(
 		success: (data: any) => void,
 		error: (errorMsg: string, request?: XMLHttpRequest) => void,
-	): XMLHttpRequest | undefined;
+	): Promise<XMLHttpRequest | undefined>;
 	/**
 	 * 中断当前请求
 	 */
@@ -77,7 +86,7 @@ export type UploaderOptions = {
 	/**
 	 * 数据
 	 */
-	data?: {};
+	data?: RequestData;
 	/**
 	 * 跨域
 	 */
@@ -89,7 +98,7 @@ export type UploaderOptions = {
 	/**
 	 * 请求头
 	 */
-	headers?: { [key: string]: string };
+	headers?: RequestHeaders;
 	/**
 	 * 上传前处理
 	 */

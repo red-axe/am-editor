@@ -28,6 +28,7 @@
     "tinycolor2": "^1.4.2"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.178"
+    "@types/lodash": "^4.14.178",
+    "@types/tinycolor2": "^1.4.2"
   }
 }

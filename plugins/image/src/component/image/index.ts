@@ -10,6 +10,7 @@ import {
 	Resizer,
 	CardType,
 } from '@aomao/engine';
+import PhotoSwipe from 'photoswipe';
 import { ImageValue } from '..';
 import Pswp from '../pswp';
 import './index.css';
@@ -410,7 +411,7 @@ class Image {
 		event.preventDefault();
 		event.stopPropagation();
 
-		const imageArray: Array<PhotoSwipe.Item> = [];
+		const imageArray: PhotoSwipe.Item[] = [];
 		const cardRoot = this.editor.card.closest(this.root);
 		let rootIndex = 0;
 

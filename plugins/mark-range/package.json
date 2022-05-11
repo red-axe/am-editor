@@ -26,6 +26,7 @@
     "dependencies": {
         "@aomao/engine": "^2.8.26",
         "@babel/runtime": "^7.13.10",
-        "tinycolor2": "^1.4.2"
+        "tinycolor2": "^1.4.2",
+        "@types/tinycolor2": "^1.4.2"
     }
 }

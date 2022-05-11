@@ -41,7 +41,6 @@ class Uploader implements UploaderInterface {
 			}
 			const {
 				url,
-				data,
 				onUploading,
 				onSuccess,
 				onError,
@@ -49,6 +48,10 @@ class Uploader implements UploaderInterface {
 				crossOrigin,
 				headers,
 			} = this.options;
+			let data = this.options.data;
+			if (typeof data === 'function') {
+				data = await data();
+			}
 			if (data) {
 				Object.keys(data).forEach((key) => {
 					formData.append(key, data![key]);
@@ -83,7 +86,7 @@ class Uploader implements UploaderInterface {
 				type: this.options.type || 'json',
 				withCredentials,
 				crossOrigin,
-				headers: headers,
+				headers,
 				success: (response: any) => {
 					if (onSuccess) onSuccess(response, file);
 				},

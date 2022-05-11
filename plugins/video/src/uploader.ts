@@ -11,7 +11,7 @@ import {
 	decodeCardValue,
 	encodeCardValue,
 } from '@aomao/engine';
-
+import type { RequestData, RequestHeaders } from '@aomao/engine';
 import VideoComponent, { VideoValue, VideoStatus } from './component';
 
 export interface VideoUploaderOptions extends PluginOptions {
@@ -30,7 +30,7 @@ export interface VideoUploaderOptions extends PluginOptions {
 	/**
 	 * 额外携带数据上传
 	 */
-	data?: {};
+	data?: RequestData;
 	/**
 	 * 请求类型，默认 multipart/form-data;
 	 */
@@ -46,7 +46,7 @@ export interface VideoUploaderOptions extends PluginOptions {
 	/**
 	 * 请求头
 	 */
-	headers?: { [key: string]: string } | (() => { [key: string]: string });
+	headers?: RequestHeaders;
 	/**
 	 * 文件接收的格式，默认 "*"
 	 */
@@ -91,7 +91,11 @@ export interface VideoUploaderOptions extends PluginOptions {
 		/**
 		 * 额外携带数据上传
 		 */
-		data?: {};
+		data?: RequestData;
+		/**
+		 * 请求头
+		 */
+		headers?: RequestHeaders;
 		/**
 		 * 请求类型，默认 multipart/form-data;
 		 */
@@ -185,7 +189,7 @@ export default class<
 				contentType,
 				crossOrigin,
 				withCredentials,
-				headers: typeof headers === 'function' ? headers() : headers,
+				headers,
 				onBefore: (file) => {
 					if (file.size > limitSize) {
 						this.editor.messageError(
@@ -391,15 +395,22 @@ export default class<
 		const { query, parse } = this.options;
 		if (!query || !video_id) return success();
 
-		const { action, type, contentType, data } = query;
+		const { action, type, contentType, data, headers } = query;
 		request.ajax({
 			url: action,
 			contentType: contentType || '',
 			type: type === undefined ? 'json' : type,
-			data: {
-				...data,
-				id: video_id,
-			},
+			headers,
+			data:
+				typeof data === 'function'
+					? async () => {
+							const newData = await data();
+							return { ...newData, id: video_id };
+					  }
+					: {
+							...data,
+							id: video_id,
+					  },
 			success: (response: any) => {
 				const { result, data } = response;
 				if (!result) {

@@ -86,7 +86,7 @@ withCredentials?: boolean;
 /**
 * 请求头
 */
-headers?: { [key: string]: string } | (() => { [key: string]: string });
+headers?: Record<string, string> | (() => Promise<Record<string, string>>);
 /**
  * 数据返回类型，默认 json
  */
@@ -98,7 +98,7 @@ name?: string
 /**
  * 额外携带数据上传
  */
-data?: {};
+data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
 /**
  * 请求类型，默认 multipart/form-data;
  */
@@ -145,7 +145,7 @@ query?: {
     /**
      * 额外携带数据上传
      */
-    data?: {};
+    data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
     /**
      * 请求类型，默认 multipart/form-data;
      */

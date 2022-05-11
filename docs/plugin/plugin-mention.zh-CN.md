@@ -43,7 +43,7 @@ type?: '*' | 'json' | 'xml' | 'html' | 'text' | 'js';
 /**
  * 额外携带数据上传
  */
-data?: {};
+data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
 /**
  * 请求类型，默认 multipart/form-data;
  */

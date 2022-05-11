@@ -31,6 +31,7 @@
     "devDependencies": {
         "@types/keymaster": "^1.6.28",
         "@types/lodash": "^4.14.178",
-        "@vue/compiler-sfc": "^3.2.9"
+        "@vue/compiler-sfc": "^3.2.9",
+        "@types/tinycolor2": "^1.4.2"
     }
 }

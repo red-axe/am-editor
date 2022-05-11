@@ -15,8 +15,10 @@ import {
 	READY_CARD_KEY,
 	CARD_VALUE_KEY,
 } from '@aomao/engine';
+import type { RequestData } from '@aomao/engine';
 import MathComponent, { MathValue } from './component';
 import locales from './locales';
+import { RequestHeaders } from '@aomao/engine';
 
 export interface MathOptions extends PluginOptions {
 	/**
@@ -30,7 +32,11 @@ export interface MathOptions extends PluginOptions {
 	/**
 	 * 额外携带数据上传
 	 */
-	data?: {};
+	data?: RequestData;
+	/**
+	 * 请求头
+	 */
+	headers?: RequestHeaders;
 	/**
 	 * 请求类型，默认 application/json;
 	 */
@@ -92,17 +98,25 @@ export default class Math<
 		failed: (message: string) => void,
 	) {
 		const { request } = this.editor;
-		const { action, type, contentType, data, parse } = this.options;
+		const { action, type, contentType, parse, headers } = this.options;
+		const data = this.options.data;
 		this.#request[key]?.abort();
 		this.#request[key] = request.ajax({
 			url: action,
 			method: 'POST',
 			contentType: contentType || 'application/json',
 			type: type === undefined ? 'json' : type,
-			data: {
-				...data,
-				content: code,
-			},
+			headers,
+			data:
+				typeof data === 'function'
+					? async () => {
+							const newData = await data();
+							return { ...newData, content: code };
+					  }
+					: {
+							...data,
+							content: code,
+					  },
 			success: (response) => {
 				const url =
 					response.url || (response.data && response.data.url);

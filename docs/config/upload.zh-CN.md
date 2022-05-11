@@ -21,7 +21,7 @@ export type UploaderOptions = {
     // 内容类型
 	contentType?: string;
     // 额外数据
-	data?: {};
+	data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
     // 跨域
 	crossOrigin?: boolean;
     // 请求头

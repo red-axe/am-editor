@@ -32,6 +32,7 @@
     },
     "devDependencies": {
         "@types/keymaster": "^1.6.28",
-        "@types/lodash": "^4.14.178"
+        "@types/lodash": "^4.14.178",
+        "@types/tinycolor2": "^1.4.2"
     }
 }

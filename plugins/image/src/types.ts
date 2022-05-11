@@ -1,5 +1,6 @@
 import { CardType, NodeInterface, PluginOptions } from '@aomao/engine';
 import { EventEmitter2 } from 'eventemitter2';
+import PhotoSwipe from 'photoswipe';
 
 export interface PswpInterface extends EventEmitter2 {
 	root: NodeInterface;
@@ -24,7 +25,7 @@ export interface PswpInterface extends EventEmitter2 {
 	getCount(): number;
 	afterChange(): void;
 	setWhiteBackground(): void;
-	open(items: Array<PhotoSwipe.Item>, index: number): void;
+	open(items: PhotoSwipe.Item[], index: number): void;
 	reset: () => void;
 	close(): void;
 	destroy(): void;

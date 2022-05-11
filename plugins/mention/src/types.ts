@@ -1,4 +1,5 @@
 import { CardInterface, NodeInterface, PluginOptions } from '@aomao/engine';
+import type { RequestData, RequestHeaders } from '@aomao/engine';
 
 export type MentionItem = { key?: string; name: string; avatar?: string };
 export interface MentionOptions extends PluginOptions {
@@ -39,7 +40,11 @@ export interface MentionOptions extends PluginOptions {
 	/**
 	 * 额外携带数据上传
 	 */
-	data?: {};
+	data?: RequestData;
+	/**
+	 * 请求头
+	 */
+	headers?: RequestHeaders;
 	/**
 	 * 请求类型，默认 multipart/form-data;
 	 */

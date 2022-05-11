@@ -11,7 +11,7 @@ import {
 	CARD_VALUE_KEY,
 	encodeCardValue,
 } from '@aomao/engine';
-
+import { RequestData, RequestHeaders } from '@aomao/engine';
 import FileComponent from './component';
 import type { FileValue } from './component';
 
@@ -31,7 +31,7 @@ export interface FileUploaderOptions extends PluginOptions {
 	/**
 	 * 额外携带数据上传
 	 */
-	data?: {};
+	data?: RequestData;
 	/**
 	 * 请求类型，默认 multipart/form-data;
 	 */
@@ -47,7 +47,7 @@ export interface FileUploaderOptions extends PluginOptions {
 	/**
 	 * 请求头
 	 */
-	headers?: { [key: string]: string } | (() => { [key: string]: string });
+	headers?: RequestHeaders;
 	/**
 	 * 文件接收的格式，默认 "*"
 	 */
@@ -121,7 +121,6 @@ export default class<
 		const { request, card, language } = this.editor;
 		const {
 			action,
-			data,
 			type,
 			contentType,
 			multiple,
@@ -130,6 +129,10 @@ export default class<
 			headers,
 			name,
 		} = this.options;
+		let data = this.options.data;
+		if (typeof data === 'function') {
+			data = await data();
+		}
 		const { parse } = this.options;
 		const limitSize = this.options.limitSize || 5 * 1024 * 1024;
 		if (!Array.isArray(files)) {
@@ -151,7 +154,7 @@ export default class<
 				contentType,
 				crossOrigin,
 				withCredentials,
-				headers: typeof headers === 'function' ? headers() : headers,
+				headers,
 				onBefore: (file) => {
 					if (file.size > limitSize) {
 						this.editor.messageError(
