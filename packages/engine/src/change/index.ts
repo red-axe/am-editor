@@ -770,6 +770,11 @@ class ChangeModel implements ChangeInterface {
 				}
 			}
 		}
+		const endContentNode = safeRange
+			.cloneRange()
+			.shrinkToElementNode()
+			.shrinkToTextNode()
+			.getEndOffsetNode();
 		// 先删除范围内的所有内容
 		safeRange.extractContents();
 		let { startNode } = safeRange;
@@ -806,7 +811,8 @@ class ChangeModel implements ChangeInterface {
 		}
 
 		const prevNode = block;
-		const nextNode = startNode;
+		const nextNode =
+			endContentNode && endContentNode.isConnected ? startNode : null;
 		let isEmptyNode = startNode.get<Node>()?.childNodes.length === 0;
 		if (!isEmptyNode && startNode.length > 0 && startNode.inEditor()) {
 			if (
@@ -892,9 +898,9 @@ class ChangeModel implements ChangeInterface {
 			}
 		};
 		if (
-			nextNode.length > 0 &&
 			prevNode &&
 			nextNode &&
+			nextNode.length > 0 &&
 			nodeApi.isBlock(prevNode) &&
 			nodeApi.isBlock(nextNode) &&
 			!prevNode.equal(nextNode) &&
