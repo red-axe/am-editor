@@ -1,7 +1,7 @@
 import copyTo from 'copy-to-clipboard';
 import { EditorInterface, EngineInterface, ClipboardInterface } from './types';
 import { RangeInterface } from './types/range';
-import { isSafari } from './utils';
+import { isEngine, isSafari } from './utils';
 import { $ } from './node';
 import Range from './range';
 import { DATA_ELEMENT, ROOT, VIEW_CLASS_NAME } from './constants';
@@ -153,9 +153,11 @@ export default class Clipboard implements ClipboardInterface {
 
 	cut() {
 		const range = Range.from(this.editor);
-		if (!range) return;
+		if (!range || !isEngine(this.editor)) return;
 		const root = range.commonAncestorNode;
-		(this.editor as EngineInterface).change.delete(range);
+		const change = this.editor.change;
+		change.cacheRangeBeforeCommand();
+		change.delete(range);
 		const listElements = this.editor.node.isList(root)
 			? root
 			: root.find('ul,ol');
@@ -174,5 +176,6 @@ export default class Clipboard implements ClipboardInterface {
 				list.remove();
 			}
 		}
+		change.range.select(range);
 	}
 }

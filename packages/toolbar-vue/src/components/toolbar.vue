@@ -169,6 +169,7 @@ export default defineComponent({
             props.engine.on("change",updateByTimeout)
             props.engine.on("blur",updateByTimeout)
             props.engine.on('focus', updateByTimeout)
+            props.engine.on('historyChange', updateByTimeout)
             if (isMobile) {
               props.engine.on('readonly', handleReadonly)
               props.engine.on('blur', hideMobileToolbar)
@@ -187,6 +188,7 @@ export default defineComponent({
             props.engine.off('readonly', updateByTimeout);
             props.engine.off("blur",updateByTimeout)
             props.engine.off('focus', updateByTimeout)
+            props.engine.off('historyChange', updateByTimeout)
             if (isMobile) {
               props.engine.off('readonly', handleReadonly)
               props.engine.off('blur', hideMobileToolbar)

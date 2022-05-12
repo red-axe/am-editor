@@ -745,7 +745,7 @@ class ChangeModel implements ChangeInterface {
 				else child.remove();
 				if (isBreak) {
 					child = undefined;
-					return;
+					break;
 				}
 				child = next;
 			}

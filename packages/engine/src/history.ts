@@ -172,6 +172,7 @@ class HistoryModel implements HistoryInterface {
 				this.actionOps.splice(this.currentActionIndex);
 				this.actionOps.push(this.currentAction);
 				this.currentActionIndex = this.actionOps.length;
+				this.engine.trigger('historyChange');
 			}
 			this.currentAction = {};
 			// 保存成功后清除操作前记录的range

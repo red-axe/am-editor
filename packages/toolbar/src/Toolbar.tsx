@@ -250,6 +250,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
 		engine.on('change', update);
 		engine.on('blur', update);
 		engine.on('focus', update);
+		engine.on('historyChange', update);
 		let scrollTimer: NodeJS.Timeout;
 
 		const hideMobileToolbar = () => {
@@ -285,6 +286,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
 			engine.off('change', update);
 			engine.off('blur', update);
 			engine.off('focus', update);
+			engine.off('historyChange', update);
 			if (isMobile) {
 				engine.off('readonly', handleReadonly);
 				engine.off('blur', hideMobileToolbar);
