@@ -415,7 +415,10 @@ class NodeModel implements NodeModelInterface {
 		const plugin = block.findPlugin(source);
 		//循环追加
 		while (child) {
-			const next = child.next();
+			let next = child.next();
+			if (next?.isCursor()) {
+				next = next.next();
+			}
 			const markPlugin = mark.findPlugin(child);
 			if (
 				plugin &&
@@ -465,7 +468,12 @@ class NodeModel implements NodeModelInterface {
 			}
 
 			//追加到要合并的列表中
-			if (child.length > 0 && !child.equal(source)) source.append(child);
+			if (
+				child.length > 0 &&
+				!child.equal(source) &&
+				!child.parent()?.equal(source)
+			)
+				source.append(child);
 			child = next;
 		}
 		//移除需要合并的节点

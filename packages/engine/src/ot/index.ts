@@ -121,7 +121,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	handleChange = (ops: Op[]) => {
 		const newOps = this.engine.trigger('opsChange', ops);
-		if (!newOps) {
+		if (!!newOps) {
 			ops = newOps;
 		}
 		this.submitOps(ops);

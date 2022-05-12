@@ -1,4 +1,4 @@
-import { EngineInterface } from '../../types';
+import { EngineInterface, NodeInterface } from '../../types';
 
 class Backspace {
 	private engine: EngineInterface;
@@ -49,6 +49,19 @@ class Backspace {
 						}
 					}
 				}
+				const startParent =
+					'li' === startBlock.name ? startBlock.parent() : null;
+				const endParent =
+					'li' === endBlock.name ? endBlock.parent() : null;
+				if ('li' === startBlock.name && list.isFirst(range)) {
+					cloneRange.setStartBefore(startBlock);
+				}
+				if (
+					'li' === endBlock.name &&
+					blockApi.isLastOffset(range, 'end')
+				) {
+					cloneRange.setEndAfter(endBlock);
+				}
 				change.delete(cloneRange, isDeepMerge);
 				// 光标在列表的最后一行，并且开始光标不在最后一行
 				if (
@@ -60,31 +73,44 @@ class Backspace {
 					cloneRange.shrinkToElementNode().shrinkToTextNode();
 					const selection = cloneRange.createSelection();
 					startBlock.append(endBlock.children());
-					const parent = endBlock.parent();
 					endBlock.remove();
-					if (
-						parent &&
-						node.isList(parent) &&
-						parent.get<Node>()?.childNodes.length === 0
-					) {
-						parent.remove();
-					}
 					selection.move();
 				}
 				if ('li' === startBlock.name) {
-					const parent = startBlock.parent();
 					if (
 						node.isCustomize(startBlock) &&
 						startBlock.get<Node>()?.childNodes.length === 0
 					)
 						startBlock.remove();
-					if (
-						parent &&
-						node.isList(parent) &&
-						parent.get<Node>()?.childNodes.length === 0
-					) {
-						parent.remove();
+				}
+
+				const removeEmptyParent = (parent: NodeInterface) => {
+					if (node.isList(parent)) {
+						const childNodes = parent.get<Node>()?.childNodes || [];
+						if (childNodes.length == 0) {
+							parent.remove();
+						} else if (childNodes.length === 1) {
+							const first = parent.first();
+							if (first?.isCursor()) {
+								parent.after(first);
+								parent.remove();
+							}
+						}
 					}
+				};
+				if (
+					startParent &&
+					startParent.length > 0 &&
+					node.isList(startParent)
+				) {
+					removeEmptyParent(startParent);
+				}
+				if (
+					endParent &&
+					endParent.length > 0 &&
+					node.isList(endParent)
+				) {
+					removeEmptyParent(endParent);
 				}
 				list.addBr(startBlock);
 				if (!startBlock.equal(endBlock)) list.addBr(endBlock);

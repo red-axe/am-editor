@@ -772,18 +772,19 @@ class ChangeModel implements ChangeInterface {
 		}
 		// 先删除范围内的所有内容
 		safeRange.extractContents();
+		let { startNode } = safeRange;
 		if (
-			safeRange.startNode.isEditable() &&
-			safeRange.startNode.get<Node>()?.childNodes.length === 0
+			startNode.isEditable() &&
+			startNode.get<Node>()?.childNodes.length === 0
 		) {
-			safeRange.startNode.html('<p><br /></p>');
+			startNode.html('<p><br /></p>');
 		}
 		safeRange.collapse(true);
 		// 后续处理
-		let { startNode } = safeRange
+		startNode = safeRange
 			.shrinkToElementNode()
 			.shrinkToTextNode()
-			.enlargeToElementNode();
+			.enlargeToElementNode().startNode;
 		// 只删除了文本，不做处理
 		if (startNode.isText() || !block.inEditor()) {
 			if (this.isEmpty()) this.initValue(safeRange);
