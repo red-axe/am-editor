@@ -3,9 +3,8 @@
     :class="['toolbar-dropdown-list',`toolbar-dropdown-${direction || 'vertical'}`,{'toolbar-dropdown-dot': hasDot !== false},className]"
     >
         <a-tooltip v-for="{ key , placement , title , direction , hasDot , content , className , icon, disabled } in items" :key="key" :placement="placement || 'right'" 
-        :overlayStyle="(!!title || !!hotkeys[key]) && !isMobile ? {} : {display:'none'}"
         >
-            <template #title>
+            <template #title v-if="(!!title || !!hotkeys[key]) && !isMobile">
                 <div v-if="!!title" class="toolbar-tooltip-title">{{title}}</div>
                 <div v-if="!!hotkeys[key]" class="toolbar-tooltip-hotkey" v-html="hotkeys[key]"></div>
             </template>
