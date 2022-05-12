@@ -892,11 +892,13 @@ class ChangeModel implements ChangeInterface {
 			}
 		};
 		if (
+			nextNode.length > 0 &&
 			prevNode &&
 			nextNode &&
 			nodeApi.isBlock(prevNode) &&
 			nodeApi.isBlock(nextNode) &&
 			!prevNode.equal(nextNode) &&
+			!prevNode.parent()?.equal(nextNode) &&
 			nextNode.inEditor()
 		) {
 			deepMergeNode(

@@ -348,6 +348,7 @@ class NodeModel implements NodeModelInterface {
 		target: NodeInterface,
 		remove: boolean = true,
 	) {
+		if (source.equal(target)) return;
 		//要合并的节点是文本，就直接追加
 		if (target.isText()) {
 			source.append(target);
@@ -399,7 +400,7 @@ class NodeModel implements NodeModelInterface {
 				}
 			}
 			// 源节点卡片名称与目标节点卡片一样就删除目标节点的第一个卡片节点
-			if (this.isCustomize(target)) {
+			if (this.isCustomize(target) && !sourceFirst?.equal(target)) {
 				const targetFirst = target.first();
 				if (
 					targetFirst?.isCard() &&
