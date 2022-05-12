@@ -411,6 +411,14 @@ class ChangeModel implements ChangeInterface {
 				first.name === 'p' &&
 				!(first.length === 1 && first.first()?.name === 'br')
 			) {
+				// 粘贴第一行居中样式会丢失
+				if (
+					startNode.name === 'p' &&
+					nodeApi.isEmptyWidthChild(startNode)
+				) {
+					const styles = first.css();
+					startNode.css(styles);
+				}
 				nodeApi.unwrap(first);
 			}
 		};
