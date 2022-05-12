@@ -120,7 +120,10 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	}
 
 	handleChange = (ops: Op[]) => {
-		ops = this.engine.trigger('opsChange', ops);
+		const newOps = this.engine.trigger('opsChange', ops);
+		if (!newOps) {
+			ops = newOps;
+		}
 		this.submitOps(ops);
 		this.engine.history.handleSelfOps(
 			ops.filter((op) => !op['nl'] && !op.p.includes(READY_CARD_KEY)),
