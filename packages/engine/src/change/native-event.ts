@@ -56,10 +56,26 @@ class NativeEvent {
 				let cardRightText = cardRight.text().replace(/\u200B/g, '');
 				if (cardRightText) {
 					cardRightText = escape(cardRightText);
-					range.setEndAfter(card.root);
-					range.collapse(false);
+					// 卡片有样式，并且后面没有节点了
+					const next = card.root.next();
+					if (card.queryMarks) {
+						const marks = card.queryMarks(true);
+						let newNode = marks[marks.length - 1];
+						newNode.append(cardRightText);
+						for (let i = marks.length - 2; i >= 0; i--) {
+							newNode = marks[i].append(newNode);
+						}
+						card.root.after(newNode);
+						range.select(newNode, true).collapse(false);
+					} else if (next && (next.isText() || node.isMark(next))) {
+						range.select(next, true).collapse(true);
+						node.insertText(cardRightText, range);
+					} else {
+						range.setEndAfter(card.root);
+						range.collapse(false);
+						node.insertText(cardRightText, range);
+					}
 					node.html(cardRight, '&#8203;');
-					node.insertText(cardRightText, range);
 					change.apply(range);
 				}
 			} else change.range.toTrusty(range);

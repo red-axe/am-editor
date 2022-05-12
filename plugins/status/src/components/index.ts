@@ -248,7 +248,9 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 		if (!this.#container) return [];
 		return this.#container
 			.allChildren()
-			.filter((child) => child.isElement())
+			.filter(
+				(child) => child.isElement() && this.editor.node.isMark(child),
+			)
 			.map((c) => {
 				if (clone) {
 					const child = c.clone();

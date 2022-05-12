@@ -299,7 +299,9 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		if (!this.#container) return [];
 		return this.#container
 			.allChildren()
-			.filter((child) => child.isElement())
+			.filter(
+				(child) => child.isElement() && this.editor.node.isMark(child),
+			)
 			.map((c) => (clone ? c.clone() : c));
 	}
 
