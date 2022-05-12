@@ -229,9 +229,14 @@ class Inline implements InlineModelInterface {
 						return false;
 					}
 					if (node.isInline(child)) {
-						const children = child.children();
-						node.unwrap(child);
-						child = children;
+						if (!child.isCard()) {
+							const children = child.children();
+							node.unwrap(child);
+							child = children;
+						} else {
+							// 如果不添加，最后选中是一个inline card 的话不会被选中
+							inlnes.push(child);
+						}
 					}
 					if (
 						(node.isMark(child) && !child.isCard()) ||
@@ -288,10 +293,16 @@ class Inline implements InlineModelInterface {
 		}
 		selection.move();
 		if (inlnes.length > 0) {
-			const startNode = inlnes[0].first()!;
-			const lastNode = inlnes[inlnes.length - 1].last()!;
-			safeRange.setStart(startNode, 1);
-			safeRange.setEnd(lastNode, lastNode.text().length - 1);
+			const firstInline = inlnes[0];
+			if (!firstInline.isCard()) {
+				const startNode = firstInline.first()!;
+				safeRange.setStart(startNode, 1);
+			}
+			const lastInline = inlnes[inlnes.length - 1];
+			if (!lastInline.isCard()) {
+				const lastNode = lastInline.last()!;
+				safeRange.setEnd(lastNode, lastNode.text().length - 1);
+			}
 		}
 
 		if (!range) change.apply(safeRange);
