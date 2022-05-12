@@ -206,7 +206,7 @@ class ChangeEvent implements ChangeEventInterface {
 			});
 		});
 		let inputTimeout: NodeJS.Timeout | null = null;
-		this.onContainer('input', (e: Event) => {
+		this.onContainer('input', (e: InputEvent) => {
 			if (this.engine.readonly) {
 				return;
 			}

@@ -6,6 +6,7 @@ import {
 import { $ } from '../node';
 import { CARD_ELEMENT_KEY, CARD_KEY, EDITABLE_SELECTOR } from '../constants';
 import Range from '../range';
+import { isFirefox } from '../utils';
 
 export type ChangeRangeOptions = {
 	onSelect?: (range: RangeInterface) => void;
@@ -253,11 +254,13 @@ class ChangeRange implements ChangeRangeInterface {
 		if (startNode.name === 'p' && !otStopped) {
 			if (startChildNodes.length === 0) startNode.append('<br />');
 			else if (
+				!isFirefox &&
 				startChildNodes.length > 1 &&
 				startChildNodes[startChildNodes.length - 2].nodeName !== 'BR' &&
 				startChildNodes[startChildNodes.length - 1].nodeName === 'BR'
 			) {
-				startNode.last()?.remove();
+				const br = startNode.last();
+				br?.remove();
 			}
 		}
 		if (
