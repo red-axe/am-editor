@@ -227,7 +227,11 @@ export default class<
 			} else {
 				delete this.loadCounts[id];
 				value.status = 'error';
-				this.editor.card.update(id, value);
+				(value.message = this.editor.language.get<string>(
+					'image',
+					'loadError',
+				)),
+					this.editor.card.update(id, value);
 			}
 		};
 	}
@@ -369,7 +373,7 @@ export default class<
 							resolve();
 						};
 						image.onerror = () => {
-							insertCard({ src: '' });
+							insertCard({ src: '', status: 'error' });
 							resolve();
 						};
 					});

@@ -1,6 +1,11 @@
 import isHotkey from 'is-hotkey';
 import { CARD_LEFT_SELECTOR, CARD_RIGHT_SELECTOR } from '../../constants';
-import { CardEntry, CardInterface, EngineInterface } from '../../types';
+import {
+	CardEntry,
+	CardInterface,
+	EngineInterface,
+	RangeInterface,
+} from '../../types';
 import { CardType } from '../enum';
 
 class Right {
@@ -99,11 +104,35 @@ class Right {
 		return true;
 	}
 
+	fincNextCard(range: RangeInterface) {
+		if (!range.collapsed) return null;
+		const { startNode, startOffset } = range;
+		if (startNode.isText()) {
+			const text = startNode.text();
+			if (text.length === startOffset) {
+				const next = startNode.nextElement();
+				if (next && next.isCard()) {
+					return this.engine.card.find(next);
+				}
+			}
+		}
+		return null;
+	}
+
 	trigger(event: KeyboardEvent) {
 		const { change } = this.engine;
 		const range = change.range.get();
 		const card = this.engine.card.getSingleCard(range);
-		if (!card) return true;
+		if (!card) {
+			const nextCard = this.fincNextCard(range);
+			if (nextCard) {
+				event.preventDefault();
+				nextCard.focus(range, true);
+				change.range.select(range);
+				return false;
+			}
+			return true;
+		}
 		if (isHotkey('shift+right', event)) {
 			return;
 		}

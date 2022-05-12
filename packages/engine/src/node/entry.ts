@@ -300,7 +300,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	prevElement(): NodeInterface | null {
 		const node =
-			this.length === 0 || !this.isElement()
+			this.length === 0
 				? null
 				: this.get<Element>()!.previousElementSibling;
 		return node ? new NodeEntry(node) : null;
@@ -312,9 +312,7 @@ class NodeEntry implements NodeInterface {
 	 */
 	nextElement(): NodeInterface | null {
 		const node =
-			this.length === 0 || !this.isElement()
-				? null
-				: this.get<Element>()!.nextElementSibling;
+			this.length === 0 ? null : this.get<Element>()!.nextElementSibling;
 		return node ? new NodeEntry(node) : null;
 	}
 

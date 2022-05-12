@@ -4,7 +4,12 @@ import {
 	CARD_LEFT_SELECTOR,
 	CARD_RIGHT_SELECTOR,
 } from '../../constants';
-import { CardEntry, CardInterface, EngineInterface } from '../../types';
+import {
+	CardEntry,
+	CardInterface,
+	EngineInterface,
+	RangeInterface,
+} from '../../types';
 import { CardType } from '../enum';
 
 class Left {
@@ -103,11 +108,32 @@ class Left {
 		return true;
 	}
 
+	fincPrevCard(range: RangeInterface) {
+		if (!range.collapsed) return null;
+		const { startNode, startOffset } = range;
+		if (startNode.isText() && startOffset === 0) {
+			const prev = startNode.prevElement();
+			if (prev && prev.isCard()) {
+				return this.engine.card.find(prev);
+			}
+		}
+		return null;
+	}
+
 	trigger(event: KeyboardEvent) {
 		const { change } = this.engine;
 		const range = change.range.get();
 		const card = this.engine.card.getSingleCard(range);
-		if (!card) return true;
+		if (!card) {
+			const prevCard = this.fincPrevCard(range);
+			if (prevCard) {
+				event.preventDefault();
+				prevCard.focus(range, false);
+				change.range.select(range);
+				return false;
+			}
+			return true;
+		}
 		if (isHotkey('shift+left', event)) {
 			return false;
 		}

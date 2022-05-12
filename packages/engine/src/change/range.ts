@@ -149,6 +149,23 @@ class ChangeRange implements ChangeRangeInterface {
 				range.setStart(startNode, startOffset - 1);
 				range.collapse(true);
 			}
+			// 卡片左右侧光标零宽字符节点
+			if (startNode.isText()) {
+				const parent = startNode.parent();
+				if (
+					parent?.attributes(CARD_ELEMENT_KEY) === 'right' &&
+					startOffset === 0
+				) {
+					range.setStart(startNode, 1);
+					range.collapse(true);
+				} else if (
+					parent?.attributes(CARD_ELEMENT_KEY) === 'left' &&
+					startOffset === 1
+				) {
+					range.setStart(startNode, 0);
+					range.collapse(true);
+				}
+			}
 		}
 		//修复inline光标
 		let { startNode, endNode, startOffset, endOffset } = range

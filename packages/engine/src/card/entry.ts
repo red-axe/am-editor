@@ -276,9 +276,12 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		) {
 			return;
 		}
-
-		range.select(toStart ? cardLeft : cardRight, true).shrinkToTextNode();
-		range.collapse(false);
+		const zeroElement = toStart ? cardLeft : cardRight;
+		range.select(zeroElement, true).shrinkToTextNode();
+		const textNode = zeroElement.first();
+		if (!textNode) return;
+		range.setStart(textNode, toStart ? 0 : 1);
+		range.collapse(true);
 		if (this.onFocus) this.onFocus();
 	}
 
