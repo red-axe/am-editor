@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-mark-range",
-    "version": "2.8.26",
+    "version": "2.8.27",
     "description": "范围标记",
     "publishConfig": {
         "access": "public"
@@ -24,9 +24,9 @@
         "url": "https://github.com/yanmao-cc/am-editor/issues"
     },
     "dependencies": {
-        "@aomao/engine": "^2.8.26",
+        "@aomao/engine": "^2.8.27",
         "@babel/runtime": "^7.13.10",
-        "tinycolor2": "^1.4.2",
-        "@types/tinycolor2": "^1.4.2"
+        "@types/tinycolor2": "^1.4.2",
+        "tinycolor2": "^1.4.2"
     }
 }
