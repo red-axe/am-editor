@@ -177,7 +177,7 @@ class CardModel implements CardModelInterface {
 		ignoreEditable?: boolean,
 	): NodeInterface | undefined {
 		if (isNode(selector)) selector = $(selector);
-		if (isNodeEntry(selector) && !selector.isCard()) {
+		if (!selector.isCard()) {
 			const card = selector.closest(CARD_SELECTOR, (node: Node) => {
 				if (
 					node && ignoreEditable
@@ -217,7 +217,7 @@ class CardModel implements CardModelInterface {
 			if (
 				item.root.name !==
 				(isNode(selector)
-					? selector.nodeName.toString()
+					? selector.nodeName.toString().toLowerCase()
 					: selector.name)
 			)
 				return false;

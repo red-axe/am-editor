@@ -107,6 +107,13 @@ class Range implements RangeInterface {
 		} else if (startNode.name === 'br') {
 			startNode.remove();
 		}
+		// 防止文本节点被插入到根节点上
+		if (
+			(node.nodeType === Node.TEXT_NODE || node.nodeName === 'BR') &&
+			startNode.isEditable()
+		) {
+			this.shrinkToElementNode().shrinkToTextNode();
+		}
 		this.base.insertNode(node);
 	}
 
