@@ -449,18 +449,25 @@ class Producer extends EventEmitter2 {
 			i++;
 			ops.forEach((op) => {
 				if ('ld' in op) {
-					const pathValue = getValue(
-						this.doc?.data,
-						op.oldPath || [],
-					);
-					// 删除的是文字
+					const path = op.oldPath || [];
+					const pathValue = getValue(this.doc?.data, path);
+					// 删除的是部分文字
 					if (typeof pathValue === 'string') {
-						allOps.push({
-							id: op.id,
-							bi: op.bi,
-							sd: pathValue,
-							p: op.p,
-						});
+						const parentValue = getValue(
+							this.doc?.data,
+							path.slice(0, path.length - 1),
+						);
+						if (
+							typeof parentValue === 'string' &&
+							parentValue !== pathValue
+						) {
+							allOps.push({
+								id: op.id,
+								bi: op.bi,
+								sd: pathValue,
+								p: op.p,
+							});
+						}
 						return;
 					}
 					if (pathValue !== undefined) {
