@@ -58,8 +58,8 @@ class NativeEvent {
 					cardRightText = escape(cardRightText);
 					// 卡片有样式，并且后面没有节点了
 					const next = card.root.next();
-					if (card.queryMarks) {
-						const marks = card.queryMarks(true);
+					const marks = card.queryMarks ? card.queryMarks(true) : [];
+					if (marks.length > 0) {
 						let newNode = marks[marks.length - 1];
 						newNode.append(cardRightText);
 						for (let i = marks.length - 2; i >= 0; i--) {
