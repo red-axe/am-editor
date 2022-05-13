@@ -144,21 +144,77 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	submitOps(ops: Op[]) {
 		if (!this.doc) return;
-		try {
-			(this.doc as Doc).submitOp(ops, {
-				source: this.clientId,
-			});
-		} catch (error) {
-			console.error(
-				'SubmitOps Error:',
-				'MSG:',
-				error,
-				'OPS:',
+		// 提交前，先模拟一次操作会不会出现报错
+		const tempDoc = new OTDoc();
+		const tempData = JSON.parse(JSON.stringify(this.doc.data));
+		tempDoc.create(tempData);
+		tempDoc.submitOp(ops, null, (err: any) => {
+			if (!this.doc) return;
+			// 如果模拟提交出现错误，那就删除所有的data，然后重新序列化ops提交
+			if (err) {
+				console.error(
+					'协同结构出现错误，将重置服务端内容，当前历史记录也将清空',
+					err,
+					ops,
+					tempData,
+				);
+				this.engine.history.clear();
+				const delOps = [];
+				const data = this.doc.data;
+				for (let i = data.length - 1; i > 1; i--) {
+					const item = data[i];
+					delOps.push({
+						bi: -1,
+						id: '',
+						ld: item,
+						p: [i],
+						nl: undefined,
+					});
+				}
+				// 提交到服务端删除全部内容
+				this.doc.submitOp(delOps, {
+					source: this.clientId,
+				});
+				// 获取当前新的数据
+				const addOps = [];
+				const newData = toJSON0(this.engine.container) || [];
+				for (let i = 2; i < newData.length; i++) {
+					const item = newData[i];
+					addOps.push({
+						bi: -1,
+						id: '',
+						li: item,
+						p: [i],
+						nl: undefined,
+					});
+				}
+				// 提交到服务端更新全部内容
+				this.doc.submitOp(addOps, {
+					source: this.clientId,
+				});
+				return;
+			}
+			this.doc.submitOp(
 				ops,
-				'DATA:',
-				this.doc.data,
+				{
+					source: this.clientId,
+				},
+				(error) => {
+					if (error) {
+						console.error(
+							'SubmitOps Error:',
+							error,
+							'OPS:',
+							ops,
+							'DATA:',
+							this.doc?.data,
+						);
+						// 重置
+						this.doc?.destroy();
+					}
+				},
 			);
-		}
+		});
 	}
 
 	apply(ops: Op[]) {

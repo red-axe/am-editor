@@ -1,6 +1,6 @@
 import { EventEmitter2 } from 'eventemitter2';
-import { Doc, Op, Path } from 'sharedb';
-import { Type } from 'sharedb/lib/sharedb';
+import { Doc, Op, Path, ShareDBSourceOptions } from 'sharedb';
+import { Callback, Type } from 'sharedb/lib/sharedb';
 import { CardInterface } from './card';
 import { NodeInterface } from './node';
 import { RangeInterface, RangePath } from './range';
@@ -66,9 +66,13 @@ export interface DocInterface<T = any> extends EventEmitter2 {
 	// 从文档中创建json0数据
 	create(): void;
 	// 把操作应用到文档
-	apply(ops: Op[]): void;
+	apply(ops: Op[], options: any, callback?: (err?: any) => void): void;
 	// 提交操作到協同作業
-	submitOp(ops: Op[]): void;
+	submitOp(
+		ops: Op[],
+		options?: ShareDBSourceOptions,
+		callback?: Callback,
+	): void;
 	// 注销
 	destroy(): void;
 }
