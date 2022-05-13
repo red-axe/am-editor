@@ -438,6 +438,7 @@ class TableComponent<V extends TableValue = TableValue>
 				onClick: () => {
 					this.command.copy(true);
 					this.editor.messageSuccess(
+						'copy',
 						this.editor.language.get<string>('copy', 'success'),
 					);
 				},

@@ -145,7 +145,11 @@ export default class Clipboard implements ClipboardInterface {
 				throw 'Copy failed';
 			}
 		} catch (err) {
-			console.log('The copy command was not executed successfully ', err);
+			this.editor.messageError(
+				'copy',
+				'The copy command was not executed successfully ',
+				err,
+			);
 			clera();
 		}
 		return success;

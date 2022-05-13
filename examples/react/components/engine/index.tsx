@@ -31,13 +31,16 @@ const EngineComponent: React.FC<EngineProps> = forwardRef<
 
 		const engine = new Engine(container.current, options);
 
-		engine.messageSuccess = (msg: string) => {
+		engine.messageSuccess = (type: string, msg: string, ...args: any[]) => {
+			console.log(type, msg, ...args);
 			message.success(msg);
 		};
-		engine.messageError = (error: string) => {
+		engine.messageError = (type: string, error: string, ...args: any[]) => {
+			console.error(type, error, ...args);
 			message.error(error);
 		};
-		engine.messageConfirm = (msg: string) => {
+		engine.messageConfirm = (type: string, msg: string, ...args: any[]) => {
+			console.log(type, msg, ...args);
 			return new Promise<boolean>((resolve, reject) => {
 				Modal.confirm({
 					content: msg,

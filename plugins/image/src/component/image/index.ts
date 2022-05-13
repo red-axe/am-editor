@@ -209,6 +209,7 @@ class Image {
 				this.message || this.options.message || 'Error message',
 			);
 			this.editor.messageSuccess(
+				'copy',
 				this.editor.language.get('copy', 'success').toString(),
 			);
 		});

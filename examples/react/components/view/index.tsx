@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import Message from 'antd/es/message';
-import { $, View, ViewInterface, removeUnit } from '@aomao/engine';
+import { $, View, ViewInterface } from '@aomao/engine';
 import { plugins, cards } from '../editor/config';
 import Loading from '../loading';
 import Context from '../../context';
@@ -54,10 +54,20 @@ const ViewRender: React.FC<ViewProps> = ({ content, html }) => {
 					},
 				},
 			});
-			view.current.messageSuccess = (msg: string) => {
+			view.current.messageSuccess = (
+				type: string,
+				msg: string,
+				...args: any[]
+			) => {
+				console.log(type, msg, ...args);
 				Message.success(msg);
 			};
-			view.current.messageError = (error: string) => {
+			view.current.messageError = (
+				type: string,
+				error: string,
+				...args: any[]
+			) => {
+				console.error(type, error, ...args);
 				Message.error(error);
 			};
 			setViewLoading(false);

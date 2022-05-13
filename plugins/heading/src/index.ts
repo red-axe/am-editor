@@ -111,10 +111,12 @@ export default class<
 
 					if (this.editor.clipboard.copy(url)) {
 						this.editor.messageSuccess(
+							'copy',
 							language.get('copy', 'success').toString(),
 						);
 					} else {
 						this.editor.messageError(
+							'copy',
 							language.get('copy', 'error').toString(),
 						);
 					}
@@ -263,10 +265,12 @@ export default class<
 
 			if (clipboard.copy(url)) {
 				this.editor!.messageSuccess(
+					'copy',
 					language.get('copy', 'success').toString(),
 				);
 			} else {
 				this.editor!.messageError(
+					'copy',
 					language.get('copy', 'error').toString(),
 				);
 			}

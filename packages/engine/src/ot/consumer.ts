@@ -333,8 +333,8 @@ class Consumer implements ConsumerInterface {
 			if (path && this.engine.isFocus()) this.setRangeByRemotePath(path);
 			this.engine.change.change(true, applyNodes);
 			return applyNodes;
-		} catch (error) {
-			console.log(error);
+		} catch (error: any) {
+			this.engine.messageError('ot', error);
 			return [];
 		}
 	}
@@ -427,8 +427,8 @@ class Consumer implements ConsumerInterface {
 				start: this.getSideText(startNode, startOffset),
 				end: this.getSideText(endNode, endOffset),
 			};
-		} catch (error) {
-			console.log(error);
+		} catch (error: any) {
+			this.engine.messageError('ot', error);
 			return;
 		}
 	}
@@ -454,8 +454,8 @@ class Consumer implements ConsumerInterface {
 				range.setEnd(endInfo.container, endInfo.offset);
 			}
 			this.engine.change.range.select(range, false);
-		} catch (error) {
-			console.error(error);
+		} catch (error: any) {
+			this.engine.messageError('ot', error);
 		}
 	}
 
@@ -542,8 +542,8 @@ class Consumer implements ConsumerInterface {
 
 					change.range.select(range);
 					range.scrollRangeIntoView();
-				} catch (error) {
-					console.error(error);
+				} catch (error: any) {
+					this.engine.messageError('ot', error);
 				}
 			}
 		}

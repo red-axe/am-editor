@@ -158,6 +158,7 @@ export default class<
 				onBefore: (file) => {
 					if (file.size > limitSize) {
 						this.editor.messageError(
+							'upload-limit',
 							language
 								.get('file', 'uploadLimitError')
 								.toString()

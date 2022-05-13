@@ -458,6 +458,7 @@ class NativeEvent {
 			// 提示是否要转换
 			this.engine
 				.messageConfirm(
+					'markdown',
 					this.engine.language.get<string>('checkMarkdown', 'title'),
 				)
 				.then(() => {
@@ -475,7 +476,7 @@ class NativeEvent {
 					);
 				})
 				.catch((err) => {
-					if (err) this.engine.messageError(err);
+					if (err) this.engine.messageError('markdown', err);
 				});
 		};
 

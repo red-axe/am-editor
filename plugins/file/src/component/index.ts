@@ -227,6 +227,7 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 				this.getValue()?.message || 'Error message',
 			);
 			this.editor.messageSuccess(
+				'copy',
 				this.editor.language.get('copy', 'success').toString(),
 			);
 		});

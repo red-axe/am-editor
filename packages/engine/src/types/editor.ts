@@ -437,15 +437,19 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 	 * 显示成功的信息
 	 * @param message 信息
 	 */
-	messageSuccess(message: string): void;
+	messageSuccess(type: string, message: string, ...args: any[]): void;
 	/**
 	 * 显示错误信息
 	 * @param error 错误信息
 	 */
-	messageError(error: string): void;
+	messageError(type: string, error: string, ...args: any[]): void;
 	/**
 	 * 消息确认
 	 * @param message 消息
 	 */
-	messageConfirm(message: string): Promise<boolean>;
+	messageConfirm(
+		type: string,
+		message: string,
+		...args: any[]
+	): Promise<boolean>;
 }

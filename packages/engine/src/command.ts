@@ -59,8 +59,8 @@ class Command implements CommandInterface {
 		if (plugin && plugin.queryState) {
 			try {
 				return plugin.queryState(args);
-			} catch (error) {
-				console.error(error);
+			} catch (error: any) {
+				this.editor.messageError('command-query', error);
 			}
 		}
 	}
@@ -114,8 +114,8 @@ class Command implements CommandInterface {
 				change?.onSelect();
 				this.editor.trigger('afterCommandExecute', name, ...args);
 				return result;
-			} catch (error) {
-				console.error(error);
+			} catch (error: any) {
+				this.editor.messageError('command-execute', error);
 			}
 		}
 	}
@@ -137,8 +137,8 @@ class Command implements CommandInterface {
 				const result = plugin[method](...args);
 				change?.combinText();
 				return result;
-			} catch (error) {
-				console.log(error);
+			} catch (error: any) {
+				this.editor.messageError('command-excute-method', error);
 			}
 		}
 	}

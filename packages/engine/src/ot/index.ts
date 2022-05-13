@@ -153,8 +153,9 @@ class OTModel extends EventEmitter2 implements OTInterface {
 			if (!this.doc) return;
 			// 如果模拟提交出现错误，那就删除所有的data，然后重新序列化ops提交
 			if (err) {
-				console.error(
-					'协同结构出现错误，将重置服务端内容，当前历史记录也将清空',
+				this.engine.messageError(
+					'ot',
+					`协同结构出现错误，将重置服务端内容，当前历史记录也将清空`,
 					err,
 					ops,
 					tempData,
@@ -202,7 +203,8 @@ class OTModel extends EventEmitter2 implements OTInterface {
 				},
 				(error) => {
 					if (error) {
-						console.error(
+						this.engine.messageError(
+							'ot',
 							'SubmitOps Error:',
 							error,
 							'OPS:',

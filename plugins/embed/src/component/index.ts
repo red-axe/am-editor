@@ -160,7 +160,7 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 			this.render();
 			super.didRender();
 		} else {
-			this.editor.messageError(locales['addressInvalid']);
+			this.editor.messageError('embed', locales['addressInvalid']);
 		}
 	};
 

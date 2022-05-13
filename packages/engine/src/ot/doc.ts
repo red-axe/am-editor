@@ -28,7 +28,7 @@ class Doc<T = any> extends EventEmitter2 implements DocInterface {
 				if (callback) callback(undefined);
 			} catch (error: any) {
 				if (callback) callback(error);
-				else console.error(error);
+				else this.engine?.messageError('ot', error);
 			}
 		}
 	}

@@ -100,9 +100,9 @@ class HistoryModel implements HistoryInterface {
 				ot.consumer.handleIndex(applyNodes);
 				this.currentActionIndex--;
 				isUndo = true;
-			} catch (error) {
+			} catch (error: any) {
 				this.reset();
-				console.error(error);
+				this.engine.messageError('history-undo', error);
 			}
 			if (this.engine.isEmpty()) this.engine.change.initValue();
 
@@ -135,9 +135,9 @@ class HistoryModel implements HistoryInterface {
 				ot.consumer.handleIndex(applyNodes);
 				this.currentActionIndex++;
 				isRedo = true;
-			} catch (error) {
+			} catch (error: any) {
 				this.reset();
-				console.error(error);
+				this.engine.messageError('history-redo', error);
 			}
 
 			if (isRedo) {
@@ -395,8 +395,8 @@ class HistoryModel implements HistoryInterface {
 					rangePath: prevOp.rangePath,
 					startRangePath: prevOp.startRangePath,
 				};
-			} catch (error) {
-				console.error(error);
+			} catch (error: any) {
+				this.engine.messageError('history-undo-op', error);
 			}
 		}
 		return;
@@ -430,8 +430,8 @@ class HistoryModel implements HistoryInterface {
 					rangePath: currentOp.rangePath,
 					startRangePath: currentOp.startRangePath,
 				};
-			} catch (error) {
-				console.error(error);
+			} catch (error: any) {
+				this.engine.messageError('history-redo-op', error);
 			}
 		}
 		return;

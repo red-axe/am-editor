@@ -103,6 +103,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				event.preventDefault();
 				component.command.copy();
 				this.editor.messageSuccess(
+					'copy',
 					this.editor.language.get<string>('copy', 'success'),
 				);
 				return false;

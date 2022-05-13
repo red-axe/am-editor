@@ -213,16 +213,20 @@ class Editor<T extends EditorOptions = EditorOptions>
 		return this.event.trigger<R>(eventType, ...args);
 	}
 
-	messageSuccess(message: string) {
-		console.log(`success:${message}`);
+	messageSuccess(type: string, message: string, ...args: any[]) {
+		console.log(type, `success:${message}`, ...args);
 	}
 
-	messageError(error: string) {
-		console.log(`error:${error}`);
+	messageError(type: string, error: string, ...args: any[]) {
+		console.error(type, `error:${error}`, ...args);
 	}
 
-	messageConfirm(message: string): Promise<boolean> {
-		console.log(`confirm:${message}`);
+	messageConfirm(
+		type: string,
+		message: string,
+		...args: any[]
+	): Promise<boolean> {
+		console.log(type, `confirm:${message}`, ...args);
 		return Promise.reject(false);
 	}
 

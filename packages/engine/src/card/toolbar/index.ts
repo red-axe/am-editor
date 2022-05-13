@@ -135,10 +135,12 @@ class CardToolbar implements CardToolbarInterface {
 						const result = clipboard.copy(this.card.root[0], true);
 						if (result)
 							editor.messageSuccess(
+								'copy',
 								language.get<string>('copy', 'success'),
 							);
 						else
 							editor.messageError(
+								'copy',
 								language.get<string>('copy', 'error'),
 							);
 					},
