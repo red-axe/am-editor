@@ -86,7 +86,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	}
 
 	onCopy = (event: ClipboardEvent) => {
-		if (!isEngine(this.editor)) return true;
+		if (!isEngine(this.editor) || this.editor.readonly) return true;
 		const { change, card } = this.editor;
 		const range = change.range.get();
 		const component = card.find<TableValue, TableComponent>(
@@ -113,7 +113,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	};
 
 	onCut = (event: ClipboardEvent) => {
-		if (!isEngine(this.editor)) return true;
+		if (!isEngine(this.editor) || this.editor.readonly) return true;
 		const { change, card } = this.editor;
 		const range = change.range.get();
 		const component = card.find<TableValue, TableComponent>(
@@ -136,7 +136,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	};
 
 	onPaste = (event: ClipboardEvent) => {
-		if (!isEngine(this.editor)) return true;
+		if (!isEngine(this.editor) || this.editor.readonly) return true;
 		const { change, card } = this.editor;
 		const range = change.range.get();
 		const component = card.find<TableValue, TableComponent>(

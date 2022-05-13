@@ -31,7 +31,7 @@ export default class extends Plugin<Options> {
 	}
 	// 执行方法
 	execute() {
-		if (!isEngine(this.editor)) return;
+		if (!isEngine(this.editor) || this.editor.readonly) return;
 		const { card } = this.editor;
 		card.insert<TestValue>(TestComponent.cardName, {
 			text: 'This is card value',
@@ -57,7 +57,7 @@ export default class extends Plugin<Options> {
 	};
 	// 解析粘贴过来的html
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor)) return;
+		if (!isEngine(this.editor) || this.editor.readonly) return;
 		if (node.isElement()) {
 			const type = node.attributes('data-type');
 			if (type === TestComponent.cardName) {

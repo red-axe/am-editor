@@ -99,7 +99,7 @@ class TableComponent<V extends TableValue = TableValue>
 				this.editor.event.listeners['keydown:tab'] = [];
 			this.editor.event.listeners['keydown:tab'].unshift(
 				(event: KeyboardEvent) => {
-					if (!isEngine(this.editor)) return;
+					if (!isEngine(this.editor) || this.editor.readonly) return;
 					const { change, block, node, card } = this.editor;
 
 					const range = change.range.get();
@@ -146,7 +146,7 @@ class TableComponent<V extends TableValue = TableValue>
 			);
 			// 下键选择
 			this.editor.on('keydown:down', (event) => {
-				if (!isEngine(this.editor)) return;
+				if (!isEngine(this.editor) || this.editor.readonly) return;
 				const { change, card } = this.editor;
 
 				const range = change.range.get();
@@ -214,7 +214,7 @@ class TableComponent<V extends TableValue = TableValue>
 			});
 			// 上键选择
 			this.editor.on('keydown:up', (event) => {
-				if (!isEngine(this.editor)) return;
+				if (!isEngine(this.editor) || this.editor.readonly) return;
 				const { change, card } = this.editor;
 
 				const range = change.range.get();
@@ -281,7 +281,7 @@ class TableComponent<V extends TableValue = TableValue>
 			});
 			// 左键选择
 			this.editor.on('keydown:left', () => {
-				if (!isEngine(this.editor)) return;
+				if (!isEngine(this.editor) || this.editor.readonly) return;
 				const { change, card } = this.editor;
 
 				const range = change.range.get();
@@ -299,7 +299,7 @@ class TableComponent<V extends TableValue = TableValue>
 			});
 			// 右键选择
 			this.editor.on('keydown:right', () => {
-				if (!isEngine(this.editor)) return;
+				if (!isEngine(this.editor) || this.editor.readonly) return;
 				const { change, card } = this.editor;
 
 				const range = change.range.get();
