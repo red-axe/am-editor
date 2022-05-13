@@ -453,6 +453,16 @@ class Producer extends EventEmitter2 {
 						this.doc?.data,
 						op.oldPath || [],
 					);
+					// 删除的是文字
+					if (typeof pathValue === 'string') {
+						allOps.push({
+							id: op.id,
+							bi: op.bi,
+							sd: pathValue,
+							p: op.p,
+						});
+						return;
+					}
 					if (pathValue !== undefined) {
 						const childIds = op.childIds || [];
 						const opDataId =
