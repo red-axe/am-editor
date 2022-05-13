@@ -467,8 +467,8 @@ class Producer extends EventEmitter2 {
 								sd: pathValue,
 								p: op.p,
 							});
+							return;
 						}
-						return;
 					}
 					if (pathValue !== undefined) {
 						const childIds = op.childIds || [];

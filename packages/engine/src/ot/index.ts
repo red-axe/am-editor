@@ -149,6 +149,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		const tempData = JSON.parse(JSON.stringify(this.doc.data));
 		tempDoc.create(tempData);
 		tempDoc.submitOp(ops, null, (err: any) => {
+			tempDoc.destroy();
 			if (!this.doc) return;
 			// 如果模拟提交出现错误，那就删除所有的data，然后重新序列化ops提交
 			if (err) {
