@@ -35,19 +35,21 @@ export default class<
 
 	#styleName = 'font-size';
 
+	defaultSize =
+		this.options.defaultSize ||
+		this.editor.container.css('font-size') ||
+		'14px';
+
 	init() {
 		super.init();
 		if (isEngine(this.editor)) {
 			this.editor.on('paste:each', this.pasteEach);
 		}
+		if (this.options.defaultSize)
+			this.editor.container.css('font-size', this.defaultSize);
 	}
 
-	isTrigger(
-		size: string,
-		defaultSize: string = this.options.defaultSize ||
-			this.editor.container.css('font-size') ||
-			'14px',
-	) {
+	isTrigger(size: string, defaultSize: string = this.defaultSize) {
 		return size !== defaultSize;
 	}
 
@@ -71,7 +73,7 @@ export default class<
 			if (!source) return;
 			const fontsize = this.convertToPX(source);
 			if (source.endsWith('pt')) node.css(this.#styleName, fontsize);
-			if (fontsize !== this.options.defaultSize) {
+			if (fontsize !== this.defaultSize) {
 				const { filter } = this.options;
 				if (filter) {
 					const result = filter(fontsize);
