@@ -161,7 +161,8 @@ class OTModel extends EventEmitter2 implements OTInterface {
 					tempData,
 				);
 				this.engine.history.clear();
-				const delOps = [];
+				// 提交到服务端删除全部内容
+				const delOps: any[] = [];
 				const data = this.doc.data;
 				for (let i = data.length - 1; i > 1; i--) {
 					const item = data[i];
@@ -173,10 +174,6 @@ class OTModel extends EventEmitter2 implements OTInterface {
 						nl: undefined,
 					});
 				}
-				// 提交到服务端删除全部内容
-				this.doc.submitOp(delOps, {
-					source: this.clientId,
-				});
 				// 获取当前新的数据
 				const addOps = [];
 				const newData = toJSON0(this.engine.container) || [];
@@ -191,7 +188,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 					});
 				}
 				// 提交到服务端更新全部内容
-				this.doc.submitOp(addOps, {
+				this.doc.submitOp(delOps.concat(addOps), {
 					source: this.clientId,
 				});
 				return;
