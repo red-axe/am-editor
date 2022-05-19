@@ -865,6 +865,7 @@ class NodeModel implements NodeModelInterface {
 	}
 
 	addBrForBlock = (blockNode: NodeInterface) => {
+		if (blockNode.isText()) return;
 		const children = blockNode.get<Element>()!.childNodes;
 		// 非光标标记的字节的数量
 		let notCursorCount = 0;
