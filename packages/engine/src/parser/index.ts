@@ -83,6 +83,10 @@ class Parser implements ParserInterface {
 			source = source.replace(/<a(\s[^>]+?)\/>/gi, (_, t) => {
 				return '<a'.concat(t, '></a>');
 			});
+			// 移除掉所有的事件绑定
+			source = source?.replace(/<[\/]{0,1}.+?>/gi, (str) => {
+				return str.replace(/on[a-zA-Z]{0,20}=("|').*("|')/g, '');
+			});
 			// 在 p 里包含 div 标签时 DOMParser 解析错误
 			// <p><div>foo</div></p>
 			// 变成
