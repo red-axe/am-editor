@@ -1,3 +1,5 @@
+> In the past two years, the `am-editor` editor has done a lot of functions and extensions based on the `contenteditable` attribute, but also encountered many problems. Of course, some problems are doomed from the very beginning of the architectural design. So, be bold now and try to abandon the `contenteditable` attribute and use the self-drawn cursor mode to develop the next version of the [rich text editor](https://github.com/editablejs/editable).
+
 # am-editor
 
 <p align="center">

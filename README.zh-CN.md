@@ -1,3 +1,5 @@
+> 过去两年中，`am-editor` 编辑器基于 `contenteditable` 属性上做了很多功能和扩展，也遇到了很多问题。当然，有些问题从一开始的架构设计上就注定了的。所以，现在大胆一些，尝试抛弃`contenteditable`属性，使用自绘光标的模式开发的下一个版本的[富文本编辑器](https://github.com/editablejs/editable)。
+
 # am-editor
 
 <p align="center">
