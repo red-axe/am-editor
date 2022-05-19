@@ -185,22 +185,24 @@ export default class extends Plugin<Options> {
 	}
 	// parse into html
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${TestComponent.cardName}`).each((cardNode) => {
-			const node = $(cardNode);
-			const card = this.editor.card.find(node) as TestComponent;
-			const value = card?.getValue();
-			if (value) {
-				node.empty();
-				const div = $(
-					`<div data-type="${
-						TestComponent.cardName
-					}" data-value="${encodeCardValue(
-						value,
-					)}">Card to html</div>`,
-				);
-				node.replaceWith(div);
-			} else node.remove();
-		});
+		root.find(`[${CARD_KEY}=${TestComponent.cardName}]`).each(
+			(cardNode) => {
+				const node = $(cardNode);
+				const card = this.editor.card.find(node) as TestComponent;
+				const value = card?.getValue();
+				if (value) {
+					node.empty();
+					const div = $(
+						`<div data-type="${
+							TestComponent.cardName
+						}" data-value="${encodeCardValue(
+							value,
+						)}">Card to html</div>`,
+					);
+					node.replaceWith(div);
+				} else node.remove();
+			},
+		);
 	}
 }
 export { TestComponent };
@@ -561,20 +563,22 @@ export default class extends Plugin<Options> {
 	}
 	// parse into html
 	parseHtml(root: NodeInterface) {
-		root.find(`[${CARD_KEY}=${TestComponent.cardName}`).each((cardNode) => {
-			const node = $(cardNode);
-			const card = this.editor.card.find(node) as TestComponent;
-			const value = card?.getValue();
-			if (value) {
-				node.empty();
-				const div = $(
-					`<div data-type="${
-						TestComponent.cardName
-					}" data-value="${encodeCardValue(value)}"></div>`,
-				);
-				node.replaceWith(div);
-			} else node.remove();
-		});
+		root.find(`[${CARD_KEY}=${TestComponent.cardName}]`).each(
+			(cardNode) => {
+				const node = $(cardNode);
+				const card = this.editor.card.find(node) as TestComponent;
+				const value = card?.getValue();
+				if (value) {
+					node.empty();
+					const div = $(
+						`<div data-type="${
+							TestComponent.cardName
+						}" data-value="${encodeCardValue(value)}"></div>`,
+					);
+					node.replaceWith(div);
+				} else node.remove();
+			},
+		);
 	}
 }
 export { TestComponent };
