@@ -83,9 +83,9 @@ class Parser implements ParserInterface {
 			source = source.replace(/<a(\s[^>]+?)\/>/gi, (_, t) => {
 				return '<a'.concat(t, '></a>');
 			});
-			// 移除掉所有的事件绑定
-			source = source?.replace(/<[\/]{0,1}.+?>/gi, (str) => {
-				return str.replace(/on[a-zA-Z]{0,20}=("|').*("|')/g, '');
+			// 移除掉img事件绑定，img 标签在 DOMParser 中会加载 onload 和 onerror 事件
+			source = source?.replace(/<img .*>/gi, (str) => {
+				return str.replace(/on[a-zA-Z]{0,20}=/g, 'notallow=');
 			});
 			// 在 p 里包含 div 标签时 DOMParser 解析错误
 			// <p><div>foo</div></p>
