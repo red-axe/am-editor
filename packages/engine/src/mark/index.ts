@@ -13,7 +13,7 @@ import {
 	RangeInterface,
 } from '../types';
 import { MarkInterface, MarkModelInterface } from '../types/mark';
-import { createMakrdownIt, getDocument, isEngine } from '../utils';
+import { createMarkdownIt, getDocument, isEngine } from '../utils';
 import { Backspace } from './typing';
 import { $ } from '../node';
 import { isNode } from '../node/utils';
@@ -60,7 +60,7 @@ class Mark implements MarkModelInterface {
 			node.type === Node.TEXT_NODE
 				? node.text().substr(0, startOffset)
 				: node.text();
-		const markdown = createMakrdownIt(this.editor, 'zero');
+		const markdown = createMarkdownIt(this.editor, 'zero');
 		const { renderer, options } = markdown;
 		const tokens = markdown.parseInline(text, {});
 		if (tokens.length === 0) return;
@@ -78,7 +78,7 @@ class Mark implements MarkModelInterface {
 						lineContent += result;
 					},
 				});
-				if (!result) {
+				if (result === false) {
 					isHit = true;
 					return;
 				}

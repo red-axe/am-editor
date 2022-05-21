@@ -1,4 +1,6 @@
+import MarkdownIt from 'markdown-it';
 import Markdown from 'markdown-it';
+import Token from 'markdown-it/lib/token';
 import { EditorInterface, EngineInterface, ViewInterface } from '../types';
 import TinyCanvas from './tiny-canvas';
 export * from './string';
@@ -24,7 +26,7 @@ export const isView = (editor: EditorInterface): editor is ViewInterface => {
 	return editor.kind === 'view';
 };
 
-export const createMakrdownIt = (
+export const createMarkdownIt = (
 	editor: EditorInterface,
 	presetName: Markdown.PresetName = 'default',
 ) => {
@@ -35,4 +37,69 @@ export const createMakrdownIt = (
 	});
 	editor.trigger('markdown-it', markdown);
 	return markdown;
+};
+
+export const convertMarkdown = (
+	editor: EditorInterface,
+	markdown: MarkdownIt,
+	tokens: Token[],
+) => {
+	const { renderer, options } = markdown;
+	let isHit = false;
+	const blockTags = editor.schema.getTags('blocks');
+	let textContent = '';
+	let nodeContent: string[] = [];
+	tokens.forEach((token, index) => {
+		const { type, tag, children, nesting } = token;
+		const result = editor.trigger('markdown-it-token', {
+			token,
+			markdown,
+			callback: (result: string) => {
+				textContent += result;
+			},
+		});
+		if (result === false) {
+			isHit = true;
+			return;
+		}
+
+		let content = '';
+		if (type === 'inline' && children) {
+			content = renderer.renderInline(children, options, {});
+		} else if (typeof renderer.rules[type] !== 'undefined') {
+			content = renderer.rules[type]!(
+				tokens,
+				index,
+				options,
+				{},
+				renderer,
+			);
+		} else {
+			content = renderer.renderToken(tokens, index, options);
+		}
+		if (nesting === 1) {
+			nodeContent.push('');
+			textContent += content;
+		} else if (nesting === 0) {
+			if (nodeContent.length === 0) {
+				textContent += content;
+				if (tag && !isHit) isHit = true;
+			} else if (!!content)
+				nodeContent[nodeContent.length - 1] += content;
+		} else if (nesting === -1) {
+			if (
+				nodeContent.length > 0 &&
+				!nodeContent[nodeContent.length - 1] &&
+				blockTags.includes(tag)
+			)
+				nodeContent[nodeContent.length - 1] += '<br />';
+			textContent += nodeContent[nodeContent.length - 1] ?? '';
+			nodeContent.pop();
+			if (nodeContent.every((content) => !content)) nodeContent = [];
+			textContent += content;
+			if (!isHit && tag !== 'p') isHit = true;
+		}
+	});
+	if (isHit && textContent) return textContent;
+	return null;
 };

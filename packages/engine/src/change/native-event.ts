@@ -24,7 +24,7 @@ import { $ } from '../node';
 import Parser, { TextParser } from '../parser';
 import Paste from './paste';
 import { CardActiveTrigger, CardType } from '../card/enum';
-import { createMakrdownIt, escape } from '../utils';
+import { convertMarkdown, createMarkdownIt, escape } from '../utils';
 import Token from 'markdown-it/lib/token';
 
 class NativeEvent {
@@ -413,77 +413,19 @@ class NativeEvent {
 			}
 		});
 
-		const convertMarkdown = (text: string) => {
+		const convertMD = (text: string) => {
 			change.cacheRangeBeforeCommand();
-			const markdown = createMakrdownIt(this.engine, 'zero');
-			const { renderer, options } = markdown;
+			const markdown = createMarkdownIt(this.engine, 'zero');
 			markdown.enable(['paragraph', 'html_inline', 'newline']);
 			//.disable(['strikethrough', 'emphasis', 'link', 'image', 'table', 'code', 'blockquote', 'hr', 'list', 'heading'])
 			const tokens = markdown.parse(text, {});
 			if (tokens.length === 0) return;
-			let isHit = false;
-			const blockTags = this.engine.schema.getTags('blocks');
-			let textContent = '';
-			let nodeContent: string[] = [];
-			tokens.forEach((token, index) => {
-				const { type, tag, children, nesting } = token;
-				const result = this.engine.trigger('markdown-it-token', {
-					token,
-					markdown,
-					callback: (result: string) => {
-						textContent += result;
-					},
-				});
-				if (!result) {
-					isHit = true;
-					return;
-				}
-
-				let content = '';
-				if (type === 'inline' && children) {
-					content = renderer.renderInline(children, options, {});
-				} else if (typeof renderer.rules[type] !== 'undefined') {
-					content = renderer.rules[type]!(
-						tokens,
-						index,
-						options,
-						{},
-						renderer,
-					);
-				} else {
-					content = renderer.renderToken(tokens, index, options);
-				}
-				if (nesting === 1) {
-					nodeContent.push('');
-					textContent += content;
-				} else if (nesting === 0) {
-					if (nodeContent.length === 0) {
-						textContent += content;
-						if (tag && !isHit) isHit = true;
-					} else if (!!content)
-						nodeContent[nodeContent.length - 1] += content;
-				} else if (nesting === -1) {
-					if (
-						nodeContent.length > 0 &&
-						!nodeContent[nodeContent.length - 1] &&
-						blockTags.includes(tag)
-					)
-						nodeContent[nodeContent.length - 1] += '<br />';
-					textContent += nodeContent[nodeContent.length - 1] ?? '';
-					nodeContent.pop();
-					if (nodeContent.every((content) => !content))
-						nodeContent = [];
-					textContent += content;
-					if (!isHit && tag !== 'p') isHit = true;
-				}
-			});
-			if (isHit) return textContent;
-			return null;
+			return convertMarkdown(this.engine, markdown, tokens);
 		};
 
 		const pasteMarkdown = async (html: string, text: string) => {
 			// 先解析text
-			let result = convertMarkdown(text);
+			let result = convertMD(text);
 			// 没有 markdown，尝试解析 html
 			if (result === null) {
 				// 先解析html
@@ -507,7 +449,7 @@ class NativeEvent {
 					parser = new Parser(text, this.engine);
 					parserText = parser.toText(schema);
 				}
-				result = convertMarkdown(parserText);
+				result = convertMD(parserText);
 			}
 			if (result === null) return;
 			const handlePaste = () => {

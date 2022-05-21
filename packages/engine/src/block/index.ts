@@ -16,7 +16,12 @@ import {
 	PluginEntry,
 } from '../types';
 import { BlockInterface, BlockModelInterface } from '../types/block';
-import { createMakrdownIt, getDocument, isEngine } from '../utils';
+import {
+	convertMarkdown,
+	createMarkdownIt,
+	getDocument,
+	isEngine,
+} from '../utils';
 import { Backspace, Enter } from './typing';
 import { $ } from '../node';
 import { isBlockPlugin } from '../plugin';
@@ -69,75 +74,19 @@ class Block implements BlockModelInterface {
 		if (!editor.node.isRootBlock(blockNode)) return;
 		const text = block.getLeftText(blockNode).trimEnd();
 		const cacheRange = range.toPath();
-		const markdown = createMakrdownIt(this.editor, 'zero');
-		const { renderer, options } = markdown;
+		const markdown = createMarkdownIt(this.editor, 'zero');
 		const tokens = markdown.parse(text, {});
 		if (tokens.length === 0) return;
-		let isHit = false;
-		let textContent = '';
-		let nodeContent: string[] = [];
-		const blockTags = this.editor.schema.getTags('blocks');
-		tokens.forEach((token, index) => {
-			const { type, tag, children, nesting } = token;
-			const result = editor.trigger('markdown-it-token', {
-				token,
-				markdown,
-				callback: (result: string) => {
-					textContent += result;
-				},
-			});
-			if (!result) {
-				isHit = true;
-				return;
-			}
-
-			let content = '';
-			if (type === 'inline' && children) {
-				content = renderer.renderInline(children, options, {});
-			} else if (typeof renderer.rules[type] !== 'undefined') {
-				content = renderer.rules[type]!(
-					tokens,
-					index,
-					options,
-					{},
-					renderer,
-				);
-			} else {
-				content = renderer.renderToken(tokens, index, options);
-			}
-			if (nesting === 1) {
-				nodeContent.push('');
-				textContent += content;
-			} else if (nesting === 0) {
-				if (tag && nodeContent.length === 0) {
-					textContent += content;
-					if (!isHit) isHit = true;
-				} else if (nodeContent.length === 0 && !!content)
-					nodeContent.push(content);
-				else if (!!content)
-					nodeContent[nodeContent.length - 1] += content;
-			} else if (nesting === -1) {
-				if (
-					nodeContent.length > 0 &&
-					!nodeContent[nodeContent.length - 1] &&
-					blockTags.includes(tag)
-				)
-					nodeContent[nodeContent.length - 1] += '<br />';
-				textContent += nodeContent[nodeContent.length - 1] ?? '';
-				nodeContent.pop();
-				if (nodeContent.every((content) => !content)) nodeContent = [];
-				textContent += content;
-				if (!isHit && tag !== 'p') isHit = true;
-			}
-		});
-		if (isHit) {
+		const content = convertMarkdown(this.editor, markdown, tokens);
+		if (content) {
 			event.preventDefault();
 			range.select(blockNode, true);
-			change.paste(textContent, range);
+			change.paste(content, range);
 			change.rangePathBeforeCommand = cacheRange;
 			change.range.select(range);
+			return false;
 		}
-		return !isHit;
+		return true;
 	}
 	pluginCaches: Map<string, BlockInterface> = new Map();
 	/**
