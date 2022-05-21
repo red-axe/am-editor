@@ -263,7 +263,7 @@ export default class Math<
 		if (node.isElement()) {
 			const attributes = node.attributes();
 			const type = attributes['data-type'];
-			if (type === MathComponent.cardName) {
+			if (type && type === MathComponent.cardName) {
 				const value = attributes['data-value'];
 				const cardValue = decodeCardValue(value);
 				if (!cardValue.url) return;

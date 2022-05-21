@@ -122,7 +122,7 @@ class MentionPlugin<
 		if (node.isElement()) {
 			const attributes = node.attributes();
 			const type = attributes['data-type'];
-			if (type === MentionComponent.cardName) {
+			if (type && type === MentionComponent.cardName) {
 				const value = attributes['data-value'];
 				const cardValue = decodeCardValue<MentionValue>(value);
 				if (!cardValue.name) return;

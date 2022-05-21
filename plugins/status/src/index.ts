@@ -65,7 +65,7 @@ export default class<
 		if (node.isElement()) {
 			const attributes = node.attributes();
 			const type = attributes['data-type'];
-			if (type === StatusComponent.cardName) {
+			if (type && type === StatusComponent.cardName) {
 				const value = attributes['data-value'];
 				const cardValue = decodeCardValue<StatusValue>(value);
 				this.editor.card.replaceNode(

@@ -8,6 +8,7 @@ import {
 	PluginOptions,
 	decodeCardValue,
 	CARD_VALUE_KEY,
+	READY_CARD_KEY,
 } from '@aomao/engine';
 import type MarkdownIt from 'markdown-it';
 import TaskMarkdown from './markdown';
@@ -53,6 +54,7 @@ export default class<
 		if (isEngine(this.editor)) {
 			this.editor.on('markdown-it', this.markdownIt);
 			this.editor.on('paste:each-after', this.pasteEachAfter);
+			this.editor.on('paste:each', this.pasteHtml);
 		}
 	}
 
@@ -191,6 +193,23 @@ export default class<
 		}
 	};
 
+	pasteHtml = (node: NodeInterface) => {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const attributes = node.attributes();
+			const type = attributes[CARD_KEY] || attributes[READY_CARD_KEY];
+			if (
+				type &&
+				type === CheckboxComponent.cardName &&
+				node.parent()?.name !== 'li'
+			) {
+				node.remove();
+				return false;
+			}
+		}
+		return true;
+	};
+
 	pasteEachAfter = (root: NodeInterface) => {
 		const liNodes = root.find(`li.${this.editor.list.CUSTOMZIE_LI_CLASS}`);
 		liNodes.each((_, index) => {
@@ -218,6 +237,7 @@ export default class<
 		if (isEngine(this.editor)) {
 			this.editor.off('markdown-it', this.markdownIt);
 			this.editor.off('paste:each-after', this.pasteEachAfter);
+			this.editor.off('paste:each', this.pasteHtml);
 		}
 	}
 }

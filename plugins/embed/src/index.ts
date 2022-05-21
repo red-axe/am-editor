@@ -74,7 +74,7 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 		if (node.isElement()) {
 			const attributes = node.attributes();
 			const type = attributes['data-type'];
-			if (type === EmbedComponent.cardName) {
+			if (type && type === EmbedComponent.cardName) {
 				const value = attributes['data-value'];
 				const cardValue = decodeCardValue(value);
 				if (!cardValue.url) return;
