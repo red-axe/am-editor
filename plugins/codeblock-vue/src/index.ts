@@ -47,7 +47,6 @@ export default class<
 		this.editor.on('paste:each', this.pasteHtml);
 		if (isEngine(this.editor)) {
 			this.editor.on('markdown-it', this.markdownIt);
-			this.editor.on('markdown-it-token', this.markdownItToken);
 		}
 	}
 
@@ -79,24 +78,6 @@ export default class<
 			mardown.enable('code');
 			mardown.enable('fence');
 		}
-	};
-
-	markdownItToken = ({
-		token,
-		callback,
-	}: {
-		token: Token;
-		callback: (result: string) => void;
-	}) => {
-		if (token.type === 'fence' && token.tag === 'code') {
-			callback(
-				`<pre ${DATA_SYNTAX}="${token.info.toLowerCase()}"><code>${unescape(
-					token.content,
-				)}</code></pre>`,
-			);
-			return false;
-		}
-		return true;
 	};
 
 	pasteSchema = (schema: SchemaInterface) => {
@@ -274,7 +255,6 @@ export default class<
 		this.editor.off('paste:each', this.pasteHtml);
 		if (isEngine(this.editor)) {
 			this.editor.off('markdown-it', this.markdownIt);
-			this.editor.off('markdown-it-token', this.markdownItToken);
 		}
 	}
 }
