@@ -453,9 +453,10 @@ class List implements ListModelInterface {
 		if (!isEngine(this.editor)) return;
 		const { change, block, node } = this.editor;
 		const safeRange = range || change.range.toTrusty();
+		const cloneRange = safeRange.cloneRange();
 		const selection = blocks
 			? undefined
-			: safeRange.cloneRange().shrinkToElementNode().createSelection();
+			: cloneRange.shrinkToElementNode().createSelection();
 		blocks = blocks || block.getBlocks(safeRange);
 		blocks.forEach((block) => {
 			block = block.closest('ul,ol');
@@ -481,7 +482,7 @@ class List implements ListModelInterface {
 			this.addStart(block);
 		}
 		selection?.move();
-		if (!range && selection !== undefined) change.apply(safeRange);
+		if (!range && selection !== undefined) change.apply(cloneRange);
 	}
 	/**
 	 * 给列表添加start序号
