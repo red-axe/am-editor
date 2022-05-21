@@ -16,6 +16,8 @@ import {
 	VIEW_CLASS_NAME,
 	SchemaBlock,
 } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
+import Token from 'markdown-it/lib/token';
 import CodeBlockComponent, {
 	CodeBlockEditor,
 	CodeBlockValue,
@@ -29,20 +31,7 @@ export interface CodeBlockOptions extends PluginOptions {
 	styleMap?: Record<string, string>;
 }
 
-// 缩写替换
-const MODE_ALIAS = {
-	text: 'plain',
-	sh: 'bash',
-	ts: 'typescript',
-	js: 'javascript',
-	py: 'python',
-	puml: 'plantuml',
-	uml: 'plantuml',
-	vb: 'basic',
-	md: 'markdown',
-	'c++': 'cpp',
-	'c#': 'csharp',
-};
+const DATA_SYNTAX = 'data-syntax';
 
 export default class<
 	T extends CodeBlockOptions = CodeBlockOptions,
@@ -56,10 +45,9 @@ export default class<
 		this.editor.on('parse:html', this.parseHtml);
 		this.editor.on('paste:schema', this.pasteSchema);
 		this.editor.on('paste:each', this.pasteHtml);
-		if (isEngine(this.editor) && this.markdown) {
-			this.editor.on('keydown:enter', this.markdown);
-			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.on('paste:markdown-before', this.pasteMarkdown);
+		if (isEngine(this.editor)) {
+			this.editor.on('markdown-it', this.markdownIt);
+			this.editor.on('markdown-it-token', this.markdownItToken);
 		}
 	}
 
@@ -86,42 +74,29 @@ export default class<
 		return this.options.hotkey || '';
 	}
 
-	markdown = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor) || this.options.markdown === false) return;
-		const { change, node, command } = this.editor;
-		const blockApi = this.editor.block;
-		const range = change.range.get();
-
-		if (!range.collapsed || change.isComposing() || !this.markdown) return;
-
-		const block = blockApi.closest(range.startNode);
-
-		if (!node.isRootBlock(block)) {
-			return;
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) {
+			mardown.enable('code');
+			mardown.enable('fence');
 		}
+	};
 
-		const chars = blockApi.getLeftText(block);
-		const match = /^`{3,}(.*){0,20}$/.exec(chars);
-
-		if (match) {
-			const modeText = (undefined === match[1] ? '' : match[1])
-				.trim()
-				.toLowerCase();
-			const alias = { ...(this.options.alias || {}), ...MODE_ALIAS };
-			const mode = alias[modeText] || modeText;
-
-			if (mode || mode === '') {
-				event.preventDefault();
-				blockApi.removeLeftText(block);
-				command.execute(
-					(this.constructor as PluginEntry).pluginName,
-					mode,
-				);
-				block.remove();
-				return false;
-			}
+	markdownItToken = ({
+		token,
+		callback,
+	}: {
+		token: Token;
+		callback: (result: string) => void;
+	}) => {
+		if (token.type === 'fence' && token.tag === 'code') {
+			callback(
+				`<pre ${DATA_SYNTAX}="${token.info.toLowerCase()}"><code>${unescape(
+					token.content,
+				)}</code></pre>`,
+			);
+			return false;
 		}
-		return;
+		return true;
 	};
 
 	pasteSchema = (schema: SchemaInterface) => {
@@ -130,7 +105,7 @@ export default class<
 				type: 'block',
 				name: 'pre',
 				attributes: {
-					'data-syntax': '*',
+					[DATA_SYNTAX]: '*',
 					class: '*',
 					language: '*',
 				},
@@ -139,7 +114,7 @@ export default class<
 				type: 'block',
 				name: 'code',
 				attributes: {
-					'data-syntax': {
+					[DATA_SYNTAX]: {
 						required: true,
 						value: '*',
 					},
@@ -172,7 +147,7 @@ export default class<
 				type: 'block',
 				name: 'div',
 				attributes: {
-					'data-syntax': {
+					[DATA_SYNTAX]: {
 						required: true,
 						value: '*',
 					},
@@ -184,10 +159,10 @@ export default class<
 	pasteHtml = (node: NodeInterface) => {
 		if (!isEngine(this.editor) || node.isText()) return;
 		if (
-			node.get<HTMLElement>()?.hasAttribute('data-syntax') ||
+			node.get<HTMLElement>()?.hasAttribute(DATA_SYNTAX) ||
 			node.name === 'pre'
 		) {
-			let syntax: string | undefined = node.attributes('data-syntax');
+			let syntax: string | undefined = node.attributes(DATA_SYNTAX);
 			if (!syntax) {
 				const getSyntaxForClass = (node: NodeInterface) => {
 					const classList = node?.get<HTMLElement>()?.classList;
@@ -211,7 +186,7 @@ export default class<
 				const code = node.find('code');
 				if (!syntax && code.length > 0) {
 					syntax =
-						code.attributes('data-syntax') ||
+						code.attributes(DATA_SYNTAX) ||
 						code.attributes('language');
 					if (!syntax) {
 						syntax = getSyntaxForClass(code);
@@ -232,102 +207,6 @@ export default class<
 			return false;
 		}
 		return true;
-	};
-
-	checkMarkdownMath = (child: NodeInterface) => {
-		return !this.checkMarkdown(child)?.match;
-	};
-
-	checkMarkdown = (node: NodeInterface) => {
-		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
-		const text = node.text();
-		if (!text) return;
-		const reg = /`{3,}/;
-		const match = reg.exec(text);
-		return {
-			reg,
-			match,
-		};
-	};
-
-	pasteMarkdown = (node: NodeInterface) => {
-		const result = this.checkMarkdown(node);
-		if (!result) return;
-		let { match } = result;
-		if (!match) return;
-		const { card } = this.editor;
-
-		let newText = '';
-		const nameMaps = {};
-		CodeBlockComponent.getModes().forEach((item) => {
-			nameMaps[item.value] = item.name;
-		});
-		const langs = Object.keys(nameMaps)
-			.concat(Object.keys(MODE_ALIAS))
-			.concat(Object.keys(this.options.alias || {}))
-			.sort((a, b) => (a.length > b.length ? -1 : 1));
-
-		const createCodeblock = (
-			nodes: Array<string>,
-			mode: string = 'text',
-		) => {
-			//获取中间字符
-			const codeText = nodes.join('\n');
-			let code = unescape(codeText);
-
-			if (code.endsWith('\n')) code = code.substr(0, code.length - 1);
-			const tempNode = $('<div></div>');
-			const carNode = card.replaceNode<CodeBlockValue>(
-				tempNode,
-				'codeblock',
-				{
-					mode,
-					code,
-				},
-			);
-			tempNode.remove();
-
-			return carNode.get<Element>()?.outerHTML;
-		};
-
-		const rows = node.text().split(/\n|\r\n/);
-		let nodes: Array<string> = [];
-		let isCode: boolean = false;
-		let mode = 'text';
-		rows.forEach((row) => {
-			let match = /^(.*)`{3,}(\s)*$/.exec(row);
-			if (match && isCode) {
-				nodes.push(match[1]);
-				newText += createCodeblock(nodes, mode) + '\n';
-				mode = 'text';
-				isCode = false;
-				nodes = [];
-				return;
-			}
-			match = /^`{3,}(.*)/.exec(row);
-			if (match) {
-				isCode = true;
-				mode =
-					langs.find(
-						(key) =>
-							match &&
-							(match[1] || '')
-								.trim()
-								.toLowerCase()
-								.indexOf(key) === 0,
-					) || 'text';
-				const alias = { ...(this.options.alias || {}), ...MODE_ALIAS };
-				mode = alias[mode] || mode;
-			} else if (isCode) {
-				nodes.push(row);
-			} else {
-				newText += row + '\n';
-			}
-		});
-		if (nodes.length > 0) {
-			newText += createCodeblock(nodes, mode) + '\n';
-		}
-		node.text(newText);
 	};
 
 	parseHtml = (
@@ -373,7 +252,7 @@ export default class<
 				node.removeAttributes(CARD_KEY);
 				node.removeAttributes(CARD_TYPE_KEY);
 				node.removeAttributes(CARD_VALUE_KEY);
-				node.attributes('data-syntax', value.mode || 'plain');
+				node.attributes(DATA_SYNTAX, value.mode || 'plain');
 				newContent
 					.removeClass(VIEW_CLASS_NAME)
 					.removeClass(contentClassName);
@@ -393,10 +272,9 @@ export default class<
 		this.editor.off('parse:html', this.parseHtml);
 		this.editor.off('paste:schema', this.pasteSchema);
 		this.editor.off('paste:each', this.pasteHtml);
-		if (isEngine(this.editor) && this.markdown) {
-			this.editor.off('keydown:enter', this.markdown);
-			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.off('paste:markdown-before', this.pasteMarkdown);
+		if (isEngine(this.editor)) {
+			this.editor.off('markdown-it', this.markdownIt);
+			this.editor.off('markdown-it-token', this.markdownItToken);
 		}
 	}
 }

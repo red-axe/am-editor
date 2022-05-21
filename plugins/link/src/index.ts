@@ -6,6 +6,7 @@ import {
 	PluginEntry,
 	PluginOptions,
 } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
 import Toolbar from './toolbar';
 import locales from './locales';
 
@@ -13,7 +14,7 @@ import './index.css';
 
 export interface LinkOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: string;
+	markdown?: boolean;
 	onConfirm?: (
 		text: string,
 		link: string,
@@ -43,11 +44,6 @@ export default class<
 
 	tagName = 'a';
 
-	markdown =
-		this.options.markdown === undefined
-			? '([^!]|^)\\[(.+?)\\]\\(\\s*([\\S]+?)\\s*\\)$'
-			: this.options.markdown;
-
 	init() {
 		super.init();
 		const editor = this.editor;
@@ -55,6 +51,7 @@ export default class<
 			this.toolbar = new Toolbar(editor, {
 				onConfirm: this.options.onConfirm,
 			});
+			this.editor.on('markdown-it', this.markdownIt);
 		}
 		editor.on('paste:each', this.pasteHtml);
 		editor.on('parse:html', this.parseHtml);
@@ -149,58 +146,11 @@ export default class<
 		return;
 	}
 
-	checkMarkdown = (node: NodeInterface) => {
-		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
-
-		const text = node.text();
-		if (!text) return;
-
-		const reg = /(\[(.+?)\]\(\s*([\S]+?)\s*\))/;
-		const match = reg.exec(text);
-		return {
-			reg,
-			match,
-		};
-	};
-
-	pasteMarkdown = (node: NodeInterface) => {
-		const result = this.checkMarkdown(node);
-		if (!result) return;
-		let { reg, match } = result;
-		if (!match) return;
-
-		let newText = '';
-		let textNode = node.clone(true).get<Text>()!;
-		while (
-			textNode.textContent &&
-			(match = reg.exec(textNode.textContent))
-		) {
-			//从匹配到的位置切断
-			let regNode = textNode.splitText(match.index);
-			if (
-				textNode.textContent.endsWith('!') ||
-				match[2].startsWith('!')
-			) {
-				newText += textNode.textContent;
-				textNode = regNode.splitText(match[0].length);
-				newText += regNode.textContent;
-				continue;
-			}
-			newText += textNode.textContent;
-			//从匹配结束位置分割
-			textNode = regNode.splitText(match[0].length);
-
-			const text = match[2];
-			const url = match[3];
-
-			const inlineNode = $(`<${this.tagName} />`);
-			this.setAttributes(inlineNode, '_blank', (url || '').trim());
-			inlineNode.html(!!text ? text : url);
-
-			newText += inlineNode.get<Element>()?.outerHTML;
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) {
+			mardown.enable('link');
+			mardown.enable('linkify');
 		}
-		newText += textNode.textContent;
-		node.text(newText);
 	};
 
 	parseHtml = (root: NodeInterface) => {
@@ -233,9 +183,9 @@ export default class<
 	};
 
 	destroy(): void {
-		super.destroy();
 		this.editor.off('paste:each', this.pasteHtml);
 		this.editor.off('parse:html', this.parseHtml);
 		this.editor.off('select', this.bindQuery);
+		this.editor.off('markdown-it', this.markdownIt);
 	}
 }

@@ -1,8 +1,9 @@
-import { MarkPlugin, PluginOptions } from '@aomao/engine';
+import { isEngine, MarkPlugin, PluginOptions } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
 
 export interface ItalicOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: string;
+	markdown?: boolean;
 }
 export default class<
 	T extends ItalicOptions = ItalicOptions,
@@ -13,8 +14,16 @@ export default class<
 
 	tagName = 'em';
 
-	markdown =
-		this.options.markdown === undefined ? '_' : this.options.markdown;
+	init(): void {
+		super.init();
+		if (isEngine(this.editor)) {
+			this.editor.on('markdown-it', this.markdownIt);
+		}
+	}
+
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) mardown.enable('emphasis');
+	};
 
 	hotkey() {
 		return this.options.hotkey || 'mod+i';

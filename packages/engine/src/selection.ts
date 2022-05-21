@@ -220,7 +220,8 @@ class Selection implements SelectionInterface {
 		let parent = this.anchor.parent();
 		if (parent) {
 			node.removeZeroWidthSpace(parent);
-			this.range.setStartBefore(this.anchor);
+			if (this.anchor.get()?.isConnected)
+				this.range.setStartBefore(this.anchor);
 			this.anchor.remove();
 			parent[0].normalize();
 		}
@@ -229,7 +230,8 @@ class Selection implements SelectionInterface {
 		parent = this.focus.parent();
 		if (parent) {
 			node.removeZeroWidthSpace(parent);
-			this.range.setEndBefore(this.focus);
+			if (this.focus.get()?.isConnected)
+				this.range.setEndBefore(this.focus);
 			this.focus.remove();
 			parent[0].normalize();
 			if (

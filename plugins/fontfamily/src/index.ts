@@ -95,7 +95,6 @@ export default class<
 	};
 
 	destroy(): void {
-		super.destroy();
 		if (isEngine(this.editor)) {
 			this.editor.off('paste:each', this.pasteEach);
 		}

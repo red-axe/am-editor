@@ -133,10 +133,12 @@ class Range implements RangeInterface {
 	}
 	setEndAfter(node: Node | NodeInterface): void {
 		if (isNodeEntry(node)) node = node[0];
+		if (!node.parentNode) return;
 		return this.base.setEndAfter(node);
 	}
 	setEndBefore(node: Node | NodeInterface): void {
 		if (isNodeEntry(node)) node = node[0];
+		if (!node.parentNode) return;
 		return this.base.setEndBefore(node);
 	}
 	setStart(node: Node | NodeInterface, offset: number): void {
@@ -145,10 +147,12 @@ class Range implements RangeInterface {
 	}
 	setStartAfter(node: Node | NodeInterface): void {
 		if (isNodeEntry(node)) node = node[0];
+		if (!node.parentNode) return;
 		return this.base.setStartAfter(node);
 	}
 	setStartBefore(node: Node | NodeInterface): void {
 		if (isNodeEntry(node)) node = node[0];
+		if (!node.parentNode) return;
 		return this.base.setStartBefore(node);
 	}
 
@@ -561,7 +565,10 @@ class Range implements RangeInterface {
 
 	getStartOffsetNode = (): Node => {
 		const { startContainer, startOffset } = this;
-		if (startContainer.nodeType === Node.ELEMENT_NODE) {
+		if (
+			startContainer.nodeType === Node.ELEMENT_NODE ||
+			startContainer.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+		) {
 			return (
 				startContainer.childNodes[startOffset] ||
 				startContainer.childNodes[startOffset - 1] ||
@@ -573,7 +580,10 @@ class Range implements RangeInterface {
 
 	getEndOffsetNode = (): Node => {
 		const { endContainer, endOffset } = this;
-		if (endContainer.nodeType === Node.ELEMENT_NODE) {
+		if (
+			endContainer.nodeType === Node.ELEMENT_NODE ||
+			endContainer.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+		) {
 			return (
 				endContainer.childNodes[endOffset] ||
 				endContainer.childNodes[endOffset - 1] ||

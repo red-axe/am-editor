@@ -87,6 +87,15 @@ class Parser implements ParserInterface {
 			source = source?.replace(/<img .*>/gi, (str) => {
 				return str.replace(/on[a-zA-Z]{0,20}=/g, 'notallow=');
 			});
+			// 移除嵌套节点中的 \n  <ol>\n<li><br /></li>\n</ol>\
+			source = source.replace(
+				/<([a-zA-Z]+.*)>\n<([a-zA-Z]+.*)>/gi,
+				'<$1><$2>',
+			);
+			source = source.replace(
+				/<\/([a-zA-Z]+.*)>\n<\/([a-zA-Z]+.*)>/gi,
+				'</$1></$2>',
+			);
 			// 在 p 里包含 div 标签时 DOMParser 解析错误
 			// <p><div>foo</div></p>
 			// 变成
@@ -133,33 +142,21 @@ class Parser implements ParserInterface {
 				node.replaceWith(newNode);
 				return newNode;
 			} else {
-				if (!nodeApi.isBlock(newNode, schema)) {
-					if (value.replace) {
-						node.replaceWith(newNode);
-						node = newNode;
-					} else {
-						//把包含旧子节点的新节点追加到旧节点下
-						node.each((childNode) => {
-							(childNode as Element).append(
-								...newNode.get<Element>()!.childNodes,
-							);
-						});
-					}
-					if (!convertAfterNode || convertAfterNode.length === 0)
-						convertAfterNode = newNode;
+				if (value.replace) {
+					node.replaceWith(newNode);
+					node = newNode;
 				} else {
-					if (value.replace) {
-						node.replaceWith(newNode);
-						node = newNode;
-					} else {
-						node.each((childNode) => {
-							(childNode as Element).append(
-								...newNode.get<Element>()!.childNodes,
-							);
-						});
-					}
-					if (!convertAfterNode || convertAfterNode.length === 0)
-						convertAfterNode = newNode;
+					//把包含旧子节点的新节点追加到旧节点下
+					newNode.each((newNode) => {
+						const oldNode = node.get<Element>();
+						if (oldNode && oldNode instanceof Element)
+							oldNode.append(newNode);
+					});
+				}
+				if (!convertAfterNode || convertAfterNode.length === 0)
+					convertAfterNode = newNode;
+
+				if (nodeApi.isBlock(newNode, schema)) {
 					//排除之前的过滤规则后再次过滤
 					value = conversion.transform(
 						newNode,

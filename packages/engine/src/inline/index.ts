@@ -46,8 +46,6 @@ class Inline implements InlineModelInterface {
 			typing
 				.getHandleListener('right', 'keydown')
 				?.on((event) => right.trigger(event));
-			//markdown
-			event.on('keydown:space', (event) => this.triggerMarkdown(event));
 		}
 	}
 
@@ -110,41 +108,6 @@ class Inline implements InlineModelInterface {
 			}
 		}
 		return range;
-	}
-
-	/**
-	 * 解析markdown
-	 * @param event 事件
-	 */
-	triggerMarkdown(event: KeyboardEvent) {
-		const editor = this.editor;
-		if (!isEngine(editor)) return;
-		const { change } = editor;
-		let range = change.range.get();
-		if (!range.collapsed || change.isComposing()) return;
-		const { startNode, startOffset } = range;
-		const node =
-			startNode.type === Node.TEXT_NODE
-				? startNode
-				: startNode.children().eq(startOffset - 1);
-		if (!node) return;
-		const cacheRange = range.toPath();
-		const text =
-			node.type === Node.TEXT_NODE
-				? node.text().substr(0, startOffset)
-				: node.text();
-		const result = !Object.keys(editor.plugin.components).some(
-			(pluginName) => {
-				const plugin = editor.plugin.components[pluginName];
-				if (isInlinePlugin(plugin) && !!plugin.markdown) {
-					const reuslt = plugin.triggerMarkdown(event, text, node);
-					if (reuslt === false) return true;
-				}
-				return;
-			},
-		);
-		if (!result) change.rangePathBeforeCommand = cacheRange;
-		return result;
 	}
 
 	/**

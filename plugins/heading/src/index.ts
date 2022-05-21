@@ -1,16 +1,15 @@
 import {
 	$,
 	isEngine,
-	NodeInterface,
 	getHashId,
 	Tooltip,
 	BlockPlugin,
-	PluginEntry,
 	PluginOptions,
 	DATA_ID,
 	DATA_ELEMENT,
 	UI,
 } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
 import Outline from './outline';
 import type { OutlineData } from './outline';
 import './index.css';
@@ -61,8 +60,7 @@ export default class<
 		}
 		if (isEngine(this.editor)) {
 			this.editor.on('keydown:backspace', this.onBackspace);
-			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.on('paste:markdown', this.pasteMarkdown);
+			this.editor.on('markdown-it', this.markdownIt);
 		}
 		//引擎处理
 		if (!isEngine(this.editor) || this.options.showAnchor === false) return;
@@ -320,97 +318,8 @@ export default class<
 		].filter((item) => !enableTypes || enableTypes.indexOf(item.key) > -1);
 	}
 
-	//设置markdown
-	markdown(event: KeyboardEvent, text: string, block: NodeInterface) {
-		if (!isEngine(this.editor) || this.options.markdown === false)
-			return false;
-		let type: any = '';
-		switch (text) {
-			case '#':
-				type = 'h1';
-				break;
-			case '##':
-				type = 'h2';
-				break;
-			case '###':
-				type = 'h3';
-				break;
-			case '####':
-				type = 'h4';
-				break;
-			case '#####':
-				type = 'h5';
-				break;
-			case '######':
-				type = 'h6';
-				break;
-		}
-		if (!type) return true;
-		const { enableTypes } = this.options;
-		// 未启用
-		if (enableTypes && enableTypes.indexOf(type) < 0) return true;
-
-		event.preventDefault();
-		this.editor.block.removeLeftText(block);
-		if (this.editor.node.isEmpty(block)) {
-			block.empty();
-			block.append('<br />');
-		}
-		this.editor.command.execute(
-			(this.constructor as PluginEntry).pluginName,
-			type,
-		);
-		return false;
-	}
-
-	checkMarkdownMath = (child: NodeInterface) => {
-		return !this.checkMarkdown(child)?.match;
-	};
-
-	checkMarkdown = (node: NodeInterface) => {
-		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
-
-		const text = node.text();
-		const reg = /(^|\r\n|\n)(#{1,6})(.*)/;
-		const match = reg.exec(text);
-		return {
-			reg,
-			match,
-		};
-	};
-
-	pasteMarkdown = (node: NodeInterface) => {
-		const result = this.checkMarkdown(node);
-		if (!result) return;
-		let { reg, match } = result;
-		if (!match) return;
-
-		let newText = '';
-		let textNode = node.clone(true).get<Text>()!;
-
-		const { enableTypes } = this.options;
-
-		while (
-			textNode.textContent &&
-			(match = reg.exec(textNode.textContent))
-		) {
-			const codeLength = match[2].length;
-			//从匹配到的位置切断
-			let regNode = textNode.splitText(match.index);
-			newText += textNode.textContent;
-			//从匹配结束位置分割
-			textNode = regNode.splitText(match[0].length);
-			// 过滤不支持的节点
-			if (enableTypes && enableTypes.indexOf(`h${codeLength}`) < 0) {
-				newText += match[2] + match[3];
-			} else
-				newText +=
-					match[1] +
-					`<h${codeLength}>${match[3].trim()}</h${codeLength}>\n`;
-		}
-		newText += textNode.textContent;
-
-		node.text(newText);
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) mardown.enable('heading');
 	};
 
 	onBackspace = (event: KeyboardEvent) => {
@@ -450,8 +359,7 @@ export default class<
 		}
 		if (isEngine(this.editor)) {
 			this.editor.off('keydown:backspace', this.onBackspace);
-			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.off('paste:markdown', this.pasteMarkdown);
+			this.editor.off('markdown-it', this.markdownIt);
 		}
 		//引擎处理
 		if (!isEngine(this.editor) || this.options.showAnchor === false) return;

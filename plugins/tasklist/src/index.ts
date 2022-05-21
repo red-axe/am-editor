@@ -5,11 +5,12 @@ import {
 	CARD_KEY,
 	SchemaBlock,
 	isEngine,
-	PluginEntry,
 	PluginOptions,
 	decodeCardValue,
 	CARD_VALUE_KEY,
 } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
+import TaskMarkdown from './markdown';
 import CheckboxComponent, { CheckboxValue } from './checkbox';
 import './index.css';
 
@@ -17,6 +18,8 @@ export interface TasklistOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean | string[];
 }
+
+const TASK_LIST_CLASS = 'data-list-task';
 
 export default class<
 	T extends TasklistOptions = TasklistOptions,
@@ -37,7 +40,7 @@ export default class<
 	variable = {
 		'@var0': {
 			required: true,
-			value: [this.editor.list.CUSTOMZIE_UL_CLASS, 'data-list-task'],
+			value: [this.editor.list.CUSTOMZIE_UL_CLASS, TASK_LIST_CLASS],
 		},
 		'@var1': '@number',
 	};
@@ -48,8 +51,7 @@ export default class<
 		super.init();
 		this.editor.on('parse:html', this.parseHtml);
 		if (isEngine(this.editor)) {
-			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.on('paste:markdown', this.pasteMarkdown);
+			this.editor.on('markdown-it', this.markdownIt);
 			this.editor.on('paste:each-after', this.pasteEachAfter);
 		}
 	}
@@ -79,7 +81,7 @@ export default class<
 				node.hasClass(this.editor.list.CUSTOMZIE_LI_CLASS) &&
 				node.first()?.attributes(CARD_KEY) === 'checkbox'
 			);
-		return node.hasClass('data-list') && node.hasClass('data-list-task');
+		return node.hasClass('data-list') && node.hasClass(TASK_LIST_CLASS);
 	}
 
 	execute(value?: any) {
@@ -100,7 +102,7 @@ export default class<
 				) as Array<NodeInterface>;
 				listBlocks.forEach((list) => {
 					if (this.editor.node.isList(list))
-						list.addClass('data-list-task');
+						list.addClass(TASK_LIST_CLASS);
 				});
 			}
 			selection.move();
@@ -172,63 +174,21 @@ export default class<
 			node.append(checkbox);
 			results.push(node);
 		});
-		root.find('.data-list-task').css({
+		root.find(`.${TASK_LIST_CLASS}`).css({
 			'list-style': 'none',
 		});
 		return results;
 	};
 
-	//设置markdown
-	markdown = (event: KeyboardEvent, text: string, block: NodeInterface) => {
-		const { markdown } = this.options;
-		if (!isEngine(this.editor) || markdown === false) return;
-		const { node, command } = this.editor;
-		const blockApi = this.editor.block;
-		const plugin = blockApi.findPlugin(block);
-		// fix: 列表、引用等 markdown 快捷方式不应该在标题内生效
-		if (
-			block.name !== 'p' ||
-			(plugin &&
-				(plugin.constructor as PluginEntry).pluginName === 'heading')
-		) {
-			return;
+	markdownIt = (markdown: MarkdownIt) => {
+		if (this.options.markdown !== false) {
+			markdown.use(TaskMarkdown, {
+				enabled: true,
+				itemClass: this.editor.list.CUSTOMZIE_LI_CLASS,
+				rootClass: `${this.editor.list.CUSTOMZIE_UL_CLASS} ${TASK_LIST_CLASS}`,
+			});
+			markdown.enable('task-list');
 		}
-
-		let markdownWords = ['[]', '[ ]', '[x]'];
-		if (Array.isArray(markdown)) {
-			markdownWords = markdown;
-		}
-
-		if (markdownWords.indexOf(text) < 0) return;
-		event.preventDefault();
-		blockApi.removeLeftText(block);
-		if (node.isEmpty(block)) {
-			block.empty();
-			block.append('<br />');
-		}
-		command.execute(
-			(this.constructor as PluginEntry).pluginName,
-			text === '[x]' ? { checked: true } : undefined,
-		);
-		return false;
-	};
-
-	checkMarkdownMath = (child: NodeInterface) => {
-		return !this.checkMarkdown(child)?.match;
-	};
-
-	checkMarkdown = (node: NodeInterface) => {
-		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
-
-		const text = node.text();
-		if (!text) return;
-
-		const reg = /(^|\r\n|\n)(-\s*)?(\[[\sx]{0,1}\])/;
-		const match = reg.exec(text);
-		return {
-			reg,
-			match,
-		};
 	};
 
 	pasteEachAfter = (root: NodeInterface) => {
@@ -241,7 +201,7 @@ export default class<
 				const card = this.editor.card.find<CheckboxValue>(firstChild);
 				if (card) {
 					const parent = child.parent();
-					parent?.addClass('data-list-task');
+					parent?.addClass(TASK_LIST_CLASS);
 					const value = card.getValue();
 					if (value && value.checked) {
 						parent?.attributes('checked', 'true');
@@ -253,78 +213,10 @@ export default class<
 		});
 	};
 
-	pasteMarkdown = (node: NodeInterface) => {
-		const result = this.checkMarkdown(node);
-		if (!result) return;
-		const { match } = result;
-		if (!match) return;
-
-		const { list, card } = this.editor;
-
-		const createList = (nodes: Array<string>, indent?: number) => {
-			const listNode = $(
-				`<${this.tagName} class="${
-					list.CUSTOMZIE_UL_CLASS
-				} data-list-task">${nodes.join('')}</${this.tagName}>`,
-			);
-			if (indent) {
-				listNode.attributes(this.editor.list.INDENT_KEY, indent);
-			}
-			list.addBr(listNode);
-			return listNode.get<Element>()?.outerHTML;
-		};
-		const text = node.text();
-		let newText = match[1] || '';
-		const rows = text.split(/\n|\r\n/);
-		let nodes: Array<string> = [];
-		let indent = 0;
-		rows.forEach((row) => {
-			const match = /^(\s*)(-\s*)?(\[[\sx]{0,1}\])/.exec(row);
-			if (match && !/(\[(.*)\]\(([\S]+?)\))/.test(row)) {
-				const codeLength = match[0].length;
-				const content = row.substr(
-					/^\s+/.test(row.substr(codeLength))
-						? codeLength + 1
-						: codeLength,
-				);
-				const tempNode = $('<span />');
-				const cardNode = card.replaceNode<CheckboxValue>(
-					tempNode,
-					this.cardName,
-					{
-						checked: match[0].indexOf('x') > 0,
-					},
-				);
-				tempNode.remove();
-				if (match[1].length !== indent && nodes.length > 0) {
-					newText += createList(nodes, indent);
-					nodes = [];
-					indent = Math.ceil(match[1].length / 2);
-				}
-				nodes.push(
-					`<li class="${list.CUSTOMZIE_LI_CLASS}">${
-						cardNode.get<Element>()?.outerHTML
-					}${content}</li>`,
-				);
-			} else if (nodes.length > 0) {
-				newText += createList(nodes, indent) + '\n' + row + '\n';
-				nodes = [];
-			} else {
-				newText += row + '\n';
-			}
-		});
-		if (nodes.length > 0) {
-			newText += createList(nodes, indent) + '\n';
-		}
-		node.text(newText);
-	};
-
 	destroy(): void {
-		super.destroy();
 		this.editor.off('parse:html', this.parseHtml);
 		if (isEngine(this.editor)) {
-			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.off('paste:markdown', this.pasteMarkdown);
+			this.editor.off('markdown-it', this.markdownIt);
 			this.editor.off('paste:each-after', this.pasteEachAfter);
 		}
 	}

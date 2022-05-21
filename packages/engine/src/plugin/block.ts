@@ -2,7 +2,6 @@ import ElementPluginEntry from './element';
 import type {
 	SchemaBlock,
 	BlockInterface,
-	NodeInterface,
 	PluginInterface,
 	PluginOptions,
 } from '../types';
@@ -46,15 +45,6 @@ abstract class BlockEntry<T extends PluginOptions = PluginOptions>
 			canMerge: this.canMerge,
 		} as SchemaBlock;
 	}
-	/**
-	 * Markdown 处理
-	 */
-	markdown?(
-		event: KeyboardEvent,
-		text: string,
-		block: NodeInterface,
-		node: NodeInterface,
-	): boolean | void;
 }
 
 export default BlockEntry;

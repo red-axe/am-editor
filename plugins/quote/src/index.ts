@@ -3,9 +3,9 @@ import {
 	isEngine,
 	NodeInterface,
 	BlockPlugin,
-	PluginEntry,
 	PluginOptions,
 } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
 import './index.css';
 
 export interface QuoteOptions extends PluginOptions {
@@ -31,9 +31,8 @@ export default class<
 			this.editor.on('paste:each', this.pasteHtml);
 			this.editor.on('keydown:backspace', this.onBackspace);
 			this.editor.on('keydown:enter', this.onEnter);
-			this.editor.on('paste:markdown', this.pasteMarkdown);
 			this.editor.on('paste:each', this.pasteEach);
-			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.on('markdown-it', this.markdownIt);
 		}
 	}
 
@@ -68,103 +67,16 @@ export default class<
 		return this.options.hotkey || 'mod+shift+u';
 	}
 
-	//设置markdown
-	markdown = (event: KeyboardEvent, text: string, block: NodeInterface) => {
-		if (this.options.markdown === false || !isEngine(this.editor)) return;
-		const { node, command } = this.editor;
-		const blockApi = this.editor.block;
-		const plugin = blockApi.findPlugin(block);
-		// fix: 列表、引用等 markdown 快捷方式不应该在标题内生效
-		if (
-			block.name !== 'p' ||
-			(plugin &&
-				(plugin.constructor as PluginEntry).pluginName === 'heading')
-		) {
-			return;
-		}
-		if (['>'].indexOf(text) < 0) return;
-		event.preventDefault();
-		blockApi.removeLeftText(block);
-		if (node.isEmpty(block)) {
-			block.empty();
-			block.append('<br />');
-		}
-		command.execute((this.constructor as PluginEntry).pluginName);
-		return false;
-	};
-
 	pasteEach = (node: NodeInterface) => {
 		if (node.isText() && node.parent()?.name === this.tagName) {
 			this.editor.node.wrap(node, $('<p></p>'));
 		}
 	};
 
-	checkMarkdownMath = (child: NodeInterface) => {
-		return !this.checkMarkdown(child)?.match;
-	};
-
-	checkMarkdown = (node: NodeInterface) => {
-		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
-
-		const text = node.text();
-		if (!text) return;
-
-		const reg = /(^|\r\n|\n)(>\s+[^>]+)(\r\n|\n|$)/;
-		const match = reg.exec(text);
-		return {
-			reg,
-			match,
-		};
-	};
-
-	pasteMarkdown = (node: NodeInterface) => {
-		const result = this.checkMarkdown(node);
-		if (!result) return;
-		const { match } = result;
-		if (!match) return;
-
-		const text = node.text();
-		let newText = match[1] || '';
-		const rows = text.split(/\n|\r\n/);
-		let nodes: Array<string> = [];
-		rows.forEach((row) => {
-			const match = /^([>]{1,})/.exec(row);
-			if (match) {
-				const codeLength = match[1].length;
-				const content = row.substr(
-					/^\s+/.test(row.substr(codeLength))
-						? codeLength + 1
-						: codeLength,
-				);
-				const container = $('<div></div>');
-				container.html(content);
-				const childNodes = container.children();
-				if (
-					childNodes.length > 1 ||
-					(childNodes.length === 1 &&
-						!this.editor.node.isBlock(childNodes[0]) &&
-						!childNodes.eq(0)?.isBlockCard())
-				) {
-					nodes.push(`<p>${content}</p>`);
-				} else {
-					nodes.push(content);
-				}
-			} else if (nodes.length > 0) {
-				newText +=
-					`<${this.tagName}>${nodes.join('')}</${this.tagName}>` +
-					'\n' +
-					row +
-					'\n';
-				nodes = [];
-			} else {
-				newText += row + '\n';
-			}
-		});
-		if (nodes.length > 0) {
-			newText +=
-				`<${this.tagName}>${nodes.join('')}</${this.tagName}>` + '\n';
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) {
+			mardown.enable('blockquote');
 		}
-		node.text(newText);
 	};
 
 	onBackspace = (event: KeyboardEvent) => {
@@ -257,7 +169,7 @@ export default class<
 			node.css('padding-left', '');
 			node.css('text-indent', '');
 			if (nodeApi.isEmpty(node)) {
-				node.append('<p><br/></p>');
+				node.empty().append('<p><br/></p>');
 			}
 			this.editor.normalize(node);
 			return false;
@@ -271,9 +183,8 @@ export default class<
 			this.editor.off('paste:each', this.pasteHtml);
 			this.editor.off('keydown:backspace', this.onBackspace);
 			this.editor.off('keydown:enter', this.onEnter);
-			this.editor.off('paste:markdown', this.pasteMarkdown);
 			this.editor.off('paste:each', this.pasteEach);
-			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
+			this.editor.off('markdown-it', this.markdownIt);
 		}
 	}
 }

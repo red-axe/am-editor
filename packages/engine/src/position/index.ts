@@ -42,20 +42,22 @@ class Position {
 		if (isEngine(this.#editor) && !isMobile) {
 			this.#editor.scrollNode?.on('scroll', this.updateListener);
 		}
-		let size = { width: target.width(), height: target.height() };
-		if (typeof ResizeObserver !== 'undefined') {
-			this.#observer = new ResizeObserver(() => {
-				const width = target.width();
-				const height = target.height();
+		if (target && target.length > 0) {
+			let size = { width: target.width(), height: target.height() };
+			if (typeof ResizeObserver !== 'undefined') {
+				this.#observer = new ResizeObserver(() => {
+					const width = target.width();
+					const height = target.height();
 
-				if (width === size.width && height === size.height) return;
-				size = {
-					width,
-					height,
-				};
-				this.updateListener();
-			});
-			this.#observer.observe(target.get<HTMLElement>()!);
+					if (width === size.width && height === size.height) return;
+					size = {
+						width,
+						height,
+					};
+					this.updateListener();
+				});
+				this.#observer.observe(target.get<HTMLElement>()!);
+			}
 		}
 		this.update();
 	}

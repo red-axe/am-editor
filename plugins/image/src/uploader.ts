@@ -16,6 +16,7 @@ import {
 	removeUnit,
 	CardType,
 } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
 import type { RequestData, RequestHeaders } from '@aomao/engine';
 import { ImageOptions } from '.';
 import ImageComponent, { ImageValue } from './component';
@@ -145,14 +146,12 @@ export default class<
 
 	init() {
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:space', this.markdown);
 			this.editor.on('drop:files', this.dropFiles);
 			this.editor.on('paste:event', this.pasteFiles);
 			this.editor.on('paste:schema', this.pasteSchema);
 			this.editor.on('paste:each', this.pasteEach);
 			this.editor.on('paste:after', this.pasteAfter);
-			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.on('paste:markdown', this.pasteMarkdown);
+			this.editor.on('markdown-it', this.markdownIt);
 		}
 		let { accept } = this.options.file || {};
 		if (typeof accept === 'string') accept = accept.split(',');
@@ -715,117 +714,21 @@ export default class<
 			});
 	};
 
-	markdown = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor) || this.options.markdown === false) return;
-		const { change } = this.editor;
-		const range = change.range.get();
-
-		if (!range.collapsed || change.isComposing() || !this.markdown) return;
-		const cloneRange = range.cloneRange();
-		cloneRange.shrinkToTextNode();
-		const { startNode } = cloneRange;
-		if (!startNode.isText()) return;
-		const text = startNode.text();
-		const match = /!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)/.exec(text);
-		if (match) {
-			cloneRange.setStart(startNode, match.index);
-			change.range.select(cloneRange);
-			event.preventDefault();
-			const splits = match[1].split('|');
-			const src = match[2];
-			const alignment = splits[1];
-			if (alignment === 'center' || alignment === 'right') {
-				this.editor.command.execute('alignment', alignment);
-			}
-			this.insertRemote(src, splits[0]);
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) {
+			mardown.enable('image');
+			mardown.enable('reference');
 		}
-	};
-
-	checkMarkdownMath = (child: NodeInterface) => {
-		return !this.checkMarkdown(child)?.match;
-	};
-
-	checkMarkdown = (node: NodeInterface) => {
-		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
-
-		const text = node.text();
-		if (!text) return;
-		// 带跳转链接的图片
-		let reg =
-			/(\[!\[([^\]]{0,})\]\((\S{0,})(https?:\/\/[^\)]{5,})\)\]\(([\S]+?)\))|(!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\))/i;
-		let match = reg.exec(text);
-
-		if (!match) {
-			// 无跳转链接的图片
-			//![aomao-preview](https://user-images.githubusercontent.com/55792257/125074830-62d79300-e0f0-11eb-8d0f-bb96a7775568.png)
-			reg = /(!\[([^\]]{0,})\]\((\S{0,})(https?:\/\/[^\)]{5,})\))/i;
-			match = reg.exec(text);
-		}
-		return {
-			reg,
-			match,
-		};
-	};
-
-	pasteMarkdown = (node: NodeInterface) => {
-		const result = this.checkMarkdown(node);
-		if (!result) return;
-
-		const { isRemote } = this.options;
-		let { reg, match } = result;
-		if (!match) return;
-		let newText = '';
-		let textNode = node.clone(true).get<Text>()!;
-		const { card } = this.editor;
-		while (
-			textNode.textContent &&
-			(match = reg.exec(textNode.textContent))
-		) {
-			//从匹配到的位置切断
-			let regNode = textNode.splitText(match.index);
-			newText += textNode.textContent;
-			//从匹配结束位置分割
-			textNode = regNode.splitText(match[0].length);
-			const isLink = match[0].startsWith('[');
-			const alt = match[2] || match[6];
-			const src = match[4] || match[8];
-			const link = isLink ? match[5] : '';
-			const imagePlugin =
-				this.editor.plugin.findPlugin<ImageOptions>('image');
-			const cardNode = card.replaceNode<ImageValue>($(regNode), 'image', {
-				src,
-				status:
-					(isRemote && isRemote(src)) || /^data:image\//i.test(src)
-						? 'uploading'
-						: 'done',
-				alt,
-				percent: 0,
-				link: !!link
-					? {
-							href: link,
-							target: isRemote && isRemote(link) ? '_blank' : '',
-					  }
-					: undefined,
-				type: imagePlugin?.options.defaultType || CardType.INLINE,
-			});
-			regNode.remove();
-
-			newText += cardNode.get<Element>()?.outerHTML;
-		}
-		newText += textNode.textContent;
-		node.text(newText);
 	};
 
 	destroy() {
 		if (isEngine(this.editor)) {
-			this.editor.off('keydown:space', this.markdown);
 			this.editor.off('drop:files', this.dropFiles);
 			this.editor.off('paste:event', this.pasteFiles);
 			this.editor.off('paste:schema', this.pasteSchema);
 			this.editor.off('paste:each', this.pasteEach);
 			this.editor.off('paste:after', this.pasteAfter);
-			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.off('paste:markdown', this.pasteMarkdown);
+			this.editor.off('markdown-it', this.markdownIt);
 		}
 	}
 }

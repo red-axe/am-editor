@@ -184,15 +184,4 @@ export interface BlockInterface<T extends PluginOptions = PluginOptions>
 	 * 获取当前插件定义规则
 	 */
 	schema(): SchemaBlock | Array<SchemaBlock>;
-
-	/**
-	 * Markdown 处理
-	 * @returns 返回false表示已拦截处理
-	 */
-	markdown?(
-		event: KeyboardEvent,
-		text: string,
-		block: NodeInterface,
-		node: NodeInterface,
-	): boolean | void;
 }

@@ -24,7 +24,8 @@ import { $ } from '../node';
 import Parser, { TextParser } from '../parser';
 import Paste from './paste';
 import { CardActiveTrigger, CardType } from '../card/enum';
-import { escape } from '../utils';
+import { createMakrdownIt, escape } from '../utils';
+import Token from 'markdown-it/lib/token';
 
 class NativeEvent {
 	engine: EngineInterface;
@@ -412,23 +413,79 @@ class NativeEvent {
 			}
 		});
 
-		const parserMarkdown = (text: string) => {
-			const textNode = $(document.createTextNode(text));
-			const result = this.engine.trigger(
-				'paste:markdown-check',
-				textNode,
-			);
-			return {
-				node: textNode,
-				result,
-			};
+		const convertMarkdown = (text: string) => {
+			change.cacheRangeBeforeCommand();
+			const markdown = createMakrdownIt(this.engine, 'zero');
+			const { renderer, options } = markdown;
+			markdown.enable(['paragraph', 'html_inline', 'newline']);
+			//.disable(['strikethrough', 'emphasis', 'link', 'image', 'table', 'code', 'blockquote', 'hr', 'list', 'heading'])
+			const tokens = markdown.parse(text, {});
+			if (tokens.length === 0) return;
+			let isHit = false;
+			const blockTags = this.engine.schema.getTags('blocks');
+			let textContent = '';
+			let nodeContent: string[] = [];
+			tokens.forEach((token, index) => {
+				const { type, tag, children, nesting } = token;
+				const result = this.engine.trigger('markdown-it-token', {
+					token,
+					markdown,
+					callback: (result: string) => {
+						textContent += result;
+					},
+				});
+				if (!result) {
+					isHit = true;
+					return;
+				}
+
+				let content = '';
+				if (type === 'inline' && children) {
+					content = renderer.renderInline(children, options, {});
+				} else if (typeof renderer.rules[type] !== 'undefined') {
+					content = renderer.rules[type]!(
+						tokens,
+						index,
+						options,
+						{},
+						renderer,
+					);
+				} else {
+					content = renderer.renderToken(tokens, index, options);
+				}
+				if (nesting === 1) {
+					nodeContent.push('');
+					textContent += content;
+				} else if (nesting === 0) {
+					if (nodeContent.length === 0) {
+						textContent += content;
+						if (tag && !isHit) isHit = true;
+					} else if (!!content)
+						nodeContent[nodeContent.length - 1] += content;
+				} else if (nesting === -1) {
+					if (
+						nodeContent.length > 0 &&
+						!nodeContent[nodeContent.length - 1] &&
+						blockTags.includes(tag)
+					)
+						nodeContent[nodeContent.length - 1] += '<br />';
+					textContent += nodeContent[nodeContent.length - 1] ?? '';
+					nodeContent.pop();
+					if (nodeContent.every((content) => !content))
+						nodeContent = [];
+					textContent += content;
+					if (!isHit && tag !== 'p') isHit = true;
+				}
+			});
+			if (isHit) return textContent;
+			return null;
 		};
 
 		const pasteMarkdown = async (html: string, text: string) => {
 			// 先解析text
-			let { node, result } = parserMarkdown(text);
+			let result = convertMarkdown(text);
 			// 没有 markdown，尝试解析 html
-			if (result !== false) {
+			if (result === null) {
 				// 先解析html
 				let parser = new Parser(html, this.engine);
 				const schema = this.engine.schema.clone();
@@ -450,11 +507,17 @@ class NativeEvent {
 					parser = new Parser(text, this.engine);
 					parserText = parser.toText(schema);
 				}
-				const htmlResult = parserMarkdown(parserText);
-				node = htmlResult.node;
-				result = htmlResult.result;
+				result = convertMarkdown(parserText);
 			}
-			if (result !== false) return;
+			if (result === null) return;
+			const handlePaste = () => {
+				this.engine.history.saveOp();
+				this.paste(result!, this.#lastePasteRange, undefined, false);
+			};
+			if (this.engine.options.markdownMode !== 'confirm') {
+				handlePaste();
+				return;
+			}
 			// 提示是否要转换
 			this.engine
 				.messageConfirm(
@@ -462,18 +525,7 @@ class NativeEvent {
 					this.engine.language.get<string>('checkMarkdown', 'title'),
 				)
 				.then(() => {
-					change.cacheRangeBeforeCommand();
-					this.engine.trigger('paste:markdown-before', node);
-					this.engine.trigger('paste:markdown', node);
-					this.engine.trigger('paste:markdown-after', node);
-
-					node.get<Text>()?.normalize();
-					this.paste(
-						node.text(),
-						this.#lastePasteRange,
-						undefined,
-						false,
-					);
+					handlePaste();
 				})
 				.catch((err) => {
 					if (err) this.engine.messageError('markdown', err);

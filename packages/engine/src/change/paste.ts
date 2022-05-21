@@ -251,6 +251,10 @@ export default class Paste {
 				}
 				// 补齐 li
 				if (node.name !== 'li' && parentIsList) {
+					if (node.name === 'br') {
+						node.remove();
+						return undefined;
+					}
 					const li = $('<li />');
 					node.before(li);
 					li.append(node);

@@ -2,19 +2,28 @@ import {
 	$,
 	ConversionFromValue,
 	ConversionToValue,
+	isEngine,
 	MarkPlugin,
 	PluginOptions,
 } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
 
 export interface SupOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: string;
+	markdown?: boolean;
 }
 export default class<T extends SupOptions = SupOptions> extends MarkPlugin<T> {
 	tagName = 'sup';
 
 	static get pluginName() {
 		return 'sup';
+	}
+
+	init() {
+		super.init();
+		if (isEngine(this.editor)) {
+			this.editor.on('markdown-it', this.markdownIt);
+		}
 	}
 
 	conversion(): { from: ConversionFromValue; to: ConversionToValue }[] {
@@ -37,10 +46,18 @@ export default class<T extends SupOptions = SupOptions> extends MarkPlugin<T> {
 		];
 	}
 
-	markdown =
-		this.options.markdown === undefined ? '^' : this.options.markdown;
-
 	hotkey() {
 		return this.options.hotkey || 'mod+.';
+	}
+
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) {
+			mardown.use(require('markdown-it-sup'));
+			mardown.enable('sup');
+		}
+	};
+
+	destroy(): void {
+		this.editor.off('markdown-it', this.markdownIt);
 	}
 }

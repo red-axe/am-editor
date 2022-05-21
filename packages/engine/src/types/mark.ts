@@ -127,10 +127,6 @@ export interface MarkInterface<T extends PluginOptions = PluginOptions>
 	 */
 	readonly tagName: string;
 	/**
-	 * Markdown 规则，可选
-	 */
-	readonly markdown?: string;
-	/**
 	 * 回车后是否复制mark效果，默认为 true，允许
 	 * <p><strong>abc<cursor /></strong></p>
 	 * 在光标处回车后，第二行默认会继续 strong 样式，如果为 false，将不在加 strong 样式
@@ -174,26 +170,4 @@ export interface MarkInterface<T extends PluginOptions = PluginOptions>
 	 * @param args 在调用 command.execute 执行插件传入时的参数
 	 */
 	isTrigger?(...args: any): boolean;
-	/**
-	 * 解析markdown
-	 * @param event 事件
-	 * @param text markdown文本
-	 * @param node 触发节点
-	 */
-	triggerMarkdown(
-		event: KeyboardEvent,
-		text: string,
-		node: NodeInterface,
-	): boolean | void;
-	/**
-	 * 检测当前粘贴节点是否符合markdown解析规则
-	 */
-	checkMarkdown(
-		node: NodeInterface,
-	): { reg: RegExp; match: RegExpExecArray | null } | undefined;
-	/**
-	 * 解析粘贴markdown
-	 * @param node 节点
-	 */
-	pasteMarkdown(node: NodeInterface): boolean | void;
 }

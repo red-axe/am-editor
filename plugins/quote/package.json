@@ -22,5 +22,8 @@
   "dependencies": {
     "@aomao/engine": "^2.9.0",
     "@babel/runtime": "^7.13.10"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^12.2.3"
   }
 }

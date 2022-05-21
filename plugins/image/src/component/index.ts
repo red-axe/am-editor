@@ -98,7 +98,10 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 	}
 
 	setSize(size: Size, loaded?: boolean) {
-		if (!loaded) this.setValue({ size } as T);
+		if (!size.width || !size.height) return;
+		const value = this.getValue();
+		if (!loaded || !value.size || !value.size.height || !value.size.width)
+			this.setValue({ size } as T);
 		if (this.widthInput) {
 			this.widthInput.get<HTMLInputElement>()!.value =
 				size.width.toString();

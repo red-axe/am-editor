@@ -120,7 +120,10 @@ class Typing implements TypingInterface {
 				return false;
 			});
 		//触发默认事件
-		if (result === false) {
+		if (
+			result === false &&
+			this.engine.trigger(type + ':default', event) !== false
+		) {
 			this.getHandleListener('default', type)?.trigger(event);
 		}
 	}

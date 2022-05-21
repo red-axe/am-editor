@@ -13,7 +13,7 @@ import {
 	RangeInterface,
 } from '../types';
 import { MarkInterface, MarkModelInterface } from '../types/mark';
-import { getDocument, isEngine } from '../utils';
+import { createMakrdownIt, getDocument, isEngine } from '../utils';
 import { Backspace } from './typing';
 import { $ } from '../node';
 import { isNode } from '../node/utils';
@@ -60,19 +60,72 @@ class Mark implements MarkModelInterface {
 			node.type === Node.TEXT_NODE
 				? node.text().substr(0, startOffset)
 				: node.text();
-		const result = !Object.keys(editor.plugin.components).some(
-			(pluginName) => {
-				const plugin = editor.plugin.components[pluginName];
-				if (isMarkPlugin(plugin) && !!plugin.markdown) {
-					const reuslt = plugin.triggerMarkdown(event, text, node);
-					if (reuslt === false) return true;
+		const markdown = createMakrdownIt(this.editor, 'zero');
+		const { renderer, options } = markdown;
+		const tokens = markdown.parseInline(text, {});
+		if (tokens.length === 0) return;
+		let isHit = false;
+		let textContent = '';
+		tokens.forEach((token) => {
+			let lineContent = '';
+			const children = token.children || [];
+			children.forEach((child, index) => {
+				const { type } = child;
+				const result = editor.trigger('markdown-it-token', {
+					token,
+					markdown,
+					callback: (result: string) => {
+						lineContent += result;
+					},
+				});
+				if (!result) {
+					isHit = true;
+					return;
 				}
-				return;
-			},
-		);
-		if (!result) change.rangePathBeforeCommand = cacheRange;
-		return result;
+				if (!isHit && type !== 'text') {
+					isHit = true;
+				}
+				if (typeof renderer.rules[type] !== 'undefined') {
+					lineContent += renderer.rules[type]!(
+						children,
+						index,
+						options,
+						{},
+						renderer,
+					);
+				} else {
+					lineContent += renderer.renderToken(
+						children,
+						index,
+						options,
+					);
+				}
+			});
+			textContent += lineContent;
+		});
+		if (isHit) {
+			const nodeApi = this.editor.node;
+			event.preventDefault();
+			range.setStart(node[0], 0);
+			range.setEnd(node[0], startOffset);
+			change.paste(textContent, range);
+			change.rangePathBeforeCommand = cacheRange;
+			range.collapse(false);
+			range.enlargeToElementNode();
+			const contentNode = $(textContent);
+			const last = contentNode.last();
+			const lastNode = contentNode.eq(contentNode.length - 1);
+			if (
+				nodeApi.isMark(contentNode) ||
+				(last && nodeApi.isMark(last)) ||
+				(lastNode && nodeApi.isMark(lastNode))
+			)
+				nodeApi.insertText('\xa0', range);
+			change.range.select(range);
+		}
+		return !isHit;
 	}
+
 	pluginCaches: Map<string, MarkInterface> = new Map();
 	/**
 	 * 根据节点查找mark插件实例

@@ -522,9 +522,11 @@ class List implements ListModelInterface {
 					startCache[prevIndent] =
 						startCache[prevIndent] || prevStart + len;
 				}
-			} else
+			} else {
 				cacheIndent =
 					parseInt(prevNode.attributes(this.INDENT_KEY), 10) || 0;
+			}
+
 			prevNode = prevNode.prev();
 		}
 

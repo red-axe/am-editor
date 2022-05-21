@@ -2,13 +2,15 @@ import {
 	$,
 	ConversionFromValue,
 	ConversionToValue,
+	isEngine,
 	MarkPlugin,
 	PluginOptions,
 } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
 
 export interface StrikethroughOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: string;
+	markdown?: boolean;
 }
 export default class<
 	T extends StrikethroughOptions = StrikethroughOptions,
@@ -19,12 +21,16 @@ export default class<
 		return 'strikethrough';
 	}
 
+	init() {
+		super.init();
+		if (isEngine(this.editor)) {
+			this.editor.on('markdown-it', this.markdownIt);
+		}
+	}
+
 	hotkey() {
 		return this.options.hotkey || 'mod+shift+x';
 	}
-
-	markdown =
-		this.options.markdown === undefined ? '~~' : this.options.markdown;
 
 	conversion(): { from: ConversionFromValue; to: ConversionToValue }[] {
 		return [
@@ -58,5 +64,15 @@ export default class<
 				to: this.tagName,
 			},
 		];
+	}
+
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) {
+			mardown.enable('strikethrough');
+		}
+	};
+
+	destroy(): void {
+		this.editor.off('markdown-it', this.markdownIt);
 	}
 }

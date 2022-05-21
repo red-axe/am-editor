@@ -416,10 +416,7 @@ class NodeModel implements NodeModelInterface {
 		const plugin = block.findPlugin(source);
 		//循环追加
 		while (child) {
-			let next = child.next();
-			if (next?.isCursor()) {
-				next = next.next();
-			}
+			const next = child.next();
 			const markPlugin = mark.findPlugin(child);
 			if (
 				plugin &&
@@ -870,9 +867,18 @@ class NodeModel implements NodeModelInterface {
 		// 非光标标记的字节的数量
 		let notCursorCount = 0;
 		let allText = true;
+		let hasBlock = false;
+		const isP = blockNode.name === 'p';
 		for (const child of children) {
 			if (allText && child.nodeType === Node.TEXT_NODE) {
 				allText = false;
+			} else if (
+				!isP &&
+				!hasBlock &&
+				child.nodeType === Node.ELEMENT_NODE &&
+				this.isBlock(child)
+			) {
+				hasBlock = true;
 			}
 			if (
 				child.nodeType === Node.ELEMENT_NODE &&
@@ -886,16 +892,18 @@ class NodeModel implements NodeModelInterface {
 				break;
 			}
 		}
-		if (blockNode.name === 'p' && notCursorCount === 0) {
+		if (isP && notCursorCount === 0) {
 			const br = document.createElement('br');
 			blockNode.each((children) => {
 				children.appendChild(br.cloneNode());
 			});
 		}
 		if (
+			!hasBlock &&
+			allText &&
 			this.isBlock(blockNode) &&
-			this.isEmptyWithTrim(blockNode) &&
-			allText
+			(children.length !== 1 || children[0].nodeName !== 'BR') &&
+			this.isEmptyWithTrim(blockNode)
 		) {
 			blockNode.empty();
 			blockNode.append(document.createElement('br'));

@@ -1,9 +1,15 @@
-import { NodeInterface, InlinePlugin, PluginOptions } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
+import {
+	NodeInterface,
+	InlinePlugin,
+	PluginOptions,
+	isEngine,
+} from '@aomao/engine';
 import './index.css';
 
 export interface CodeOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: string;
+	markdown?: boolean;
 }
 export default class<
 	T extends CodeOptions = CodeOptions,
@@ -15,12 +21,16 @@ export default class<
 	init() {
 		super.init();
 		this.editor.on('parse:html', this.parseHtml);
+		if (isEngine(this.editor)) {
+			this.editor.on('markdown-it', this.markdownIt);
+		}
 	}
 
 	tagName = 'code';
 
-	markdown =
-		this.options.markdown === undefined ? '`' : this.options.markdown;
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) mardown.enable('backticks');
+	};
 
 	hotkey() {
 		return this.options.hotkey || 'mod+e';
@@ -40,7 +50,7 @@ export default class<
 	};
 
 	destroy() {
-		super.destroy();
 		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off('markdown-it', this.markdownIt);
 	}
 }

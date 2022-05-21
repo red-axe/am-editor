@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.0",
-    "@types/lodash": "^4.14.178"
+    "@types/lodash": "^4.14.178",
+	"@types/markdown-it": "^12.2.3"
   }
 }

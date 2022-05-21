@@ -10,6 +10,7 @@ import { RangeInterface } from './range';
 import { Op } from 'sharedb';
 import { EditorInterface, EditorOptions } from './editor';
 import { HotkeyInterface } from './hotkey';
+import MarkdownIt from 'markdown-it';
 
 /**
  * 编辑器容器接口
@@ -70,6 +71,11 @@ export interface EngineOptions extends EditorOptions {
 	 * 在编辑器尾部单击空白处是否自动添加空行
 	 */
 	autoAppend?: boolean;
+	/**
+	 * markdown 模式，默认为检测到 markdown 语法就直接转换
+	 * 使用 confirm 模式，需要确认后再次转换
+	 */
+	markdownMode?: 'confirm';
 }
 
 export interface Engine<T extends EngineOptions = EngineOptions> {

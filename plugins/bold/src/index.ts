@@ -1,8 +1,9 @@
-import { MarkPlugin, PluginOptions } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
+import { MarkPlugin, PluginOptions, isEngine } from '@aomao/engine';
 
 export interface BoldOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
-	markdown?: string;
+	markdown?: boolean;
 }
 export default class<
 	T extends BoldOptions = BoldOptions,
@@ -13,8 +14,16 @@ export default class<
 
 	tagName = 'strong';
 
-	markdown =
-		this.options.markdown === undefined ? '**' : this.options.markdown;
+	init(): void {
+		super.init();
+		if (isEngine(this.editor)) {
+			this.editor.on('markdown-it', this.markdownIt);
+		}
+	}
+
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) mardown.enable('emphasis');
+	};
 
 	hotkey() {
 		return this.options.hotkey || 'mod+b';
@@ -37,5 +46,9 @@ export default class<
 				to: this.tagName,
 			},
 		];
+	}
+
+	destroy(): void {
+		this.editor.off('markdown-it', this.markdownIt);
 	}
 }

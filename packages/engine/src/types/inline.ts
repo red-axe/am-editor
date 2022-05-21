@@ -92,26 +92,4 @@ export interface InlineInterface<T extends PluginOptions = PluginOptions>
 	 * @param args 在调用 command.execute 执行插件传入时的参数
 	 */
 	isTrigger?(...args: any): boolean;
-	/**
-	 * 解析markdown
-	 * @param event 事件
-	 * @param text markdown文本
-	 * @param node 触发节点
-	 */
-	triggerMarkdown(
-		event: KeyboardEvent,
-		text: string,
-		node: NodeInterface,
-	): boolean | void;
-	/**
-	 * 检测当前粘贴节点是否符合markdown解析规则
-	 */
-	checkMarkdown(
-		node: NodeInterface,
-	): { reg: RegExp; match: RegExpExecArray | null } | undefined;
-	/**
-	 * 解析粘贴markdown
-	 * @param node 节点
-	 */
-	pasteMarkdown(node: NodeInterface): boolean | void;
 }

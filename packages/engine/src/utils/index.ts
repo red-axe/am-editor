@@ -1,3 +1,4 @@
+import Markdown from 'markdown-it';
 import { EditorInterface, EngineInterface, ViewInterface } from '../types';
 import TinyCanvas from './tiny-canvas';
 export * from './string';
@@ -21,4 +22,17 @@ export const isEngine = (
  */
 export const isView = (editor: EditorInterface): editor is ViewInterface => {
 	return editor.kind === 'view';
+};
+
+export const createMakrdownIt = (
+	editor: EditorInterface,
+	presetName: Markdown.PresetName = 'default',
+) => {
+	const markdown = new Markdown(presetName, {
+		html: true,
+		typographer: true,
+		linkify: true,
+	});
+	editor.trigger('markdown-it', markdown);
+	return markdown;
 };

@@ -1,13 +1,10 @@
 import ElementPluginEntry from './element';
 import type {
 	MarkInterface,
-	NodeInterface,
 	SchemaMark,
-	PluginEntry as PluginEntryType,
 	PluginInterface,
 	PluginOptions,
 } from '../types';
-import { $ } from '../node';
 import { isEngine } from '../utils';
 
 abstract class MarkEntry<T extends PluginOptions = PluginOptions>
@@ -19,10 +16,6 @@ abstract class MarkEntry<T extends PluginOptions = PluginOptions>
 	 * 标签名称
 	 */
 	abstract readonly tagName: string;
-	/**
-	 * Markdown 规则，可选
-	 */
-	readonly markdown?: string;
 	/**
 	 * 回车后是否复制mark效果，默认为 true，允许
 	 * <p><strong>abc<cursor /></strong></p>
@@ -49,15 +42,6 @@ abstract class MarkEntry<T extends PluginOptions = PluginOptions>
 	 * 合并级别，值越大就合并在越外围
 	 */
 	readonly mergeLeval: number = 1;
-
-	init() {
-		super.init();
-		const editor = this.editor;
-		if (isEngine(editor) && this.markdown) {
-			editor.on('paste:markdown-check', this.checkMarkdownMath);
-			editor.on('paste:markdown', this.pasteMarkdown);
-		}
-	}
 
 	execute(...args: any) {
 		const editor = this.editor;
@@ -110,128 +94,6 @@ abstract class MarkEntry<T extends PluginOptions = PluginOptions>
 	 * @param args 在调用 command.execute 执行插件传入时的参数
 	 */
 	isTrigger?(...args: any): boolean;
-	/**
-	 * 解析markdown
-	 * @param event 事件
-	 * @param text markdown文本
-	 * @param node 触发节点
-	 */
-	triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface) {
-		const editor = this.editor;
-		if (!isEngine(editor) || !this.markdown) return;
-		const { block, change, command } = editor;
-		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
-		const match = new RegExp(`^(.*)${key}(.+?)${key}$`).exec(text);
-
-		if (match) {
-			//限制block下某些禁用的mark插件
-			const blockPlugin = block.findPlugin(node);
-			const pluginName = (this.constructor as PluginEntryType).pluginName;
-			if (
-				blockPlugin &&
-				blockPlugin.disableMark &&
-				blockPlugin.disableMark.indexOf(pluginName) > -1
-			)
-				return;
-			let range = change.range.get();
-			const visibleChar = match[1] && /\S$/.test(match[1]);
-			const codeChar = match[2];
-			event.preventDefault();
-			let leftText = text.substr(
-				0,
-				text.length - codeChar.length - 2 * this.markdown.length,
-			);
-			node.get<Text>()!.splitText(
-				(leftText + codeChar).length + 2 * this.markdown.length,
-			);
-			if (visibleChar) {
-				leftText += ' ';
-			}
-			node[0].nodeValue = leftText + codeChar;
-			range.setStart(node[0], leftText.length);
-			range.setEnd(node[0], (leftText + codeChar).length);
-			change.range.select(range);
-			command.execute((this.constructor as PluginEntryType).pluginName);
-			range = change.range.get();
-			range.collapse(false);
-			range.enlargeToElementNode();
-			editor.node.insertText('\xa0', range);
-			change.range.select(range);
-			return false;
-		}
-		return;
-	}
-
-	checkMarkdownMath = (child: NodeInterface) => {
-		const text = child.text();
-		// 含有html标签就不检测
-		if (/<.+?>.*<\/.+?>/gi.test(text)) {
-			return false;
-		}
-		return !this.checkMarkdown(child)?.match;
-	};
-
-	checkMarkdown(node: NodeInterface) {
-		if (!isEngine(this.editor) || !this.markdown) return;
-		if (!node.isText()) return;
-
-		let text = node.text();
-		if (!text) return;
-		const key = this.markdown.replace(/(\*|\^|\$)/g, '\\$1');
-		const reg =
-			key === '_'
-				? new RegExp(
-						`\\s+(${key}([^${key}\\r\\n%5Cr%5Cn"]+)${key})\\s+`,
-				  )
-				: new RegExp(`(${key}([^${key}\\r\\n%5Cr%5Cn"]+)${key})`);
-		let match = reg.exec(text);
-		return {
-			reg,
-			match,
-		};
-	}
-
-	pasteMarkdown = (node: NodeInterface) => {
-		const result = this.checkMarkdown(node);
-		if (!result) return;
-		let { reg, match } = result;
-		if (!match) return;
-		let newText = '';
-		let textNode = node.clone(true).get<Text>()!;
-
-		while (
-			textNode.textContent &&
-			(match = reg.exec(textNode.textContent))
-		) {
-			//从匹配到的位置切断
-			let regNode = textNode.splitText(match.index);
-			newText += textNode.textContent;
-			//从匹配结束位置分割
-			textNode = regNode.splitText(match[0].length);
-			// ~z</code>ad<code>a~ 这样的不做处理
-			if (/<\/.+?>.*<.+?>/gi.test(match[0])) {
-				newText += match[0];
-				continue;
-			}
-			//获取中间字符
-			const markNode = $(
-				`<${this.tagName}>${match[2]}</${this.tagName}>`,
-			);
-			this.setStyle(markNode);
-			this.setAttributes(markNode);
-			newText += markNode.get<Element>()?.outerHTML;
-		}
-		newText += textNode.textContent;
-
-		node.text(newText);
-	};
-
-	destroy() {
-		if (isEngine(this.editor) && this.markdown) {
-			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.off('paste:markdown', this.pasteMarkdown);
-		}
-	}
 }
 
 export default MarkEntry;

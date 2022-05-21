@@ -4,12 +4,12 @@ import {
 	NodeInterface,
 	CARD_KEY,
 	isEngine,
-	PluginEntry,
 	SchemaInterface,
 	PluginOptions,
 	CARD_VALUE_KEY,
 	decodeCardValue,
 } from '@aomao/engine';
+import type MarkdownIt from 'markdown-it';
 import HrComponent, { HrValue } from './component';
 
 export interface HrOptions extends PluginOptions {
@@ -26,9 +26,7 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 		this.editor.on('paste:schema', this.pasteSchema);
 		this.editor.on('paste:each', this.pasteHtml);
 		if (isEngine(this.editor)) {
-			this.editor.on('keydown:enter', this.markdown);
-			this.editor.on('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.on('paste:markdown', this.pasteMarkdown);
+			this.editor.on('markdown-it', this.markdownIt);
 		}
 	}
 
@@ -42,73 +40,10 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 		return this.options.hotkey || 'mod+shift+e';
 	}
 
-	markdown = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor) || this.options.markdown === false) return;
-		const { change, command, node } = this.editor;
-		const range = change.range.get();
-
-		if (!range.collapsed || change.isComposing() || !this.markdown) return;
-		const blockApi = this.editor.block;
-		const block = blockApi.closest(range.startNode);
-
-		if (!node.isRootBlock(block)) {
-			return;
+	markdownIt = (mardown: MarkdownIt) => {
+		if (this.options.markdown !== false) {
+			mardown.enable('hr');
 		}
-
-		const chars = blockApi.getLeftText(block);
-		const match = /^[-]{3,}$/.exec(chars);
-
-		if (match) {
-			event.preventDefault();
-			blockApi.removeLeftText(block);
-			command.execute((this.constructor as PluginEntry).pluginName);
-			return false;
-		}
-		return;
-	};
-
-	checkMarkdownMath = (child: NodeInterface) => {
-		return !this.checkMarkdown(child)?.match;
-	};
-
-	checkMarkdown = (node: NodeInterface) => {
-		if (!isEngine(this.editor) || !this.markdown || !node.isText()) return;
-
-		const text = node.text();
-		const reg = /(^|\r\n|\n)((-\s*){3,})\s?(\r\n|\n|$)/;
-		const match = reg.exec(text);
-		return {
-			reg,
-			match,
-		};
-	};
-
-	pasteMarkdown = (node: NodeInterface) => {
-		const result = this.checkMarkdown(node);
-		if (!result) return;
-		let { reg, match } = result;
-		if (!match) return;
-
-		let newText = '';
-		let textNode = node.clone(true).get<Text>()!;
-		const { card } = this.editor;
-		while (
-			textNode.textContent &&
-			(match = reg.exec(textNode.textContent))
-		) {
-			//从匹配到的位置切断
-			let regNode = textNode.splitText(match.index);
-			newText += textNode.textContent;
-			//从匹配结束位置分割
-			textNode = regNode.splitText(match[0].length);
-
-			const cardNode = card.replaceNode($(regNode), 'hr');
-			regNode.remove();
-			//  match[1] 把之前的换行符补上
-			newText += match[1] + cardNode.get<Element>()?.outerHTML + '\n';
-		}
-		newText += textNode.textContent;
-		node.text(newText);
 	};
 
 	pasteSchema = (schema: SchemaInterface) => {
@@ -163,9 +98,7 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 		this.editor.off('paste:schema', this.pasteSchema);
 		this.editor.off('paste:each', this.pasteHtml);
 		if (isEngine(this.editor)) {
-			this.editor.off('keydown:enter', this.markdown);
-			this.editor.off('paste:markdown-check', this.checkMarkdownMath);
-			this.editor.off('paste:markdown', this.pasteMarkdown);
+			this.editor.off('markdown-it', this.markdownIt);
 		}
 	}
 }
