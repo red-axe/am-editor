@@ -47,13 +47,17 @@ engine.on('paste:schema', (schema) => {
 
 ## 导入/导出
 
-使用 engine 实例提供的 `getHtml` 和 `setHtml` 两个方法，以 `html` 为中介进行转换
+使用 `engine` 实例提供的 `getHtml` 和 `setHtml` 两个方法，以 `html` 为中介进行转换
 
 可以使用第三方库或者后端 api 读取其它文档并转换为`html`标准格式后传回前端，调用 `setHtml` 设置到编辑器中
 
 转化为其它文档格式同理，使用 `getHtml` 获取到 `html` 后进行转换
 
 有些卡片可能需要额外的属性才能使 `html` 正确的还原，可以查看具体卡片插件中的 `pasteHtml` 方法中有哪些转换条件
+
+## 导出 Markdown
+
+使用 `engine` 实例提供的 `getHtml` 方法获取到 html，然后使用 [turndown](https://github.com/mixmark-io/turndown) 这个库进行转换
 
 ## icon 丢失
 

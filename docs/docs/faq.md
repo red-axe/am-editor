@@ -55,6 +55,10 @@ Convert to other document formats in the same way, use `getHtml` to obtain `html
 
 Some cards may require additional attributes to restore the `html` correctly. You can check the conversion conditions in the `pasteHtml` method in the specific card plug-in
 
+## Export Markdown
+
+Use the `getHtml` method provided by the `engine` instance to get the html, and then use the [turndown](https://github.com/mixmark-io/turndown) library to convert
+
 ## icon missing
 
 icon icon is a font icon introduced directly through [iconfont](https://at.alicdn.com/t/project/1456030/0cbd04d3-3ca1-4898-b345-e0a9150fcc80.html?spm=a313x.7781069.1998910419.35).
