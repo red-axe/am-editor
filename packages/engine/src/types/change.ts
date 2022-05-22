@@ -226,7 +226,11 @@ export interface ChangeInterface {
 	 * 初始化一个编辑器空值
 	 * @param range
 	 */
-	initValue(range?: RangeInterface): void;
+	initValue(
+		range?: RangeInterface,
+		apply?: boolean,
+		container?: NodeInterface,
+	): void;
 	/**
 	 * 给编辑器设置一个值
 	 * @param value 值

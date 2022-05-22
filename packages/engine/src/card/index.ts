@@ -31,7 +31,7 @@ import {
 } from '../utils';
 import { Backspace, Enter, Left, Right, Up, Down, Default } from './typing';
 import { $ } from '../node';
-import { isNode, isNodeEntry } from '../node/utils';
+import { isNode } from '../node/utils';
 import { CardActiveTrigger, CardType } from './enum';
 import { toJSON0, updateIndex } from '../ot/utils';
 import './index.css';
@@ -809,6 +809,9 @@ class CardModel implements CardModelInterface {
 							: 'true',
 					);
 				child.attributes(DATA_ELEMENT, EDITABLE);
+				if (isEngine(this.editor)) {
+					this.editor.normalize(child);
+				}
 			});
 			this.render(center);
 		}

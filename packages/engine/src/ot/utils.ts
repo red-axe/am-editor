@@ -448,3 +448,41 @@ export const getValue = (data: any, path: Path, id?: string) => {
 	}
 	return hasValue ? value : undefined;
 };
+
+export const findFromDoc = (
+	data: any,
+	callback: (attributes: Record<string, string>) => boolean,
+): {
+	paths: number[];
+	children: any[];
+	name: string;
+	attributes: Record<string, string>;
+} | null => {
+	if (!Array.isArray(data) || data.length < 1) {
+		return null;
+	}
+	for (let i = 1; i < data.length; i++) {
+		if (i === 1) {
+			const attributes = data[i];
+			if (
+				typeof attributes === 'object' &&
+				callback &&
+				callback(attributes)
+			) {
+				return {
+					paths: [],
+					name: data[0],
+					attributes,
+					children: data.slice(i + 1),
+				};
+			}
+		} else if (Array.isArray(data[i])) {
+			const result = findFromDoc(data[i], callback);
+			if (result) {
+				result.paths.unshift(i);
+				return result;
+			}
+		}
+	}
+	return null;
+};

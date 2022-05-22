@@ -4,7 +4,6 @@ import OTJSON from 'ot-json0';
 import { EngineInterface } from '../types/engine';
 import { toJSON0 } from './utils';
 import { DocInterface } from '../types/ot';
-import { Callback } from 'sharedb/lib/sharedb';
 
 class Doc<T = any> extends EventEmitter2 implements DocInterface {
 	private engine?: EngineInterface;

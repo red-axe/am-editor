@@ -91,6 +91,9 @@ class Container {
 			);
 			// 获取编辑器内第一个子节点
 			const firstBlock = container.first();
+			if (!firstBlock) {
+				engine.change.initValue(undefined, true, targetNode);
+			}
 			//获取到编辑器内最后一个子节点
 			const lastBlock = container.last();
 			let isHandle = false;

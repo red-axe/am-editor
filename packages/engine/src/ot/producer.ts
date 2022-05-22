@@ -12,6 +12,7 @@ import {
 	filterOperations,
 	updateIndex,
 	opsSort,
+	findFromDoc,
 } from './utils';
 import { escapeDots, escape, decodeCardValue } from '../utils/string';
 import { toJSON0, getValue } from './utils';
@@ -196,7 +197,7 @@ class Producer extends EventEmitter2 {
 	 */
 	generateOps(
 		records: MutationRecord[],
-		node: NodeInterface = this.engine.container,
+		root: NodeInterface = this.engine.container,
 	): Array<Op> {
 		const addNodes: Array<Node> = [];
 		const allOps: Array<
@@ -240,7 +241,7 @@ class Producer extends EventEmitter2 {
 			const rootId = blockElement.attributes(DATA_ID);
 			let path = pathCaches.get(targetElement);
 			if (path === undefined) {
-				path = this.getPath(targetElement, node).map(
+				path = this.getPath(targetElement, root).map(
 					(index) => index + JSON0_INDEX.ELEMENT,
 				);
 				pathCaches.set(targetElement, path);
@@ -256,7 +257,7 @@ class Producer extends EventEmitter2 {
 				} else {
 					let path = pathCaches.get(blockElement);
 					if (!path) {
-						path = this.getPath(blockElement, node);
+						path = this.getPath(blockElement, root);
 						pathCaches.set(blockElement, path);
 					}
 					beginIndex = path.length;
@@ -302,6 +303,22 @@ class Producer extends EventEmitter2 {
 									? removedNode['__index']
 									: this.getRemoveNodeIndex(record, records);
 							const rIndex = _index + JSON0_INDEX.ELEMENT;
+							if (rootId) {
+								const result = findFromDoc(
+									this.doc?.data || [],
+									(attributes) => {
+										return attributes[DATA_ID] === rootId;
+									},
+								);
+								if (!result) {
+									i++;
+									continue;
+								} else if (
+									result.paths.join(',') !== path.join(',')
+								) {
+									path = result.paths;
+								}
+							}
 							// 删除的情况下，目标节点也应该获取 __index ，不然在还有新增的情况会导致path不正确
 							const newPath = path?.concat();
 							if (newPath && newPath.length > 0) {
@@ -434,11 +451,27 @@ class Producer extends EventEmitter2 {
 						id: rootId,
 						bi: beginIndex,
 					};
+					if (rootId) {
+						const result = findFromDoc(
+							this.doc?.data || [],
+							(attributes) => {
+								return attributes[DATA_ID] === rootId;
+							},
+						);
+						if (!result) {
+							i++;
+							continue;
+						} else if (result.paths.join(',') !== path.join(',')) {
+							path = result.paths;
+						}
+					}
 					newOp.p = p.concat(
 						[...path],
 						[1, escapeDots(attributeName || '')],
 					);
-					if (oldValue) newOp.od = oldValue;
+					if (oldValue) {
+						newOp.od = oldValue;
+					}
 					if (attrValue) newOp.oi = attrValue;
 					if (record['nl']) {
 						newOp.nl = true;
@@ -591,30 +624,26 @@ class Producer extends EventEmitter2 {
 	findCardForDoc = (
 		data: any,
 		name: string,
-		callback?: (attriables: { [key: string]: string }) => boolean,
-	): { attriables: any; rendered: boolean } | void => {
-		if (!Array.isArray(data)) {
-			return;
-		}
-		for (let i = 1; i < data.length; i++) {
-			if (i === 1) {
-				const attriables = data[i];
-				if (attriables && attriables['data-card-key'] === name) {
-					if (callback && callback(attriables)) {
-						const body = data[i + 1];
-						return {
-							attriables,
-							rendered:
-								Array.isArray(body) &&
-								Array.isArray(body[2]) &&
-								Array.isArray(body[2][2]),
-						};
-					}
+		callback?: (attributes: { [key: string]: string }) => boolean,
+	): { attributes: any; rendered: boolean } | void => {
+		const result = findFromDoc(data, (attributes) => {
+			if (attributes['data-card-key'] === name) {
+				if (callback) {
+					return callback(attributes);
 				}
-			} else if (Array.isArray(data[i])) {
-				const result = this.findCardForDoc(data[i], name, callback);
-				if (result) return result;
+				return true;
 			}
+			return false;
+		});
+		if (result) {
+			const { attributes, children } = result;
+			return {
+				attributes,
+				rendered:
+					Array.isArray(children) &&
+					Array.isArray(children[2]) &&
+					Array.isArray(children[2][2]),
+			};
 		}
 	};
 	/**
@@ -682,10 +711,10 @@ class Producer extends EventEmitter2 {
 					const result = this.findCardForDoc(
 						this.doc.data,
 						cardName,
-						(attriables) => {
+						(attributes) => {
 							// 卡片id一致
 							const value = decodeCardValue(
-								attriables[CARD_VALUE_KEY],
+								attributes[CARD_VALUE_KEY],
 							);
 							return value.id === cardValue.id;
 						},

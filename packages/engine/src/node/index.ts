@@ -8,7 +8,6 @@ import {
 	SchemaInterface,
 	SchemaBlock,
 	RangeInterface,
-	ElementInterface,
 } from '../types';
 import {
 	ANCHOR,
@@ -27,7 +26,7 @@ import {
 import { getDocument, getStyleMap, isEngine } from '../utils';
 import $ from './query';
 import getHashId, { uuid } from './hash';
-import { isMatchesSelector, isNode, isNodeEntry } from './utils';
+import { isNode, isNodeEntry } from './utils';
 
 class NodeModel implements NodeModelInterface {
 	private editor: EditorInterface;

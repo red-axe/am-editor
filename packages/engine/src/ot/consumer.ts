@@ -213,7 +213,11 @@ class Consumer implements ConsumerInterface {
 		const { startNode, endNode } = this.getElementFromPath(root, path);
 		const domBegine = $(startNode);
 		const domEnd = $(endNode);
-		if (domEnd.length > 0 && !domBegine.isRoot() && !root.isCard()) {
+		if (
+			domEnd.length > 0 &&
+			!domBegine.isRoot() &&
+			(!root.isCard() || root.isEditableCard())
+		) {
 			const element =
 				typeof value === 'string'
 					? document.createTextNode(value)

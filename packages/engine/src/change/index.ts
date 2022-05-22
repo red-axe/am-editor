@@ -151,18 +151,22 @@ class ChangeModel implements ChangeInterface {
 		return this.event.isSelecting;
 	}
 
-	initValue(range?: RangeInterface, apply: boolean = true) {
-		const html = this.engine.container.html();
+	initValue(
+		range?: RangeInterface,
+		apply: boolean = true,
+		container = this.engine.container,
+	) {
+		const html = container.html();
 		const defaultHtml = '<p><br /></p>';
 		if (
 			html === defaultHtml ||
-			(this.engine.container.get<Node>()?.childNodes.length || 0) > 0
+			(container.get<Node>()?.childNodes.length || 0) > 0
 		)
 			return;
 		const emptyHtml = html || defaultHtml;
 		const node = $(emptyHtml);
 		if (node.get<Node>()?.childNodes.length === 0) node.html('<br />');
-		this.engine.container.empty().append(node);
+		container.empty().append(node);
 		const safeRange = range || this.range.get();
 
 		if (!range && apply) {
