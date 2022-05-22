@@ -1,4 +1,4 @@
-import type { FileOptions } from '../types';
+import type { FileOptions, FileValue } from '../types';
 import {
 	$,
 	Card,
@@ -12,46 +12,8 @@ import {
 	isEngine,
 	Tooltip,
 	SelectStyleType,
-	CardValue,
 } from '@aomao/engine';
 import './index.css';
-
-export interface FileValue extends CardValue {
-	/**
-	 *  文件名称
-	 */
-	name: string;
-	/**
-	 * 文件大小
-	 */
-	size?: number;
-	/**
-	 * 状态
-	 * uploading 上传中
-	 * done 上传成功
-	 */
-	status?: 'uploading' | 'done' | 'error';
-	/**
-	 * 文件地址
-	 */
-	url?: string;
-	/**
-	 * 预览地址
-	 */
-	preview?: string;
-	/**
-	 * 下载地址
-	 */
-	download?: string;
-	/**
-	 * 上传进度
-	 */
-	percent?: number;
-	/**
-	 * 错误状态下的错误信息
-	 */
-	message?: string;
-}
 
 export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 	static get cardName() {
@@ -107,60 +69,78 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 	};
 
 	toolbar() {
-		const items: Array<CardToolbarItemOptions | ToolbarItemOptions> = [];
-		const value = this.getValue();
-		if (!value) return items;
 		const options =
 			this.editor.plugin.findPlugin<FileOptions>('file')?.options ?? {};
-		const { status, preview, download } = value;
-		const locale = this.getLocales();
-		if (status === 'done') {
-			if (!!preview) {
-				const onPreview = () => {
-					if (options.onPreview) options.onPreview(preview, value);
-				};
-				items.push({
-					type: 'button',
-					content: '<span class="data-icon data-icon-preview" />',
-					title: locale.preview,
-					link: !options.onPreview
-						? sanitizeUrl(this.onBeforeRender('preview', preview))
-						: undefined,
-					onClick: options.onPreview ? onPreview : undefined,
-				});
+		const getItems = () => {
+			const items: Array<CardToolbarItemOptions | ToolbarItemOptions> =
+				[];
+			const value = this.getValue();
+			if (!value) return items;
+			const { status, preview, download } = value;
+			const locale = this.getLocales();
+			if (status === 'done') {
+				if (!!preview) {
+					const onPreview = () => {
+						if (options.onPreview)
+							options.onPreview(preview, value);
+					};
+					items.push({
+						key: 'preview',
+						type: 'button',
+						content: '<span class="data-icon data-icon-preview" />',
+						title: locale.preview,
+						link: !options.onPreview
+							? sanitizeUrl(
+									this.onBeforeRender('preview', preview),
+							  )
+							: undefined,
+						onClick: options.onPreview ? onPreview : undefined,
+					});
+				}
+
+				if (!!download) {
+					const onDownload = () => {
+						if (options.onDownload)
+							options.onDownload(download, value);
+					};
+					items.push({
+						key: 'download',
+						type: 'button',
+						content:
+							'<span class="data-icon data-icon-download" />',
+						title: locale.download,
+						link: !options.onDownload
+							? sanitizeUrl(
+									this.onBeforeRender('download', download),
+							  )
+							: undefined,
+						onClick: options.onDownload ? onDownload : undefined,
+					});
+				}
+
+				if (
+					!(!isEngine(this.editor) || this.editor.readonly) &&
+					items.length > 0
+				) {
+					items.push({
+						key: 'separator',
+						type: 'separator',
+					});
+				}
 			}
 
-			if (!!download) {
-				const onDownload = () => {
-					if (options.onDownload) options.onDownload(download, value);
-				};
+			if (!(!isEngine(this.editor) || this.editor.readonly)) {
 				items.push({
-					type: 'button',
-					content: '<span class="data-icon data-icon-download" />',
-					title: locale.download,
-					link: !options.onDownload
-						? sanitizeUrl(this.onBeforeRender('download', download))
-						: undefined,
-					onClick: options.onDownload ? onDownload : undefined,
+					key: 'delete',
+					type: 'delete',
 				});
 			}
-
-			if (
-				!(!isEngine(this.editor) || this.editor.readonly) &&
-				items.length > 0
-			) {
-				items.push({
-					type: 'separator',
-				});
-			}
+			return items;
+		};
+		if (options?.cardToolbars) {
+			return options.cardToolbars(getItems());
 		}
-
-		if (!(!isEngine(this.editor) || this.editor.readonly)) {
-			items.push({
-				type: 'delete',
-			});
-		}
-		return items;
+		return getItems();
 	}
 
 	renderTemplate(value: FileValue) {

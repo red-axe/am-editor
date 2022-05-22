@@ -5,17 +5,13 @@ import {
 	CARD_KEY,
 	isEngine,
 	SchemaInterface,
-	PluginOptions,
 	CARD_VALUE_KEY,
 	decodeCardValue,
 } from '@aomao/engine';
 import type MarkdownIt from 'markdown-it';
 import HrComponent, { HrValue } from './component';
+import { HrOptions } from './types';
 
-export interface HrOptions extends PluginOptions {
-	hotkey?: string | Array<string>;
-	markdown?: boolean;
-}
 export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'hr';

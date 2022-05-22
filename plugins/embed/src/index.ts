@@ -8,19 +8,12 @@ import {
 	isEngine,
 	NodeInterface,
 	Plugin,
-	PluginOptions,
 	READY_CARD_KEY,
 	SchemaInterface,
 } from '@aomao/engine';
-import EmbedComponent, {
-	EmbedRenderBeforeEvent,
-	EmbedValue,
-} from './component';
+import EmbedComponent from './component';
 import locales from './locales';
-
-export interface EmbedOptions extends PluginOptions {
-	renderBefore?: EmbedRenderBeforeEvent;
-}
+import { EmbedOptions, EmbedValue } from './types';
 
 class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 	static get pluginName() {

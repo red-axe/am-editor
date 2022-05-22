@@ -8,6 +8,7 @@ import {
 	CardValue,
 } from '@aomao/engine';
 import './index.css';
+import { HrOptions } from './types';
 export interface HrValue extends CardValue {}
 class Hr<T extends HrValue = HrValue> extends Card<T> {
 	static get cardName() {
@@ -27,18 +28,30 @@ class Hr<T extends HrValue = HrValue> extends Card<T> {
 	}
 
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
-		if (!isEngine(this.editor) || this.editor.readonly) return [];
-		return [
-			{
-				type: 'dnd',
-			},
-			{
-				type: 'copy',
-			},
-			{
-				type: 'delete',
-			},
-		];
+		const getItems = (): Array<
+			ToolbarItemOptions | CardToolbarItemOptions
+		> => {
+			if (!isEngine(this.editor) || this.editor.readonly) return [];
+			return [
+				{
+					key: 'dnd',
+					type: 'dnd',
+				},
+				{
+					key: 'copy',
+					type: 'copy',
+				},
+				{
+					key: 'delete',
+					type: 'delete',
+				},
+			];
+		};
+		const options = this.editor.plugin.findPlugin<HrOptions>('hr')?.options;
+		if (options?.cardToolbars) {
+			return options.cardToolbars(getItems());
+		}
+		return getItems();
 	}
 
 	onActivate(activated: boolean) {

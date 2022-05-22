@@ -14,6 +14,7 @@ import CodeBlockEditor from './editor';
 import renderSelect from './select';
 import modeDatas from './mode';
 import { CodeBlockEditorInterface } from './types';
+import { CodeBlockOptions } from '@/types';
 import './index.css';
 
 export interface CodeBlockValue extends CardValue {
@@ -152,81 +153,99 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 	}
 	#viewAutoWrap?: boolean = undefined;
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
-		if (this.loading) return [];
-		if (!isEngine(this.editor) || this.editor.readonly) {
+		const getItems = (): Array<
+			CardToolbarItemOptions | ToolbarItemOptions
+		> => {
+			if (this.loading) return [];
+			if (!isEngine(this.editor) || this.editor.readonly) {
+				return [
+					{ key: 'copy', type: 'copy' },
+					{
+						key: 'autoWrap',
+						type: 'switch',
+						content: this.editor.language.get<string>(
+							CodeBlcok.cardName,
+							'autoWrap',
+						),
+						getState: () => {
+							if (this.#viewAutoWrap === undefined) {
+								this.#viewAutoWrap =
+									!!this.getValue()?.autoWrap;
+							}
+							return this.#viewAutoWrap;
+						},
+						onClick: () => {
+							const autoWrap = !this.#viewAutoWrap;
+							this.#viewAutoWrap = autoWrap;
+							this.codeEditor?.setAutoWrap(autoWrap);
+						},
+					},
+				];
+			}
 			return [
-				{ type: 'copy' },
+				{ key: 'dnd', type: 'dnd' },
 				{
+					key: 'copy',
+					type: 'copy',
+				},
+				{
+					key: 'delete',
+					type: 'delete',
+				},
+				{
+					key: 'select',
+					type: 'node',
+					node: $('<div />'),
+					didMount: (node) => {
+						// 等待编辑插件渲染成功后才能去到mode
+						setTimeout(() => {
+							renderSelect(
+								node.get<HTMLElement>()!,
+								(
+									this.constructor as typeof CodeBlcok
+								).getModes(),
+								this.#modeNameMap[this.codeEditor!.mode] ||
+									this.codeEditor!.mode ||
+									'plain',
+								(mode) => {
+									this.codeEditor?.update(mode);
+									setTimeout(() => {
+										this.codeEditor?.focus();
+									}, 10);
+								},
+							);
+						}, 100);
+					},
+				},
+				{
+					key: 'autoWrap',
 					type: 'switch',
 					content: this.editor.language.get<string>(
 						CodeBlcok.cardName,
 						'autoWrap',
 					),
 					getState: () => {
-						if (this.#viewAutoWrap === undefined) {
-							this.#viewAutoWrap = !!this.getValue()?.autoWrap;
-						}
-						return this.#viewAutoWrap;
+						return !!this.getValue()?.autoWrap;
 					},
 					onClick: () => {
-						const autoWrap = !this.#viewAutoWrap;
-						this.#viewAutoWrap = autoWrap;
+						const value = this.getValue();
+						const autoWrap = !value?.autoWrap;
+						this.setValue({
+							autoWrap,
+						} as V);
 						this.codeEditor?.setAutoWrap(autoWrap);
 					},
 				},
 			];
+		};
+		const options =
+			this.editor.plugin.findPlugin<CodeBlockOptions>(
+				'codeblock',
+			)?.options;
+		if (options?.cardToolbars) {
+			return options.cardToolbars(getItems());
 		}
-		return [
-			{
-				type: 'dnd',
-			},
-			{
-				type: 'copy',
-			},
-			{
-				type: 'delete',
-			},
-			{
-				type: 'node',
-				node: $('<div />'),
-				didMount: (node) => {
-					// 等待编辑插件渲染成功后才能去到mode
-					setTimeout(() => {
-						renderSelect(
-							node.get<HTMLElement>()!,
-							(this.constructor as typeof CodeBlcok).getModes(),
-							this.#modeNameMap[this.codeEditor!.mode] ||
-								this.codeEditor!.mode ||
-								'plain',
-							(mode) => {
-								this.codeEditor?.update(mode);
-								setTimeout(() => {
-									this.codeEditor?.focus();
-								}, 10);
-							},
-						);
-					}, 100);
-				},
-			},
-			{
-				type: 'switch',
-				content: this.editor.language.get<string>(
-					CodeBlcok.cardName,
-					'autoWrap',
-				),
-				getState: () => {
-					return !!this.getValue()?.autoWrap;
-				},
-				onClick: () => {
-					const value = this.getValue();
-					const autoWrap = !value?.autoWrap;
-					this.setValue({
-						autoWrap,
-					} as V);
-					this.codeEditor?.setAutoWrap(autoWrap);
-				},
-			},
-		];
+		return getItems();
 	}
 
 	focusEditor() {

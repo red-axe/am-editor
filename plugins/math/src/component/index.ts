@@ -2,15 +2,18 @@ import debounce from 'lodash/debounce';
 import {
 	$,
 	Card,
+	CardToolbarItemOptions,
 	CardType,
 	CardValue,
 	isEngine,
 	NodeInterface,
 	Position,
+	ToolbarItemOptions,
 } from '@aomao/engine';
 import { getLocales } from '../utils';
 import MathEditor from './editor';
 import './index.css';
+import { MathOptions } from '@/types';
 
 export interface MathValue extends CardValue {
 	code: string;
@@ -106,6 +109,15 @@ export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 		if (!isEngine(this.editor) || this.editor.readonly) return;
 		if (activated) this.renderEditor();
 		else this.mathEditor?.destroy();
+	}
+
+	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+		const options =
+			this.editor.plugin.findPlugin<MathOptions>('math')?.options;
+		if (options?.cardToolbars) {
+			return options.cardToolbars([]);
+		}
+		return [];
 	}
 
 	renderPureText(text: string) {

@@ -134,103 +134,128 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 	}
 
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
-		if (!isEngine(this.editor) || this.editor.readonly) return [];
-		const { language } = this.editor;
-		let value = this.getValue();
-		if (this.isLocalError === true || value?.status !== 'done')
-			return [
+		const getItems = (): Array<
+			CardToolbarItemOptions | ToolbarItemOptions
+		> => {
+			if (!isEngine(this.editor) || this.editor.readonly) return [];
+			const { language } = this.editor;
+			let value = this.getValue();
+			if (this.isLocalError === true || value?.status !== 'done')
+				return [
+					{
+						key: 'delete',
+						type: 'delete',
+					},
+				];
+
+			const items: Array<CardToolbarItemOptions | ToolbarItemOptions> = [
 				{
+					key: 'copy',
+					type: 'copy',
+				},
+				{
+					key: 'delete',
 					type: 'delete',
 				},
 			];
-
-		const items: Array<CardToolbarItemOptions | ToolbarItemOptions> = [
-			{
-				type: 'copy',
-			},
-			{
-				type: 'delete',
-			},
-		];
-		if (isMobile) return items;
-		const resizerItems: (CardToolbarItemOptions | ToolbarItemOptions)[] = [
-			{
-				type: 'input',
-				placeholder: language
-					.get('image', 'toolbbarWidthTitle')
-					.toString(),
-				prefix: 'W:',
-				value: value?.size?.width || 0,
-				didMount: (node) => {
-					this.widthInput = node.find('input[type=input]');
+			if (isMobile) return items;
+			const resizerItems: (
+				| CardToolbarItemOptions
+				| ToolbarItemOptions
+			)[] = [
+				{
+					key: 'width',
+					type: 'input',
+					placeholder: language
+						.get('image', 'toolbbarWidthTitle')
+						.toString(),
+					prefix: 'W:',
+					value: value?.size?.width || 0,
+					didMount: (node) => {
+						this.widthInput = node.find('input[type=input]');
+					},
+					onChange: (value) => {
+						const height = Math.round(
+							parseInt(value, 10) * (this.image?.rate || 1),
+						);
+						this.onInputChange(value, height);
+					},
 				},
-				onChange: (value) => {
-					const height = Math.round(
-						parseInt(value, 10) * (this.image?.rate || 1),
-					);
-					this.onInputChange(value, height);
+				{
+					key: 'height',
+					type: 'input',
+					placeholder: language
+						.get('image', 'toolbbarHeightTitle')
+						.toString(),
+					prefix: 'H:',
+					value: value?.size?.height || 0,
+					didMount: (node) => {
+						this.heightInput = node.find('input[type=input]');
+					},
+					onChange: (value) => {
+						const width = Math.round(
+							parseInt(value, 10) / (this.image?.rate || 1),
+						);
+						this.onInputChange(width, value);
+					},
 				},
-			},
-			{
-				type: 'input',
-				placeholder: language
-					.get('image', 'toolbbarHeightTitle')
-					.toString(),
-				prefix: 'H:',
-				value: value?.size?.height || 0,
-				didMount: (node) => {
-					this.heightInput = node.find('input[type=input]');
+				{
+					key: 'resize',
+					type: 'button',
+					content:
+						'<span class="data-icon data-icon-huanyuan"></span>',
+					title: language.get<string>(
+						'image',
+						'toolbarReductionTitle',
+					),
+					onClick: () => {
+						value = this.getValue();
+						this.onInputChange(
+							value?.size?.naturalWidth || 0,
+							value?.size?.naturalHeight || 0,
+						);
+					},
 				},
-				onChange: (value) => {
-					const width = Math.round(
-						parseInt(value, 10) / (this.image?.rate || 1),
-					);
-					this.onInputChange(width, value);
+			];
+			const typeItems: (CardToolbarItemOptions | ToolbarItemOptions)[] = [
+				{
+					key: 'block',
+					type: 'button',
+					content:
+						'<span class="data-icon data-icon-block-image"></span>',
+					title: language.get<string>('image', 'displayBlockTitle'),
+					onClick: () => {
+						this.type = CardType.BLOCK;
+					},
 				},
-			},
-			{
-				type: 'button',
-				content: '<span class="data-icon data-icon-huanyuan"></span>',
-				title: language.get<string>('image', 'toolbarReductionTitle'),
-				onClick: () => {
-					value = this.getValue();
-					this.onInputChange(
-						value?.size?.naturalWidth || 0,
-						value?.size?.naturalHeight || 0,
-					);
+				{
+					key: 'inline',
+					type: 'button',
+					content:
+						'<span class="data-icon data-icon-inline-image"></span>',
+					title: language.get<string>('image', 'displayInlineTitle'),
+					onClick: () => {
+						this.type = CardType.INLINE;
+					},
 				},
-			},
-		];
-		const typeItems: (CardToolbarItemOptions | ToolbarItemOptions)[] = [
-			{
-				type: 'button',
-				content:
-					'<span class="data-icon data-icon-block-image"></span>',
-				title: language.get<string>('image', 'displayBlockTitle'),
-				onClick: () => {
-					this.type = CardType.BLOCK;
-				},
-			},
-			{
-				type: 'button',
-				content:
-					'<span class="data-icon data-icon-inline-image"></span>',
-				title: language.get<string>('image', 'displayInlineTitle'),
-				onClick: () => {
-					this.type = CardType.INLINE;
-				},
-			},
-		];
-		const imagePlugin =
-			this.editor.plugin.findPlugin<ImageOptions>('image');
-		return items.concat([
-			...(imagePlugin?.options?.enableResizer === false
-				? []
-				: resizerItems),
-			...(imagePlugin?.options?.enableTypeSwitch === false
-				? []
-				: typeItems),
-		]);
+			];
+			const imagePlugin =
+				this.editor.plugin.findPlugin<ImageOptions>('image');
+			return items.concat([
+				...(imagePlugin?.options?.enableResizer === false
+					? []
+					: resizerItems),
+				...(imagePlugin?.options?.enableTypeSwitch === false
+					? []
+					: typeItems),
+			]);
+		};
+		const options =
+			this.editor.plugin.findPlugin<ImageOptions>('image')?.options;
+		if (options?.cardToolbars) {
+			return options.cardToolbars(getItems());
+		}
+		return getItems();
 	}
 
 	onActivate(activated: boolean) {

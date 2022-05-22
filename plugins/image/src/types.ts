@@ -1,4 +1,10 @@
-import { CardType, NodeInterface, PluginOptions } from '@aomao/engine';
+import {
+	CardToolbarItemOptions,
+	CardType,
+	NodeInterface,
+	PluginOptions,
+	ToolbarItemOptions,
+} from '@aomao/engine';
 import { EventEmitter2 } from 'eventemitter2';
 import PhotoSwipe from 'photoswipe';
 
@@ -52,4 +58,7 @@ export interface ImageOptions extends PluginOptions {
 	 * 最高高度，设置后默认按最高高度缩放
 	 */
 	maxHeight?: number;
+	cardToolbars?: (
+		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }

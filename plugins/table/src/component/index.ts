@@ -333,130 +333,165 @@ class TableComponent<V extends TableValue = TableValue>
 		this.handleChange('local');
 	};
 
-	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
-		if (!isEngine(this.editor) || this.editor.readonly)
-			return [
-				{
-					type: 'maximize',
-				},
-			];
-		const language = this.editor.language.get('table');
-		const funBtns: Array<ToolbarItemOptions | CardToolbarItemOptions> = [
-			{
-				type: 'node',
-				title: this.editor.language.get<string>(
-					'table',
-					'color',
-					'title',
-				),
-				node: this.colorTool!.getButton(),
-			},
-			{
-				type: 'button',
-				title: super.getValue()?.noBorder
-					? language['showBorder']
-					: language['noBorder'],
-				content: '<span class="data-icon data-icon-no-border"></span>',
-				didMount: (node) => {
-					const value = super.getValue();
-					if (value?.noBorder === true) {
-						node.addClass('active');
-					}
-					this.noBorderToolButton = node;
-				},
-				onClick: (_, node) => {
-					const value = super.getValue();
-					this.setValue({
-						noBorder: !value?.noBorder,
-					} as V);
-					const table = this.wrapper?.find('.data-table');
-					if (value?.noBorder === true) {
-						table?.removeAttributes('data-table-no-border');
-						node.removeClass('active');
-					} else {
-						table?.attributes('data-table-no-border', 'true');
-						node.addClass('active');
-					}
-				},
-			},
-			{
-				type: 'dropdown',
-				content: '<span class="data-icon data-icon-align-top" />',
-				title: language['verticalAlign']['title'],
-				didMount: (node) => {
-					this.alignToolButton = node.find('.data-toolbar-btn');
-				},
-				items: [
+	toolbar(): (ToolbarItemOptions | CardToolbarItemOptions)[] {
+		const getItems = (): (
+			| ToolbarItemOptions
+			| CardToolbarItemOptions
+		)[] => {
+			if (!isEngine(this.editor) || this.editor.readonly)
+				return [
 					{
-						type: 'button',
-						content: `<span class="data-icon data-icon-align-top"></span> ${language['verticalAlign']['top']}`,
-						onClick: (event: MouseEvent) =>
-							this.updateAlign(event, 'top'),
+						key: 'maximize',
+						type: 'maximize',
+					},
+				];
+			const language = this.editor.language.get('table');
+			const funBtns: Array<ToolbarItemOptions | CardToolbarItemOptions> =
+				[
+					{
+						key: 'color',
+						type: 'node',
+						title: this.editor.language.get<string>(
+							'table',
+							'color',
+							'title',
+						),
+						node: this.colorTool!.getButton(),
 					},
 					{
+						key: 'border',
 						type: 'button',
-						content: `<span class="data-icon data-icon-align-middle"></span> ${language['verticalAlign']['middle']}`,
-						onClick: (event: MouseEvent) =>
-							this.updateAlign(event, 'middle'),
+						title: super.getValue()?.noBorder
+							? language['showBorder']
+							: language['noBorder'],
+						content:
+							'<span class="data-icon data-icon-no-border"></span>',
+						didMount: (node) => {
+							const value = super.getValue();
+							if (value?.noBorder === true) {
+								node.addClass('active');
+							}
+							this.noBorderToolButton = node;
+						},
+						onClick: (_, node) => {
+							const value = super.getValue();
+							this.setValue({
+								noBorder: !value?.noBorder,
+							} as V);
+							const table = this.wrapper?.find('.data-table');
+							if (value?.noBorder === true) {
+								table?.removeAttributes('data-table-no-border');
+								node.removeClass('active');
+							} else {
+								table?.attributes(
+									'data-table-no-border',
+									'true',
+								);
+								node.addClass('active');
+							}
+						},
 					},
 					{
-						type: 'button',
-						content: `<span class="data-icon data-icon-align-bottom"></span> ${language['verticalAlign']['bottom']}`,
-						onClick: (event: MouseEvent) =>
-							this.updateAlign(event, 'bottom'),
+						key: 'align',
+						type: 'dropdown',
+						content:
+							'<span class="data-icon data-icon-align-top" />',
+						title: language['verticalAlign']['title'],
+						didMount: (node) => {
+							this.alignToolButton =
+								node.find('.data-toolbar-btn');
+						},
+						items: [
+							{
+								type: 'button',
+								content: `<span class="data-icon data-icon-align-top"></span> ${language['verticalAlign']['top']}`,
+								onClick: (event: MouseEvent) =>
+									this.updateAlign(event, 'top'),
+							},
+							{
+								type: 'button',
+								content: `<span class="data-icon data-icon-align-middle"></span> ${language['verticalAlign']['middle']}`,
+								onClick: (event: MouseEvent) =>
+									this.updateAlign(event, 'middle'),
+							},
+							{
+								type: 'button',
+								content: `<span class="data-icon data-icon-align-bottom"></span> ${language['verticalAlign']['bottom']}`,
+								onClick: (event: MouseEvent) =>
+									this.updateAlign(event, 'bottom'),
+							},
+						],
 					},
-				],
-			},
-			{
-				type: 'button',
-				title: language['mergeCell'],
-				content:
-					'<span class="data-icon data-icon-merge-cells"></span>',
-				disabled: this.conltrollBar.getMenuDisabled('mergeCell'),
-				onClick: () => {
-					this.command.mergeCell();
-				},
-			},
-			{
-				type: 'button',
-				title: language['splitCell'],
-				content:
-					'<span class="data-icon data-icon-solit-cells"></span>',
-				disabled: this.conltrollBar.getMenuDisabled('splitCell'),
-				onClick: () => {
-					this.command.splitCell();
-				},
-			},
-		];
-		if (this.isMaximize) return funBtns;
-		const toolbars: Array<ToolbarItemOptions | CardToolbarItemOptions> = [
-			{
-				type: 'maximize',
-			},
-			{
-				type: 'copy',
-				onClick: () => {
-					this.command.copy(true);
-					this.editor.messageSuccess(
-						'copy',
-						this.editor.language.get<string>('copy', 'success'),
-					);
-				},
-			},
-			{
-				type: 'delete',
-			},
-			{
-				type: 'separator',
-			},
-			...funBtns,
-		];
-		if (removeUnit(this.wrapper?.css('margin-left') || '0') === 0) {
-			toolbars.unshift({
-				type: 'dnd',
-			});
+					{
+						key: 'merge',
+						type: 'button',
+						title: language['mergeCell'],
+						content:
+							'<span class="data-icon data-icon-merge-cells"></span>',
+						disabled:
+							this.conltrollBar.getMenuDisabled('mergeCell'),
+						onClick: () => {
+							this.command.mergeCell();
+						},
+					},
+					{
+						key: 'split',
+						type: 'button',
+						title: language['splitCell'],
+						content:
+							'<span class="data-icon data-icon-solit-cells"></span>',
+						disabled:
+							this.conltrollBar.getMenuDisabled('splitCell'),
+						onClick: () => {
+							this.command.splitCell();
+						},
+					},
+				];
+			if (this.isMaximize) return funBtns;
+			const toolbars: Array<ToolbarItemOptions | CardToolbarItemOptions> =
+				[
+					{
+						key: 'maximize',
+						type: 'maximize',
+					},
+					{
+						key: 'copy',
+						type: 'copy',
+						onClick: () => {
+							this.command.copy(true);
+							this.editor.messageSuccess(
+								'copy',
+								this.editor.language.get<string>(
+									'copy',
+									'success',
+								),
+							);
+						},
+					},
+					{
+						key: 'delete',
+						type: 'delete',
+					},
+					{
+						key: 'separator',
+						type: 'separator',
+					},
+					...funBtns,
+				];
+			if (removeUnit(this.wrapper?.css('margin-left') || '0') === 0) {
+				toolbars.unshift({
+					key: 'dnd',
+					type: 'dnd',
+				});
+			}
+			return toolbars;
+		};
+		const options =
+			this.editor.plugin.findPlugin<TableOptions>('table')?.options;
+		if (options?.cardToolbars) {
+			return options.cardToolbars(getItems());
 		}
-		return toolbars;
+		return getItems();
 	}
 
 	onSelectLeft(event: KeyboardEvent) {

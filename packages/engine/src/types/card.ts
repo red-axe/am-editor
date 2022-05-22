@@ -70,15 +70,18 @@ export interface CardToolbarInterface {
 
 export type CardToolbarItemOptions =
 	| {
+			key?: string;
 			type: 'dnd';
 			content?: string;
 			title?: string;
 	  }
 	| {
+			key?: string;
 			type: 'separator';
 			node?: NodeInterface;
 	  }
 	| {
+			key?: string;
 			type: 'delete' | 'maximize' | 'copy';
 			disabled?: boolean;
 			content?: string;
@@ -86,6 +89,7 @@ export type CardToolbarItemOptions =
 			onClick?: (event: MouseEvent, node: NodeInterface) => void;
 	  }
 	| {
+			key?: string;
 			type: 'more';
 			disabled?: boolean;
 			content?: string;

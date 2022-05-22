@@ -115,6 +115,7 @@ class CardToolbar implements CardToolbarInterface {
 		switch (item.type) {
 			case 'separator':
 				return {
+					key: 'separator',
 					type: 'node',
 					node:
 						item.node ||
@@ -122,6 +123,7 @@ class CardToolbar implements CardToolbarInterface {
 				};
 			case 'copy':
 				return {
+					key: 'copy',
 					type: 'button',
 					content:
 						item.content ||
@@ -147,6 +149,7 @@ class CardToolbar implements CardToolbarInterface {
 				};
 			case 'delete':
 				return {
+					key: 'delete',
 					type: 'button',
 					content:
 						item.content ||
@@ -164,6 +167,7 @@ class CardToolbar implements CardToolbarInterface {
 				};
 			case 'maximize':
 				return {
+					key: 'maximize',
 					type: 'button',
 					content:
 						item.content ||
@@ -181,6 +185,7 @@ class CardToolbar implements CardToolbarInterface {
 				};
 			case 'more':
 				return {
+					key: 'more',
 					type: 'dropdown',
 					content:
 						item.content ||
@@ -273,7 +278,6 @@ class CardToolbar implements CardToolbarInterface {
 	}
 
 	showDnd() {
-		const { root } = this.editor;
 		if (!this.#dndNode) return;
 		if (this.#dndNode.length === 0) return;
 		if (!this.card.isMaximize) {

@@ -14,6 +14,8 @@ import {
 	unescape,
 	AjaxInterface,
 	DATA_CONTENTEDITABLE_KEY,
+	ToolbarItemOptions,
+	CardToolbarItemOptions,
 } from '@aomao/engine';
 import CollapseComponent, { CollapseComponentInterface } from './collapse';
 import { MentionItem } from '../types';
@@ -303,6 +305,15 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 				(child) => child.isElement() && this.editor.node.isMark(child),
 			)
 			.map((c) => (clone ? c.clone() : c));
+	}
+
+	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+		const options =
+			this.editor.plugin.findPlugin<MentionOptions>('mention')?.options;
+		if (options?.cardToolbars) {
+			return options.cardToolbars([]);
+		}
+		return [];
 	}
 
 	render(): string | void | NodeInterface {

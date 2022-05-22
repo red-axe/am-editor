@@ -288,37 +288,52 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	};
 
 	toolbar() {
-		const items: Array<CardToolbarItemOptions | ToolbarItemOptions> = [];
-		const value = this.getValue();
-		if (!value) return items;
-		const { status, download } = value;
-		const locale = this.getLocales();
-		if (status === 'done') {
-			if (!!download) {
-				items.push({
-					type: 'button',
-					content: '<span class="data-icon data-icon-download" />',
-					title: locale.download,
-					onClick: this.downloadFile,
-				});
+		const getItems = () => {
+			const items: Array<CardToolbarItemOptions | ToolbarItemOptions> =
+				[];
+			const value = this.getValue();
+			if (!value) return items;
+			const { status, download } = value;
+			const locale = this.getLocales();
+			if (status === 'done') {
+				if (!!download) {
+					items.push({
+						key: 'dropdown',
+						type: 'button',
+						content:
+							'<span class="data-icon data-icon-download" />',
+						title: locale.download,
+						onClick: this.downloadFile,
+					});
+				}
+
+				if (isEngine(this.editor) && !this.editor.readonly) {
+					items.push({
+						key: 'copy',
+						type: 'copy',
+					});
+					items.push({
+						key: 'separator',
+						type: 'separator',
+					});
+				}
 			}
 
 			if (isEngine(this.editor) && !this.editor.readonly) {
 				items.push({
-					type: 'copy',
-				});
-				items.push({
-					type: 'separator',
+					key: 'delete',
+					type: 'delete',
 				});
 			}
-		}
+			return items;
+		};
 
-		if (isEngine(this.editor) && !this.editor.readonly) {
-			items.push({
-				type: 'delete',
-			});
+		const options =
+			this.editor.plugin.findPlugin<VideoOptions>('video')?.options;
+		if (options?.cardToolbars) {
+			return options.cardToolbars(getItems());
 		}
-		return items;
+		return getItems();
 	}
 
 	setProgressPercent(percent: number) {

@@ -1,9 +1,11 @@
 import {
 	CardInterface,
+	CardToolbarItemOptions,
 	CardValue,
 	ClipboardData,
 	NodeInterface,
 	PluginOptions,
+	ToolbarItemOptions,
 } from '@aomao/engine';
 import { EventEmitter2 } from 'eventemitter2';
 
@@ -198,6 +200,9 @@ export interface TableOptions extends PluginOptions {
 	colMinWidth?: number;
 	rowMinHeight?: number;
 	markdown?: boolean;
+	cardToolbars?: (
+		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }
 
 export type ControllOptions = {

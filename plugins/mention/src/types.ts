@@ -1,4 +1,10 @@
-import { CardInterface, NodeInterface, PluginOptions } from '@aomao/engine';
+import {
+	CardInterface,
+	CardToolbarItemOptions,
+	NodeInterface,
+	PluginOptions,
+	ToolbarItemOptions,
+} from '@aomao/engine';
 import type { RequestData, RequestHeaders } from '@aomao/engine';
 
 export type MentionItem = { key?: string; name: string; avatar?: string };
@@ -56,4 +62,8 @@ export interface MentionOptions extends PluginOptions {
 		result: boolean;
 		data: Array<MentionItem>;
 	};
+
+	cardToolbars?: (
+		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }

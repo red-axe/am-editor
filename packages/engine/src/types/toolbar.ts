@@ -4,6 +4,7 @@ import { NodeInterface } from './node';
  * 按钮
  */
 export type ButtonOptions = {
+	key?: string;
 	/**
 	 * 类型
 	 */
@@ -42,6 +43,7 @@ export type ButtonOptions = {
 	didMount?: (node: NodeInterface) => void;
 };
 export type SwitchOptions = {
+	key?: string;
 	/**
 	 * 类型
 	 */
@@ -79,6 +81,7 @@ export type SwitchOptions = {
  * 输入框
  */
 export type InputOptions = {
+	key?: string;
 	/**
 	 * 类型
 	 */
@@ -120,6 +123,7 @@ export type InputOptions = {
  * 单选按钮
  */
 export type DropdownSwitchOptions = {
+	key?: string;
 	/**
 	 * 类型
 	 */
@@ -170,6 +174,7 @@ export type DropdownButtonOptions = {
  * 下拉框
  */
 export type DropdownOptions = {
+	key?: string;
 	/**
 	 * 类型
 	 */
@@ -199,6 +204,7 @@ export type DropdownOptions = {
  * 自定义节点
  */
 export type NodeOptions = {
+	key?: string;
 	/**
 	 * 类型
 	 */

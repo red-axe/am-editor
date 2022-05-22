@@ -1,4 +1,8 @@
-import { PluginOptions } from '@aomao/engine';
+import {
+	CardToolbarItemOptions,
+	PluginOptions,
+	ToolbarItemOptions,
+} from '@aomao/engine';
 
 export interface VideoOptions extends PluginOptions {
 	onBeforeRender?: (
@@ -13,4 +17,8 @@ export interface VideoOptions extends PluginOptions {
 	 * 填满编辑器宽度
 	 */
 	fullEditor?: boolean | number;
+
+	cardToolbars?: (
+		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }

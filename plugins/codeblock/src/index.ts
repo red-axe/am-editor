@@ -9,26 +9,18 @@ import {
 	SchemaInterface,
 	unescape,
 	CARD_TYPE_KEY,
-	PluginOptions,
 	READY_CARD_KEY,
 	decodeCardValue,
 	VIEW_CLASS_NAME,
 	SchemaBlock,
 } from '@aomao/engine';
 import type MarkdownIt from 'markdown-it';
-import Token from 'markdown-it/lib/token';
 import CodeBlockComponent, {
 	CodeBlockEditor,
 	CodeBlockValue,
 } from './component';
 import locales from './locales';
-
-export interface CodeBlockOptions extends PluginOptions {
-	hotkey?: string | Array<string>;
-	markdown?: boolean;
-	alias?: Record<string, string>;
-	styleMap?: Record<string, string>;
-}
+import { CodeBlockOptions } from './types';
 
 const DATA_SYNTAX = 'data-syntax';
 
