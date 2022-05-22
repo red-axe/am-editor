@@ -12,11 +12,10 @@ import {
 	SchemaInterface,
 } from '@aomao/engine';
 import FileComponent from './component';
-import type { FileValue } from './component';
 import FileUploader from './uploader';
 import type { FileUploaderOptions } from './uploader';
 import locales from './locales';
-import { FileOptions } from './types';
+import { FileOptions, FileValue } from './types';
 
 export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 	static get pluginName() {

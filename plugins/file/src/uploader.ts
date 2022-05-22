@@ -13,7 +13,7 @@ import {
 } from '@aomao/engine';
 import { RequestData, RequestHeaders } from '@aomao/engine';
 import FileComponent from './component';
-import type { FileValue } from './component';
+import type { FileValue } from './types';
 
 export interface FileUploaderOptions extends PluginOptions {
 	/**
