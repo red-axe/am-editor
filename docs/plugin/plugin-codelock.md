@@ -53,25 +53,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-Support markdown by default, pass in `false` to close
-
-CodeBlock plugin markdown syntax is ```
-
-```ts
-markdown?: boolean;//enabled by default, false off
-//Use configuration
-new Engine(...,{
-    config:{
-        "codeblock":{
-            //Close markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ### Alias
 
 Alias settings

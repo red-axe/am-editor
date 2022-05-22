@@ -37,25 +37,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-Support markdown by default, pass in `false` to close
-
-Tasklist plugin markdown syntax is `[]`, `[ ]`, `[x]`
-
-```ts
-markdown?: boolean;//enabled by default, false off
-//Use configuration
-new Engine(...,{
-    config:{
-        "tasklist":{
-            //Close markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## Command
 
 You can pass in {checked:true} to indicate checked, optional parameters

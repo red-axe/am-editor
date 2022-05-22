@@ -6,8 +6,6 @@
 
 此类插件我们需要继承 `InlinePlugin` 抽象类，`InlinePlugin` 抽象类在继承 `ElementPlugin` 抽象类的基础上扩展了一些属性和方法。所以继承 `InlinePlugin` 的插件也同样拥有`ElementPlugin`抽象类的所有属性和方法
 
-因为`InlinePlugin` 已经实现了`markdown`语法处理，`execute`，`queryState` 命令，所以我们很容易就能配置好一个 Inline 插件
-
 ```ts
 import { InlinePlugin } from '@aomao/engine';
 
@@ -45,19 +43,6 @@ export default class extends InlinePlugin {
 标签名称，必须
 
 此处的标签名称与父类`ElementPlugin`中的标签名称作用是一致的，只不过标签名称是 `InlinePlugin` 插件必要的属性之一
-
-### `markdown`
-
-Markdown 语法，可选
-
-类型：`string`
-
-因为 `InlinePlugin` 插件中已经实现了对 markdown 的语法解析，所以我们只需要传入插件的 markdown 语法即可，例如：
-
-```ts
-//行内代码语法
-readonly markdown = "`"
-```
 
 ## 方法
 
@@ -110,35 +95,4 @@ export default class extends InlinePlugin {
  * @param args 在调用 command.execute 执行插件传入时的参数
  */
 isTrigger?(...args: any): boolean;
-```
-
-### `triggerMarkdown`
-
-解析`markdown`语法，可选
-
-在 `InlinePlugin` 默认解析后无法满足需求时，我们可以重写此方法
-
-```ts
-/**
- * 解析markdown
- * @param event 事件
- * @param text markdown文本
- * @param node 触发节点
- */
-triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface): void
-```
-
-### `pasteMarkdown`
-
-粘贴时批量解析`markdown`语法
-
-在 `InlinePlugin` 默认解析后无法满足需求时，我们可以重写此方法
-
-在粘贴时如果有检测到是`markdown`语法，会转换为纯文本后传入，需要把当前符合当前插件的`markdown`语法文本全部替换为 inline 标签
-
-```ts
-/**
- * @param node 含有markdown语法的文本节点
- * */
-pasteMarkdown(node: NodeInterface): void
 ```

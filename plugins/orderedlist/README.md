@@ -37,25 +37,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-默认支持 markdown，传入`false`关闭
-
-Orderedlist 插件 markdown 语法为`1.` 序号+点
-
-```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
-new Engine(...,{
-    config:{
-        "orderedlist":{
-            //关闭markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## 命令
 
 有一个参数 `start:number` 默认为 1，表示列表开始序号

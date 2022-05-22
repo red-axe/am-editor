@@ -37,25 +37,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-默认支持 markdown，传入`false`关闭
-
-Tasklist 插件 markdown 语法为`[]`, `[ ]`, `[x]`
-
-```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
-new Engine(...,{
-    config:{
-        "tasklist":{
-            //关闭markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## 命令
 
 可传入 { checked:true } 表示选中，可选参数

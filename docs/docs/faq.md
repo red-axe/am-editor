@@ -59,7 +59,36 @@ Some cards may require additional attributes to restore the `html` correctly. Yo
 
 Use the `getHtml` method provided by the `engine` instance to get the html, and then use the [turndown](https://github.com/mixmark-io/turndown) library to convert
 
-## icon missing
+## Disable/Customize Markdown
+
+All `markdown` syntax uses [markdown-it](https://github.com/markdown-it/markdown-it) to handle transformations.
+
+You can customize markdown transitions by listening to the events of markdown-it and markdown-it-token
+
+```ts
+engine.on('markdown-it', markdown => {
+	// enable plugin using markdown-it api
+	markdown.enable('markdown-it plugin name')
+	// disable plugin using markdown-it api
+	markdown.disable('markdown-it plugin name')
+	// or add a plugin
+	markdown.use (markdown-it plugin)
+})
+// By default, the plug-in set by markdown-ti will be used for conversion. If there are additional requirements, you can listen to this event interception and call the callback to return the string by yourself. If there is a need for more replication, it is recommended to use the api of markdown-it to make plugins.
+engine.on('markdown-it-token', ({ token, markdown, callback }) => {
+	// token is the currently processed token
+	// markdown is the current markdown-it instance
+	// callback is the currently processed callback
+	if(token.type === 'paragraph_open') {
+		callback('<p>')
+		// must return false
+		return false
+	}
+	return true
+})
+```
+
+## Icon missing
 
 icon icon is a font icon introduced directly through [iconfont](https://at.alicdn.com/t/project/1456030/0cbd04d3-3ca1-4898-b345-e0a9150fcc80.html?spm=a313x.7781069.1998910419.35).
 

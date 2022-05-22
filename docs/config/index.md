@@ -86,11 +86,6 @@ console.log(view.language.get<string>('test'));
 Some plugins require the configuration of additional properties:
 
 ```ts
-// Configure italic markdown syntax
-[Italic.pluginName]: {
-    // The default is _ underscore, here is modified to a single * sign
-    markdown:'*',
-},
 // upload picture
 [ImageUploader.pluginName]: {
     file: {

@@ -58,25 +58,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-默认支持 markdown，传入`false`关闭
-
-Heading 插件 markdown 语法为`#` `##` `###` `####` `#####` `######`
-
-```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
-new Engine(...,{
-    config:{
-        "heading":{
-            //关闭markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ### 禁用 mark 插件样式效果
 
 可以在标题下禁用 mark 插件效果，默认禁用 ['fontsize', 'bold'] ，在分割、粘贴等情况下过滤掉这些插件样式
@@ -88,8 +69,6 @@ disableMark?: Array<string> //mark插件名称集合
 ### 要启用的类型（h1 h2 h3 h4 h5 h6）
 
 可以定义 h1 - h6 所需要的节点类型，如果不定义则支持全部
-
-设置后 markdown 也会失效
 
 ```ts
 enableTypes?: Array<string>

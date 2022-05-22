@@ -53,25 +53,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-Support markdown by default, pass in `false` to close
-
-Link plug-in markdown syntax is `[text](link address)` and it is triggered after pressing enter
-
-```ts
-markdown?: boolean;//enabled by default, false off
-//Use configuration
-new Engine(...,{
-    config:{
-        "link":{
-            //Close markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ### onConfirm
 
 The url or text to be modified can be modified

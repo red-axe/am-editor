@@ -58,25 +58,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-Support markdown by default, pass in `false` to close
-
-The heading plugin markdown syntax is `#` `##` `###` `####` `#####` `######`
-
-```ts
-markdown?: boolean;//enabled by default, false off
-//Use configuration
-new Engine(...,{
-    config:{
-        "heading":{
-            //Close markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ### Disable mark plugin style effect
 
 You can disable the mark plug-in effect under the title, ['fontsize','bold'] is disabled by default, and filter out these plug-in styles in the case of splitting, pasting, etc.

@@ -135,20 +135,3 @@ Set the `schema` rule of this block plugin, optional
 The `BlockPlugin` plugin has implemented the `schema` method and will automatically set the rules according to the `tagName` `style` `attributes`.
 
 If you need to use it, you can override this method or use super.schema() to call this method again
-
-### `markdown`
-
-Parse `markdown` grammar, optional
-
-By default, after pressing the space, the engine will get the text characters in front of the space, and then call this method, we can find the `markdown` syntax of the text in the method
-
-```ts
-/**
- * Markdown processing
- * @param event event
- * @param text text
- * @param block block-level node
- * @param node trigger node
- */
-markdown?(event: KeyboardEvent, text: string, block: NodeInterface, node: NodeInterface): boolean | void;
-```

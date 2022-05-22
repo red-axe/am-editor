@@ -37,25 +37,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-Support markdown by default, pass in `false` to close
-
-The markdown syntax of the Quote plug-in is `>` and it is triggered after the carriage return.
-
-```ts
-markdown?: boolean;//enabled by default, false off
-//Use configuration
-new Engine(...,{
-    config:{
-        "quote":{
-            //Close markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## Command
 
 ```ts

@@ -38,25 +38,6 @@ new Engine(...,{
   })
 ```
 
-### Markdown
-
-Support markdown by default, pass in `false` to close
-
-Sub plugin markdown syntax is `~`
-
-```ts
-markdown?: boolean;//enabled by default, false off
-//Use configuration
-new Engine(...,{
-     config:{
-         "sub":{
-             //Close markdown
-             markdown:false
-         }
-     }
-  })
-```
-
 ## Command
 
 ```ts

@@ -194,27 +194,6 @@ parse?: (
 };
 ```
 
-### Markdown
-
-Support markdown by default, pass in `false` to close
-
-ImageUploader plug-in markdown syntax is `/^!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)$/`
-
-After obtaining the image address, it will use the `remote` configuration to `POST` the image address to the server, the request parameter is `url`, and the server will use the image address to download and save the new image address and return it
-
-```ts
-markdown?: boolean;//enabled by default, false off
-//Use configuration
-new Engine(...,{
-    config:{
-        [ImageUploader.pluginName]:{
-            //Close markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## Command
 
 ### `Image` plugin command

@@ -38,25 +38,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-Support markdown by default, pass in `false` to close
-
-The markdown syntax of the Bold plugin is `**`
-
-```ts
-markdown?: boolean;//enabled by default, false off
-//Use configuration
-new Engine(...,{
-    config:{
-        "bold":{
-            //Close markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## Command
 
 ```ts

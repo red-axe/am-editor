@@ -86,11 +86,6 @@ console.log(view.language.get<string>('test'));
 一些插件需要额外属性的配置:
 
 ```ts
-// 配置斜体 markdown 语法
-[Italic.pluginName]: {
-    // 默认为 _ 下划线，这里修改为单个 * 号
-    markdown: '*',
-},
 // 图片上传
 [ImageUploader.pluginName]: {
     file: {

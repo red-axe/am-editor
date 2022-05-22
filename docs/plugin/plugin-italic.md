@@ -38,25 +38,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-Support markdown by default, pass in `false` to close
-
-Italic plugin markdown syntax is `_`
-
-```ts
-markdown?: boolean;//enabled by default, false off
-//Use configuration
-new Engine(...,{
-    config:{
-        "italic":{
-            //Close markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## Command
 
 ```ts

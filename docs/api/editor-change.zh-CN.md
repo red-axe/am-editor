@@ -196,7 +196,7 @@ setHtml(html: string, callback?: (count: number) => void): void;
 
 设置 markdown，会格式化为合法的编辑器值
 
-会走粘贴 markdown 事件，可在 paste:markdown 事件中拦截自定义处理
+会走粘贴 markdown 事件，可在 markdown-it 和 markdown-token 事件中拦截自定义处理
 
 ```ts
 /**

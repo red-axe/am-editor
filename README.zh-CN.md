@@ -292,7 +292,7 @@ const engine = new Engine(ref.current, {
 });
 ```
 
-`CodeBlock` 插件默认支持 `markdown`，在编辑器一行开头位置输入代码块语法` ```javascript ` 回车后即可触发。
+`CodeBlock` 插件默认支持 `markdown`，在编辑器一行开头位置输入代码块语法` ```javascript ` 空格后即可触发。
 
 ### 工具栏
 

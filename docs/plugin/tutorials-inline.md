@@ -6,8 +6,6 @@ Usually used in scenarios where the text is individually styled and cannot be ne
 
 For this type of plug-in, we need to inherit the `InlinePlugin` abstract class. The `InlinePlugin` abstract class extends some properties and methods on the basis of inheriting the `ElementPlugin` abstract class. So the plugin that inherits `InlinePlugin` also has all the attributes and methods of the `ElementPlugin` abstract class
 
-Because `InlinePlugin` has implemented `markdown` syntax processing, `execute`, `queryState` commands, so we can easily configure an Inline plugin
-
 ```ts
 import { InlinePlugin } from '@aomao/engine';
 
@@ -45,19 +43,6 @@ export default class extends InlinePlugin {
 Label name, must
 
 The label name here is the same as the label name in the parent class `ElementPlugin`, except that the label name is one of the necessary attributes of the `InlinePlugin` plugin
-
-### `markdown`
-
-Markdown syntax, optional
-
-Type: `string`
-
-Because the grammar parsing of markdown has been implemented in the `InlinePlugin` plugin, we only need to pass in the markdown grammar of the plugin, for example:
-
-```ts
-//Inline code syntax
-readonly markdown = "`"
-```
 
 ## Method
 
@@ -110,35 +95,4 @@ If you implement the isTrigger method, you need to determine whether to cancel o
  * @param args is the parameter passed in when calling command.execute to execute the plugin
  */
 isTrigger?(...args: any): boolean;
-```
-
-### `triggerMarkdown`
-
-Parse `markdown` grammar, optional
-
-We can override this method when `InlinePlugin` fails to meet the requirements after the default parsing
-
-```ts
-/**
- * Parse markdown
- * @param event event
- * @param text markdown text
- * @param node trigger node
- */
-triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface): void
-```
-
-### `pasteMarkdown`
-
-Batch parsing of `markdown` syntax when pasting
-
-We can override this method when `InlinePlugin` fails to meet the requirements after the default parsing
-
-If a `markdown` syntax is detected during pasting, it will be converted into plain text and then passed in. You need to replace all the `markdown` syntax texts currently in line with the current plug-in with inline tags
-
-```ts
-/**
- * @param node contains a text node with markdown syntax
- * */
-pasteMarkdown(node: NodeInterface): void
 ```

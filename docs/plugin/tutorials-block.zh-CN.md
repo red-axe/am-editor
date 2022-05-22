@@ -135,20 +135,3 @@ execute(...args) {
 `BlockPlugin` 插件已经实现了`schema`方法，会自动根据 `tagName` `style` `attributes` 设置规则。
 
 如果需要使用，可以重写此方法或者使用 super.schema()再次调用此方法
-
-### `markdown`
-
-解析`markdown`语法，可选
-
-默认在按下空格后，引擎会获取到空格前面的文本字符，然后调用此方法，我们可以在方法中查找文本的`markdown`语法
-
-```ts
-/**
- * Markdown 处理
- * @param event 事件
- * @param text 文本
- * @param block 块级节点
- * @param node 触发节点
- */
-markdown?(event: KeyboardEvent, text: string, block: NodeInterface, node: NodeInterface): boolean | void;
-```

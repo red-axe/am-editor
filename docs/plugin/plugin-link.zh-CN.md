@@ -53,25 +53,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-默认支持 markdown，传入`false`关闭
-
-Link 插件 markdown 语法为`[文本](链接地址)` 回车后触发
-
-```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
-new Engine(...,{
-    config:{
-        "link":{
-            //关闭markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ### onConfirm
 
 可对要修改的 url 或者 文本 进行修改

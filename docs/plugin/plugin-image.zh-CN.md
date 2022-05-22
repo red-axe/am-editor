@@ -192,27 +192,6 @@ parse?: (
 };
 ```
 
-### Markdown
-
-默认支持 markdown，传入`false`关闭
-
-ImageUploader 插件 markdown 语法为`/^!\[([^\]]{0,})\]\((https?:\/\/[^\)]{5,})\)$/`
-
-获取到图片地址后，会使用 `remote` 配置将图片地址 `POST` 到服务端，请求参数为 `url`，服务端使用图片地址下载保存后将新的图片地址返回
-
-```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
-new Engine(...,{
-    config:{
-        [ImageUploader.pluginName]:{
-            //关闭markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## 命令
 
 ### `Image` 插件命令

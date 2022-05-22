@@ -38,25 +38,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-默认支持 markdown，传入`false`关闭
-
-Italic 插件 markdown 语法为`_`
-
-```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
-new Engine(...,{
-    config:{
-        "italic":{
-            //关闭markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## 命令
 
 ```ts

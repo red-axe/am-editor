@@ -37,25 +37,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-Support markdown by default, pass in `false` to close
-
-The orderedlist plugin markdown syntax is `1.` serial number + dot
-
-```ts
-markdown?: boolean;//enabled by default, false off
-//Use configuration
-new Engine(...,{
-    config:{
-        "orderedlist":{
-            //Close markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## Command
 
 There is a parameter `start:number` which defaults to 1, which indicates the starting number of the list

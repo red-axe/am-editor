@@ -41,25 +41,6 @@ new Engine(...,{
  })
 ```
 
-### Markdown
-
-默认支持 markdown，传入`false`关闭
-
-Link 插件 markdown 语法为`[文本](链接地址)` 回车后触发
-
-```ts
-markdown?: boolean;//默认开启，false 关闭
-//使用配置
-new Engine(...,{
-    config:{
-        "link":{
-            //关闭markdown
-            markdown:false
-        }
-    }
- })
-```
-
 ## 命令
 
 可传入三个参数[target?:string,href?:string,text?:string] 打开模式：可选，默认链接：可选，默认文本：可选

@@ -247,7 +247,7 @@ const engine = new Engine(ref.current, {
 });
 ```
 
-The `CodeBlock` plugin supports `markdown` by default. Enter the code block syntax ````javascript` at the beginning of a line in the editor to trigger it after pressing Enter.
+The `CodeBlock` plugin supports `markdown` by default. Enter the code block syntax ````javascript` at the beginning of a line in the editor to trigger it after pressing Space.
 
 ### Toolbar
 

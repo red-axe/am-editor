@@ -6,8 +6,6 @@ Usually used for text modification, for example, bold, italic, underline, backgr
 
 For this type of plug-in, we need to inherit the `MarkPlugin` abstract class. The `MarkPlugin` abstract class extends some properties and methods on the basis of inheriting the `ElementPlugin` abstract class. So the plugin that inherits `MarkPlugin` also has all the attributes and methods of the `ElementPlugin` abstract class
 
-Because `MarkPlugin` has implemented `markdown` syntax processing, `execute`, `queryState` commands, so we can easily configure a Mark plugin
-
 ```ts
 import { MarkPlugin } from '@aomao/engine';
 
@@ -46,19 +44,6 @@ export default class extends MarkPlugin {
 Label name, must
 
 The tag name here is the same as the tag name in the parent class `ElementPlugin`, except that the tag name is one of the necessary attributes of the `MarkPlugin` plugin
-
-### `markdown`
-
-Markdown syntax, optional
-
-Type: `string`
-
-Because the markdown syntax analysis has been implemented in the `MarkPlugin` plugin, we only need to pass in the markdown syntax of the plugin, for example:
-
-```ts
-//Bold grammar
-readonly markdown = "**"
-```
 
 ### `copyOnEnter`
 
@@ -144,35 +129,4 @@ If you implement the isTrigger method, you need to determine whether to cancel o
  * @param args is the parameter passed in when calling command.execute to execute the plugin
  */
 isTrigger?(...args: any): boolean;
-```
-
-### `triggerMarkdown`
-
-Parse `markdown` grammar, optional
-
-We can override this method when the requirement cannot be met after the default parsing of `MarkPlugin`
-
-```ts
-/**
- * Parse markdown
- * @param event event
- * @param text markdown text
- * @param node trigger node
- */
-triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface): void
-```
-
-### `pasteMarkdown`
-
-Batch parsing of `markdown` syntax when pasting
-
-We can override this method when the requirement cannot be met after the default parsing of `MarkPlugin`
-
-If the `markdown` syntax is detected during pasting, it will be converted into plain text and then passed in. You need to replace all the `markdown` syntax texts currently in line with the current plug-in with the mark tag
-
-```ts
-/**
- * @param node contains a text node with markdown syntax
- * */
-pasteMarkdown(node: NodeInterface): void
 ```

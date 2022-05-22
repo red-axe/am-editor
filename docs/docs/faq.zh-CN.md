@@ -59,6 +59,35 @@ engine.on('paste:schema', (schema) => {
 
 使用 `engine` 实例提供的 `getHtml` 方法获取到 html，然后使用 [turndown](https://github.com/mixmark-io/turndown) 这个库进行转换
 
+## 禁用/自定义 Markdown
+
+所有的`markdown`语法均使用 [markdown-it](https://github.com/markdown-it/markdown-it) 处理转换。
+
+可以通过监听 markdown-it 和 markdown-it-token 的事件，来自定义 markdown 转换
+
+```ts
+engine.on('markdown-it', (markdown) => {
+	// 使用 markdown-it api 启用插件
+	markdown.enable('markdown-it 插件名称');
+	// 使用 markdown-it api 禁用插件
+	markdown.disable('markdown-it 插件名称');
+	// 或者 新增插件
+	markdown.use(markdown - it插件);
+});
+// 默认会使用markdown-ti设置好的插件进行转换，如果有额外需求可以监听这个事件拦截，并自行调用 callback 返回字符串。如果有更复制的需求，建议使用 markdown-it 的api制作插件。
+engine.on('markdown-it-token', ({ token, markdown, callback }) => {
+	// token 为当前处理的 token
+	// markdown 为当前markdown-it实例
+	// callback 为当前处理的回调
+	if (token.type === 'paragraph_open') {
+		callback('<p>');
+		// 必须返回 flase
+		return false;
+	}
+	return true;
+});
+```
+
 ## icon 丢失
 
 icon 图标是直接通过 [iconfont](https://at.alicdn.com/t/project/1456030/0cbd04d3-3ca1-4898-b345-e0a9150fcc80.html?spm=a313x.7781069.1998910419.35) 引入的字体图标。
