@@ -119,33 +119,6 @@ export default class<
 		return this.query();
 	}
 
-	triggerMarkdown(event: KeyboardEvent, text: string, node: NodeInterface) {
-		const editor = this.editor;
-		if (!isEngine(editor) || !this.markdown) return;
-		const match = new RegExp(this.markdown).exec(text);
-		if (match) {
-			const { command } = editor;
-			event.preventDefault();
-			const text = match[2];
-			const url = match[3];
-			// 移除 markdown 语法
-			const markdownTextNode = node
-				.get<Text>()!
-				.splitText(match.index + match[1].length);
-			markdownTextNode.splitText(match[0].length - match[1].length);
-			$(markdownTextNode).remove();
-			command.execute(
-				(this.constructor as PluginEntry).pluginName,
-				'_blank',
-				url,
-				text,
-			);
-			editor.node.insertText('\xA0');
-			return false;
-		}
-		return;
-	}
-
 	markdownIt = (mardown: MarkdownIt) => {
 		if (this.options.markdown !== false) {
 			mardown.enable('link');
