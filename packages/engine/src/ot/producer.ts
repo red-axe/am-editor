@@ -313,11 +313,12 @@ class Producer extends EventEmitter2 {
 								if (!result) {
 									i++;
 									continue;
-								} else if (
-									result.paths.join(',') !== path.join(',')
-								) {
-									path = result.paths;
 								}
+								// else if (
+								// 	result.paths.join(',') !== path.join(',')
+								// ) {
+								// 	path = result.paths;
+								// }
 							}
 							// 删除的情况下，目标节点也应该获取 __index ，不然在还有新增的情况会导致path不正确
 							const newPath = path?.concat();
@@ -461,9 +462,10 @@ class Producer extends EventEmitter2 {
 						if (!result) {
 							i++;
 							continue;
-						} else if (result.paths.join(',') !== path.join(',')) {
-							path = result.paths;
 						}
+						// else if (result.paths.join(',') !== path.join(',')) {
+						// 	path = result.paths;
+						// }
 					}
 					newOp.p = p.concat(
 						[...path],

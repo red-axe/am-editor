@@ -1161,38 +1161,17 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		}
 		command.mockCopy();
 		if (selectArea.begin.col > index) {
-			command.insertColAt(
-				isNext ? index - 1 : index,
-				count,
-				isNext,
-				widths,
-				true,
-			);
-			selection.selectCol(index, index + count - 1);
+			const targetIndex = isNext ? index - 1 : index;
+			command.removeCol();
+			command.insertColAt(targetIndex, count, isNext, widths, true);
+			selection.selectCol(targetIndex, targetIndex + count - 1);
 			command.mockPaste(true);
-			setTimeout(() => {
-				selection.selectCol(
-					selectArea.begin.col + count,
-					selectArea.end.col + count,
-				);
-				command.removeCol();
-				selection.selectCol(index, index + count - 1);
-			}, 10);
 		} else {
-			command.insertColAt(
-				isNext ? index - 1 : index,
-				count,
-				isNext,
-				widths,
-				true,
-			);
-			selection.selectCol(index, index + count - 1);
+			command.removeCol();
+			const targetIndex = (isNext ? index - 1 : index) - count;
+			command.insertColAt(targetIndex, count, isNext, widths, true);
+			selection.selectCol(targetIndex + 1, targetIndex + count);
 			command.mockPaste(true);
-			setTimeout(() => {
-				selection.selectCol(selectArea.begin.col, selectArea.end.col);
-				command.removeCol();
-				selection.selectCol(index - count, index - 1);
-			}, 10);
 		}
 		this.placeholder?.css('display', 'none');
 		this.draggingHeader = undefined;
@@ -1263,33 +1242,17 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const { begin, end } = selectArea;
 		command.mockCopy();
 		if (begin.row > index) {
-			command.insertRowAt(
-				isNext ? index - 1 : index,
-				count,
-				!isNext,
-				true,
-			);
+			const targetIndex = isNext ? index - 1 : index;
+			command.removeRow();
+			command.insertRowAt(targetIndex, count, !isNext, true);
 			selection.selectRow(index, index + count - 1);
-			setTimeout(() => {
-				command.mockPaste(true);
-				selection.selectRow(begin.row + count, end.row + count);
-				command.removeRow();
-				selection.selectRow(index, index + count - 1);
-			}, 10);
+			command.mockPaste(true);
 		} else {
-			command.insertRowAt(
-				isNext ? index - 1 : index,
-				count,
-				!isNext,
-				true,
-			);
-			selection.selectRow(index, index + count - 1);
-			setTimeout(() => {
-				command.mockPaste(true);
-				selection.selectRow(begin.row, end.row);
-				command.removeRow();
-				selection.selectRow(index - count, index - 1);
-			}, 10);
+			command.removeRow();
+			const targetIndex = (isNext ? index - 1 : index) - count;
+			command.insertRowAt(targetIndex, count, !isNext, true);
+			selection.selectRow(targetIndex + 1, targetIndex + count);
+			command.mockPaste(true);
 		}
 		this.placeholder?.css('display', 'none');
 		this.draggingHeader = undefined;

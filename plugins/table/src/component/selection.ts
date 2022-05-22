@@ -557,6 +557,15 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		} else if (target.name === 'td') {
 			event.preventDefault();
 		}
+		const next = () => {
+			this.select({ row, col }, { row, col });
+			this.dragging = {
+				trigger: {
+					element: td,
+				},
+			};
+			this.addDragEvent();
+		};
 		// 右键不触发拖选
 		if (event instanceof MouseEvent && event.button === 2) {
 			if (!!target.attributes('table-cell-selection')) {
@@ -570,7 +579,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				const block = editableElement.last();
 				if (block) {
 					// 不是块级卡片不处理
-					if (!block.isBlockCard()) return;
+					if (!block.isBlockCard()) return next();
 					//节点不可见不处理
 					if (
 						(block.get<HTMLElement>()?.offsetTop || 0) +
@@ -578,7 +587,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 						(event instanceof MouseEvent ? event : event.touches[0])
 							.clientY
 					)
-						return;
+						return next();
 					const node = $('<p><br /></p>');
 					editableElement.append(node);
 					const range = this.editor.change.range.get();
@@ -587,13 +596,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				}
 			}
 		}
-		this.select({ row, col }, { row, col });
-		this.dragging = {
-			trigger: {
-				element: td,
-			},
-		};
-		this.addDragEvent();
+		next();
 	};
 
 	addDragEvent() {
@@ -1014,9 +1017,9 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			trHtml.push(trElement.get<HTMLElement>()!.outerHTML);
 		}
 
-		return `<div><meta name="aomao" content="table" /><table style="width:${tableWidth}px">${colgroup}${trHtml.join(
+		return `<body><meta name="aomao" content="table" /><table style="width:${tableWidth}px">${colgroup}${trHtml.join(
 			'',
-		)}</table></div>`;
+		)}</table></body>`;
 	}
 
 	hasMergeCell() {
