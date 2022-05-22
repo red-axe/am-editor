@@ -1,4 +1,4 @@
-import Engine, {
+import {
 	$,
 	CardEntry,
 	DATA_TRANSIENT_ATTRIBUTES,
@@ -68,7 +68,8 @@ export default class<
 	init() {
 		super.init();
 		const globals: Array<SchemaGlobal> = [];
-		this.options.keys.forEach((key) => {
+		const optionKeys = this.options?.keys || [];
+		optionKeys.forEach((key) => {
 			globals.push(
 				{
 					type: 'block',
@@ -95,9 +96,7 @@ export default class<
 			this.editor.on('select', this.onSelectionChange);
 			this.editor.on('parse:value', this.parseValue);
 			this.editor.on('afterSetValue', this.onAfterSetValue);
-			const keys = this.options.keys.map((key) =>
-				this.getPreviewName(key),
-			);
+			const keys = optionKeys.map((key) => this.getPreviewName(key));
 			this.editor.history.onFilter((op) => {
 				if (
 					('od' in op || 'oi' in op) &&
@@ -154,20 +153,22 @@ export default class<
 	};
 
 	schema() {
-		const rules: Array<SchemaMark> = this.options.keys.map((key) => {
-			return {
-				name: 'span',
-				type: 'mark',
-				attributes: {
-					[this.MARK_KEY]: {
-						required: true,
-						value: key,
+		const rules: Array<SchemaMark> = (this.options?.keys || []).map(
+			(key) => {
+				return {
+					name: 'span',
+					type: 'mark',
+					attributes: {
+						[this.MARK_KEY]: {
+							required: true,
+							value: key,
+						},
+						[this.MARK_UUID]: '*',
+						[this.getIdName(key)]: '*',
 					},
-					[this.MARK_UUID]: '*',
-					[this.getIdName(key)]: '*',
-				},
-			};
-		});
+				};
+			},
+		);
 		return rules;
 	}
 	/**
