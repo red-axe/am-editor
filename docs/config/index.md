@@ -251,3 +251,9 @@ After rendering, `View` loses all editing capabilities and collaboration capabil
 -   type: `boolean`
 -   Default: `true`
 -   Details: Whether to automatically add a blank line when clicking on the blank space at the end of the editor (<div style="padding-bottom: 20px;"></div>) Clicking within 20 pixels of padding-bottom will add a blank line
+
+### markdownMode
+
+-   Type: `auto` | `confirm`
+-   Default: auto
+-   markdown mode, the default is to directly convert when markdown syntax is detected. When using `confirm` mode, you need to call `engine.messageConfirm` to confirm and then convert.

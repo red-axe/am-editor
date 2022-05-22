@@ -251,3 +251,9 @@ console.log(view.language.get<string>('test'));
 -   类型：`boolean`
 -   默认值：`true`
 -   详细：在编辑器尾部单击空白处是否自动添加空行（<div style="padding-bottom: 20px;"></div>）在 padding-bottom 这 20 像素内点击会添加空行
+
+### markdownMode
+
+-   类型：`auto` | `confirm`
+-   默认值：auto
+-   markdown 模式，默认为检测到 markdown 语法就直接转换。使用 `confirm` 模式，需要调用`engine.messageConfirm`确认后再转换。
