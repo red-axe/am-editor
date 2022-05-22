@@ -31,10 +31,21 @@ export default defineComponent({
     components:{
         AmGroup
     },
-    props:toolbarProps,
-    
+    props: toolbarProps,
+
     setup(props){
-        let groups = ref<Array<GroupDataProps>>([])
+        let groups = ref<any>([])
+		//计算移动浏览器的视图变化
+        const calcuMobileView = () => {
+          if(!props.engine.isFocus() || props.engine.readonly) return
+
+          if(caluTimeoutRef.value) clearTimeout(caluTimeoutRef.value as NodeJS.Timeout);
+          caluTimeoutRef.value = setTimeout(() => {
+            const rect = toolbarRef.value?.getBoundingClientRect()
+            const height = rect?.height || 0
+            mobileView.top = global.Math.max(document.body.scrollTop, document.documentElement.scrollTop) + (window.visualViewport.height || 0) - height
+          }, 100);
+        }
         const update = () => {
             if(isMobile) calcuMobileView()
             const data: Array<GroupDataProps> = [];
@@ -124,17 +135,7 @@ export default defineComponent({
         const toolbarRef = ref<HTMLDivElement | null>(null)
         const caluTimeoutRef = ref<NodeJS.Timeout | null>(null);
         const mobileView = reactive({ top: 0 })
-        //计算移动浏览器的视图变化
-        const calcuMobileView = () => {
-          if(!props.engine.isFocus() || props.engine.readonly) return
-        
-          if(caluTimeoutRef.value) clearTimeout(caluTimeoutRef.value as NodeJS.Timeout);
-          caluTimeoutRef.value = setTimeout(() => {
-            const rect = toolbarRef.value?.getBoundingClientRect()
-            const height = rect?.height || 0
-            mobileView.top = global.Math.max(document.body.scrollTop, document.documentElement.scrollTop) + (window.visualViewport.height || 0) - height
-          }, 100);
-        }
+
 
         let scrollTimer:NodeJS.Timeout;
 
@@ -181,7 +182,7 @@ export default defineComponent({
             }
             updateByTimeout()
         })
-        
+
         onUnmounted(() => {
             props.engine.off("select",updateByTimeout)
             props.engine.off("change",updateByTimeout)
