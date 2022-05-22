@@ -104,3 +104,20 @@ icon 图标是直接通过 [iconfont](https://at.alicdn.com/t/project/1456030/0c
 ```
 
 如果出现不能访问的情况，我们可以把这三个文件下载下来，然后在 css 中重新定义 @font-face 并引入新的字体文件
+
+## 如何定制卡片工具栏
+
+在卡片组件的插件配置项中，配置 `cardToolbars` 选项
+
+```ts
+new Engine(container, {
+	config: {
+		codeblock: {
+			cardToolbars: (items) => {
+				console.log(items);
+				return items.filter((item) => item.key === 'copy');
+			},
+		},
+	},
+});
+```

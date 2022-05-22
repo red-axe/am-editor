@@ -67,24 +67,24 @@ You can customize markdown transitions by listening to the events of markdown-it
 
 ```ts
 engine.on('markdown-it', markdown => {
-	// enable plugin using markdown-it api
-	markdown.enable('markdown-it plugin name')
-	// disable plugin using markdown-it api
-	markdown.disable('markdown-it plugin name')
-	// or add a plugin
-	markdown.use (markdown-it plugin)
+ // enable plugin using markdown-it api
+ markdown.enable('markdown-it plugin name')
+ // disable plugin using markdown-it api
+ markdown.disable('markdown-it plugin name')
+ // or add a plugin
+ markdown.use (markdown-it plugin)
 })
 // By default, the plug-in set by markdown-ti will be used for conversion. If there are additional requirements, you can listen to this event interception and call the callback to return the string by yourself. If there is a need for more replication, it is recommended to use the api of markdown-it to make plugins.
 engine.on('markdown-it-token', ({ token, markdown, callback }) => {
-	// token is the currently processed token
-	// markdown is the current markdown-it instance
-	// callback is the currently processed callback
-	if(token.type === 'paragraph_open') {
-		callback('<p>')
-		// must return false
-		return false
-	}
-	return true
+ // token is the currently processed token
+ // markdown is the current markdown-it instance
+ // callback is the currently processed callback
+ if(token.type === 'paragraph_open') {
+  callback('<p>')
+  // must return false
+  return false
+ }
+ return true
 })
 ```
 
@@ -104,3 +104,20 @@ icon icon is a font icon introduced directly through [iconfont](https://at.alicd
 ```
 
 If there is no access, we can download these three files, and then redefine @font-face in css and introduce a new font file
+
+## How to customize the card toolbar
+
+In the plugin configuration item of the card component, configure the `cardToolbars` option
+
+```ts
+new Engine(container, {
+	config: {
+		codeblock: {
+			cardToolbars: (items) => {
+				console.log(items);
+				return items.filter((item) => item.key === 'copy');
+			},
+		},
+	},
+});
+```
