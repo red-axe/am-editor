@@ -1,14 +1,15 @@
 <template>
     <div
-    :class="['toolbar-dropdown-list',`toolbar-dropdown-${direction || 'vertical'}`,{'toolbar-dropdown-dot': hasDot !== false},className]"
+	ref="element"
+    :class="['toolbar-dropdown-list',`toolbar-dropdown-${direction || 'vertical'}`,{[`toolbar-dropdown-placement-${placement}`]: !!placement },{'toolbar-dropdown-dot': hasDot !== false},className]"
     >
-        <a-tooltip v-for="{ key , placement , title , direction , hasDot , content , className , icon, disabled } in items" :key="key" :placement="placement || 'right'" 
+        <a-tooltip v-for="{ key , placement , title, content , className , icon, disabled } in items" :key="key" :placement="placement || 'right'"
         >
             <template #title v-if="(!!title || !!hotkeys[key]) && !isMobile">
                 <div v-if="!!title" class="toolbar-tooltip-title">{{title}}</div>
                 <div v-if="!!hotkeys[key]" class="toolbar-tooltip-hotkey" v-html="hotkeys[key]"></div>
             </template>
-            <a 
+            <a
             :class="['toolbar-dropdown-list-item',className, {'toolbar-dropdown-list-item-disabled': disabled}]"
             @click="triggerSelect($event,key)">
                 <span v-if="((typeof values === 'string' && values === key) || (Array.isArray(values) && values.indexOf(key) > -1)) &&
@@ -21,7 +22,7 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import ATooltip from "ant-design-vue/es/tooltip"
 import { formatHotkey, isMobile } from '@aomao/engine'
 import { dropdownListProps , DropdownListItem } from '../types'
@@ -35,6 +36,8 @@ export default defineComponent({
     },
     props:dropdownListProps,
     setup(props){
+		const placement = ref<string>('')
+		const element = ref<HTMLElement | null>(null)
         const getHotkey = (item:DropdownListItem) => {
             const { command, key } = item
             let { hotkey } = item
@@ -56,9 +59,25 @@ export default defineComponent({
         props.items.forEach(item => {
             hotkeys[item.key] = getHotkey(item)
         })
+
+
+		onMounted(() => {
+			if (element.value) {
+				const ev = element.value
+				const scrollElement = props.engine?.scrollNode?.get<HTMLElement>();
+				if (!scrollElement) return;
+				const rect = ev.getBoundingClientRect();
+				const scrollRect = scrollElement.getBoundingClientRect();
+				if (rect.top < scrollRect.top) placement.value = 'bottom';
+				if (rect.bottom > scrollRect.bottom) placement.value = 'top'
+			}
+		})
+
         return {
+			element,
             isMobile,
-            hotkeys
+            hotkeys,
+			placement
         }
     },
     methods:{

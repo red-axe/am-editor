@@ -4,12 +4,12 @@
             <div v-if="!!title" class="toolbar-tooltip-title">{{title}}</div>
             <div v-if="!!hotkeyText" class="toolbar-tooltip-hotkey" v-html="hotkeyText"></div>
         </template>
-        <button 
-        :class="['toolbar-button',className,{'toolbar-button-active': active,'toolbar-button-disabled':disabled}]" 
+        <button
+        :class="['toolbar-button',className,{'toolbar-button-active': active,'toolbar-button-disabled':disabled}]"
         ref="element"
-        @click="triggerClick" 
-        @mousedown="triggerMouseDown" 
-        @mouseenter="triggerMouseEnter" 
+        @click="triggerClick"
+        @mousedown="triggerMouseDown"
+        @mouseenter="triggerMouseEnter"
         @mouseleave="triggerMouseLeave">
             <slot name="icon">
                 <span v-if="iconIsHtml" v-html="icon"></span>

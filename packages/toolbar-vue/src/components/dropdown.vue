@@ -28,7 +28,7 @@
                 </template>
             </am-button>
         </div>
-        <am-dropdown-list 
+        <am-dropdown-list
         v-if="visible"
         :hasDot="hasDot"
         :engine="engine"
@@ -74,7 +74,7 @@ export default defineComponent({
 		 props.items.length > 0
 			?  props.items.find(item => item.isDefault === true) ||  props.items[0]
 			: null;
-            
+
             if(item){
                 if(cxt.slots.default){
                     buttonContent.value =  item
@@ -97,7 +97,7 @@ export default defineComponent({
             valuesVar.value = values ||
 						(props.icon || props.content ? '' : defaultItem?.key || '')
         }
-        
+
         const triggerMouseDown = (event: MouseEvent) => {
             event.preventDefault();
         }
@@ -201,12 +201,16 @@ export default defineComponent({
     left: 0px;
 }
 
-.editor-toolbar-mobile .toolbar-dropdown .toolbar-dropdown-list,.editor-toolbar-popup .toolbar-dropdown .toolbar-dropdown-list{
+.editor-toolbar-mobile .toolbar-dropdown .toolbar-dropdown-list, .editor-toolbar-popup .toolbar-dropdown .toolbar-dropdown-list:not(.toolbar-dropdown-placement-bottom) {
     bottom: 32px;
     top: auto;
-    max-height: calc(30vh);
     overflow: auto;
 }
+
+.editor-toolbar-mobile .toolbar-dropdown .toolbar-dropdown-list {
+    max-height: calc(30vh);
+}
+
 
 .editor-toolbar-mobile .toolbar-dropdown.toolbar-dropdown-right .toolbar-dropdown-list,.editor-toolbar-popup .toolbar-dropdown.toolbar-dropdown-right .toolbar-dropdown-list{
     right: 0px;
