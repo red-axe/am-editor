@@ -292,11 +292,42 @@ class Editor<T extends EditorOptions = EditorOptions>
 		if (range.collapsed) {
 			return;
 		}
+
+		const setNodes = (nodes: Node[]) => {
+			if (0 === nodes.length) return {};
+			for (let i = nodes.length - 1; i > 0; i--) {
+				const node = nodes[i];
+				node.appendChild(nodes[i - 1]);
+			}
+			return {
+				inner: nodes[0],
+				outter: nodes[nodes.length - 1],
+			};
+		};
+
 		card = root.closest(`[${CARD_KEY}]`, (node) => {
-			if ($(node).isEditable()) return;
 			return node.parentNode || undefined;
 		});
-		if (card.length > 0) return;
+		if (card.length > 0) {
+			const compnoent = this.card.find(card);
+			if (compnoent && compnoent.getSelectionNodes) {
+				const nodes = compnoent.getSelectionNodes();
+				if (nodes.length > 0) {
+					const { inner, outter } = setNodes(
+						nodes.map((node) => node[0]),
+					);
+					let html = nodes.map((node) => node.html()).join('');
+					const parser = new Parser(`<div>${html}</div>`, this);
+					html = parser.toHTML(inner, outter);
+					const text = new Parser(html, this).toText(
+						this.schema,
+						true,
+					);
+					return { html, text };
+				}
+			}
+			return;
+		}
 		const { node, list } = this;
 		// 修复自定义列表选择范围
 		let customizeStartItem: NodeInterface | undefined;
@@ -406,17 +437,6 @@ class Editor<T extends EditorOptions = EditorOptions>
 				listMergeBlocks.push(parent);
 			}
 		});
-		const setNodes = (nodes: Node[]) => {
-			if (0 === nodes.length) return {};
-			for (let i = nodes.length - 1; i > 0; i--) {
-				const node = nodes[i];
-				node.appendChild(nodes[i - 1]);
-			}
-			return {
-				inner: nodes[0],
-				outter: nodes[nodes.length - 1],
-			};
-		};
 		const { inner, outter } = setNodes(nodes);
 		const listNodes: NodeInterface[] = [];
 		contents.childNodes.forEach((child) => {
