@@ -185,7 +185,6 @@ export default class<
 	markdownIt = (markdown: MarkdownIt) => {
 		if (this.options.markdown !== false) {
 			markdown.use(TaskMarkdown, {
-				enabled: true,
 				itemClass: this.editor.list.CUSTOMZIE_LI_CLASS,
 				rootClass: `${this.editor.list.CUSTOMZIE_UL_CLASS} ${TASK_LIST_CLASS}`,
 			});
@@ -241,5 +240,5 @@ export default class<
 		}
 	}
 }
-export { CheckboxComponent };
+export { CheckboxComponent, TaskMarkdown };
 export type { CheckboxValue };
