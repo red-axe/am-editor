@@ -1,10 +1,13 @@
 import tinycolor2 from 'tinycolor2';
 import type { MarkInterface, NodeInterface, SchemaInterface } from '../types';
-import { READY_CARD_KEY, READY_CARD_SELECTOR } from '../constants/card';
+import {
+	READY_CARD_KEY,
+	READY_CARD_SELECTOR,
+	CARD_KEY,
+} from '../constants/card';
 import Parser from '../parser';
 import { EngineInterface } from '../types/engine';
 import { $ } from '../node';
-import { CARD_KEY } from '@aomao/engine';
 
 export default class Paste {
 	protected source: string;
@@ -101,7 +104,11 @@ export default class Paste {
 									const cardName =
 										first.attributes(CARD_KEY) ||
 										first.attributes(READY_CARD_KEY);
-									list.addCardToCustomize(target, cardName);
+									if (cardName)
+										list.addCardToCustomize(
+											target,
+											cardName,
+										);
 								}
 							}
 						};
