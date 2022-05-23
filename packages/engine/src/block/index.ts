@@ -78,7 +78,7 @@ class Block implements BlockModelInterface {
 		const markdown = createMarkdownIt(this.editor, 'zero');
 		const tokens = markdown.parse(text, {});
 		if (tokens.length === 0) return;
-		const content = convertMarkdown(this.editor, markdown, tokens);
+		const content = convertMarkdown(this.editor, markdown, tokens, false);
 		if (content) {
 			event.preventDefault();
 			range.select(blockNode, true);

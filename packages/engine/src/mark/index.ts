@@ -50,7 +50,9 @@ class Mark implements MarkModelInterface {
 		const { change } = editor;
 		let range = change.range.get();
 		if (!range.collapsed || change.isComposing()) return;
-		const { startNode, startOffset } = range;
+		const { startNode, startOffset } = range
+			.cloneRange()
+			.shrinkToTextNode();
 		const node =
 			startNode.type === Node.TEXT_NODE
 				? startNode

@@ -43,6 +43,7 @@ export const convertMarkdown = (
 	editor: EditorInterface,
 	markdown: MarkdownIt,
 	tokens: Token[],
+	checkInline: boolean = true,
 ) => {
 	const { renderer, options } = markdown;
 	let isHit = false;
@@ -66,7 +67,10 @@ export const convertMarkdown = (
 		let content = '';
 		if (type === 'inline' && children) {
 			content = renderer.renderInline(children, options, {});
-			if (children.find((child) => child.type.endsWith('_open'))) {
+			if (
+				checkInline &&
+				children.find((child) => child.type.endsWith('_open'))
+			) {
 				isHit = true;
 			}
 		} else if (typeof renderer.rules[type] !== 'undefined') {
