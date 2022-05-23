@@ -394,7 +394,13 @@ class ChangeRange implements ChangeRangeInterface {
 	}
 
 	blur() {
+		const range = this.get();
+		range.commonAncestorNode
+			.closest(EDITABLE_SELECTOR)
+			.get<HTMLElement>()
+			?.blur();
 		this.engine.container.get<HTMLElement>()?.blur();
+		this.engine.trigger('blur');
 	}
 }
 export default ChangeRange;

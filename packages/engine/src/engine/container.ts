@@ -34,6 +34,9 @@ class Container {
 		this._focused =
 			document.activeElement !== null &&
 			this.node.equal(document.activeElement);
+		const { engine } = options;
+		engine.on('blur', this._setBlur);
+		engine.on('focus', this._setFocus);
 	}
 
 	_init() {
@@ -79,6 +82,14 @@ class Container {
 		this.node.on(isMobile ? 'touchstart' : 'mousedown', this.triggerFoucs);
 		this.node.on('focus', this.handleFocus);
 	}
+
+	_setFocus = () => {
+		this._focused = true;
+	};
+
+	_setBlur = () => {
+		this._focused = false;
+	};
 
 	handleClick = (event: MouseEvent) => {
 		const { engine, autoAppend, autoPrepend } = this.options;
@@ -148,7 +159,6 @@ class Container {
 				range.commonAncestorNode.isRoot(engine.container) ||
 				range.commonAncestorNode.inEditor(engine.container)
 			) {
-				this._focused = true;
 				engine.change.range.setLastBlurRange();
 				engine.trigger('focus');
 			}
@@ -193,7 +203,6 @@ class Container {
 			this.blurTimeout = setTimeout(() => {
 				const range = engine.change.range.get();
 				if (!range.commonAncestorNode.inEditor(engine.container)) {
-					this._focused = false;
 					engine.change.range.setLastBlurRange(lastRange);
 					engine.trigger('blur');
 				}
@@ -235,6 +244,8 @@ class Container {
 
 	destroy() {
 		const { className, engine } = this.options;
+		engine.on('blur', this._setBlur);
+		engine.on('focus', this._setFocus);
 		engine.off('realtimeChange', this.onRealtimeChange);
 		document.removeEventListener('mousedown', this.docMouseDown);
 		this.node.removeAttributes(DATA_CONTENTEDITABLE_KEY);
