@@ -45,7 +45,8 @@ class Mark implements MarkModelInterface {
 	 */
 	triggerMarkdown(event: KeyboardEvent) {
 		const editor = this.editor;
-		if (!isEngine(editor)) return;
+		if (!isEngine(editor) || editor.options.markdown?.mode === false)
+			return;
 		const { change } = editor;
 		let range = change.range.get();
 		if (!range.collapsed || change.isComposing()) return;

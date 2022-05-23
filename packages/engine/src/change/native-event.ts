@@ -420,43 +420,20 @@ class NativeEvent {
 			//.disable(['strikethrough', 'emphasis', 'link', 'image', 'table', 'code', 'blockquote', 'hr', 'list', 'heading'])
 			const tokens = markdown.parse(text, {});
 			if (tokens.length === 0) return;
+			console.log(tokens);
 			return convertMarkdown(this.engine, markdown, tokens);
 		};
 
-		const pasteMarkdown = async (html: string, text: string) => {
+		const pasteMarkdown = async (text: string) => {
 			// 先解析text
-			let result = convertMD(text);
-			// 没有 markdown，尝试解析 html
-			if (result === null) {
-				// 先解析html
-				let parser = new Parser(html, this.engine);
-				const schema = this.engine.schema.clone();
-				//转换Text，没那么严格，加入以下规则，以免被过滤掉，并且 div后面会加换行符
-				schema.add([
-					{
-						name: 'span',
-						type: 'mark',
-					},
-					{
-						name: 'div',
-						type: 'block',
-					},
-				]);
-				// 不遍历卡片，不对 ol 节点格式化，以免复制列表就去提示检测到markdown
-				let parserText = parser.toText(schema, false, false);
-				// html中没有解析到文本
-				if (!parserText) {
-					parser = new Parser(text, this.engine);
-					parserText = parser.toText(schema);
-				}
-				result = convertMD(parserText);
-			}
+			const result = convertMD(text);
 			if (result === null) return;
 			const handlePaste = () => {
 				this.engine.history.saveOp();
+				change.cacheRangeBeforeCommand();
 				this.paste(result!, this.#lastePasteRange, undefined, false);
 			};
-			if (this.engine.options.markdownMode !== 'confirm') {
+			if (this.engine.options.markdown?.mode !== 'confirm') {
 				handlePaste();
 				return;
 			}
@@ -511,13 +488,74 @@ class NativeEvent {
 			if (files.length === 0) {
 				change.cacheRangeBeforeCommand();
 				this.paste(source);
-				setTimeout(() => {
-					// 如果 text 和 html 都有，就解析 text
-					pasteMarkdown(
-						source.replace(/\r\n/g, '\n'),
-						(text || '').replace(/\r\n/g, '\n'),
-					);
-				}, 200);
+				const markdown = this.engine.options.markdown || {};
+				if (markdown.mode !== false) {
+					if (!markdown.check) {
+						if (!text) return;
+						// 没有 html，直接转换 markdown
+						if (!html) {
+							setTimeout(() => {
+								pasteMarkdown(text);
+							}, 0);
+							return;
+						}
+						// 检测 text 中是否有markdown语法
+						const rows = text.split('\n') || '';
+						// 所有有效的段落
+						let rowCount = 0;
+						// 有语法的段落
+						let validCount = 0;
+						let isCodeblock = false;
+						for (let i = 0; i < rows.length; i++) {
+							const rowText = rows[i];
+							if (!rowText.trim()) continue;
+							if (rowText.startsWith('```')) {
+								if (!isCodeblock) {
+									isCodeblock = true;
+									validCount++;
+									rowCount++;
+								} else {
+									isCodeblock = false;
+								}
+
+								continue;
+							}
+							if (isCodeblock) continue;
+							rowCount++;
+
+							if (
+								/^(#|\*|-|\+|\[ \]|\[x\]|\d\.|>|){1}\s+/.test(
+									rowText,
+								)
+							) {
+								validCount++;
+							} else if (/^(---|\*\*\*|\+\+\+)/.test(rowText)) {
+								validCount++;
+							} else if (
+								/(\*|~|\^|_|\`|\]\(https?:\/\/)/.test(rowText)
+							) {
+								validCount++;
+							}
+						}
+						if (
+							rowCount === 0 ||
+							validCount === 0 ||
+							validCount / rowCount > 0.5
+						) {
+							setTimeout(() => {
+								pasteMarkdown(text);
+							}, 0);
+						}
+					} else {
+						markdown
+							.check(text ?? '', html ?? '')
+							.then((result) => {
+								if (!!result) {
+									pasteMarkdown(result);
+								}
+							});
+					}
+				}
 			}
 		});
 

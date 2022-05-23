@@ -475,14 +475,20 @@ class Consumer implements ConsumerInterface {
 				startClone.pop();
 				endClone.pop();
 				const { container, change } = this.engine;
-				const startChild = container.getChildByPath(
-					startClone,
-					(child) => !isTransientElement($(child)),
-				);
-				const endChild = container.getChildByPath(
-					endClone,
-					(child) => !isTransientElement($(child)),
-				);
+				const startChild = start.id
+					? container.find(`[${DATA_ID}="${start.id}"]`).get<Node>()
+					: container.getChildByPath(
+							startClone,
+							(child) => !isTransientElement($(child)),
+					  );
+				if (!startChild) return;
+				const endChild = end.id
+					? container.find(`[${DATA_ID}="${end.id}"]`).get<Node>()
+					: container.getChildByPath(
+							endClone,
+							(child) => !isTransientElement($(child)),
+					  );
+				if (!endChild) return;
 				const getMaxOffset = (node: Node, offset: number) => {
 					if (node.nodeType === getDocument().TEXT_NODE) {
 						const text = node.textContent || '';

@@ -66,6 +66,9 @@ export const convertMarkdown = (
 		let content = '';
 		if (type === 'inline' && children) {
 			content = renderer.renderInline(children, options, {});
+			if (children.find((child) => child.type.endsWith('_open'))) {
+				isHit = true;
+			}
 		} else if (typeof renderer.rules[type] !== 'undefined') {
 			content = renderer.rules[type]!(
 				tokens,

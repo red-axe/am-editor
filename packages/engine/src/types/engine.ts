@@ -72,10 +72,20 @@ export interface EngineOptions extends EditorOptions {
 	 */
 	autoAppend?: boolean;
 	/**
-	 * markdown 模式，默认为检测到 markdown 语法就直接转换
-	 * 使用 confirm 模式，需要确认后再次转换
+	 * markdown 配置
 	 */
-	markdownMode?: 'confirm';
+	markdown?: {
+		/**
+		 * markdown 模式，默认 执行 check 函数返回 true 就直接转换
+		 * 1. 使用 confirm 模式，调用 engine.messageConfirm 确认后再次转换
+		 * 2. false 为关闭全部 markdown 功能
+		 */
+		mode?: 'confirm' | false;
+		/**
+		 * 检测是否为 markdown 语法，如果为 true 则将 makrdown 转换后粘贴
+		 */
+		check?: (text: string, html: string) => Promise<string | false>;
+	};
 }
 
 export interface Engine<T extends EngineOptions = EngineOptions> {
