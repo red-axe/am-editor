@@ -252,8 +252,24 @@ After rendering, `View` loses all editing capabilities and collaboration capabil
 -   Default: `true`
 -   Details: Whether to automatically add a blank line when clicking on the blank space at the end of the editor (<div style="padding-bottom: 20px;"></div>) Clicking within 20 pixels of padding-bottom will add a blank line
 
-### markdownMode
+### markdown
 
--   Type: `auto` | `confirm`
--   Default: auto
+type:
+
+```ts
+markdown?: {
+	/**
+	* In markdown mode, by default, if the check function returns true, it will be converted directly
+	* 1. Use confirm mode, call engine.messageConfirm to confirm and convert again
+	* 2. false to turn off all markdown functions
+	*/
+	mode?: 'confirm' | false;
+	/**
+	* Detect whether it is markdown syntax, if true, convert the makrdown and paste it, if the default detection does not meet the requirements, you can use this function for custom detection
+	*/
+	check?: (text: string, html: string) => Promise<string | false>;
+};
+```
+
+-   Default: `undefined`
 -   markdown mode, the default is to directly convert when markdown syntax is detected. When using `confirm` mode, you need to call `engine.messageConfirm` to confirm and then convert.

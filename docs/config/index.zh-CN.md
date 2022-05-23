@@ -252,8 +252,24 @@ console.log(view.language.get<string>('test'));
 -   默认值：`true`
 -   详细：在编辑器尾部单击空白处是否自动添加空行（<div style="padding-bottom: 20px;"></div>）在 padding-bottom 这 20 像素内点击会添加空行
 
-### markdownMode
+### markdown
 
--   类型：`auto` | `confirm`
--   默认值：auto
+类型：
+
+```ts
+markdown?: {
+	/**
+	 * markdown 模式，默认 执行 check 函数返回 true 就直接转换
+	 * 1. 使用 confirm 模式，调用 engine.messageConfirm 确认后再次转换
+	 * 2. false 为关闭全部 markdown 功能
+	 */
+	mode?: 'confirm' | false;
+	/**
+	 * 检测是否为 markdown 语法，如果为 true 则将 makrdown 转换后粘贴，如果默认检测不满足需求可以使用此函数进行自定义检测
+	 */
+	check?: (text: string, html: string) => Promise<string | false>;
+};
+```
+
+-   默认值：`undefined`
 -   markdown 模式，默认为检测到 markdown 语法就直接转换。使用 `confirm` 模式，需要调用`engine.messageConfirm`确认后再转换。
