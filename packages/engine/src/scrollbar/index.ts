@@ -37,12 +37,13 @@ class Scrollbar extends EventEmitter2 {
 	private sHeight: number = 0;
 	private xWidth: number = 0;
 	private yHeight: number = 0;
-	#observer?: MutationObserver;
+	#observer?: ResizeObserver;
 	#reverse?: boolean;
 	#content?: NodeInterface;
 	shadowTimer?: NodeJS.Timeout;
 	#enableScroll: boolean = true;
 	#scroll?: ScrollbarCustomeOptions;
+	#isScrolling = false;
 	/**
 	 * @param {nativeNode} container 需要添加滚动条的元素
 	 * @param {boolean} x 横向滚动条
@@ -129,114 +130,84 @@ class Scrollbar extends EventEmitter2 {
 		return offsetWidth;
 	}
 
-	refresh = debounce(
-		() => {
-			const element = this.container.get<HTMLElement>();
-			if (element) {
-				const { scrollTop } = element;
-				const contentElement = this.#content?.get<HTMLElement>();
-				const sPLeft = removeUnit(this.container.css('padding-left'));
-				const sPRight = removeUnit(this.container.css('padding-right'));
-				const sPTop = removeUnit(this.container.css('padding-top'));
-				const sPBottom = removeUnit(
-					this.container.css('padding-bottom'),
-				);
-				const scrollWidth = contentElement
-					? this.#content!.width() + sPLeft + sPRight
-					: element.scrollWidth;
-				const scrollHeight = contentElement
-					? this.#content!.height() + sPTop + sPBottom
-					: element.scrollHeight;
-				this.oWidth = this.getWidth();
-				this.oHeight =
-					this.container.height() -
-					removeUnit(this.container.css('border-top-width')) -
-					removeUnit(this.container.css('border-bottom-width'));
-				this.sWidth = scrollWidth;
-				this.sHeight = scrollHeight;
-				this.xWidth = Math.floor(
-					(this.oWidth * this.oWidth) / scrollWidth,
-				);
-				this.yHeight = Math.floor(
-					(this.oHeight * this.oHeight) / scrollHeight,
-				);
-				if (this.x) {
-					this.slideX?.css('width', this.xWidth + 'px');
-					const display =
-						Math.round(this.oWidth) - sPLeft - sPRight ===
-							this.sWidth ||
-						(contentElement &&
-							Math.round(this.#content!.width()) <=
-								Math.round(this.oWidth - sPLeft - sPRight))
-							? 'none'
-							: 'block';
-					this.slideX?.css('display', display);
-					this.emit('display', display);
-					this.shadowLeft?.css('display', display);
-					this.shadowRight?.css('display', display);
-				}
-				if (this.y) {
-					this.slideY?.css('height', this.yHeight + 'px');
-					const display =
-						Math.round(this.oHeight) - sPTop - sPBottom ===
-							this.sHeight ||
-						(contentElement &&
-							Math.round(this.#content!.height()) <=
-								Math.round(this.oHeight - sPTop - sPBottom))
-							? 'none'
-							: 'block';
-					this.slideY?.css('display', display);
-					this.emit('display', display);
-				}
-				// 实际内容宽度小于容器滚动宽度（有内容删除了）
-				if (
-					this.x &&
-					contentElement &&
-					element.scrollWidth - sPLeft - sPRight >
-						this.#content!.width()
-				) {
-					let left =
-						element.scrollWidth -
-						sPLeft -
-						sPRight -
-						this.#content!.width();
-					if (this.#scroll) {
-						const { onScrollX, getScrollLeft } = this.#scroll;
-
-						left = getScrollLeft
-							? getScrollLeft(-0) + element.scrollLeft - left
-							: element.scrollLeft - left;
-						if (left < 0) left = 0;
-						if (onScrollX) {
-							const result = onScrollX(left);
-							if (result > 0) element.scrollLeft = result;
-							else element.scrollLeft = 0;
-						}
-						this.scroll({ left });
-					} else {
-						element.scrollLeft -= left;
-					}
-					return;
-				}
-				// 实际内容高度小于容器滚动高度（有内容删除了）
-				if (
-					this.y &&
-					contentElement &&
-					element.scrollHeight - sPTop - sPBottom !==
-						this.#content!.height()
-				) {
-					element.scrollTop -=
-						element.scrollHeight -
-						sPTop -
-						sPBottom -
-						this.#content!.height();
-					return;
-				}
-				const left = this.#scroll?.getScrollLeft
-					? this.#scroll.getScrollLeft(element.scrollLeft)
-					: element.scrollLeft;
+	refresh = () => {
+		const element = this.container.get<HTMLElement>();
+		if (element) {
+			const scrollEnd = () => {
+				setTimeout(() => {
+					this.#isScrolling = false;
+				}, 0);
+			};
+			const { scrollTop } = element;
+			const contentElement = this.#content?.get<HTMLElement>();
+			const sPLeft = removeUnit(this.container.css('padding-left'));
+			const sPRight = removeUnit(this.container.css('padding-right'));
+			const sPTop = removeUnit(this.container.css('padding-top'));
+			const sPBottom = removeUnit(this.container.css('padding-bottom'));
+			const scrollWidth = contentElement
+				? this.#content!.width() + sPLeft + sPRight
+				: element.scrollWidth;
+			const scrollHeight = contentElement
+				? this.#content!.height() + sPTop + sPBottom
+				: element.scrollHeight;
+			this.oWidth = this.getWidth();
+			this.oHeight =
+				this.container.height() -
+				removeUnit(this.container.css('border-top-width')) -
+				removeUnit(this.container.css('border-bottom-width'));
+			this.sWidth = scrollWidth;
+			this.sHeight = scrollHeight;
+			this.xWidth = Math.floor((this.oWidth * this.oWidth) / scrollWidth);
+			this.yHeight = Math.floor(
+				(this.oHeight * this.oHeight) / scrollHeight,
+			);
+			if (this.x) {
+				this.slideX?.css('width', this.xWidth + 'px');
+				const display =
+					Math.round(this.oWidth) - sPLeft - sPRight ===
+						this.sWidth ||
+					(contentElement &&
+						Math.round(this.#content!.width()) <=
+							Math.round(this.oWidth - sPLeft - sPRight))
+						? 'none'
+						: 'block';
+				this.slideX?.css('display', display);
+				this.emit('display', display);
+				this.shadowLeft?.css('display', display);
+				this.shadowRight?.css('display', display);
+			}
+			if (this.y) {
+				this.slideY?.css('height', this.yHeight + 'px');
+				const display =
+					Math.round(this.oHeight) - sPTop - sPBottom ===
+						this.sHeight ||
+					(contentElement &&
+						Math.round(this.#content!.height()) <=
+							Math.round(this.oHeight - sPTop - sPBottom))
+						? 'none'
+						: 'block';
+				this.slideY?.css('display', display);
+				this.emit('display', display);
+			}
+			// 实际内容宽度小于容器滚动宽度（有内容删除了）
+			if (
+				this.x &&
+				contentElement &&
+				element.scrollWidth - sPLeft - sPRight > this.#content!.width()
+			) {
+				this.#isScrolling = true;
+				let left =
+					element.scrollWidth -
+					sPLeft -
+					sPRight -
+					this.#content!.width();
 				if (this.#scroll) {
-					const { onScrollX } = this.#scroll;
+					const { onScrollX, getScrollLeft } = this.#scroll;
+
+					left = getScrollLeft
+						? getScrollLeft(-0) + element.scrollLeft - left
+						: element.scrollLeft - left;
+					if (left < 0) left = 0;
 					if (onScrollX) {
 						const result = onScrollX(left);
 						if (result > 0) element.scrollLeft = result;
@@ -244,14 +215,46 @@ class Scrollbar extends EventEmitter2 {
 					}
 					this.scroll({ left });
 				} else {
-					this.reRenderX(left);
+					element.scrollLeft -= left;
+					scrollEnd();
 				}
-				this.reRenderY(scrollTop);
+				return;
 			}
-		},
-		0,
-		{ leading: true },
-	);
+			// 实际内容高度小于容器滚动高度（有内容删除了）
+			if (
+				this.y &&
+				contentElement &&
+				element.scrollHeight - sPTop - sPBottom !==
+					this.#content!.height()
+			) {
+				this.#isScrolling = true;
+				element.scrollTop -=
+					element.scrollHeight -
+					sPTop -
+					sPBottom -
+					this.#content!.height();
+				scrollEnd();
+				return;
+			}
+			const left = this.#scroll?.getScrollLeft
+				? this.#scroll.getScrollLeft(element.scrollLeft)
+				: element.scrollLeft;
+			if (this.#scroll) {
+				const { onScrollX } = this.#scroll;
+				if (onScrollX) {
+					this.#isScrolling = true;
+					const result = onScrollX(left);
+					if (result > 0) element.scrollLeft = result;
+					else element.scrollLeft = 0;
+					scrollEnd();
+				}
+				this.scroll({ left });
+			} else {
+				this.reRenderX(left);
+			}
+			this.reRenderY(scrollTop);
+		}
+	};
 
 	/**
 	 * 启用鼠标在内容节点上滚动或在移动设备使用手指滑动
@@ -282,6 +285,9 @@ class Scrollbar extends EventEmitter2 {
 			}
 			top = event.top;
 			left = event.left;
+		} else if (!this.#isScrolling) {
+			this.refresh();
+			return;
 		} else return;
 
 		this.reRenderX(left);
@@ -424,27 +430,11 @@ class Scrollbar extends EventEmitter2 {
 		this.container.on('scroll', this.scroll);
 		const containerElement = this.container.get<HTMLElement>();
 		if (!containerElement) return;
-		let size = {
-			width: this.container.width(),
-			height: this.container.height(),
-		};
-		this.#observer = new MutationObserver(() => {
-			const width = this.container.width();
-			const height = this.container.height();
-			if (width === size.width && height === size.height) return;
-			size = {
-				width,
-				height,
-			};
-			this.refresh();
-		});
-		this.#observer.observe(containerElement, {
-			attributes: true,
-			attributeFilter: ['style'],
-			attributeOldValue: true,
-			childList: true,
-			subtree: true,
-		});
+		// this.#observer = new ResizeObserver(() => {
+		// 	console.log('resize')
+		// 	this.refresh();
+		// });
+		// this.#observer.observe(containerElement);
 		window.addEventListener('resize', this.refresh);
 		// 绑定滚动条事件
 		this.bindXScrollEvent();

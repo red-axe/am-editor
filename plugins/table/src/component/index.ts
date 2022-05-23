@@ -823,8 +823,8 @@ class TableComponent<V extends TableValue = TableValue>
 			//this.scrollbar.disableScroll();
 			let scrollbarTimeout: NodeJS.Timeout | null = null;
 			const handleScrollbarChange = () => {
-				// if (tableOptions['maxRightWidth'])
-				// 	this.overflow(tableOptions['maxRightWidth']());
+				if (tableOptions['maxRightWidth'])
+					this.overflow(tableOptions['maxRightWidth']());
 				if (scrollbarTimeout) clearTimeout(scrollbarTimeout);
 				scrollbarTimeout = setTimeout(() => {
 					if (isEngine(this.editor)) {

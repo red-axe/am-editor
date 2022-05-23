@@ -6,7 +6,7 @@ import React, {
 	useContext,
 } from 'react';
 import classnames from 'classnames';
-import { $, EditorInterface, isEngine, Scrollbar } from '@aomao/engine';
+import { $, EditorInterface, isEngine } from '@aomao/engine';
 import { Outline, OutlineData } from '@aomao/plugin-heading';
 import context from '../../context';
 import { findReadingSection } from './utils';
@@ -86,14 +86,6 @@ const Toc: React.FC<Props> = ({ editor, title }: Props) => {
 			}
 		};
 	}, [listenerViewChange]);
-
-	useEffect(() => {
-		if (!rootRef.current) return;
-		const scrollbar = new Scrollbar(rootRef.current, false, true, false);
-		return () => {
-			scrollbar.destroy();
-		};
-	}, [datas]);
 
 	if (datas.length === 0) return null;
 
