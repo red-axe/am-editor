@@ -14,6 +14,7 @@ import {
 	RangeInterface,
 	random,
 	NodeInterface,
+	isNode,
 } from '@aomao/engine';
 import Loading from '../loading';
 import CommentButton from './button';
@@ -202,9 +203,10 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 			};
 			if (typeof ResizeObserver === 'undefined') return;
 			const resizeObserver = new ResizeObserver(update);
-			resizeObserver.observe(editor.container[0]);
+			const container = editor.container.get<HTMLElement>()!;
+			resizeObserver.observe(container);
 			return () => {
-				resizeObserver.unobserve(editor.container[0]);
+				resizeObserver.unobserve(container);
 			};
 		}, []);
 
@@ -238,6 +240,8 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 					? editor.container
 							.get<HTMLElement>()!
 							.querySelector(selectors)
+					: isNode(selectors)
+					? (selectors as Element)
 					: selectors.get<HTMLElement>();
 			if (!element) return -1;
 			//选好计算每个标记评论项距离编辑器根节点的top
