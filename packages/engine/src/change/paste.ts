@@ -4,6 +4,7 @@ import { READY_CARD_KEY, READY_CARD_SELECTOR } from '../constants/card';
 import Parser from '../parser';
 import { EngineInterface } from '../types/engine';
 import { $ } from '../node';
+import { CARD_KEY } from '@aomao/engine';
 
 export default class Paste {
 	protected source: string;
@@ -79,6 +80,44 @@ export default class Paste {
 							text = text.replace(/\u200b/g, '');
 							node.text(text);
 						}
+					} else if (/^\n$/.test(text)) {
+						if (nodeApi.isList(parent)) {
+							node.remove();
+							return;
+						}
+						const next = node.next();
+						if (next && nodeApi.isBlock(next)) node.remove();
+					}
+					if (nodeApi.isList(parent)) {
+						const next = node.next();
+						const prev = node.prev();
+						const addCardToCustomize = (
+							node: NodeInterface,
+							target: NodeInterface,
+						) => {
+							if (nodeApi.isCustomize(node)) {
+								const first = node.first();
+								if (first && first.isCard()) {
+									const cardName =
+										first.attributes(CARD_KEY) ||
+										first.attributes(READY_CARD_KEY);
+									list.addCardToCustomize(target, cardName);
+								}
+							}
+						};
+						let cloneLi = null;
+						if (next?.name === 'li') {
+							cloneLi = next.clone();
+							addCardToCustomize(next, cloneLi);
+						} else if (prev?.name === 'li') {
+							cloneLi = prev.clone();
+							addCardToCustomize(prev, cloneLi);
+						} else {
+							cloneLi = $(`<li></li>`);
+						}
+						node.before(cloneLi);
+						cloneLi.append(node);
+						return cloneLi;
 					}
 					return undefined;
 				}

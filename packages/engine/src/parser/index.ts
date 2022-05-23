@@ -87,15 +87,6 @@ class Parser implements ParserInterface {
 			source = source?.replace(/<img .*>/gi, (str) => {
 				return str.replace(/on[a-zA-Z]{0,20}=/g, 'notallow=');
 			});
-			// 移除嵌套节点中的 \n  <ol>\n<li><br /></li>\n</ol>\
-			source = source.replace(
-				/<([a-zA-Z]+.*)>\n<([a-zA-Z]+.*)>/gi,
-				'<$1><$2>',
-			);
-			source = source.replace(
-				/<\/([a-zA-Z]+.*)>\n<\/([a-zA-Z]+.*)>/gi,
-				'</$1></$2>',
-			);
 			// 在 p 里包含 div 标签时 DOMParser 解析错误
 			// <p><div>foo</div></p>
 			// 变成
