@@ -408,7 +408,6 @@ export const pluginConfig: Record<string, PluginOptions> = {
 	[ToolbarPlugin.pluginName]: toolbarOptions,
 	[Table.pluginName]: tableOptions,
 	[MarkRange.pluginName]: markRangeOptions,
-	[Italic.pluginName]: italicOptions,
 	[Image.pluginName]: imageOptions,
 	[ImageUploader.pluginName]: imageUploaderOptions,
 	[FileUploader.pluginName]: fileOptions,

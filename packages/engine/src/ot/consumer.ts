@@ -296,7 +296,7 @@ class Consumer implements ConsumerInterface {
 				const target = this.engine.container.find(
 					`[${DATA_ID}="${op.id}"]`,
 				);
-				if (target.inEditor()) {
+				if (target.length > 0 && target.inEditor()) {
 					root = target;
 					path = path.slice(op.bi);
 				}
