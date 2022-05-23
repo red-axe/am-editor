@@ -187,11 +187,6 @@ export const markRangeOptions: MarkRangeOptions = {
 	keys: ['comment'],
 };
 
-export const italicOptions: ItalicOptions = {
-	// 默认为 _ 下划线，这里修改为单个 * 号
-	markdown: '*',
-};
-
 export const imageOptions: ImageOptions = {
 	onBeforeRender: (status: string, url: string) => {
 		if (!url || url.indexOf('http') === 0) return url;
