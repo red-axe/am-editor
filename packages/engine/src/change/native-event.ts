@@ -500,12 +500,28 @@ class NativeEvent {
 							return;
 						}
 						// 检测 text 中是否有markdown语法
-						const rows = text.split('\n') || '';
+						const rows = text.split(/\r\n|\n/) || '';
 						// 所有有效的段落
 						let rowCount = 0;
 						// 有语法的段落
 						let validCount = 0;
 						let isCodeblock = false;
+						// 有序列表的markdown 对比html中的有序列表节点，如果不存在节点才算作markdown
+						const root = new DOMParser().parseFromString(
+							html,
+							'text/html',
+						);
+						const lis = root.querySelectorAll('li');
+						const orderTexts: string[] = [];
+						lis.forEach((li) => {
+							const text = li.textContent ?? '';
+							if (
+								li.parentElement?.nodeName === 'OL' ||
+								/\d\.\s+/.test(text)
+							) {
+								orderTexts.push(text);
+							}
+						});
 						for (let i = 0; i < rows.length; i++) {
 							const rowText = rows[i];
 							if (!rowText.trim()) continue;
@@ -524,11 +540,18 @@ class NativeEvent {
 							rowCount++;
 
 							if (
-								/^(#|\*|-|\+|\[ \]|\[x\]|\d\.|>|){1}\s+/.test(
-									rowText,
-								)
+								/^(#|\*|-|\+|\[ \]|\[x\]|>){1}\s+/.test(rowText)
 							) {
 								validCount++;
+							} else if (/^\d\.\s+/.test(rowText)) {
+								if (
+									!orderTexts.includes(rowText) &&
+									!orderTexts.includes(
+										rowText.replace(/^\d\./, '').trim(),
+									)
+								) {
+									validCount++;
+								}
 							} else if (/^(---|\*\*\*|\+\+\+)/.test(rowText)) {
 								validCount++;
 							} else if (
@@ -538,9 +561,8 @@ class NativeEvent {
 							}
 						}
 						if (
-							rowCount === 0 ||
-							validCount === 0 ||
-							validCount / rowCount > 0.5
+							validCount > 0 &&
+							(rowCount === 0 || validCount / rowCount > 0.5)
 						) {
 							setTimeout(() => {
 								pasteMarkdown(text);
