@@ -83,7 +83,9 @@ abstract class CardEntry<T extends CardValue = CardValue>
 
 	get id() {
 		if (this._id) return this._id;
-		const value = this.getValue();
+		const attributesValues = this.root.attributes(CARD_VALUE_KEY);
+		if (!attributesValues) return {} as T;
+		const value = decodeCardValue(attributesValues);
 		return typeof value === 'object' ? value?.id || '' : '';
 	}
 
@@ -92,10 +94,13 @@ abstract class CardEntry<T extends CardValue = CardValue>
 	}
 
 	get type() {
-		return (
-			this.getValue()?.type ||
-			(this.root.attributes(CARD_TYPE_KEY) as CardType)
-		);
+		let type = this.root.attributes(CARD_TYPE_KEY);
+		if (!type) {
+			const attributesValues = this.root.attributes(CARD_VALUE_KEY);
+			const value = decodeCardValue(attributesValues || '{}');
+			type = value?.type || (this.constructor as CardEntryType).cardType;
+		}
+		return type as CardType;
 	}
 
 	set type(type: CardType) {
