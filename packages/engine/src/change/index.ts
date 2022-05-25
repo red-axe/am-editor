@@ -9,7 +9,7 @@ import { RangeInterface, RangePath } from '../types/range';
 import ChangeEvent from './event';
 import Parser from '../parser';
 import { ANCHOR_SELECTOR, CURSOR_SELECTOR, FOCUS_SELECTOR } from '../constants';
-import { combinText } from '../utils';
+import { combinText, convertMarkdown, createMarkdownIt } from '../utils';
 import { TRIGGER_CARD_ID } from '../constants/card';
 import { DATA_ID, EDITABLE_SELECTOR, UI_SELECTOR } from '../constants/root';
 import { SelectionInterface } from '../types/selection';
@@ -260,14 +260,16 @@ class ChangeModel implements ChangeInterface {
 	}
 
 	setMarkdown(text: string, callback?: (count: number) => void) {
-		const textNode = $(document.createTextNode(text));
-		this.engine.trigger('paste:markdown-before', textNode);
-		this.engine.trigger('paste:markdown', textNode);
-		this.engine.trigger('paste:markdown-after', textNode);
+		const markdown = createMarkdownIt(this.engine, 'zero');
+		markdown.enable(['paragraph', 'html_inline', 'newline']);
+		//.disable(['strikethrough', 'emphasis', 'link', 'image', 'table', 'code', 'blockquote', 'hr', 'list', 'heading'])
+		const tokens = markdown.parse(text, {});
+		if (tokens.length === 0) return;
+		let result = convertMarkdown(this.engine, markdown, tokens);
+		if (!result) result = text;
 		const { card, container } = this.engine;
-		textNode.get<Text>()?.normalize();
 		this.#nativeEvent.paste(
-			textNode.text(),
+			result,
 			undefined,
 			callback,
 			true,
