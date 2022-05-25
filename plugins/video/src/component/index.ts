@@ -338,6 +338,9 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 
 	setProgressPercent(percent: number) {
 		this.container?.find('.percent').html(`${percent}%`);
+		this.setValue({
+			percent,
+		} as T);
 	}
 
 	getMaxWidth(node: NodeInterface = this.getCenter()) {
@@ -548,8 +551,15 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
-		if (!value || (this.container && this.container.inEditor())) return;
 		const center = this.getCenter();
+		if (!value || (this.container && this.container.inEditor())) {
+			//设置为加载状态
+			this.container = $(this.renderTemplate({ ...value }));
+			center.empty();
+			center.append(this.container);
+			this.initPlayer();
+			return;
+		}
 		//先清空卡片内容容器
 		center.empty();
 		const { command, plugin } = this.editor;
@@ -732,6 +742,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 
 	didRender() {
 		super.didRender();
+		this.onWindowResize();
 		window.addEventListener('resize', this.onWindowResize);
 		this.editor.on('editor:resize', this.onWindowResize);
 		this.toolbarModel?.setDefaultAlign('top');
