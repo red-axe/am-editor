@@ -368,6 +368,8 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		const fEndCol = endCol;
 		for (let row = fBeginRow; row > -1 && row <= fEndRow; row++) {
 			for (let col = fBeginCol; col > -1 && col <= fEndCol; col++) {
+				const tr = this.tableModel.table[row];
+				if (!tr) continue;
 				const cell = this.tableModel.table[row][col];
 				if (!cell) continue;
 				if (this.table.helper.isEmptyModelCol(cell)) {

@@ -3,6 +3,7 @@ import {
 	Card,
 	CardToolbarItemOptions,
 	CardType,
+	closest,
 	DATA_CONTENTEDITABLE_KEY,
 	EDITABLE_SELECTOR,
 	getComputedStyle,
@@ -622,19 +623,19 @@ class TableComponent<V extends TableValue = TableValue>
 	): DOMRect | void | false | RangeInterface[] {
 		const backgroundRect = node.get<HTMLElement>()!.getBoundingClientRect();
 		const domRect = new DOMRect(backgroundRect.x, backgroundRect.y, 0, 0);
-		const { startNode, endNode } = range;
-		const startElement = startNode.closest('td');
-		const endElement = endNode.closest('td');
+		const { startContainer, endContainer } = range;
+		const startElement = closest(startContainer, 'td');
+		const endElement = closest(endContainer, 'td');
 		if (
-			startElement.name !== 'td' ||
-			endElement.name !== 'td' ||
-			startElement.equal(endElement)
+			!(startElement instanceof Element) ||
+			!(endElement instanceof Element) ||
+			startElement.nodeName !== 'TD' ||
+			endElement?.nodeName !== 'TD' ||
+			startElement === endElement
 		)
 			return;
 
-		const startRect = startElement
-			.get<HTMLElement>()!
-			.getBoundingClientRect();
+		const startRect = startElement.getBoundingClientRect();
 		const vLeft =
 			(this.viewport?.getBoundingClientRect()?.left || 0) +
 			(this.activated ? 13 : 0);
@@ -646,7 +647,7 @@ class TableComponent<V extends TableValue = TableValue>
 		domRect.width = startRect.right - startRect.left;
 		domRect.height = startRect.bottom - startRect.top;
 
-		const rect = endElement.get<HTMLElement>()!.getBoundingClientRect();
+		const rect = endElement.getBoundingClientRect();
 		domRect.width = Math.min(
 			rect.right - (startRect.left < vLeft ? vLeft : startRect.left),
 			(this.viewport?.width() || 0) - (this.activated ? 13 : 0),
@@ -829,7 +830,7 @@ class TableComponent<V extends TableValue = TableValue>
 				scrollbarTimeout = setTimeout(() => {
 					if (isEngine(this.editor)) {
 						this.editor.ot.refreshSelection(false);
-						this.conltrollBar.refresh();
+						this.conltrollBar.refresh(false);
 					}
 				}, 20);
 			};
@@ -842,7 +843,7 @@ class TableComponent<V extends TableValue = TableValue>
 			}
 		}
 		this.selection.on('select', () => {
-			this.conltrollBar.refresh();
+			this.conltrollBar.refresh(false);
 			setTimeout(() => {
 				this.isChanged = true;
 			}, 200);
@@ -955,7 +956,7 @@ class TableComponent<V extends TableValue = TableValue>
 					),
 				);
 		});
-		this.conltrollBar.refresh();
+		this.conltrollBar.refresh(false);
 		this.scrollbar?.refresh();
 		setTimeout(() => {
 			// 找到所有可编辑节点，对没有 contenteditable 属性的节点添加contenteditable一下

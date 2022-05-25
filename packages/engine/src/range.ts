@@ -899,33 +899,37 @@ Range.fromPath = (
 	const startOffset = startPath.pop();
 	const endOffset = endPath.pop();
 
-	const getNode = (path: Path, context: NodeInterface = editor.container) => {
-		let domNode = context;
+	const getNode = (
+		path: Path,
+		context: Element = editor.container.get<Element>()!,
+	) => {
+		let domNode: Node = context;
 		for (let i = 0; i < path.length; i++) {
 			let p = path[i];
 			if (p < 0) {
 				p = 0;
 			}
 			let needNode = undefined;
-			let domChild = domNode.first();
+			let domChild = domNode.firstChild;
 			let offset = 0;
-			while (domChild && domChild.length > 0) {
+			while (domChild) {
 				if (
-					(!domChild.attributes(DATA_TRANSIENT_ELEMENT) &&
-						domChild.attributes(DATA_ELEMENT) !== UI) ||
+					!(domChild instanceof Element) ||
+					(!domChild.getAttribute(DATA_TRANSIENT_ELEMENT) &&
+						domChild.getAttribute(DATA_ELEMENT) !== UI) ||
 					(includeCardCursor &&
 						['left', 'right'].includes(
-							domChild.attributes(CARD_ELEMENT_KEY),
+							domChild.getAttribute(CARD_ELEMENT_KEY) || '',
 						))
 				) {
-					if (offset === p || !domChild.next()) {
+					if (offset === p || !domChild.nextSibling) {
 						needNode = domChild;
 						break;
 					}
 					offset++;
-					domChild = domChild.next();
+					domChild = domChild.nextSibling;
 				} else {
-					domChild = domChild.next();
+					domChild = domChild.nextSibling;
 				}
 			}
 			if (!needNode) break;
@@ -960,36 +964,31 @@ Range.fromPath = (
 		}
 	};
 	const beginContext = path.start.id
-		? root.find(`[${DATA_ID}="${path.start.id}"]`)
-		: root;
+		? root.get<Element>()?.querySelector(`[${DATA_ID}="${path.start.id}"]`)
+		: root.get<Element>();
 	const startNode = getNode(
-		path.start.bi > -1 && beginContext.length > 0
+		path.start.bi > -1 && beginContext instanceof Element
 			? startPath.slice(path.start.bi)
 			: startPath,
-		beginContext.length > 0 ? beginContext : undefined,
+		beginContext instanceof Element ? beginContext : undefined,
 	);
 	const endContext = path.end.id
-		? root.find(`[${DATA_ID}="${path.end.id}"]`)
+		? root.get<Element>()?.querySelector(`[${DATA_ID}="${path.end.id}"]`)
 		: root;
 	const endNode = getNode(
-		path.end.bi > -1 && endContext.length > 0
+		path.end.bi > -1 && endContext instanceof Element
 			? endPath.slice(path.end.bi)
 			: endPath,
-		endContext.length > 0 ? endContext : undefined,
+		endContext instanceof Element ? endContext : undefined,
 	);
 	const range = Range.create(editor, document);
 	setRange(
 		'setStart',
 		range,
-		startNode.get(),
+		startNode,
 		startOffset === undefined ? 0 : startOffset,
 	);
-	setRange(
-		'setEnd',
-		range,
-		endNode.get(),
-		endOffset === undefined ? 0 : endOffset,
-	);
+	setRange('setEnd', range, endNode, endOffset === undefined ? 0 : endOffset);
 	return range;
 };
 

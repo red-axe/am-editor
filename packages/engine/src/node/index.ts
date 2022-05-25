@@ -56,7 +56,8 @@ class NodeModel implements NodeModelInterface {
 				.getTags('marks')
 				.includes(
 					(
-						(node as Node).nodeName ?? (node as NodeInterface).name
+						(node as Node).nodeName?.toLowerCase() ??
+						(node as NodeInterface).name
 					).toLowerCase(),
 				) && schema.getType(node) === 'mark'
 		);
@@ -74,9 +75,8 @@ class NodeModel implements NodeModelInterface {
 			schema
 				.getTags('inlines')
 				.includes(
-					(
-						(node as Node).nodeName ?? (node as NodeInterface).name
-					).toLowerCase(),
+					(node as Node).nodeName?.toLowerCase() ??
+						(node as NodeInterface).name,
 				) && schema.getType(node) === 'inline'
 		);
 	}
@@ -94,7 +94,8 @@ class NodeModel implements NodeModelInterface {
 				.getTags('blocks')
 				.includes(
 					(
-						(node as Node).nodeName ?? (node as NodeInterface).name
+						(node as Node).nodeName?.toLowerCase() ??
+						(node as NodeInterface).name
 					).toLowerCase(),
 				) && schema.getType(node) === 'block'
 		);

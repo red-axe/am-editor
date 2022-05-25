@@ -256,11 +256,11 @@ export interface ControllBarInterface extends EventEmitter2 {
 
 	init(): void;
 
-	refresh(): void;
+	refresh(refershSize?: boolean): void;
 
-	renderRowBars(start?: number, end?: number): void;
+	renderRowBars(refershSize?: boolean): void;
 
-	renderColBars(): void;
+	renderColBars(refershSize?: boolean): void;
 
 	removeRow(index: number): void;
 

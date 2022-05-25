@@ -43,10 +43,7 @@ class Consumer implements ConsumerInterface {
 			};
 		const offset = index - JSON0_INDEX.ELEMENT;
 		// 正在加载中的节点，直接渲染
-		if (
-			node.nodeType === Node.ELEMENT_NODE &&
-			(node as HTMLElement).hasAttribute(CARD_LOADING_KEY)
-		) {
+		if (node instanceof Element && node.hasAttribute(CARD_LOADING_KEY)) {
 			const { card } = this.engine;
 			const cardComponent = card.find(node);
 			if (cardComponent) {
@@ -54,16 +51,19 @@ class Consumer implements ConsumerInterface {
 				card.renderComponent(cardComponent);
 			}
 		}
-		const childNode = Array.from(node.childNodes).filter((node) => {
-			const childNode = $(node);
-			return !isTransientElement(childNode);
-		})[offset];
+		const childNodes: Node[] = [];
+		node.childNodes.forEach((child) => {
+			if (!isTransientElement(child)) {
+				childNodes.push(child);
+			}
+		});
+		const childNode = childNodes[offset];
 		const pathOffset = path[1];
 		if (
 			1 === path.length ||
 			pathOffset === JSON0_INDEX.TAG_NAME ||
 			pathOffset === JSON0_INDEX.ATTRIBUTE ||
-			(childNode && childNode.nodeType === Node.TEXT_NODE)
+			childNode instanceof Text
 		) {
 			return {
 				startNode: childNode,
@@ -78,9 +78,10 @@ class Consumer implements ConsumerInterface {
 	fromRemoteAttr(attr: RemoteAttr) {
 		if (!attr) return;
 		const { id, leftText, rightText } = attr;
-		const idNode = $(`[${DATA_ID}="${id}"]`);
-		if (idNode.length === 0) return;
-		const node = idNode.get()!;
+		const node = this.engine.container
+			.get<Element>()
+			?.querySelector(`[${DATA_ID}="${id}"]`);
+		if (!node) return;
 		const text = node.textContent || '';
 		if (text === '')
 			return {

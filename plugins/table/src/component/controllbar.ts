@@ -82,7 +82,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.bindEvents();
 	}
 
-	renderRowBars(start: number = 0, end?: number) {
+	renderRowBars(refershSize: boolean = true) {
 		const table = this.tableRoot?.get<HTMLTableElement>();
 		if (!table) return;
 		//行删除按钮
@@ -126,25 +126,31 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 					this.rowAddAlign === 'down' ? false : true,
 				);
 			});
-		const trs = table.rows;
-		end = end || trs?.length || 0;
-		const rowBars = this.rowsHeader?.find(Template.ROWS_HEADER_ITEM_CLASS);
-		for (let i = start; i < end; i++) {
-			rowBars?.eq(i)?.css('height', getComputedStyle(trs[i], 'height'));
+		if (refershSize) {
+			const trs = table.rows;
+			const end = trs?.length || 0;
+			const rowBars = this.rowsHeader?.find(
+				Template.ROWS_HEADER_ITEM_CLASS,
+			);
+			for (let i = 0; i < end; i++) {
+				rowBars
+					?.eq(i)
+					?.css('height', getComputedStyle(trs[i], 'height'));
+			}
+			const rowTrigger = this.rowsHeader?.find(
+				Template.ROWS_HEADER_TRIGGER_CLASS,
+			);
+			const tableWidth = this.tableRoot!.width();
+			const wrapperWidth = this.table.wrapper?.width() || 0;
+			const width = tableWidth < wrapperWidth ? tableWidth : wrapperWidth;
+			rowTrigger?.css(
+				'width',
+				`${width + (this.rowsHeader?.width() || 0) - 1}px`,
+			);
 		}
-		const rowTrigger = this.rowsHeader?.find(
-			Template.ROWS_HEADER_TRIGGER_CLASS,
-		);
-		const tableWidth = this.tableRoot!.width();
-		const wrapperWidth = this.table.wrapper?.width() || 0;
-		const width = tableWidth < wrapperWidth ? tableWidth : wrapperWidth;
-		rowTrigger?.css(
-			'width',
-			`${width + (this.rowsHeader?.width() || 0) - 1}px`,
-		);
 	}
 
-	renderColBars() {
+	renderColBars(refershSize: boolean = true) {
 		const table = this.tableRoot?.get<HTMLTableElement>();
 		if (!table) return;
 		const tableWidth = removeUnit(getComputedStyle(table, 'width'));
@@ -193,6 +199,13 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.tableRoot?.css('width', `${tableWidth}px`);
 		this.colsHeader?.css('width', `${tableWidth}px`);
 
+		if (refershSize) this.renderColSize();
+	}
+
+	renderColSize() {
+		const table = this.tableRoot?.get<HTMLTableElement>();
+		if (!table) return;
+		const tableWidth = removeUnit(getComputedStyle(table, 'width'));
 		const cols = this.tableRoot?.find('col');
 		if (!cols) return;
 
@@ -630,9 +643,9 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	/**
 	 * 刷新控制UI
 	 */
-	refresh() {
-		this.renderColBars();
-		this.renderRowBars();
+	refresh(refershSize: boolean = true) {
+		this.renderColBars(refershSize);
+		this.renderRowBars(refershSize);
 		this.activeHeader();
 	}
 	/**

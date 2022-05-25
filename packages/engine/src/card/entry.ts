@@ -107,8 +107,10 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		if (!this.name || type === this.type) return;
 		// 替换后重新渲染
 		const { card } = this.editor;
+		const attributesValues = this.root.attributes(CARD_VALUE_KEY);
+		const value = decodeCardValue(attributesValues || '{}');
 		const component = card.replace(this, this.name, {
-			...this.getValue(),
+			...value,
 			type,
 		});
 		card.render(component.root);
@@ -166,7 +168,8 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		if (value == null) {
 			return;
 		}
-		const currentValue = this.getValue();
+		const attributesValues = this.root.attributes(CARD_VALUE_KEY);
+		const currentValue = decodeCardValue(attributesValues || '{}');
 		if (!!currentValue?.id) delete value['id'];
 		value = { ...currentValue, ...value } as T;
 		if (value.type && currentValue?.type !== value.type) {

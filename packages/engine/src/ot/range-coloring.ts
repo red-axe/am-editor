@@ -634,9 +634,9 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	updateBackgroundPosition() {
-		(this.engine.scrollNode ?? this.root)
-			.children(`.${USER_BACKGROUND_CLASS}`)
-			.each((child) => {
+		(this.engine.scrollNode?.get<Element>() ?? this.root.get<Element>())
+			?.querySelectorAll(`.${USER_BACKGROUND_CLASS}`)
+			.forEach((child) => {
 				const node = $(child);
 				const range = child['__range'];
 				const uuid = node.attributes(DATA_UUID);
@@ -649,23 +649,26 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	updateCursorPosition() {
-		this.root.children(`.${USER_CURSOR_CLASS}`).each((child) => {
-			const node = $(child);
-			let target = child['__target'];
-			if (!target) {
-				node.remove();
-				return;
-			}
-			if (!target.name)
-				target = Range.fromPath(this.engine, target, true);
-			if (
-				target.startContainer ||
-				0 !== $(target).closest('body').length
-			) {
-				const rect = this.getCursorRect(target);
-				this.setCursorRect(node, rect);
-			} else node.remove();
-		});
+		this.root
+			.get<Element>()
+			?.querySelectorAll(`.${USER_CURSOR_CLASS}`)
+			.forEach((child) => {
+				const node = $(child);
+				let target = child['__target'];
+				if (!target) {
+					node.remove();
+					return;
+				}
+				if (!target.name)
+					target = Range.fromPath(this.engine, target, true);
+				if (
+					target.startContainer ||
+					0 !== $(target).closest('body').length
+				) {
+					const rect = this.getCursorRect(target);
+					this.setCursorRect(node, rect);
+				} else node.remove();
+			});
 	}
 
 	updateCardPosition() {
@@ -675,17 +678,17 @@ class RangeColoring implements RangeColoringInterface {
 			left: 0,
 			top: 0,
 		};
-		this.root.children(`.${USER_MASK_CLASS}`).each((child) => {
-			const node = $(child);
-			const target = child['__node'];
-			if (0 !== $(target).closest('body').length) {
-				const rect = target.getBoundingClientRect();
-				node.css({
-					left: rect.left - parentRect.left + 'px',
-					top: rect.top - parentRect.top + 'px',
-				});
-			} else node.remove();
-		});
+		this.root
+			.get<Element>()
+			?.querySelectorAll<HTMLElement>(`.${USER_MASK_CLASS}`)
+			.forEach((child) => {
+				const target: Element | undefined = child['__node'];
+				if (target?.isConnected) {
+					const rect = target.getBoundingClientRect();
+					child.style.left = rect.left - parentRect.left + 'px';
+					child.style.top = rect.top - parentRect.top + 'px';
+				} else child.parentNode?.removeChild(child);
+			});
 	}
 
 	updatePosition() {
@@ -732,16 +735,17 @@ class RangeColoring implements RangeColoringInterface {
 				}
 			}
 		});
-		(this.engine.scrollNode ?? this.root)
-			.find(`[${DATA_UUID}]`)
-			.each((child) => {
-				const domChild = $(child);
-				const uuid = domChild.attributes(DATA_UUID);
+		(this.engine.scrollNode?.get<Element>() ?? this.root.get<Element>())
+			?.querySelectorAll(`[${DATA_UUID}]`)
+			.forEach((child) => {
+				const uuid = child.getAttribute(DATA_UUID);
 				const member = members.find((m) => m.uuid === uuid);
-				if (!member || info[uuid]) {
-					if (domChild.hasClass(USER_MASK_CLASS)) {
-						const target = $(domChild[0]['__node']);
-						const component = engine.card.find(target);
+				if (!member || (uuid && info[uuid])) {
+					if (child.classList.contains(USER_MASK_CLASS)) {
+						const target: Node | undefined = child['__node'];
+						const component = target
+							? engine.card.find(target)
+							: null;
 						if (
 							component &&
 							!component.isEditable &&
@@ -750,7 +754,7 @@ class RangeColoring implements RangeColoringInterface {
 							this.setCardActivatedByOther(component);
 						}
 					}
-					domChild.remove();
+					child.parentNode?.removeChild(child);
 				}
 			});
 		engine.card.each((component) => {
