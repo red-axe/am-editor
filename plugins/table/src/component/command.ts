@@ -477,7 +477,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const { selection, helper } = this.table;
 		const areaHtml = selection.getSelectionHtml(all);
 		if (!areaHtml) return;
-		this.editor.clipboard.copy($(areaHtml)[0]);
+		this.editor.clipboard.copy(areaHtml);
 		helper.copyHTML(areaHtml);
 	}
 
