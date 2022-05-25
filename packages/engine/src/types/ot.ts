@@ -306,6 +306,11 @@ export interface MutationInterface extends EventEmitter2 {
 	 * @param ops 操作
 	 */
 	onChange(ops: Op[]): void;
+	/**
+	 * 对比节点与当前文档对象的差异
+	 * @param root
+	 */
+	diff(root?: Element): Op[];
 }
 
 export interface ConsumerInterface {
@@ -420,12 +425,6 @@ export interface ConsumerInterface {
 	 * @param path
 	 */
 	setRangeByPath(path: { start: RangePath; end: RangePath }): void;
-	/**
-	 * 处理完操作后更新节点的 __index
-	 * @param ops
-	 * @param applyNodes
-	 */
-	handleIndex(applyNodes: NodeInterface[]): void;
 }
 
 export interface OTInterface extends EventEmitter2 {
@@ -460,6 +459,11 @@ export interface OTInterface extends EventEmitter2 {
 	 * @param ops
 	 */
 	submitOps(ops: Op[]): void;
+	/**
+	 * 对比节点与当前文档对象的差异
+	 * @param root
+	 */
+	diff(root?: Element): Op[];
 	/**
 	 * 应用操作
 	 * @param ops

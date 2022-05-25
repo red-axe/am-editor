@@ -2,7 +2,7 @@ import { debounce, cloneDeep } from 'lodash';
 import { EventEmitter2 } from 'eventemitter2';
 import { Doc, Op } from 'sharedb';
 import { EngineInterface } from '../types/engine';
-import { filterOperations, updateIndex } from './utils';
+import { filterOperations } from './utils';
 
 import {
 	ConsumerInterface,
@@ -217,14 +217,17 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		});
 	}
 
+	/**
+	 * 对比节点与当前文档对象的差异
+	 * @param root
+	 */
+	diff(root: Element = this.engine.container.get<Element>()!) {
+		return this.mutation?.diff(root) || [];
+	}
+
 	apply(ops: Op[]) {
 		this.stopMutation();
-		const applyNodes = this.consumer.handleRemoteOperations(ops);
-		this.consumer.handleIndex(
-			ops.some((op) => op['bi'] < 0)
-				? [this.engine.container]
-				: applyNodes,
-		);
+		this.consumer.handleRemoteOperations(ops);
 		this.startMutation();
 	}
 
@@ -234,16 +237,11 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		// 除了div 和 selection-data 外 还必须有其它节点
 		if (doc.type && Array.isArray(doc.data) && doc.data.length > 2) {
 			// 远端有数据就设置数据到当前编辑器
-			this.engine.setJsonValue(doc.data, () => {
-				updateIndex(this.engine.container);
-			});
+			this.engine.setJsonValue(doc.data);
 			return;
 		}
 		// 如果有设置默认值，就设置编辑器的值
-		if (defaultValue)
-			engine.setValue(defaultValue, () => {
-				updateIndex(this.engine.container);
-			});
+		if (defaultValue) engine.setValue(defaultValue);
 		// 没有数据，就把当前编辑器值提交
 		doc.on('create', () => {
 			const data = toJSON0(engine.container);

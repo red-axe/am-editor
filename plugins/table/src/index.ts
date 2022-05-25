@@ -43,45 +43,6 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			editor.change.event.onDocument('copy', this.onCopy, 0);
 			editor.change.event.onDocument('cut', this.onCut, 0);
 			editor.change.event.onDocument('paste', this.onPaste, 0);
-			// 过滤掉表格初始化的时候调整后的宽度作为历史记录
-			const targetTableCache: Record<string, TableInterface> = {};
-			editor.history.onFilter((op) => {
-				if (
-					op.id &&
-					(('od' in op &&
-						(op.od.startsWith('width') ||
-							op.od === op.id ||
-							op.od.startsWith('data:') ||
-							/^\d+$/.test(op.od))) ||
-						('oi' in op &&
-							(op.oi.startsWith('width') ||
-								op.oi === op.id ||
-								op.oi.startsWith('data:') ||
-								/^\d+$/.test(op.oi))))
-				) {
-					let component: TableInterface | undefined =
-						targetTableCache[op.id];
-					if (!component || !component.root.parent()) {
-						const targetNode = $(`[${DATA_ID}="${op.id}"]`);
-						delete targetTableCache[op.id];
-						if (targetNode.length > 0) {
-							component = editor.card.find<
-								TableValue,
-								TableComponent
-							>(targetNode);
-							//if(component && component?.name === TableComponent.cardName) targetTableCache[op.id] = component
-						}
-					}
-					if (
-						component?.name === TableComponent.cardName &&
-						!component.isChanged
-					) {
-						op['nl'] = true;
-						return true;
-					}
-				}
-				return false;
-			});
 		}
 	}
 

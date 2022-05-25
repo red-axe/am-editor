@@ -761,7 +761,7 @@ export interface NodeIdInterface {
 	 * 在根节点内为需要创建data-id的子节点创建data-id
 	 * @param root 根节点
 	 */
-	generateAll(root?: Element | NodeInterface, force?: boolean): void;
+	generateAll(root: Element | NodeInterface, force?: boolean): void;
 	/**
 	 * 为节点创建一个随机data-id
 	 * @param node 节点

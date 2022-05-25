@@ -33,7 +33,7 @@ import { Backspace, Enter, Left, Right, Up, Down, Default } from './typing';
 import { $ } from '../node';
 import { isNode } from '../node/utils';
 import { CardActiveTrigger, CardType } from './enum';
-import { toJSON0, updateIndex } from '../ot/utils';
+import { toJSON0 } from '../ot/utils';
 import './index.css';
 
 class CardModel implements CardModelInterface {
@@ -816,16 +816,6 @@ class CardModel implements CardModelInterface {
 			this.render(center);
 		}
 		card.didRender();
-		const cardParent = card.root.parent();
-		// 如果父节点是根节点，则直接获取index
-		if (cardParent?.isRoot()) {
-			card.root[0]['__index'] = card.root.index();
-		} else if (cardParent) {
-			// 以卡片的父节点为基础去更新index
-			updateIndex(cardParent);
-		}
-		//  可编辑卡片更新内部节点的index
-		if (card.isEditable) updateIndex(card.root);
 	}
 
 	removeComponent(card: CardInterface): void {
@@ -887,6 +877,7 @@ class CardModel implements CardModelInterface {
 				card.root.before(_block);
 				range.select(_block, true);
 				range.collapse(false);
+				this.editor.nodeId.generate(_block);
 				return;
 			}
 		} else {
@@ -932,6 +923,7 @@ class CardModel implements CardModelInterface {
 				card.root.after(_block);
 				range.select(_block, true);
 				range.collapse(false);
+				this.editor.nodeId.generate(_block);
 				return;
 			}
 		} else {

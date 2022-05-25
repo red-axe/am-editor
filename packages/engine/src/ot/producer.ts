@@ -1,26 +1,24 @@
-import { EventEmitter2 } from 'eventemitter2';
 import {
-	diff_match_patch,
 	DIFF_DELETE,
-	patch_obj,
 	DIFF_EQUAL,
 	DIFF_INSERT,
+	diff_match_patch,
+	patch_obj,
 } from 'diff-match-patch';
+import { EventEmitter2 } from 'eventemitter2';
+import { Doc, Path, StringDeleteOp, StringInsertOp } from 'sharedb';
 import {
+	DocInterface,
+	EngineInterface,
+	NodeInterface,
+	TargetOp,
+} from '../types';
+import {
+	findFromDoc,
 	isTransientAttribute,
 	isTransientElement,
-	filterOperations,
-	updateIndex,
-	opsSort,
-	findFromDoc,
+	toJSON0,
 } from './utils';
-import { escapeDots, escape, decodeCardValue } from '../utils/string';
-import { toJSON0, getValue } from './utils';
-import { EngineInterface } from '../types/engine';
-import { Op, Path, StringInsertOp, StringDeleteOp, Doc } from 'sharedb';
-import { NodeInterface } from '../types/node';
-import { DocInterface, RepairOp } from '../types/ot';
-import { $ } from '../node';
 import {
 	CARD_CENTER_SELECTOR,
 	CARD_KEY,
@@ -31,13 +29,14 @@ import {
 	DATA_ID,
 	DATA_TRANSIENT_ELEMENT,
 	JSON0_INDEX,
-	ROOT,
 	UI,
 	UI_SELECTOR,
 } from '../constants';
-import { getDocument } from '../utils/node';
+import { $ } from '../node';
+import { closest, isRoot } from '../node/utils';
+import { decodeCardValue } from '../utils';
 
-class Producer extends EventEmitter2 {
+export default class Producer extends EventEmitter2 {
 	private engine: EngineInterface;
 	private doc?: DocInterface | Doc;
 	private dmp: diff_match_patch;
@@ -56,8 +55,12 @@ class Producer extends EventEmitter2 {
 		this.dmp = new diff_match_patch();
 	}
 
+	setDoc(doc: DocInterface | Doc) {
+		this.doc = doc;
+	}
+
 	textToOps(path: Path, text1: string, text2: string) {
-		const ops: Array<StringDeleteOp | StringInsertOp> = [];
+		const ops: (StringDeleteOp | StringInsertOp)[] = [];
 		const patches = this.dmp.patch_make(text1, text2);
 		Object.keys(patches).forEach((key) => {
 			const patch: patch_obj = patches[key];
@@ -89,533 +92,479 @@ class Producer extends EventEmitter2 {
 		return ops;
 	}
 
-	cacheNode(node: Node) {
-		this.cacheNodes.push(node);
-		node.childNodes.forEach((child) => {
-			this.cacheNodes.push(child);
-			this.cacheNode(child);
-		});
-	}
-
-	clearCache() {
-		this.cacheNodes = [];
-	}
-
-	inCache(node: Node) {
-		return this.cacheNodes.find((n) => n === node);
-	}
-
-	isTransientMutation(
-		record: MutationRecord,
-		transientElements?: Array<Node>,
-		loadingCards?: NodeInterface[],
-	) {
-		const { addedNodes, removedNodes, target, type, attributeName } =
-			record;
-		const targetNode = $(target);
-		if (type === 'childList') {
-			const childs: Array<NodeInterface> = [];
-			if (addedNodes[0]) {
-				childs.push($(addedNodes[0]));
-			}
-			if (removedNodes[0]) {
-				childs.push($(removedNodes[0]));
-			}
-			childs.push(targetNode);
-			if (
-				childs.some((child) =>
-					isTransientElement(child, transientElements, loadingCards),
-				)
-			)
-				return true;
-		}
-		return (
-			(type === 'attributes' &&
-				(isTransientElement(
-					targetNode,
-					transientElements,
-					loadingCards,
-				) ||
-					isTransientAttribute(targetNode, attributeName || ''))) ||
-			(type === 'characterData' &&
-				isTransientElement(targetNode, transientElements, loadingCards))
-		);
-	}
-
-	filter = (element: NodeInterface | Node) => {
-		//父节点就是编辑器根节点，就不需要过滤
-		return element[0]?.parentElement?.getAttribute(DATA_ELEMENT) === ROOT
-			? undefined
-			: (node: Node) => {
-					if (node['isTransient'] !== undefined)
-						return !node['isTransient'];
-					const isTransient = isTransientElement(
-						node,
-						this.cacheTransientElements,
-					);
-					node['isTransient'] = isTransient;
-					return !isTransient;
-			  };
-	};
-
-	getPath = (root: NodeInterface, node: NodeInterface) => {
-		return root.isRoot() ? [] : root.getPath(node, this.filter(root));
-	};
-	private indexCaches: Map<Node, number> = new Map();
-	getIndex = (element: NodeInterface) => {
-		const cacheIndex = this.indexCaches.get(element[0]);
-		if (cacheIndex !== undefined) return cacheIndex;
-		const parent = element[0].parentNode;
-		if (!parent) return 0;
-		const filter = this.filter(element);
-		if (filter && !filter(element[0])) return -1;
-		const prev = element[0].previousSibling;
-		if (prev) {
-			const prevIndex = this.indexCaches.get(prev);
-			if (prevIndex !== undefined) {
-				const index = prevIndex + 1;
-				this.indexCaches.set(element[0], index);
-				return index;
-			}
-		}
-		let i = 0;
-		for (const child of parent.childNodes) {
-			if (child === element[0]) return i;
-			if (filter && !filter(child)) continue;
-			this.indexCaches.set(child, i);
-			i++;
-		}
-		return -1;
-	};
 	/**
-	 * 从DOM变更记录中生产 ops
-	 * @param records DOM变更记录集合
-	 * @param path 路径
-	 * @param oldPath
-	 * @param node 开始遍历的节点，默认为编辑器根节点
+	 * 生成属性ops
+	 * @param id
+	 * @param oldAttributes
+	 * @param path
+	 * @param newAttributes
 	 * @returns
 	 */
-	generateOps(
-		records: MutationRecord[],
-		root: NodeInterface = this.engine.container,
-	): Array<Op> {
-		const addNodes: Array<Node> = [];
-		const allOps: Array<
-			Op & {
-				id?: string;
-				bi?: number;
-				addNode?: NodeInterface;
-				childIds?: string[];
-				oldPath?: Path;
+	handleAttributes(
+		id: string,
+		beginIndex: number,
+		path: Path,
+		oldAttributes: Record<string, any>,
+		newAttributes: Record<string, any>,
+	) {
+		const ops: TargetOp[] = [];
+		const oId = id === 'root' ? '' : id;
+		const oBi = id === 'root' ? -1 : beginIndex;
+		Object.keys(newAttributes).forEach((key) => {
+			const newAttr = newAttributes[key];
+			const newPath = [...path, JSON0_INDEX.ATTRIBUTE, key];
+			// 旧属性没有，新增属性
+			if (!oldAttributes.hasOwnProperty(key)) {
+				if (newAttr !== oldAttributes[key]) {
+					ops.push({
+						id: oId,
+						bi: oBi,
+						p: newPath,
+						oi: newAttr,
+					});
+					return;
+				}
 			}
-		> = [];
-		let ops: Array<RepairOp> = [];
-		let attrOps: Array<any> = [];
-		const cacheNodes: Array<Node> = [];
-		// 文本数据变更标记
-		let isValueString = false;
-		const pathCaches: Map<NodeInterface, number[]> = new Map();
-		// 循环记录集合
-		for (let i = 0; records[i]; ) {
-			const record = records[i];
-			const { target, addedNodes, removedNodes, type } = record;
-			// 当前节点在需要增加的节点记录集合中就跳过
-			const inCache = this.inCache(target);
+			const oldAttr = oldAttributes[key];
+			// 旧属性有，修改属性
+			if (newAttr !== oldAttr) {
+				ops.push({
+					id: oId,
+					bi: oBi,
+					p: newPath,
+					od: oldAttr,
+					oi: newAttr,
+				});
+			}
+		});
+		Object.keys(oldAttributes).forEach((key) => {
+			// 旧属性有，新增没有，删除
+			if (!newAttributes.hasOwnProperty(key)) {
+				ops.push({
+					id: oId,
+					bi: oBi,
+					p: path.concat(JSON0_INDEX.ATTRIBUTE, key),
+					od: oldAttributes[key],
+				});
+			}
+		});
+		return ops;
+	}
 
-			const targetElement = $(target);
-			if (
-				inCache ||
-				(!targetElement.inEditor() && !targetElement.isRoot())
+	/**
+	 * 处理新数据只有一行文本的时候
+	 * @param id
+	 * @param path
+	 * @param newText
+	 * @param oldValue
+	 * @returns
+	 */
+	handleFirstLineText = (
+		id: string,
+		beginIndex: number,
+		path: Path,
+		newText: string,
+		oldChildren: any[],
+	) => {
+		const ops: TargetOp[] = [];
+		const oldText = oldChildren[0];
+		const isText = typeof oldText === 'string';
+		const oId = id === 'root' ? '' : id;
+		const oBi = id === 'root' ? -1 : beginIndex;
+		// 都是文本
+		if (isText) {
+			if (newText !== oldText) {
+				const tOps = this.textToOps(path, oldText, newText);
+				for (let i = 0; i < tOps.length; i++) {
+					ops.push(
+						Object.assign({}, tOps[i], {
+							id: oId,
+							bi: oBi,
+						}),
+					);
+				}
+			}
+		}
+		for (let c = oldChildren.length - 1; c >= (isText ? 1 : 0); c--) {
+			const oldChild = oldChildren[c];
+			const newPath = path.concat();
+			newPath[newPath.length - 1] = c + JSON0_INDEX.ELEMENT;
+			ops.push({
+				id: oId,
+				bi: oBi,
+				p: newPath,
+				ld: oldChild,
+			});
+		}
+		if (!isText)
+			ops.push({
+				id: oId,
+				bi: oBi,
+				p: path,
+				li: newText,
+			});
+		return ops;
+	};
+
+	handleChildren = (
+		id: string,
+		beginIndex: number,
+		path: Path,
+		oldChildren: any[],
+		newChildren: any[],
+	) => {
+		const ops: TargetOp[] = [];
+		const oId = id === 'root' ? '' : id;
+		const oBi = id === 'root' ? -1 : beginIndex;
+		// 2.1 旧节点没有子节点数据
+		if (oldChildren.length === 0) {
+			// 全部插入
+			for (let c = 2; c < newChildren.length; c++) {
+				ops.push({
+					id,
+					bi: path.length,
+					p: path.concat(c),
+					li: newChildren[c],
+				});
+			}
+		}
+		// 2.2 旧节点有子节点数据
+		else {
+			// 2.2.1 新节点没有子节点数据
+			if (newChildren.length === 0) {
+				// 全部删除
+				for (let c = oldChildren.length - 1; c >= 0; c--) {
+					ops.push({
+						id: oId,
+						bi: oBi,
+						p: path.concat(c + JSON0_INDEX.ELEMENT),
+						ld: oldChildren[c],
+					});
+				}
+			}
+			// 2.2.2 新节点有子节点数据，并且是字符
+			else if (
+				newChildren.length === 1 &&
+				typeof newChildren[0] === 'string'
 			) {
-				i++;
+				ops.push(
+					...this.handleFirstLineText(
+						id,
+						beginIndex,
+						path.concat(JSON0_INDEX.ELEMENT),
+						newChildren[0],
+						oldChildren,
+					),
+				);
+			}
+			// 2.2.3 新节点有子节点数据，并且不是字符
+			else {
+				// 2.2.3.1 如果子节点都有 id，则比较 id
+				if (
+					newChildren.every((child) =>
+						Array.isArray(child)
+							? child[JSON0_INDEX.ATTRIBUTE][DATA_ID]
+							: false,
+					) &&
+					oldChildren.every((child) =>
+						Array.isArray(child)
+							? child[JSON0_INDEX.ATTRIBUTE][DATA_ID]
+							: false,
+					)
+				) {
+					// 先找出需要删除的旧节点
+					for (let c = oldChildren.length - 1; c >= 0; c--) {
+						const oldChild = oldChildren[c];
+						const newChild = newChildren.find(
+							(child) =>
+								child[JSON0_INDEX.ATTRIBUTE][DATA_ID] ===
+								oldChild[JSON0_INDEX.ATTRIBUTE][DATA_ID],
+						);
+						if (!newChild) {
+							ops.push({
+								id: oId,
+								bi: oBi,
+								p: path.concat(c + JSON0_INDEX.ELEMENT),
+								ld: oldChild,
+							});
+							oldChildren.splice(c, 1);
+						}
+					}
+					// 再找出需要插入的新节点
+					for (let c = 0; c < newChildren.length; c++) {
+						const newChild = newChildren[c];
+						const oldChild = oldChildren.find(
+							(child) =>
+								child[JSON0_INDEX.ATTRIBUTE][DATA_ID] ===
+								newChild[JSON0_INDEX.ATTRIBUTE][DATA_ID],
+						);
+						if (!oldChild) {
+							ops.push({
+								id,
+								bi: path.length,
+								p: path.concat(c + JSON0_INDEX.ELEMENT),
+								li: newChild,
+							});
+							oldChildren.splice(c, 0, newChild);
+						}
+						// 对比有差异的子节点
+						else if (
+							JSON.stringify(newChild) !==
+							JSON.stringify(oldChild)
+						) {
+							// 比较属性
+							const newAttributes = newChild[
+								JSON0_INDEX.ATTRIBUTE
+							] as Record<string, any>;
+							const oldAttributes = oldChild[
+								JSON0_INDEX.ATTRIBUTE
+							] as Record<string, any>;
+							const idValue = newAttributes[DATA_ID];
+							const newId = idValue ?? id;
+							const newPath = path.concat(
+								c + JSON0_INDEX.ELEMENT,
+							);
+							const newBeginIndex = idValue
+								? newPath.length
+								: oBi;
+							ops.push(
+								...this.handleAttributes(
+									newId,
+									newBeginIndex,
+									newPath,
+									oldAttributes,
+									newAttributes,
+								),
+							);
+							// 比较子节点
+							ops.push(
+								...this.handleChildren(
+									newId,
+									newBeginIndex,
+									newPath,
+									oldChild.slice(JSON0_INDEX.ELEMENT),
+									newChild.slice(JSON0_INDEX.ELEMENT),
+								),
+							);
+						}
+					}
+				}
+				// 2.2.3.2 如果子节点都没有 id，则先删后插
+				else {
+					// 删除多余的旧节点
+					if (oldChildren.length > newChildren.length) {
+						for (
+							let c = oldChildren.length - 1;
+							c >= newChildren.length;
+							c--
+						) {
+							ops.push({
+								id: oId,
+								bi: oBi,
+								p: path.concat(c + JSON0_INDEX.ELEMENT),
+								ld: oldChildren[c],
+							});
+						}
+					}
+					// 对比节点是替换还是插入
+					for (let c = 0; c < newChildren.length; c++) {
+						const newChild = newChildren[c];
+						const oldChild = oldChildren[c];
+						// 没有旧节点，就插入
+						if (!oldChild) {
+							ops.push({
+								id,
+								bi: path.length,
+								p: path.concat(c + JSON0_INDEX.ELEMENT),
+								li: newChild,
+							});
+						} else if (
+							JSON.stringify(newChild) !==
+							JSON.stringify(oldChild)
+						) {
+							// 如果是一样的标签和一样的类型，则比较属性和子节点
+							if (
+								typeof newChild !== 'string' &&
+								typeof newChild === typeof oldChild &&
+								newChild[JSON0_INDEX.TAG_NAME] ===
+									oldChild[JSON0_INDEX.TAG_NAME]
+							) {
+								// 比较属性
+								const newAttributes = newChild[
+									JSON0_INDEX.ATTRIBUTE
+								] as Record<string, any>;
+								const oldAttributes = oldChild[
+									JSON0_INDEX.ATTRIBUTE
+								] as Record<string, any>;
+								const idValue = newAttributes[DATA_ID];
+								const newId = idValue ?? id;
+								const newPath = path.concat(
+									c + JSON0_INDEX.ELEMENT,
+								);
+								const newBeginIndex = idValue
+									? newPath.length
+									: oBi;
+								ops.push(
+									...this.handleAttributes(
+										newId,
+										newBeginIndex,
+										newPath,
+										oldAttributes,
+										newAttributes,
+									),
+								);
+								// 比较子节点
+								ops.push(
+									...this.handleChildren(
+										newId,
+										newBeginIndex,
+										newPath,
+										oldChild.slice(JSON0_INDEX.ELEMENT),
+										newChild.slice(JSON0_INDEX.ELEMENT),
+									),
+								);
+							} else {
+								// 直接替换旧节点
+								ops.push({
+									id: oId,
+									bi: oBi,
+									p: path.concat(c + JSON0_INDEX.ELEMENT),
+									ld: oldChild,
+								});
+								ops.push({
+									id,
+									bi: path.length,
+									p: path.concat(c + JSON0_INDEX.ELEMENT),
+									li: newChild,
+								});
+							}
+						}
+					}
+				}
+			}
+		}
+		return ops;
+	};
+
+	/**
+	 * 处理DOM节点变更记录
+	 * @param records 记录集合
+	 */
+	handleMutations(records: MutationRecord[]) {
+		let targetRoots: Element[] = [];
+		const data = this.doc?.data;
+		//records = this.handleFilter(records)
+		if (!data || records.length === 0) return;
+		for (let r = 0; r < records.length; r++) {
+			const record = records.at(r);
+			if (!record) continue;
+			const { type } = record;
+			let target: Node | null = record.target;
+			// 根节点属性变化不处理
+			if (
+				type === 'attributes' &&
+				((record.attributeName &&
+					isTransientAttribute(target, record.attributeName)) ||
+					(target instanceof Element && isRoot(target)))
+			) {
 				continue;
 			}
-			// 最近的block节点
-			const blockElement = targetElement.attributes(DATA_ID)
-				? targetElement
-				: this.engine.block.closest(
-						targetElement,
-						(node) => !!node.attributes(DATA_ID),
-				  );
-			// 最近的block节点id
-			const rootId = blockElement.attributes(DATA_ID);
-			let path = pathCaches.get(targetElement);
-			if (path === undefined) {
-				path = this.getPath(targetElement, root).map(
-					(index) => index + JSON0_INDEX.ELEMENT,
-				);
-				pathCaches.set(targetElement, path);
+
+			if (target instanceof Text) target = target.parentElement;
+			if (
+				!target ||
+				!target.isConnected ||
+				!(target instanceof Element) ||
+				target.getAttribute(DATA_ELEMENT) === UI ||
+				closest(target, `[${DATA_ELEMENT}="${UI}"]`)
+			)
+				continue;
+			// 根节点直接跳出
+			const isR = target instanceof Element && isRoot(target);
+			if (isR) {
+				targetRoots = [target];
+				break;
 			}
-			// block 节点在 path 中的开始位置
-			let beginIndex = -1;
-			if (!!rootId) {
-				if (
-					targetElement.length > 0 &&
-					targetElement[0] === blockElement[0]
-				) {
-					beginIndex = path.length;
-				} else {
-					let path = pathCaches.get(blockElement);
-					if (!path) {
-						path = this.getPath(blockElement, root);
-						pathCaches.set(blockElement, path);
+			// 判断不能是已有的节点或者已有节点的子节点
+			if (
+				targetRoots.length === 0 ||
+				(!targetRoots.includes(target) &&
+					targetRoots.every((root) => !root.contains(target)))
+			) {
+				let len = targetRoots.length;
+				for (let t = 0; t < len; t++) {
+					// 如果当前节点包含已有的节点就把已有的节点删除
+					if (target.contains(targetRoots[t])) {
+						targetRoots.splice(t, 1);
+						len--;
+						t--;
 					}
-					beginIndex = path.length;
 				}
+				targetRoots.push(target);
 			}
-
-			const oldPath = path.slice();
-			ops.forEach((op) => {
-				for (
-					let p = 0;
-					p < path!.length && op.p.length < path!.length;
-					p++
-				) {
-					if (('li' in op || 'ld' in op) && op.p.length === p + 1) {
-						if (
-							op.p[p] < path![p] ||
-							(op.p[p] === path![p] &&
-								op.p.length === path!.length)
-						) {
-							if ('li' in op) oldPath[p] = oldPath[p] - 1;
-							else if ('ld' in op) oldPath[p] = oldPath[p] + 1;
-						}
-					}
-				}
-			});
-			ops = [];
-			attrOps = [];
-			// 子节点变更
-			if (type === 'childList') {
-				// DOM中变更为移除
-				if (removedNodes[0]) {
-					// 循环要移除的节点
-					for (const removedNode of removedNodes) {
-						// 要移除的节点同时又在增加的就不处理
-						if (
-							!addNodes.find((n) => n === removedNode) &&
-							!cacheNodes.find((n) => n === removedNode)
-						) {
-							// 获取移除节点在编辑器中的索引
-
-							const _index =
-								removedNode['__index'] !== undefined
-									? removedNode['__index']
-									: this.getRemoveNodeIndex(record, records);
-							const rIndex = _index + JSON0_INDEX.ELEMENT;
-							if (rootId) {
-								const result = findFromDoc(
-									this.doc?.data || [],
-									(attributes) => {
-										return attributes[DATA_ID] === rootId;
-									},
-								);
-								if (!result) {
-									i++;
-									continue;
-								}
-								// else if (
-								// 	result.paths.join(',') !== path.join(',')
-								// ) {
-								// 	path = result.paths;
-								// }
-							}
-							// 删除的情况下，目标节点也应该获取 __index ，不然在还有新增的情况会导致path不正确
-							const newPath = path?.concat();
-							if (newPath && newPath.length > 0) {
-								newPath.pop();
-								newPath.push(
-									target['__index'] + JSON0_INDEX.ELEMENT,
-								);
-							}
-							const newOldPath = oldPath?.concat();
-							if (newOldPath.length > 0) {
-								newOldPath.pop();
-								newOldPath.push(
-									target['__index'] + JSON0_INDEX.ELEMENT,
-								);
-							}
-
-							let p: Path = [];
-							p = p.concat([...newPath!], [rIndex]);
-							let op: Path = [];
-							op = op.concat([...newOldPath], [rIndex]);
-							let childIds: string[] = [];
-							if (removedNode.nodeType === Node.ELEMENT_NODE) {
-								$(removedNode)
-									.allChildren()
-									.forEach((child) => {
-										const dataId = child.isElement()
-											? child.attributes(DATA_ID)
-											: undefined;
-										if (dataId) childIds.push(dataId);
-									});
-							}
-							const newOp = {
-								id: rootId,
-								bi: beginIndex,
-								ld: true,
-								childIds,
-								p,
-								newPath: p.slice(),
-								oldPath: op,
-							};
-							if (record['nl']) {
-								newOp['nl'] = true;
-							}
-							ops.push(newOp);
-						}
-					}
-				}
-				if (addedNodes[0]) {
-					for (const addedNode of addedNodes) {
-						if (cacheNodes.includes(addedNode)) continue;
-						const domAddedNode = $(addedNode);
-						const data = toJSON0(domAddedNode);
-						if (addedNode.parentNode === target) {
-							const addedNodes: Node[] = [];
-							domAddedNode.traverse((child) => {
-								addedNodes.push(child[0]);
-							});
-							for (let i = 0, len = allOps.length; i < len; ) {
-								const op = allOps[i];
-								if (
-									'li' in op &&
-									op.addNode &&
-									addedNodes.find(
-										(child) => child === op.addNode![0],
-									)
-								) {
-									allOps.splice(i, 1);
-									len--;
-									continue;
-								}
-								i++;
-							}
-							const index =
-								this.getIndex(domAddedNode) +
-								JSON0_INDEX.ELEMENT;
-							let p: Path = [...(path || [])];
-							// 卡片没有完全渲染就在插入body位置插入
-							p = p.concat([index]);
-							const op = {
-								id: rootId,
-								bi: beginIndex,
-								li: data,
-								addNode: domAddedNode,
-								p,
-								newPath: p.slice(),
-							};
-
-							if (record['nl']) {
-								op['nl'] = true;
-							}
-							ops.push(op);
-							cacheNodes.push(addedNode);
-							this.cacheNode(addedNode);
-						} else {
-							addNodes.push(addedNode);
-						}
-					}
-				}
-			} else if (type === 'characterData') {
-				if (!isValueString) {
-					if (
-						typeof getValue(this.doc?.data, oldPath, rootId) ===
-							'string' &&
-						(record['text-data'] || target['data']).length > 0
-					) {
-						const newOp = {
-							id: rootId,
-							bi: beginIndex,
-							path,
-							oldPath,
-							newValue: record['text-data'] || target['data'],
-						};
-						if (record['nl']) {
-							newOp['nl'] = true;
-						}
-						attrOps.push(newOp);
-						isValueString = true;
-					}
-				}
-			} else if (type === 'attributes') {
-				let { oldValue, attributeName } = record;
-				let attrValue = attributeName
-					? (target as Element).getAttribute(attributeName)
-					: '';
-				if (!oldValue) oldValue = '';
-				attrValue = attrValue ? escape(attrValue) : '';
-				if (oldValue !== attrValue) {
-					const p: Path = [];
-					const newOp: any = {
-						id: rootId,
-						bi: beginIndex,
-					};
-					if (rootId) {
-						const result = findFromDoc(
-							this.doc?.data || [],
-							(attributes) => {
-								return attributes[DATA_ID] === rootId;
-							},
-						);
-						if (!result) {
-							i++;
-							continue;
-						}
-						// else if (result.paths.join(',') !== path.join(',')) {
-						// 	path = result.paths;
-						// }
-					}
-					newOp.p = p.concat(
-						[...path],
-						[1, escapeDots(attributeName || '')],
-					);
-					if (oldValue) {
-						newOp.od = oldValue;
-					}
-					if (attrValue) newOp.oi = attrValue;
-					if (record['nl']) {
-						newOp.nl = true;
-					}
-					attrOps.push(newOp);
-				}
-			}
-			i++;
-			ops.forEach((op) => {
-				if ('ld' in op) {
-					const path = op.oldPath || [];
-					const pathValue = getValue(this.doc?.data, path);
-					// 删除的是部分文字
-					if (typeof pathValue === 'string') {
-						const parentValue = getValue(
-							this.doc?.data,
-							path.slice(0, path.length - 1),
-						);
-						if (
-							typeof parentValue === 'string' &&
-							parentValue !== pathValue
-						) {
-							allOps.push({
-								id: op.id,
-								bi: op.bi,
-								sd: pathValue,
-								p: op.p,
-							});
-							return;
-						}
-					}
-					if (pathValue !== undefined) {
-						const childIds = op.childIds || [];
-						const opDataId =
-							Array.isArray(pathValue) && pathValue[1]
-								? pathValue[1][DATA_ID]
-								: undefined;
-						const loopValue = (value: any) => {
-							if (Array.isArray(value)) {
-								const attr = value[1];
-								if (
-									attr &&
-									attr[DATA_ID] &&
-									attr[DATA_ID] !== op.id &&
-									(!opDataId || attr[DATA_ID] !== opDataId)
-								) {
-									childIds.push(attr[DATA_ID]);
-								}
-								for (let i = 2; i < value.length; i++) {
-									loopValue(value[i]);
-								}
-							}
-						};
-						loopValue(pathValue);
-						op.childIds = childIds;
-						const ldOp = {
-							id: op.id,
-							bi: beginIndex,
-							ld: pathValue,
-							p: op.p,
-							nl: op['nl'],
-							childIds,
-							oldPath: op.oldPath,
-						};
-						let has = false;
-						// 修复index
-						// 如果删除后合并，__index 可能会发生变化，如果 <ul></ul> 被删除了，那么里面的 li 就取ul的路径组合当前li的路径
-						allOps.forEach((aOp) => {
-							if ('ld' in aOp) {
-								if (aOp.id && op.childIds?.includes(aOp.id)) {
-									aOp.p = op.p.concat(
-										aOp.p.slice(op.p.length),
-									);
-									aOp.oldPath = op.oldPath?.concat(
-										aOp.oldPath?.slice(op.oldPath.length) ||
-											[],
-									);
-									aOp.ld = getValue(
-										this.doc?.data,
-										aOp.oldPath || [],
-									);
-								} else if (
-									op.id &&
-									aOp.childIds?.includes(op.id)
-								) {
-									ldOp.p = aOp.p.concat(
-										op.p.slice(aOp.p.length),
-									);
-									ldOp.oldPath = aOp.oldPath?.concat(
-										op.oldPath?.slice(aOp.oldPath.length) ||
-											[],
-									);
-									ldOp.ld = getValue(
-										this.doc?.data,
-										ldOp.oldPath || [],
-									);
-								}
-								const strP = aOp.p.join(',');
-								const strLdP = ldOp.p.join(',');
-								// 相等，不需要增加
-								if (!has && strP === strLdP) {
-									has = true;
-								}
-								// 比较删除深度，当前删除深度比已有的要深就忽略，当前删除的深度比已有的要浅就替换
-								// 删除深度比已有的要深，忽略
-								// if(strLdP.startsWith(strP)) {
-								// 	return true
-								// }
-								// // 删除深度比已有的要浅，替换
-								// if(strP.startsWith(strLdP)) {
-								// 	allOps.splice(index, 1, ldOp);
-								// 	return true
-								// }
-							}
-						});
-						if (!has) allOps.push(ldOp);
-					}
-				}
-				if ('li' in op) {
-					allOps.push({
-						id: op.id,
-						bi: beginIndex,
-						li: op.li,
-						p: op.p,
-						nl: op['nl'],
-						addNode: op['addNode'],
-					} as any);
-				}
-			});
-			allOps.push(...attrOps);
 		}
 
-		return allOps.map((op) => {
-			if ('li' in op) {
-				delete op.addNode;
-			} else if ('ld' in op) {
-				delete op.childIds;
-				delete op.oldPath;
-			}
-			return op;
+		const ops: TargetOp[] = [];
+		targetRoots.forEach((root) => {
+			ops.push(...this.diff(root, data));
 		});
+		this.emit('ops', ops);
 	}
+
+	diff(root: Element, data: any = this.doc?.data || []) {
+		const ops: TargetOp[] = [];
+		if (!root.isConnected) return [];
+		let id = isRoot(root) ? 'root' : root.getAttribute(DATA_ID);
+		if (!id) {
+			const cRoot = this.engine.block
+				.closest($(root), (node) => !!node.attributes(DATA_ID))
+				.get<Element>();
+			if (!(cRoot instanceof Element)) return [];
+			root = cRoot;
+			id = root.getAttribute(DATA_ID);
+		}
+		if (!id) return [];
+		const newJson = toJSON0(root) as any[];
+		if (!newJson) return [];
+		const isRootId = id === 'root';
+		const oldValue = findFromDoc(data, (attributes) =>
+			isRootId ? true : attributes[DATA_ID] === id,
+		);
+		if (!oldValue) return [];
+		// 比较新旧数据
+		const { path } = oldValue;
+		// 1. 根节点属性变更
+		if (id !== 'root') {
+			const newAttributes = newJson[JSON0_INDEX.ATTRIBUTE] as Record<
+				string,
+				any
+			>;
+			const oldAttributes = oldValue.attributes;
+			ops.push(
+				...this.handleAttributes(
+					id,
+					path.length,
+					path,
+					oldAttributes,
+					newAttributes,
+				),
+			);
+		}
+		// 2. 子节点变更
+		const newChildren = newJson.slice(2);
+		const oldChildren = oldValue.children;
+		ops.push(
+			...this.handleChildren(
+				isRootId ? '' : id,
+				isRootId ? -1 : path.length,
+				path,
+				oldChildren,
+				newChildren,
+			),
+		);
+		return ops;
+	}
+
 	/**
 	 * 从 doc 中查找目标卡片
 	 * @param data
@@ -648,299 +597,4 @@ class Producer extends EventEmitter2 {
 			};
 		}
 	};
-	/**
-	 * 处理DOM节点变更记录
-	 * @param records 记录集合
-	 */
-	handleMutations(records: MutationRecord[]) {
-		// 初次加载中的卡片，在提交ops后把loading状态移除
-		const loadingCards: NodeInterface[] = [];
-		//需要先过滤标记为非协同节点的变更，包括 data-element=ui、data-transient-element 等标记的节点，可以在 isTransientMutation 中查看逻辑
-		//记录大于300的时候，先获取所有的不需要参与协同交互的节点，以提高效率
-		if (records.length > 299) {
-			this.cacheTransientElements = [];
-			//非可编辑卡片的子节点
-			const { card, container } = this.engine;
-			card.each((card) => {
-				// 增加异步加载的卡片子节点
-				if (!card.isEditable || card.loading) {
-					// 正在加载的可编辑卡片要获取内部子节点
-					const isEditableLoading = card.isEditable && card.loading;
-					card.root.allChildren().forEach((child) => {
-						if (child.type === getDocument().ELEMENT_NODE) {
-							if (isEditableLoading)
-								child[0]['__card_root'] = card.root;
-							this.cacheTransientElements?.push(child[0]);
-						}
-					});
-				}
-			});
-			//所有的UI子节点
-			const uiElements = container.find(`${UI_SELECTOR}`);
-			uiElements.each((_, index) => {
-				const ui = uiElements.eq(index);
-				ui?.allChildren().forEach((child) => {
-					if (child.type === getDocument().ELEMENT_NODE)
-						this.cacheTransientElements?.push(child[0]);
-				});
-			});
-		}
-		const targetElements: Node[] = [];
-		const cardMap = new Map<Node, boolean>();
-		records = records.filter((record) => {
-			const beginCardIndex = loadingCards.length;
-			let isTransient = this.isTransientMutation(
-				record,
-				this.cacheTransientElements,
-				loadingCards,
-			);
-			// 判断要过滤的卡片是否在协同数据中渲染成功
-			if (loadingCards.length > beginCardIndex && this.doc) {
-				// 删除卡片不需要过滤
-				const cardElement = loadingCards[loadingCards.length - 1];
-				if (
-					record.removedNodes.length === 1 &&
-					cardElement[0] === record.removedNodes[0]
-				) {
-					return true;
-				}
-				const tMapValue = cardMap.get(cardElement[0]);
-				if (tMapValue === undefined && cardElement.isEditableCard()) {
-					const cardName = cardElement.attributes(CARD_KEY);
-					const cardValue = decodeCardValue(
-						cardElement.attributes(CARD_VALUE_KEY),
-					);
-					const result = this.findCardForDoc(
-						this.doc.data,
-						cardName,
-						(attributes) => {
-							// 卡片id一致
-							const value = decodeCardValue(
-								attributes[CARD_VALUE_KEY],
-							);
-							return value.id === cardValue.id;
-						},
-					);
-					// 没有这个卡片节点，或者卡片内部已经渲染了才需要过滤
-					if (result && !result.rendered) {
-						isTransient = false;
-						record['nl'] = true;
-					} else {
-						isTransient = true;
-					}
-					cardMap.set(cardElement[0], isTransient);
-				} else if (tMapValue !== undefined) {
-					isTransient = tMapValue;
-				}
-				// 标记节点为已处理
-				record.addedNodes.forEach((addNode) => {
-					addNode['__card_rendered'] = true;
-				});
-				// 需要比对异步加载的卡片子节点(body -> center -> 非 ui 和 data-transient-element节点)是否已经处理完，处理完就移除掉卡片根节点的 CARD_LOADING_KEY 标记
-				// card.root.removeAttributes(CARD_LOADING_KEY);
-				// 判断卡片下面的节点
-				const children = cardElement
-					.find(CARD_CENTER_SELECTOR)
-					.children()
-					.toArray();
-
-				const isRendered =
-					children.length > 0 &&
-					children.every((child) => {
-						if (child.length === 0) return true;
-						const attributes = child.attributes();
-						if (
-							(attributes[DATA_ELEMENT] === UI ||
-								!!attributes[DATA_TRANSIENT_ELEMENT]) &&
-							!child.hasClass(CARD_LOADING_KEY)
-						) {
-							return true;
-						}
-						if (child[0]['__card_rendered'] === true) {
-							return true;
-						}
-						return false;
-					});
-				if (isRendered) {
-					const handleEditableCard = (
-						editableCard: NodeInterface,
-					) => {
-						const childAllLoaded = editableCard
-							.find(CARD_SELECTOR)
-							.toArray()
-							.every((childCard) => {
-								const childLoading =
-									childCard.attributes(CARD_LOADING_KEY);
-								if (
-									!childLoading ||
-									childCard[0]['__card_rendered']
-								) {
-									return true;
-								}
-								return false;
-							});
-						if (childAllLoaded) {
-							editableCard.removeAttributes(CARD_LOADING_KEY);
-						}
-					};
-					// 可编辑卡片需要查看子卡片是否都渲染成功
-					if (cardElement.isEditableCard()) {
-						handleEditableCard(cardElement);
-					} else {
-						cardElement.removeAttributes(CARD_LOADING_KEY);
-						// 非可编辑卡片需要判断当前是否在可编辑器卡内，加载成功需要判断父级的可编辑卡片是否都加载成功
-						const cardParentElement = cardElement.parent();
-						if (cardParentElement) {
-							const parentEditableCard = this.engine.card.closest(
-								cardParentElement,
-								true,
-							);
-							if (
-								parentEditableCard &&
-								parentEditableCard.length > 0
-							) {
-								handleEditableCard(parentEditableCard);
-							}
-						}
-					}
-				}
-			}
-			if (
-				!isTransient &&
-				!targetElements.includes(record.target) &&
-				!targetElements.find((element) =>
-					element.contains(record.target),
-				)
-			) {
-				let index = -1;
-				while (
-					(index = targetElements.findIndex((element) =>
-						record.target.contains(element),
-					)) &&
-					index > -1
-				) {
-					targetElements.splice(index, 1);
-				}
-				targetElements.push(record.target);
-			}
-			return !isTransient;
-		});
-		this.clearCache();
-		//重置缓存
-		this.cacheTransientElements = undefined;
-		this.indexCaches.clear();
-		let ops = this.generateOps(records);
-		ops = filterOperations(ops);
-		targetElements.forEach((element) => {
-			let node = $(element);
-			if (node.isEditable() && !node.isRoot()) {
-				const card = this.engine.card.find(node, true);
-				node = card?.root || node;
-			}
-			updateIndex(
-				node,
-				(child) =>
-					!isTransientElement(child, this.cacheTransientElements),
-			);
-		});
-		if (ops.length !== 0) {
-			this.emitOps(ops);
-		}
-	}
-
-	emitOps(ops: ((RepairOp & { newValue?: string; path?: number[] }) | Op)[]) {
-		let emitOps: Op[] = [];
-		ops.forEach((op) => {
-			if ('path' in op && op.newValue !== undefined) {
-				const pathValue = getValue(this.doc?.data, op.oldPath || []);
-				if (!pathValue) return;
-				const newOps = this.textToOps(
-					[...op.path!],
-					pathValue,
-					op.newValue,
-				);
-				newOps.forEach((nOp) => {
-					nOp['id'] = op.id;
-					nOp['bi'] = op.bi;
-				});
-				emitOps = emitOps.concat(newOps);
-			} else if (op.p.length !== 0) {
-				emitOps.push(op);
-			}
-		});
-		if (emitOps.length !== 0) {
-			opsSort(emitOps);
-			this.emit('ops', emitOps);
-		}
-	}
-
-	setDoc(doc: DocInterface | Doc) {
-		this.doc = doc;
-	}
-
-	/**
-	 * 获取要移除节点的索引
-	 * @param record 当前记录
-	 * @param records 记录集合
-	 * @returns
-	 */
-	getRemoveNodeIndex(
-		record: MutationRecord,
-		records: MutationRecord[],
-	): number {
-		const { target, nextSibling, previousSibling, addedNodes } = record;
-		const targetElement = target as Element;
-		// 获取目标节点的过滤后非协同节点后的所有子节点
-		const childNodes =
-			target.nodeType === getDocument().ELEMENT_NODE &&
-			targetElement.getAttribute(DATA_ELEMENT) === ROOT
-				? Array.from(target.childNodes)
-				: Array.from(target.childNodes).filter(
-						(node) =>
-							!isTransientElement(
-								node,
-								this.cacheTransientElements,
-							),
-				  );
-		const addedIndex = childNodes.indexOf(addedNodes[0] as ChildNode);
-		const prevIndex = childNodes.indexOf(previousSibling as ChildNode);
-		const nextIndex = childNodes.indexOf(nextSibling as ChildNode);
-		let index;
-		if (prevIndex !== -1) {
-			index = prevIndex + 1;
-		} else if (nextIndex !== -1) {
-			index = nextIndex;
-		} else if (addedIndex !== -1) {
-			index = addedIndex;
-		} else if (previousSibling) {
-			if (nextSibling) {
-				if (previousSibling) {
-					index = this.getRemoveNodeIndexFromMutation(
-						previousSibling,
-						target,
-						records,
-					);
-				}
-			} else {
-				index = target.childNodes.length;
-			}
-		} else index = 0;
-		return index !== undefined ? index : 0;
-	}
-
-	getRemoveNodeIndexFromMutation(
-		node: Node,
-		target: Node,
-		records: MutationRecord[],
-	) {
-		const record = records.find(
-			(record) =>
-				record.target === target && record.removedNodes[0] === node,
-		);
-		if (record) {
-			return this.getRemoveNodeIndex(record, records);
-		}
-		return 0;
-	}
 }
-export default Producer;

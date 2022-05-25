@@ -114,6 +114,8 @@ class Range implements RangeInterface {
 		) {
 			this.shrinkToElementNode().shrinkToTextNode();
 		}
+		if (node instanceof Element || node instanceof DocumentFragment)
+			this.editor.nodeId.generate(node);
 		this.base.insertNode(node);
 	}
 

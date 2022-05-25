@@ -3,6 +3,7 @@ import {
 	EditorInterface,
 	NodeIdInterface,
 	NodeInterface,
+	SchemaInterface,
 	SchemaRule,
 } from '../types';
 import $ from './query';
@@ -17,10 +18,10 @@ import { getParentInRoot } from '../utils';
 import { isNode, isNodeEntry } from './utils';
 
 class NodeId implements NodeIdInterface {
-	editor: EditorInterface;
+	schema: SchemaInterface;
 	#rules: { [key: string]: SchemaRule[] } = {};
-	constructor(editor: EditorInterface) {
-		this.editor = editor;
+	constructor(editor: SchemaInterface) {
+		this.schema = editor;
 	}
 
 	init() {
@@ -34,7 +35,7 @@ class NodeId implements NodeIdInterface {
 	getRules() {
 		const rules: { [key: string]: SchemaRule[] } = {};
 		// const { blocks, inlines, marks } = this.editor.schema.data;
-		this.editor.schema.data.blocks.forEach((schema) => {
+		this.schema.data.blocks.forEach((schema) => {
 			if (!rules[schema.name]) {
 				rules[schema.name] = [];
 			}
@@ -60,8 +61,7 @@ class NodeId implements NodeIdInterface {
 	 * @param root 根节点
 	 */
 	generateAll(
-		root: Element | NodeInterface | DocumentFragment = this.editor
-			.container,
+		root: Element | NodeInterface | DocumentFragment,
 		force: boolean = false,
 	) {
 		const rules = this.#rules;
@@ -97,10 +97,7 @@ class NodeId implements NodeIdInterface {
 			!nodeRules ||
 			nodeRules.length === 0 ||
 			!nodeRules.some((rule) =>
-				this.editor.schema.checkNode(
-					node as NodeInterface,
-					rule.attributes,
-				),
+				this.schema.checkNode(node as NodeInterface, rule.attributes),
 			)
 		) {
 			return;
@@ -145,10 +142,7 @@ class NodeId implements NodeIdInterface {
 			!nodeRules ||
 			nodeRules.length === 0 ||
 			!nodeRules.some((rule) =>
-				this.editor.schema.checkNode(
-					node as NodeInterface,
-					rule.attributes,
-				),
+				this.schema.checkNode(node as NodeInterface, rule.attributes),
 			)
 		) {
 			return false;

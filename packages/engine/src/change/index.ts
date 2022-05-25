@@ -787,6 +787,7 @@ class ChangeModel implements ChangeInterface {
 			startNode.get<Node>()?.childNodes.length === 0
 		) {
 			startNode.html('<p><br /></p>');
+			this.engine.nodeId.generate(startNode);
 		}
 		safeRange.collapse(true);
 		// 后续处理

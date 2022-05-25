@@ -123,5 +123,9 @@ class Mutation extends EventEmitter2 implements MutationInterface {
 	onChange(ops: Op[]) {
 		if (!this.isStopped) this.emit('onChange', ops);
 	}
+
+	diff(root: Element = this.engine.container.get<Element>()!): Op[] {
+		return this.producer.diff(root, this.doc?.data);
+	}
 }
 export default Mutation;

@@ -94,10 +94,7 @@ class HistoryModel implements HistoryInterface {
 			try {
 				const { ot } = this.engine;
 				ot.submitOps(undoOp.ops || []);
-				const applyNodes = ot.consumer.handleSelfOperations(
-					undoOp.ops!,
-				);
-				ot.consumer.handleIndex(applyNodes);
+				ot.consumer.handleSelfOperations(undoOp.ops!);
 				this.currentActionIndex--;
 				isUndo = true;
 			} catch (error: any) {
@@ -129,10 +126,7 @@ class HistoryModel implements HistoryInterface {
 			try {
 				const { ot } = this.engine;
 				ot.submitOps(redoOp.ops || []);
-				const applyNodes = ot.consumer.handleSelfOperations(
-					redoOp.ops!,
-				);
-				ot.consumer.handleIndex(applyNodes);
+				ot.consumer.handleSelfOperations(redoOp.ops!);
 				this.currentActionIndex++;
 				isRedo = true;
 			} catch (error: any) {

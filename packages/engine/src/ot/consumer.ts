@@ -11,7 +11,7 @@ import {
 } from '../types/ot';
 import { NodeInterface } from '../types/node';
 import { getDocument } from '../utils';
-import { isTransientElement, updateIndex, toDOM } from './utils';
+import { isTransientElement, toDOM } from './utils';
 import { $ } from '../node';
 import { CARD_LOADING_KEY, DATA_ID, EDITABLE_SELECTOR } from '../constants';
 import { RangePath } from '../types';
@@ -352,34 +352,6 @@ class Consumer implements ConsumerInterface {
 		});
 		this.engine.change.change(false, applyNodes);
 		return applyNodes;
-	}
-
-	handleIndex(applyNodes: NodeInterface[]) {
-		const targetElements: Node[] = [];
-		applyNodes.forEach((node) => {
-			let target = node.isRoot() ? node : node.parent() || node;
-			if (target.isEditable() && !target.isRoot()) {
-				target = this.engine.card.find(target, true)?.root || target;
-			}
-			if (
-				target &&
-				target.length > 0 &&
-				!targetElements.includes(target[0]) &&
-				!targetElements.find((element) => element.contains(target[0]))
-			) {
-				let index = -1;
-				while (
-					(index = targetElements.findIndex((element) =>
-						target[0].contains(element),
-					)) &&
-					index > -1
-				) {
-					targetElements.splice(index, 1);
-				}
-				targetElements.push(target[0]);
-			}
-		});
-		targetElements.forEach((element) => updateIndex($(element)));
 	}
 
 	setRangeAfterOp(op: TargetOp) {

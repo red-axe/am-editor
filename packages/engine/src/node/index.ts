@@ -671,6 +671,8 @@ class NodeModel implements NodeModelInterface {
 					}
 				}
 			}
+			if (node instanceof Element || node instanceof DocumentFragment)
+				this.editor.nodeId.generate(node);
 		} else {
 			const targetNode = block.closest(
 				range.startNode.isEditable()

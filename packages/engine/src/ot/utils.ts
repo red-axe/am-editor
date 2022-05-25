@@ -28,6 +28,7 @@ import {
 import { getParentInRoot, toHex, unescapeDots, unescape } from '../utils';
 import { closest, isCard, isEditableCard, isNode } from '../node/utils';
 import $ from '../node/query';
+import { isRoot } from './../node/utils';
 
 export const isTransientElement = (
 	node: NodeInterface | Node,
@@ -109,21 +110,29 @@ export const isTransientElement = (
 	return false;
 };
 
-export const isTransientAttribute = (node: NodeInterface, attr: string) => {
-	if (node.isRoot()) return true;
+export const isTransientAttribute = (
+	node: NodeInterface | Node,
+	attr: string,
+) => {
+	const element = (isNode(node) ? node : node[0]) as Element;
+	if (isRoot(element)) return true;
 	if (
-		node.isCard() &&
+		isCard(element) &&
 		['id', 'class', 'style', CARD_LOADING_KEY, CARD_EDITABLE_KEY].includes(
 			attr,
 		)
 	)
 		return true;
-	const transient = node.attributes(DATA_TRANSIENT_ATTRIBUTES);
+	const transient = element.getAttribute(DATA_TRANSIENT_ATTRIBUTES);
 	if (
 		transient === '*' ||
-		transient
-			.split(',')
-			.some((value) => value.trim().toLowerCase() === attr.toLowerCase())
+		(transient &&
+			transient
+				.split(',')
+				.some(
+					(value) =>
+						value.trim().toLowerCase() === attr.toLowerCase(),
+				))
 	)
 		return true;
 	return false;
@@ -189,138 +198,6 @@ const isReversePath = (op: Path, next: Path, length: number = 1): boolean => {
 	return isEqual(op.slice(), nextClone);
 };
 
-export const updateIndex = (
-	root: NodeInterface,
-	filter?: (child: NodeInterface) => boolean,
-) => {
-	if (root.isText()) return;
-	let childrens = root.children().toArray();
-	if (!root.isEditable()) {
-		childrens = filter ? childrens.filter(filter) : childrens;
-	}
-	childrens.forEach((child, index) => {
-		child[0]['__index'] = index;
-		if (!child.isText()) updateIndex(child);
-	});
-};
-
-export const opsSort = (ops: Op[]) => {
-	ops.sort((op1, op2) => {
-		/**
-		 *  diff > 0：op1在op2之后 [1,2,3] -> [1,2] | [2,3] -> [1,2]
-		 *  diff < 0：op1在op2之前 [1,2] -> [1,2,3] | [1,2] -> [2,3]
-		 *  diff = 0: op1和op2相同 [1,2] -> [1,2]
-		 */
-		let diff = op1.p.length < op2.p.length ? -1 : 0;
-		/**
-		 * op1.p.length > op2.p.length：op1在op2之后，并且op2的每一项都与op1的固定op2的长度数据每一项相同
-		 */
-		let les = false;
-		for (let p = 0; p < op1.p.length; p++) {
-			const v1 = op1.p[p];
-			// od oi 最后一个参数是属性名称
-			if (typeof v1 === 'string') break;
-			// op2 中没有这个索引路径，op1 < op2
-			if (p >= op2.p.length) {
-				diff = 1;
-				les = true;
-				break;
-			}
-			const v2 = op2.p[p];
-			if (v1 < v2) {
-				diff = -1;
-				break;
-			} else if (v1 > v2) {
-				diff = 1;
-				break;
-			}
-		}
-		// 文字删除，排再最前面
-		if ('sd' in op1) {
-			// 相同文字删除不处理，按原来顺序操作，textToOps 中已经计算好删除后的位置.2021-12-08
-			if ('sd' in op2 || 'si' in op2) {
-				return 0;
-			}
-			return -1;
-		}
-		if ('sd' in op2) {
-			// 相同文字删除不处理，按原来顺序操作，textToOps 中已经计算好删除后的位置.2021-12-08
-			if ('sd' in op1 || 'si' in op1) {
-				return 0;
-			}
-			return 1;
-		}
-
-		// 删除div，但是修改span属性，span的op放在前面 <div><span>修改属性</span></div>
-		if (les && 'ld' in op2 && 'od' in op1) {
-			return -1;
-		}
-
-		if (les && 'ld' in op1 && 'od' in op2) {
-			return -1;
-		}
-
-		if (diff === 0 && 'od' in op1 && 'ld' in op2) {
-			return -1;
-		}
-
-		if (diff === 0 && 'od' in op2 && 'ld' in op1) {
-			return 1;
-		}
-
-		if ('od' in op1 && 'ld' in op2) {
-			return 1;
-		}
-		if ('od' in op2 && 'ld' in op1) {
-			return -1;
-		}
-		if ('oi' in op1 && diff < 1 && 'li' in op2) {
-			return -1;
-		}
-		if ('oi' in op1 && diff > -1 && 'li' in op2) {
-			return 1;
-		}
-		if ('oi' in op2 && diff > -1 && 'li' in op1) {
-			return 1;
-		}
-		if ('oi' in op2 && diff < 1 && 'li' in op1) {
-			return -1;
-		}
-		if ('od' in op1 && ('li' in op2 || 'ld' in op2)) {
-			return -1;
-		}
-		if ('od' in op2 && ('li' in op1 || 'ld' in op1)) {
-			return 1;
-		}
-		if ('oi' in op1 && ('li' in op2 || 'ld' in op2)) {
-			return 1;
-		}
-		if ('oi' in op2 && ('li' in op1 || 'ld' in op1)) {
-			return -1;
-		}
-		// 如果删除节点比增加的节点索引小，排在加入节点前面
-		if ('ld' in op1 && 'li' in op2) return -1;
-		if ('li' in op1 && 'ld' in op2) return 1;
-		if (diff < 1 && 'ld' in op1 && 'si' in op2) return 1;
-		if (diff > 0 && 'ld' in op1 && 'si' in op2) return -1;
-		if (diff < 1 && 'si' in op1 && 'ld' in op2) return 1;
-		if (diff > 0 && 'si' in op1 && 'ld' in op2) return -1;
-		const isLi =
-			('li' in op1 && 'li' in op2) || ('oi' in op1 && 'oi' in op2);
-		const isLd =
-			('ld' in op1 && 'ld' in op2) || ('od' in op1 && 'od' in op2);
-		// 都是新增节点，越小排越前面
-		if (isLi) {
-			return diff;
-		}
-		// 都是删除节点，越大排越前面
-		else if (isLd) {
-			return -diff;
-		}
-		return 0;
-	});
-};
-
 export const toDOM = (ops: Op[] | Op[][]): Node => {
 	const fragment = document.createDocumentFragment();
 	let elementName: string | null = null;
@@ -379,11 +256,17 @@ export const toDOM = (ops: Op[] | Op[][]): Node => {
 	}
 };
 
-const childToJSON0 = (node: NodeInterface, values: Array<{} | string>) => {
-	const childNodes = node.children();
+const childToJSON0 = (
+	node: NodeInterface | Node,
+	values: Array<{} | string>,
+) => {
+	if (!(node instanceof Node)) {
+		node = node[0];
+	}
+	const childNodes = node.childNodes;
 	if (0 !== childNodes.length) {
 		for (let i = 0; i < childNodes.length; i++) {
-			const child = childNodes.eq(i);
+			const child = childNodes.item(i);
 			if (!child) continue;
 			const data = toJSON0(child);
 			if (data) {
@@ -394,21 +277,23 @@ const childToJSON0 = (node: NodeInterface, values: Array<{} | string>) => {
 };
 
 export const toJSON0 = (
-	node: NodeInterface,
+	node: NodeInterface | Node,
 ): string | undefined | (string | {})[] => {
 	let values: Array<{} | string>;
+	if (!(node instanceof Node)) {
+		node = node[0];
+	}
 	if (!isTransientElement(node)) {
-		const { attributes, nodeValue } = node.get<Element>()!;
-		if (node.type === Node.ELEMENT_NODE) {
-			values = [node.name];
+		const { nodeValue } = node;
+		if (node instanceof Element) {
+			const attributes = node.attributes;
+			values = [node.nodeName.toLowerCase()];
 			const data = {};
 			for (let i = 0; attributes && i < attributes.length; i++) {
 				const { name, specified, value } = attributes[i];
 				if (specified && !isTransientAttribute(node, name)) {
-					if (name === 'style') {
-						data['style'] = toHex(
-							node.get<HTMLElement>()?.style.cssText || value,
-						);
+					if (name === 'style' && node instanceof HTMLElement) {
+						data['style'] = toHex(node.style.cssText || value);
 					} else if ('string' === typeof value) {
 						data[name] = value;
 					}
@@ -417,8 +302,7 @@ export const toJSON0 = (
 			values.push(data);
 			childToJSON0(node, values);
 			return values;
-		}
-		return node.type === Node.TEXT_NODE ? String(nodeValue) : undefined;
+		} else if (node instanceof Text) return String(nodeValue);
 	}
 	return;
 };
@@ -449,15 +333,17 @@ export const getValue = (data: any, path: Path, id?: string) => {
 	return hasValue ? value : undefined;
 };
 
-export const findFromDoc = (
-	data: any,
-	callback: (attributes: Record<string, string>) => boolean,
-): {
-	paths: number[];
+export interface DocData {
+	path: number[];
 	children: any[];
 	name: string;
 	attributes: Record<string, string>;
-} | null => {
+}
+
+export const findFromDoc = (
+	data: any,
+	callback: (attributes: Record<string, string>) => boolean,
+): DocData | null => {
 	if (!Array.isArray(data) || data.length < 1) {
 		return null;
 	}
@@ -470,7 +356,7 @@ export const findFromDoc = (
 				callback(attributes)
 			) {
 				return {
-					paths: [],
+					path: [],
 					name: data[0],
 					attributes,
 					children: data.slice(i + 1),
@@ -479,7 +365,7 @@ export const findFromDoc = (
 		} else if (Array.isArray(data[i])) {
 			const result = findFromDoc(data[i], callback);
 			if (result) {
-				result.paths.unshift(i);
+				result.path.unshift(i);
 				return result;
 			}
 		}

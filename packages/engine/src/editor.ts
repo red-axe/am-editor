@@ -162,7 +162,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 		this.plugin = new Plugin(this);
 		// 节点管理
 		this.node = new NodeModel(this);
-		this.nodeId = new NodeId(this);
+		this.nodeId = new NodeId(this.schema);
 		// 列表
 		this.list = new List(this);
 		// 样式标记
