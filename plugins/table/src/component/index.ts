@@ -926,8 +926,14 @@ class TableComponent<V extends TableValue = TableValue>
 			: this.wrapper.find('table');
 		const colElements = table.find('col').toArray();
 		colElements.forEach((colElement, index) => {
-			const width = colElement.attributes('width');
-			colItems.eq(index)?.css('width', `${width}px`);
+			const width =
+				colElement.attributes('width') || colElement.css('width');
+			colItems
+				.eq(index)
+				?.css(
+					'width',
+					`${Math.max(parseInt(width), this.colMinWidth)}px`,
+				);
 		});
 
 		const rowsHeader = this.wrapper.find(Template.ROWS_HEADER_CLASS);
@@ -951,8 +957,9 @@ class TableComponent<V extends TableValue = TableValue>
 				.eq(index)
 				?.css(
 					'height',
-					removeUnit(
-						getComputedStyle(rowElement.get<Element>()!, 'height'),
+					Math.max(
+						parseInt(rowElement.css('width')),
+						this.rowMinHeight,
 					),
 				);
 		});
