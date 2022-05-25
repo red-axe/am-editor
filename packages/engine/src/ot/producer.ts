@@ -7,34 +7,11 @@ import {
 } from 'diff-match-patch';
 import { EventEmitter2 } from 'eventemitter2';
 import { Doc, Path, StringDeleteOp, StringInsertOp } from 'sharedb';
-import {
-	DocInterface,
-	EngineInterface,
-	NodeInterface,
-	TargetOp,
-} from '../types';
-import {
-	findFromDoc,
-	isTransientAttribute,
-	isTransientElement,
-	toJSON0,
-} from './utils';
-import {
-	CARD_CENTER_SELECTOR,
-	CARD_KEY,
-	CARD_LOADING_KEY,
-	CARD_SELECTOR,
-	CARD_VALUE_KEY,
-	DATA_ELEMENT,
-	DATA_ID,
-	DATA_TRANSIENT_ELEMENT,
-	JSON0_INDEX,
-	UI,
-	UI_SELECTOR,
-} from '../constants';
+import { DocInterface, EngineInterface, TargetOp } from '../types';
+import { findFromDoc, isTransientAttribute, toJSON0 } from './utils';
+import { DATA_ELEMENT, DATA_ID, JSON0_INDEX, UI } from '../constants';
 import { $ } from '../node';
 import { closest, isRoot } from '../node/utils';
-import { decodeCardValue } from '../utils';
 
 export default class Producer extends EventEmitter2 {
 	private engine: EngineInterface;
@@ -222,7 +199,7 @@ export default class Producer extends EventEmitter2 {
 			for (let c = 2; c < newChildren.length; c++) {
 				ops.push({
 					id,
-					bi: path.length,
+					bi: oBi,
 					p: path.concat(c),
 					li: newChildren[c],
 				});
@@ -250,7 +227,7 @@ export default class Producer extends EventEmitter2 {
 				ops.push(
 					...this.handleFirstLineText(
 						id,
-						beginIndex,
+						oBi,
 						path.concat(JSON0_INDEX.ELEMENT),
 						newChildren[0],
 						oldChildren,
@@ -301,7 +278,7 @@ export default class Producer extends EventEmitter2 {
 						if (!oldChild) {
 							ops.push({
 								id,
-								bi: path.length,
+								bi: oBi,
 								p: path.concat(c + JSON0_INDEX.ELEMENT),
 								li: newChild,
 							});
@@ -319,18 +296,13 @@ export default class Producer extends EventEmitter2 {
 							const oldAttributes = oldChild[
 								JSON0_INDEX.ATTRIBUTE
 							] as Record<string, any>;
-							const idValue = newAttributes[DATA_ID];
-							const newId = idValue ?? id;
 							const newPath = path.concat(
 								c + JSON0_INDEX.ELEMENT,
 							);
-							const newBeginIndex = idValue
-								? newPath.length
-								: oBi;
 							ops.push(
 								...this.handleAttributes(
-									newId,
-									newBeginIndex,
+									id,
+									oBi,
 									newPath,
 									oldAttributes,
 									newAttributes,
@@ -339,8 +311,8 @@ export default class Producer extends EventEmitter2 {
 							// 比较子节点
 							ops.push(
 								...this.handleChildren(
-									newId,
-									newBeginIndex,
+									id,
+									oBi,
 									newPath,
 									oldChild.slice(JSON0_INDEX.ELEMENT),
 									newChild.slice(JSON0_INDEX.ELEMENT),
@@ -374,7 +346,7 @@ export default class Producer extends EventEmitter2 {
 						if (!oldChild) {
 							ops.push({
 								id,
-								bi: path.length,
+								bi: oBi,
 								p: path.concat(c + JSON0_INDEX.ELEMENT),
 								li: newChild,
 							});
@@ -396,18 +368,13 @@ export default class Producer extends EventEmitter2 {
 								const oldAttributes = oldChild[
 									JSON0_INDEX.ATTRIBUTE
 								] as Record<string, any>;
-								const idValue = newAttributes[DATA_ID];
-								const newId = idValue ?? id;
 								const newPath = path.concat(
 									c + JSON0_INDEX.ELEMENT,
 								);
-								const newBeginIndex = idValue
-									? newPath.length
-									: oBi;
 								ops.push(
 									...this.handleAttributes(
-										newId,
-										newBeginIndex,
+										id,
+										oBi,
 										newPath,
 										oldAttributes,
 										newAttributes,
@@ -416,8 +383,8 @@ export default class Producer extends EventEmitter2 {
 								// 比较子节点
 								ops.push(
 									...this.handleChildren(
-										newId,
-										newBeginIndex,
+										id,
+										oBi,
 										newPath,
 										oldChild.slice(JSON0_INDEX.ELEMENT),
 										newChild.slice(JSON0_INDEX.ELEMENT),
@@ -433,7 +400,7 @@ export default class Producer extends EventEmitter2 {
 								});
 								ops.push({
 									id,
-									bi: path.length,
+									bi: oBi,
 									p: path.concat(c + JSON0_INDEX.ELEMENT),
 									li: newChild,
 								});
@@ -503,7 +470,7 @@ export default class Producer extends EventEmitter2 {
 				targetRoots.push(target);
 			}
 		}
-
+		if (targetRoots.length === 0) return;
 		const ops: TargetOp[] = [];
 		targetRoots.forEach((root) => {
 			ops.push(...this.diff(root, data));
