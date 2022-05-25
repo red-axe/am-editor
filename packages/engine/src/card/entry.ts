@@ -411,8 +411,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 	didRender() {
 		if (this.loading) {
 			this.find(`.${CARD_LOADING_KEY}`).remove();
-			if (!isEngine(this.editor) || this.editor.ot.isStopped())
-				this.root.removeAttributes(CARD_LOADING_KEY);
+			this.root.removeAttributes(CARD_LOADING_KEY);
 		}
 		this.initResize();
 		this.initToolbar();
