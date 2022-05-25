@@ -127,6 +127,7 @@ class Backspace {
 			// 空的节点就清空所有的mark空节点以及inline节点，避免重复的合并到上一级节点上
 			if (node.isEmpty(blockNode)) blockNode.html('<br />');
 			change.mergeAfterDelete(blockNode);
+			change.change(false);
 			return false;
 		}
 		return true;
