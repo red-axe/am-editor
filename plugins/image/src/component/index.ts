@@ -82,6 +82,9 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 		return CardType.INLINE;
 	}
 
+	static get collab() {
+		return false;
+	}
 	// static get autoSelected() {
 	// 	return false;
 	// }
@@ -260,7 +263,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 
 	onActivate(activated: boolean) {
 		super.onActivate(activated);
-		if (activated) this.image?.focus();
+		if (activated && !this.selectedByOther) this.image?.focus();
 		else this.image?.blur();
 	}
 
@@ -328,6 +331,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 			this.image.size.width = value.size?.width || 0;
 			this.image.size.height = value.size?.height || 0;
 			if (value.percent) this.image.setProgressPercent(value.percent);
+			this.image.resizer?.destroy();
 		}
 		this.image.render(loadingBg);
 	}

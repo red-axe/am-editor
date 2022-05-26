@@ -98,7 +98,7 @@ class Image {
 	private meta: NodeInterface;
 	private maximize: NodeInterface;
 	private bg: NodeInterface;
-	private resizer?: Resizer;
+	resizer?: Resizer;
 	private pswp: PswpInterface;
 	src: string;
 	status: Status;
