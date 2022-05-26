@@ -196,11 +196,11 @@ export default class Producer extends EventEmitter2 {
 		// 2.1 旧节点没有子节点数据
 		if (oldChildren.length === 0) {
 			// 全部插入
-			for (let c = 2; c < newChildren.length; c++) {
+			for (let c = 0; c < newChildren.length; c++) {
 				ops.push({
 					id,
 					bi: oBi,
-					p: path.concat(c),
+					p: path.concat(c + JSON0_INDEX.ELEMENT),
 					li: newChildren[c],
 				});
 			}
