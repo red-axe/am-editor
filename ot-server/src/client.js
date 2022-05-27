@@ -48,7 +48,19 @@ class Client {
 					if (!doc) return;
 					//广播消息
 					if (action === 'broadcast') {
-						if (data.type === 'select') doc.selection = data.body;
+						if (data.type === 'select') {
+							if ('remove' in data.body) {
+								const index = doc.selection.findIndex(
+									(selection) =>
+										selection.uuid === data.body.uuid,
+								);
+								if (index > -1) {
+									doc.selection.splice(index, 1, data.body);
+								} else {
+									doc.selection.push(data.body);
+								}
+							}
+						}
 						doc.broadcast(
 							'broadcast',
 							data,

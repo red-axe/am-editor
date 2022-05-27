@@ -125,14 +125,24 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 							isLastCol = true;
 					}
 					if (isLastCol) {
-						cell.element.classList.add('table-last-column');
+						if (
+							!cell.element.classList.contains(
+								'table-last-column',
+							)
+						)
+							cell.element.classList.add('table-last-column');
 					} else {
-						cell.element.classList.remove('table-last-column');
+						if (
+							cell.element.classList.contains('table-last-column')
+						)
+							cell.element.classList.remove('table-last-column');
 					}
 					if (isLastRow) {
-						cell.element.classList.add('table-last-row');
+						if (!cell.element.classList.contains('table-last-row'))
+							cell.element.classList.add('table-last-row');
 					} else {
-						cell.element.classList.remove('table-last-row');
+						if (cell.element.classList.contains('table-last-row'))
+							cell.element.classList.remove('table-last-row');
 					}
 				}
 			});

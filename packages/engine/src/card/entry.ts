@@ -424,8 +424,6 @@ abstract class CardEntry<T extends CardValue = CardValue>
 	}
 	abstract render(): NodeInterface | string | void;
 
-	updateBackgroundSelection?(range: RangeInterface): void;
-
 	drawBackground?(
 		node: NodeInterface,
 		range: RangeInterface,

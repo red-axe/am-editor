@@ -2,8 +2,7 @@ import { debounce, cloneDeep } from 'lodash';
 import { EventEmitter2 } from 'eventemitter2';
 import { Doc, Op } from 'sharedb';
 import { EngineInterface } from '../types/engine';
-import { filterOperations } from './utils';
-
+import { filterOperations, toJSON0 } from './utils';
 import {
 	ConsumerInterface,
 	Attribute,
@@ -11,16 +10,13 @@ import {
 	Member,
 	MutationInterface,
 	OTInterface,
-	RangeColoringInterface,
 	SelectionInterface,
 	TargetOp,
 } from '../types/ot';
 import OTSelection from './selection';
-import RangeColoring from './range-coloring';
 import OTDoc from './doc';
 import Consumer from './consumer';
 import Mutation from './mutation';
-import { toJSON0 } from './utils';
 import { random } from '../utils';
 import { CARD_VALUE_KEY, READY_CARD_KEY } from '../constants';
 import './index.css';
@@ -29,10 +25,8 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	private engine: EngineInterface;
 	private members: Array<Member>;
 	private currentMember?: Member;
-	private waitingOps: Array<TargetOp> = [];
 	private clientId: string;
 	selection: SelectionInterface;
-	private rangeColoring: RangeColoringInterface;
 	consumer: ConsumerInterface;
 	private mutation: MutationInterface | null;
 	doc: DocInterface | Doc | null = null;
@@ -43,28 +37,11 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.engine = engine;
 		this.members = [];
 		this.selection = new OTSelection(engine);
-		this.rangeColoring = new RangeColoring(engine);
 		this.consumer = new Consumer(engine);
 		this.mutation = new Mutation(engine.container, { engine });
 		this.mutation.on('onChange', this.handleChange);
 		this.clientId = random(8);
-		this.waitingOps = [];
-		this.engine.on('select', this.updateSelection);
 	}
-
-	private updateRangeColoringPosition = debounce(() => {
-		this.updateSelection();
-		this.rangeColoring.updatePosition();
-	}, 100);
-
-	private applyWaitingOps = debounce(() => {
-		const operations = filterOperations(this.waitingOps);
-		if (operations.length > 0) {
-			this.waitingOps = [];
-			this.apply(operations);
-			this.engine.history.handleRemoteOps(operations);
-		}
-	}, 0);
 
 	colors = [
 		'#597EF7',
@@ -88,7 +65,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	initRemote(
 		doc: Doc,
 		defaultValue?: string,
-		onSelectionChange?: (paths: Attribute[]) => void,
+		onSelectionChange?: (path: Attribute) => void,
 	) {
 		// 没有启动协同，或者当前doc对象没有注销，就去注销
 		const isDestroy = !this.doc || this.doc.type === null;
@@ -105,13 +82,15 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		// 监听操作
 		doc.on('op', (op, clientId) => {
 			if (this.clientId !== clientId.toString()) {
-				this.waitingOps = this.waitingOps.concat(op);
-				this.applyWaitingOps();
+				if (op.length > 0) {
+					this.apply(op);
+					this.engine.history.handleRemoteOps(op);
+				}
 			}
 		});
 		this.selection.removeAllListeners();
-		this.selection.on('change', (paths) => {
-			if (onSelectionChange) onSelectionChange(paths);
+		this.selection.on('change', (path) => {
+			if (onSelectionChange) onSelectionChange(path);
 		});
 		if (!this.engine.readonly) this.startMutation();
 		if (isDestroy) {
@@ -128,9 +107,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.engine.history.handleSelfOps(
 			ops.filter((op) => !op['nl'] && !op.p.includes(READY_CARD_KEY)),
 		);
-		if (this.doc && this.doc?.type !== null) {
-			this.updateRangeColoringPosition();
-		}
+
 		this.engine.trigger('ops', ops);
 		if (
 			ops.find(
@@ -144,6 +121,9 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	submitOps(ops: Op[]) {
 		if (!this.doc) return;
+		ops.forEach((op) => {
+			(op as any).uid = this.currentMember?.uuid;
+		});
 		// 提交前，先模拟一次操作会不会出现报错
 		const tempDoc = new OTDoc();
 		const tempData = JSON.parse(JSON.stringify(this.doc.data));
@@ -155,7 +135,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 			if (err) {
 				this.engine.messageError(
 					'ot',
-					`协同结构出现错误，将重置服务端内容，当前历史记录也将清空`,
+					`If there is an error in the collaborative structure, the content of the server will be reset, and the current history will also be cleared.`,
 					err,
 					ops,
 					tempData,
@@ -191,6 +171,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 				this.doc.submitOp(delOps.concat(addOps), {
 					source: this.clientId,
 				});
+				this.selection.emitSelectChange(true);
 				return;
 			}
 			this.doc.submitOp(
@@ -212,6 +193,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 						// 重置
 						this.doc?.destroy();
 					}
+					this.selection.emitSelectChange(true);
 				},
 			);
 		});
@@ -228,6 +210,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	apply(ops: Op[]) {
 		this.stopMutation();
 		this.consumer.handleRemoteOperations(ops);
+		this.selection.emitSelectChange();
 		this.startMutation();
 	}
 
@@ -331,6 +314,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.members = this.members.filter((m) => {
 			return m.uuid !== member.uuid;
 		});
+		this.selection.removeAttirbute(member.uuid);
 	}
 
 	setCurrentMember(member: Member) {
@@ -339,52 +323,36 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		const findMember = this.members.find((m) => m.uuid === member.uuid);
 		if (!findMember) return;
 		this.currentMember = findMember;
+		this.selection.setCurrent(findMember);
 	}
 
 	getCurrentMember() {
 		return this.currentMember;
 	}
 
-	renderSelection(
-		attributes: Array<Attribute>,
-		isDraw: boolean = false,
-		showInfo?: boolean,
-	) {
-		const { members, currentMember } = this;
-		this.selection.data = attributes;
-		attributes = attributes.filter(
-			(item) => item.uuid !== currentMember?.uuid,
-		);
-		this.rangeColoring.render(attributes, members, isDraw, showInfo);
-		this.rangeColoring.updatePosition();
-	}
-
-	updateSelection = () => {
-		if (!this.engine.change.isComposing() && this.currentMember) {
-			const range = this.selection.updateSelections(
-				this.currentMember,
-				this.members,
-			).range;
-			this.rangeColoring.updateBackgroundAlpha(range);
-		}
-	};
-
-	refreshSelection(showInfo?: boolean) {
-		if (!this.currentMember) return;
-		const data = this.selection.updateSelections(
-			this.currentMember,
-			this.members,
-		).data;
-		this.renderSelection(data, true, showInfo);
+	renderSelection(attributes: Attribute[] | Attribute) {
+		if (!Array.isArray(attributes)) attributes = [attributes];
+		attributes.forEach((attribute) => {
+			if (
+				this.currentMember &&
+				attribute.uuid === this.currentMember.uuid
+			)
+				return;
+			const member = this.members.find((m) => m.uuid === attribute.uuid);
+			if ('remove' in attribute || !member)
+				this.selection.removeAttirbute(attribute.uuid);
+			else {
+				this.selection.setAttribute(attribute, member);
+			}
+		});
 	}
 
 	destroy() {
 		if (this.doc) this.doc.destroy();
+		this.selection.destory();
 		this.mutation?.off('onChange', this.handleChange);
 		this.mutation?.destroyCache();
-		this.engine.off('select', this.updateSelection);
 		this.stopMutation();
-		this.rangeColoring.destroy();
 		this.mutation = null;
 	}
 }

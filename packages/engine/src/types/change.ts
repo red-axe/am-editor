@@ -194,7 +194,7 @@ export interface ChangeInterface {
 	/**
 	 * 编辑器中光标改变触发
 	 */
-	onSelect: () => void;
+	onSelect: (range?: RangeInterface) => void;
 	/**
 	 * 设置编辑器值后触发
 	 */

@@ -360,11 +360,6 @@ export interface CardInterface<T extends CardValue = CardValue> {
 	 */
 	didRender(): void;
 	/**
-	 * 更新可编辑器卡片协同选择区域
-	 * @param range 光标
-	 */
-	updateBackgroundSelection?(range: RangeInterface): void;
-	/**
 	 * 渲染可编辑器卡片协同选择区域
 	 * @param node 背景画布
 	 * @param range 渲染光标

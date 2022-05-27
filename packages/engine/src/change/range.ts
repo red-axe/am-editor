@@ -387,9 +387,18 @@ class ChangeRange implements ChangeRangeInterface {
 		const editableElement =
 			range.commonAncestorNode.closest(EDITABLE_SELECTOR);
 		editableElement?.get<HTMLElement>()?.focus();
-		if (editableElement && !this.engine.container.equal(editableElement)) {
+		if (
+			editableElement.length > 0 &&
+			!this.engine.container.equal(editableElement)
+		) {
 			const mouseEvent = new MouseEvent('mousedown');
 			this.engine.container.get<HTMLElement>()?.dispatchEvent(mouseEvent);
+			setTimeout(() => {
+				const mouseEvent = new MouseEvent('mouseup');
+				this.engine.container
+					.get<HTMLElement>()
+					?.dispatchEvent(mouseEvent);
+			}, 0);
 		}
 	}
 

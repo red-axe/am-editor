@@ -184,7 +184,6 @@ export interface TableInterface<V extends TableValue = TableValue>
 	command: TableCommandInterface;
 	colMinWidth: number;
 	rowMinHeight: number;
-	isChanged: boolean;
 	/**
 	 * 渲染
 	 */

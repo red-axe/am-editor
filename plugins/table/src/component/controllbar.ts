@@ -132,10 +132,14 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			const rowBars = this.rowsHeader?.find(
 				Template.ROWS_HEADER_ITEM_CLASS,
 			);
-			for (let i = 0; i < end; i++) {
-				rowBars
-					?.eq(i)
-					?.css('height', getComputedStyle(trs[i], 'height'));
+			if (rowBars) {
+				for (let i = 0; i < end; i++) {
+					const newHeight = getComputedStyle(trs[i], 'height');
+					const bar = rowBars[i] as HTMLElement | undefined;
+					const oldHeight = bar?.style.height;
+					if (bar && newHeight !== oldHeight)
+						bar.style.height = newHeight;
+				}
 			}
 			const rowTrigger = this.rowsHeader?.find(
 				Template.ROWS_HEADER_TRIGGER_CLASS,
@@ -143,10 +147,13 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			const tableWidth = this.tableRoot!.width();
 			const wrapperWidth = this.table.wrapper?.width() || 0;
 			const width = tableWidth < wrapperWidth ? tableWidth : wrapperWidth;
-			rowTrigger?.css(
-				'width',
-				`${width + (this.rowsHeader?.width() || 0) - 1}px`,
-			);
+			const newWidth = width + (this.rowsHeader?.width() || 0) - 1;
+			rowTrigger?.each((row) => {
+				const oldWidth = (row as HTMLElement).style.width;
+				if (oldWidth !== newWidth + 'px') {
+					(row as HTMLElement).style.width = newWidth + 'px';
+				}
+			});
 		}
 	}
 
@@ -281,22 +288,28 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			});
 		} else {
 			cols.each((_, index) => {
-				const width =
+				const newWidth =
 					Math.round(
 						((tableWidth * colWidthArray[index]) / allColWidth) *
 							10000,
 					) / 10000;
-				colBars.eq(index)?.css('width', width + 'px');
-				cols.eq(index)?.attributes('width', width);
+				const bar = colBars[index] as HTMLElement | undefined;
+				const oldWidth = bar?.style.width;
+				if (bar && oldWidth !== newWidth + 'px')
+					bar.style.width = newWidth + 'px';
 			});
 		}
 		const colTrigger = this.colsHeader?.find(
 			Template.COLS_HEADER_TRIGGER_CLASS,
 		);
-		colTrigger?.css(
-			'height',
-			`${(tableModel?.height || 0) + (this.colsHeader?.height() || 0)}px`,
-		);
+		const newHeight =
+			(tableModel?.height || 0) + (this.colsHeader?.height() || 0);
+		colTrigger?.each((col) => {
+			const oldHeight = (col as HTMLElement).style.height;
+			if (oldHeight !== newHeight + 'px') {
+				(col as HTMLElement).style.height = newHeight + 'px';
+			}
+		});
 	}
 	/**
 	 * 绑定事件
@@ -307,14 +320,14 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				isMobile ? 'touchstart' : 'mousedown',
 				this.onMouseDownColsHeader,
 			)
-			.on('click', this.onClickColsHeader)
+			.on('mouseup', this.onClickColsHeader)
 			.on('dragstart', this.onDragStartColsHeader);
 		this.rowsHeader
 			?.on(
 				isMobile ? 'touchstart' : 'mousedown',
 				this.onMouseDownRowsHeader,
 			)
-			.on('click', this.onClickRowsHeader)
+			.on('mouseup', this.onClickRowsHeader)
 			.on('dragstart', this.onDragStartRowsHeader);
 		this.tableHeader?.on('mousedown', this.onClickTableHeader);
 		this.table.wrapper?.on('contextmenu', (event) =>
@@ -580,23 +593,40 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const colBars = this.colsHeader?.find(Template.COLS_HEADER_ITEM_CLASS);
 		const rowBars = this.rowsHeader?.find(Template.ROWS_HEADER_ITEM_CLASS);
 		const { begin, end, allCol, allRow } = selectArea;
-		for (let r = begin.row; r <= end.row; r++) {
-			if (allCol) {
-				rowBars?.eq(r)?.addClass('selected');
-				if (allRow) rowBars?.eq(r)?.addClass('no-dragger');
+		if (rowBars) {
+			for (let r = begin.row; r <= end.row; r++) {
+				if (allCol) {
+					const bar = rowBars[r] as HTMLElement | undefined;
+					if (!bar?.classList.contains('selected')) {
+						bar?.classList.add('selected');
+					}
+					if (allRow && !bar?.classList.contains('no-dragger'))
+						bar?.classList.add('no-dragger');
+				}
 			}
 		}
 
-		for (let c = begin.col; c <= end.col; c++) {
-			if (allRow) {
-				colBars?.eq(c)?.addClass('selected');
-				if (allCol) colBars?.eq(c)?.addClass('no-dragger');
+		if (colBars) {
+			for (let c = begin.col; c <= end.col; c++) {
+				if (allRow) {
+					const bar = colBars[c] as HTMLElement | undefined;
+					if (!bar?.classList.contains('selected')) {
+						bar?.classList.add('selected');
+					}
+					if (allCol && !bar?.classList.contains('no-dragger'))
+						bar?.classList.add('no-dragger');
+				}
 			}
 		}
+		const tableHeaderElement = this.tableHeader?.get<HTMLElement>();
 		if (allCol && allRow) {
-			this.tableHeader?.addClass('selected');
+			if (!tableHeaderElement?.classList.contains('selected')) {
+				tableHeaderElement?.classList.add('selected');
+			}
 		} else {
-			this.tableHeader?.removeClass('selected');
+			if (tableHeaderElement?.classList.contains('selected')) {
+				tableHeaderElement?.classList.remove('selected');
+			}
 		}
 		//行删除按钮
 		if (allCol && !allRow) {
@@ -634,11 +664,23 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	clearActiveStatus() {
 		const colBars = this.colsHeader?.find(Template.COLS_HEADER_ITEM_CLASS);
 		const rowBars = this.rowsHeader?.find(Template.ROWS_HEADER_ITEM_CLASS);
-		colBars?.removeClass('selected');
-		colBars?.removeClass('no-dragger');
-		rowBars?.removeClass('selected');
-		rowBars?.removeClass('no-dragger');
-		this.tableHeader?.removeClass('selected');
+		colBars?.each((bar) => {
+			const barElement = bar as HTMLElement;
+			if (barElement.classList.contains('selected'))
+				barElement.classList.remove('selected');
+			if (barElement.classList.contains('no-dragger'))
+				barElement.classList.remove('no-dragger');
+		});
+		rowBars?.each((bar) => {
+			const barElement = bar as HTMLElement;
+			if (barElement.classList.contains('selected'))
+				barElement.classList.remove('selected');
+			if (barElement.classList.contains('no-dragger'))
+				barElement.classList.remove('no-dragger');
+		});
+		const tableHeader = this.tableHeader?.get<HTMLElement>();
+		if (tableHeader?.classList.contains('selected'))
+			tableHeader.classList.remove('selected');
 	}
 	/**
 	 * 刷新控制UI

@@ -13,6 +13,7 @@ import {
 	DATA_TRANSIENT_ATTRIBUTES,
 	CARD_LOADING_KEY,
 	DATA_CONTENTEDITABLE_KEY,
+	DATA_ID,
 } from '../constants';
 import {
 	CardEntry,
@@ -356,8 +357,11 @@ class CardModel implements CardModelInterface {
 		const clazz = this.classes[name];
 		if (!clazz) throw ''.concat(name, ': This card does not exist');
 		const type = value?.type || clazz.cardType;
+		const dataId = node.attributes(DATA_ID);
 		const cardNode = transformCustomTags(
-			`<card type="${type}" name="${name}" value="${encodeCardValue(
+			`<card ${
+				dataId ?? `${DATA_ID}="${dataId}"`
+			} type="${type}" name="${name}" value="${encodeCardValue(
 				value,
 			)}"></card>`,
 		);

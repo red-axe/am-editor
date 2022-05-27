@@ -8,10 +8,15 @@ import {
 import { EventEmitter2 } from 'eventemitter2';
 import { Doc, Path, StringDeleteOp, StringInsertOp } from 'sharedb';
 import { DocInterface, EngineInterface, TargetOp } from '../types';
-import { findFromDoc, isTransientAttribute, toJSON0 } from './utils';
-import { DATA_ELEMENT, DATA_ID, JSON0_INDEX, UI } from '../constants';
+import {
+	findFromDoc,
+	isTransientAttribute,
+	toJSON0,
+	isTransientElement,
+} from './utils';
+import { DATA_ID, JSON0_INDEX } from '../constants';
 import { $ } from '../node';
-import { closest, isRoot } from '../node/utils';
+import { isRoot } from '../node/utils';
 
 export default class Producer extends EventEmitter2 {
 	private engine: EngineInterface;
@@ -420,7 +425,6 @@ export default class Producer extends EventEmitter2 {
 	handleMutations(records: MutationRecord[]) {
 		let targetRoots: Element[] = [];
 		const data = this.doc?.data;
-		//records = this.handleFilter(records)
 		if (!data || records.length === 0) return;
 		for (let r = 0; r < records.length; r++) {
 			const record = records.at(r);
@@ -442,8 +446,7 @@ export default class Producer extends EventEmitter2 {
 				!target ||
 				!target.isConnected ||
 				!(target instanceof Element) ||
-				target.getAttribute(DATA_ELEMENT) === UI ||
-				closest(target, `[${DATA_ELEMENT}="${UI}"]`)
+				isTransientElement(target)
 			)
 				continue;
 			// 根节点直接跳出
@@ -475,7 +478,9 @@ export default class Producer extends EventEmitter2 {
 		targetRoots.forEach((root) => {
 			ops.push(...this.diff(root, data));
 		});
-		this.emit('ops', ops);
+		if (ops.length > 0) {
+			this.emit('ops', ops);
+		}
 	}
 
 	diff(root: Element, data: any = this.doc?.data || []) {

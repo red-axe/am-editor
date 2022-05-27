@@ -599,24 +599,6 @@ class TableComponent<V extends TableValue = TableValue>
 		} as V;
 	}
 
-	updateBackgroundSelection?(range: RangeInterface): void {
-		const { selectArea, tableModel } = this.selection;
-		if (selectArea && selectArea.count > 1 && tableModel) {
-			const { begin, end } = selectArea;
-			const startModel = tableModel.table[begin.row][begin.col];
-			if (
-				!this.helper.isEmptyModelCol(startModel) &&
-				startModel.element
-			) {
-				range.setStart(startModel.element, 0);
-			}
-			const endModel = tableModel.table[end.row][end.col];
-			if (!this.helper.isEmptyModelCol(endModel) && endModel.element) {
-				range.setEnd(endModel.element, 0);
-			}
-		}
-	}
-
 	drawBackground?(
 		node: NodeInterface,
 		range: RangeInterface,
@@ -636,30 +618,28 @@ class TableComponent<V extends TableValue = TableValue>
 			return;
 
 		const startRect = startElement.getBoundingClientRect();
-		const vLeft =
-			(this.viewport?.getBoundingClientRect()?.left || 0) +
-			(this.activated ? 13 : 0);
+		const endRect = endElement.getBoundingClientRect();
+		const viewportRect = this.viewport?.getBoundingClientRect();
+		const vLeft = (viewportRect?.left || 0) + (this.activated ? 13 : 0);
 		domRect.x = Math.max(
 			startRect.left - backgroundRect.left,
 			vLeft - (this.editor.root.getBoundingClientRect()?.left || 0),
 		);
 		domRect.y = startRect.top - backgroundRect.top;
-		domRect.width = startRect.right - startRect.left;
+		domRect.width =
+			(viewportRect
+				? Math.min(endRect.right, viewportRect.right)
+				: endRect.right) - startRect.left;
 		domRect.height = startRect.bottom - startRect.top;
-
-		const rect = endElement.getBoundingClientRect();
-		domRect.width = Math.min(
-			rect.right - (startRect.left < vLeft ? vLeft : startRect.left),
-			(this.viewport?.width() || 0) - (this.activated ? 13 : 0),
-		);
 		if (domRect.width < 0) domRect.width = 0;
-		domRect.height = rect.bottom - startRect.top;
+		domRect.height = endRect.bottom - startRect.top;
 		return domRect;
 	}
 
 	activate(activated: boolean) {
 		super.activate(activated);
 		if (activated) {
+			this.conltrollBar.refresh();
 			this.wrapper?.addClass('active');
 		} else {
 			this.selection.clearSelect();
@@ -751,8 +731,6 @@ class TableComponent<V extends TableValue = TableValue>
 		});
 	};
 
-	isChanged: boolean = false;
-
 	didRender() {
 		super.didRender();
 		this.editor.on('undo', this.doChange);
@@ -822,17 +800,26 @@ class TableComponent<V extends TableValue = TableValue>
 				}
 			});
 			//this.scrollbar.disableScroll();
-			let scrollbarTimeout: NodeJS.Timeout | null = null;
-			const handleScrollbarChange = () => {
+			let prevScrollData = {
+				x: 0,
+				y: 0,
+			};
+			const handleScrollbarChange = ({
+				x,
+				y,
+			}: Record<string, number>) => {
+				if (prevScrollData.x === x && prevScrollData.y === y) return;
+				prevScrollData = {
+					x,
+					y,
+				};
 				if (tableOptions['maxRightWidth'])
 					this.overflow(tableOptions['maxRightWidth']());
-				if (scrollbarTimeout) clearTimeout(scrollbarTimeout);
-				scrollbarTimeout = setTimeout(() => {
-					if (isEngine(this.editor)) {
-						this.editor.ot.refreshSelection(false);
-						this.conltrollBar.refresh(false);
-					}
-				}, 20);
+
+				if (isEngine(this.editor)) {
+					this.editor.trigger('scroll', this.root, { x, y });
+					this.conltrollBar.refresh();
+				}
 			};
 			this.scrollbar.on('change', handleScrollbarChange);
 			if (!isMobile)
@@ -844,14 +831,7 @@ class TableComponent<V extends TableValue = TableValue>
 		}
 		this.selection.on('select', () => {
 			this.conltrollBar.refresh(false);
-			setTimeout(() => {
-				this.isChanged = true;
-			}, 200);
 			if (!isEngine(this.editor)) return;
-			const { selectArea, tableModel } = this.selection;
-			if (selectArea && selectArea.count > 1 && tableModel) {
-				this.editor.ot.updateSelection();
-			}
 			const align = this.selection.getSingleCell()?.css('vertical-align');
 			this.updateAlignText(align as any);
 			this.toolbarModel?.update();
@@ -896,6 +876,7 @@ class TableComponent<V extends TableValue = TableValue>
 			this.overflow(tableOptions.maxRightWidth());
 		this.scrollbar?.refresh();
 	}
+	private remoteRefreshTimeout: NodeJS.Timeout | null = null;
 
 	remoteRefresh() {
 		if (
@@ -963,9 +944,10 @@ class TableComponent<V extends TableValue = TableValue>
 					),
 				);
 		});
-		this.conltrollBar.refresh(false);
+		// this.conltrollBar.refresh();
 		this.scrollbar?.refresh();
-		setTimeout(() => {
+		if (this.remoteRefreshTimeout) clearTimeout(this.remoteRefreshTimeout);
+		this.remoteRefreshTimeout = setTimeout(() => {
 			// 找到所有可编辑节点，对没有 contenteditable 属性的节点添加contenteditable一下
 			this.wrapper?.find(EDITABLE_SELECTOR).each((editableNode) => {
 				const editableElement = editableNode as Element;

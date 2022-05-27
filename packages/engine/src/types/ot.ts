@@ -22,6 +22,10 @@ export type Attribute = {
 	 * 是否激活
 	 */
 	active: boolean;
+	/**
+	 * 是否强制更新
+	 */
+	force?: boolean;
 };
 
 /**
@@ -83,18 +87,31 @@ export interface SelectionInterface extends EventEmitter2 {
 	 */
 	currentRangePath?: { start: RangePath; end: RangePath };
 	/**
-	 * 所有选区数据
+	 * 触发选择改变
 	 */
-	data: Attribute[];
+	emitSelectChange: (refreshBG?: boolean) => void;
 	/**
-	 * 更新协作者选区
-	 * @param currentMember
-	 * @param members
+	 * 设置当前用户id
+	 * @param uuid
 	 */
-	updateSelections(
-		currentMember: Member,
-		members: Array<Member>,
-	): { data: Array<Attribute>; range: RangeInterface };
+	setCurrent(member: Member): void;
+	/**
+	 * 设置用户属性
+	 * @param attr
+	 */
+	setAttribute(attr: Attribute, member: Member, refreshBG?: boolean): void;
+	/**
+	 * 移除用户属性
+	 * @param uuid
+	 */
+	removeAttirbute(uuid: string): void;
+	/**
+	 * 获取用户属性
+	 * @param uuid
+	 */
+	getAttribute(uuid: string): Attribute | undefined;
+
+	destory(): void;
 }
 
 export type CursorRect = {
@@ -232,12 +249,7 @@ export interface RangeColoringInterface {
 	 * @param members
 	 * @param idDraw
 	 */
-	render(
-		data: Array<Attribute>,
-		members: Array<Member>,
-		idDraw: boolean,
-		showInfo?: boolean,
-	): void;
+	render(data: Attribute, members: Member, showInfo?: boolean): void;
 	/**
 	 * 销毁
 	 */
@@ -447,7 +459,7 @@ export interface OTInterface extends EventEmitter2 {
 	initRemote(
 		doc: Doc,
 		defaultValue?: string,
-		onSelectionChange?: (paths: Attribute[]) => void,
+		onSelectionChange?: (path: Attribute) => void,
 	): void;
 	/**
 	 * 处理操作改变
@@ -538,19 +550,7 @@ export interface OTInterface extends EventEmitter2 {
 	/**
 	 * 渲染用戶選區
 	 */
-	renderSelection(
-		attributes: Array<Attribute>,
-		isDraw?: boolean,
-		showInfo?: boolean,
-	): void;
-	/**
-	 * 更新用户选区
-	 */
-	updateSelection(): void;
-	/**
-	 * 实例化选区
-	 */
-	refreshSelection(showInfo?: boolean): void;
+	renderSelection(attributes: Attribute[] | Attribute): void;
 	/**
 	 * 销毁
 	 */

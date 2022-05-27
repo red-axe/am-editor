@@ -546,19 +546,32 @@ class RangeColoring implements RangeColoringInterface {
 		if (cardInfo && !cardInfo.isCenter(commonAncestorNode)) {
 			cardInfo = undefined;
 		}
-
+		const removeCardMasks: string[] = [];
 		card.each((cardComponent) => {
 			if (cardComponent.isEditable) return;
 			if (!cardInfo || !cardComponent.root.equal(cardInfo.root)) {
 				if (cardComponent.activatedByOther === uuid) {
 					this.setCardActivatedByOther(cardComponent);
 				}
-				this.root
-					.children(`.${USER_MASK_CLASS}[${DATA_UUID}="${uuid}"]`)
-					.remove();
-				Tooltip.hide();
+				removeCardMasks.push(uuid);
 			}
 		});
+		if (removeCardMasks.length > 0) {
+			this.root
+				.get<Element>()
+				?.querySelectorAll(
+					removeCardMasks
+						.map(
+							(uuid) =>
+								`.${USER_MASK_CLASS}[${DATA_UUID}="${uuid}"]`,
+						)
+						.join(','),
+				)
+				?.forEach((child) => {
+					child.parentNode?.removeChild(child);
+					Tooltip.hide();
+				});
+		}
 		if (cardInfo && !cardInfo.isEditable) {
 			const root =
 				this.setCardActivatedByOther(cardInfo, member) || cardInfo.root;
@@ -699,72 +712,61 @@ class RangeColoring implements RangeColoringInterface {
 
 	updateBackgroundAlpha(range: RangeInterface) {
 		const cursorRect = this.getCursorRect(range);
-		this.root.children(`.${USER_CURSOR_CLASS}`).each((child) => {
-			const node = $(child);
-			const trigger = node.find(`.${USER_CURSOR_TRIGGER_CLASS}`);
-			const left = node.css('left');
-			const top = node.css('top');
-			const bgColor = tinycolor2(node.css('background-color'));
-			if (cursorRect.left === left && cursorRect.top === top) {
-				bgColor.setAlpha(0.3);
-			} else {
-				bgColor.setAlpha(1);
-			}
-			node.css('background-color', bgColor.toRgbString());
-			trigger.css('background-color', bgColor.toRgbString());
-		});
+		this.root
+			.get<Element>()
+			?.querySelectorAll<HTMLElement>(`.${USER_CURSOR_CLASS}`)
+			.forEach((child) => {
+				const trigger = child.querySelector<HTMLElement>(
+					`.${USER_CURSOR_TRIGGER_CLASS}`,
+				);
+				const left = child.style.left;
+				const top = child.style.top;
+				const bgColor = tinycolor2(child.style.backgroundColor);
+				if (cursorRect.left === left && cursorRect.top === top) {
+					bgColor.setAlpha(0.3);
+				} else {
+					bgColor.setAlpha(1);
+				}
+				const bgs = bgColor.toRgbString();
+				child.style.backgroundColor = bgs;
+				if (trigger) trigger.style.backgroundColor = bgs;
+			});
 	}
 
-	render(
-		data: Array<Attribute>,
-		members: Array<Member>,
-		idDraw: boolean,
-		showInfo?: boolean,
-	) {
-		const { engine } = this;
-		const info = {};
-		data.forEach((item) => {
-			const { path, uuid, active } = item;
-			const member = members.find((m) => m.uuid === uuid);
-			if (member && (idDraw || active)) {
-				if (path) {
-					const range = Range.fromPath(engine, path, true);
-					this.drawRange(range, member, showInfo);
-				} else {
-					info[uuid] = true;
+	render(attribute: Attribute, member: Member, showInfo?: boolean) {
+		const { path, uuid, active } = attribute;
+		if (path) {
+			const range = Range.fromPath(this.engine, path, true);
+			this.drawRange(range, member, active || showInfo);
+		} else {
+			this.remove(uuid);
+		}
+	}
+
+	remove(uuid: string) {
+		const dataElement = (
+			this.engine.scrollNode?.get<Element>() ?? this.root.get<Element>()
+		)?.querySelector(`[${DATA_UUID}="${uuid}"]`);
+		if (dataElement) {
+			if (dataElement.classList.contains(USER_MASK_CLASS)) {
+				const target: Node | undefined = dataElement['__node'];
+				const component = target ? this.engine.card.find(target) : null;
+				if (
+					component &&
+					!component.isEditable &&
+					component.activatedByOther === uuid
+				) {
+					// 取消锁定
+					this.setCardActivatedByOther(component);
 				}
 			}
-		});
-		(this.engine.scrollNode?.get<Element>() ?? this.root.get<Element>())
-			?.querySelectorAll(`[${DATA_UUID}]`)
-			.forEach((child) => {
-				const uuid = child.getAttribute(DATA_UUID);
-				const member = members.find((m) => m.uuid === uuid);
-				if (!member || (uuid && info[uuid])) {
-					if (child.classList.contains(USER_MASK_CLASS)) {
-						const target: Node | undefined = child['__node'];
-						const component = target
-							? engine.card.find(target)
-							: null;
-						if (
-							component &&
-							!component.isEditable &&
-							component.activatedByOther === uuid
-						) {
-							this.setCardActivatedByOther(component);
-						}
-					}
-					child.parentNode?.removeChild(child);
-				}
-			});
-		engine.card.each((component) => {
-			if (component.isEditable) return;
-			const member = members.find(
-				(m) => m.uuid === component.selectedByOther,
-			);
-			if (!member || info[member.uuid]) {
-				this.setCardSelectedByOther(component);
-			}
+			dataElement.parentNode?.removeChild(dataElement);
+		}
+		this.engine.card.each((component) => {
+			if (component.isEditable || component.selectedByOther !== uuid)
+				return;
+			// 取消锁定
+			this.setCardSelectedByOther(component);
 		});
 	}
 }

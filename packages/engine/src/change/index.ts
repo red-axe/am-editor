@@ -44,20 +44,29 @@ class ChangeModel implements ChangeInterface {
 
 		this.onChange = this.options.onChange || function () {};
 		this.onRealtimeChange = this.options.onRealtimeChange || function () {};
-
+		let prevRange: Record<string, Node | number> | null = null;
 		this.onSelect = (range?: RangeInterface) => {
-			if (selectTimeout) clearTimeout(selectTimeout);
-			selectTimeout = setTimeout(() => {
-				const { mark, block, inline } = engine;
-				range = range || this.range.get();
-				this.marks = mark.findMarks(range);
-				this.blocks = block.findBlocks(range);
-				this.inlines = inline.findInlines(range);
-				if (this.options.onSelect) this.options.onSelect();
-			}, 50);
+			const { mark, block, inline } = engine;
+			range = range || this.range.get();
+			if (
+				prevRange?.startContainer === range.startContainer &&
+				prevRange?.startOffset === range.startOffset &&
+				prevRange?.endContainer === range.endContainer &&
+				prevRange?.endOffset === range.endOffset
+			)
+				return;
+			prevRange = {
+				startContainer: range.startContainer,
+				startOffset: range.startOffset,
+				endContainer: range.endContainer,
+				endOffset: range.endOffset,
+			};
+			this.marks = mark.findMarks(range);
+			this.blocks = block.findBlocks(range);
+			this.inlines = inline.findInlines(range);
+			if (this.options.onSelect) this.options.onSelect();
 		};
 		this.onSetValue = this.options.onSetValue || function () {};
-		let selectTimeout: null | NodeJS.Timeout = null;
 		this.range = new ChangeRange(engine, {
 			onSelect: (range) => {
 				this.onSelect(range);

@@ -2,22 +2,167 @@ import { EventEmitter2 } from 'eventemitter2';
 import { EngineInterface } from '../types/engine';
 import { Attribute, Member, SelectionInterface } from '../types/ot';
 import { isTransientElement } from './utils';
-import { RangePath } from '../types/range';
+import { RangeInterface, RangePath } from '../types/range';
 import { CardType } from '../card/enum';
+import RangeColoring from './range-coloring';
+import { CardInterface } from '../types/card';
+import { NodeInterface } from '../types/node';
+import Range from '../range';
 
 class OTSelection extends EventEmitter2 implements SelectionInterface {
 	private engine: EngineInterface;
+	private prevRange: Record<string, Node | number> | null = null;
+	private rangeColoring: RangeColoring;
 	currentRangePath?: { start: RangePath; end: RangePath };
-	data: Attribute[] = [];
+	data: Map<string, Attribute> = new Map();
+	current: Member | null = null;
 
 	constructor(engine: EngineInterface) {
 		super();
 		this.engine = engine;
+		this.rangeColoring = new RangeColoring(engine);
+		engine.container.on('keyup', this.emitSelectChange);
+		engine.container.on('mousedown', this.handleMouseDown);
+		engine.on('scroll', this.handleScroll);
 	}
 
-	updateSelections(currentMember: Member, members: Array<Member>) {
-		const { change, card } = this.engine;
-		const range = change.range.get().cloneRange();
+	handleScroll = (node: NodeInterface) => {
+		const children = this.engine.container.get<Element>()?.childNodes;
+		if (!children) return;
+		for (const [key, attr] of this.data) {
+			if (key === this.current?.uuid) continue;
+			if (attr.path?.start.id) {
+				const startOffset = attr.path.start.path[0];
+				const child = children.item(startOffset);
+				if (child && node.equal(child)) {
+					this.rangeColoring.updatePosition();
+					break;
+				}
+			}
+		}
+	};
+
+	handleMouseDown = () => {
+		this.engine.container.on('mouseup', this.handleMouseUp);
+		this.engine.container.on('mousemove', this.emitSelectChange);
+	};
+
+	handleMouseUp = () => {
+		this.engine.container.off('mouseup', this.handleMouseUp);
+		this.engine.container.off('mousemove', this.emitSelectChange);
+		this.emitSelectChange();
+	};
+
+	getCardResizeRange(card: CardInterface) {
+		if (card?.getSelectionNodes) {
+			const nodes = card.getSelectionNodes();
+			if (nodes.length > 0) {
+				const range = Range.create(this.engine);
+				range.setStart(nodes[0], 0);
+				const end = nodes[nodes.length - 1];
+				range.setEnd(
+					end,
+					end.isText()
+						? end.text().length
+						: end.get<Element>()?.childNodes.length || 0,
+				);
+				return range;
+			}
+		}
+		return null;
+	}
+	private observer: ResizeObserver | null = null;
+	emitSelectChange = (refreshBG = false) => {
+		if (this.engine.change.isComposing()) return;
+		let current = this.engine.change.range.get();
+		this.observer?.disconnect();
+		const card = this.engine.card.find(
+			current.commonAncestorContainer,
+			true,
+		);
+		if (card?.getSelectionNodes) {
+			let newRange = this.getCardResizeRange(card);
+			if (newRange) {
+				current = newRange.cloneRange();
+				this.observer = new ResizeObserver(() => {
+					newRange = this.getCardResizeRange(card);
+					if (newRange) {
+						this.prevRange = {
+							startContainer: newRange.startContainer,
+							endContainer: newRange.endContainer,
+							startOffset: newRange.startOffset,
+							endOffset: newRange.endOffset,
+						};
+						this.onSelectionChange(newRange, true, refreshBG);
+					} else {
+						this.observer?.disconnect();
+					}
+				});
+				this.observer.observe(card.root.get<Element>()!);
+			}
+		}
+
+		if (
+			this.prevRange?.startContainer === current.startContainer &&
+			this.prevRange.endContainer === current.endContainer &&
+			this.prevRange.startOffset === current.startOffset &&
+			this.prevRange.endOffset === current.endOffset
+		)
+			return;
+
+		if (
+			!current.commonAncestorNode.isRoot() &&
+			!current.commonAncestorNode.inEditor()
+		) {
+			if (this.current) this.removeAttirbute(this.current.uuid);
+			this.prevRange = null;
+		} else {
+			this.prevRange = {
+				startContainer: current.startContainer,
+				endContainer: current.endContainer,
+				startOffset: current.startOffset,
+				endOffset: current.endOffset,
+			};
+			this.onSelectionChange(current, false, refreshBG);
+		}
+	};
+
+	setCurrent(member: Member) {
+		this.current = member;
+	}
+
+	setAttribute(attr: Attribute, member: Member, refreshBG = false) {
+		const item = this.data.get(attr.uuid);
+		if (attr.force || JSON.stringify(item || {}) !== JSON.stringify(attr)) {
+			this.data.set(
+				attr.uuid,
+				Object.assign({}, attr, { active: !item }),
+			);
+			if (attr.uuid === this.current?.uuid) {
+				if (refreshBG === true) this.rangeColoring.updatePosition();
+				this.emit('change', attr);
+			} else {
+				this.rangeColoring.render(attr, member);
+			}
+		}
+	}
+
+	removeAttirbute(uuid: string) {
+		if (!this.data.has(uuid)) return;
+		this.data.delete(uuid);
+		if (uuid === this.current?.uuid)
+			this.emit('change', { uuid, remove: true });
+		else this.rangeColoring.remove(uuid);
+	}
+
+	getAttribute(uuid: string) {
+		return this.data.get(uuid);
+	}
+
+	onSelectionChange(range: RangeInterface, force = false, refreshBG = false) {
+		if (!this.current) return;
+		const { card } = this.engine;
+		range = range.cloneRange();
 		const activeCard = card.active;
 		if (activeCard && !activeCard.isEditable) {
 			const center = activeCard.getCenter();
@@ -32,12 +177,8 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 			} else if (center && center.length > 0) {
 				range.select(center.get()!, true);
 			}
-		} else if (
-			activeCard?.isEditable &&
-			activeCard.updateBackgroundSelection
-		) {
-			activeCard.updateBackgroundSelection(range);
 		}
+
 		if (!activeCard && !range.collapsed) {
 			const startCard = this.engine.card.find(range.startNode, true);
 			if (startCard && startCard.type === CardType.BLOCK) {
@@ -52,56 +193,23 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 		const path = range.toPath(true);
 		// 用作历史记录的不包含卡片左右光标位置
 		this.currentRangePath = range.toPath();
-		const pathString = JSON.stringify(path);
-		let data: Array<Attribute | null> = this.data;
-		let isMember = false;
-		let isUpdate = false;
-		data = data.map((attr) => {
-			if (!attr) {
-				isUpdate = true;
-				return null;
-			}
-
-			if (attr.uuid === currentMember.uuid) {
-				isMember = true;
-				if (pathString !== JSON.stringify(attr.path)) {
-					isUpdate = true;
-					attr.path = path;
-					attr.active = true;
-				}
-				return attr;
-			} else {
-				if (members.find((member) => member.uuid === attr.uuid)) {
-					attr.active = false;
-					return attr;
-				} else {
-					isUpdate = true;
-					return null;
-				}
-			}
-		});
-
-		const newData: Array<Attribute> = [];
-		data.forEach((attr) => {
-			if (!!attr) newData.push(attr);
-		});
-
-		if (!isMember) {
-			isUpdate = true;
-			newData.push({
+		const current = this.getAttribute(this.current.uuid);
+		this.setAttribute(
+			Object.assign({}, current, {
 				path,
-				uuid: currentMember.uuid,
-				active: true,
-			});
-		}
-		if (isUpdate) {
-			this.data = newData;
-			this.emit('change', newData);
-		}
-		return {
-			data: newData,
-			range,
-		};
+				uuid: this.current.uuid,
+				force,
+			}),
+			this.current,
+			refreshBG,
+		);
+		this.rangeColoring.updateBackgroundAlpha(range);
+	}
+
+	destory() {
+		this.engine.container.off('keyup', this.emitSelectChange);
+		this.engine.container.off('mousedown', this.handleMouseDown);
+		this.engine.off('scroll', this.handleScroll);
 	}
 }
 

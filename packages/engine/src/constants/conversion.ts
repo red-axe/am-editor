@@ -1,4 +1,4 @@
-import { DATA_ELEMENT, ROOT } from './root';
+import { DATA_ELEMENT, DATA_ID, ROOT } from './root';
 import $ from '../node/query';
 import { ConversionData } from '../types';
 import {
@@ -24,6 +24,7 @@ const defaultConversion: ConversionData = [
 					attributes[CARD_KEY] || attributes[READY_CARD_KEY]
 				).toLowerCase(),
 				editable: attributes[CARD_EDITABLE_KEY],
+				[DATA_ID]: attributes[DATA_ID],
 			};
 			//其它 data 属性
 			for (const attrName in oldAttrs) {

@@ -262,13 +262,33 @@ class NativeEvent {
 			}
 		}
 	}
-
+	private prevSelection: {
+		anchorNode: Node | null;
+		anchorOffset: number;
+		focusNode: Node | null;
+		focusOffset: number;
+	} | null = null;
 	handleSelectionChange() {
 		const { change, container, card } = this.engine;
 		if (change.isComposing()) return;
 		const { window } = container;
 		const selection = window?.getSelection();
-
+		if (
+			this.prevSelection?.anchorNode === selection?.anchorNode &&
+			this.prevSelection?.anchorOffset === selection?.anchorOffset &&
+			this.prevSelection?.focusNode === selection?.focusNode &&
+			this.prevSelection?.focusOffset === selection?.focusOffset
+		)
+			return;
+		this.prevSelection = selection
+			? {
+					anchorNode: selection.anchorNode,
+					anchorOffset: selection.anchorOffset,
+					focusNode: selection.focusNode,
+					focusOffset: selection.focusOffset,
+			  }
+			: null;
+		change.onSelect();
 		if (selection && selection.anchorNode) {
 			const range = Range.from(this.engine, selection)!;
 			// 不在编辑器内不处理
@@ -338,16 +358,12 @@ class NativeEvent {
 			const range = change.range.get();
 			this.repairInput(event, range);
 			change.range.select(range);
-			change.onSelect();
+			change.onSelect(range);
 			change.change();
 		});
-		let selectionChangeTimeout: NodeJS.Timeout | undefined = undefined;
+
 		change.event.onDocument('selectionchange', () => {
-			if (selectionChangeTimeout) clearTimeout(selectionChangeTimeout);
-			selectionChangeTimeout = setTimeout(
-				() => this.handleSelectionChange(),
-				50,
-			);
+			this.handleSelectionChange();
 		});
 		change.event.onSelect((event: any) => {
 			const range = change.range.get();
@@ -365,7 +381,7 @@ class NativeEvent {
 			) {
 				card.activate(range.commonAncestorNode);
 			}
-			change.onSelect();
+			change.onSelect(range);
 		});
 
 		change.event.onDocument('mousedown', (e: MouseEvent) => {
