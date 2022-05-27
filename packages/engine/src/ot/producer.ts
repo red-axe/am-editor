@@ -15,11 +15,10 @@ import {
 	toJSON0,
 	isTransientElement,
 } from './utils';
+import { CARD_LOADING_KEY, CARD_KEY, CARD_TYPE_KEY } from './../constants/card';
 import { DATA_ID, JSON0_INDEX } from '../constants';
 import { $ } from '../node';
 import { isRoot } from '../node/utils';
-import { CARD_KEY, CARD_TYPE_KEY } from '@aomao/engine';
-import { CARD_LOADING_KEY } from './../constants/card';
 
 export default class Producer extends EventEmitter2 {
 	private engine: EngineInterface;
