@@ -1,4 +1,5 @@
 import { EventEmitter2 } from 'eventemitter2';
+import { isEqual } from 'lodash';
 import { EngineInterface } from '../types/engine';
 import { Attribute, Member, SelectionInterface } from '../types/ot';
 import { isTransientElement } from './utils';
@@ -133,7 +134,7 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 
 	setAttribute(attr: Attribute, member: Member, refreshBG = false) {
 		const item = this.data.get(attr.uuid);
-		if (attr.force || JSON.stringify(item || {}) !== JSON.stringify(attr)) {
+		if (attr.force || !isEqual(item || {}, attr)) {
 			this.data.set(
 				attr.uuid,
 				Object.assign({}, attr, { active: !item }),

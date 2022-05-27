@@ -722,12 +722,12 @@ class CardModel implements CardModelInterface {
 			});
 		});
 		readyCards.forEach((cardNode) => {
-			const readyKey = cardNode.attributes(READY_CARD_KEY);
-			const key = cardNode.attributes(CARD_KEY);
+			const attributes = cardNode.attributes();
+			const readyKey = attributes[READY_CARD_KEY];
+			const key = attributes[CARD_KEY];
 			const name = readyKey || key;
 			if (this.classes[name]) {
-				const value = cardNode.attributes(CARD_VALUE_KEY);
-				const attributes = cardNode.attributes();
+				const value = attributes[CARD_VALUE_KEY];
 
 				let card: CardInterface | undefined;
 				if (key) {

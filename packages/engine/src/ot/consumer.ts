@@ -219,7 +219,8 @@ class Consumer implements ConsumerInterface {
 			!domBegine.isRoot() &&
 			(!root.isCard() ||
 				(root.isEditableCard() &&
-					domBegine.closest(EDITABLE_SELECTOR).isEditable()))
+					(domBegine.length === 0 ||
+						domBegine.closest(EDITABLE_SELECTOR).isEditable())))
 		) {
 			const element =
 				typeof value === 'string'

@@ -120,7 +120,7 @@ class Parser implements ParserInterface {
 			const { rule } = value;
 			oldRules.push(rule);
 			const { name, attributes, style } = value.node;
-			delete attributes[DATA_ID];
+			if (name !== 'card') delete attributes[DATA_ID];
 			delete attributes['id'];
 			const newNode = $(`<${name} />`);
 			nodeApi.setAttributes(newNode, {
@@ -261,6 +261,7 @@ class Parser implements ParserInterface {
 				if (conversion && (!schema.getType(node) || isCard)) {
 					const newNode = this.convert(conversion, node, schema);
 					if (newNode) {
+						if (isCard) return true;
 						return newNode;
 					}
 				}

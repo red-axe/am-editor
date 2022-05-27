@@ -305,11 +305,9 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 				this.codeEditor.setAutoWrap(!!value?.autoWrap);
 				return;
 			}
-			setTimeout(() => {
-				this.mirror = this.codeEditor?.create(mode, code, {
-					lineWrapping: !!value?.autoWrap,
-				});
-			}, 50);
+			this.mirror = this.codeEditor?.create(mode, code, {
+				lineWrapping: !!value?.autoWrap,
+			});
 		} else {
 			this.codeEditor?.create(mode, code, {
 				lineWrapping: !!value?.autoWrap,

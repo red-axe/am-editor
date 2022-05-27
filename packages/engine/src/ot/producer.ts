@@ -7,6 +7,7 @@ import {
 } from 'diff-match-patch';
 import { EventEmitter2 } from 'eventemitter2';
 import { Doc, Path, StringDeleteOp, StringInsertOp } from 'sharedb';
+import { isEqual } from 'lodash';
 import { DocInterface, EngineInterface, TargetOp } from '../types';
 import {
 	findFromDoc,
@@ -17,6 +18,8 @@ import {
 import { DATA_ID, JSON0_INDEX } from '../constants';
 import { $ } from '../node';
 import { isRoot } from '../node/utils';
+import { CARD_KEY, CARD_TYPE_KEY } from '@aomao/engine';
+import { CARD_LOADING_KEY } from './../constants/card';
 
 export default class Producer extends EventEmitter2 {
 	private engine: EngineInterface;
@@ -188,6 +191,28 @@ export default class Producer extends EventEmitter2 {
 		return ops;
 	};
 
+	isLoadingCard = (child: any) => {
+		if (
+			child.length > JSON0_INDEX.ATTRIBUTE &&
+			!Array.isArray(child[1]) &&
+			typeof child[1] === 'object'
+		) {
+			const attributes = child[JSON0_INDEX.ATTRIBUTE];
+			const cardKey = attributes[CARD_KEY];
+			const cardType = attributes[CARD_TYPE_KEY];
+			const dataId = attributes[DATA_ID];
+			if (cardKey && cardType && dataId) {
+				const cardNode = this.engine.container
+					.get<Element>()
+					?.querySelector(`[${DATA_ID}="${dataId}"]`);
+				if (cardNode?.getAttribute(CARD_LOADING_KEY)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+
 	handleChildren = (
 		id: string,
 		beginIndex: number,
@@ -198,6 +223,8 @@ export default class Producer extends EventEmitter2 {
 		const ops: TargetOp[] = [];
 		const oId = id === 'root' ? '' : id;
 		const oBi = id === 'root' ? -1 : beginIndex;
+
+		if (this.isLoadingCard(newChildren)) return [];
 		// 2.1 旧节点没有子节点数据
 		if (oldChildren.length === 0) {
 			// 全部插入
@@ -290,10 +317,7 @@ export default class Producer extends EventEmitter2 {
 							oldChildren.splice(c, 0, newChild);
 						}
 						// 对比有差异的子节点
-						else if (
-							JSON.stringify(newChild) !==
-							JSON.stringify(oldChild)
-						) {
+						else if (!isEqual(newChild, oldChild)) {
 							// 比较属性
 							const newAttributes = newChild[
 								JSON0_INDEX.ATTRIBUTE
@@ -313,6 +337,8 @@ export default class Producer extends EventEmitter2 {
 									newAttributes,
 								),
 							);
+							// 过滤掉正在渲染的卡片，不再遍历子节点
+							if (this.isLoadingCard(newChild)) continue;
 							// 比较子节点
 							ops.push(
 								...this.handleChildren(
@@ -355,10 +381,7 @@ export default class Producer extends EventEmitter2 {
 								p: path.concat(c + JSON0_INDEX.ELEMENT),
 								li: newChild,
 							});
-						} else if (
-							JSON.stringify(newChild) !==
-							JSON.stringify(oldChild)
-						) {
+						} else if (!isEqual(newChild, oldChild)) {
 							// 如果是一样的标签和一样的类型，则比较属性和子节点
 							if (
 								typeof newChild !== 'string' &&
@@ -385,6 +408,8 @@ export default class Producer extends EventEmitter2 {
 										newAttributes,
 									),
 								);
+								// 过滤掉正在渲染的卡片，不再遍历子节点
+								if (this.isLoadingCard(newChild)) continue;
 								// 比较子节点
 								ops.push(
 									...this.handleChildren(
@@ -522,6 +547,7 @@ export default class Producer extends EventEmitter2 {
 				),
 			);
 		}
+		if (this.isLoadingCard(newJson)) return ops;
 		// 2. 子节点变更
 		const newChildren = newJson.slice(2);
 		const oldChildren = oldValue.children;

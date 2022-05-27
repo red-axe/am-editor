@@ -82,9 +82,10 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		// 监听操作
 		doc.on('op', (op, clientId) => {
 			if (this.clientId !== clientId.toString()) {
-				if (op.length > 0) {
-					this.apply(op);
-					this.engine.history.handleRemoteOps(op);
+				const ops = filterOperations(op);
+				if (ops.length > 0) {
+					this.apply(ops);
+					this.engine.history.handleRemoteOps(ops);
 				}
 			}
 		});
