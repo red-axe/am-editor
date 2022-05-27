@@ -1055,11 +1055,32 @@ class Inline implements InlineModelInterface {
 				.shrinkToElementNode()
 				.createSelection();
 			const inlines = this.findInlines(node);
+			const applyInlines: NodeInterface[] = [];
 			inlines.forEach((inline) => {
 				if (inline.isCard()) return;
-				this.flat(inline);
+				const newInline = this.flat(inline);
+				if (newInline) applyInlines.push(newInline);
 			});
 			selection.move();
+			const nodeApi = this.editor.node;
+			applyInlines.forEach((inline) => {
+				const prev = inline.prev()?.prev();
+				const next = inline.next()?.next();
+				if (
+					prev &&
+					nodeApi.isMark(prev) &&
+					prev.get<Element>()!.childNodes.length === 0
+				) {
+					prev.remove();
+				}
+				if (
+					next &&
+					nodeApi.isMark(next) &&
+					next.get<Element>()!.childNodes.length === 0
+				) {
+					next.remove();
+				}
+			});
 			return;
 		}
 		if (node.isCard()) return;
