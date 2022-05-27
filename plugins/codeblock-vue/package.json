@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-codeblock-vue",
-  "version": "2.9.6",
+  "version": "2.9.7",
   "description": "代码块 Vue",
   "keywords": [
     "codeblock",
@@ -28,7 +28,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.9.6",
+    "@aomao/engine": "^2.9.7",
     "@babel/runtime": "^7.13.10",
     "ant-design-vue": "^2.2.6",
     "codemirror": "^5.60.0",
