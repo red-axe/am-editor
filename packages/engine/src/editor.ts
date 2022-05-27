@@ -325,8 +325,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 					);
 					return { html, text };
 				}
-			}
-			return;
+			} else if (!compnoent?.isEditable) return;
 		}
 		const { node, list } = this;
 		// 修复自定义列表选择范围
