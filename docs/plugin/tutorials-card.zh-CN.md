@@ -1471,18 +1471,6 @@ beforeRender(): void
 didRender(): void;
 ```
 
-### `updateBackgroundSelection`
-
-更新可编辑器卡片协同选择区域
-
-```ts
-/**
- * 更新可编辑器卡片协同选择区域
- * @param range 光标
- */
-updateBackgroundSelection?(range: RangeInterface): void;
-```
-
 ### `drawBackground`
 
 渲染可编辑器卡片协同选择区域

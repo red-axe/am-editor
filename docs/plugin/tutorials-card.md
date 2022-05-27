@@ -1425,18 +1425,6 @@ Triggered after the card is successfully rendered
 didRender(): void;
 ```
 
-### `updateBackgroundSelection`
-
-Update the editable card collaborative selection area
-
-```ts
-/**
- * Update the editable card collaborative selection area
- * @param range cursor
- */
-updateBackgroundSelection?(range: RangeInterface): void;
-```
-
 ### `drawBackground`
 
 Render the editable card collaborative selection area
