@@ -288,11 +288,12 @@ class NativeEvent {
 					focusOffset: selection.focusOffset,
 			  }
 			: null;
-		change.onSelect();
 		if (selection && selection.anchorNode) {
 			const range = Range.from(this.engine, selection)!;
 			// 不在编辑器内不处理
 			if (!range.commonAncestorNode.inEditor(container)) return;
+
+			change.onSelect();
 			// 判断当前光标是否包含卡片或者在卡片内部
 			let containsCard =
 				range.containsCard() ||

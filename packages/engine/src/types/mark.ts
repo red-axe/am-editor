@@ -96,6 +96,11 @@ export interface MarkModelInterface {
 	 */
 	merge(range?: RangeInterface): void;
 	/**
+	 * 合并mark样式
+	 * @param marks
+	 */
+	mergeMarks(marks: Array<NodeInterface>): void;
+	/**
 	 * 光标处插入mark标签
 	 * @param mark mark标签
 	 * @param range 指定光标，默认为编辑器选中的光标

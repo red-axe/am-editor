@@ -47,6 +47,7 @@ export default class<
 	#isRevoke: boolean = false;
 	#isPreview: boolean = false;
 	#isApply: boolean = false;
+	#isCreateting: boolean = false;
 	#previewAwating?: (value: boolean) => void;
 
 	static get pluginName() {
@@ -70,22 +71,13 @@ export default class<
 		const globals: Array<SchemaGlobal> = [];
 		const optionKeys = this.options?.keys || [];
 		optionKeys.forEach((key) => {
-			globals.push(
-				{
-					type: 'block',
-					attributes: {
-						[this.getIdName(key)]: '*',
-						[this.MARK_KEY]: key,
-					},
+			globals.push({
+				type: 'mark',
+				attributes: {
+					[this.getIdName(key)]: '*',
+					[this.MARK_KEY]: key,
 				},
-				{
-					type: 'inline',
-					attributes: {
-						[this.getIdName(key)]: '*',
-						[this.MARK_KEY]: key,
-					},
-				},
-			);
+			});
 		});
 		this.editor.schema.add(globals);
 		this.editor.on('beforeCommandExecute', this.onBeforeCommandExecute);
@@ -343,6 +335,7 @@ export default class<
 					text += subRange.getText();
 				}
 			});
+			this.#isCreateting = true;
 			this.#isPreview = true;
 			return text;
 		}
@@ -444,6 +437,7 @@ export default class<
 				}
 			});
 		this.#isApply = true;
+		this.#isCreateting = false;
 	}
 	/**
 	 * 遗弃预览项
@@ -459,6 +453,7 @@ export default class<
 				.find(`[${this.getPreviewName(key)}]`)
 				.toArray();
 		//遍历预览节点
+		const mergeMarks: NodeInterface[] = [];
 		elements.forEach((markNode) => {
 			const mark = $(markNode);
 			//获取旧id传
@@ -478,10 +473,16 @@ export default class<
 			} else {
 				//移除预览样式
 				mark.removeAttributes(this.getPreviewName(key));
+				mergeMarks.push(mark);
 			}
 		});
 		if (!id && elements.length > 0 && isEngine(this.editor)) {
 			this.#isRevoke = true;
+			this.#isCreateting = false;
+			if (mergeMarks.length > 0) {
+				// 合并
+				this.editor.mark.mergeMarks(mergeMarks);
+			}
 		}
 	}
 	/**
@@ -628,6 +629,24 @@ export default class<
 
 		this.triggerChange();
 
+		const keys = this.options.keys;
+		for (let k = 0; k < keys.length; k++) {
+			const key = keys[k];
+			const name = this.getPreviewName(key);
+			const { startNode, endNode, commonAncestorNode } = range;
+			const parent = commonAncestorNode.parent();
+			if (
+				this.#isCreateting &&
+				(startNode.attributes(name) ||
+					endNode.attributes(name) ||
+					commonAncestorNode.attributes(name) ||
+					!range.commonAncestorNode.inEditor() ||
+					parent?.attributes(name))
+			) {
+				this.range = range;
+				return;
+			}
+		}
 		const selectInfo = this.getSelectInfo(range, true);
 		this.editor.trigger(`${PLUGIN_NAME}:select`, range, selectInfo);
 		this.range = range;

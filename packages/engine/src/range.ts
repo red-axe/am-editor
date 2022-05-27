@@ -522,6 +522,7 @@ class Range implements RangeInterface {
 				ranges.push(docRange);
 			}
 		});
+		if (ranges.length === 0) ranges.push(this);
 		return ranges;
 	};
 
