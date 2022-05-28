@@ -501,7 +501,12 @@ class NativeEvent {
 				this.paste(source);
 				const markdown = this.engine.options.markdown || {};
 				if (markdown.mode !== false) {
-					if (!markdown.check) {
+					// 单独的链接不做解析，由 paste:each 触发执行
+					if (
+						!markdown.check &&
+						text &&
+						!/^https?:\/\/\S+$/i.test(text.trim())
+					) {
 						if (!text) return;
 						// 没有 html，直接转换 markdown
 						if (!html) {
@@ -579,7 +584,7 @@ class NativeEvent {
 								pasteMarkdown(text);
 							}, 0);
 						}
-					} else {
+					} else if (markdown.check) {
 						markdown
 							.check(text ?? '', html ?? '')
 							.then((result) => {

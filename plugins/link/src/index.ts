@@ -51,7 +51,8 @@ export default class<
 			this.toolbar = new Toolbar(editor, {
 				onConfirm: this.options.onConfirm,
 			});
-			this.editor.on('markdown-it', this.markdownIt);
+			editor.on('markdown-it', this.markdownIt);
+			editor.on('paste:each', this.pasteHtml);
 		}
 		editor.on('parse:html', this.parseHtml);
 		editor.on('select', this.bindQuery);
@@ -125,6 +126,25 @@ export default class<
 		}
 	};
 
+	pasteHtml = (child: NodeInterface) => {
+		if (child.isText()) {
+			const text = child.text();
+			const { node, inline } = this.editor;
+			if (
+				/^https?:\/\/\S+$/.test(text.toLowerCase().trim()) &&
+				inline.closest(child).equal(child)
+			) {
+				const newNode = node.wrap(
+					child,
+					$(`<${this.tagName} target="_blank" href="${text}"></a>`),
+				);
+				inline.repairCursor(newNode);
+				return false;
+			}
+		}
+		return true;
+	};
+
 	parseHtml = (root: NodeInterface) => {
 		root.find(this.tagName).css({
 			'font-size': 'inherit',
@@ -136,8 +156,10 @@ export default class<
 	};
 
 	destroy(): void {
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('select', this.bindQuery);
-		this.editor.off('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		editor.off('paste:each', this.pasteHtml);
+		editor.off('parse:html', this.parseHtml);
+		editor.off('select', this.bindQuery);
+		editor.off('markdown-it', this.markdownIt);
 	}
 }
