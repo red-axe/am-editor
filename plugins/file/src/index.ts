@@ -17,16 +17,20 @@ import type { FileUploaderOptions } from './uploader';
 import locales from './locales';
 import { FileOptions, FileValue } from './types';
 
+const PARSE_HTML = 'parse:html';
+const PASTE_SCHEMA = 'paste:schema';
+const PASTE_EACH = 'paste:each';
 export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'file';
 	}
 
 	init() {
-		this.editor.language.add(locales);
-		this.editor.on('parse:html', this.parseHtml);
-		this.editor.on('paste:each', this.pasteHtml);
-		this.editor.on('paste:schema', this.pasteSchema);
+		const editor = this.editor;
+		editor.language.add(locales);
+		editor.on(PARSE_HTML, this.parseHtml);
+		editor.on(PASTE_EACH, this.pasteHtml);
+		editor.on(PASTE_SCHEMA, this.pasteSchema);
 	}
 
 	execute(
@@ -130,14 +134,15 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 	};
 
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (node.isElement()) {
 			const type = node.attributes('data-type');
 			if (type === FileComponent.cardName) {
 				const value = node.attributes('data-value');
 				const cardValue = decodeCardValue(value);
 				if (!cardValue.url) return;
-				this.editor.card.replaceNode(
+				editor.card.replaceNode(
 					node,
 					FileComponent.cardName,
 					cardValue,
@@ -187,9 +192,10 @@ export default class<T extends FileOptions = FileOptions> extends Plugin<T> {
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('paste:each', this.pasteHtml);
-		this.editor.off('paste:schema', this.pasteSchema);
+		const editor = this.editor;
+		editor.off(PARSE_HTML, this.parseHtml);
+		editor.off(PASTE_EACH, this.pasteHtml);
+		editor.off(PASTE_SCHEMA, this.pasteSchema);
 	}
 }
 

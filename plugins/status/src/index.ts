@@ -15,6 +15,10 @@ import StatusComponent, { StatusValue } from './components';
 import locales from './locales';
 import { StatusOptions } from './types';
 
+const PARSE_HTML = 'parse:html';
+const PASTE_EACH = 'paste:each';
+const PASTE_SCHEMA = 'paste:schema';
+
 export default class<
 	T extends StatusOptions = StatusOptions,
 > extends Plugin<T> {
@@ -23,15 +27,17 @@ export default class<
 	}
 
 	init() {
-		this.editor.language.add(locales);
-		this.editor.on('parse:html', this.parseHtml);
-		this.editor.on('paste:each', this.pasteHtml);
-		this.editor.on('paste:schema', this.pasteSchema);
+		const editor = this.editor;
+		editor.language.add(locales);
+		editor.on(PARSE_HTML, this.parseHtml);
+		editor.on(PASTE_EACH, this.pasteHtml);
+		editor.on(PASTE_SCHEMA, this.pasteSchema);
 	}
 
 	execute() {
-		if (!isEngine(this.editor)) return;
-		const { card } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { card } = editor;
 		const component = card.insert<
 			StatusValue,
 			StatusComponent<StatusValue>
@@ -61,14 +67,15 @@ export default class<
 	};
 
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (node.isElement()) {
 			const attributes = node.attributes();
 			const type = attributes['data-type'];
 			if (type && type === StatusComponent.cardName) {
 				const value = attributes['data-value'];
 				const cardValue = decodeCardValue<StatusValue>(value);
-				this.editor.card.replaceNode(
+				editor.card.replaceNode(
 					node,
 					StatusComponent.cardName,
 					cardValue,
@@ -84,12 +91,13 @@ export default class<
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: StatusValue) => NodeInterface,
 	) => {
+		const editor = this.editor;
 		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${StatusComponent.cardName}"],[${READY_CARD_KEY}="${StatusComponent.cardName}"]`,
 		).each((statusNode) => {
 			const node = $(statusNode);
-			const card = this.editor.card.find<StatusValue>(node);
+			const card = editor.card.find<StatusValue>(node);
 			const value =
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
@@ -102,7 +110,7 @@ export default class<
 				let wrapNode = rootWrapNode.first()!;
 				marks.forEach((mark) => {
 					const outerNode = $(mark);
-					wrapNode = this.editor.node.wrap(wrapNode, outerNode);
+					wrapNode = editor.node.wrap(wrapNode, outerNode);
 				});
 				node.empty();
 				let newNode = $(html);
@@ -128,9 +136,10 @@ export default class<
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('paste:each', this.pasteHtml);
-		this.editor.off('paste:schema', this.pasteSchema);
+		const editor = this.editor;
+		editor.off(PARSE_HTML, this.parseHtml);
+		editor.off(PASTE_EACH, this.pasteHtml);
+		editor.off(PASTE_SCHEMA, this.pasteSchema);
 	}
 }
 export { StatusComponent };

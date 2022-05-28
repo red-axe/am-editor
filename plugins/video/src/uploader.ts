@@ -103,6 +103,9 @@ export interface VideoUploaderOptions extends PluginOptions {
 	};
 }
 
+const DROP_FILES = 'drop:files';
+const PASTE_EVENT = 'paste:event';
+const PASTE_EACH = 'paste:each';
 export default class<
 	T extends VideoUploaderOptions = VideoUploaderOptions,
 > extends Plugin<T> {
@@ -116,10 +119,11 @@ export default class<
 	extensionNames: string[] | Record<string, string> = { mp4: 'video/mp4' };
 
 	init() {
-		if (isEngine(this.editor)) {
-			this.editor.on('drop:files', this.dropFiles);
-			this.editor.on('paste:event', this.pasteFiles);
-			this.editor.on('paste:each', this.pasteEach);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.on(DROP_FILES, this.dropFiles);
+			editor.on(PASTE_EVENT, this.pasteFiles);
+			editor.on(PASTE_EACH, this.pasteEach);
 		}
 		let { accept } = this.options.file || {};
 		if (typeof accept === 'string') accept = accept.split(',');
@@ -152,7 +156,8 @@ export default class<
 			}
 			return;
 		}
-		const { request, card, language } = this.editor;
+		const editor = this.editor;
+		const { request, card, language } = editor;
 		const {
 			action,
 			data,
@@ -192,7 +197,7 @@ export default class<
 				headers,
 				onBefore: (file) => {
 					if (file.size > limitSize) {
-						this.editor.messageError(
+						editor.messageError(
 							'upload-limit',
 							language
 								.get('video', 'uploadLimitError')
@@ -208,7 +213,7 @@ export default class<
 				},
 				onReady: (fileInfo) => {
 					if (
-						!isEngine(this.editor) ||
+						!isEngine(editor) ||
 						!!this.cardComponents[fileInfo.uid]
 					)
 						return;
@@ -338,7 +343,7 @@ export default class<
 							message:
 								typeof result.data === 'string'
 									? result.data
-									: this.editor.language.get<string>(
+									: language.get<string>(
 											'video',
 											'uploadError',
 									  ),
@@ -346,7 +351,7 @@ export default class<
 					}
 					//成功
 					else {
-						this.editor.card.update<VideoValue>(
+						editor.card.update<VideoValue>(
 							component.id,
 							typeof result.data === 'string'
 								? { url: result.data }
@@ -366,10 +371,7 @@ export default class<
 						status: 'error',
 						message:
 							error.message ||
-							this.editor.language.get<string>(
-								'video',
-								'uploadError',
-							),
+							language.get<string>('video', 'uploadError'),
 					});
 					delete this.cardComponents[file.uid || ''];
 				},
@@ -391,7 +393,7 @@ export default class<
 		}) => void,
 		failed: (message: string) => void = () => {},
 	) {
-		const { request } = this.editor;
+		const { request, language } = this.editor;
 
 		const { query, parse } = this.options;
 		if (!query || !video_id) return success();
@@ -420,8 +422,7 @@ export default class<
 					const result = parse ? parse(response) : response;
 					if (result.result === false) {
 						failed(
-							result.data ||
-								this.editor.language.get('video', 'loadError'),
+							result.data || language.get('video', 'loadError'),
 						);
 					} else
 						success({
@@ -434,28 +435,27 @@ export default class<
 				}
 			},
 			error: (error) => {
-				failed(
-					error.message ||
-						this.editor.language.get('video', 'loadError'),
-				);
+				failed(error.message || language.get('video', 'loadError'));
 			},
 			method: 'GET',
 		});
 	}
 
 	dropFiles = (files: File[]) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		files = files.filter((file) => this.isVideo(file));
 		if (files.length === 0) return;
-		this.editor.command.execute('video-uploader', files);
+		editor.command.execute('video-uploader', files);
 		return false;
 	};
 
 	pasteFiles = ({ files }: Record<'files', File[]>) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		files = files.filter((file) => this.isVideo(file));
 		if (files.length === 0) return;
-		this.editor.command.execute(
+		editor.command.execute(
 			'video-uploader',
 			files.filter((file) => this.isVideo(file)),
 			files,
@@ -485,10 +485,9 @@ export default class<
 	};
 
 	destroy() {
-		if (isEngine(this.editor)) {
-			this.editor.off('drop:files', this.dropFiles);
-			this.editor.off('paste:event', this.pasteFiles);
-			this.editor.off('paste:each', this.pasteEach);
-		}
+		const editor = this.editor;
+		editor.off(DROP_FILES, this.dropFiles);
+		editor.off(PASTE_EVENT, this.pasteFiles);
+		editor.off(PASTE_EACH, this.pasteEach);
 	}
 }

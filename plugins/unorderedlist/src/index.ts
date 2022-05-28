@@ -14,6 +14,7 @@ export interface UnorderedlistOptions extends PluginOptions {
 	markdown?: boolean;
 }
 
+const MARKDOWN_IT = 'markdown-it';
 export default class<
 	T extends UnorderedlistOptions = UnorderedlistOptions,
 > extends ListPlugin<T> {
@@ -35,8 +36,9 @@ export default class<
 
 	init() {
 		super.init();
-		if (isEngine(this.editor)) {
-			this.editor.on('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.on(MARKDOWN_IT, this.markdownIt);
 		}
 	}
 
@@ -64,8 +66,9 @@ export default class<
 	}
 
 	execute() {
-		if (!isEngine(this.editor)) return;
-		const { change, list, block } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, list, block } = editor;
 		list.split();
 		const range = change.range.get();
 		const activeBlocks = block.findBlocks(range);
@@ -93,8 +96,6 @@ export default class<
 	};
 
 	destroy(): void {
-		if (isEngine(this.editor)) {
-			this.editor.off('markdown-it', this.markdownIt);
-		}
+		this.editor.off(MARKDOWN_IT, this.markdownIt);
 	}
 }

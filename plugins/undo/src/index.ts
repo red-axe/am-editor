@@ -9,13 +9,15 @@ export default class<T extends UndoOptions = UndoOptions> extends Plugin<T> {
 	}
 
 	execute() {
-		if (!isEngine(this.editor)) return;
-		if (!this.editor.readonly) this.editor.history.undo();
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		if (!editor.readonly) editor.history.undo();
 	}
 
 	queryState() {
-		if (!isEngine(this.editor) || this.editor.readonly) return;
-		return this.editor.history.hasUndo();
+		const editor = this.editor;
+		if (!isEngine(editor) || editor.readonly) return;
+		return editor.history.hasUndo();
 	}
 
 	hotkey() {

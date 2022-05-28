@@ -38,8 +38,9 @@ class PluginModel implements PluginModelInterface {
 	add(clazz: PluginEntry, options?: PluginOptions) {
 		this.data[clazz.pluginName] = clazz;
 		options = { ...options };
-		if (isEngine(this.editor)) {
-			const plugin = new clazz(this.editor, options);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			const plugin = new clazz(editor, options);
 			if (plugin.init) plugin.init();
 			this.components[clazz.pluginName] = plugin;
 		}

@@ -90,8 +90,9 @@ class Checkbox<V extends CheckboxValue = CheckboxValue> extends Card<V> {
 		} else {
 			this.#container = this.getCenter().first()!;
 		}
+		const editor = this.editor;
 		this.update(!value?.checked);
-		if (!isEngine(this.editor) || this.editor.readonly) {
+		if (!isEngine(editor) || editor.readonly) {
 			return;
 		}
 		this.#container.on('mousedown', this.onClick);

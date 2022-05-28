@@ -94,14 +94,15 @@ class TableComponent<V extends TableValue = TableValue>
 
 	init() {
 		super.init();
-		if (isEngine(this.editor)) {
+		const editor = this.editor;
+		if (isEngine(editor)) {
 			// tab 键选择
-			if (!this.editor.event.listeners['keydown:tab'])
-				this.editor.event.listeners['keydown:tab'] = [];
-			this.editor.event.listeners['keydown:tab'].unshift(
+			if (!editor.event.listeners['keydown:tab'])
+				editor.event.listeners['keydown:tab'] = [];
+			editor.event.listeners['keydown:tab'].unshift(
 				(event: KeyboardEvent) => {
-					if (!isEngine(this.editor) || this.editor.readonly) return;
-					const { change, block, node, card } = this.editor;
+					if (!isEngine(editor) || editor.readonly) return;
+					const { change, block, node, card } = editor;
 
 					const range = change.range.get();
 					const td = range.endNode.closest('td');
@@ -146,9 +147,9 @@ class TableComponent<V extends TableValue = TableValue>
 				},
 			);
 			// 下键选择
-			this.editor.on('keydown:down', (event) => {
-				if (!isEngine(this.editor) || this.editor.readonly) return;
-				const { change, card } = this.editor;
+			editor.on('keydown:down', (event) => {
+				if (!isEngine(editor) || editor.readonly) return;
+				const { change, card } = editor;
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
@@ -214,9 +215,9 @@ class TableComponent<V extends TableValue = TableValue>
 				return;
 			});
 			// 上键选择
-			this.editor.on('keydown:up', (event) => {
-				if (!isEngine(this.editor) || this.editor.readonly) return;
-				const { change, card } = this.editor;
+			editor.on('keydown:up', (event) => {
+				if (!isEngine(editor) || editor.readonly) return;
+				const { change, card } = editor;
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
@@ -281,9 +282,9 @@ class TableComponent<V extends TableValue = TableValue>
 				return;
 			});
 			// 左键选择
-			this.editor.on('keydown:left', () => {
-				if (!isEngine(this.editor) || this.editor.readonly) return;
-				const { change, card } = this.editor;
+			editor.on('keydown:left', () => {
+				if (!isEngine(editor) || editor.readonly) return;
+				const { change, card } = editor;
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
@@ -299,9 +300,9 @@ class TableComponent<V extends TableValue = TableValue>
 				}
 			});
 			// 右键选择
-			this.editor.on('keydown:right', () => {
-				if (!isEngine(this.editor) || this.editor.readonly) return;
-				const { change, card } = this.editor;
+			editor.on('keydown:right', () => {
+				if (!isEngine(editor) || editor.readonly) return;
+				const { change, card } = editor;
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
@@ -318,7 +319,7 @@ class TableComponent<V extends TableValue = TableValue>
 			});
 		}
 		if (this.colorTool) return;
-		this.colorTool = new ColorTool(this.editor, this.id, {
+		this.colorTool = new ColorTool(editor, this.id, {
 			colors: TableComponent.colors,
 			defaultColor: super.getValue()?.color,
 			onChange: (color: string) => {
@@ -335,24 +336,25 @@ class TableComponent<V extends TableValue = TableValue>
 	};
 
 	toolbar(): (ToolbarItemOptions | CardToolbarItemOptions)[] {
+		const editor = this.editor;
 		const getItems = (): (
 			| ToolbarItemOptions
 			| CardToolbarItemOptions
 		)[] => {
-			if (!isEngine(this.editor) || this.editor.readonly)
+			if (!isEngine(editor) || editor.readonly)
 				return [
 					{
 						key: 'maximize',
 						type: 'maximize',
 					},
 				];
-			const language = this.editor.language.get('table');
+			const language = editor.language.get('table');
 			const funBtns: Array<ToolbarItemOptions | CardToolbarItemOptions> =
 				[
 					{
 						key: 'color',
 						type: 'node',
-						title: this.editor.language.get<string>(
+						title: editor.language.get<string>(
 							'table',
 							'color',
 							'title',
@@ -460,12 +462,9 @@ class TableComponent<V extends TableValue = TableValue>
 						type: 'copy',
 						onClick: () => {
 							this.command.copy(true);
-							this.editor.messageSuccess(
+							editor.messageSuccess(
 								'copy',
-								this.editor.language.get<string>(
-									'copy',
-									'success',
-								),
+								editor.language.get<string>('copy', 'success'),
 							);
 						},
 					},
@@ -488,7 +487,7 @@ class TableComponent<V extends TableValue = TableValue>
 			return toolbars;
 		};
 		const options =
-			this.editor.plugin.findPlugin<TableOptions>('table')?.options;
+			editor.plugin.findPlugin<TableOptions>('table')?.options;
 		if (options?.cardToolbars) {
 			return options.cardToolbars(getItems());
 		}
@@ -577,18 +576,19 @@ class TableComponent<V extends TableValue = TableValue>
 		if (!tableRoot) return value;
 		const { tableModel } = this.selection;
 		if (!tableModel) return value;
-		const { schema, conversion } = this.editor;
+		const editor = this.editor;
+		const { schema, conversion } = editor;
 		const container = $('<div></div>');
 		container.append(tableRoot.clone(true));
-		const parser = new Parser(container, this.editor, (node) => {
+		const parser = new Parser(container, editor, (node) => {
 			node.find(Template.TABLE_TD_BG_CLASS).remove();
 			node.find(EDITABLE_SELECTOR).each((root) => {
-				this.editor.node.unwrap($(root));
+				editor.node.unwrap($(root));
 			});
 		});
 		const { rows, cols, height, width } = tableModel;
 		const html = parser.toValue(schema, conversion, false, false);
-		if (!isEngine(this.editor)) return { ...value, html };
+		if (!isEngine(editor)) return { ...value, html };
 		return {
 			...value,
 			rows,
@@ -650,25 +650,23 @@ class TableComponent<V extends TableValue = TableValue>
 	}
 
 	handleChange = (trigger: 'remote' | 'local' = 'local') => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		this.conltrollBar.refresh();
 		this.selection.render('change');
 		const oldValue = super.getValue();
 		if (oldValue?.noBorder) {
 			this.noBorderToolButton?.addClass('active');
 		} else this.noBorderToolButton?.removeClass('active');
-		if (trigger === 'local' && isEngine(this.editor)) {
+		if (trigger === 'local' && isEngine(editor)) {
 			const value = this.getValue();
 			if (value) this.setValue(value);
 		}
 	};
 
 	onChange = (trigger: 'remote' | 'local' = 'local') => {
-		if (
-			isEngine(this.editor) &&
-			trigger === 'local' &&
-			this.editor.ot.isStopped()
-		)
+		const editor = this.editor;
+		if (isEngine(editor) && trigger === 'local' && editor.ot.isStopped())
 			return;
 		if (this.#changeTimeout) clearTimeout(this.#changeTimeout);
 		this.#changeTimeout = setTimeout(() => {
@@ -733,20 +731,20 @@ class TableComponent<V extends TableValue = TableValue>
 
 	didRender() {
 		super.didRender();
-		this.editor.on('undo', this.doChange);
-		this.editor.on('redo', this.doChange);
-		this.viewport = isEngine(this.editor)
+		const editor = this.editor;
+		editor.on('undo', this.doChange);
+		editor.on('redo', this.doChange);
+		this.viewport = isEngine(editor)
 			? this.wrapper?.find(Template.VIEWPORT)
 			: this.wrapper?.find(Template.VIEWPORT_READER);
 
 		this.selection.init();
 		this.conltrollBar.init();
 		this.command.init();
-		if (!isEngine(this.editor) || this.editor.readonly)
+		if (!isEngine(editor) || editor.readonly)
 			this.toolbarModel?.setOffset([0, 0]);
 		else this.toolbarModel?.setOffset([13, -28, 0, -6]);
-		const tablePlugin =
-			this.editor.plugin.findPlugin<TableOptions>('table');
+		const tablePlugin = editor.plugin.findPlugin<TableOptions>('table');
 		const tableOptions = tablePlugin?.options.overflow || {};
 		if (this.viewport) {
 			this.selection.refreshModel();
@@ -760,9 +758,9 @@ class TableComponent<V extends TableValue = TableValue>
 								`-${x > max ? max : x}px`,
 							);
 							if (x > 0) {
-								this.editor.root.find('.data-card-dnd').hide();
+								editor.root.find('.data-card-dnd').hide();
 							} else {
-								this.editor.root.find('.data-card-dnd').show();
+								editor.root.find('.data-card-dnd').show();
 							}
 							return x - max;
 						},
@@ -816,8 +814,8 @@ class TableComponent<V extends TableValue = TableValue>
 				if (tableOptions['maxRightWidth'])
 					this.overflow(tableOptions['maxRightWidth']());
 
-				if (isEngine(this.editor)) {
-					this.editor.trigger('scroll', this.root, { x, y });
+				if (isEngine(editor)) {
+					editor.trigger('scroll', this.root, { x, y });
 					this.conltrollBar.refresh();
 				}
 			};
@@ -825,13 +823,13 @@ class TableComponent<V extends TableValue = TableValue>
 			if (!isMobile)
 				window.addEventListener('scroll', this.updateScrollbar);
 			window.addEventListener('resize', this.updateScrollbar);
-			if (isEngine(this.editor) && !isMobile) {
-				this.editor.scrollNode?.on('scroll', this.updateScrollbar);
+			if (isEngine(editor) && !isMobile) {
+				editor.scrollNode?.on('scroll', this.updateScrollbar);
 			}
 		}
 		this.selection.on('select', () => {
 			this.conltrollBar.refresh(false);
-			if (!isEngine(this.editor)) return;
+			if (!isEngine(editor)) return;
 			const align = this.selection.getSingleCell()?.css('vertical-align');
 			this.updateAlignText(align as any);
 			this.toolbarModel?.update();
@@ -844,15 +842,15 @@ class TableComponent<V extends TableValue = TableValue>
 		});
 		this.conltrollBar.on('sizeChanging', () => {
 			this.scrollbar?.refresh();
-			this.editor.trigger('editor:resize');
+			editor.trigger('editor:resize');
 			this.updateScrollbar();
 		});
 		this.command.on('actioned', (action, silence) => {
 			if (action === 'paste') {
-				this.editor.card.render(this.wrapper);
+				editor.card.render(this.wrapper);
 			}
 			if (['splitCell', 'mergeCell'].includes(action)) {
-				this.editor.trigger('editor:resize');
+				editor.trigger('editor:resize');
 			}
 			this.selection.render(action);
 			this.toolbarModel?.update();
@@ -869,7 +867,7 @@ class TableComponent<V extends TableValue = TableValue>
 		const value = super.getValue();
 		if (!value?.html) {
 			const tableValue = this.getValue();
-			if (tableValue && isEngine(this.editor)) this.setValue(tableValue);
+			if (tableValue && isEngine(editor)) this.setValue(tableValue);
 			this.onChange();
 		}
 		if (tableOptions.maxRightWidth)
@@ -962,8 +960,8 @@ class TableComponent<V extends TableValue = TableValue>
 	}
 
 	render() {
-		this.template.isReadonly =
-			!isEngine(this.editor) || this.editor.readonly;
+		const editor = this.editor;
+		this.template.isReadonly = !isEngine(editor) || editor.readonly;
 		// 重新渲染
 		if (
 			this.wrapper &&
@@ -992,15 +990,15 @@ class TableComponent<V extends TableValue = TableValue>
 			value.cols = model.cols;
 		}
 		//渲染卡片
-		this.wrapper = isEngine(this.editor)
+		this.wrapper = isEngine(editor)
 			? $(
 					this.template.htmlEdit(
 						value,
-						menuData(this.editor.language.get('table')),
+						menuData(editor.language.get('table')),
 					),
 			  )
 			: $(this.template.htmlView(value));
-		if (!isEngine(this.editor)) {
+		if (!isEngine(editor)) {
 			this.wrapper
 				.find('table')
 				.addClass('data-table')
@@ -1016,12 +1014,15 @@ class TableComponent<V extends TableValue = TableValue>
 		super.destroy();
 		this.scrollbar?.destroy();
 		this.command.removeAllListeners();
-		this.selection.removeAllListeners();
-		this.selection.destroy();
-		this.conltrollBar.removeAllListeners();
-		this.conltrollBar.destroy();
-		this.editor.off('undo', this.doChange);
-		this.editor.off('redo', this.doChange);
+		const selection = this.selection;
+		selection.removeAllListeners();
+		selection.destroy();
+		const bar = this.conltrollBar;
+		bar.removeAllListeners();
+		bar.destroy();
+		const editor = this.editor;
+		editor.off('undo', this.doChange);
+		editor.off('redo', this.doChange);
 	}
 }
 

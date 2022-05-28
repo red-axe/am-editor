@@ -23,25 +23,25 @@ class Command implements CommandInterface {
 	 * @returns
 	 */
 	queryEnabled(name: string) {
+		const editor = this.editor;
 		// 没有插件
-		const plugin = this.editor.plugin.components[name];
+		const plugin = editor.plugin.components[name];
 		if (!plugin || plugin.disabled) return false;
 		// 只读状态下，如果插件没有指定为非禁用，一律禁用
 		if (
-			(!isEngine(this.editor) ||
-				this.editor.readonly ||
-				!this.editor.isFocus()) &&
+			(!isEngine(editor) || editor.readonly || !editor.isFocus()) &&
 			plugin.disabled !== false
 		)
 			return false;
+		const cardApi = editor.card;
 		// 当前激活非可编辑卡片时全部禁用
-		if (this.editor.card.active) {
+		if (cardApi.active) {
 			if (
 				(isMarkPlugin(plugin) || plugin.kind === 'plugin') &&
-				this.editor.card.active.executeMark
+				cardApi.active.executeMark
 			)
 				return true;
-			if (this.editor.card.active.isEditable) return true;
+			if (cardApi.active.isEditable) return true;
 			return false;
 		}
 		// TODO:查询当前所处位置的插件
@@ -55,12 +55,13 @@ class Command implements CommandInterface {
 	 * @returns
 	 */
 	queryState(name: string, ...args: any) {
-		const plugin = this.editor.plugin.components[name];
+		const editor = this.editor;
+		const plugin = editor.plugin.components[name];
 		if (plugin && plugin.queryState) {
 			try {
 				return plugin.queryState(args);
 			} catch (error: any) {
-				this.editor.messageError('command-query', error);
+				editor.messageError('command-query', error);
 			}
 		}
 	}
@@ -71,8 +72,9 @@ class Command implements CommandInterface {
 	 */
 	handleExecuteBefore() {
 		let change: ChangeInterface | undefined;
-		if (isEngine(this.editor)) {
-			change = this.editor.change;
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			change = editor.change;
 			const range = change.range.get();
 			if (
 				!range.commonAncestorNode.isRoot() &&
@@ -83,14 +85,14 @@ class Command implements CommandInterface {
 				if (uiElement.length > 0) {
 					const cardId = uiElement.attributes(TRIGGER_CARD_ID);
 					if (cardId) {
-						const { card } = this.editor;
+						const { card } = editor;
 						component = card.find(cardId);
 						if (component) {
 							card.select(component);
 						}
 					}
 				}
-				if (!component) this.editor.focus();
+				if (!component) editor.focus();
 			}
 			change.cacheRangeBeforeCommand();
 		}
@@ -104,18 +106,19 @@ class Command implements CommandInterface {
 	 * @returns
 	 */
 	execute(name: string, ...args: any) {
-		const plugin = this.editor.plugin.components[name];
+		const editor = this.editor;
+		const plugin = editor.plugin.components[name];
 		if (plugin && plugin.execute) {
 			const change = this.handleExecuteBefore();
-			this.editor.trigger('beforeCommandExecute', name, ...args);
+			editor.trigger('beforeCommandExecute', name, ...args);
 			try {
 				const result = plugin.execute(...args);
 				change?.combinText();
 				change?.onSelect();
-				this.editor.trigger('afterCommandExecute', name, ...args);
+				editor.trigger('afterCommandExecute', name, ...args);
 				return result;
 			} catch (error: any) {
-				this.editor.messageError('command-execute', error);
+				editor.messageError('command-execute', error);
 			}
 		}
 	}
@@ -128,17 +131,16 @@ class Command implements CommandInterface {
 	 * @returns
 	 */
 	executeMethod(name: string, method: string, ...args: any) {
-		const plugin = this.editor.plugin.components[name];
+		const editor = this.editor;
+		const plugin = editor.plugin.components[name];
 		if (plugin && plugin[method]) {
 			try {
-				const change = isEngine(this.editor)
-					? this.editor.change
-					: null;
+				const change = isEngine(editor) ? editor.change : null;
 				const result = plugin[method](...args);
 				change?.combinText();
 				return result;
 			} catch (error: any) {
-				this.editor.messageError('command-excute-method', error);
+				editor.messageError('command-excute-method', error);
 			}
 		}
 	}

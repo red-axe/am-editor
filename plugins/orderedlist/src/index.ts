@@ -35,8 +35,9 @@ export default class<
 
 	init() {
 		super.init();
-		if (isEngine(this.editor)) {
-			this.editor.on('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.on('markdown-it', this.markdownIt);
 		}
 	}
 
@@ -62,8 +63,9 @@ export default class<
 	}
 
 	execute(start: number = 1) {
-		if (!isEngine(this.editor)) return;
-		const { change, list, block } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, list, block } = editor;
 		list.split();
 		const range = change.range.get();
 		const activeBlocks = block.findBlocks(range);

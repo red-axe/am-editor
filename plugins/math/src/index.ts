@@ -19,6 +19,10 @@ import MathComponent, { MathValue } from './component';
 import locales from './locales';
 import { MathOptions } from './types';
 
+const PARSE_HTML = 'parse:html';
+const PASTE_SCHEMA = 'paste:schema';
+const PASTE_EACH = 'paste:each';
+
 export default class Math<
 	T extends MathOptions = MathOptions,
 > extends Plugin<T> {
@@ -31,10 +35,11 @@ export default class Math<
 	#request: Record<string, AjaxInterface> = {};
 
 	init() {
-		this.editor.language.add(locales);
-		this.editor.on('parse:html', this.parseHtml);
-		this.editor.on('paste:each', this.pasteHtml);
-		this.editor.on('paste:schema', this.pasteSchema);
+		const editor = this.editor;
+		editor.language.add(locales);
+		editor.on(PARSE_HTML, this.parseHtml);
+		editor.on(PASTE_EACH, this.pasteHtml);
+		editor.on(PASTE_SCHEMA, this.pasteSchema);
 	}
 
 	execute(...args: any): void {
@@ -66,7 +71,7 @@ export default class Math<
 		success: (url: string) => void,
 		failed: (message: string) => void,
 	) {
-		const { request } = this.editor;
+		const { request, language } = this.editor;
 		const { action, type, contentType, parse, headers } = this.options;
 		const data = this.options.data;
 		this.#request[key]?.abort();
@@ -116,10 +121,7 @@ export default class Math<
 				}
 			},
 			error: (error) => {
-				failed(
-					error.message ||
-						this.editor.language.get('image', 'uploadError'),
-				);
+				failed(error.message || language.get('image', 'uploadError'));
 			},
 		});
 	}
@@ -228,7 +230,8 @@ export default class Math<
 	};
 
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (node.isElement()) {
 			const attributes = node.attributes();
 			const type = attributes['data-type'];
@@ -236,7 +239,7 @@ export default class Math<
 				const value = attributes['data-value'];
 				const cardValue = decodeCardValue(value);
 				if (!cardValue.url) return;
-				this.editor.card.replaceNode(
+				editor.card.replaceNode(
 					node,
 					MathComponent.cardName,
 					cardValue,
@@ -287,9 +290,10 @@ export default class Math<
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('paste:each', this.pasteHtml);
-		this.editor.off('paste:schema', this.pasteSchema);
+		const editor = this.editor;
+		editor.off(PARSE_HTML, this.parseHtml);
+		editor.off(PASTE_EACH, this.pasteHtml);
+		editor.off(PASTE_SCHEMA, this.pasteSchema);
 	}
 }
 

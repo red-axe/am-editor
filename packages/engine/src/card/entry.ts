@@ -106,7 +106,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 	set type(type: CardType) {
 		if (!this.name || type === this.type) return;
 		// 替换后重新渲染
-		const { card } = this.editor;
+		const card = this.editor.card;
 		const attributesValues = this.root.attributes(CARD_VALUE_KEY);
 		const value = decodeCardValue(attributesValues || '{}');
 		const component = card.replace(this, this.name, {
@@ -134,7 +134,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		this._id = value.id;
 		value.type = type;
 		this.setValue(value);
-		this.defaultMaximize = new Maximize(this.editor, this);
+		this.defaultMaximize = new Maximize(editor, this);
 	}
 
 	init() {
@@ -142,13 +142,15 @@ abstract class CardEntry<T extends CardValue = CardValue>
 			CARD_EDITABLE_KEY,
 			this.isEditable ? 'true' : 'false',
 		);
-		this.toolbarModel?.hide();
-		this.toolbarModel?.destroy();
+		const toolbar = this.toolbarModel;
+		toolbar?.hide();
+		toolbar?.destroy();
+		const editor = this.editor;
 		if (this.toolbar) {
-			this.toolbarModel = new Toolbar(this.editor, this);
+			this.toolbarModel = new Toolbar(editor, this);
 		}
 		if (this.resize) {
-			this.resizeModel = new Resize(this.editor, this);
+			this.resizeModel = new Resize(editor, this);
 		}
 	}
 

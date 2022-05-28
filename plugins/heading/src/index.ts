@@ -54,26 +54,26 @@ export default class<
 
 	init() {
 		super.init();
-		//阅读模式处理
-		if (!isEngine(this.editor) && this.options.showAnchor !== false) {
-			this.editor.on('render', this.onRender);
-		}
-		if (isEngine(this.editor)) {
-			this.editor.on('keydown:backspace', this.onBackspace);
-			this.editor.on('markdown-it', this.markdownIt);
-		}
-		//引擎处理
-		if (!isEngine(this.editor) || this.options.showAnchor === false) return;
+		const editor = this.editor;
 
-		this.editor.on('setValue', this.updateId);
-		this.editor.on('realtimeChange', this.realtimeChange);
-		this.editor.on('select', this.showAnchor);
-		this.editor.on('blur', this.showAnchor);
-		window.addEventListener('resize', this.updateAnchorPosition);
+		if (isEngine(editor)) {
+			editor.on('keydown:backspace', this.onBackspace);
+			editor.on('markdown-it', this.markdownIt);
+			editor.on('setValue', this.updateId);
+			editor.on('realtimeChange', this.realtimeChange);
+			editor.on('select', this.showAnchor);
+			editor.on('blur', this.showAnchor);
+			window.addEventListener('resize', this.updateAnchorPosition);
+		} else {
+			//阅读模式处理
+			if (this.options.showAnchor === false) return;
+			editor.on('render', this.onRender);
+		}
 	}
 
 	onRender = (root: Node) => {
-		const { language } = this.editor;
+		const editor = this.editor;
+		const { language } = editor;
 		const container = $(root);
 		if (this.tagName.length === 0) return;
 		container.find(this.tagName.join(',')).each((heading) => {
@@ -107,13 +107,13 @@ export default class<
 						? this.options.anchorCopy(id)
 						: window.location.href + '/' + id;
 
-					if (this.editor.clipboard.copy(url)) {
-						this.editor.messageSuccess(
+					if (editor.clipboard.copy(url)) {
+						editor.messageSuccess(
 							'copy',
 							language.get('copy', 'success').toString(),
 						);
 					} else {
-						this.editor.messageError(
+						editor.messageError(
 							'copy',
 							language.get('copy', 'error').toString(),
 						);
@@ -148,8 +148,9 @@ export default class<
 	};
 
 	updateAnchorPosition = () => {
-		if (!isEngine(this.editor)) return;
-		const { change, root } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, root } = editor;
 		const button = root.find('.data-anchor-button');
 
 		if (button.length === 0) {
@@ -184,8 +185,9 @@ export default class<
 	};
 
 	showAnchor = () => {
-		if (!isEngine(this.editor) || this.tagName.length === 0) return;
-		const { change, root, clipboard, language, card } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor) || this.tagName.length === 0) return;
+		const { change, root, clipboard, language, card } = editor;
 		const range = change.range.get();
 		let button = root.find('.data-anchor-button');
 		const block = range.startNode.closest(this.tagName.join(','));
@@ -194,7 +196,7 @@ export default class<
 			block.length === 0 ||
 			(button.length > 0 &&
 				button.find('.data-icon-'.concat(block.name)).length === 0) ||
-			!this.editor.isFocus()
+			!editor.isFocus()
 		) {
 			button.remove();
 			Tooltip.hide();
@@ -203,7 +205,7 @@ export default class<
 		if (
 			block.length === 0 ||
 			card.closest(block, true) ||
-			!this.editor.isFocus()
+			!editor.isFocus()
 		) {
 			return;
 		}
@@ -262,12 +264,12 @@ export default class<
 				: window.location.href + '/' + id;
 
 			if (clipboard.copy(url)) {
-				this.editor!.messageSuccess(
+				editor!.messageSuccess(
 					'copy',
 					language.get('copy', 'success').toString(),
 				);
 			} else {
-				this.editor!.messageError(
+				editor!.messageError(
 					'copy',
 					language.get('copy', 'error').toString(),
 				);
@@ -276,20 +278,22 @@ export default class<
 	};
 
 	execute(type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p') {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (!type || type === this.queryState()) type = 'p';
 		const { enableTypes } = this.options;
 		// 未启用
 		if (type !== 'p' && enableTypes && enableTypes.indexOf(type) < 0)
 			return;
-		const { list, block } = this.editor;
+		const { list, block } = editor;
 		list.split();
 		block.setBlocks(`<${type} />`);
 	}
 
 	queryState() {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		const blocks = change.blocks;
 		if (blocks.length === 0) {
 			return '';
@@ -323,11 +327,12 @@ export default class<
 	};
 
 	onBackspace = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor)) return;
-		const { change, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, node } = editor;
 		const range = change.range.get();
 		if (!range.collapsed) return;
-		const blockApi = this.editor.block;
+		const blockApi = editor.block;
 		if (!blockApi.isFirstOffset(range, 'start')) return;
 		const block = blockApi.closest(range.startNode);
 
@@ -353,22 +358,18 @@ export default class<
 	};
 
 	destroy() {
-		//阅读模式处理
-		if (!isEngine(this.editor) && this.options.showAnchor !== false) {
-			this.editor.off('render', this.onRender);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.off('keydown:backspace', this.onBackspace);
+			editor.off('markdown-it', this.markdownIt);
+			editor.off('setValue', this.updateId);
+			editor.off('realtimeChange', this.realtimeChange);
+			editor.off('select', this.showAnchor);
+			editor.off('blur', this.showAnchor);
+			window.removeEventListener('resize', this.updateAnchorPosition);
+		} else {
+			editor.off('render', this.onRender);
 		}
-		if (isEngine(this.editor)) {
-			this.editor.off('keydown:backspace', this.onBackspace);
-			this.editor.off('markdown-it', this.markdownIt);
-		}
-		//引擎处理
-		if (!isEngine(this.editor) || this.options.showAnchor === false) return;
-
-		this.editor.off('setValue', this.updateId);
-		this.editor.off('realtimeChange', this.realtimeChange);
-		this.editor.off('select', this.showAnchor);
-		this.editor.off('blur', this.showAnchor);
-		window.removeEventListener('resize', this.updateAnchorPosition);
 	}
 }
 

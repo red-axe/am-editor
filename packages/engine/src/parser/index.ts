@@ -166,8 +166,9 @@ class Parser implements ParserInterface {
 		schema: SchemaInterface,
 		conversion: ConversionInterface | null,
 	) {
-		const nodeApi = this.editor.node;
-		const inlineApi = this.editor.inline;
+		const editor = this.editor;
+		const nodeApi = editor.node;
+		const inlineApi = editor.inline;
 		//转换标签和分割 mark 和 inline
 		// 不分割，就只转换卡片
 		if (!this.isNormalize) {
@@ -274,7 +275,7 @@ class Parser implements ParserInterface {
 					if (rule) {
 						oldRules.push(rule);
 						if (node.get<Element>()?.childNodes.length === 0) {
-							this.editor.mark.repairCursor(node);
+							editor.mark.repairCursor(node);
 						}
 						let newNode = filter(node);
 						if (!newNode) return;
@@ -515,14 +516,15 @@ class Parser implements ParserInterface {
 		customTags: boolean = false,
 	) {
 		const result: Array<string> = [];
-		const nodeApi = this.editor.node;
+		const editor = this.editor;
+		const nodeApi = editor.node;
 		const root = this.root.clone(true);
 		if (schema) this.normalize(root, schema, conversion);
-		this.editor.trigger('parse:value-before', root);
+		editor.trigger('parse:value-before', root);
 		this.traverse(root, schema, conversion, {
 			onOpen: (child, name, attributes, styles) => {
 				if (
-					this.editor.trigger(
+					editor.trigger(
 						'parse:value',
 						child,
 						attributes,
@@ -575,7 +577,7 @@ class Parser implements ParserInterface {
 				result.push('</'.concat(name, '>'));
 			},
 		});
-		this.editor.trigger('parse:value-after', result);
+		editor.trigger('parse:value-after', result);
 		//移除前后的换行符
 		if (result.length > 0 && /^\n+/g.test(result[0])) {
 			result[0] = result[0].replace(/^\n+/g, '');
@@ -597,16 +599,17 @@ class Parser implements ParserInterface {
 	 */
 	toHTML(inner?: Node, outter?: Node) {
 		const element = $('<div />');
-		const style = this.editor.container.css();
+		const editor = this.editor;
+		const style = editor.container.css();
 		if (inner && outter) {
 			$(inner).append(this.root).css(style);
 			element.append(outter);
 		} else {
 			element.append(this.root);
 		}
-		this.editor.trigger('parse:html-before', this.root);
-		this.editor.trigger('parse:html', element);
-		this.editor.trigger('parse:html-after', element);
+		editor.trigger('parse:html-before', this.root);
+		editor.trigger('parse:html', element);
+		editor.trigger('parse:html-after', element);
 		return element.html();
 	}
 
@@ -642,6 +645,7 @@ class Parser implements ParserInterface {
 	) {
 		const root = this.root.clone(true);
 		const result: Array<string> = [];
+		const editor = this.editor;
 		this.traverse(
 			root,
 			null,
@@ -652,9 +656,7 @@ class Parser implements ParserInterface {
 						result.push('\n');
 					}
 					if (formatOL && node.name === 'li') {
-						if (
-							node.hasClass(this.editor.list.CUSTOMZIE_LI_CLASS)
-						) {
+						if (node.hasClass(editor.list.CUSTOMZIE_LI_CLASS)) {
 							return;
 						}
 						const parent = node.parent();
@@ -677,10 +679,7 @@ class Parser implements ParserInterface {
 				onClose: (node, name) => {
 					if (
 						name === 'p' ||
-						this.editor.node.isBlock(
-							node,
-							schema || this.editor.schema,
-						)
+						editor.node.isBlock(node, schema || editor.schema)
 					) {
 						const children = Array.from(
 							node.get<HTMLElement>()!.childNodes,
@@ -692,9 +691,9 @@ class Parser implements ParserInterface {
 									(child) => child.nodeName === 'BR',
 								)) ||
 							children.some((child) =>
-								this.editor.node.isBlock(
+								editor.node.isBlock(
 									child,
-									schema || this.editor.schema,
+									schema || editor.schema,
 								),
 							)
 						)

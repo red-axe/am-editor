@@ -40,8 +40,9 @@ abstract class ListEntry<T extends PluginOptions = PluginOptions>
 	abstract isCurrent(node: NodeInterface): boolean;
 
 	pasteBefore = (documentFragment: DocumentFragment) => {
-		if (!this.cardName || !this.editor) return;
-		const { list } = this.editor;
+		const editor = this.editor;
+		if (!this.cardName || !editor) return;
+		const { list } = editor;
 		const node = $(documentFragment);
 		const children = node.allChildren();
 		children.forEach((domChild) => {
@@ -63,8 +64,9 @@ abstract class ListEntry<T extends PluginOptions = PluginOptions>
 	};
 
 	pasteInsert = () => {
-		if (!this.cardName || !isEngine(this.editor)) return;
-		const { change, list } = this.editor;
+		const editor = this.editor;
+		if (!this.cardName || !isEngine(editor)) return;
+		const { change, list } = editor;
 		const range = change.range.get();
 		const rootBlock = range.getRootBlock();
 		const nextBlock = rootBlock?.next();
@@ -90,10 +92,11 @@ abstract class ListEntry<T extends PluginOptions = PluginOptions>
 	};
 
 	destroy() {
-		if (isEngine(this.editor)) {
-			this.editor.off('paste:before', this.pasteBefore);
-			this.editor.off('paste:insert', this.pasteInsert);
-			this.editor.off('paste:after', this.pasteAfter);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.off('paste:before', this.pasteBefore);
+			editor.off('paste:insert', this.pasteInsert);
+			editor.off('paste:after', this.pasteAfter);
 		}
 	}
 }

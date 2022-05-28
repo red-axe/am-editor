@@ -15,16 +15,21 @@ import EmbedComponent from './component';
 import locales from './locales';
 import { EmbedOptions, EmbedValue } from './types';
 
+const PARSE_HTML = 'parse:html';
+const PASTE_SCHEMA = 'paste:schema';
+const PASTE_EACH = 'paste:each';
+
 class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'embed';
 	}
 
 	init() {
-		this.editor.language.add(locales);
-		this.editor.on('parse:html', this.parseHtml);
-		this.editor.on('paste:schema', this.pasteSchema);
-		this.editor.on('paste:each', this.pasteHtml);
+		const editor = this.editor;
+		editor.language.add(locales);
+		editor.on(PARSE_HTML, this.parseHtml);
+		editor.on(PASTE_SCHEMA, this.pasteSchema);
+		editor.on(PASTE_EACH, this.pasteHtml);
 	}
 
 	hotkey() {
@@ -63,7 +68,8 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 	};
 
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (node.isElement()) {
 			const attributes = node.attributes();
 			const type = attributes['data-type'];
@@ -71,7 +77,7 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 				const value = attributes['data-value'];
 				const cardValue = decodeCardValue(value);
 				if (!cardValue.url) return;
-				this.editor.card.replaceNode(
+				editor.card.replaceNode(
 					node,
 					EmbedComponent.cardName,
 					cardValue,
@@ -131,9 +137,10 @@ class Embed<T extends EmbedOptions = EmbedOptions> extends Plugin<T> {
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('paste:schema', this.pasteSchema);
-		this.editor.off('paste:each', this.pasteHtml);
+		const editor = this.editor;
+		editor.off(PARSE_HTML, this.parseHtml);
+		editor.off(PASTE_SCHEMA, this.pasteSchema);
+		editor.off(PASTE_EACH, this.pasteHtml);
 	}
 }
 

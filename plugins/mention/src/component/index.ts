@@ -76,10 +76,11 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 
 	search = (keyword: string): Promise<MentionItem[]> => {
 		const options = this.getPluginOptions();
+		const editor = this.editor;
 		if (options && options.onSearch) return options.onSearch(keyword);
-		const reuslt = this.editor.trigger('mention:search', keyword);
+		const reuslt = editor.trigger('mention:search', keyword);
 		if (reuslt !== undefined) return reuslt;
-		const { request } = this.editor;
+		const { request } = editor;
 		return new Promise((resolve) => {
 			if (options?.action) {
 				const { type, contentType, parse, headers } = options;
@@ -106,26 +107,26 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 	};
 
 	init() {
-		if (!this.#position) this.#position = new Position(this.editor);
-		if (!isEngine(this.editor) || isServer) {
+		const editor = this.editor;
+		if (!this.#position) this.#position = new Position(editor);
+		if (!isEngine(editor) || isServer) {
 			return;
 		}
 		super.init();
 		if (this.component) return;
 		const options = this.getPluginOptions();
-		this.component = new CollapseComponent(this.editor, {
+		this.component = new CollapseComponent(editor, {
 			onCancel: () => {
 				this.changeToText();
 			},
 			onSelect: (_, data: { [key: string]: string }) => {
-				let newValue =
-					this.editor.trigger('mention:select', data) || {};
+				let newValue = editor.trigger('mention:select', data) || {};
 				delete newValue['id'];
 				if (options?.onSelect) {
 					newValue = options.onSelect(data) || {};
 					delete newValue['id'];
 				}
-				const { card } = this.editor;
+				const { card } = editor;
 				const value = this.getValue();
 				this.component?.remove();
 				this.component = undefined;
@@ -137,10 +138,10 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 					...newValue,
 				});
 				card.removeNode(this);
-				this.editor.trigger('mention:insert', component);
+				editor.trigger('mention:insert', component);
 				if (options?.onInsert) options.onInsert(component);
-				if (isEngine(this.editor)) {
-					const { change } = this.editor;
+				if (isEngine(editor)) {
+					const { change } = editor;
 					const range = change.range.get().cloneRange();
 					range.setStartAfter(component.root.get()!);
 					range.collapse(true);
@@ -153,20 +154,22 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 	}
 
 	remove() {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		this.component?.remove();
 		this.#keyword?.remove();
-		this.editor.card.remove(this.id);
+		editor.card.remove(this.id);
 	}
 
 	changeToText() {
-		if (!this.root.inEditor() || !isEngine(this.editor)) {
+		const editor = this.editor;
+		if (!this.root.inEditor() || !isEngine(editor)) {
 			return;
 		}
 
 		const content = this.#keyword?.get<HTMLElement>()?.innerText || '';
 		this.remove();
-		this.editor.node.insertText(content);
+		editor.node.insertText(content);
 	}
 
 	activate(activated: boolean) {
@@ -178,8 +181,9 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 	}
 
 	handleInput() {
-		if (!isEngine(this.editor)) return;
-		const { change, card } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, card } = editor;
 		if (change.isComposing()) {
 			return;
 		}
@@ -197,7 +201,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		const keyword = content.substr(1);
 		// 搜索关键词为空
 		const defaultData =
-			this.editor.trigger<MentionItem[]>('mention:default') ||
+			editor.trigger<MentionItem[]>('mention:default') ||
 			this.getPluginOptions()?.defaultData;
 		if (keyword === '' && defaultData) {
 			this.component?.render(this.root, defaultData);
@@ -206,7 +210,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 
 		this.component?.render(this.root, true);
 
-		const reuslt = this.editor.trigger('mention:search', keyword);
+		const reuslt = editor.trigger('mention:search', keyword);
 		if (reuslt !== undefined) {
 			reuslt;
 		}
@@ -265,11 +269,11 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 
 	executeMark(mark?: NodeInterface, warp?: boolean) {
 		if (!this.#container) return;
-
+		const markApi = this.editor.mark;
 		const children = this.#container.children();
 		if (!mark) {
 			// 移除所有标记
-			this.editor.mark.unwrapByNodes(this.queryMarks(false));
+			markApi.unwrapByNodes(this.queryMarks(false));
 			this.setValue({
 				marks: [] as string[],
 			} as T);
@@ -277,7 +281,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 			// 增加标记
 			children.each((_, index) => {
 				const child = children.eq(index);
-				if (child) this.editor.mark.wrapByNode(child, mark);
+				if (child) markApi.wrapByNode(child, mark);
 			});
 			const marks = this.queryMarks().map(
 				(child) => child.clone().get<HTMLElement>()?.outerHTML || '',
@@ -287,7 +291,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 			} as T);
 		} else {
 			// 移除标记
-			this.editor.mark.unwrapByNodes(this.queryMarks(false), mark);
+			markApi.unwrapByNodes(this.queryMarks(false), mark);
 			const marks = this.queryMarks().map(
 				(child) => child.get<HTMLElement>()?.outerHTML || '',
 			);
@@ -318,6 +322,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
+		const editor = this.editor;
 		// 有值的情况、展示模式
 		if (value?.name && !this.#container) {
 			const { id, key, name, ...info } = value;
@@ -332,7 +337,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 			this.#container.on('click', () => {
 				if (!this.#container) return;
 
-				this.editor.trigger('mention:item-click', this.#container, {
+				editor.trigger('mention:item-click', this.#container, {
 					key: unescape(key || ''),
 					name: unescape(name),
 					...info,
@@ -358,10 +363,10 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		}
 
 		// 不是引擎，阅读模式
-		if (!isEngine(this.editor)) {
+		if (!isEngine(editor)) {
 			return this.#container;
 		}
-		const language = this.editor.language.get('mention');
+		const language = editor.language.get('mention');
 		let timeout: NodeJS.Timeout | undefined = undefined;
 		const options = this.getPluginOptions();
 		// 没有值的情况下，弹出下拉框编辑模式
@@ -401,8 +406,8 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 			});
 			this.getCenter().append(this.#container);
 			setTimeout(() => {
-				if (isEngine(this.editor)) {
-					const range = this.editor.change.range.get();
+				if (isEngine(editor)) {
+					const range = editor.change.range.get();
 					this.#keyword = this.#container?.eq(0);
 					range.select(this.#keyword!, true).collapse(false);
 					const selection = window.getSelection();
@@ -413,7 +418,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 			if (
 				!(options?.defaultData
 					? options?.defaultData
-					: this.editor.trigger('mention:default'))
+					: editor.trigger('mention:default'))
 			) {
 				setTimeout(() => {
 					this.handleInput();
@@ -421,7 +426,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 			} else {
 				this.component?.render(
 					this.root,
-					this.editor.trigger('mention:default') ||
+					editor.trigger('mention:default') ||
 						options?.defaultData ||
 						[],
 				);

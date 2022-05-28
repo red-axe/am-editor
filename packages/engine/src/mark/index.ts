@@ -63,7 +63,7 @@ class Mark implements MarkModelInterface {
 			node.type === Node.TEXT_NODE
 				? node.text().substr(0, startOffset)
 				: node.text();
-		const markdown = createMarkdownIt(this.editor, 'zero');
+		const markdown = createMarkdownIt(editor, 'zero');
 		const { renderer, options } = markdown;
 		const tokens = markdown.parseInline(text, {});
 		if (tokens.length === 0) return;
@@ -107,7 +107,7 @@ class Mark implements MarkModelInterface {
 			textContent += lineContent;
 		});
 		if (isHit) {
-			const nodeApi = this.editor.node;
+			const nodeApi = editor.node;
 			event.preventDefault();
 			range.setStart(node[0], 0);
 			range.setEnd(node[0], startOffset);
@@ -790,8 +790,9 @@ class Mark implements MarkModelInterface {
 		range?: RangeInterface,
 		removeMark?: NodeInterface | Node | string | Array<NodeInterface>,
 	) {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		const safeRange = range || change.range.toTrusty();
 		const doc = getDocument(safeRange.startContainer);
 		const collapsed = safeRange.collapsed;
@@ -910,7 +911,7 @@ class Mark implements MarkModelInterface {
 			return nodeApi.wrap(targetNode, mark);
 		} else if (node.name === 'br') {
 			const parent = node.parent();
-			if (parent && this.editor.node.isBlock(parent)) {
+			if (parent && nodeApi.isBlock(parent)) {
 				const cloneMark = mark.clone(true);
 				cloneMark.html('&#8203;');
 				nodeApi.replace(node, cloneMark);
@@ -1021,9 +1022,10 @@ class Mark implements MarkModelInterface {
 	 * @param both mark标签两侧节点
 	 */
 	wrap(mark: NodeInterface | Node | string, range?: RangeInterface) {
-		const change = isEngine(this.editor) ? this.editor.change : undefined;
+		const editor = this.editor;
+		const change = isEngine(editor) ? editor.change : undefined;
 		if (!range && !change) return;
-		const { node } = this.editor;
+		const { node } = editor;
 		const safeRange = range || change!.range.toTrusty();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof mark === 'string' || isNode(mark)) {
@@ -1035,7 +1037,7 @@ class Mark implements MarkModelInterface {
 		if (commonAncestorNode.type === Node.TEXT_NODE) {
 			commonAncestorNode = commonAncestorNode.parent()!;
 		}
-		const card = this.editor.card.find(commonAncestorNode, true);
+		const card = editor.card.find(commonAncestorNode, true);
 		let isEditable = card?.isEditable;
 		const nodes = isEditable
 			? card?.getSelectionNodes
@@ -1272,8 +1274,9 @@ class Mark implements MarkModelInterface {
 	 * @param range 光标，默认当前选区光标
 	 */
 	merge(range?: RangeInterface): void {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		const safeRange = range || change.range.toTrusty();
 		const marks = this.findMarks(safeRange);
 		if (marks.length === 0) {
@@ -1294,8 +1297,9 @@ class Mark implements MarkModelInterface {
 		nodes: NodeInterface[],
 		removeMark?: NodeInterface | Array<NodeInterface>,
 	) {
+		const editor = this.editor;
 		// 清除 Mark
-		const nodeApi = this.editor.node;
+		const nodeApi = editor.node;
 		nodes.forEach((node) => {
 			removeMark = removeMark as
 				| NodeInterface
@@ -1322,7 +1326,7 @@ class Mark implements MarkModelInterface {
 							.get<Element>()
 							?.className.split(/\s+/);
 						if (removeClass) {
-							const { schema } = this.editor;
+							const { schema } = editor;
 							const schemas = schema.find(
 								(rule) => rule.name === node.name,
 							);
@@ -1361,8 +1365,9 @@ class Mark implements MarkModelInterface {
 		removeMark?: NodeInterface | Node | string | Array<NodeInterface>,
 		range?: RangeInterface,
 	) {
-		if (!isEngine(this.editor)) return;
-		const { change, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, node } = editor;
 		const safeRange = range || change.range.toTrusty();
 		const doc = getDocument(safeRange.startContainer) || document;
 
@@ -1378,7 +1383,7 @@ class Mark implements MarkModelInterface {
 		if (commonAncestorNode.type === Node.TEXT_NODE) {
 			commonAncestorNode = commonAncestorNode.parent()!;
 		}
-		const card = this.editor.card.find(commonAncestorNode, true);
+		const card = editor.card.find(commonAncestorNode, true);
 		let isEditable = card?.isEditable;
 		const nodes = isEditable
 			? card?.getSelectionNodes
@@ -1439,7 +1444,7 @@ class Mark implements MarkModelInterface {
 									markNodes.push(child);
 								} else if (child.isCard()) {
 									const cardComponent =
-										this.editor.card.find(child);
+										editor.card.find(child);
 									if (
 										cardComponent &&
 										cardComponent.executeMark
@@ -1509,8 +1514,9 @@ class Mark implements MarkModelInterface {
 	 * @param range 指定光标，默认为编辑器选中的光标
 	 */
 	insert(mark: NodeInterface | Node | string, range?: RangeInterface): void {
-		if (!isEngine(this.editor)) return;
-		const { change, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, node } = editor;
 		const safeRange = range || change.range.toTrusty();
 		if (typeof mark === 'string' || isNode(mark)) {
 			const doc = getDocument(safeRange.startContainer);
@@ -1530,14 +1536,15 @@ class Mark implements MarkModelInterface {
 	 * @param range 范围
 	 */
 	findMarks(range: RangeInterface) {
+		const editor = this.editor;
 		const cloneRange = range.cloneRange();
 		if (cloneRange.startNode.isRoot()) cloneRange.shrinkToElementNode();
 		if (
 			!cloneRange.startNode.inEditor() ||
-			this.editor.card.find(cloneRange.startNode)
+			editor.card.find(cloneRange.startNode)
 		)
 			return [];
-		const { node } = this.editor;
+		const { node } = editor;
 		const handleRange = (
 			allowBlock: boolean,
 			range: RangeInterface,
@@ -1675,7 +1682,7 @@ class Mark implements MarkModelInterface {
 				) {
 					nodes.push(node);
 				} else if (node.isCard()) {
-					const cardComponent = this.editor.card.find(node);
+					const cardComponent = editor.card.find(node);
 					if (cardComponent?.queryMarks) {
 						nodes.push(...cardComponent.queryMarks());
 					}
@@ -1689,7 +1696,7 @@ class Mark implements MarkModelInterface {
 
 		const nodes = findNodes($(startNode));
 		const { commonAncestorNode } = cloneRange;
-		const card = this.editor.card.find(commonAncestorNode, true);
+		const card = editor.card.find(commonAncestorNode, true);
 		let isEditable = card?.isEditable;
 		const selectionNodes = isEditable
 			? card?.getSelectionNodes
@@ -1727,7 +1734,7 @@ class Mark implements MarkModelInterface {
 										addNode(nodes, child);
 									} else if (child.isCard()) {
 										const cardComponent =
-											this.editor.card.find(child);
+											editor.card.find(child);
 										if (cardComponent?.queryMarks) {
 											cardComponent
 												.queryMarks()

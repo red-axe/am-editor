@@ -526,8 +526,9 @@ class NodeModel implements NodeModelInterface {
 	 * @param range 光标
 	 */
 	insertText(text: string, range?: RangeInterface) {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		const safeRange = range || change.range.toTrusty();
 
 		const doc = getDocument(safeRange.startContainer);
@@ -602,8 +603,7 @@ class NodeModel implements NodeModelInterface {
 			// 如果当前光标位置的block节点是空节点，就不用分割
 			let { commonAncestorNode } = range;
 			if (commonAncestorNode.isText()) {
-				commonAncestorNode =
-					this.editor.block.closest(commonAncestorNode);
+				commonAncestorNode = editor.block.closest(commonAncestorNode);
 			}
 			let splitNode = null;
 			if (
@@ -673,7 +673,7 @@ class NodeModel implements NodeModelInterface {
 				}
 			}
 			if (node instanceof Element || node instanceof DocumentFragment)
-				this.editor.nodeId.generate(node);
+				editor.nodeId.generate(node);
 		} else {
 			const targetNode = block.closest(
 				range.startNode.isEditable()

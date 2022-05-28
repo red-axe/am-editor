@@ -11,6 +11,8 @@ export interface FontsizeOptions extends PluginOptions {
 	filter?: (fontSize: string) => string | boolean;
 }
 
+const PASTE_EACH = 'paste:each';
+
 export default class<
 	T extends FontsizeOptions = FontsizeOptions,
 > extends MarkPlugin<T> {
@@ -42,11 +44,12 @@ export default class<
 
 	init() {
 		super.init();
-		if (isEngine(this.editor)) {
-			this.editor.on('paste:each', this.pasteEach);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.on(PASTE_EACH, this.pasteEach);
 		}
 		if (this.options.defaultSize)
-			this.editor.container.css('font-size', this.defaultSize);
+			editor.container.css('font-size', this.defaultSize);
 	}
 
 	isTrigger(size: string, defaultSize: string = this.defaultSize) {
@@ -90,8 +93,9 @@ export default class<
 	};
 
 	destroy(): void {
-		if (isEngine(this.editor)) {
-			this.editor.off('paste:each', this.pasteEach);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.off(PASTE_EACH, this.pasteEach);
 		}
 	}
 }

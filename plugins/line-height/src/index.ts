@@ -11,6 +11,7 @@ export interface LineHeightOptions extends PluginOptions {
 	filter?: (lineHeight: string) => string | boolean;
 }
 
+const PASTE_EACH = 'paste:each';
 export default class<
 	T extends LineHeightOptions = LineHeightOptions,
 > extends Plugin<T> {
@@ -21,16 +22,18 @@ export default class<
 	#styleName = 'line-height';
 
 	init() {
-		this.editor.schema.add(this.schema());
-		if (isEngine(this.editor)) {
-			this.editor.on('paste:each', this.pasteEach);
+		const editor = this.editor;
+		editor.schema.add(this.schema());
+		if (isEngine(editor)) {
+			editor.on(PASTE_EACH, this.pasteEach);
 		}
 	}
 
 	execute(lineHeight?: string) {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (lineHeight === 'default') lineHeight = '';
-		const { change, block } = this.editor;
+		const { change, block } = editor;
 		const range = change.range.get();
 		const blocks = block.findBlocks(range);
 		// 没找到目标 block
@@ -44,8 +47,9 @@ export default class<
 	}
 
 	queryState() {
-		if (!isEngine(this.editor)) return;
-		const { change, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, node } = editor;
 		const range = change.range.get();
 		if (!range.startNode.inEditor()) return ['default'];
 		const { blocks } = change;
@@ -105,8 +109,9 @@ export default class<
 	}
 
 	pasteEach = (node: NodeInterface) => {
+		const editor = this.editor;
 		//pt 转为px
-		if (!node.isCard() && this.editor.node.isBlock(node)) {
+		if (!node.isCard() && editor.node.isBlock(node)) {
 			const lineHeightSource = node.css(this.#styleName);
 			if (!lineHeightSource) return;
 			const lineHeight = this.convertToPX(lineHeightSource);
@@ -122,14 +127,12 @@ export default class<
 					node.css(this.#styleName, result);
 				}
 			} else node.css(this.#styleName, '');
-			const nodeApi = this.editor.node;
+			const nodeApi = editor.node;
 			if (!nodeApi.isBlock(node)) nodeApi.unwrap(node);
 		}
 	};
 
 	destroy() {
-		if (isEngine(this.editor)) {
-			this.editor.off('paste:each', this.pasteEach);
-		}
+		this.editor.off(PASTE_EACH, this.pasteEach);
 	}
 }

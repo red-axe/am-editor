@@ -55,7 +55,7 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 		this.barUI = this.root.find('.data-pswp-custom-top-bar');
 		this.closeUI = this.root.find('.data-pswp-button-close');
 		$(document.body).append(this.root);
-		this.zoomUI = new Zoom(this.editor, this);
+		this.zoomUI = new Zoom(editor, this);
 		this.zoomUI.render();
 		this.reset();
 		this.bindClickEvent();

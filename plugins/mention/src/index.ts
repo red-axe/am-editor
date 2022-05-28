@@ -16,6 +16,12 @@ import MentionComponent, { MentionValue } from './component';
 import locales from './locales';
 import { MentionOptions } from './types';
 
+const PARSER_VALUE = 'parse:value';
+const PARSER_HTML = 'parse:html';
+const PASTE_SCHEMA = 'paste:schema';
+const PASTE_EACH = 'paste:each';
+const KEYDOWN_AT = 'keydown:at';
+
 class MentionPlugin<
 	T extends MentionOptions = MentionOptions,
 > extends Plugin<T> {
@@ -24,14 +30,15 @@ class MentionPlugin<
 	}
 
 	init() {
-		this.editor.on('parse:value', this.paserValue);
-		this.editor.on('parse:html', this.parseHtml);
-		this.editor.on('paste:each', this.pasteHtml);
-		this.editor.on('paste:schema', this.pasteSchema);
-		if (isEngine(this.editor)) {
-			this.editor.on('keydown:at', this.onAt);
+		const editor = this.editor;
+		editor.on(PARSER_VALUE, this.paserValue);
+		editor.on(PARSER_HTML, this.parseHtml);
+		editor.on(PASTE_EACH, this.pasteHtml);
+		editor.on(PASTE_SCHEMA, this.pasteSchema);
+		if (isEngine(editor)) {
+			editor.on(KEYDOWN_AT, this.onAt);
 		}
-		this.editor.language.add(locales);
+		editor.language.add(locales);
 	}
 
 	paserValue = (node: NodeInterface) => {
@@ -47,11 +54,12 @@ class MentionPlugin<
 	};
 	private renderTime = Date.now();
 	onAt = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (Date.now() - this.renderTime < 200) {
 			return false;
 		}
-		const { change } = this.editor;
+		const { change } = editor;
 		let range = change.range.get();
 		// 空格触发
 		if (this.options.spaceTrigger) {
@@ -72,9 +80,9 @@ class MentionPlugin<
 		// 插入 @，并弹出选择器
 		if (range.collapsed) {
 			event.preventDefault();
-			const card = this.editor.card.insert(MentionComponent.cardName);
+			const card = editor.card.insert(MentionComponent.cardName);
 			card.root.attributes(DATA_TRANSIENT_ELEMENT, 'true');
-			this.editor.card.activate(card.root);
+			editor.card.activate(card.root);
 			range = change.range.get();
 			//选中关键词输入节点
 			const keyword = card.find('.data-mention-component-keyword');
@@ -118,7 +126,8 @@ class MentionPlugin<
 	};
 
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (node.isElement()) {
 			const attributes = node.attributes();
 			const type = attributes['data-type'];
@@ -126,7 +135,7 @@ class MentionPlugin<
 				const value = attributes['data-value'];
 				const cardValue = decodeCardValue<MentionValue>(value);
 				if (!cardValue.name) return;
-				this.editor.card.replaceNode(
+				editor.card.replaceNode(
 					node,
 					MentionComponent.cardName,
 					cardValue,
@@ -142,12 +151,13 @@ class MentionPlugin<
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: MentionValue) => NodeInterface,
 	) => {
+		const editor = this.editor;
 		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${MentionComponent.cardName}"],[${READY_CARD_KEY}="${MentionComponent.cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find<
+			const card = editor.card.find<
 				MentionValue,
 				MentionComponent<MentionValue>
 			>(node);
@@ -165,7 +175,7 @@ class MentionPlugin<
 				let wrapNode = rootWrapNode.first()!;
 				marks.forEach((mark) => {
 					const outerNode = $(mark);
-					wrapNode = this.editor.node.wrap(wrapNode, outerNode);
+					wrapNode = editor.node.wrap(wrapNode, outerNode);
 				});
 				node.empty();
 				let newNode = $(html);
@@ -183,12 +193,13 @@ class MentionPlugin<
 	execute() {}
 
 	destroy() {
-		this.editor.off('parse:value', this.paserValue);
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('paste:each', this.pasteHtml);
-		this.editor.off('paste:schema', this.pasteSchema);
-		if (isEngine(this.editor)) {
-			this.editor.off('keydown:at', this.onAt);
+		const editor = this.editor;
+		editor.off(PARSER_VALUE, this.paserValue);
+		editor.off(PARSER_HTML, this.parseHtml);
+		editor.off(PASTE_EACH, this.pasteHtml);
+		editor.off(PASTE_SCHEMA, this.pasteSchema);
+		if (isEngine(editor)) {
+			editor.off(KEYDOWN_AT, this.onAt);
 		}
 	}
 }

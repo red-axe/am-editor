@@ -651,8 +651,9 @@ class Range implements RangeInterface {
 	 * @param isLeft
 	 */
 	handleBr = (isLeft?: boolean) => {
-		const { list } = this.editor;
-		const block = this.editor.block.closest(this.commonAncestorNode);
+		const editor = this.editor;
+		const { list } = editor;
+		const block = editor.block.closest(this.commonAncestorNode);
 		block.find('br').each((br) => {
 			const domBr = $(br);
 			const prev = domBr.prev();

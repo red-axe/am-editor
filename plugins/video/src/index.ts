@@ -22,6 +22,9 @@ import type { VideoUploaderOptions } from './uploader';
 import locales from './locales';
 import { VideoOptions } from './types';
 
+const PARSE_HTML = 'parse:html';
+const PASTE_EACH = 'paste:each';
+const PASTE_SCHEMA = 'paste:schema';
 export default class VideoPlugin<
 	T extends VideoOptions = VideoOptions,
 > extends Plugin<T> {
@@ -30,10 +33,11 @@ export default class VideoPlugin<
 	}
 
 	init() {
-		this.editor.language.add(locales);
-		this.editor.on('parse:html', this.parseHtml);
-		this.editor.on('paste:each', this.pasteHtml);
-		this.editor.on('paste:schema', this.pasteSchema);
+		const editor = this.editor;
+		editor.language.add(locales);
+		editor.on(PARSE_HTML, this.parseHtml);
+		editor.on(PASTE_EACH, this.pasteHtml);
+		editor.on(PASTE_SCHEMA, this.pasteSchema);
 	}
 
 	execute(
@@ -150,14 +154,15 @@ export default class VideoPlugin<
 	};
 
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (node.isElement()) {
 			const type = node.attributes('data-type');
 			if (type === VideoComponent.cardName) {
 				const value = node.attributes('data-value');
 				const cardValue = decodeCardValue(value) as VideoValue;
 				if (!cardValue.url) return;
-				this.editor.card.replaceNode(
+				editor.card.replaceNode(
 					node,
 					VideoComponent.cardName,
 					cardValue,
@@ -213,9 +218,10 @@ export default class VideoPlugin<
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('paste:each', this.pasteHtml);
-		this.editor.off('paste:schema', this.pasteSchema);
+		const editor = this.editor;
+		editor.off(PARSE_HTML, this.parseHtml);
+		editor.off(PASTE_EACH, this.pasteHtml);
+		editor.off(PASTE_SCHEMA, this.pasteSchema);
 	}
 }
 

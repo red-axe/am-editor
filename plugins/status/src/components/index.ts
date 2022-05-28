@@ -78,8 +78,9 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 
 	init() {
 		super.init();
-		const { card } = this.editor;
-		if (!this.#position) this.#position = new Position(this.editor);
+		const editor = this.editor;
+		const { card } = editor;
+		if (!this.#position) this.#position = new Position(editor);
 		if (this.#statusEditor) return;
 
 		this.#statusEditor = new StatusEditor({
@@ -120,20 +121,15 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 	}
 
 	getColor() {
+		const markApi = this.editor.mark;
 		const marks = this.queryMarks();
 		const background =
 			marks
-				.find(
-					(mark) =>
-						this.editor.mark.findPlugin(mark)?.name === 'backcolor',
-				)
+				.find((mark) => markApi.findPlugin(mark)?.name === 'backcolor')
 				?.css('background-color') || '';
 		const color =
 			marks
-				.find(
-					(mark) =>
-						this.editor.mark.findPlugin(mark)?.name === 'fontcolor',
-				)
+				.find((mark) => markApi.findPlugin(mark)?.name === 'fontcolor')
 				?.css('color') || '';
 		return {
 			background: toHex(background),
@@ -191,16 +187,16 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 
 	executeMark(mark?: NodeInterface, warp?: boolean) {
 		if (!this.#container) return;
-
+		const markApi = this.editor.mark;
 		const children = this.#container.children();
 		if (!mark) {
 			// 移除所有标记
 			const marks = this.queryMarks(false);
 			let hasBg = false;
-			this.editor.mark.unwrapByNodes(
+			markApi.unwrapByNodes(
 				marks.filter((unmark) => {
 					if (hasBg) return true;
-					const plugin = this.editor.mark.findPlugin(unmark);
+					const plugin = markApi.findPlugin(unmark);
 					if (plugin?.name === 'backcolor') {
 						hasBg = true;
 						return false;
@@ -212,14 +208,14 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 				marks: [] as string[],
 			} as T);
 		} else if (warp) {
-			const backgroundPlugin = this.editor.mark.findPlugin(mark);
+			const backgroundPlugin = markApi.findPlugin(mark);
 			if (backgroundPlugin?.name === 'backcolor') {
 				mark.addClass('data-label-background');
 			}
 			// 增加标记
 			children.each((_, index) => {
 				const child = children.eq(index);
-				if (child) this.editor.mark.wrapByNode(child, mark);
+				if (child) markApi.wrapByNode(child, mark);
 			});
 			const marks = this.queryMarks().map(
 				(child) => child.clone().get<HTMLElement>()?.outerHTML || '',
@@ -228,12 +224,12 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 				marks,
 			} as T);
 		} else {
-			const backgroundPlugin = this.editor.mark.findPlugin(mark);
+			const backgroundPlugin = markApi.findPlugin(mark);
 			if (backgroundPlugin?.name === 'backcolor') {
 				return;
 			}
 			// 移除标记
-			this.editor.mark.unwrapByNodes(this.queryMarks(false), mark);
+			markApi.unwrapByNodes(this.queryMarks(false), mark);
 			const marks = this.queryMarks().map(
 				(child) => child.get<HTMLElement>()?.outerHTML || '',
 			);
@@ -267,7 +263,8 @@ class Status<T extends StatusValue = StatusValue> extends Card<T> {
 
 	onActivate(activated: boolean) {
 		super.onActivate(activated);
-		if (!isEngine(this.editor) || this.editor.readonly) return;
+		const editor = this.editor;
+		if (!isEngine(editor) || editor.readonly) return;
 		if (activated) this.renderEditor();
 		else this.#statusEditor?.destroy();
 	}

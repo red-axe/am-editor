@@ -1,6 +1,5 @@
 import {
 	isEngine,
-	NodeInterface,
 	ElementPlugin,
 	PluginEntry,
 	PluginOptions,
@@ -14,6 +13,7 @@ export interface AlignmentOptions extends PluginOptions {
 		justify?: string;
 	};
 }
+const KEYDOWN_BACKSPACE = 'keydown:backspace';
 export default class<
 	T extends AlignmentOptions = AlignmentOptions,
 > extends ElementPlugin<T> {
@@ -36,12 +36,13 @@ export default class<
 
 	init() {
 		super.init();
-		this.editor.on('keydown:backspace', this.onBackspace);
+		this.editor.on(KEYDOWN_BACKSPACE, this.onBackspace);
 	}
 
 	execute(align?: 'left' | 'center' | 'right' | 'justify') {
-		if (!isEngine(this.editor) || this.editor.readonly) return;
-		const { change, block } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor) || editor.readonly) return;
+		const { change, block } = editor;
 		block.setBlocks({
 			style: {
 				'text-align':
@@ -50,14 +51,15 @@ export default class<
 		});
 		change.blocks.forEach((block) => {
 			if (block.name === 'li') {
-				this.editor.list.addAlign(block, align);
+				editor.list.addAlign(block, align);
 			}
 		});
 	}
 
 	queryState() {
-		if (!isEngine(this.editor)) return;
-		const { change, schema } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, schema } = editor;
 		const blocks = change.blocks;
 
 		if (blocks.length === 0) {
@@ -96,8 +98,9 @@ export default class<
 	}
 
 	onBackspace = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor)) return;
-		const { change, block } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, block } = editor;
 		const range = change.range.get();
 		if (
 			block.isLastOffset(range, 'end') ||
@@ -106,10 +109,11 @@ export default class<
 		)
 			return;
 		// 改变对齐
+		const commandApi = editor.command;
 		const align = this.queryState();
 		if (align === 'center') {
 			event.preventDefault();
-			this.editor.command.execute(
+			commandApi.execute(
 				(this.constructor as PluginEntry).pluginName,
 				'left',
 			);
@@ -118,7 +122,7 @@ export default class<
 
 		if (align === 'right') {
 			event.preventDefault();
-			this.editor.command.execute(
+			commandApi.execute(
 				(this.constructor as PluginEntry).pluginName,
 				'center',
 			);
@@ -128,6 +132,6 @@ export default class<
 	};
 
 	destroy() {
-		this.editor.off('keydown:backspace', this.onBackspace);
+		this.editor.off(KEYDOWN_BACKSPACE, this.onBackspace);
 	}
 }

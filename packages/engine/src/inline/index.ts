@@ -147,8 +147,9 @@ class Inline implements InlineModelInterface {
 	 * @param range 光标，默认获取当前光标
 	 */
 	wrap(inline: NodeInterface | Node | string, range?: RangeInterface) {
-		if (!isEngine(this.editor)) return;
-		const { change, mark, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, mark, node } = editor;
 		const safeRange = range || change.range.toTrusty();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof inline === 'string' || isNode(inline)) {
@@ -341,8 +342,9 @@ class Inline implements InlineModelInterface {
 	 * @param range 光标
 	 */
 	insert(inline: NodeInterface | Node | string, range?: RangeInterface) {
-		if (!isEngine(this.editor)) return;
-		const { change, node, mark } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, node, mark } = editor;
 		const safeRange = range || change.range.toTrusty();
 		const doc = getDocument(safeRange.startContainer);
 		if (typeof inline === 'string' || isNode(inline)) {
@@ -689,8 +691,9 @@ class Inline implements InlineModelInterface {
 	 * 分割inline标签
 	 */
 	split(range?: RangeInterface) {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		const safeRange = range || change.range.toTrusty();
 		//const selection = safeRange.createSelection('inline-split');
 		if (safeRange.collapsed) {
@@ -707,14 +710,15 @@ class Inline implements InlineModelInterface {
 	 * @param range 光标
 	 */
 	findInlines(range: RangeInterface) {
+		const editor = this.editor;
 		const cloneRange = range.cloneRange();
 		if (cloneRange.startNode.isRoot()) cloneRange.shrinkToElementNode();
 		if (
 			!cloneRange.startNode.inEditor() ||
-			this.editor.card.find(cloneRange.startNode)
+			editor.card.find(cloneRange.startNode)
 		)
 			return [];
-		const nodeApi = this.editor.node;
+		const nodeApi = editor.node;
 		const handleRange = (
 			allowBlock: boolean,
 			range: RangeInterface,
@@ -854,7 +858,7 @@ class Inline implements InlineModelInterface {
 
 		const nodes = findNodes($(startNode));
 		const { commonAncestorNode } = cloneRange;
-		const card = this.editor.card.find(commonAncestorNode, true);
+		const card = editor.card.find(commonAncestorNode, true);
 		let isEditable = card?.isEditable;
 		const selectionNodes = isEditable
 			? card?.getSelectionNodes
@@ -1049,6 +1053,7 @@ class Inline implements InlineModelInterface {
 	}
 
 	flat(node: NodeInterface | RangeInterface, schema?: SchemaInterface) {
+		const editor = this.editor;
 		if (isRangeInterface(node)) {
 			const selection = node
 				.cloneRange()
@@ -1062,7 +1067,7 @@ class Inline implements InlineModelInterface {
 				if (newInline) applyInlines.push(newInline);
 			});
 			selection.move();
-			const nodeApi = this.editor.node;
+			const nodeApi = editor.node;
 			applyInlines.forEach((inline) => {
 				const prev = inline.prev()?.prev();
 				const next = inline.next()?.next();
@@ -1084,8 +1089,8 @@ class Inline implements InlineModelInterface {
 			return;
 		}
 		if (node.isCard()) return;
-		const nodeApi = this.editor.node;
-		const markApi = this.editor.mark;
+		const nodeApi = editor.node;
+		const markApi = editor.mark;
 		//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
 		if (nodeApi.isInline(node, schema) && node.name !== 'br') {
 			const parentInline = this.closest(node);

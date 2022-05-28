@@ -12,6 +12,9 @@ export interface SupOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
+
+const MARKDOWN_IT = 'markdown-it';
+
 export default class<T extends SupOptions = SupOptions> extends MarkPlugin<T> {
 	tagName = 'sup';
 
@@ -21,8 +24,9 @@ export default class<T extends SupOptions = SupOptions> extends MarkPlugin<T> {
 
 	init() {
 		super.init();
-		if (isEngine(this.editor)) {
-			this.editor.on('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.on(MARKDOWN_IT, this.markdownIt);
 		}
 	}
 
@@ -58,6 +62,6 @@ export default class<T extends SupOptions = SupOptions> extends MarkPlugin<T> {
 	};
 
 	destroy(): void {
-		this.editor.off('markdown-it', this.markdownIt);
+		this.editor.off(MARKDOWN_IT, this.markdownIt);
 	}
 }

@@ -129,7 +129,7 @@ class Image {
 		this.maximize = this.root.find('.data-image-maximize');
 		this.bg = this.root.find('.data-image-bg');
 		this.maxWidth = this.getMaxWidth();
-		this.pswp = pswp || new Pswp(this.editor);
+		this.pswp = pswp || new Pswp(editor);
 		this.message = this.options.message;
 		pswp = this.pswp;
 	}
@@ -189,13 +189,12 @@ class Image {
 	}
 
 	bindErrorEvent(node: NodeInterface) {
+		const editor = this.editor;
 		const copyNode = node.find('.data-icon-copy');
 		copyNode.on('mouseenter', () => {
 			Tooltip.show(
 				copyNode,
-				this.editor.language
-					.get('image', 'errorMessageCopy')
-					.toString(),
+				editor.language.get('image', 'errorMessageCopy').toString(),
 			);
 		});
 		copyNode.on('mouseleave', () => {
@@ -205,12 +204,12 @@ class Image {
 			event.stopPropagation();
 			event.preventDefault();
 			Tooltip.hide();
-			this.editor.clipboard.copy(
+			editor.clipboard.copy(
 				this.message || this.options.message || 'Error message',
 			);
-			this.editor.messageSuccess(
+			editor.messageSuccess(
 				'copy',
-				this.editor.language.get('copy', 'success').toString(),
+				editor.language.get('copy', 'success').toString(),
 			);
 		});
 	}
@@ -220,7 +219,8 @@ class Image {
 	}
 
 	imageLoadCallback() {
-		const root = this.editor.card.closest(this.root);
+		const editor = this.editor;
+		const root = editor.card.closest(this.root);
 		if (!root || this.status === 'uploading') {
 			return;
 		}
@@ -248,13 +248,13 @@ class Image {
 		this.detail.css('height', '');
 		this.detail.css('width', '');
 		const { onChange } = this.options;
-		if (isEngine(this.editor) && onChange) {
+		if (isEngine(editor) && onChange) {
 			onChange(this.size, true);
 		}
 		window.removeEventListener('resize', this.onWindowResize);
 		window.addEventListener('resize', this.onWindowResize);
-		this.editor.off('editor:resize', this.onWindowResize);
-		this.editor.on('editor:resize', this.onWindowResize);
+		editor.off('editor:resize', this.onWindowResize);
+		editor.on('editor:resize', this.onWindowResize);
 		// 重新调整拖动层尺寸
 		if (this.resizer) {
 			this.resizer.setSize(img.clientWidth, img.clientHeight);
@@ -411,19 +411,19 @@ class Image {
 	openZoom = (event: MouseEvent | TouchEvent) => {
 		event.preventDefault();
 		event.stopPropagation();
-
+		const editor = this.editor;
 		const imageArray: PhotoSwipe.Item[] = [];
-		const cardRoot = this.editor.card.closest(this.root);
+		const cardRoot = editor.card.closest(this.root);
 		let rootIndex = 0;
 
-		this.editor.container
+		editor.container
 			.find('[data-card-key="image"]')
 			.toArray()
 			.filter((image) => {
 				return image.find('img').length > 0;
 			})
 			.forEach((imageNode, index) => {
-				const card = this.editor.card.find<ImageValue>(imageNode);
+				const card = editor.card.find<ImageValue>(imageNode);
 				const value = card?.getValue();
 				if (!card || !value) return;
 				const image = card.getCenter().find('img');
@@ -465,9 +465,10 @@ class Image {
 		if (!clientWidth || !clientHeight) {
 			return;
 		}
+		const editor = this.editor;
 		this.maxWidth = this.getMaxWidth();
 		this.rate = clientHeight / clientWidth;
-		if (isMobile || !isEngine(this.editor) || this.editor.readonly) return;
+		if (isMobile || !isEngine(editor) || editor.readonly) return;
 		if (this.options.enableResizer === false) {
 			return;
 		}
@@ -527,17 +528,15 @@ class Image {
 		if (display === CardType.BLOCK) {
 			this.root.addClass('data-image-blcok');
 		}
+		const editor = this.editor;
 		if (enableResizer === false) {
 			this.root.addClass('data-image-disable-resize');
 		}
-		if (this.status === 'error' && isEngine(this.editor)) {
+		if (this.status === 'error' && isEngine(editor)) {
 			this.root = $(
 				this.renderTemplate(
 					this.message ||
-						this.editor.language.get<string>(
-							'image',
-							'uploadError',
-						),
+						editor.language.get<string>('image', 'uploadError'),
 				),
 			);
 			this.bindErrorEvent(this.root);
@@ -614,7 +613,7 @@ class Image {
 			});
 		}
 
-		if (!isEngine(this.editor) || this.editor.readonly) {
+		if (!isEngine(editor) || editor.readonly) {
 			const link = this.image.closest('a');
 			// 无链接
 			if (link.length === 0) {
@@ -622,7 +621,7 @@ class Image {
 			}
 		}
 		this.maximize.on('click', this.openZoom);
-		if (isEngine(this.editor) || !this.root.inEditor()) {
+		if (isEngine(editor) || !this.root.inEditor()) {
 			this.image.on('dblclick', this.openZoom);
 		}
 	}

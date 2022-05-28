@@ -57,13 +57,14 @@ class ToolbarPlugin<
 	private popup?: ToolbarPopup;
 
 	init() {
-		if (isEngine(this.editor)) {
-			this.editor.on('keydown:slash', this.onSlash);
-			this.editor.on('parse:value', this.paserValue);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.on('keydown:slash', this.onSlash);
+			editor.on('parse:value', this.paserValue);
 		}
-		this.editor.language.add(locales);
+		editor.language.add(locales);
 		if (this.options.popup) {
-			this.popup = new ToolbarPopup(this.editor, {
+			this.popup = new ToolbarPopup(editor, {
 				items: this.options.popup.items,
 			});
 		}
@@ -80,10 +81,11 @@ class ToolbarPlugin<
 	};
 
 	onSlash = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		let range = change.range.get();
-		const block = this.editor.block.closest(range.startNode);
+		const block = editor.block.closest(range.startNode);
 		const text = block.text().trim();
 		if (text === '/' && isSafari) {
 			block.empty();
@@ -99,15 +101,15 @@ class ToolbarPlugin<
 			range = change.range.get();
 			if (range.collapsed) {
 				event.preventDefault();
-				const data = this.options.config || defaultConfig(this.editor);
-				const card = this.editor.card.insert(
+				const data = this.options.config || defaultConfig(editor);
+				const card = editor.card.insert(
 					ToolbarComponent.cardName,
 					{},
 					data,
 				) as ToolbarComponent<ToolbarValue>;
 				card.setData(data);
 				card.root.attributes(DATA_TRANSIENT_ELEMENT, 'true');
-				this.editor.card.activate(card.root);
+				editor.card.activate(card.root);
 				range = change.range.get();
 				//选中关键词输入节点
 				const keyword = card.find('.data-toolbar-component-keyword');
@@ -124,8 +126,9 @@ class ToolbarPlugin<
 
 	destroy() {
 		this.popup?.destroy();
-		this.editor.off('keydown:slash', this.onSlash);
-		this.editor.off('parse:value', this.paserValue);
+		const editor = this.editor;
+		editor.off('keydown:slash', this.onSlash);
+		editor.off('parse:value', this.paserValue);
 	}
 }
 export { ToolbarComponent, ToolbarPopup };

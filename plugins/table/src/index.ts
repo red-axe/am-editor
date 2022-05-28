@@ -47,8 +47,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	}
 
 	onCopy = (event: ClipboardEvent) => {
-		if (!isEngine(this.editor) || this.editor.readonly) return true;
-		const { change, card } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor) || editor.readonly) return true;
+		const { change, card } = editor;
 		const range = change.range.get();
 		const component = card.find<TableValue, TableComponent>(
 			range.commonAncestorNode,
@@ -63,9 +64,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			if (nodes.length > 1) {
 				event.preventDefault();
 				component.command.copy();
-				this.editor.messageSuccess(
+				editor.messageSuccess(
 					'copy',
-					this.editor.language.get<string>('copy', 'success'),
+					editor.language.get<string>('copy', 'success'),
 				);
 				return false;
 			}
@@ -74,8 +75,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	};
 
 	onCut = (event: ClipboardEvent) => {
-		if (!isEngine(this.editor) || this.editor.readonly) return true;
-		const { change, card } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor) || editor.readonly) return true;
+		const { change, card } = editor;
 		const range = change.range.get();
 		const component = card.find<TableValue, TableComponent>(
 			range.commonAncestorNode,
@@ -97,8 +99,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	};
 
 	onPaste = (event: ClipboardEvent) => {
-		if (!isEngine(this.editor) || this.editor.readonly) return true;
-		const { change, card } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor) || editor.readonly) return true;
+		const { change, card } = editor;
 		const range = change.range.get();
 		const component = card.find<TableValue, TableComponent>(
 			range.commonAncestorNode,
@@ -109,7 +112,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			component.getSelectionNodes &&
 			component.name === TableComponent.cardName
 		) {
-			const data = this.editor.clipboard.getData(event);
+			const data = editor.clipboard.getData(event);
 			if (
 				!data ||
 				!/<meta\s+name="aomao"\s+content="table"\s{0,}\/?>/gi.test(
@@ -256,13 +259,14 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	};
 
 	execute(rows?: number, cols?: number): void {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		//可编辑子区域内不插入表格
-		const { change } = this.editor;
+		const { change } = editor;
 		const range = change.range.get();
 		if (range.startNode.closest(EDITABLE_SELECTOR).length > 0) return;
 		//插入表格
-		this.editor.card.insert<TableValue>(TableComponent.cardName, {
+		editor.card.insert<TableValue>(TableComponent.cardName, {
 			rows: rows || 3,
 			cols: cols || 3,
 			overflow: !!this.options.overflow,
@@ -280,7 +284,8 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	}
 
 	pasteHtml = (root: NodeInterface) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		const clearWH = (
 			node: NodeInterface,
 			type: 'width' | 'height' = 'width',
@@ -292,9 +297,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		};
 		const tables = root.find('table');
 		if (tables.length === 0) return;
-		const helper = new Helper(this.editor);
+		const helper = new Helper(editor);
 		// 判断当前是在可编辑卡片内，在可编辑卡片内不嵌套表格
-		const { change } = this.editor;
+		const { change } = editor;
 		const range = change.range.get();
 
 		const clearTable = (table: NodeInterface) => {
@@ -307,8 +312,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			trs.forEach((tr) => {
 				const tds = tr.find('td').toArray();
 				tds.forEach((td) => {
-					if (!this.editor.node.isEmpty(td))
-						table.before(td.children());
+					if (!editor.node.isEmpty(td)) table.before(td.children());
 				});
 			});
 			const tfoot = table.find('tfoot');
@@ -402,9 +406,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				}
 				// 对单元格内的内容标准化
 				const fragmentNode = $(fragment);
-				element
-					?.empty()
-					.append(this.editor.node.normalize(fragmentNode));
+				element?.empty().append(editor.node.normalize(fragmentNode));
 			});
 			const background =
 				node?.css('background') || node?.css('background-color');
@@ -435,24 +437,20 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 					tr?.css('background') || tr?.css('background-color');
 				if (background) tds?.css('background', background);
 			});
-			this.editor.nodeId.generateAll(node, true);
+			editor.nodeId.generateAll(node, true);
 			const children = node.allChildren();
 			children.forEach((child) => {
-				if (this.editor.node.isInline(child)) {
-					this.editor.inline.repairCursor(child);
+				if (editor.node.isInline(child)) {
+					editor.inline.repairCursor(child);
 				}
 			});
 			const html = node
 				.get<HTMLElement>()!
 				.outerHTML.replace(/\n|\r\n/g, '')
 				.replace(/>\s+</g, '><');
-			this.editor.card.replaceNode<TableValue>(
-				node,
-				TableComponent.cardName,
-				{
-					html,
-				},
-			);
+			editor.card.replaceNode<TableValue>(node, TableComponent.cardName, {
+				html,
+			});
 			node.remove();
 		});
 	};
@@ -461,6 +459,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		root: NodeInterface,
 		callback?: (node: NodeInterface, value: TableValue) => NodeInterface,
 	) => {
+		const editor = this.editor;
 		const results: NodeInterface[] = [];
 		root.find(
 			`[${CARD_KEY}="${TableComponent.cardName}"],[${READY_CARD_KEY}="${TableComponent.cardName}"]`,
@@ -478,7 +477,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 					node.remove();
 					return;
 				} else {
-					this.editor.trigger('parse:html', table);
+					editor.trigger('parse:html', table);
 				}
 			}
 			const width = table.attributes('width') || table.css('width');
@@ -506,7 +505,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			});
 			table.find(Template.TABLE_TD_BG_CLASS).remove();
 			table.find(Template.TABLE_TD_CONTENT_CLASS).each((content) => {
-				this.editor.node.unwrap($(content));
+				editor.node.unwrap($(content));
 			});
 			if (callback) {
 				table = callback(table, value);
@@ -524,10 +523,11 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('paste:each-after', this.pasteHtml);
-		this.editor.off('paste:schema', this.pasteSchema);
-		this.editor.off('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		editor.off('parse:html', this.parseHtml);
+		editor.off('paste:each-after', this.pasteHtml);
+		editor.off('paste:schema', this.pasteSchema);
+		editor.off('markdown-it', this.markdownIt);
 	}
 }
 

@@ -145,7 +145,7 @@ export default class Clipboard implements ClipboardInterface {
 				throw 'Copy failed';
 			}
 		} catch (err) {
-			this.editor.messageError(
+			editor.messageError(
 				'copy',
 				'The copy command was not executed successfully ',
 				err,
@@ -156,13 +156,14 @@ export default class Clipboard implements ClipboardInterface {
 	}
 
 	cut() {
-		const range = Range.from(this.editor);
-		if (!range || !isEngine(this.editor)) return;
+		const editor = this.editor;
+		const range = Range.from(editor);
+		if (!range || !isEngine(editor)) return;
 		const root = range.commonAncestorNode;
-		const change = this.editor.change;
+		const change = editor.change;
 		change.cacheRangeBeforeCommand();
 		change.delete(range);
-		const listElements = this.editor.node.isList(root)
+		const listElements = editor.node.isList(root)
 			? root
 			: root.find('ul,ol');
 		for (let i = 0; i < listElements.length; i++) {

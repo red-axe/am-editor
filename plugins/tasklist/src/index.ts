@@ -21,7 +21,10 @@ export interface TasklistOptions extends PluginOptions {
 }
 
 const TASK_LIST_CLASS = 'data-list-task';
-
+const PARSE_HTML = 'parse:html';
+const MARKDOWN_IT = 'markdown-it';
+const PASTE_EACH = 'paste:each';
+const PASTE_EACH_AFTER = 'paste:each-after';
 export default class<
 	T extends TasklistOptions = TasklistOptions,
 > extends ListPlugin<T> {
@@ -50,11 +53,12 @@ export default class<
 
 	init() {
 		super.init();
-		this.editor.on('parse:html', this.parseHtml);
-		if (isEngine(this.editor)) {
-			this.editor.on('markdown-it', this.markdownIt);
-			this.editor.on('paste:each-after', this.pasteEachAfter);
-			this.editor.on('paste:each', this.pasteHtml);
+		const editor = this.editor;
+		editor.on(PARSE_HTML, this.parseHtml);
+		if (isEngine(editor)) {
+			editor.on(MARKDOWN_IT, this.markdownIt);
+			editor.on(PASTE_EACH_AFTER, this.pasteEachAfter);
+			editor.on(PASTE_EACH, this.pasteHtml);
 		}
 	}
 
@@ -87,8 +91,9 @@ export default class<
 	}
 
 	execute(value?: any) {
-		if (!isEngine(this.editor)) return;
-		const { change, list, block } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, list, block } = editor;
 		list.split();
 		const range = change.range.get();
 		const activeBlocks = block.findBlocks(range);
@@ -103,7 +108,7 @@ export default class<
 					value,
 				) as Array<NodeInterface>;
 				listBlocks.forEach((list) => {
-					if (this.editor.node.isList(list))
+					if (editor.node.isList(list))
 						list.addClass(TASK_LIST_CLASS);
 				});
 			}
@@ -183,10 +188,11 @@ export default class<
 	};
 
 	markdownIt = (markdown: MarkdownIt) => {
+		const editor = this.editor;
 		if (this.options.markdown !== false) {
 			markdown.use(TaskMarkdown, {
-				itemClass: this.editor.list.CUSTOMZIE_LI_CLASS,
-				rootClass: `${this.editor.list.CUSTOMZIE_UL_CLASS} ${TASK_LIST_CLASS}`,
+				itemClass: editor.list.CUSTOMZIE_LI_CLASS,
+				rootClass: `${editor.list.CUSTOMZIE_UL_CLASS} ${TASK_LIST_CLASS}`,
 			});
 			markdown.enable('task-list');
 		}
@@ -210,13 +216,14 @@ export default class<
 	};
 
 	pasteEachAfter = (root: NodeInterface) => {
-		const liNodes = root.find(`li.${this.editor.list.CUSTOMZIE_LI_CLASS}`);
+		const editor = this.editor;
+		const liNodes = root.find(`li.${editor.list.CUSTOMZIE_LI_CLASS}`);
 		liNodes.each((_, index) => {
 			const child = liNodes.eq(index);
 			if (!child) return;
 			const firstChild = child.first();
 			if (firstChild && firstChild.name === CheckboxComponent.cardName) {
-				const card = this.editor.card.find<CheckboxValue>(firstChild);
+				const card = editor.card.find<CheckboxValue>(firstChild);
 				if (card) {
 					const parent = child.parent();
 					parent?.addClass(TASK_LIST_CLASS);
@@ -232,11 +239,12 @@ export default class<
 	};
 
 	destroy(): void {
-		this.editor.off('parse:html', this.parseHtml);
-		if (isEngine(this.editor)) {
-			this.editor.off('markdown-it', this.markdownIt);
-			this.editor.off('paste:each-after', this.pasteEachAfter);
-			this.editor.off('paste:each', this.pasteHtml);
+		const editor = this.editor;
+		editor.off(PARSE_HTML, this.parseHtml);
+		if (isEngine(editor)) {
+			editor.off(MARKDOWN_IT, this.markdownIt);
+			editor.off(PASTE_EACH_AFTER, this.pasteEachAfter);
+			editor.off(PASTE_EACH, this.pasteHtml);
 		}
 	}
 }

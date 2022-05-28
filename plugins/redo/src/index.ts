@@ -9,13 +9,15 @@ export default class<T extends RedoOptions = RedoOptions> extends Plugin<T> {
 	}
 
 	execute() {
-		if (!isEngine(this.editor)) return;
-		if (!this.editor.readonly) this.editor.history.redo();
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		if (!editor.readonly) editor.history.redo();
 	}
 
 	queryState() {
-		if (!isEngine(this.editor) || this.editor.readonly) return;
-		return this.editor.history.hasRedo();
+		const editor = this.editor;
+		if (!isEngine(editor) || editor.readonly) return;
+		return editor.history.hasRedo();
 	}
 
 	hotkey() {

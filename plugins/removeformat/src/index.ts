@@ -11,8 +11,9 @@ export default class<
 	}
 
 	execute() {
-		if (!isEngine(this.editor)) return;
-		const { change, block, mark, inline } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, block, mark, inline } = editor;
 		const blockApi = block;
 		const range = change.range.get();
 		const blocks = blockApi.getBlocks(range);

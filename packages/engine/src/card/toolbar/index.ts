@@ -44,9 +44,9 @@ class CardToolbar implements CardToolbarInterface {
 	constructor(editor: EditorInterface, card: CardInterface) {
 		this.editor = editor;
 		this.card = card;
-		this.position = new Position(this.editor);
+		this.position = new Position(editor);
 		this.unbindEnterShow();
-		if (!isEngine(this.editor) || this.editor.readonly) {
+		if (!isEngine(editor) || editor.readonly) {
 			this.bindEnterShow();
 		}
 	}
@@ -70,8 +70,9 @@ class CardToolbar implements CardToolbarInterface {
 		this.#hideTimeout = setTimeout(() => {
 			this.hide();
 			this.#hideTimeout = null;
-			this.toolbar?.root?.off('mouseenter', this.clearHide);
-			this.toolbar?.root?.off('mouseleave', this.enterHide);
+			const toolbar = this.toolbar;
+			toolbar?.root?.off('mouseenter', this.clearHide);
+			toolbar?.root?.off('mouseleave', this.enterHide);
 		}, 200);
 	};
 
@@ -80,8 +81,9 @@ class CardToolbar implements CardToolbarInterface {
 		this.#showTimeout = setTimeout(() => {
 			this.#showTimeout = null;
 			this.show();
-			this.toolbar?.root?.on('mouseenter', this.clearHide);
-			this.toolbar?.root?.on('mouseleave', this.enterHide);
+			const toolbar = this.toolbar;
+			toolbar?.root?.on('mouseenter', this.clearHide);
+			toolbar?.root?.on('mouseleave', this.enterHide);
 		}, 200);
 	};
 
@@ -303,19 +305,19 @@ class CardToolbar implements CardToolbarInterface {
 		const container = this.getContainer();
 		if (container && container.length > 0) {
 			this.showDnd();
+			const card = this.card;
 			container.addClass('data-toolbar-active');
 			container.attributes(
 				'toolbar-trigger-key',
-				(this.card.constructor as CardEntry).cardName,
+				(card.constructor as CardEntry).cardName,
 			);
 			if (this.toolbar) this.toolbar.show();
 			let prevAlign = this.#defaultAlign;
+			const position = this.position;
 			setTimeout(() => {
-				this.position.bind(
+				position.bind(
 					container,
-					this.card.isMaximize
-						? this.card.getCenter().first()!
-						: this.card.root,
+					card.isMaximize ? card.getCenter().first()! : card.root,
 					this.#defaultAlign,
 					this.offset,
 					(rect) => {
@@ -325,20 +327,20 @@ class CardToolbar implements CardToolbarInterface {
 							rect.align === 'bottomLeft' &&
 							rect.align !== prevAlign
 						) {
-							this.position.setOffset([
+							position.setOffset([
 								this.offset[2],
 								this.offset[3],
 							]);
 							prevAlign = rect.align;
-							this.position.update(false);
+							position.update(false);
 						} else if (
 							this.offset &&
 							rect.align === this.#defaultAlign &&
 							rect.align !== prevAlign
 						) {
-							this.position.setOffset(this.offset);
+							position.setOffset(this.offset);
 							prevAlign = rect.align;
-							this.position.update(false);
+							position.update(false);
 						}
 						prevAlign = rect.align;
 					},

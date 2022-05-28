@@ -227,14 +227,14 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		video.oncontextmenu = function () {
 			return false;
 		};
+		const editor = this.editor;
 		video.onloadedmetadata = () => {
-			const videoPlugin =
-				this.editor.plugin.findPlugin<VideoOptions>('video');
+			const videoPlugin = editor.plugin.findPlugin<VideoOptions>('video');
 			const fullEditor = videoPlugin?.options.fullEditor;
 			const fullWidth =
-				this.editor.container.width() -
-				removeUnit(this.editor.container.css('padding-left')) -
-				removeUnit(this.editor.container.css('padding-right'));
+				editor.container.width() -
+				removeUnit(editor.container.css('padding-left')) -
+				removeUnit(editor.container.css('padding-right'));
 
 			if (!value.naturalWidth) {
 				value.naturalWidth = video.videoWidth || this.video?.width();
@@ -276,7 +276,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		// 一次渲染时序开启 controls 会触发一次内容为空的 window.onerror，疑似 chrome bug
 		setTimeout(() => {
 			video.controls = true;
-			if (!isEngine(this.editor))
+			if (!isEngine(editor))
 				(video as HTMLMediaElement)['controlsList'] = 'nodownload';
 		}, 0);
 	}
@@ -288,6 +288,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	};
 
 	toolbar() {
+		const editor = this.editor;
 		const getItems = () => {
 			const items: Array<CardToolbarItemOptions | ToolbarItemOptions> =
 				[];
@@ -307,7 +308,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 					});
 				}
 
-				if (isEngine(this.editor) && !this.editor.readonly) {
+				if (isEngine(editor) && !editor.readonly) {
 					items.push({
 						key: 'copy',
 						type: 'copy',
@@ -319,7 +320,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 				}
 			}
 
-			if (isEngine(this.editor) && !this.editor.readonly) {
+			if (isEngine(editor) && !editor.readonly) {
 				items.push({
 					key: 'delete',
 					type: 'delete',
@@ -329,7 +330,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		};
 
 		const options =
-			this.editor.plugin.findPlugin<VideoOptions>('video')?.options;
+			editor.plugin.findPlugin<VideoOptions>('video')?.options;
 		if (options?.cardToolbars) {
 			return options.cardToolbars(getItems());
 		}
@@ -562,13 +563,14 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		}
 		//先清空卡片内容容器
 		center.empty();
-		const { command, plugin } = this.editor;
+		const editor = this.editor;
+		const { command, plugin } = editor;
 		const { video_id, status } = value;
 		const locales = this.getLocales();
 
 		this.maxWidth = this.getMaxWidth();
 		//阅读模式
-		if (!isEngine(this.editor)) {
+		if (!isEngine(editor)) {
 			if (status === 'done') {
 				//设置为加载状态
 				this.container = $(
@@ -726,8 +728,9 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	}
 
 	handleClick = (event: MouseEvent) => {
-		if (isEngine(this.editor) && !this.activated) {
-			this.editor.card.activate(
+		const editor = this.editor;
+		if (isEngine(editor) && !this.activated) {
+			editor.card.activate(
 				this.root,
 				CardActiveTrigger.MOUSE_DOWN,
 				event,
@@ -743,11 +746,12 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	didRender() {
 		super.didRender();
 		this.onWindowResize();
+		const editor = this.editor;
 		window.addEventListener('resize', this.onWindowResize);
-		this.editor.on('editor:resize', this.onWindowResize);
+		editor.on('editor:resize', this.onWindowResize);
 		this.toolbarModel?.setDefaultAlign('top');
 		this.container?.on('mousedown', this.handleClick);
-		if (!isEngine(this.editor) || this.editor.readonly) {
+		if (!isEngine(editor) || editor.readonly) {
 			this.mask?.hide();
 		}
 	}

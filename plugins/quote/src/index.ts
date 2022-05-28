@@ -12,6 +12,12 @@ export interface QuoteOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
+
+const PARSE_HTML = 'parse:html';
+const KEYDOWN_BACKSPACE = 'keydown:backspace';
+const KEYDOWN_ENTER = 'keydown:enter';
+const PASTE_EACH = 'paste:each';
+const MARKDOWN_IT = 'markdown-it';
 export default class<
 	T extends QuoteOptions = QuoteOptions,
 > extends BlockPlugin<T> {
@@ -25,20 +31,22 @@ export default class<
 
 	init() {
 		super.init();
-		this.editor.schema.addAllowIn(this.tagName);
-		this.editor.on('parse:html', this.parseHtml);
-		if (isEngine(this.editor)) {
-			this.editor.on('paste:each', this.pasteHtml);
-			this.editor.on('keydown:backspace', this.onBackspace);
-			this.editor.on('keydown:enter', this.onEnter);
-			this.editor.on('paste:each', this.pasteEach);
-			this.editor.on('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		editor.schema.addAllowIn(this.tagName);
+		editor.on(PARSE_HTML, this.parseHtml);
+		if (isEngine(editor)) {
+			editor.on(PASTE_EACH, this.pasteHtml);
+			editor.on(KEYDOWN_BACKSPACE, this.onBackspace);
+			editor.on(KEYDOWN_ENTER, this.onEnter);
+			editor.on(PASTE_EACH, this.pasteEach);
+			editor.on(MARKDOWN_IT, this.markdownIt);
 		}
 	}
 
 	execute() {
-		if (!isEngine(this.editor)) return;
-		const { change, block, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, block, node } = editor;
 		if (!this.queryState()) {
 			block.wrap(`<${this.tagName} />`);
 		} else {
@@ -53,8 +61,9 @@ export default class<
 	}
 
 	queryState() {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		const blocks = change.blocks;
 		if (blocks.length === 0) {
 			return false;
@@ -80,10 +89,11 @@ export default class<
 	};
 
 	onBackspace = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor)) return;
-		const { change, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, node } = editor;
 		const range = change.range.get();
-		const blockApi = this.editor.block;
+		const blockApi = editor.block;
 
 		const inEnd = blockApi.isLastOffset(range, 'end');
 		if (inEnd && !range.collapsed) {
@@ -131,9 +141,10 @@ export default class<
 	};
 
 	onEnter = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
-		const blockApi = this.editor.block;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
+		const blockApi = editor.block;
 		const range = change.range.get();
 		// 选区选中最后的节点
 		const block = blockApi.closest(range.endNode);
@@ -163,28 +174,30 @@ export default class<
 	};
 
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (node.name === this.tagName) {
-			const nodeApi = this.editor.node;
+			const nodeApi = editor.node;
 			node.css('padding-left', '');
 			node.css('text-indent', '');
 			if (nodeApi.isEmpty(node)) {
 				node.empty().append('<p><br/></p>');
 			}
-			this.editor.normalize(node);
+			editor.normalize(node);
 			return false;
 		}
 		return true;
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
-		if (isEngine(this.editor)) {
-			this.editor.off('paste:each', this.pasteHtml);
-			this.editor.off('keydown:backspace', this.onBackspace);
-			this.editor.off('keydown:enter', this.onEnter);
-			this.editor.off('paste:each', this.pasteEach);
-			this.editor.off('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		editor.off(PARSE_HTML, this.parseHtml);
+		if (isEngine(editor)) {
+			editor.off(PASTE_EACH, this.pasteHtml);
+			editor.off(KEYDOWN_BACKSPACE, this.onBackspace);
+			editor.off(KEYDOWN_ENTER, this.onEnter);
+			editor.off(PASTE_EACH, this.pasteEach);
+			editor.off(MARKDOWN_IT, this.markdownIt);
 		}
 	}
 }

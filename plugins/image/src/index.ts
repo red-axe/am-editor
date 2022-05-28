@@ -17,14 +17,17 @@ import { ImageUploaderOptions } from './uploader';
 import locales from './locales';
 import { ImageOptions } from './types';
 
+const PARSE_HTML = 'parse:html';
+
 export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'image';
 	}
 
 	init() {
-		this.editor.language.add(locales);
-		this.editor.on('parse:html', this.parseHtml);
+		const editor = this.editor;
+		editor.language.add(locales);
+		editor.on(PARSE_HTML, this.parseHtml);
 	}
 
 	execute(
@@ -115,13 +118,12 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 		callback?: (node: NodeInterface, value: ImageValue) => NodeInterface,
 	) => {
 		const results: NodeInterface[] = [];
+		const editor = this.editor;
 		root.find(
 			`[${CARD_KEY}="${ImageComponent.cardName}"],[${READY_CARD_KEY}="${ImageComponent.cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find(
-				node,
-			) as ImageComponent<ImageValue>;
+			const card = editor.card.find(node) as ImageComponent<ImageValue>;
 			const value =
 				card?.getValue() ||
 				decodeCardValue(node.attributes(CARD_VALUE_KEY));
@@ -149,7 +151,7 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 					img = callback(img, value);
 				}
 				if (type === CardType.BLOCK) {
-					img = this.editor.node.wrap(
+					img = editor.node.wrap(
 						img,
 						$(`<p style="text-align:center;"></p>`),
 					);
@@ -162,7 +164,7 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off(PARSE_HTML, this.parseHtml);
 	}
 }
 

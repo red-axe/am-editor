@@ -28,10 +28,11 @@ class Hr<T extends HrValue = HrValue> extends Card<T> {
 	}
 
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
+		const editor = this.editor;
 		const getItems = (): Array<
 			ToolbarItemOptions | CardToolbarItemOptions
 		> => {
-			if (!isEngine(this.editor) || this.editor.readonly) return [];
+			if (!isEngine(editor) || editor.readonly) return [];
 			return [
 				{
 					key: 'dnd',
@@ -47,7 +48,7 @@ class Hr<T extends HrValue = HrValue> extends Card<T> {
 				},
 			];
 		};
-		const options = this.editor.plugin.findPlugin<HrOptions>('hr')?.options;
+		const options = editor.plugin.findPlugin<HrOptions>('hr')?.options;
 		if (options?.cardToolbars) {
 			return options.cardToolbars(getItems());
 		}

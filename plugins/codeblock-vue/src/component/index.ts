@@ -72,8 +72,8 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 				});
 			}
 		});
-
-		this.codeEditor = new CodeBlockEditor(this.editor, {
+		const editor = this.editor;
+		this.codeEditor = new CodeBlockEditor(editor, {
 			synatxMap: this.#modeSynatxMap,
 			onSave: (mode, value) => {
 				const oldValue = this.getValue();
@@ -86,16 +86,16 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 			onMouseDown: (event) => {
 				if (!this.activated)
 					setTimeout(() => {
-						this.editor.card.activate(
+						editor.card.activate(
 							this.root,
 							CardActiveTrigger.MOUSE_DOWN,
 						);
 					}, 10);
 			},
 			onUpFocus: (event) => {
-				if (!isEngine(this.editor)) return;
+				if (!isEngine(editor)) return;
 				event.preventDefault();
-				const { change, card } = this.editor;
+				const { change, card } = editor;
 				const range = change.range.get().cloneRange();
 				const prev = this.root.prev();
 				const cardComponent = prev ? card.find(prev) : undefined;
@@ -113,9 +113,9 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 				this.toolbarModel?.hide();
 			},
 			onDownFocus: (event) => {
-				if (!isEngine(this.editor)) return;
+				if (!isEngine(editor)) return;
 				event.preventDefault();
-				const { change, card } = this.editor;
+				const { change, card } = editor;
 				const range = change.range.get().cloneRange();
 				const next = this.root.next();
 				const cardComponent = next ? card.find(next) : undefined;
@@ -133,9 +133,9 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 				this.toolbarModel?.hide();
 			},
 			onLeftFocus: (event) => {
-				if (!isEngine(this.editor)) return;
+				if (!isEngine(editor)) return;
 				event.preventDefault();
-				const { change } = this.editor;
+				const { change } = editor;
 				const range = change.range.get().cloneRange();
 				this.focus(range, true);
 				change.range.select(range);
@@ -143,9 +143,9 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 				this.toolbarModel?.hide();
 			},
 			onRightFocus: (event) => {
-				if (!isEngine(this.editor)) return;
+				if (!isEngine(editor)) return;
 				event.preventDefault();
-				const { change } = this.editor;
+				const { change } = editor;
 				const range = change.range.get().cloneRange();
 				this.focus(range, false);
 				change.range.select(range);
@@ -156,17 +156,18 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 	}
 	#viewAutoWrap?: boolean = undefined;
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
+		const editor = this.editor;
 		const getItems = (): Array<
 			CardToolbarItemOptions | ToolbarItemOptions
 		> => {
 			if (this.loading) return [];
-			if (!isEngine(this.editor) || this.editor.readonly) {
+			if (!isEngine(editor) || editor.readonly) {
 				return [
 					{ key: 'copy', type: 'copy' },
 					{
 						key: 'autoWrap',
 						type: 'switch',
-						content: this.editor.language.get<string>(
+						content: editor.language.get<string>(
 							CodeBlcok.cardName,
 							'autoWrap',
 						),
@@ -223,7 +224,7 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 				{
 					key: 'autoWrap',
 					type: 'switch',
-					content: this.editor.language.get<string>(
+					content: editor.language.get<string>(
 						CodeBlcok.cardName,
 						'autoWrap',
 					),
@@ -242,9 +243,7 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 			];
 		};
 		const options =
-			this.editor.plugin.findPlugin<CodeBlockOptions>(
-				'codeblock',
-			)?.options;
+			editor.plugin.findPlugin<CodeBlockOptions>('codeblock')?.options;
 		if (options?.cardToolbars) {
 			return options.cardToolbars(getItems());
 		}

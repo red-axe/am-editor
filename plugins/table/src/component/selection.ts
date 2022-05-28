@@ -473,8 +473,9 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	}
 
 	focusCell(cell: NodeInterface | Node, start: boolean = false) {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		if (isNode(cell)) cell = $(cell);
 		const range = change.range.get();
 		const editableElement = cell.find(EDITABLE_SELECTOR);
@@ -494,8 +495,9 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	}
 
 	selectCellRange(cell: NodeInterface | Node) {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		if (isNode(cell)) cell = $(cell);
 		const range = change.range.get();
 		const editableElement = cell.find(EDITABLE_SELECTOR);
@@ -517,8 +519,9 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 
 	onTdMouseDown = (event: MouseEvent | TouchEvent) => {
 		this.selectRange = undefined;
-		if (!event.target || !isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!event.target || !isEngine(editor)) return;
+		const { change } = editor;
 		const target = $(event.target);
 		const td = target.closest('td');
 		if (td.length === 0) return;
@@ -602,9 +605,9 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 						return next();
 					const node = $('<p><br /></p>');
 					editableElement.append(node);
-					const range = this.editor.change.range.get();
+					const range = editor.change.range.get();
 					range.select(node, true).collapse(false);
-					this.editor.change.apply(range);
+					editor.change.apply(range);
 				}
 			}
 		}
@@ -707,13 +710,14 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	};
 
 	selectLeft(event: KeyboardEvent, td: NodeInterface) {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		//获取单元格位置
 		const [row, col] = this.getCellPoint(td);
 		if (row < 0 || col < 0) return;
 		const count = this.selectArea?.count || 0;
 		//查看当前光标是否处于单元格可编辑节点的开始位置
-		const range = this.editor.change.range.get();
+		const range = editor.change.range.get();
 		if (count === 0) {
 			if (this.selectRange && this.selectRange.type === 'right') {
 				if (range.endOffset !== this.selectRange.startOffset) {
@@ -757,14 +761,15 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	}
 
 	selectRigth(event: KeyboardEvent, td: NodeInterface) {
-		if (!isEngine(this.editor) || !this.tableModel) return;
+		const editor = this.editor;
+		if (!isEngine(editor) || !this.tableModel) return;
 		event.stopPropagation();
 		//获取单元格位置
 		const [row, col] = this.getCellPoint(td);
 		if (row < 0 || col < 0) return;
 		const count = this.selectArea?.count || 0;
 		//当前没有选择任何单元格的时候判断光标位置
-		const range = this.editor.change.range.get();
+		const range = editor.change.range.get();
 		if (count === 0) {
 			if (this.selectRange && this.selectRange.type === 'left') {
 				if (range.startOffset !== this.selectRange.endOffset) {
@@ -819,13 +824,14 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	}
 
 	selectUp(event: KeyboardEvent, td: NodeInterface) {
-		if (!isEngine(this.editor) || !this.tableModel) return;
+		const editor = this.editor;
+		if (!isEngine(editor) || !this.tableModel) return;
 		//获取单元格位置
 		const [row, col] = this.getCellPoint(td);
 		if (row < 0 || col < 0) return;
 		const count = this.selectArea?.count || 0;
 		//当前没有选择任何单元格的时候判断光标位置
-		const range = this.editor.change.range.get();
+		const range = editor.change.range.get();
 		if (count === 0) {
 			if (this.selectRange && this.selectRange.type === 'bottom') {
 				if (range.endOffset !== this.selectRange.startOffset) {
@@ -865,13 +871,14 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 	}
 
 	selectDown(event: KeyboardEvent, td: NodeInterface) {
-		if (!isEngine(this.editor) || !this.tableModel) return;
+		const editor = this.editor;
+		if (!isEngine(editor) || !this.tableModel) return;
 		//获取单元格位置
 		const [row, col] = this.getCellPoint(td);
 		if (row < 0 || col < 0) return;
 		const count = this.selectArea?.count || 0;
 		//当前没有选择任何单元格的时候判断光标位置
-		const range = this.editor.change.range.get();
+		const range = editor.change.range.get();
 		range.shrinkToElementNode();
 		if (count === 0) {
 			if (this.selectRange && this.selectRange.type === 'top') {

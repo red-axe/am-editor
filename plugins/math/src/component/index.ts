@@ -43,13 +43,12 @@ export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 
 	init() {
 		super.init();
-		const tips = getLocales<{ text: string; href: string }>(
-			this.editor,
-		).tips;
-		const { card } = this.editor;
-		if (!this.#position) this.#position = new Position(this.editor);
+		const editor = this.editor;
+		const tips = getLocales<{ text: string; href: string }>(editor).tips;
+		const { card } = editor;
+		if (!this.#position) this.#position = new Position(editor);
 		if (this.mathEditor) return;
-		this.mathEditor = new MathEditor(this.editor, {
+		this.mathEditor = new MathEditor(editor, {
 			tips: `<a class="tips-text" href="${tips.href}" target="_blank"><span class="data-icon data-icon-question-circle-o"></span>${tips.text}</a>`,
 			onFocus: () => {
 				this.editorContainer?.addClass('textarea-focus');
@@ -90,14 +89,15 @@ export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 	}
 
 	getMaxWidth(node: NodeInterface = this.root) {
-		const block = this.editor.block.closest(node).get<HTMLElement>();
+		const editor = this.editor;
+		const block = editor.block.closest(node).get<HTMLElement>();
 		if (!block) return 0;
 		const style = window.getComputedStyle(block);
 		const width =
 			parseInt(style.width) -
 			parseInt(style['padding-left']) -
 			parseInt(style['padding-right']);
-		return !isEngine(this.editor) ? width : width - 2;
+		return !isEngine(editor) ? width : width - 2;
 	}
 
 	focusTextarea() {
@@ -105,8 +105,9 @@ export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 	}
 
 	onActivate(activated: boolean) {
+		const editor = this.editor;
 		super.onActivate(activated);
-		if (!isEngine(this.editor) || this.editor.readonly) return;
+		if (!isEngine(editor) || editor.readonly) return;
 		if (activated) this.renderEditor();
 		else this.mathEditor?.destroy();
 	}
@@ -182,8 +183,9 @@ export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 	};
 
 	renderView() {
+		const editor = this.editor;
 		const value = this.getValue();
-		const locales = getLocales(this.editor);
+		const locales = getLocales(editor);
 		const { url, code } = value || { url: '', code: '' };
 		if (!this.container) {
 			this.container = $('<span class="data-math-container"></span>');
@@ -206,7 +208,7 @@ export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 				this.renderMath(code);
 			});
 		} else if (code) {
-			if (!isEngine(this.editor)) {
+			if (!isEngine(editor)) {
 				this.renderPureText(code);
 			} else {
 				this.renderMath(code);
@@ -214,7 +216,7 @@ export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 		} else {
 			this.renderPureText(locales.placeholder);
 		}
-		if (!isEngine(this.editor) || this.editor.readonly) {
+		if (!isEngine(editor) || editor.readonly) {
 			this.container.css('cursor', 'pointer');
 			this.container.attributes('draggable', 'true');
 			this.container.css('user-select', 'none');

@@ -69,8 +69,9 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 	};
 
 	toolbar() {
+		const editor = this.editor;
 		const options =
-			this.editor.plugin.findPlugin<FileOptions>('file')?.options ?? {};
+			editor.plugin.findPlugin<FileOptions>('file')?.options ?? {};
 		const getItems = () => {
 			const items: Array<CardToolbarItemOptions | ToolbarItemOptions> =
 				[];
@@ -119,7 +120,7 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 				}
 
 				if (
-					!(!isEngine(this.editor) || this.editor.readonly) &&
+					!(!isEngine(editor) || editor.readonly) &&
 					items.length > 0
 				) {
 					items.push({
@@ -129,7 +130,7 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 				}
 			}
 
-			if (!(!isEngine(this.editor) || this.editor.readonly)) {
+			if (!(!isEngine(editor) || editor.readonly)) {
 				items.push({
 					key: 'delete',
 					type: 'delete',
@@ -187,13 +188,12 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 	}
 
 	bindErrorEvent(node: NodeInterface) {
+		const editor = this.editor;
 		const copyNode = node.find('.data-icon-copy');
 		copyNode.on('mouseenter', () => {
 			Tooltip.show(
 				copyNode,
-				this.editor.language
-					.get('image', 'errorMessageCopy')
-					.toString(),
+				editor.language.get('image', 'errorMessageCopy').toString(),
 			);
 		});
 		copyNode.on('mouseleave', () => {
@@ -203,12 +203,10 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 			event.stopPropagation();
 			event.preventDefault();
 			Tooltip.hide();
-			this.editor.clipboard.copy(
-				this.getValue()?.message || 'Error message',
-			);
-			this.editor.messageSuccess(
+			editor.clipboard.copy(this.getValue()?.message || 'Error message');
+			editor.messageSuccess(
 				'copy',
-				this.editor.language.get('copy', 'success').toString(),
+				editor.language.get('copy', 'success').toString(),
 			);
 		});
 	}
@@ -234,8 +232,8 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 		} else {
 			this.container = this.getCenter().first()!;
 		}
-
-		if (isEngine(this.editor)) {
+		const editor = this.editor;
+		if (isEngine(editor)) {
 			this.container.attributes('draggable', 'true');
 		} else {
 			this.renderView();
@@ -246,7 +244,7 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 		this.container?.find('.percent').html(`${value.percent}%`);
 		this.updateMaxWidth();
 		window.addEventListener('resize', this.onWindowResize);
-		this.editor.on('editor:resize', this.onWindowResize);
+		editor.on('editor:resize', this.onWindowResize);
 	}
 
 	renderView() {

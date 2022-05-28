@@ -62,8 +62,9 @@ abstract class MarkEntry<T extends PluginOptions = PluginOptions>
 	}
 
 	queryState() {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		//如果没有属性和样式限制，直接查询是否包含当前标签名称
 		if (!this.style && !this.attributes)
 			return change.marks.some((node) => node.name === this.tagName);

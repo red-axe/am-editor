@@ -81,7 +81,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const cloneNode = cols.eq(colBase)?.clone();
 		if (!cloneNode) return;
 		let counter = count;
-
+		const nodeId = this.editor.nodeId;
 		while (counter > 0) {
 			// 插入头 和 col
 			const cloneColHeader = $(baseColHeader.outerHTML);
@@ -93,7 +93,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			const insertCloneCol = cloneNode?.clone();
 			insertCloneCol.removeAttributes(DATA_ID);
 			insertCloneCol.attributes('width', width);
-			this.editor.nodeId.create(insertCloneCol);
+			nodeId.create(insertCloneCol);
 			const baseCol = cols[index];
 			if (insertMethod === 'after') $(baseCol).after(insertCloneCol);
 			else colgroup[0].insertBefore(insertCloneCol[0], baseCol);
@@ -109,7 +109,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 					DATA_TRANSIENT_ATTRIBUTES,
 					'table-cell-selection',
 				);
-				this.editor.nodeId.generate(td);
+				nodeId.generate(td);
 			}
 		});
 
@@ -318,6 +318,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			});
 		});
 		let _count = count;
+		const nodeId = this.editor.nodeId;
 		const _loop = () => {
 			const tr = this.tableRoot
 				?.get<HTMLTableElement>()
@@ -335,8 +336,8 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			$(baseRowBar)[insertMethod](
 				$((baseRowBar as HTMLElement).outerHTML),
 			);
-			this.editor.nodeId.generate(tr);
-			this.editor.nodeId.generateAll(tr);
+			nodeId.generate(tr);
+			nodeId.generateAll(tr);
 			_count--;
 		};
 
@@ -469,8 +470,9 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 	}
 
 	removeTable() {
-		if (!isEngine(this.editor)) this.emit('tableRemoved');
-		this.editor.card.remove(this.table.id);
+		const editor = this.editor;
+		if (!isEngine(editor)) this.emit('tableRemoved');
+		editor.card.remove(this.table.id);
 	}
 
 	copy(all: boolean = false) {
@@ -589,13 +591,11 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const isSingleTd = begin.row === end.row && begin.col === end.col;
 		const { html, text } = data;
 		if (!html) return;
-		const { schema, conversion } = this.editor;
-		const pasteHTML = new Parser(html, this.editor).toValue(
-			schema,
-			conversion,
-		);
+		const editor = this.editor;
+		const { schema, conversion } = editor;
+		const pasteHTML = new Parser(html, editor).toValue(schema, conversion);
 		const element = helper.trimBlankSpan($(pasteHTML));
-		this.editor.nodeId.generateAll(element, true);
+		editor.nodeId.generateAll(element, true);
 		if (element.name === 'table') {
 			helper.normalizeTable(element);
 			const pasteTableModel = helper.getTableModel(element);

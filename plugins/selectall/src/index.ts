@@ -7,6 +7,7 @@ import {
 
 export interface SelectAllOptions extends PluginOptions {}
 
+const KEYDOWN_ALL = 'keydown:all';
 export default class<
 	T extends SelectAllOptions = SelectAllOptions,
 > extends Plugin<T> {
@@ -15,21 +16,22 @@ export default class<
 	}
 
 	init() {
-		this.editor.on('keydown:all', this.onSelectAll);
+		this.editor.on(KEYDOWN_ALL, this.onSelectAll);
 	}
 
 	execute() {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		const range = change.range.get();
 		const editableElement = range.startNode.closest(EDITABLE_SELECTOR);
 		if (editableElement.length > 0) {
 			range.select(editableElement, true);
 		} else {
-			range.select(this.editor.container, true);
+			range.select(editor.container, true);
 		}
 		change.range.select(range);
-		this.editor.trigger('select');
+		editor.trigger('select');
 	}
 
 	onSelectAll = (event: KeyboardEvent) => {
@@ -39,6 +41,6 @@ export default class<
 	};
 
 	destroy() {
-		this.editor.off('keydown:all', this.onSelectAll);
+		this.editor.off(KEYDOWN_ALL, this.onSelectAll);
 	}
 }

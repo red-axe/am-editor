@@ -39,15 +39,16 @@ class List implements ListModelInterface {
 	}
 
 	init() {
-		if (isEngine(this.editor)) {
+		const editor = this.editor;
+		if (isEngine(editor)) {
 			//绑定回车事件
-			const enter = new Enter(this.editor);
-			this.editor.typing
+			const enter = new Enter(editor);
+			editor.typing
 				.getHandleListener('enter', 'keydown')
 				?.on((event) => enter.trigger(event));
 			//删除事件
-			this.backspaceEvent = new Backspace(this.editor);
-			this.editor.typing
+			this.backspaceEvent = new Backspace(editor);
+			editor.typing
 				.getHandleListener('backspace', 'keydown')
 				?.on((event) => this.backspaceEvent?.trigger(event));
 		}
@@ -151,8 +152,9 @@ class List implements ListModelInterface {
 
 	getPlugins() {
 		const plugins: Array<ListInterface> = [];
-		Object.keys(this.editor.plugin.components).forEach((name) => {
-			const plugin = this.editor.plugin.components[name];
+		const pluginApi = this.editor.plugin;
+		Object.keys(pluginApi.components).forEach((name) => {
+			const plugin = pluginApi.components[name];
 			if (!!(plugin as ListInterface).isCurrent) {
 				plugins.push(plugin as ListInterface);
 			}
@@ -230,10 +232,11 @@ class List implements ListModelInterface {
 	 * @param node 节点
 	 */
 	unwrapCustomize(node: NodeInterface) {
-		if (this.editor.node.isCustomize(node)) {
+		const nodeApi = this.editor.node;
+		if (nodeApi.isCustomize(node)) {
 			switch (node.name) {
 				case 'li':
-					if (this.editor.node.isCustomize(node)) {
+					if (nodeApi.isCustomize(node)) {
 						const first = node.first();
 						if (first?.isCard()) first.remove();
 					}
@@ -301,8 +304,9 @@ class List implements ListModelInterface {
 	 * 获取当前选区的修复列表后的节点集合
 	 */
 	normalize(range?: RangeInterface) {
-		if (!isEngine(this.editor)) return [];
-		const { change, block, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return [];
+		const { change, block, node } = editor;
 		range = range || change.range.get();
 		const blocks = block.getBlocks(range);
 		const listNodes: Array<NodeInterface> = [];
@@ -364,8 +368,9 @@ class List implements ListModelInterface {
 	 * 将选中列表项列表分割出来单独作为一个列表
 	 */
 	split(range?: RangeInterface) {
-		if (!isEngine(this.editor)) return;
-		const { change, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, node } = editor;
 		const safeRange = range || change.range.toTrusty();
 		const blocks = this.normalize(range);
 		if (
@@ -450,8 +455,9 @@ class List implements ListModelInterface {
 	}
 
 	merge(blocks?: Array<NodeInterface>, range?: RangeInterface) {
-		if (!isEngine(this.editor)) return;
-		const { change, block, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, block, node } = editor;
 		const safeRange = range || change.range.toTrusty();
 		const cloneRange = safeRange.cloneRange();
 		const selection = blocks
@@ -489,10 +495,11 @@ class List implements ListModelInterface {
 	 * @param block 列表节点
 	 */
 	addStart(block?: NodeInterface) {
-		if (!isEngine(this.editor)) return;
-		const { change, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, node } = editor;
 		if (!block) {
-			const blocks = this.editor.block.getBlocks(change.range.get());
+			const blocks = editor.block.getBlocks(change.range.get());
 			if (blocks.length === 0) return;
 			block = blocks[0].closest('ul,ol');
 		}
@@ -637,12 +644,13 @@ class List implements ListModelInterface {
 			(first?.isCard() && first.attributes(CARD_KEY) === cardName)
 		)
 			return;
+		const editor = this.editor;
 		//创建卡片
-		const { card } = this.editor;
+		const { card } = editor;
 		const component = card.create(cardName, {
 			value,
 		});
-		const range = Range.create(this.editor);
+		const range = Range.create(editor);
 		//设置光标选中空的标签，在这个位置插入卡片
 		const br = $('<br />');
 		if ((node.get<Node>()?.childNodes.length ?? 0) > 0) {
@@ -737,8 +745,9 @@ class List implements ListModelInterface {
 	}
 
 	insert(fragment: DocumentFragment, range?: RangeInterface) {
-		if (!isEngine(this.editor) || fragment.childNodes.length === 0) return;
-		const { change, node, block } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor) || fragment.childNodes.length === 0) return;
+		const { change, node, block } = editor;
 		const safeRange = range || change.range.toTrusty();
 		// 光标展开，先删除内容
 		if (!safeRange.collapsed) change.delete(safeRange, true, true);
@@ -792,7 +801,7 @@ class List implements ListModelInterface {
 		if (node.isCustomize(listElement)) {
 			const cardElement = listElement.prev()?.first()?.first();
 			if (cardElement) {
-				const cardComponent = this.editor.card.find(cardElement);
+				const cardComponent = editor.card.find(cardElement);
 				if (cardComponent)
 					this.addCardToCustomize(
 						startLi,
@@ -967,7 +976,7 @@ class List implements ListModelInterface {
 						? listElements
 						: [listElements]
 					).forEach((child) => {
-						if (this.editor.node.isList(child))
+						if (editor.node.isList(child))
 							startListElment?.before(child);
 					});
 				}
@@ -1306,7 +1315,7 @@ class List implements ListModelInterface {
 		//判断选区内容是否是空节点
 		const block = $('<div />');
 		block.append(contents);
-		return this.editor.node.isEmpty(block);
+		return nodeApi.isEmpty(block);
 	}
 }
 

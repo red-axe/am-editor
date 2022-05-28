@@ -22,17 +22,19 @@ export default class extends Plugin<Options> {
 	}
 	// 插件初始化
 	init() {
+		const editor = this.editor;
 		// 监听解析成html的事件
-		this.editor.on('parse:html', this.parseHtml);
+		editor.on('parse:html', this.parseHtml);
 		// 监听粘贴时候设置schema规则的入口
-		this.editor.on('paste:schema', this.pasteSchema);
+		editor.on('paste:schema', this.pasteSchema);
 		// 监听粘贴时候的节点循环
-		this.editor.on('paste:each', this.pasteHtml);
+		editor.on('paste:each', this.pasteHtml);
 	}
 	// 执行方法
 	execute() {
-		if (!isEngine(this.editor) || this.editor.readonly) return;
-		const { card } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor) || editor.readonly) return;
+		const { card } = editor;
 		card.insert<TestValue>(TestComponent.cardName, {
 			text: 'This is card value',
 		});
@@ -57,13 +59,14 @@ export default class extends Plugin<Options> {
 	};
 	// 解析粘贴过来的html
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor) || this.editor.readonly) return;
+		const editor = this.editor;
+		if (!isEngine(editor) || editor.readonly) return;
 		if (node.isElement()) {
 			const type = node.attributes('data-type');
 			if (type === TestComponent.cardName) {
 				const value = node.attributes('data-value');
 				const cardValue = decodeCardValue(value);
-				this.editor.card.replaceNode(
+				editor.card.replaceNode(
 					node,
 					TestComponent.cardName,
 					cardValue,
@@ -97,12 +100,13 @@ export default class extends Plugin<Options> {
 	};
 
 	destroy() {
+		const editor = this.editor;
 		// 监听解析成html的事件
-		this.editor.off('parse:html', this.parseHtml);
+		editor.off('parse:html', this.parseHtml);
 		// 监听粘贴时候设置schema规则的入口
-		this.editor.off('paste:schema', this.pasteSchema);
+		editor.off('paste:schema', this.pasteSchema);
 		// 监听粘贴时候的节点循环
-		this.editor.off('paste:each', this.pasteHtml);
+		editor.off('paste:each', this.pasteHtml);
 	}
 }
 export { TestComponent };

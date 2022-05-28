@@ -49,11 +49,12 @@ class ToolbarComponent<V extends ToolbarValue = ToolbarValue> extends Card<V> {
 	}
 
 	init() {
-		if (!isEngine(this.editor) || isServer) {
+		const editor = this.editor;
+		if (!isEngine(editor) || isServer) {
 			return;
 		}
 
-		this.component = new CollapseComponent(this.editor, {
+		this.component = new CollapseComponent(editor, {
 			onCancel: () => {
 				this.changeToText();
 			},
@@ -68,13 +69,14 @@ class ToolbarComponent<V extends ToolbarValue = ToolbarValue> extends Card<V> {
 	}
 
 	getData(): Data {
-		if (!isEngine(this.editor)) {
+		const editor = this.editor;
+		if (!isEngine(editor)) {
 			return [];
 		}
 		const data:
 			| Data
 			| { title: any; items: Omit<CollapseItemProps, 'engine'>[] }[] = [];
-		const defaultConfig = getToolbarDefaultConfig(this.editor);
+		const defaultConfig = getToolbarDefaultConfig(editor);
 		const collapseConfig = defaultConfig.find(
 			({ type }) => type === 'collapse',
 		);
@@ -102,7 +104,7 @@ class ToolbarComponent<V extends ToolbarValue = ToolbarValue> extends Card<V> {
 							...(typeof item !== 'string' ? item : {}),
 							disabled: collapseItem.onDisabled
 								? collapseItem.onDisabled()
-								: !this.editor.command.queryEnabled(name),
+								: !editor.command.queryEnabled(name),
 						});
 					}
 				});
@@ -150,24 +152,27 @@ class ToolbarComponent<V extends ToolbarValue = ToolbarValue> extends Card<V> {
 	}
 
 	remove() {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		this.component?.remove();
-		this.editor.card.remove(this.id);
+		editor.card.remove(this.id);
 	}
 
 	changeToText() {
-		if (!this.root.inEditor() || !isEngine(this.editor)) {
+		const editor = this.editor;
+		if (!this.root.inEditor() || !isEngine(editor)) {
 			return;
 		}
 
 		const content = this.keyword?.get<HTMLElement>()?.innerText || '';
 		this.remove();
-		this.editor.node.insertText(content);
+		editor.node.insertText(content);
 	}
 
 	destroy() {
-		this.component?.unbindEvents();
-		this.component?.remove();
+		const component = this.component;
+		component?.unbindEvents();
+		component?.remove();
 	}
 
 	activate(activated: boolean) {
@@ -179,8 +184,9 @@ class ToolbarComponent<V extends ToolbarValue = ToolbarValue> extends Card<V> {
 	}
 
 	handleInput() {
-		if (!isEngine(this.editor)) return;
-		const { change, card } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, card } = editor;
 		if (change.isComposing()) {
 			return;
 		}
@@ -188,9 +194,10 @@ class ToolbarComponent<V extends ToolbarValue = ToolbarValue> extends Card<V> {
 			this.keyword
 				?.get<HTMLElement>()
 				?.innerText.replace(/[\r\n]/g, '') || '';
+		const component = this.component;
 		// 内容为空
 		if (content === '') {
-			this.component?.remove();
+			component?.remove();
 			card.remove(this.id);
 			return;
 		}
@@ -198,15 +205,11 @@ class ToolbarComponent<V extends ToolbarValue = ToolbarValue> extends Card<V> {
 		const keyword = content.substr(1);
 		// 搜索关键词为空
 		if (keyword === '') {
-			this.component?.render(
-				this.editor.root,
-				this.root,
-				this.#collapseData || [],
-			);
+			component?.render(editor.root, this.root, this.#collapseData || []);
 			return;
 		}
 		const data = this.search(keyword);
-		this.component?.render(this.editor.root, this.root, data);
+		component?.render(editor.root, this.root, data);
 	}
 
 	resetPlaceHolder() {

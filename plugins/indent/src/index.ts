@@ -22,6 +22,10 @@ export interface IndentOptions extends PluginOptions {
 
 export const TEXT_INENT_KEY = 'text-indent';
 
+const KEYDOWN_BACKSPACE = 'keydown:backspace';
+const KEYDOWN_TAB = 'keydown:tab';
+const KEYDOWN_SHIFT_TAB = 'keydown:shift-tab';
+const PASTE_EACH = 'paste:each';
 export default class<
 	T extends IndentOptions = IndentOptions,
 > extends Plugin<T> {
@@ -30,21 +34,23 @@ export default class<
 	}
 
 	init() {
-		this.editor.schema.add(this.schema());
+		const editor = this.editor;
+		editor.schema.add(this.schema());
 		this.conversion().forEach(({ from, to }) => {
-			this.editor.conversion.add(from, to);
+			editor.conversion.add(from, to);
 		});
-		this.editor.on('keydown:backspace', this.onBackspace);
-		this.editor.on('keydown:tab', this.onTab);
-		this.editor.on('keydown:shift-tab', this.onShiftTab);
-		if (isEngine(this.editor)) {
-			this.editor.on('paste:each', this.pasteEach);
+		editor.on(KEYDOWN_BACKSPACE, this.onBackspace);
+		editor.on(KEYDOWN_TAB, this.onTab);
+		editor.on(KEYDOWN_SHIFT_TAB, this.onShiftTab);
+		if (isEngine(editor)) {
+			editor.on(PASTE_EACH, this.pasteEach);
 		}
 	}
 
 	execute(type: 'in' | 'out' = 'in') {
-		if (!isEngine(this.editor)) return;
-		const { change, list, block } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, list, block } = editor;
 		list.split();
 		const range = change.range.get();
 		const blocks = block.findBlocks(range);
@@ -61,11 +67,12 @@ export default class<
 	}
 
 	queryState() {
-		if (!isEngine(this.editor)) return;
-		const { change, list, node } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, list, node } = editor;
 		const range = change.range.get();
 		if (!range.startNode.inEditor()) return 0;
-		const block = this.editor.block.closest(range.startNode);
+		const block = editor.block.closest(range.startNode);
 		if (block.name === 'li') {
 			return list.getIndent(block.closest('ul,ol'));
 		}
@@ -77,7 +84,8 @@ export default class<
 	}
 
 	addPadding(block: NodeInterface, padding: number, maxPadding: number) {
-		const { list, node } = this.editor;
+		const editor = this.editor;
+		const { list, node } = editor;
 		if (block.name === 'li') return;
 		if (node.isList(block)) {
 			list.addIndent(block, padding, maxPadding);
@@ -88,13 +96,13 @@ export default class<
 					let newValue = removeUnit(currentValue) + padding;
 					// 获取自身宽度计算最大的indent
 					let width = block.width();
-					width = width === 0 ? this.editor.root.width() : width;
+					width = width === 0 ? editor.root.width() : width;
 					// 获取字体大小用作计算em
 					let fontSize = block.css('font-size');
 					// 如果本身没有字体大小就，获取编辑器根节点默认字体大小
 					fontSize =
 						!fontSize || fontSize.endsWith('em')
-							? this.editor.root.css('font-size')
+							? editor.root.css('font-size')
 							: fontSize;
 					if (fontSize.endsWith('em')) {
 						fontSize = $(document.body).css('font-size');
@@ -203,11 +211,12 @@ export default class<
 	}
 
 	onBackspace = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor)) return;
-		const { change, list, node } = this.editor;
-		const blockApi = this.editor.block;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, list, node } = editor;
+		const blockApi = editor.block;
 		let range = change.range.get();
-		const block = this.editor.block.closest(range.startNode);
+		const block = blockApi.closest(range.startNode);
 		if (!node.isBlock(block)) return;
 		const parent = block.parent();
 		let blocks = change.blocks;
@@ -228,7 +237,7 @@ export default class<
 		else if (!range.collapsed) return;
 		if (this.queryState()) {
 			event.preventDefault();
-			this.editor.command.execute(
+			editor.command.execute(
 				(this.constructor as PluginEntry).pluginName,
 				'out',
 			);
@@ -238,13 +247,14 @@ export default class<
 	};
 
 	onTab = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor)) return;
-		const { change, list, block } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, list, block } = editor;
 		const range = change.range.get();
 		//列表
 		if (range.collapsed && list.isFirst(range)) {
 			event.preventDefault();
-			this.editor.command.execute(
+			editor.command.execute(
 				(this.constructor as PluginEntry).pluginName,
 				'in',
 			);
@@ -253,7 +263,7 @@ export default class<
 		// <p><cursor />foo</p>
 		if (!range.collapsed || block.isFirstOffset(range, 'start')) {
 			event.preventDefault();
-			this.editor.command.execute(
+			editor.command.execute(
 				(this.constructor as PluginEntry).pluginName,
 				'in',
 				true,
@@ -264,9 +274,10 @@ export default class<
 	};
 
 	onShiftTab = (event: KeyboardEvent) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		event.preventDefault();
-		this.editor.command.execute(
+		editor.command.execute(
 			(this.constructor as PluginEntry).pluginName,
 			'out',
 		);
@@ -284,12 +295,9 @@ export default class<
 	}
 
 	pasteEach = (node: NodeInterface) => {
+		const editor = this.editor;
 		//pt 转为px
-		if (
-			node.isElement() &&
-			!node.isCard() &&
-			this.editor.node.isBlock(node)
-		) {
+		if (node.isElement() && !node.isCard() && editor.node.isBlock(node)) {
 			const styles = node.css();
 			const textIndentSource = styles[TEXT_INENT_KEY];
 			if (!!textIndentSource && textIndentSource.endsWith('pt')) {
@@ -299,13 +307,13 @@ export default class<
 					let newValue = removeUnit(textIndent);
 					// 获取自身宽度计算最大的indent
 					let width = node.width();
-					width = width === 0 ? this.editor.root.width() : width;
+					width = width === 0 ? editor.root.width() : width;
 					// 获取字体大小用作计算em
 					let fontSize = node.css('font-size');
 					// 如果本身没有字体大小就，获取编辑器根节点默认字体大小
 					fontSize =
 						!fontSize || fontSize.endsWith('em')
-							? this.editor.root.css('font-size')
+							? editor.root.css('font-size')
 							: fontSize;
 					if (fontSize.endsWith('em')) {
 						fontSize = $(document.body).css('font-size');
@@ -334,11 +342,12 @@ export default class<
 	};
 
 	destroy() {
-		this.editor.off('keydown:backspace', this.onBackspace);
-		this.editor.off('keydown:tab', this.onTab);
-		this.editor.off('keydown:shift-tab', this.onShiftTab);
-		if (isEngine(this.editor)) {
-			this.editor.off('paste:each', this.pasteEach);
+		const editor = this.editor;
+		editor.off(KEYDOWN_BACKSPACE, this.onBackspace);
+		editor.off(KEYDOWN_TAB, this.onTab);
+		editor.off(KEYDOWN_SHIFT_TAB, this.onShiftTab);
+		if (isEngine(editor)) {
+			editor.off(PASTE_EACH, this.pasteEach);
 		}
 	}
 }

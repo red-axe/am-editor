@@ -23,7 +23,10 @@ import locales from './locales';
 import { CodeBlockOptions } from './types';
 
 const DATA_SYNTAX = 'data-syntax';
-
+const PARSE_HTML = 'parse:html';
+const PASTE_SCHEMA = 'paste:schema';
+const PASTE_EACH = 'paste:each';
+const MARKDOWN_IT = 'markdown-it';
 export default class<
 	T extends CodeBlockOptions = CodeBlockOptions,
 > extends Plugin<T> {
@@ -32,20 +35,22 @@ export default class<
 	}
 
 	init() {
-		this.editor.language.add(locales);
-		this.editor.on('parse:html', this.parseHtml);
-		this.editor.on('paste:schema', this.pasteSchema);
-		this.editor.on('paste:each', this.pasteHtml);
-		if (isEngine(this.editor)) {
-			this.editor.on('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		editor.language.add(locales);
+		editor.on(PARSE_HTML, this.parseHtml);
+		editor.on(PASTE_SCHEMA, this.pasteSchema);
+		editor.on(PASTE_EACH, this.pasteHtml);
+		if (isEngine(editor)) {
+			editor.on(MARKDOWN_IT, this.markdownIt);
 		}
 	}
 
 	execute(mode: string, value: string) {
-		if (!isEngine(this.editor)) return;
-		const { card } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { card } = editor;
 		if (!value) {
-			const data = this.editor.getSelectionData();
+			const data = editor.getSelectionData();
 			if (data) value = data.text;
 		}
 		const component = card.insert<
@@ -129,7 +134,8 @@ export default class<
 	};
 
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor) || node.isText()) return;
+		const editor = this.editor;
+		if (!isEngine(editor) || node.isText()) return;
 		if (
 			node.get<HTMLElement>()?.hasAttribute(DATA_SYNTAX) ||
 			node.name === 'pre'
@@ -165,13 +171,13 @@ export default class<
 					}
 				}
 			}
-			let code = new Parser(node, this.editor).toText(
+			let code = new Parser(node, editor).toText(
 				undefined,
 				undefined,
 				false,
 			);
 			code = unescape(code.replace(/\u200b/g, ''));
-			this.editor.card.replaceNode<CodeBlockValue>(node, 'codeblock', {
+			editor.card.replaceNode<CodeBlockValue>(node, 'codeblock', {
 				mode: syntax || 'plain',
 				code,
 			});
@@ -188,12 +194,13 @@ export default class<
 			value: CodeBlockValue,
 		) => NodeInterface,
 	) => {
+		const editor = this.editor;
 		const results: NodeInterface[] = [];
 		const synatxMap = {};
 		CodeBlockComponent.getModes().forEach((item) => {
 			synatxMap[item.value] = item.syntax;
 		});
-		const codeEditor = new CodeBlockEditor(this.editor, {
+		const codeEditor = new CodeBlockEditor(editor, {
 			synatxMap,
 			styleMap: this.options.styleMap,
 		});
@@ -209,7 +216,7 @@ export default class<
 			`[${CARD_KEY}="${CodeBlockComponent.cardName}"],[${READY_CARD_KEY}="${CodeBlockComponent.cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find(
+			const card = editor.card.find(
 				node,
 			) as CodeBlockComponent<CodeBlockValue>;
 			const value =
@@ -241,11 +248,12 @@ export default class<
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('paste:schema', this.pasteSchema);
-		this.editor.off('paste:each', this.pasteHtml);
-		if (isEngine(this.editor)) {
-			this.editor.off('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		editor.off(PARSE_HTML, this.parseHtml);
+		editor.off(PASTE_SCHEMA, this.pasteSchema);
+		editor.off(PASTE_EACH, this.pasteHtml);
+		if (isEngine(editor)) {
+			editor.off(MARKDOWN_IT, this.markdownIt);
 		}
 	}
 }

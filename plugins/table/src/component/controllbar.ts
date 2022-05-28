@@ -343,23 +343,24 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.menuBar?.on('mouseover', (event) => this.handleHoverMenu(event));
 		this.menuBar?.on('mouseleave', (event) => this.hideHighlight(event));
 		//列头部 padding 区域单击让其选中表格卡片上方的blcok
+		const editor = this.editor;
 		this.viewport?.on(
 			isMobile ? 'touchstart' : 'mousedown',
 			(event: MouseEvent) => {
 				if (!event.target) return;
 				const targetNode = $(event.target);
 				if (
-					!isEngine(this.editor) ||
+					!isEngine(editor) ||
 					!event.target ||
 					!this.viewport?.equal(targetNode)
 				)
 					return;
 				event.preventDefault();
 				event.stopPropagation();
-				const { change } = this.editor;
+				const { change } = editor;
 				const range = change.range.get();
-				this.editor.card.focusPrevBlock(this.table, range, true);
-				this.editor.card.activate(
+				editor.card.focusPrevBlock(this.table, range, true);
+				editor.card.activate(
 					range.startNode,
 					CardActiveTrigger.MOUSE_DOWN,
 				);
@@ -1338,11 +1339,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	}
 
 	showContextMenu(event: MouseEvent) {
+		const editor = this.editor;
 		if (
 			!this.menuBar ||
 			!event.target ||
 			!this.table.wrapper ||
-			!this.editor.scrollNode
+			!editor.scrollNode
 		)
 			return;
 		event.preventDefault();
@@ -1428,7 +1430,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const wrapperRect = this.table.wrapper
 			.get<HTMLElement>()!
 			.getBoundingClientRect();
-		const viewport = this.editor.scrollNode.getViewport();
+		const viewport = editor.scrollNode.getViewport();
 		top += event.offsetY;
 		const menuHeight = this.menuBar.height();
 		// 底部溢出

@@ -76,6 +76,10 @@ export interface FileUploaderOptions extends PluginOptions {
 	};
 }
 
+const DROP_FILES = 'drop:files';
+const PASTE_EVENT = 'paste:event';
+const PASTE_EACH = 'paste:each';
+
 export default class<
 	T extends FileUploaderOptions = FileUploaderOptions,
 > extends Plugin<T> {
@@ -88,10 +92,11 @@ export default class<
 	extensionNames: Record<string, string> | string[] = { '*': '*' };
 
 	init() {
-		if (isEngine(this.editor)) {
-			this.editor.on('drop:files', this.dropFiles);
-			this.editor.on('paste:event', this.pasteFiles);
-			this.editor.on('paste:each', this.pasteEach);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.on(DROP_FILES, this.dropFiles);
+			editor.on(PASTE_EVENT, this.pasteFiles);
+			editor.on(PASTE_EACH, this.pasteEach);
 		}
 		let { accept } = this.options.file || {};
 		if (typeof accept === 'string') accept = accept.split(',');
@@ -117,8 +122,9 @@ export default class<
 	}
 
 	async execute(files?: Array<File> | MouseEvent) {
-		if (!isEngine(this.editor)) return;
-		const { request, card, language } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { request, card, language } = editor;
 		const {
 			action,
 			type,
@@ -157,7 +163,7 @@ export default class<
 				headers,
 				onBefore: (file) => {
 					if (file.size > limitSize) {
-						this.editor.messageError(
+						editor.messageError(
 							'upload-limit',
 							language
 								.get('file', 'uploadLimitError')
@@ -173,7 +179,7 @@ export default class<
 				},
 				onReady: (fileInfo) => {
 					if (
-						!isEngine(this.editor) ||
+						!isEngine(editor) ||
 						!!this.cardComponents[fileInfo.uid]
 					)
 						return;
@@ -270,7 +276,7 @@ export default class<
 							message:
 								typeof result.data === 'string'
 									? result.data
-									: this.editor.language.get<string>(
+									: language.get<string>(
 											'file',
 											'uploadError',
 									  ),
@@ -282,7 +288,7 @@ export default class<
 								: {
 										...result.data,
 								  };
-						this.editor.card.update(component.id, value);
+						editor.card.update(component.id, value);
 					}
 					delete this.cardComponents[file.uid || ''];
 				},
@@ -293,10 +299,7 @@ export default class<
 						status: 'error',
 						message:
 							error.message ||
-							this.editor.language.get<string>(
-								'file',
-								'uploadError',
-							),
+							language.get<string>('file', 'uploadError'),
 					});
 					delete this.cardComponents[file.uid || ''];
 				},
@@ -308,18 +311,20 @@ export default class<
 	}
 
 	dropFiles = (files: Array<File>) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		files = files.filter((file) => this.isFile(file));
 		if (files.length === 0) return;
-		this.editor.command.execute('file-uploader', files);
+		editor.command.execute('file-uploader', files);
 		return false;
 	};
 
 	pasteFiles = ({ files }: Record<'files', File[]>) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		files = files.filter((file) => this.isFile(file));
 		if (files.length === 0) return;
-		this.editor.command.execute(
+		editor.command.execute(
 			'file-uploader',
 			files.filter((file) => this.isFile(file)),
 			files,
@@ -349,10 +354,11 @@ export default class<
 	};
 
 	destroy() {
-		if (isEngine(this.editor)) {
-			this.editor.off('drop:files', this.dropFiles);
-			this.editor.off('paste:event', this.pasteFiles);
-			this.editor.off('paste:each', this.pasteEach);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.off(DROP_FILES, this.dropFiles);
+			editor.off(PASTE_EVENT, this.pasteFiles);
+			editor.off(PASTE_EACH, this.pasteEach);
 		}
 	}
 }

@@ -11,6 +11,8 @@ export interface CodeOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
+const PARSE_HTML = 'parse:html';
+const MARKDOWN_IT = 'markdown-it';
 export default class<
 	T extends CodeOptions = CodeOptions,
 > extends InlinePlugin<T> {
@@ -20,9 +22,10 @@ export default class<
 
 	init() {
 		super.init();
-		this.editor.on('parse:html', this.parseHtml);
-		if (isEngine(this.editor)) {
-			this.editor.on('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		editor.on(PARSE_HTML, this.parseHtml);
+		if (isEngine(editor)) {
+			editor.on(MARKDOWN_IT, this.markdownIt);
 		}
 	}
 
@@ -50,7 +53,8 @@ export default class<
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		editor.off(PARSE_HTML, this.parseHtml);
+		editor.off(MARKDOWN_IT, this.markdownIt);
 	}
 }

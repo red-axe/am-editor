@@ -35,11 +35,12 @@ export default class<
 	}
 
 	init() {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 
-		this.editor.on('beforeCommandExecute', this.onBeforeCommandExecute);
+		editor.on('beforeCommandExecute', this.onBeforeCommandExecute);
 		// 鼠标选中文本之后添加样式
-		this.editor.container.on('mouseup', this.onContainerMouseUp);
+		editor.container.on('mouseup', this.onContainerMouseUp);
 	}
 
 	onBeforeCommandExecute = (name: string) => {
@@ -52,28 +53,30 @@ export default class<
 		if (!this.activeMarks || !e.target) {
 			return;
 		}
+		const editor = this.editor;
 		// 在Card里不生效
-		if (this.editor!.card.closest($(e.target))) {
-			this.removeActiveNodes(this.editor!.container[0].ownerDocument!);
+		if (editor.card.closest($(e.target))) {
+			this.removeActiveNodes(editor.container[0].ownerDocument!);
 			return;
 		}
 		this.isFormat = true;
 		this.paintFormat(this.activeMarks, this.activeBlocks);
 		this.isFormat = false;
 		if (this.type === 'single')
-			this.removeActiveNodes(this.editor!.container[0].ownerDocument!);
+			this.removeActiveNodes(editor.container[0].ownerDocument!);
 	};
 
 	removeActiveNodes(node: NodeInterface | Node) {
 		if (isNode(node)) node = $(node);
-		this.editor!.container.removeClass(PAINTFORMAT_CLASS);
+		const editor = this.editor;
+		editor.container.removeClass(PAINTFORMAT_CLASS);
 		this.activeMarks = undefined;
 		this.activeBlocks = undefined;
 		if (this.event) {
 			node.off('keydown', this.event);
 			this.event = undefined;
 		}
-		if (isEngine(this.editor)) this.editor.trigger('select');
+		if (isEngine(editor)) editor.trigger('select');
 	}
 
 	bindEvent(node: NodeInterface) {
@@ -94,8 +97,9 @@ export default class<
 	}
 
 	paintFormat(activeMarks: NodeInterface[], activeBlocks?: NodeInterface[]) {
-		if (!isEngine(this.editor)) return;
-		const { change, command, block } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change, command, block } = editor;
 		const range = change.range.get();
 		const removeCommand = this.options.removeCommand || 'removeformat';
 		// 选择范围为折叠状态，应用在整个段落，包括段落自己的样式
@@ -134,21 +138,23 @@ export default class<
 				});
 			}
 		}
-		this.editor.mark.merge(range);
+		editor.mark.merge(range);
 	}
 
 	paintMarks(activeMarks: NodeInterface[]) {
-		const { mark } = this.editor!;
+		const editor = this.editor;
+		const { mark } = editor;
 		for (let i = activeMarks.length - 1; i >= 0; i--) {
 			const node = activeMarks[i];
-			mark.wrap(this.editor.node.clone(node, false, false));
+			mark.wrap(editor.node.clone(node, false, false));
 		}
 	}
 
 	paintBlocks(currentBlock: NodeInterface, activeBlocks: NodeInterface[]) {
-		if (!isEngine(this.editor) || !currentBlock.inEditor()) return;
-		const { node, change } = this.editor!;
-		const blockApi = this.editor.block;
+		const editor = this.editor;
+		if (!isEngine(editor) || !currentBlock.inEditor()) return;
+		const { node, change } = editor;
+		const blockApi = editor.block;
 		const range = change.range.get();
 		const selection = range.createSelection('removeformat');
 		activeBlocks.forEach((block) => {
@@ -190,19 +196,20 @@ export default class<
 	}
 
 	execute(type: string = 'single') {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (this.activeMarks) {
-			this.removeActiveNodes(this.editor.container);
+			this.removeActiveNodes(editor.container);
 			return;
 		}
 		this.type = type;
-		this.bindEvent(this.editor.container);
-		const { change, mark, block } = this.editor;
+		this.bindEvent(editor.container);
+		const { change, mark, block } = editor;
 		const range = change.range.get();
 		this.activeMarks = mark.findMarks(range);
 		this.activeBlocks = block.findBlocks(range);
-		this.editor.trigger('select');
-		this.editor.container.addClass('data-paintformat-mode');
+		editor.trigger('select');
+		editor.container.addClass('data-paintformat-mode');
 	}
 
 	queryState() {
@@ -210,7 +217,8 @@ export default class<
 	}
 
 	destroy() {
-		this.editor.off('beforeCommandExecute', this.onBeforeCommandExecute);
-		this.editor.container.off('mouseup', this.onContainerMouseUp);
+		const editor = this.editor;
+		editor.off('beforeCommandExecute', this.onBeforeCommandExecute);
+		editor.container.off('mouseup', this.onContainerMouseUp);
 	}
 }

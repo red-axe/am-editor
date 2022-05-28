@@ -16,6 +16,12 @@ export interface LinkOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
+
+const PASTE_EACH = 'paste:each';
+const MARKDOWN_IT = 'markdown-it';
+const PARSE_HTML = 'parse:html';
+const SELECT = 'select';
+
 export default class<
 	T extends LinkOptions = LinkOptions,
 > extends InlinePlugin<T> {
@@ -47,11 +53,11 @@ export default class<
 			this.toolbar = new Toolbar(editor, {
 				onConfirm: this.options.onConfirm,
 			});
-			this.editor.on('markdown-it', this.markdownIt);
-			editor.on('paste:each', this.pasteHtml);
+			editor.on(MARKDOWN_IT, this.markdownIt);
+			editor.on(PASTE_EACH, this.pasteHtml);
 		}
-		editor.on('parse:html', this.parseHtml);
-		editor.on('select', this.bindQuery);
+		editor.on(PARSE_HTML, this.parseHtml);
+		editor.on(SELECT, this.bindQuery);
 		editor.language.add(locales);
 	}
 
@@ -60,8 +66,9 @@ export default class<
 	}
 
 	execute() {
-		if (!isEngine(this.editor)) return;
-		const { inline, change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { inline, change } = editor;
 		if (!this.queryState()) {
 			const inlineNode = $(`<${this.tagName} />`);
 			this.setStyle(inlineNode, ...arguments);
@@ -91,8 +98,9 @@ export default class<
 	};
 
 	query = () => {
-		if (!isEngine(this.editor)) return;
-		const { change } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { change } = editor;
 		const inlineNode = change.inlines.find((node) => this.isSelf(node));
 		this.toolbar?.hide(inlineNode);
 		if (inlineNode && inlineNode.length > 0 && !inlineNode.isCard()) {
@@ -157,9 +165,9 @@ export default class<
 
 	destroy(): void {
 		const editor = this.editor;
-		editor.off('paste:each', this.pasteHtml);
-		editor.off('parse:html', this.parseHtml);
-		editor.off('select', this.bindQuery);
-		editor.off('markdown-it', this.markdownIt);
+		editor.off(PASTE_EACH, this.pasteHtml);
+		editor.off(PARSE_HTML, this.parseHtml);
+		editor.off(SELECT, this.bindQuery);
+		editor.off(MARKDOWN_IT, this.markdownIt);
 	}
 }

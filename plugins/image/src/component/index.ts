@@ -137,11 +137,12 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 	}
 
 	toolbar(): Array<CardToolbarItemOptions | ToolbarItemOptions> {
+		const editor = this.editor;
 		const getItems = (): Array<
 			CardToolbarItemOptions | ToolbarItemOptions
 		> => {
-			if (!isEngine(this.editor) || this.editor.readonly) return [];
-			const { language } = this.editor;
+			if (!isEngine(editor) || editor.readonly) return [];
+			const { language } = editor;
 			let value = this.getValue();
 			if (this.isLocalError === true || value?.status !== 'done')
 				return [
@@ -242,8 +243,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 					},
 				},
 			];
-			const imagePlugin =
-				this.editor.plugin.findPlugin<ImageOptions>('image');
+			const imagePlugin = editor.plugin.findPlugin<ImageOptions>('image');
 			return items.concat([
 				...(imagePlugin?.options?.enableResizer === false
 					? []
@@ -254,7 +254,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 			]);
 		};
 		const options =
-			this.editor.plugin.findPlugin<ImageOptions>('image')?.options;
+			editor.plugin.findPlugin<ImageOptions>('image')?.options;
 		if (options?.cardToolbars) {
 			return options.cardToolbars(getItems());
 		}
@@ -287,10 +287,10 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 	render(loadingBg?: string): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
+		const editor = this.editor;
 		if (!this.image || this.image.root.length === 0) {
-			const imagePlugin =
-				this.editor.plugin.findPlugin<ImageOptions>('image');
-			this.image = new Image(this.editor, {
+			const imagePlugin = editor.plugin.findPlugin<ImageOptions>('image');
+			this.image = new Image(editor, {
 				root: this.root,
 				container: this.getCenter(),
 				status: value.status || 'done',
@@ -304,7 +304,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 				enableResizer: imagePlugin?.options?.enableResizer,
 				onBeforeRender: (status, src) => {
 					const imagePlugin =
-						this.editor.plugin.findPlugin<ImageOptions>('image');
+						editor.plugin.findPlugin<ImageOptions>('image');
 					if (imagePlugin) {
 						const { onBeforeRender } = imagePlugin.options || {};
 						if (onBeforeRender) return onBeforeRender(status, src);
@@ -312,7 +312,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 					return src;
 				},
 				onChange: (size, loaded) => {
-					if (isEngine(this.editor) && !this.editor.readonly && size)
+					if (isEngine(editor) && !editor.readonly && size)
 						this.setSize(size, loaded);
 				},
 				onError: () => {

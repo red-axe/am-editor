@@ -74,8 +74,9 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 	}
 
 	toolbar() {
+		const editor = this.editor;
 		const getItems = () => {
-			if (isEngine(this.editor)) {
+			if (isEngine(editor)) {
 				const items: Array<
 					CardToolbarItemOptions | ToolbarItemOptions
 				> = [];
@@ -87,7 +88,7 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 							type: 'button',
 							content:
 								'<span class="data-icon data-icon-expand" />',
-							title: this.editor.language.get<string>(
+							title: editor.language.get<string>(
 								'embed',
 								'expand',
 							),
@@ -98,7 +99,7 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 							type: 'button',
 							content:
 								'<span class="data-icon data-icon-compact-display" />',
-							title: this.editor.language.get<string>(
+							title: editor.language.get<string>(
 								'embed',
 								'collapse',
 							),
@@ -106,7 +107,7 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 						},
 					);
 				}
-				if (!this.editor.readonly) {
+				if (!editor.readonly) {
 					items.unshift(
 						{ key: 'dnd', type: 'dnd' },
 						{ key: 'copy', type: 'copy' },
@@ -119,7 +120,7 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 			return [];
 		};
 		const options =
-			this.editor.plugin.findPlugin<EmbedOptions>('embed')?.options;
+			editor.plugin.findPlugin<EmbedOptions>('embed')?.options;
 		if (options?.cardToolbars) {
 			return options.cardToolbars(getItems());
 		}
@@ -131,7 +132,8 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 	}
 
 	handleSubmit = () => {
-		const locales = this.editor.language.get('embed');
+		const editor = this.editor;
+		const locales = editor.language.get('embed');
 		const center = this.getCenter();
 		const url = sanitizeUrl(
 			center.find('[data-role="url"]').get<HTMLInputElement>()?.value ||
@@ -155,7 +157,7 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 			this.render();
 			super.didRender();
 		} else {
-			this.editor.messageError('embed', locales['addressInvalid']);
+			editor.messageError('embed', locales['addressInvalid']);
 		}
 	};
 

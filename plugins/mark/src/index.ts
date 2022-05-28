@@ -6,6 +6,7 @@ export interface MarkOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 	markdown?: boolean;
 }
+const MARKDOWN_IT = 'markdown-it';
 export default class<
 	T extends MarkOptions = MarkOptions,
 > extends MarkPlugin<T> {
@@ -17,8 +18,9 @@ export default class<
 
 	init(): void {
 		super.init();
-		if (isEngine(this.editor)) {
-			this.editor.on('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		if (isEngine(editor)) {
+			editor.on(MARKDOWN_IT, this.markdownIt);
 		}
 	}
 
@@ -34,6 +36,6 @@ export default class<
 	};
 
 	destroy(): void {
-		this.editor.off('markdown-it', this.markdownIt);
+		this.editor.off(MARKDOWN_IT, this.markdownIt);
 	}
 }

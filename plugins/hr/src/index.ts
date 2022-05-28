@@ -12,23 +12,29 @@ import type MarkdownIt from 'markdown-it';
 import HrComponent, { HrValue } from './component';
 import { HrOptions } from './types';
 
+const PARSE_HTML = 'parse:html';
+const PASTE_SCHEMA = 'paste:schema';
+const PASTE_EACH = 'paste:each';
+const MARKDOWN_IT = 'markdown-it';
 export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'hr';
 	}
 
 	init() {
-		this.editor.on('parse:html', this.parseHtml);
-		this.editor.on('paste:schema', this.pasteSchema);
-		this.editor.on('paste:each', this.pasteHtml);
-		if (isEngine(this.editor)) {
-			this.editor.on('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		editor.on(PARSE_HTML, this.parseHtml);
+		editor.on(PASTE_SCHEMA, this.pasteSchema);
+		editor.on(PASTE_EACH, this.pasteHtml);
+		if (isEngine(editor)) {
+			editor.on(MARKDOWN_IT, this.markdownIt);
 		}
 	}
 
 	execute() {
-		if (!isEngine(this.editor)) return;
-		const { card } = this.editor;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
+		const { card } = editor;
 		card.insert(HrComponent.cardName);
 	}
 
@@ -53,9 +59,10 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 	};
 
 	pasteHtml = (node: NodeInterface) => {
-		if (!isEngine(this.editor)) return;
+		const editor = this.editor;
+		if (!isEngine(editor)) return;
 		if (node.name === 'hr') {
-			this.editor.card.replaceNode(node, HrComponent.cardName);
+			editor.card.replaceNode(node, HrComponent.cardName);
 			return false;
 		}
 		return true;
@@ -90,11 +97,12 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 	};
 
 	destroy() {
-		this.editor.off('parse:html', this.parseHtml);
-		this.editor.off('paste:schema', this.pasteSchema);
-		this.editor.off('paste:each', this.pasteHtml);
-		if (isEngine(this.editor)) {
-			this.editor.off('markdown-it', this.markdownIt);
+		const editor = this.editor;
+		editor.off(PARSE_HTML, this.parseHtml);
+		editor.off(PASTE_SCHEMA, this.pasteSchema);
+		editor.off(PASTE_EACH, this.pasteHtml);
+		if (isEngine(editor)) {
+			editor.off(MARKDOWN_IT, this.markdownIt);
 		}
 	}
 }
