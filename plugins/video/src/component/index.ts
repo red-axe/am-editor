@@ -83,12 +83,14 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	maxWidth: number = 0;
 	resizer?: ResizerInterface;
 	video?: NodeInterface;
-	rate: number = 1;
 	isLoad: boolean = false;
 	container?: NodeInterface;
 	videoContainer?: NodeInterface;
 	title?: NodeInterface;
 	mask?: NodeInterface;
+	rate = 1;
+	_fullWidth?: number;
+	_naturalSize: Record<'width' | 'height', number> = { width: 0, height: 0 };
 	static get cardName() {
 		return 'video';
 	}
@@ -216,8 +218,6 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 			video.poster = sanitizeUrl(this.onBeforeRender('cover', cover));
 		}
 		this.maxWidth = this.getMaxWidth();
-		if (value.naturalHeight && value.naturalWidth)
-			this.rate = value.naturalHeight / value.naturalWidth;
 		const contentElement = this.container?.find('.data-video-content');
 		if (!contentElement) return;
 		contentElement.append(video);
@@ -227,51 +227,54 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		video.oncontextmenu = function () {
 			return false;
 		};
+		const videoPlugin =
+			this.editor.plugin.findPlugin<VideoOptions>('video');
+		let fullEditor = videoPlugin?.options.fullEditor;
+
 		const editor = this.editor;
 		video.onloadedmetadata = () => {
-			const videoPlugin = editor.plugin.findPlugin<VideoOptions>('video');
-			const fullEditor = videoPlugin?.options.fullEditor;
-			const fullWidth =
-				editor.container.width() -
-				removeUnit(editor.container.css('padding-left')) -
-				removeUnit(editor.container.css('padding-right'));
-
-			if (!value.naturalWidth) {
-				value.naturalWidth = video.videoWidth || this.video?.width();
+			if (!value.naturalWidth || !value.naturalHeight) {
+				value.naturalWidth = video.videoWidth;
+				value.naturalHeight = video.videoHeight;
 				this.setValue({
 					naturalWidth: value.naturalWidth,
+					naturalHeight: value.naturalHeight,
 				} as T);
 			}
-			if (value.naturalWidth && !value.naturalHeight) {
-				this.rate =
-					(video.videoHeight || this.video?.height() || 1) /
-					value.naturalWidth;
-			}
-			if (typeof fullEditor === 'number') {
-				this.rate = fullEditor / fullWidth;
-			} else if (fullEditor !== true) {
-				this.rate = video.videoHeight / video.videoWidth;
-				this.setValue({
-					naturalWidth: video.videoWidth,
-					naturalHeight: video.videoHeight,
-				} as T);
-			}
-			if (fullEditor && value.naturalWidth) {
-				if (
-					value.naturalWidth < fullWidth ||
-					typeof fullEditor === 'number'
-				) {
-					const fullHeight = fullWidth * this.rate;
-					this.setValue({
-						naturalWidth: fullWidth,
-						naturalHeight: fullHeight,
-					} as T);
+			if (
+				fullEditor &&
+				this._fullWidth &&
+				(value.naturalWidth < this._fullWidth ||
+					typeof fullEditor === 'number')
+			) {
+				if (typeof fullEditor === 'boolean') {
+					this.rate = video.videoHeight / video.videoWidth;
+					fullEditor = this._fullWidth * this.rate;
+				} else {
+					this.rate = fullEditor / this._fullWidth;
 				}
+				this._naturalSize = {
+					width: this._fullWidth,
+					height: fullEditor,
+				};
+			} else {
+				this._naturalSize = {
+					width: value.naturalWidth || video.videoWidth,
+					height: value.naturalHeight || video.videoHeight,
+				};
+				this.rate = this._naturalSize.height / this._naturalSize.width;
 			}
 			this.resetSize();
 		};
 		this.video = $(video);
 		this.title = this.container?.find('.data-video-title');
+		if (value.width && value.height) {
+			this.rate = value.height / value.width;
+		}
+		this._naturalSize = {
+			width: value.naturalWidth || video.videoWidth,
+			height: value.naturalHeight || video.videoHeight,
+		};
 		this.resetSize();
 		// 一次渲染时序开启 controls 会触发一次内容为空的 window.onerror，疑似 chrome bug
 		setTimeout(() => {
@@ -364,42 +367,38 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		this.container?.css({
 			width: '',
 		});
+		const videoPlugin =
+			this.editor.plugin.findPlugin<VideoOptions>('video');
+		const fullEditor = videoPlugin?.options.fullEditor;
 
 		const video = this.video?.get<HTMLVideoElement>();
 		if (!video) return;
-		let { width, height, naturalWidth, naturalHeight } = value;
-		if (!naturalWidth) {
-			naturalWidth = video.videoWidth;
-		}
-		if (!naturalHeight) {
-			naturalHeight = video.videoHeight;
-		}
+		let { width, height } = value;
 
 		if (!height) {
-			width = naturalWidth;
+			width = this._naturalSize.width;
 			height = Math.round(this.rate * width);
 		} else if (!width) {
-			height = naturalHeight;
+			height = this._naturalSize.height;
 			width = Math.round(height / this.rate);
 		} else if (width && height) {
 			// 修正非正常的比例
 			height = Math.round(this.rate * width);
 		} else {
-			width = naturalWidth;
-			height = naturalHeight;
+			width = this._naturalSize.width;
+			height = this._naturalSize.height;
 		}
 
 		if (width > this.maxWidth) {
 			width = this.maxWidth;
 			height = Math.round(width * this.rate);
 		}
+		if (width === 0 || height === 0) return;
 		this.container?.css({
 			width: width > 0 ? `${width}px` : '',
 		});
 		this.videoContainer.css('width', width > 0 ? `${width}px` : '');
-		const videoPlugin =
-			this.editor.plugin.findPlugin<VideoOptions>('video');
-		const fullEditor = videoPlugin?.options.fullEditor;
+
 		if (typeof fullEditor === 'number')
 			this.videoContainer.css('height', height > 0 ? `${height}px` : '');
 	}
@@ -462,20 +461,15 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	initResizer() {
 		const value = this.getValue();
 		if (!value) return;
-		let { naturalHeight, naturalWidth, status } = value;
-		if (!naturalWidth || status !== 'done') return;
+		let { status } = value;
+		if (status !== 'done') return;
 		const { width, height, cover } = value;
 		this.maxWidth = this.getMaxWidth();
-		if (!naturalHeight) {
-			naturalHeight = Math.round(this.rate * naturalWidth);
-		} else {
-			this.rate = naturalHeight / naturalWidth;
-		}
 		// 拖动调整视频大小
 		const resizer = new Resizer({
 			imgUrl: cover,
-			width: width || naturalWidth,
-			height: height || naturalHeight,
+			width: width || this._naturalSize.width,
+			height: height || this._naturalSize.height,
 			rate: this.rate,
 			maxWidth: this.maxWidth,
 			onChange: ({ width, height }) => this.changeSize(width, height),
@@ -486,6 +480,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	}
 
 	onActivate(activated: boolean) {
+		super.onActivate(activated);
 		if (activated) {
 			this.container?.addClass('data-video-active');
 			this.mask?.hide();
@@ -553,6 +548,12 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
 		const center = this.getCenter();
+
+		const editor = this.editor;
+		this._fullWidth =
+			editor.container.width() -
+			removeUnit(editor.container.css('padding-left')) -
+			removeUnit(editor.container.css('padding-right'));
 		if (!value || (this.container && this.container.inEditor())) {
 			//设置为加载状态
 			this.container = $(this.renderTemplate({ ...value }));
@@ -563,7 +564,6 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		}
 		//先清空卡片内容容器
 		center.empty();
-		const editor = this.editor;
 		const { command, plugin } = editor;
 		const { video_id, status } = value;
 		const locales = this.getLocales();
