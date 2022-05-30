@@ -44,14 +44,20 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 	};
 
 	handleMouseDown = () => {
-		this.engine.container.on('mouseup', this.handleMouseUp);
-		this.engine.container.on('mousemove', this.emitSelectChange);
+		const container = this.engine.container;
+		container.off('mouseup', this.handleMouseUp);
+		container.off('mousemove', this.emitSelectChange);
+		container.on('mouseup', this.handleMouseUp);
+		container.on('mousemove', this.emitSelectChange);
 	};
 
 	handleMouseUp = () => {
-		this.engine.container.off('mouseup', this.handleMouseUp);
-		this.engine.container.off('mousemove', this.emitSelectChange);
-		this.emitSelectChange();
+		const container = this.engine.container;
+		container.off('mouseup', this.handleMouseUp);
+		container.off('mousemove', this.emitSelectChange);
+		setTimeout(() => {
+			this.emitSelectChange();
+		}, 10);
 	};
 
 	getCardResizeRange(card: CardInterface) {
@@ -208,8 +214,11 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 	}
 
 	destory() {
-		this.engine.container.off('keyup', this.emitSelectChange);
-		this.engine.container.off('mousedown', this.handleMouseDown);
+		const container = this.engine.container;
+		container.off('mouseup', this.handleMouseUp);
+		container.off('mousemove', this.emitSelectChange);
+		container.off('keyup', this.emitSelectChange);
+		container.off('mousedown', this.handleMouseDown);
 		this.engine.off('scroll', this.handleScroll);
 	}
 }
