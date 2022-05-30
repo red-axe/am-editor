@@ -372,46 +372,95 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 			?.find('td[table-cell-selection]')
 			.removeAttributes('table-cell-selection');
 
-		const fBeginRow = beginRow;
-		const fEndRow = endRow;
-		const fBeginCol = beginCol;
-		const fEndCol = endCol;
-		for (let row = fBeginRow; row > -1 && row <= fEndRow; row++) {
-			for (let col = fBeginCol; col > -1 && col <= fEndCol; col++) {
-				const tr = this.tableModel.table[row];
-				if (!tr) continue;
-				const cell = this.tableModel.table[row][col];
-				if (!cell) continue;
-				if (this.table.helper.isEmptyModelCol(cell)) {
-					if (beginRow > cell.parent.row) beginRow = cell.parent.row;
-					if (beginCol >= cell.parent.col) beginCol = cell.parent.col;
-					const parent =
-						this.tableModel.table[cell.parent.row][cell.parent.col];
-					if (!this.table.helper.isEmptyModelCol(parent)) {
+		const calc = (): Record<
+			'beginCol' | 'beginRow' | 'endRow' | 'endCol',
+			number
+		> => {
+			if (!this.tableModel)
+				return {
+					beginCol,
+					beginRow,
+					endCol,
+					endRow,
+				};
+			for (let r = beginRow; r <= endRow; r++) {
+				const row = this.tableModel.table[r];
+				if (!row) continue;
+				for (let c = beginCol; c <= endCol; c++) {
+					const cell = row[c];
+					if (!cell) continue;
+					if (!this.table.helper.isEmptyModelCol(cell)) {
+						if (
+							c !== beginCol &&
+							cell.colSpan + c - 1 === beginCol
+						) {
+							beginCol = c;
+							return calc();
+						}
+						if (
+							r !== beginRow &&
+							cell.rowSpan + r - 1 === beginRow
+						) {
+							beginRow = r;
+							return calc();
+						}
+						if (cell.rowSpan > 1 && endRow < cell.rowSpan - 1 + r) {
+							endRow = cell.rowSpan - 1 + r;
+							return calc();
+						}
+						if (cell.colSpan > 1 && endCol < cell.colSpan - 1 + c) {
+							endCol = cell.colSpan - 1 + c;
+							return calc();
+						}
+					} else {
+						const parent =
+							this.tableModel.table[cell.parent.row][
+								cell.parent.col
+							];
+						if (this.table.helper.isEmptyModelCol(parent)) continue;
+						if (
+							parent.colSpan + cell.parent.col - 1 === beginCol &&
+							cell.parent.col < beginCol
+						) {
+							beginCol = cell.parent.col;
+							return calc();
+						}
+						if (
+							parent.rowSpan + cell.parent.row - 1 === beginRow &&
+							cell.parent.row < beginRow
+						) {
+							beginRow = cell.parent.row;
+							return calc();
+						}
 						if (
 							parent.rowSpan > 1 &&
 							endRow < parent.rowSpan - 1 + cell.parent.row
-						)
+						) {
 							endRow = parent.rowSpan - 1 + cell.parent.row;
+							return calc();
+						}
 						if (
 							parent.colSpan > 1 &&
 							endCol < parent.colSpan - 1 + cell.parent.col
-						)
+						) {
 							endCol = parent.colSpan - 1 + cell.parent.col;
-					}
-				} else if (!this.table.helper.isEmptyModelCol(cell)) {
-					if (cell.rowSpan > 1) {
-						if (endRow < cell.rowSpan - 1 + row)
-							endRow = cell.rowSpan - 1 + row;
-					}
-					if (cell.colSpan > 1) {
-						if (endCol < cell.colSpan - 1 + col)
-							endCol = cell.colSpan - 1 + col;
+							return calc();
+						}
 					}
 				}
 			}
-		}
-
+			return {
+				beginCol,
+				beginRow,
+				endCol,
+				endRow,
+			};
+		};
+		const result = calc();
+		beginRow = result.beginRow;
+		endRow = result.endRow;
+		beginCol = result.beginCol;
+		endCol = result.endCol;
 		let count = 0;
 		if (
 			beginRow >= 0 &&
@@ -421,8 +470,11 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		) {
 			for (let r = beginRow; r <= endRow; r++) {
 				for (let c = beginCol; c <= endCol; c++) {
-					const col = this.tableModel.table[r][c];
-					if (col && !this.table.helper.isEmptyModelCol(col)) {
+					const row = this.tableModel.table[r];
+					if (!row) continue;
+					const col = row[c];
+					if (!col) continue;
+					if (!this.table.helper.isEmptyModelCol(col)) {
 						if (!isSame && col.element) {
 							$(col.element).attributes(
 								'table-cell-selection',
