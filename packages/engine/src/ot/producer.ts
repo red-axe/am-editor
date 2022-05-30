@@ -451,7 +451,7 @@ export default class Producer extends EventEmitter2 {
 		const data = this.doc?.data;
 		if (!data || records.length === 0) return;
 		for (let r = 0; r < records.length; r++) {
-			const record = records.at(r);
+			const record = records[r];
 			if (!record) continue;
 			const { type } = record;
 			let target: Node | null = record.target;
