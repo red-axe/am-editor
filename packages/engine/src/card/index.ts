@@ -777,8 +777,14 @@ class CardModel implements CardModelInterface {
 			}
 		});
 		let isTriggerRenderAsync = false;
+		const isRemote = isEngine(this.editor) && this.editor.ot.isRemote;
 		asyncRenderCards.forEach((card) => {
-			if (lazyRender && (card.constructor as CardEntry).lazyRender) {
+			// 可编辑卡片在远程模式下不进行异步渲染
+			if (
+				lazyRender &&
+				(card.constructor as CardEntry).lazyRender &&
+				(!card.isEditable || !isRemote)
+			) {
 				if (card.beforeRender) {
 					const result = card.beforeRender();
 					const center = card.getCenter();

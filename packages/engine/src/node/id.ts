@@ -71,15 +71,21 @@ class NodeId implements NodeIdInterface {
 		}
 		const node = isNode(root) ? root : root.get<Node>();
 		if (!node || node.nodeType === Node.TEXT_NODE) return;
-		const nodes = (isNode(root) ? $(root) : root)?.find(tagNames);
-		nodes.each((_, index) => {
-			const node = nodes.eq(index);
-			if (!node) return;
+		const rootElement = isNode(root) ? root : root.get<HTMLElement>();
+		const nodes = rootElement?.querySelectorAll(tagNames);
+		const generate = (element: Element) => {
 			// 有ID不再生成
-			if (!force && node.attributes(DATA_ID)) return;
+			if (!force && element.getAttribute(DATA_ID)) return;
 
-			this.generate(node, force);
-		});
+			this.generate(element, force);
+		};
+		if (
+			rootElement instanceof Element &&
+			tagNames.includes(rootElement.nodeName.toLowerCase())
+		) {
+			generate(rootElement);
+		}
+		nodes?.forEach(generate);
 	}
 	/**
 	 * 为节点创建一个随机data-id

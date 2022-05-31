@@ -729,6 +729,83 @@ class TableComponent<V extends TableValue = TableValue>
 		});
 	};
 
+	initScrollbar() {
+		if (!this.viewport) return;
+		const editor = this.editor;
+		const tablePlugin = editor.plugin.findPlugin<TableOptions>('table');
+		const tableOptions = tablePlugin?.options.overflow || {};
+		const overflowLeftConfig = tableOptions.maxLeftWidth
+			? {
+					onScrollX: (x: number) => {
+						if (this.isMaximize) x = 0;
+						const max = tableOptions.maxLeftWidth!();
+						this.wrapper?.css(
+							'margin-left',
+							`-${x > max ? max : x}px`,
+						);
+						if (x > 0) {
+							editor.root.find('.data-card-dnd').hide();
+						} else {
+							editor.root.find('.data-card-dnd').show();
+						}
+						return x - max;
+					},
+					getScrollLeft: (left: number) => {
+						return (
+							left -
+							removeUnit(this.wrapper?.css('margin-left') || '0')
+						);
+					},
+					getOffsetWidth: (width: number) => {
+						return (
+							width +
+							removeUnit(this.wrapper?.css('margin-left') || '0')
+						);
+					},
+			  }
+			: undefined;
+		this.scrollbar = new Scrollbar(
+			this.viewport,
+			true,
+			false,
+			true,
+			overflowLeftConfig,
+		);
+		this.scrollbar.setContentNode(this.viewport.find('.data-table')!);
+		this.scrollbar.on('display', (display: 'node' | 'block') => {
+			if (display === 'block') {
+				this.wrapper?.addClass('scrollbar-show');
+			} else {
+				this.wrapper?.removeClass('scrollbar-show');
+			}
+		});
+		//this.scrollbar.disableScroll();
+		let prevScrollData = {
+			x: 0,
+			y: 0,
+		};
+		const handleScrollbarChange = ({ x, y }: Record<string, number>) => {
+			if (prevScrollData.x === x && prevScrollData.y === y) return;
+			prevScrollData = {
+				x,
+				y,
+			};
+			if (tableOptions['maxRightWidth'])
+				this.overflow(tableOptions['maxRightWidth']());
+
+			if (isEngine(editor)) {
+				editor.trigger('scroll', this.root, { x, y });
+				this.conltrollBar.refresh();
+			}
+		};
+		this.scrollbar.on('change', handleScrollbarChange);
+		if (!isMobile) window.addEventListener('scroll', this.updateScrollbar);
+		window.addEventListener('resize', this.updateScrollbar);
+		if (isEngine(editor) && !isMobile) {
+			editor.scrollNode?.on('scroll', this.updateScrollbar);
+		}
+	}
+
 	didRender() {
 		super.didRender();
 		const editor = this.editor;
@@ -748,84 +825,9 @@ class TableComponent<V extends TableValue = TableValue>
 		const tableOptions = tablePlugin?.options.overflow || {};
 		if (this.viewport) {
 			this.selection.refreshModel();
-			const overflowLeftConfig = tableOptions.maxLeftWidth
-				? {
-						onScrollX: (x: number) => {
-							if (this.isMaximize) x = 0;
-							const max = tableOptions.maxLeftWidth!();
-							this.wrapper?.css(
-								'margin-left',
-								`-${x > max ? max : x}px`,
-							);
-							if (x > 0) {
-								editor.root.find('.data-card-dnd').hide();
-							} else {
-								editor.root.find('.data-card-dnd').show();
-							}
-							return x - max;
-						},
-						getScrollLeft: (left: number) => {
-							return (
-								left -
-								removeUnit(
-									this.wrapper?.css('margin-left') || '0',
-								)
-							);
-						},
-						getOffsetWidth: (width: number) => {
-							return (
-								width +
-								removeUnit(
-									this.wrapper?.css('margin-left') || '0',
-								)
-							);
-						},
-				  }
-				: undefined;
-			this.scrollbar = new Scrollbar(
-				this.viewport,
-				true,
-				false,
-				true,
-				overflowLeftConfig,
-			);
-			this.scrollbar.setContentNode(this.viewport.find('.data-table')!);
-			this.scrollbar.on('display', (display: 'node' | 'block') => {
-				if (display === 'block') {
-					this.wrapper?.addClass('scrollbar-show');
-				} else {
-					this.wrapper?.removeClass('scrollbar-show');
-				}
-			});
-			//this.scrollbar.disableScroll();
-			let prevScrollData = {
-				x: 0,
-				y: 0,
-			};
-			const handleScrollbarChange = ({
-				x,
-				y,
-			}: Record<string, number>) => {
-				if (prevScrollData.x === x && prevScrollData.y === y) return;
-				prevScrollData = {
-					x,
-					y,
-				};
-				if (tableOptions['maxRightWidth'])
-					this.overflow(tableOptions['maxRightWidth']());
-
-				if (isEngine(editor)) {
-					editor.trigger('scroll', this.root, { x, y });
-					this.conltrollBar.refresh();
-				}
-			};
-			this.scrollbar.on('change', handleScrollbarChange);
-			if (!isMobile)
-				window.addEventListener('scroll', this.updateScrollbar);
-			window.addEventListener('resize', this.updateScrollbar);
-			if (isEngine(editor) && !isMobile) {
-				editor.scrollNode?.on('scroll', this.updateScrollbar);
-			}
+			setTimeout(() => {
+				this.initScrollbar();
+			}, 0);
 		}
 		this.selection.on('select', () => {
 			this.conltrollBar.refresh(false);
@@ -872,7 +874,6 @@ class TableComponent<V extends TableValue = TableValue>
 		}
 		if (tableOptions.maxRightWidth)
 			this.overflow(tableOptions.maxRightWidth());
-		this.scrollbar?.refresh();
 	}
 	private remoteRefreshTimeout: NodeJS.Timeout | null = null;
 
@@ -1012,6 +1013,10 @@ class TableComponent<V extends TableValue = TableValue>
 
 	destroy() {
 		super.destroy();
+		const editor = this.editor;
+		window.removeEventListener('scroll', this.updateScrollbar);
+		window.removeEventListener('resize', this.updateScrollbar);
+		editor.scrollNode?.off('scroll', this.updateScrollbar);
 		this.scrollbar?.destroy();
 		this.command.removeAllListeners();
 		const selection = this.selection;
@@ -1020,7 +1025,6 @@ class TableComponent<V extends TableValue = TableValue>
 		const bar = this.conltrollBar;
 		bar.removeAllListeners();
 		bar.destroy();
-		const editor = this.editor;
 		editor.off('undo', this.doChange);
 		editor.off('redo', this.doChange);
 	}

@@ -455,12 +455,14 @@ export default class Producer extends EventEmitter2 {
 			if (!record) continue;
 			const { type } = record;
 			let target: Node | null = record.target;
+			// 根节点直接跳出
+			const isRT = target instanceof Element && isRoot(target);
 			// 根节点属性变化不处理
 			if (
 				type === 'attributes' &&
 				((record.attributeName &&
 					isTransientAttribute(target, record.attributeName)) ||
-					(target instanceof Element && isRoot(target)))
+					isRT)
 			) {
 				continue;
 			}
@@ -473,9 +475,8 @@ export default class Producer extends EventEmitter2 {
 				isTransientElement(target)
 			)
 				continue;
-			// 根节点直接跳出
-			const isR = target instanceof Element && isRoot(target);
-			if (isR) {
+
+			if (isRT) {
 				targetRoots = [target];
 				break;
 			}

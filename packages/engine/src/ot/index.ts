@@ -121,7 +121,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	};
 
 	submitOps(ops: Op[]) {
-		if (!this.doc) return;
+		if (!this.doc || ops.length === 0) return;
 		ops.forEach((op) => {
 			(op as any).uid = this.currentMember?.uuid;
 		});
