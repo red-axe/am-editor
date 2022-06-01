@@ -188,7 +188,7 @@ parse?: (
     response: any,
 ) => {
     result: boolean;
-    data: string;
+    data: { url: string };
 };
 ```
 

@@ -143,7 +143,7 @@ parse?: (response: any) => {
           preview?: string;
           download?: string;
           status?: string;
-      } | string;
+      };
 };
 ```
 
