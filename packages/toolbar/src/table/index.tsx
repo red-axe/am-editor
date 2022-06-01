@@ -45,6 +45,7 @@ const Selector: React.FC<Selector> = (props) => {
 					className={cls}
 					key={col}
 					onMouseDown={(e) => {
+						e.preventDefault();
 						return onSelect(e, row, col);
 					}}
 					onMouseOver={() => {

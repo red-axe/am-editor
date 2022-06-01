@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEngine, Range } from '@aomao/engine';
+import { isEngine, Range, EngineInterface } from '@aomao/engine';
 import type { EditorInterface } from '@aomao/engine';
 import type {
 	ButtonProps,
@@ -139,14 +139,13 @@ export const getToolbarDefaultConfig = (
 															props.onClick(
 																event,
 																'table',
+																engine as EngineInterface,
 															);
-														setTimeout(() => {
-															engine.command.execute(
-																'table',
-																rows,
-																cols,
-															);
-														}, 0);
+														engine.command.execute(
+															'table',
+															rows,
+															cols,
+														);
 													}}
 												/>
 											);
