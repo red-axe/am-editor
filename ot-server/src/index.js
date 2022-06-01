@@ -29,12 +29,12 @@ function startServer() {
 		const client = new Client();
 		let id = 1;
 		const getId = (docId, userId) => {
-			let uuid = client.getUUID(docId, userId);
+			let uuid = Client.getUUID(docId, userId);
 			while (client.hasUUID(docId, uuid)) {
 				id++;
 				userId = id;
 				console.log('userId', userId);
-				uuid = client.getUUID(docId, userId);
+				uuid = Client.getUUID(docId, userId);
 			}
 			return userId;
 		};
