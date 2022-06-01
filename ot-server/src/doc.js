@@ -1,3 +1,6 @@
+const { getCollectionName } = require('./config');
+
+const name = getCollectionName();
 class Doc {
 	constructor(id, destroy = function () {}) {
 		this.id = id.toString();
@@ -9,7 +12,7 @@ class Doc {
 		this.doc = undefined;
 	}
 
-	create(connection, collectionName = 'yanmao', callback = function () {}) {
+	create(connection, collectionName = name, callback = function () {}) {
 		try {
 			const doc = connection.get(collectionName, this.id);
 			doc.fetch((err) => {
@@ -29,6 +32,36 @@ class Doc {
 			console.error(error);
 			return null;
 		}
+	}
+
+	find(callback, data = this.doc ? this.doc.data : []) {
+		if (!data || !Array.isArray(data) || data.length < 1) {
+			return null;
+		}
+		for (let i = 1; i < data.length; i++) {
+			if (i === 1) {
+				const attributes = data[i];
+				if (
+					typeof attributes === 'object' &&
+					callback &&
+					callback(attributes)
+				) {
+					return {
+						path: [],
+						name: data[0],
+						attributes,
+						children: data.slice(i + 1),
+					};
+				}
+			} else if (Array.isArray(data[i])) {
+				const result = this.find(callback, data[i]);
+				if (result) {
+					result.path.unshift(i);
+					return result;
+				}
+			}
+		}
+		return null;
 	}
 
 	getMembers() {
@@ -97,7 +130,10 @@ class Doc {
 					if (sIndex > -1) {
 						this.selection.splice(sIndex, 1);
 					}
-					this.broadcast('leave', leaveMember);
+					// 可能存在一个用户多个 socket 的情况，这里需要判断一下
+					if (!this.members.find((m) => m.id === leaveMember.id)) {
+						this.broadcast('leave', leaveMember);
+					}
 					this.broadcast('broadcast', {
 						type: 'select',
 						body: this.selection,
@@ -111,8 +147,14 @@ class Doc {
 		} catch (error) {
 			console.error(error);
 		}
-		// 广播通知用户加入了
-		this.broadcast('join', member, (m) => m.uuid !== member.uuid);
+		// 广播通知用户加入了，如果已经有用户存在了（一个用户多个socket的情况），则不需要广播
+		if (
+			!this.members.find(
+				(m) => m.id === member.id && m.uuid !== member.uuid,
+			)
+		) {
+			this.broadcast('join', member, (m) => m.uuid !== member.uuid);
+		}
 		// 通知用户当前文档的所有用户
 		this.sendMessage(member.uuid, 'members', this.members);
 		// 通知用户准备好了

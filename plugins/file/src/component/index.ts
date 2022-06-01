@@ -32,6 +32,10 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 		return false;
 	}
 
+	static get collab() {
+		return false;
+	}
+
 	private container?: NodeInterface;
 
 	getLocales() {

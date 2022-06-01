@@ -1,8 +1,6 @@
 import md5 from 'blueimp-md5';
 import { NodeInterface } from '../types';
-import $ from '../node/query';
 import { DATA_ID } from '../constants';
-import { isNode, isNodeEntry } from './utils';
 
 const _counters: { [key: string]: number } = {};
 

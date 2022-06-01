@@ -157,7 +157,7 @@ class OTClient extends EventEmitter {
 				// 当前协作者用户
 				this.current = data.member as Member;
 				this.engine.ot.setCurrentMember(this.current);
-				this.engine.ot.renderSelection(data.selection, true);
+				this.engine.ot.renderSelection(data.selection);
 				this.emit('ready', this.engine.ot.getCurrentMember());
 				this.emit(EVENT.membersChange, this.normalizeMembers());
 				this.transmit(STATUS.active);
