@@ -36,7 +36,7 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 				const startOffset = attr.path.start.path[0];
 				const child = children.item(startOffset);
 				if (child && node.equal(child)) {
-					this.rangeColoring.updatePosition();
+					this.updatePosition();
 					break;
 				}
 			}
@@ -146,7 +146,7 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 				Object.assign({}, attr, { active: !item }),
 			);
 			if (attr.uuid === this.current?.uuid) {
-				if (refreshBG === true) this.rangeColoring.updatePosition();
+				if (refreshBG === true) this.updatePosition();
 				this.emit('change', attr);
 			} else {
 				this.rangeColoring.render(attr, member);
@@ -211,6 +211,10 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 			refreshBG,
 		);
 		this.rangeColoring.updateBackgroundAlpha(range);
+	}
+
+	updatePosition() {
+		this.rangeColoring.updatePosition();
 	}
 
 	destory() {

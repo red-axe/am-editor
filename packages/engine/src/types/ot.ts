@@ -111,6 +111,8 @@ export interface SelectionInterface extends EventEmitter2 {
 	 */
 	getAttribute(uuid: string): Attribute | undefined;
 
+	updatePosition(): void;
+
 	destory(): void;
 }
 
