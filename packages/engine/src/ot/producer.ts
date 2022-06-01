@@ -450,54 +450,59 @@ export default class Producer extends EventEmitter2 {
 		let targetRoots: Element[] = [];
 		const data = this.doc?.data;
 		if (!data || records.length === 0) return;
-		for (let r = 0; r < records.length; r++) {
-			const record = records[r];
-			if (!record) continue;
-			const { type } = record;
-			let target: Node | null = record.target;
-			// 根节点直接跳出
-			const isRT = target instanceof Element && isRoot(target);
-			// 根节点属性变化不处理
-			if (
-				type === 'attributes' &&
-				((record.attributeName &&
-					isTransientAttribute(target, record.attributeName)) ||
-					isRT)
-			) {
-				continue;
-			}
-
-			if (target instanceof Text) target = target.parentElement;
-			if (
-				!target ||
-				!target.isConnected ||
-				!(target instanceof Element) ||
-				isTransientElement(target)
-			)
-				continue;
-
-			if (isRT) {
-				targetRoots = [target];
-				break;
-			}
-			// 判断不能是已有的节点或者已有节点的子节点
-			if (
-				targetRoots.length === 0 ||
-				(!targetRoots.includes(target) &&
-					targetRoots.every((root) => !root.contains(target)))
-			) {
-				let len = targetRoots.length;
-				for (let t = 0; t < len; t++) {
-					// 如果当前节点包含已有的节点就把已有的节点删除
-					if (target.contains(targetRoots[t])) {
-						targetRoots.splice(t, 1);
-						len--;
-						t--;
-					}
+		if (data.length === 0) {
+			targetRoots.push(this.engine.container.get<Element>()!);
+		} else {
+			for (let r = 0; r < records.length; r++) {
+				const record = records[r];
+				if (!record) continue;
+				const { type } = record;
+				let target: Node | null = record.target;
+				// 根节点直接跳出
+				const isRT = target instanceof Element && isRoot(target);
+				// 根节点属性变化不处理
+				if (
+					type === 'attributes' &&
+					((record.attributeName &&
+						isTransientAttribute(target, record.attributeName)) ||
+						isRT)
+				) {
+					continue;
 				}
-				targetRoots.push(target);
+
+				if (target instanceof Text) target = target.parentElement;
+				if (
+					!target ||
+					!target.isConnected ||
+					!(target instanceof Element) ||
+					isTransientElement(target)
+				)
+					continue;
+
+				if (isRT) {
+					targetRoots = [target];
+					break;
+				}
+				// 判断不能是已有的节点或者已有节点的子节点
+				if (
+					targetRoots.length === 0 ||
+					(!targetRoots.includes(target) &&
+						targetRoots.every((root) => !root.contains(target)))
+				) {
+					let len = targetRoots.length;
+					for (let t = 0; t < len; t++) {
+						// 如果当前节点包含已有的节点就把已有的节点删除
+						if (target.contains(targetRoots[t])) {
+							targetRoots.splice(t, 1);
+							len--;
+							t--;
+						}
+					}
+					targetRoots.push(target);
+				}
 			}
 		}
+
 		if (targetRoots.length === 0) return;
 		const ops: TargetOp[] = [];
 		targetRoots.forEach((root) => {
@@ -524,9 +529,9 @@ export default class Producer extends EventEmitter2 {
 		const newJson = toJSON0(root) as any[];
 		if (!newJson) return [];
 		const isRootId = id === 'root';
-		const oldValue = findFromDoc(data, (attributes) =>
-			isRootId ? true : attributes[DATA_ID] === id,
-		);
+		const oldValue = isRootId
+			? data
+			: findFromDoc(data, (attributes) => attributes[DATA_ID] === id);
 		if (!oldValue) return [];
 		// 比较新旧数据
 		const { path } = oldValue;
@@ -550,12 +555,14 @@ export default class Producer extends EventEmitter2 {
 		if (this.isLoadingCard(newJson)) return ops;
 		// 2. 子节点变更
 		const newChildren = newJson.slice(2);
-		const oldChildren = oldValue.children;
+		const oldChildren = Array.isArray(oldValue)
+			? oldValue.slice(2)
+			: oldValue.children;
 		ops.push(
 			...this.handleChildren(
 				isRootId ? '' : id,
 				isRootId ? -1 : path.length,
-				path,
+				path ?? [],
 				oldChildren,
 				newChildren,
 			),

@@ -108,7 +108,7 @@ class OTClient extends EventEmitter {
 		url: string,
 		docID: string,
 		defautlValue?: string,
-		collectionName: string = 'yanmao',
+		collectionName: string = 'aomao',
 	) {
 		if (this.socket) this.socket.close();
 		// 实例化一个可以自动重连的 ws

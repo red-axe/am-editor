@@ -208,16 +208,19 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		return this.mutation?.diff(root) || [];
 	}
 
-	private updatePositionTimeout: NodeJS.Timeout | null = null;
 	apply(ops: Op[]) {
 		this.stopMutation();
 		this.consumer.handleRemoteOperations(ops);
 		this.selection.emitSelectChange();
-		if (this.updatePositionTimeout)
-			clearTimeout(this.updatePositionTimeout);
-		this.updatePositionTimeout = setTimeout(() => {
-			this.selection.updatePosition();
-		}, 200);
+		const uids: string[] = [];
+		ops.forEach((op) => {
+			if ('uid' in op) {
+				uids.push(op['uid']);
+			}
+		});
+		this.selection.refreshAttributes(
+			...this.members.filter((m) => uids.includes(m.uuid)),
+		);
 		this.startMutation();
 	}
 
