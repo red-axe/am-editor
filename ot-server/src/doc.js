@@ -34,6 +34,16 @@ class Doc {
 		}
 	}
 
+	getData() {
+		return new Promise((resolve) => {
+			if (!this.doc) return [];
+			this.doc.fetch((err) => {
+				if (err) return resolve([]);
+				resolve(this.doc.data);
+			});
+		});
+	}
+
 	find(callback, data = this.doc ? this.doc.data : []) {
 		if (!data || !Array.isArray(data) || data.length < 1) {
 			return null;

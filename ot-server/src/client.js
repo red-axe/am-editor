@@ -79,35 +79,47 @@ class Client {
 					);
 					if (docKeys.length > 0) {
 						const deleteKeys = [];
-						context.data.op = op.filter((o) => {
-							if (
-								'ld' in o &&
-								Array.isArray(o.ld) &&
-								o.ld.length > 1 &&
-								!!o.ld[1]['data-id']
-							) {
-								const id = o.ld[1]['data-id'];
-								deleteKeys.push(id);
-							} else if (
-								'li' in o &&
-								Array.isArray(o.li) &&
-								o.li.length > 1 &&
-								!!o.li[1]['data-id']
-							) {
-								const id = o.li[1]['data-id'];
-								// 这个节点已经存在了，就不能再次插入了
-								if (!deleteKeys.includes(id)) {
-									const doc = this.getDoc(docKeys[0]);
-									if (!doc) return true;
-									const node = doc.find(
-										(attributes) =>
-											attributes['data-id'] === id,
-									);
-									if (node) return false;
+						const doc = this.getDoc(docKeys[0]);
+						if (doc) {
+							doc.getData().then((data) => {
+								context.data.op = op.filter((o) => {
+									if (
+										'ld' in o &&
+										Array.isArray(o.ld) &&
+										o.ld.length > 1 &&
+										!!o.ld[1]['data-id']
+									) {
+										const id = o.ld[1]['data-id'];
+										deleteKeys.push(id);
+									} else if (
+										'li' in o &&
+										Array.isArray(o.li) &&
+										o.li.length > 1 &&
+										!!o.li[1]['data-id']
+									) {
+										const id = o.li[1]['data-id'];
+										// 这个节点已经存在了，就不能再次插入了
+										if (!deleteKeys.includes(id)) {
+											const node = doc.find(
+												(attributes) =>
+													attributes['data-id'] ===
+													id,
+												data,
+											);
+											if (node) return false;
+										}
+									}
+									return true;
+								});
+								// sharedb消息
+								try {
+									next();
+								} catch (error) {
+									console.error(error);
 								}
-							}
-							return true;
-						});
+							});
+							return;
+						}
 					}
 				}
 				// sharedb消息
