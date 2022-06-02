@@ -840,20 +840,22 @@ class ChangeModel implements ChangeInterface {
 				isEmptyNode = true;
 		}
 		if (isEmptyNode && nodeApi.isBlock(startNode) && startNode.inEditor()) {
-			let html = nodeApi.getBatchAppendHTML(activeMarks, '<br />');
-			if (startNode.isEditable()) {
-				html = `<p>${html}</p>`;
+			if (nodeApi.isList(startNode)) {
+				startNode.remove();
+			} else {
+				let html = nodeApi.getBatchAppendHTML(activeMarks, '<br />');
+				if (startNode.isEditable()) {
+					html = `<p>${html}</p>`;
+				}
+				startNode.append($(html));
+				const br = startNode.find('br');
+				const parent = br.parent();
+				if (parent && nodeApi.isMark(parent)) {
+					nodeApi.replace(br, $('\u200b', null));
+				}
+				safeRange.select(startNode, true);
 			}
-			startNode.append($(html));
-			const br = startNode.find('br');
-			const parent = br.parent();
-			if (parent && nodeApi.isMark(parent)) {
-				nodeApi.replace(br, $('\u200b', null));
-			}
-			safeRange
-				.select(startNode, true)
-				.shrinkToElementNode()
-				.shrinkToTextNode();
+			safeRange.shrinkToElementNode().shrinkToTextNode();
 			safeRange.collapse(false);
 			if (this.isEmpty()) this.initValue(safeRange);
 			if (!range) this.apply(safeRange);
