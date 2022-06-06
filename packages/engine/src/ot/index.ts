@@ -31,6 +31,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	private mutation: MutationInterface | null;
 	doc: DocInterface | Doc | null = null;
 	isRemote: boolean = false;
+	private debounceRefreshAttributes: (uids: string[]) => void;
 
 	constructor(engine: EngineInterface) {
 		super();
@@ -41,6 +42,11 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		this.mutation = new Mutation(engine.container, { engine });
 		this.mutation.on('onChange', this.handleChange);
 		this.clientId = random(8);
+		this.debounceRefreshAttributes = debounce((uids: string[]) => {
+			this.selection.refreshAttributes(
+				...this.members.filter((m) => uids.includes(m.uuid)),
+			);
+		}, 200);
 	}
 
 	colors = [
@@ -218,9 +224,9 @@ class OTModel extends EventEmitter2 implements OTInterface {
 				uids.push(op['uid']);
 			}
 		});
-		this.selection.refreshAttributes(
-			...this.members.filter((m) => uids.includes(m.uuid)),
-		);
+		setTimeout(() => {
+			this.debounceRefreshAttributes(uids);
+		}, 0);
 		this.startMutation();
 	}
 

@@ -792,6 +792,13 @@ class ChangeModel implements ChangeInterface {
 			.getEndOffsetNode();
 		// 先删除范围内的所有内容
 		safeRange.extractContents();
+		// 删除后的之前开始选中节点是空节点就删除掉
+		if (
+			block.isElement() &&
+			block.get<Element>()!.childNodes.length === 0
+		) {
+			block.remove();
+		}
 		let { startNode } = safeRange;
 		if (
 			startNode.isEditable() &&
