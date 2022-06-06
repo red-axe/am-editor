@@ -51,6 +51,7 @@ class Block implements BlockModelInterface {
 				?.on((event) => backspace.trigger(event));
 
 			event.on('keyup:space', (event) => this.triggerMarkdown(event));
+			event.on('keydown:enter', (event) => this.triggerMarkdown(event));
 		}
 	}
 

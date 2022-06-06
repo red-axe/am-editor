@@ -24,8 +24,6 @@ export default class Producer extends EventEmitter2 {
 	private engine: EngineInterface;
 	private doc?: DocInterface | Doc;
 	private dmp: diff_match_patch;
-	private cacheNodes: Array<Node> = [];
-	private cacheTransientElements?: Array<Node>;
 	timer: NodeJS.Timeout | null = null;
 	lineStart: boolean = false;
 

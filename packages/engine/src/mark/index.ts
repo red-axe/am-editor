@@ -36,6 +36,7 @@ class Mark implements MarkModelInterface {
 				?.on((event) => backspace.trigger(event));
 
 			editor.on('keydown:space', (event) => this.triggerMarkdown(event));
+			editor.on('keydown:enter', (event) => this.triggerMarkdown(event));
 		}
 	}
 
