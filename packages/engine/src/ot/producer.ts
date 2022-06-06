@@ -46,27 +46,29 @@ export default class Producer extends EventEmitter2 {
 		const patches = this.dmp.patch_make(text1, text2);
 		Object.keys(patches).forEach((key) => {
 			const patch: patch_obj = patches[key];
-			let start1 = patch.start1;
+			if (patch.start1 === null) return;
+			let offset: number = patch.start1;
 			patch.diffs.forEach((diff) => {
 				const [type, data] = diff;
 				if (type !== DIFF_DELETE) {
 					if (type !== DIFF_INSERT) {
 						if (type === DIFF_EQUAL) {
-							(start1 as number) += data.length;
+							offset += data.length;
 						}
 					} else {
 						const p: Path = [];
 
 						ops.push({
 							si: data,
-							p: p.concat([...path], [start1 as number]),
+							p: p.concat([...path], [offset]),
 						});
+						offset += data.length;
 					}
 				} else {
 					const p: Path = [];
 					ops.push({
 						sd: data,
-						p: p.concat([...path], [start1 as number]),
+						p: p.concat([...path], [offset]),
 					});
 				}
 			});
