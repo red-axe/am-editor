@@ -62,11 +62,10 @@ export default class Producer extends EventEmitter2 {
 							si: data,
 							p: p.concat([...path], [offset]),
 						});
-						offset += data.length;
 					}
 				} else {
 					const p: Path = [];
-					ops.push({
+					ops.unshift({
 						sd: data,
 						p: p.concat([...path], [offset]),
 					});
