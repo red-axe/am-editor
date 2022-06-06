@@ -608,7 +608,9 @@ class NodeModel implements NodeModelInterface {
 			let splitNode = null;
 			if (
 				this.isBlock(commonAncestorNode) &&
-				this.isEmpty(commonAncestorNode)
+				this.isEmpty(commonAncestorNode) &&
+				(commonAncestorNode.isRoot() ||
+					commonAncestorNode.parent()?.isRoot())
 			) {
 				splitNode = removeCurrentEmptyBlock
 					? commonAncestorNode
@@ -651,6 +653,22 @@ class NodeModel implements NodeModelInterface {
 					blockNode = parentBlock;
 					parentBlock = blockNode.parent();
 				}
+				const canMergeTags = schema.getCanMergeTags();
+				const name = node.nodeName.toLowerCase();
+				let fragmentLaste: Node | null = null;
+				if (
+					splitNode &&
+					blockNode.name === name &&
+					canMergeTags.includes(blockNode.name)
+				) {
+					blockNode = splitNode;
+					const fragment = document.createDocumentFragment();
+					node.childNodes.forEach((child) => {
+						fragment.appendChild(child);
+					});
+					node = fragment;
+					fragmentLaste = node.lastChild;
+				}
 				if (
 					blockNode.isEditable() &&
 					blockNode.get<Node>()?.childNodes.length === 0
@@ -670,6 +688,7 @@ class NodeModel implements NodeModelInterface {
 						if (splitNode && this.isEmptyWidthChild(splitNode))
 							splitNode.remove();
 					}
+					if (fragmentLaste) node = fragmentLaste;
 				}
 			}
 			if (node instanceof Element || node instanceof DocumentFragment)

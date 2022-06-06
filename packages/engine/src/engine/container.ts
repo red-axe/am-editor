@@ -76,7 +76,7 @@ class Container {
 		engine.on('realtimeChange', this.onRealtimeChange);
 		// 编辑器文档尾部始终保持一行
 		if (autoAppend !== false && autoPrepend !== false) {
-			this.node.on('click', this.handleClick);
+			this.node.on('mouseup', this.handleClick);
 		}
 		document.addEventListener('mousedown', this.docMouseDown);
 		this.node.on(isMobile ? 'touchstart' : 'mousedown', this.triggerFoucs);

@@ -562,12 +562,12 @@ class ChangeModel implements ChangeInterface {
 					lastNode = node;
 				}
 
-				appendNodes.push(node);
 				if (prev) {
 					prev.after(node);
 				} else {
 					nodeApi.insert(node, range, true);
 				}
+				if (node.get()?.isConnected) appendNodes.push(node);
 				if (!this.engine.node.isBlock(node) && !next?.isText()) {
 					if (prev) {
 						range.select(node, true).collapse(false);
@@ -576,7 +576,7 @@ class ChangeModel implements ChangeInterface {
 				} else {
 					prev = node;
 				}
-				if (!next) {
+				if (!next && node.get()?.isConnected) {
 					range.select(node, true).collapse(false);
 				}
 				// 被删除了重新设置开始节点位置
@@ -792,13 +792,7 @@ class ChangeModel implements ChangeInterface {
 			.getEndOffsetNode();
 		// 先删除范围内的所有内容
 		safeRange.extractContents();
-		// 删除后的之前开始选中节点是空节点就删除掉
-		if (
-			block.isElement() &&
-			block.get<Element>()!.childNodes.length === 0
-		) {
-			block.remove();
-		}
+
 		let { startNode } = safeRange;
 		if (
 			startNode.isEditable() &&
@@ -813,6 +807,14 @@ class ChangeModel implements ChangeInterface {
 			.shrinkToElementNode()
 			.shrinkToTextNode()
 			.enlargeToElementNode().startNode;
+		// 删除后的之前开始选中节点是空节点就删除掉
+		if (
+			block.isElement() &&
+			!block.equal(startNode) &&
+			block.get<Element>()!.childNodes.length === 0
+		) {
+			block.remove();
+		}
 		// 只删除了文本，不做处理
 		if (startNode.isText() || !block.inEditor()) {
 			if (this.isEmpty()) this.initValue(safeRange);
