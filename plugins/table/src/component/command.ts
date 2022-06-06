@@ -602,8 +602,11 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			const rowCount = pasteTableModel.rows;
 			const colCount = pasteTableModel.cols;
 			const startCell = pasteTableModel.table[0][0];
-			const cell = tableModel.table[begin.row][begin.col];
+			const row = tableModel.table[begin.row];
+			if (!row) return;
+			const cell = row[begin.col];
 			if (
+				!cell ||
 				helper.isEmptyModelCol(startCell) ||
 				helper.isEmptyModelCol(cell)
 			)

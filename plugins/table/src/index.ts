@@ -58,7 +58,8 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		if (
 			component &&
 			component.getSelectionNodes &&
-			component.name === TableComponent.cardName
+			component.name === TableComponent.cardName &&
+			!component.isCursor(range.startNode)
 		) {
 			const nodes = component.getSelectionNodes();
 			if (nodes.length > 1) {
@@ -86,7 +87,8 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		if (
 			component &&
 			component.getSelectionNodes &&
-			component.name === TableComponent.cardName
+			component.name === TableComponent.cardName &&
+			!component.isCursor(range.startNode)
 		) {
 			const nodes = component.getSelectionNodes();
 			if (nodes.length > 1) {
@@ -110,7 +112,8 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		if (
 			component &&
 			component.getSelectionNodes &&
-			component.name === TableComponent.cardName
+			component.name === TableComponent.cardName &&
+			!component.isCursor(range.startNode)
 		) {
 			const data = editor.clipboard.getData(event);
 			if (
