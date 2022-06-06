@@ -668,17 +668,27 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 
 	addDragEvent() {
 		this.tableRoot?.addClass('drag-select');
-		this.table.wrapper
-			?.on(isMobile ? 'touchend' : 'mouseup', this.removeDragEvent)
-			.on(isMobile ? 'touchmove' : 'mousemove', this.onDragMove);
+		document.addEventListener(
+			isMobile ? 'touchend' : 'mouseup',
+			this.removeDragEvent,
+		);
+		document.addEventListener(
+			isMobile ? 'touchmove' : 'mousemove',
+			this.onDragMove,
+		);
 	}
 
 	removeDragEvent = () => {
 		this.tableRoot?.removeClass('drag-select');
 		this.table.wrapper?.removeClass('drag-selecting');
-		this.table.wrapper
-			?.off(isMobile ? 'touchend' : 'mouseup', this.removeDragEvent)
-			.off(isMobile ? 'touchmove' : 'mousemove', this.onDragMove);
+		document.removeEventListener(
+			isMobile ? 'touchend' : 'mouseup',
+			this.removeDragEvent,
+		);
+		document.removeEventListener(
+			isMobile ? 'touchmove' : 'mousemove',
+			this.onDragMove,
+		);
 		this.dragging = undefined;
 	};
 
