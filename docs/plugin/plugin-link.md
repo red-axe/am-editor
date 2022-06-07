@@ -5,19 +5,19 @@ Link plugin
 ## Installation
 
 ```bash
-$ yarn add @aomao/plugin-link
+yarn add @aomao/plugin-link
 ```
 
 `Vue3` use
 
 ```bash
-$ yarn add @aomao/plugin-link-vue
+yarn add @aomao/plugin-link-vue
 ```
 
 `Vue2` use
 
 ```bash
-$ yarn add am-editor-link-vue2
+yarn add am-editor-link-vue2
 ```
 
 Add to engine
@@ -64,6 +64,22 @@ onConfirm?: (
      text: string,
      link: string,
 ) => Promise<{ text: string; link: string }>;
+```
+
+### enableToolbar
+
+Whether to enable the toolbar for link editing
+
+```ts
+enableToolbar?: boolean;
+```
+
+### onLinkClick
+
+Fired when a link is clicked in edit mode
+
+```ts
+onLinkClick?: (e: MouseEvent, link: string) => void;
 ```
 
 ## Command

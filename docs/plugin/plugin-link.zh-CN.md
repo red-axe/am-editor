@@ -5,19 +5,19 @@
 ## 安装
 
 ```bash
-$ yarn add @aomao/plugin-link
+yarn add @aomao/plugin-link
 ```
 
 `Vue3` 使用
 
 ```bash
-$ yarn add @aomao/plugin-link-vue
+yarn add @aomao/plugin-link-vue
 ```
 
 `Vue2` 使用
 
 ```bash
-$ yarn add am-editor-link-vue2
+yarn add am-editor-link-vue2
 ```
 
 添加到引擎
@@ -64,6 +64,22 @@ onConfirm?: (
     text: string,
     link: string,
 ) => Promise<{ text: string; link: string }>;
+```
+
+### enableToolbar
+
+是否启用对链接编辑的工具栏
+
+```ts
+enableToolbar?: boolean;
+```
+
+### onLinkClick
+
+在编辑模式下单击链接时触发
+
+```ts
+onLinkClick?: (e: MouseEvent, link: string) => void;
 ```
 
 ## 命令
