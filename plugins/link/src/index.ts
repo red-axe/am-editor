@@ -3,7 +3,6 @@ import {
 	NodeInterface,
 	InlinePlugin,
 	isEngine,
-	PluginEntry,
 	PluginOptions,
 } from '@aomao/engine';
 import type MarkdownIt from 'markdown-it';
@@ -19,6 +18,8 @@ export interface LinkOptions extends PluginOptions {
 		text: string,
 		link: string,
 	) => Promise<{ text: string; link: string }>;
+	enableToolbar?: boolean;
+	onLinkClick?: (e: MouseEvent, link: string) => void;
 }
 
 const PASTE_EACH = 'paste:each';
@@ -53,9 +54,12 @@ export default class<
 		super.init();
 		const editor = this.editor;
 		if (isEngine(editor)) {
-			this.toolbar = new Toolbar(editor, {
-				onConfirm: this.options.onConfirm,
-			});
+			if (this.options.enableToolbar !== false) {
+				this.toolbar = new Toolbar(editor, {
+					onConfirm: this.options.onConfirm,
+				});
+			}
+			editor.container.on('click', this.handleClick);
 			editor.on(MARKDOWN_IT, this.markdownIt);
 			editor.on(PASTE_EACH, this.pasteHtml);
 		}
@@ -63,6 +67,16 @@ export default class<
 		editor.on(SELECT, this.bindQuery);
 		editor.language.add(locales);
 	}
+
+	handleClick = (e: MouseEvent) => {
+		if (!e.target) return;
+		const { onLinkClick } = this.options;
+		if (!onLinkClick) return;
+		const target = $(e.target).closest(`${this.tagName}`);
+		if (target.name === this.tagName) {
+			onLinkClick(e, target.attributes('href'));
+		}
+	};
 
 	hotkey() {
 		return this.options.hotkey || { key: 'mod+k', args: ['_blank'] };
@@ -164,6 +178,7 @@ export default class<
 
 	destroy(): void {
 		const editor = this.editor;
+		editor.container.off('click', this.handleClick);
 		editor.off(PASTE_EACH, this.pasteHtml);
 		editor.off(PARSE_HTML, this.parseHtml);
 		editor.off(SELECT, this.bindQuery);
