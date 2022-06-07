@@ -744,24 +744,25 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	remove(uuid: string) {
-		const dataElement = (
-			this.engine.scrollNode?.get<Element>() ?? this.root.get<Element>()
-		)?.querySelector(`[${DATA_UUID}="${uuid}"]`);
-		if (dataElement) {
-			if (dataElement.classList.contains(USER_MASK_CLASS)) {
-				const target: Node | undefined = dataElement['__node'];
-				const component = target ? this.engine.card.find(target) : null;
-				if (
-					component &&
-					!component.isEditable &&
-					component.activatedByOther === uuid
-				) {
-					// 取消锁定
-					this.setCardActivatedByOther(component);
+		(this.engine.scrollNode?.get<Element>() ?? this.root.get<Element>())
+			?.querySelectorAll(`[${DATA_UUID}="${uuid}"]`)
+			.forEach((dataElement) => {
+				if (dataElement.classList.contains(USER_MASK_CLASS)) {
+					const target: Node | undefined = dataElement['__node'];
+					const component = target
+						? this.engine.card.find(target)
+						: null;
+					if (
+						component &&
+						!component.isEditable &&
+						component.activatedByOther === uuid
+					) {
+						// 取消锁定
+						this.setCardActivatedByOther(component);
+					}
 				}
-			}
-			dataElement.parentNode?.removeChild(dataElement);
-		}
+				dataElement.parentNode?.removeChild(dataElement);
+			});
 		this.engine.card.each((component) => {
 			if (component.isEditable || component.selectedByOther !== uuid)
 				return;
