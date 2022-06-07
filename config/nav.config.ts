@@ -18,7 +18,7 @@ export default () => {
 				path: '/config',
 			},
 			{
-				title: 'Plug-in',
+				title: 'Plugin',
 				path: '/plugin',
 			},
 			{

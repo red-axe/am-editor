@@ -76,7 +76,7 @@ parse?: (
 };
 ```
 
-## Plug-in method
+## Plugin method
 
 Get all mentions in the document
 
@@ -85,7 +85,7 @@ Get all mentions in the document
 engine.command.executeMethod('mention', 'getList');
 ```
 
-## Plug-in events
+## Plugin events
 
 `mention:default`: default drop-down query list to display data
 

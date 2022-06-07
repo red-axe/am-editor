@@ -1,6 +1,6 @@
 # Incident
 
-In the engine, we handle many events by default, such as: text input, delete, copy, paste, left and right arrow keys, markdown syntax input monitoring, plug-in shortcut keys, and so on. These events may have different processing logic at different cursor positions. Most operations are to modify the DOM tree structure and repair the cursor position. In addition, we also expose these events to the plug-in to handle by itself.
+In the engine, we handle many events by default, such as: text input, delete, copy, paste, left and right arrow keys, markdown syntax input monitoring, plugin shortcut keys, and so on. These events may have different processing logic at different cursor positions. Most operations are to modify the DOM tree structure and repair the cursor position. In addition, we also expose these events to the plugin to handle by itself.
 
 Method signature
 
@@ -211,7 +211,7 @@ Triggered before the editor executes the command
 
 ```ts
 /**
- * @param name Execute plug-in command name
+ * @param name Execute plugin command name
  * @param args command execution parameters
  * */
 (name: string, ...args: any) => void
@@ -223,7 +223,7 @@ Triggered after the editor executes a command
 
 ```ts
 /**
- * @param name Execute plug-in command name
+ * @param name Execute plugin command name
  * @param args command execution parameters
  * */
 (name: string, ...args: any) => void

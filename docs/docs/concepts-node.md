@@ -28,7 +28,7 @@ Or modified by attributes and styles:
 <span style="font-style:italic">Italic</span>
 ```
 
-They all have the same effect, but the engine judges that they all belong to different plug-ins.
+They all have the same effect, but the engine judges that they all belong to different plugins.
 
 ## Style node
 
@@ -54,7 +54,7 @@ Inline nodes have all the characteristics of style nodes, but inline nodes canno
 
 ## Block node
 
-The block-level node occupies a line in the editor. Except for explicitly specifying the nesting relationship with `schema`, it can only be under `$root` (editor root node) by default. The child node can be any other node, unless it has been specified that the plug-in cannot contain certain style node classes. For example, bolding and adjusting the font size cannot be used in the title.
+The block-level node occupies a line in the editor. Except for explicitly specifying the nesting relationship with `schema`, it can only be under `$root` (editor root node) by default. The child node can be any other node, unless it has been specified that the plugin cannot contain certain style node classes. For example, bolding and adjusting the font size cannot be used in the title.
 
 ```html
 <!-- strong tags will be filtered out -->

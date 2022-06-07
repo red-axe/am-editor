@@ -12,7 +12,7 @@ Render content
 /**
   * Render content
   * @param content rendered content
-  * @param trigger Whether to trigger the rendering completion event, used to show the special effects of the plug-in. For example, in the heading plug-in, the anchor point display function is displayed. The default is true
+  * @param trigger Whether to trigger the rendering completion event, used to show the special effects of the plugin. For example, in the heading plugin, the anchor point display function is displayed. The default is true
   */
 render(content: string, trigger?: boolean): void;
 ```

@@ -31,7 +31,7 @@ new Engine(...,{ plugins:[Link] })
 
 ## Optional
 
-### hot key
+### Hotkey
 
 The default shortcut key is `mod+k`, and the default parameter is ["_blank"]
 

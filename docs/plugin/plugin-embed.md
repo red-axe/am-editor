@@ -2,7 +2,7 @@
 
 Embed URL
 
-By inheriting this plug-in, you can embed a specific URL to realize the preview function.
+By inheriting this plugin, you can embed a specific URL to realize the preview function.
 
 ## Install
 

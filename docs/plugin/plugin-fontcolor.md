@@ -19,7 +19,7 @@ new Engine(...,{ plugins:[Fontcolor] })
 
 ## Optional
 
-### hot key
+### Hotkey
 
 No shortcut keys by default
 

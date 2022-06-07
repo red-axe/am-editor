@@ -1,6 +1,6 @@
 # editor
 
-In am-editor, the editor is a separate mode for reading and writing. Editing mode and reading mode need to be rendered through different modules. Because of the existence of `card` mode, the content output by the editor may also be interactive. In reading mode, we can also let the plug-in use `React` `Vue`Wait for the front-end framework to render some interactive components. Simply put, all the effects that can be achieved under the front-end framework can be placed in the plug-in. For example: you can make a voting plug-in, you can set voting options in edit mode, you can choose to vote in reading mode, show the number of votes after voting, and so on. These functions may be very interesting. Unlike traditional editors that output fixed html or json data, of course we also support the output of pure html and present non-interactive content.
+In am-editor, the editor is a separate mode for reading and writing. Editing mode and reading mode need to be rendered through different modules. Because of the existence of `card` mode, the content output by the editor may also be interactive. In reading mode, we can also let the plugin use `React` `Vue`Wait for the front-end framework to render some interactive components. Simply put, all the effects that can be achieved under the front-end framework can be placed in the plugin. For example: you can make a voting plugin, you can set voting options in edit mode, you can choose to vote in reading mode, show the number of votes after voting, and so on. These functions may be very interesting. Unlike traditional editors that output fixed html or json data, of course we also support the output of pure html and present non-interactive content.
 
 Instantiate engine
 
@@ -28,7 +28,7 @@ const view = new View("Renderer root node", {
 });
 ```
 
-Inside the plug-in, we may need to control the reading mode, we can use `isEngine` to determine
+Inside the plugin, we may need to control the reading mode, we can use `isEngine` to determine
 
 ```ts
 import {isEngine} from'@aomao/engine';

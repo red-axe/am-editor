@@ -53,7 +53,7 @@ You can use third-party libraries or back-end APIs to read other documents and c
 
 Convert to other document formats in the same way, use `getHtml` to obtain `html` and then convert
 
-Some cards may require additional attributes to restore the `html` correctly. You can check the conversion conditions in the `pasteHtml` method in the specific card plug-in
+Some cards may require additional attributes to restore the `html` correctly. You can check the conversion conditions in the `pasteHtml` method in the specific card plugin
 
 ## Export Markdown
 
@@ -74,7 +74,7 @@ engine.on('markdown-it', markdown => {
  // or add a plugin
  markdown.use (markdown-it plugin)
 })
-// By default, the plug-in set by markdown-ti will be used for conversion. If there are additional requirements, you can listen to this event interception and call the callback to return the string by yourself. If there is a need for more replication, it is recommended to use the api of markdown-it to make plugins.
+// By default, the plugin set by markdown-ti will be used for conversion. If there are additional requirements, you can listen to this event interception and call the callback to return the string by yourself. If there is a need for more replication, it is recommended to use the api of markdown-it to make plugins.
 engine.on('markdown-it-token', ({ token, markdown, callback }) => {
  // token is the currently processed token
  // markdown is the current markdown-it instance

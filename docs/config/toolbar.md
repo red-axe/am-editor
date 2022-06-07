@@ -12,7 +12,7 @@ import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
 -ToolbarPlugin provides plugins to the engine
 -ToolbarComponent provides the card component to the engine
 
-Except for the `Toolbar` component, the latter two are shortcuts to realize the toolbar card plug-in option when you press `/` in the editor
+Except for the `Toolbar` component, the latter two are shortcuts to realize the toolbar card plugin option when you press `/` in the editor
 
 ## Types of
 
@@ -24,7 +24,7 @@ There are now four ways to display the toolbar
 
 The attributes that the Toolbar component needs to pass in:
 
--An instance of the `editor` editor, which can be used to automatically invoke the plug-in execution -`items` plugin display configuration list
+-An instance of the `editor` editor, which can be used to automatically invoke the plugin execution -`items` plugin display configuration list
 
 ## Configuration item
 
@@ -34,7 +34,7 @@ items is a two-dimensional array. We can put plugins of the same concept in a gr
 items: [['collapse'], ['bold', 'italic']];
 ```
 
-All the display forms of the existing plug-ins have been configured in the Toolbar component, and we can directly pass in the plug-in name to use these configurations. Of course, we can also pass in an object to cover part of the configuration
+All the display forms of the existing plugins have been configured in the Toolbar component, and we can directly pass in the plugin name to use these configurations. Of course, we can also pass in an object to cover part of the configuration
 
 ```ts
 items: [
@@ -234,7 +234,7 @@ The basic properties are the same as the `button` properties, which can be viewe
 
 #### search
 
-To query characters, in the toolbar plug-in, we can use `/` to call up shortcut options in the editor, and search for related cards, so you can specify a combination of related keywords and characters here
+To query characters, in the toolbar plugin, we can use `/` to call up shortcut options in the editor, and search for related cards, so you can specify a combination of related keywords and characters here
 
 #### description
 
@@ -316,11 +316,11 @@ placement?:
     |'rightBottom';
 ```
 
-### hotkey
+### Hotkey
 
-Whether to display the hot key, or set the information of the hot key
+Whether to display the hotkey, or set the information of the hotkey
 
-The default is to display the hotkey to the prompt message (`title`), and use the `name` information to find the hotkey set by the plug-in
+The default is to display the hotkey to the prompt message (`title`), and use the `name` information to find the hotkey set by the plugin
 
 ```ts
 hotkey?: boolean | string;
@@ -328,13 +328,13 @@ hotkey?: boolean | string;
 
 ### autoExecute
 
-When the button is clicked, whether to automatically execute the plug-in command, it is enabled by default
+When the button is clicked, whether to automatically execute the plugin command, it is enabled by default
 
 ### command
 
-Plug-in command or parameter
+Plugin command or parameter
 
-If this parameter is configured and the `autoExecute` property is enabled, when the button is clicked, this configuration is called to execute the plug-in command
+If this parameter is configured and the `autoExecute` property is enabled, when the button is clicked, this configuration is called to execute the plugin command
 
 If `name` is configured, execute the plugin corresponding to `name`, otherwise execute the plugin corresponding to `name` specified by `button`
 
@@ -384,7 +384,7 @@ onMouseLeave?: (event: React.MouseEvent, engine?: EngineInterface) => void;
 
 ### onActive
 
-The custom button is activated and selected, and the plug-in `engine.command.queryState` method is called by default
+The custom button is activated and selected, and the plugin `engine.command.queryState` method is called by default
 
 ```ts
 onActive?: () => boolean;
@@ -542,7 +542,7 @@ renderContent?: (item: DropdownListItem, engine?: EngineInterface) => React.Reac
 
 ### onActive
 
-The custom button is activated and selected, and the plug-in `engine.command.queryState` method is called by default
+The custom button is activated and selected, and the plugin `engine.command.queryState` method is called by default
 
 ```ts
 onActive?: () => boolean;

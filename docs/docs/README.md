@@ -4,7 +4,7 @@ title: Introduction
 
 ## What is it?
 
-A rich text editor that supports collaborative editing, you can freely use React, Vue and other front-end common libraries to extend and define plug-ins.
+A rich text editor that supports collaborative editing, you can freely use React, Vue and other front-end common libraries to extend and define plugins.
 
 ## Fundamental
 
@@ -123,7 +123,7 @@ card node main attributes
 import { CodeBlockComponent } from '@aomao/plugin-codeblock';
 ```
 
--   Value The value of the card, used for card rendering, the type and structure of the value are defined and rendered by the card plug-in when the card plug-in is defined
+-   Value The value of the card, used for card rendering, the type and structure of the value are defined and rendered by the card plugin when the card plugin is defined
     The card value is a data string + json , taking the above code block as an example, after decoding it looks like this
 
 ```json
@@ -337,10 +337,10 @@ Use the `MutationObserver` to monitor the mutation of the `html` structure in th
 
 ## Features
 
--   Out of the box, it provides dozens of rich plug-ins to meet most needs
--   High extensibility, in addition to the basic plug-in of `mark`, inline`, and `block`type, we also provide`card`component combined with`React`, `Vue` and other front-end libraries to render the plug-in UI
+-   Out of the box, it provides dozens of rich plugins to meet most needs
+-   High extensibility, in addition to the basic plugin of `mark`, inline`, and `block`type, we also provide`card`component combined with`React`, `Vue` and other front-end libraries to render the plugin UI
 -   Rich multimedia support, not only supports pictures, audio and video, but also supports insertion of embedded multimedia content
 -   Support Markdown syntax
--   The engine is written in pure JavaScript and does not rely on any front-end libraries. Plug-ins can be rendered using front-end libraries such as `React` and `Vue`. Easily cope with complex architecture
+-   The engine is written in pure JavaScript and does not rely on any front-end libraries. Plugins can be rendered using front-end libraries such as `React` and `Vue`. Easily cope with complex architecture
 -   Built-in collaborative editing program, ready to use with lightweight configuration
 -   Compatible with most of the latest mobile browsers

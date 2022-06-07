@@ -122,19 +122,19 @@ Accept the following types of objects
 
 ### `isMarkPlugin`
 
-Is it a Mark type plug-in
+Is it a Mark type plugin
 
 Accepted object: `PluginInterface`
 
 ### `isInlinePlugin`
 
-Is it an Inline type plug-in
+Is it an Inline type plugin
 
 Accepted object: `PluginInterface`
 
 ### `isBlockPlugin`
 
-Is it a Block type plug-in
+Is it a Block type plugin
 
 Accepted object: `PluginInterface`
 

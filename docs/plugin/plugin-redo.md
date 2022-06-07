@@ -19,12 +19,12 @@ new Engine(...,{ plugins:[Redo] })
 
 ## Optional
 
-### hot key
+### Hotkey
 
 The default shortcut key is `mod+y` `shift+mod+y`
 
 ```ts
-//hot key
+//hotkey
 hotkey?: string | Array<string>;
 //Use configuration
 new Engine(...,{
@@ -40,7 +40,7 @@ new Engine(...,{
 ## Command
 
 ```ts
-//Use command to execute the plug-in and pass in the required parameters
+//Use command to execute the plugin and pass in the required parameters
 engine.command.execute('redo');
 //Use command to execute query current status, return boolean | undefined
 engine.command.queryState('redo');

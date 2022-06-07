@@ -19,12 +19,12 @@ new Engine(...,{ plugins:[Italic] })
 
 ## Optional
 
-### hot key
+### Hotkey
 
 The default shortcut key is `mod+i`, and multiple shortcut keys are passed in as an array
 
 ```ts
-//hot key,
+//hotkey,
 hotkey?: string | Array<string>;
 
 //Use configuration

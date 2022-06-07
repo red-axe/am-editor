@@ -33,10 +33,10 @@ Triggered when the copy anchor is clicked, the id value of the current title is 
 anchorCopy?:(id:string) => string
 ```
 
-### hot key
+### Hotkey
 
 ```ts
-//hot key
+//hotkey
 hotkey?: {
     h1?: string;//Title 1, default mod+opt+1
     h2?: string;//Title 2, default mod+opt+2
@@ -60,7 +60,7 @@ new Engine(...,{
 
 ### Disable mark plugin style effect
 
-You can disable the mark plug-in effect under the title, ['fontsize','bold'] is disabled by default, and filter out these plug-in styles in the case of splitting, pasting, etc.
+You can disable the mark plugin effect under the title, ['fontsize','bold'] is disabled by default, and filter out these plugin styles in the case of splitting, pasting, etc.
 
 ```ts
 disableMark?: Array<string> //mark plugin name collection
@@ -102,7 +102,7 @@ In addition, you may also need to configure the heading plugin of the items attr
 When `p` is passed in or the current heading style is consistent with the current passed value, the heading will be canceled
 
 ```ts
-//Use command to execute the plug-in and pass in the required parameters
+//Use command to execute the plugin and pass in the required parameters
 engine.command.execute(
 	'heading',
 	'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p',

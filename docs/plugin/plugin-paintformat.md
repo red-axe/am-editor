@@ -1,6 +1,6 @@
 # @aomao/plugin-paintformat
 
-Format brush plug-in
+Format brush plugin
 
 Support all mark tag plugins
 

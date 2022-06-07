@@ -4,7 +4,7 @@ List node plugin
 
 Usually used for ordered lists, unordered lists, and custom lists. For example, the task list is a custom list, and the `checkbox` inside is an implementation of `card` of type `inline`
 
-For this type of plug-in, we need to inherit the `ListPlugin` abstract class. The `ListPlugin` abstract class extends some properties and methods on the basis of inheriting the `BlockPlugin` abstract class. So the plug-in that inherits `ListPlugin` also has all the attributes and methods of the `BlockPlugin` abstract class
+For this type of plugin, we need to inherit the `ListPlugin` abstract class. The `ListPlugin` abstract class extends some properties and methods on the basis of inheriting the `BlockPlugin` abstract class. So the plugin that inherits `ListPlugin` also has all the attributes and methods of the `BlockPlugin` abstract class
 
 ## Inheritance
 
@@ -57,7 +57,7 @@ export default class extends ListPlugin {
 
 To determine whether the node is the node required by the current list, it must be implemented
 
-We need to use this method to determine which plug-in a list node attribute
+We need to use this method to determine which plugin a list node attribute
 
 ```ts
 isCurrent(node: NodeInterface) {
@@ -103,7 +103,7 @@ const activeBlocks = block.findBlocks(range);
 if (activeBlocks) {
 	//Create a marker node at the cursor
 	const selection = range.createSelection();
-	//Determine whether it belongs to the custom list node of the current plug-in type
+	//Determine whether it belongs to the custom list node of the current plugin type
 	if (list.isSpecifiedType(activeBlocks, 'ul', 'checkbox')) {
 		//Remove package
 		list.unwrap(activeBlocks);

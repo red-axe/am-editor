@@ -4,7 +4,7 @@ In-line node plugin
 
 Usually used in scenarios where the text is individually styled and cannot be nested
 
-For this type of plug-in, we need to inherit the `InlinePlugin` abstract class. The `InlinePlugin` abstract class extends some properties and methods on the basis of inheriting the `ElementPlugin` abstract class. So the plugin that inherits `InlinePlugin` also has all the attributes and methods of the `ElementPlugin` abstract class
+For this type of plugin, we need to inherit the `InlinePlugin` abstract class. The `InlinePlugin` abstract class extends some properties and methods on the basis of inheriting the `ElementPlugin` abstract class. So the plugin that inherits `InlinePlugin` also has all the attributes and methods of the `ElementPlugin` abstract class
 
 ```ts
 import { InlinePlugin } from '@aomao/engine';
@@ -63,13 +63,13 @@ export default class extends InlinePlugin {
 
 ### `execute`
 
-Execute plug-in commands, optional
+Execute plugin commands, optional
 
 The `InlinePlugin` plugin has implemented the `execute` method, if you need to use it, you can override this method
 
 ### `queryState`
 
-Query plug-in status command, optional
+Query plugin status command, optional
 
 The `InlinePlugin` plugin has implemented the `queryState` method, if you need to use it, you can override this method
 
@@ -85,9 +85,9 @@ If you need to use it, you can override this method or use super.schema() to cal
 
 Whether to trigger the execution to add the current inline package, otherwise the package with the current inline label will be removed, optional
 
-By default, the `InlinePlugin` plugin will call `editor.command.queryState` to query the current plugin state (the node selected within the current cursor matches the node set by the current inline plugin) and the currently set `tagName` `style` `attributes` In comparison, if they are consistent, the effect of removing the current inline plug-in node will be executed, otherwise the effect of the current inline plug-in node will be added.
+By default, the `InlinePlugin` plugin will call `editor.command.queryState` to query the current plugin state (the node selected within the current cursor matches the node set by the current inline plugin) and the currently set `tagName` `style` `attributes` In comparison, if they are consistent, the effect of removing the current inline plugin node will be executed, otherwise the effect of the current inline plugin node will be added.
 
-If you implement the isTrigger method, you need to determine whether to cancel or add the effect of the current inline plug-in node.
+If you implement the isTrigger method, you need to determine whether to cancel or add the effect of the current inline plugin node.
 
 ```ts
 /**

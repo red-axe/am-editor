@@ -19,7 +19,7 @@ new Engine(...,{ plugins:[Table], cards:[TableComponent]})
 
 ## Optional
 
-### hot key
+### Hotkey
 
 No shortcut keys by default
 

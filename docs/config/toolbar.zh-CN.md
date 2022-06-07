@@ -320,7 +320,7 @@ placement?:
     | 'rightBottom';
 ```
 
-### hotkey
+### Hotkey
 
 是否显示热键，或者设置热键的信息
 

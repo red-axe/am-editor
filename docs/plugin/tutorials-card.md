@@ -106,7 +106,7 @@ export default class extends Card {
 
 ### React card plugin example
 
-Card plug-in file, main function: insert card, convert/parse card
+Card plugin file, main function: insert card, convert/parse card
 
 `test/index.ts`
 
@@ -131,7 +131,7 @@ export default class extends Plugin<Options> {
 	static get pluginName() {
 		return 'test';
 	}
-	// Plug-in initialization
+	// Plugin initialization
 	init() {
 		// listen to events parsed into html
 		this.editor.on('parse:html', (node) => this.parseHtml(node));
@@ -146,7 +146,7 @@ export default class extends Plugin<Options> {
 		const { card } = this.editor;
 		card.insert(TestComponent.cardName);
 	}
-	// hot key
+	// hotkey
 	hotkey() {
 		return this.options.hotkey || 'mod+shift+0';
 	}
@@ -484,7 +484,7 @@ export default class extends Card {
 
 ### Vue card plugin example
 
-Card plug-in file, main function: insert card, convert/parse card
+Card plugin file, main function: insert card, convert/parse card
 
 `test/index.ts`
 
@@ -509,7 +509,7 @@ export default class extends Plugin<Options> {
 	static get pluginName() {
 		return 'test';
 	}
-	// Plug-in initialization
+	// Plugin initialization
 	init() {
 		// listen to events parsed into html
 		this.editor.on('parse:html', (node) => this.parseHtml(node));
@@ -524,7 +524,7 @@ export default class extends Plugin<Options> {
 		const { card } = this.editor;
 		card.insert(TestComponent.cardName);
 	}
-	// hot key
+	// hotkey
 	hotkey() {
 		return this.options.hotkey || 'mod+shift+0';
 	}
@@ -969,7 +969,7 @@ EditEditor example
 
 Type: `EditorInterface`
 
-When the plug-in is instantiated, the editor instance will be passed in. We can access it through `this`
+When the plugin is instantiated, the editor instance will be passed in. We can access it through `this`
 
 ```ts
 import {Card, isEngine} from'@aomao/engine'

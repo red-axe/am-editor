@@ -17,7 +17,7 @@ import Selectall from'@aomao/plugin-selectall';
 new Engine(...,{ plugins:[Selectall] })
 ```
 
-## hot key
+## hotkey
 
 The shortcut key is `mod+a`, which cannot be modified
 

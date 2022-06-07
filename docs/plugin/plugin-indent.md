@@ -10,7 +10,7 @@ $ yarn add @aomao/plugin-indent
 
 Add to engine
 
-This plug-in is recommended to be added first to prevent other plug-ins from intercepting the event and making it unable to take effect
+This plugin is recommended to be added first to prevent other plugins from intercepting the event and making it unable to take effect
 
 ```ts
 import Engine, {EngineInterface} from'@aomao/engine';
@@ -21,14 +21,14 @@ new Engine(...,{ plugins:[Indent] })
 
 ## Optional
 
-### hot key
+### Hotkey
 
 Default indentation shortcut `mod+]`
 
 Delete indentation shortcut key `mod+[` by default
 
 ```ts
-//hot key,
+//hotkey,
 hotkey?: {
     in?:string //Indentation shortcut key, default mod+]
     out?:string //Delete indentation shortcut key, default mod+[

@@ -19,7 +19,7 @@ new Engine(...,{ plugins:[Alignment] })
 
 ## Optional
 
-### hot key
+### Hotkey
 
 The default shortcut key is
 
@@ -32,7 +32,7 @@ Right alignment: `mod+shift+r`
 Justification: `mod+shift+j`
 
 ```ts
-//hot key
+//hotkey
 hotkey?: {
     left?: string;//Left alignment, default mod+shift+l
     center?: string;//Center alignment, default mod+shift+c
@@ -57,7 +57,7 @@ new Engine(...,{
 Optional parameters of the alignment plugin, `left` | `center` | `right` | `justify`, respectively indicate left-justified, center-justified, right-justified, and justified at both ends
 
 ```ts
-//Use command to execute the plug-in and pass in the required parameters
+//Use command to execute the plugin and pass in the required parameters
 engine.command.execute('alignment', 'left' | 'center' | 'right' | 'justify');
 //Use command to execute the query current status, return string | undefined, the alignment style of the node where the cursor is located "left" | "center" | "right" | "justify"
 engine.command.queryState('alignment');

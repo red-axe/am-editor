@@ -71,7 +71,7 @@ copy
 /**
  * Copy
  * @param data The data to be copied, which can be a node or a string
- * @param trigger Whether to trigger the clipping event and notify the plug-in to process the conversion
+ * @param trigger Whether to trigger the clipping event and notify the plugin to process the conversion
  * @returns returns whether the copy is successful
  */
 copy(data: Node | string, trigger?: boolean): boolean;

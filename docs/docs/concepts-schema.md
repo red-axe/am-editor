@@ -56,7 +56,7 @@ canMerge?: boolean;
 ```
 
 -   `allowIn` allows the name of the block-level node that the node can be put into, by default their value is `$root` (editor root node). This is usually used in nested nodes, for example: ul li unordered list has a li child node, which is also a block-level node on its own line. If a block-level node does not specify a block-level node that can be placed, it will be filtered out
--   `canMerge` Whether two adjacent block-level nodes can be merged. For example: quoting the plug-in blockquote, when two blockquote nodes are adjacent, their child nodes will be merged into one blockquote node, because it is meaningless for them to exist separately next to each other, but it will increase the complexity of the document.
+-   `canMerge` Whether two adjacent block-level nodes can be merged. For example: quoting the plugin blockquote, when two blockquote nodes are adjacent, their child nodes will be merged into one blockquote node, because it is meaningless for them to exist separately next to each other, but it will increase the complexity of the document.
 
 Type: `SchemaBlock`
 

@@ -19,7 +19,7 @@ new Engine(...,{ plugins:[Hr], cards:[HrComponent]})
 
 ## Optional
 
-### hot key
+### Hotkey
 
 Default shortcut key `mod+shift+e`
 

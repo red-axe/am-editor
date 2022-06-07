@@ -8,7 +8,7 @@ A tag is composed of `tag name`, `attribute`, and `style`. These three elements 
 
 The `ElementPlugin` plugin will automatically compose a node of the `tag name`, `attribute`, and `style` we set, and automatically add it to the `schema` rule
 
-For this type of plug-in, we need to inherit the `ElementPlugin` abstract class. The `ElementPlugin` abstract class extends some properties and methods on the basis of inheriting the `Plugin` abstract class. So the plugin that inherits `ElementPlugin` also has all the attributes and methods of the `Plugin` abstract class
+For this type of plugin, we need to inherit the `ElementPlugin` abstract class. The `ElementPlugin` abstract class extends some properties and methods on the basis of inheriting the `Plugin` abstract class. So the plugin that inherits `ElementPlugin` also has all the attributes and methods of the `Plugin` abstract class
 
 ## Inheritance
 
@@ -45,7 +45,7 @@ export default class extends ElementPlugin {
 
 Label style, optional
 
-It is used to set the style of the current label. If the plug-in does not set the label name, the style will be used as the style of the global label. The label `schema` with this style will be judged to be legal and the style will be retained.
+It is used to set the style of the current label. If the plugin does not set the label name, the style will be used as the style of the global label. The label `schema` with this style will be judged to be legal and the style will be retained.
 
 If there is a setting, it will be automatically added to the `schema` rule management
 
@@ -60,7 +60,7 @@ export default class extends ElementPlugin {
 }
 ```
 
-In some cases we need a dynamic value, such as font size, `<span style="font-size:14px"></span>` 14px is a fixed value, if you want to replace it with `every time you execute the plug-in The dynamic value passed in by editor.command.execute`, then it is necessary to use the variable representation
+In some cases we need a dynamic value, such as font size, `<span style="font-size:14px"></span>` 14px is a fixed value, if you want to replace it with `every time you execute the plugin The dynamic value passed in by editor.command.execute`, then it is necessary to use the variable representation
 
 This variable is derived from the parameters of the `editor.command.execute` command, and the variable name is determined by `@var` + the index of the location of the parameter. `editor.command.execute("plugin name","parameter 0","parameter 1","parameter 2",...)` The corresponding variable name is `@var0` `@var1` `@var2`. ..
 
@@ -148,11 +148,11 @@ export default class extends ElementPlugin {
 
 ### `setStyle`
 
-Apply the current plug-in `style` attribute to a node
+Apply the current plugin `style` attribute to a node
 
 ```ts
 /**
- * Apply the current plug-in style attribute to the node
+ * Apply the current plugin style attribute to the node
  * @param node The node that needs to be set
  * @param args If there is a dynamic value in `style`, pass it here as a parameter, and you need to pay attention to the order of the parameters
  */
@@ -174,11 +174,11 @@ setAttributes(node: NodeInterface | Node, ...args: Array<any>): void;
 
 ### `getStyle`
 
-Get the style of a node that meets the current plug-in rules
+Get the style of a node that meets the current plugin rules
 
 ```ts
 /**
- * Get the style of the node that meets the current plug-in rules
+ * Get the style of the node that meets the current plugin rules
  * @param node node
  * @returns key-value pairs of style name and style value
  */
@@ -187,7 +187,7 @@ getStyle(node: NodeInterface | Node): {[key: string]: string };
 
 ### `getAttributes`
 
-Get the attributes of the node that comply with the current plug-in rules
+Get the attributes of the node that comply with the current plugin rules
 
 ```ts
 /**
@@ -200,11 +200,11 @@ getAttributes(node: NodeInterface | Node): {[key: string]: string };
 
 ### `isSelf`
 
-Check whether the current node meets the rules set by the current plug-in
+Check whether the current node meets the rules set by the current plugin
 
 ```ts
 /**
- * Check whether the current node meets the rules set by the current plug-in
+ * Check whether the current node meets the rules set by the current plugin
  * @param node node
  * @returns true | false
  */
@@ -213,7 +213,7 @@ isSelf(node: NodeInterface | Node): boolean;
 
 ### `queryState`
 
-Query plug-in status command, optional
+Query plugin status command, optional
 
 ```ts
 queryState() {
@@ -235,7 +235,7 @@ queryState() {
 
 ### `execute`
 
-Execute plug-in commands, need to be implemented
+Execute plugin commands, need to be implemented
 
 Example of adding a mark tag:
 
@@ -248,17 +248,17 @@ execute(...args) {
     const markNode = $(`<${this.tagName} />`);
     //Set the style set by the current plugin for the node. If there is a dynamic value, the dynamic parameter will be automatically combined
     this.setStyle(markNode, ...args);
-    //Set the attributes set by the current plug-in to the node, if there are dynamic values, automatically combine dynamic parameters
+    //Set the attributes set by the current plugin to the node, if there are dynamic values, automatically combine dynamic parameters
     this.setAttributes(markNode, ...args);
 
     const {mark} = this.editor;
-    //Query whether the current cursor position meets the settings of the current plug-in
+    //Query whether the current cursor position meets the settings of the current plugin
     const trigger = !this.queryState()
     if (trigger) {
-        //Wrap the mark style label node set by the current plug-in at the cursor
+        //Wrap the mark style label node set by the current plugin at the cursor
         mark.wrap(markNode);
     } else {
-        //Remove the mark style label node set by the current plug-in at the cursor
+        //Remove the mark style label node set by the current plugin at the cursor
         mark.unwrap(markNode);
     }
 }

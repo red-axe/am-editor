@@ -4,7 +4,7 @@ Style node plugin
 
 Usually used for text modification, for example, bold, italic, underline, background color, etc.
 
-For this type of plug-in, we need to inherit the `MarkPlugin` abstract class. The `MarkPlugin` abstract class extends some properties and methods on the basis of inheriting the `ElementPlugin` abstract class. So the plugin that inherits `MarkPlugin` also has all the attributes and methods of the `ElementPlugin` abstract class
+For this type of plugin, we need to inherit the `MarkPlugin` abstract class. The `MarkPlugin` abstract class extends some properties and methods on the basis of inheriting the `ElementPlugin` abstract class. So the plugin that inherits `MarkPlugin` also has all the attributes and methods of the `ElementPlugin` abstract class
 
 ```ts
 import { MarkPlugin } from '@aomao/engine';
@@ -60,7 +60,7 @@ If copying is allowed: `<p><strong><cursor /></strong></p>`, otherwise `<p><curs
 
 Whether to follow the style, the default is true, optional
 
-After setting to not follow, input after this label will no longer have the mark plug-in effect, and the mark plug-in cancel command will be executed when the cursor is overlapped. E.g:
+After setting to not follow, input after this label will no longer have the mark plugin effect, and the mark plugin cancel command will be executed when the cursor is overlapped. E.g:
 
 `<strong>abc<cursor /></strong>` or `<strong><cursor />abc</strong>` The cursor tag represents the current cursor position
 
@@ -97,13 +97,13 @@ export default class extends MarkPlugin {
 
 ### `execute`
 
-Execute plug-in commands, optional
+Execute plugin commands, optional
 
 The `MarkPlugin` plugin has implemented the `execute` method, if you need to use it, you can override this method
 
 ### `queryState`
 
-Query plug-in status command, optional
+Query plugin status command, optional
 
 The `MarkPlugin` plugin has implemented the `queryState` method, if you need to use it, you can override this method
 
@@ -119,9 +119,9 @@ If you need to use it, you can override this method or use super.schema() to cal
 
 Whether to trigger the execution to add the current mark label package, otherwise it will remove the current mark label package, optional
 
-By default, the `MarkPlugin` plugin will call `editor.command.queryState` to query the current plugin state (the node selected within the current cursor area matches the node set by the current mark plugin) and the currently set `tagName` `style` `attributes` In comparison, if they are consistent, the effect of removing the current mark plug-in node will be executed, otherwise the effect of the current mark plug-in node will be added.
+By default, the `MarkPlugin` plugin will call `editor.command.queryState` to query the current plugin state (the node selected within the current cursor area matches the node set by the current mark plugin) and the currently set `tagName` `style` `attributes` In comparison, if they are consistent, the effect of removing the current mark plugin node will be executed, otherwise the effect of the current mark plugin node will be added.
 
-If you implement the isTrigger method, you need to determine whether to cancel or add the effect of the current mark plug-in node.
+If you implement the isTrigger method, you need to determine whether to cancel or add the effect of the current mark plugin node.
 
 ```ts
 /**

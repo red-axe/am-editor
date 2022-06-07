@@ -69,7 +69,7 @@ Triggered when the cursor changes. If selectInfo has a value, it will carry the 
 onSelect?: (range: RangeInterface, selectInfo?: {key: string, id: string}) => void
 ```
 
-### hot key
+### Hotkey
 
 No shortcut keys by default
 
@@ -78,7 +78,7 @@ No shortcut keys by default
 hotkey?:string | {key:string,args:Array<string>};//default none
 ```
 
-## Plug-in method
+## Plugin method
 
 All commands need to specify the specified key passed in in the options `keys`
 

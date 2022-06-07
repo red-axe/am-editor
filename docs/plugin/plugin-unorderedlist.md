@@ -19,12 +19,12 @@ new Engine(...,{ plugins:[Unorderedlist] })
 
 ## Optional
 
-### hot key
+### Hotkey
 
 Default shortcut key `mod+shift+8`
 
 ```ts
-//hot key
+//hotkey
 hotkey?: string | Array<string>;//default mod+shift+8
 //Use configuration
 new Engine(...,{
@@ -40,8 +40,8 @@ new Engine(...,{
 ## Command
 
 ```ts
-//Use command to execute the plug-in and pass in the required parameters
+//Use command to execute the plugin and pass in the required parameters
 engine.command.execute('unorderedlist');
-//Use command to execute query current status, return false or current list plug-in name unorderedlist tasklist unorderedlist
+//Use command to execute query current status, return false or current list plugin name unorderedlist tasklist unorderedlist
 engine.command.queryState('unorderedlist');
 ```

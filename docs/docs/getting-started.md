@@ -4,7 +4,7 @@ title: Quick start
 
 ## Get started quickly
 
-In addition to the pure `javascript` writing of the engine library, a small part of the plug-ins we provide have more complex UI, and it is a relatively easy task to use the front-end library to render the UI.
+In addition to the pure `javascript` writing of the engine library, a small part of the plugins we provide have more complex UI, and it is a relatively easy task to use the front-end library to render the UI.
 
 The following three plugins are different
 
@@ -72,7 +72,7 @@ export default EngineDemo;
 
 ### Plugins
 
-Now, on the basis of the appeal code, we introduce the `@aomao/plugin-bold` bold plug-in
+Now, on the basis of the appeal code, we introduce the `@aomao/plugin-bold` bold plugin
 
 ```tsx | pure
 import Bold from '@aomao/plugin-bold';
@@ -131,7 +131,7 @@ export default EngineDemo;
 
 A card is a separate area in the editor. The UI of this area can be customized to render content using front-end frameworks such as React and Vue, and finally mounted on the editor.
 
-Introduce the `@aomao/plugin-codeblock` code block plug-in. Part of the plug-in UI is rendered by the front-end framework, so there is a distinction. `vue3` developers use `@aomao/plugin-codeblock-vue` `vue2` developers use `am-editor-codeblock-vue2`
+Introduce the `@aomao/plugin-codeblock` code block plugin. Part of the plugin UI is rendered by the front-end framework, so there is a distinction. `vue3` developers use `@aomao/plugin-codeblock-vue` `vue2` developers use `am-editor-codeblock-vue2`
 
 ```tsx | pure
 import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
@@ -206,7 +206,7 @@ const engine = new Engine(ref.current, {
 });
 ```
 
-Rendering toolbar, the toolbar has been configured with all plug-ins, here we only need to pass in the plug-in name
+Rendering toolbar, the toolbar has been configured with all plugins, here we only need to pass in the plugin name
 
 ```tsx | pure
 return (
@@ -279,7 +279,7 @@ export default EngineDemo;
 
 #### Develop your own toolbar
 
-`@aomao/toolbar` is more to provide a toolbar UI display, the essence is to call `engine.command.execute` to execute plug-in commands
+`@aomao/toolbar` is more to provide a toolbar UI display, the essence is to call `engine.command.execute` to execute plugin commands
 
 ```tsx
 /**

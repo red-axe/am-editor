@@ -44,7 +44,7 @@ new Engine(...,{
 }
 ```
 
-### hot key
+### Hotkey
 
 No shortcut keys by default
 

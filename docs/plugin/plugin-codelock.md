@@ -31,7 +31,7 @@ new Engine(...,{ plugins:[CodeBlock], cards:[CodeBlockComponent]})
 
 ## Optional
 
-### hot key
+### Hotkey
 
 No shortcut keys by default
 

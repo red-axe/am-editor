@@ -17,7 +17,7 @@ import Video, {VideoComponent, VideoUploader} from'@aomao/plugin-video';
 new Engine(...,{ plugins:[ Video, VideoUploader], cards:[ VideoComponent ]})
 ```
 
-The main functions of the `VideoUploader` plug-in: select video files, upload video files
+The main functions of the `VideoUploader` plugin: select video files, upload video files
 
 ## `Video` optional
 
@@ -125,7 +125,7 @@ This configuration may be required when there are playback permissions or restri
 The above video file upload processing flow:
 
 -   After selecting the file to upload, you need to return the `status` field and mark the value as `transcoding`, and you need to return the unique identifier of the video file on the server side `id`, which can identify the video file in subsequent queries to obtain the video file Process the information, otherwise it will be regarded as `done` and directly transmitted to the video tag for playback
--   When the plug-in gets the `status` field value as `transcoding`, it will display the message waiting for `transcoding...`, and call the query interface through the `id` parameter every 3 seconds to get the video file processing status until `status` Stop polling when the value is not `transcoding`
+-   When the plugin gets the `status` field value as `transcoding`, it will display the message waiting for `transcoding...`, and call the query interface through the `id` parameter every 3 seconds to get the video file processing status until `status` Stop polling when the value is not `transcoding`
 
 In addition, after the `video information query interface` is configured, the `video information interface` query will be called every time a video is displayed, and the result returned by the interface will be used as a parameter for displaying the video information
 
@@ -206,7 +206,7 @@ engine.command.execute(
 );
 ```
 
-### `VideoUploader` plug-in command
+### `VideoUploader` plugin command
 
 Pop up the file selection box and perform upload
 

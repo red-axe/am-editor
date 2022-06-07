@@ -35,7 +35,7 @@ Find the mark plugin instance according to the node
 
 ```ts
 /**
- * Find the mark plug-in instance according to the node
+ * Find the mark plugin instance according to the node
  * @param node node
  */
 findPlugin(node: NodeInterface): MarkInterface | undefined;

@@ -109,7 +109,7 @@ Get the name of the list plugin according to the list node
 
 ```ts
 /**
- * Get the name of the list plug-in according to the list node
+ * Get the name of the list plugin according to the list node
  * @param block node
  */
 getPluginNameByNode(block: NodeInterface): string;

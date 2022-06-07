@@ -17,7 +17,7 @@ import File, {FileComponent, FileUploader} from'@aomao/plugin-file';
 new Engine(...,{ plugins:[ File, FileUploader], cards:[ FileComponent ]})
 ```
 
-`FileUploader` plug-in main functions: select files, upload files
+`FileUploader` plugin main functions: select files, upload files
 
 ## `File` optional
 

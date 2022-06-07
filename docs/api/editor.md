@@ -161,7 +161,7 @@ trigger(eventType: string, ...args: any): any;
 
 Show success messages, and print messages on the console by default. You can modify the `messageSuccess` method and use the UI to display `engine.messageSuccess = text => Message.show(text)`
 
-This method may be called in the plug-in or the engine to pop up a message
+This method may be called in the plugin or the engine to pop up a message
 
 ```ts
 /**

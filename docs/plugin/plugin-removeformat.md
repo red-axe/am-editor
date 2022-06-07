@@ -23,12 +23,12 @@ new Engine(...,{ plugins:[Removeformat] })
 
 ## Optional
 
-### hot key
+### Hotkey
 
 The default shortcut key is `mod+\`
 
 ```ts
-//hot key
+//hotkey
 hotkey?: string | Array<string>;
 //Use configuration
 new Engine(...,{

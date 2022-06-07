@@ -3,7 +3,7 @@
 # am-editor
 
 <p align="center">
-	A rich text editor that supports collaborative editing, you can freely use React, Vue and other front-end common libraries to extend and define plug-ins.
+	A rich text editor that supports collaborative editing, you can freely use React, Vue and other front-end common libraries to extend and define plugins.
 </p>
 
 <p align="center">
@@ -41,10 +41,10 @@
 ## Features
 
 -   🍉 **Out of the box** - Dozens of ready to use plug to meet most needs
--   🍋 **Extensibility** - In addition to the basic plug-in of `mark`, inline`and`block`type`, we also provide`card`component combined with`React`, `Vue` and other front-end libraries to render the plug-in UI
+-   🍋 **Extensibility** - In addition to the basic plugin of `mark`, inline`and`block`type`, we also provide`card`component combined with`React`, `Vue` and other front-end libraries to render the plugin UI
 -   🍎 **Markdown Support**
 -   👨‍🦳 **I18n**
--   🔥 **Zero dependency** - The engine is written by pure **JavaScript** and does not rely on any front-end libraries. Plug-ins can be developed by any libraries such as `React` 、 `Vue` or `Svelte`
+-   🔥 **Zero dependency** - The engine is written by pure **JavaScript** and does not rely on any front-end libraries. Plugins can be developed by any libraries such as `React` 、 `Vue` or `Svelte`
 -   🦔 **Collaboration** - Ready to use with lightweight configuration
 -   Compatible with most of the latest mobile browsers
 -   🦾 **TypeScript** - Of course
@@ -212,7 +212,7 @@ export default EngineDemo;
 
 ### Plugins
 
-Import `@aomao/plugin-bold` bold plug-in
+Import `@aomao/plugin-bold` bold plugin
 
 ```tsx
 import Bold from '@aomao/plugin-bold';
@@ -253,7 +253,7 @@ The `CodeBlock` plugin supports `markdown` by default. Enter the code block synt
 
 Import the `@aomao/toolbar` toolbar. Due to the complex interaction, the toolbar is basically rendered using `React` + `Antd` UI components, while `Vue3` uses `@aomao/toolbar-vue`
 
-Except for UI interaction, most of the work of the toolbar is just to call the engine to execute the corresponding plug-in commands after different button events are triggered. In the case of complicated requirements or the need to re-customize the UI, it is easier to modify after the fork.
+Except for UI interaction, most of the work of the toolbar is just to call the engine to execute the corresponding plugin commands after different button events are triggered. In the case of complicated requirements or the need to re-customize the UI, it is easier to modify after the fork.
 
 ```tsx
 import Toolbar, { ToolbarPlugin, ToolbarComponent } from '@aomao/toolbar';
@@ -269,7 +269,7 @@ const engine = new Engine(ref.current, {
 });
 ```
 
-Rendering toolbar, the toolbar has been configured with all plug-ins, here we only need to pass in the plug-in name
+Rendering toolbar, the toolbar has been configured with all plugins, here we only need to pass in the plugin name
 
 ```tsx
 return (

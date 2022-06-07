@@ -39,7 +39,7 @@ export default (opts: {
 		],
 		'/plugin': [
 			{
-				title: 'Plug-in development',
+				title: 'Plugin development',
 				'title_zh-CN': '插件开发',
 				children: [
 					{

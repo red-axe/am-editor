@@ -81,7 +81,7 @@ console.log(view.language.get<string>('test'));
 
 -   Type: `{ [key: string]: PluginOptions }`
 -   Default value: `{}`
--   Detailed: the configuration item of each plug-in, the key is the name of the plug-in, please refer to the description of each plug-in for detailed configuration. [Configuration example](https://github.com/yanmao-cc/am-editor/blob/master/examples/react/components/editor/config.tsx)
+-   Detailed: the configuration item of each plugin, the key is the name of the plugin, please refer to the description of each plugin for detailed configuration. [Configuration example](https://github.com/yanmao-cc/am-editor/blob/master/examples/react/components/editor/config.tsx)
 
 Some plugins require the configuration of additional properties:
 
@@ -218,7 +218,7 @@ Some plugins require the configuration of additional properties:
 
 The difference with `View` rendering is that you can still see the editor's edits after `readonly` is set to read-only status.
 
-After rendering, `View` loses all editing capabilities and collaboration capabilities, `View` can render a `card` plug-in with interactive effects
+After rendering, `View` loses all editing capabilities and collaboration capabilities, `View` can render a `card` plugin with interactive effects
 
 `engine.getHtml()` can only get static `html` and cannot restore the interaction effect of `card` component, but it is very friendly to search engines
 

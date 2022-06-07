@@ -19,7 +19,7 @@ new Engine(...,{ plugins:[Status], cards:[StatusComponent]})
 
 ## Optional
 
-### hot key
+### Hotkey
 
 No shortcut keys by default
 

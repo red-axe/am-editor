@@ -107,12 +107,12 @@ getValue(ignoreCursor?: boolean): string;
 
 ### `getValueAsync`
 
-Get the editor value asynchronously, and will wait for the plug-in processing to complete before getting the value
+Get the editor value asynchronously, and will wait for the plugin processing to complete before getting the value
 
 ```ts
 /**
-* Obtain the editor value asynchronously, and wait for the plug-in processing to complete before obtaining the value
-* For example, plug-in upload is waiting, and the value will be obtained after the upload is completed.
+* Obtain the editor value asynchronously, and wait for the plugin processing to complete before obtaining the value
+* For example, plugin upload is waiting, and the value will be obtained after the upload is completed.
 * @param ignoreCursor Whether to include the cursor position information, it is not included by default
 * @param callback Callback when there are plugins and actions that have not been executed, return false to terminate the value acquisition, return number to set the current action waiting time, in milliseconds
 */

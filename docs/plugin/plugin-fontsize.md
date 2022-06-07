@@ -48,7 +48,7 @@ new Engine(...,{
 defaultSize?:string //The default is 14px
 ```
 
-### hot key
+### Hotkey
 
 No shortcut keys by default
 
