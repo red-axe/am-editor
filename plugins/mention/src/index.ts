@@ -204,5 +204,5 @@ class MentionPlugin<
 	}
 }
 export { MentionComponent };
-export type { MentionValue };
+export type { MentionValue, MentionOptions };
 export default MentionPlugin;

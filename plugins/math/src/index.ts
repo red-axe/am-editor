@@ -298,4 +298,4 @@ export default class Math<
 }
 
 export { MathComponent };
-export type { MathValue };
+export type { MathValue, MathOptions };
