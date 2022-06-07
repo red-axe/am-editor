@@ -89,8 +89,40 @@ class Client {
 										o.ld.length > 1 &&
 										!!o.ld[1]['data-id']
 									) {
-										const id = o.ld[1]['data-id'];
-										deleteKeys.push(id);
+										const findChild = (childData) => {
+											if (
+												!Array.isArray(childData) ||
+												childData.length < 1
+											) {
+												return;
+											}
+											for (
+												let i = 1;
+												i < childData.length;
+												i++
+											) {
+												if (i === 1) {
+													const attributes =
+														childData[i];
+													if (
+														typeof attributes ===
+															'object' &&
+														attributes['data-id']
+													) {
+														deleteKeys.push(
+															attributes[
+																'data-id'
+															],
+														);
+													}
+												} else if (
+													Array.isArray(childData[i])
+												) {
+													findChild(childData[i]);
+												}
+											}
+										};
+										findChild(o.ld);
 									} else if (
 										'li' in o &&
 										Array.isArray(o.li) &&
