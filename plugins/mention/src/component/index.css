@@ -38,7 +38,7 @@
 
 .data-mention-component-body {
     max-height: calc(40vh);
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 .data-mention-component-placeholder {
