@@ -21,7 +21,6 @@ import Fontcolor from '@aomao/plugin-fontcolor';
 import Fontsize from '@aomao/plugin-fontsize';
 import type { FontsizeOptions } from '@aomao/plugin-fontsize';
 import Italic from '@aomao/plugin-italic';
-import type { ItalicOptions } from '@aomao/plugin-italic';
 import Underline from '@aomao/plugin-underline';
 // import type { UnderlineOptions } from '@aomao/plugin-underline';
 import Hr, { HrComponent } from '@aomao/plugin-hr';
@@ -89,7 +88,6 @@ import {
 import type { ToolbarOptions } from '@aomao/toolbar';
 
 import ReactDOM from 'react-dom';
-import Loading from '../loading';
 import Empty from 'antd/es/empty';
 import 'antd/es/empty/style';
 import { ImageUploaderOptions } from 'plugins/image/dist/uploader';
