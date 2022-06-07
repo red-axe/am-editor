@@ -111,7 +111,7 @@ export default class<
 				return;
 			}
 		}
-
+		if (!range.collapsed) return;
 		const inFirst = blockApi.isFirstOffset(range, 'start');
 		if (!inFirst) return;
 		const block = blockApi.closest(range.startNode);

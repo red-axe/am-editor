@@ -608,9 +608,7 @@ class NodeModel implements NodeModelInterface {
 			let splitNode = null;
 			if (
 				this.isBlock(commonAncestorNode) &&
-				this.isEmpty(commonAncestorNode) &&
-				(commonAncestorNode.isRoot() ||
-					commonAncestorNode.parent()?.isRoot())
+				this.isEmpty(commonAncestorNode)
 			) {
 				splitNode = removeCurrentEmptyBlock
 					? commonAncestorNode
@@ -663,11 +661,15 @@ class NodeModel implements NodeModelInterface {
 				) {
 					blockNode = splitNode;
 					const fragment = document.createDocumentFragment();
+					const children: Node[] = [];
+					const hasNext = blockNode.get<HTMLElement>()?.nextSibling;
 					node.childNodes.forEach((child) => {
-						fragment.appendChild(child);
+						if (!hasNext) children.unshift(child);
+						else children.push(child);
 					});
+					fragment.append(...children);
 					node = fragment;
-					fragmentLaste = node.lastChild;
+					fragmentLaste = fragment.lastChild;
 				}
 				if (
 					blockNode.isEditable() &&
