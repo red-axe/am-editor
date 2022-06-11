@@ -1,4 +1,5 @@
-import { debounce, cloneDeep } from 'lodash';
+import debounce from 'lodash/debounce';
+import cloneDeep from 'lodash/cloneDeep';
 import { EventEmitter2 } from 'eventemitter2';
 import { Doc, Op } from 'sharedb';
 import { EngineInterface } from '../types/engine';

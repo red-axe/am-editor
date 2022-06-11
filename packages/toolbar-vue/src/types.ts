@@ -1,6 +1,6 @@
 import type { EngineInterface, Placement } from '@aomao/engine';
 import { ExtractPropTypes, PropType, VNode } from 'vue';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 
 //命令
 export type Command =

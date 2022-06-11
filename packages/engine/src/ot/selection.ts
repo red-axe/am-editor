@@ -1,5 +1,5 @@
 import { EventEmitter2 } from 'eventemitter2';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { EngineInterface } from '../types/engine';
 import { Attribute, Member, SelectionInterface } from '../types/ot';
 import { isTransientElement } from './utils';

@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { NodeInterface } from '../types/node';
 import { FOCUS, ANCHOR, CURSOR } from '../constants/selection';
 import {

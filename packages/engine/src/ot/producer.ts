@@ -7,7 +7,7 @@ import {
 } from 'diff-match-patch';
 import { EventEmitter2 } from 'eventemitter2';
 import { Doc, Path, StringDeleteOp, StringInsertOp } from 'sharedb';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { DocInterface, EngineInterface, TargetOp } from '../types';
 import {
 	findFromDoc,

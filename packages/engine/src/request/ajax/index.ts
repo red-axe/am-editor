@@ -1,4 +1,4 @@
-import { startsWith } from 'lodash';
+import startsWith from 'lodash/startsWith';
 import { getDocument } from '../../utils';
 import {
 	AjaxInterface,

@@ -1,4 +1,6 @@
-import { cloneDeep, debounce, findLastIndex, omit } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
+import findLastIndex from 'lodash/findLastIndex';
 import { Op } from 'sharedb';
 import OTJSON from 'ot-json0';
 import { Operation, TargetOp } from './types/ot';

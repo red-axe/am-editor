@@ -1,5 +1,5 @@
 import CodeMirror, { EditorConfiguration, Editor } from 'codemirror';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import {
 	$,
 	EditorInterface,
