@@ -221,7 +221,8 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		const colWidthArray = {};
 		let allColWidth = 0;
 		let colIndex = 0;
-		cols.each((col, i) => {
+		cols.each((_, i) => {
+			const col = cols[i];
 			const colWidth = removeUnit($(col).attributes('width'));
 			if (colWidth) {
 				colWidthArray[i] = colWidth;
@@ -367,35 +368,117 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				change.range.select(range);
 			},
 		);
-
+		let colMoveTimeout: NodeJS.Timeout | null = null;
 		this.colsHeader
 			?.on('mouseenter', () => {
 				if (this.hideColAddButtonTimeount)
 					clearTimeout(this.hideColAddButtonTimeount);
 			})
-			.on('mousemove', (event: MouseEvent) =>
-				this.onMouseMoveColsHeader(event),
-			)
-			.on('mouseleave', () => {
+			.on('mousemove', (event: MouseEvent) => {
+				if (colMoveTimeout) clearTimeout(colMoveTimeout);
+				colMoveTimeout = setTimeout(() => {
+					this.onMouseMoveColsHeader(event);
+				}, 200);
+			})
+			.on('mouseleave', (e: MouseEvent) => {
+				if (colMoveTimeout) clearTimeout(colMoveTimeout);
 				this.hideColAddButtonTimeount = setTimeout(() => {
 					this.colAddButton?.hide();
 				}, 200);
 			});
-
+		let colItemTimeout: NodeJS.Timeout | null = null;
+		this.colsHeader
+			?.find(Template.COLS_HEADER_ITEM_CLASS)
+			.on('mouseenter', (e: MouseEvent) => {
+				if (colItemTimeout) clearTimeout(colItemTimeout);
+				colItemTimeout = setTimeout(() => {
+					if (e.target) {
+						$(e.target)
+							.closest(Template.COLS_HEADER_ITEM_CLASS)
+							.addClass('active');
+					}
+				}, 200);
+			})
+			.on('mouseleave', (e: MouseEvent) => {
+				if (colItemTimeout) clearTimeout(colItemTimeout);
+				if (e.target) {
+					$(e.target)
+						.closest(Template.COLS_HEADER_ITEM_CLASS)
+						.removeClass('active');
+				}
+			});
+		let colTriggerTimeout: NodeJS.Timeout | null = null;
+		this.colsHeader
+			?.find(Template.COLS_HEADER_TRIGGER_CLASS)
+			.on('mouseenter', (e: MouseEvent) => {
+				if (colTriggerTimeout) clearTimeout(colTriggerTimeout);
+				const target = $(e.target || []);
+				colTriggerTimeout = setTimeout(() => {
+					target.addClass('active');
+				}, 200);
+			})
+			.on('mouseleave', (e: MouseEvent) => {
+				if (colTriggerTimeout) clearTimeout(colTriggerTimeout);
+				if (e.target) {
+					$(e.target).removeClass('active');
+				}
+			});
+		let rowMoveTimeout: NodeJS.Timeout | null = null;
 		this.rowsHeader
 			?.on('mouseenter', () => {
 				if (this.hideRowAddButtonTimeount)
 					clearTimeout(this.hideRowAddButtonTimeount);
 			})
 			.on('mousemove', (event: MouseEvent) => {
-				this.onMouseMoveRowsHeader(event);
-				this.rowsHeader?.css('z-index', 128);
+				if (rowMoveTimeout) clearTimeout(rowMoveTimeout);
+				rowMoveTimeout = setTimeout(() => {
+					this.onMouseMoveRowsHeader(event);
+					this.rowsHeader?.css('z-index', 128);
+				}, 200);
 			})
 			.on('mouseleave', () => {
+				if (rowMoveTimeout) clearTimeout(rowMoveTimeout);
 				this.hideRowAddButtonTimeount = setTimeout(() => {
 					this.rowsHeader?.css('z-index', '');
 					this.rowAddButton?.hide();
 				}, 200);
+			});
+		let rowItemTimeout: NodeJS.Timeout | null = null;
+		this.rowsHeader
+			?.find(Template.ROWS_HEADER_ITEM_CLASS)
+			.on('mouseenter', (e: MouseEvent) => {
+				if (rowItemTimeout) clearTimeout(rowItemTimeout);
+				rowItemTimeout = setTimeout(() => {
+					if (e.target) {
+						$(e.target)
+							.closest(Template.ROWS_HEADER_ITEM_CLASS)
+							.addClass('active');
+					}
+				}, 200);
+			})
+			.on('mouseleave', (e: MouseEvent) => {
+				if (rowItemTimeout) clearTimeout(rowItemTimeout);
+				if (e.target) {
+					$(e.target)
+						.closest(Template.ROWS_HEADER_ITEM_CLASS)
+						.removeClass('active');
+				}
+			});
+		let rowTriggerTimeout: NodeJS.Timeout | null = null;
+		this.rowsHeader
+			?.find(Template.ROWS_HEADER_TRIGGER_CLASS)
+			.on('mouseenter', (e: MouseEvent) => {
+				if (rowTriggerTimeout) clearTimeout(rowTriggerTimeout);
+				const target = $(e.target || []);
+				rowTriggerTimeout = setTimeout(() => {
+					target.addClass('active');
+				}, 200);
+			})
+			.on('mouseleave', (e: MouseEvent) => {
+				if (rowTriggerTimeout) clearTimeout(rowTriggerTimeout);
+				if (e.target) {
+					$(e.target).removeClass('active');
+				}
 			});
 	}
 	/**

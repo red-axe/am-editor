@@ -111,7 +111,7 @@ class Template implements TemplateInterface {
 			`<div class="${COLS_HEADER_ITEM_CLASS_NAME}" draggable="true">
             <div class="col-dragger">
                 <span class="data-icon data-icon-drag"></span>
-                <p class="drag-info"></p>
+                <span class="drag-info"></span>
             </div>
             <div class="${COLS_HEADER_TRIGGER_CLASS_NAME}"></div>
         </div>`.repeat(cols) +

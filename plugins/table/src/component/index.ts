@@ -785,13 +785,13 @@ class TableComponent<V extends TableValue = TableValue>
 			y: 0,
 		};
 		const handleScrollbarChange = ({ x, y }: Record<string, number>) => {
+			if (tableOptions['maxRightWidth'])
+				this.overflow(tableOptions['maxRightWidth']());
 			if (prevScrollData.x === x && prevScrollData.y === y) return;
 			prevScrollData = {
 				x,
 				y,
 			};
-			if (tableOptions['maxRightWidth'])
-				this.overflow(tableOptions['maxRightWidth']());
 
 			if (isEngine(editor)) {
 				editor.trigger('scroll', this.root, { x, y });
