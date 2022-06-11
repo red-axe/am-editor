@@ -187,7 +187,6 @@ this.engine.on(
 ```ts
 this.engine.on('mention:render-item', (data, root) => {
 	const item = $(`<div>${data}</div>`);
-	root.append(item);
 	return item;
 });
 ```
