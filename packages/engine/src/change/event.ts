@@ -104,7 +104,7 @@ class ChangeEvent implements ChangeEventInterface {
 			if (this.engine.readonly) return;
 			// safari 组合输入法会直接插入@字符，这里统一全部拦截输入@字符的时候再去触发@事件
 			const { change, card, node, block, list } = this.engine;
-			if (event.data === '@') {
+			if (event.data === '@' && !this.isCardInput(event)) {
 				// 如果没有要对 @ 字符处理的就不拦截
 				const result = this.engine.trigger('keydown:at', event);
 				if (result === false) {
