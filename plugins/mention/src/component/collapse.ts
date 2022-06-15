@@ -96,7 +96,7 @@ class CollapseComponent implements CollapseComponentInterface {
 			return;
 		}
 		this.select(items.findIndex((n) => n.equal(activeNode!)));
-		activeNode.get<HTMLElement>()?.scrollIntoView();
+		activeNode.get<HTMLElement>()?.scrollIntoView({ block: 'nearest' });
 	}
 
 	unbindEvents() {
