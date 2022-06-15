@@ -19,7 +19,7 @@
 import { defineComponent, onMounted, onUnmounted, ref, reactive } from 'vue'
 import merge from 'lodash/merge';
 import omit from 'lodash/omit';
-import { isMobile } from '@aomao/engine'
+import { isMobile, removeUnit } from '@aomao/engine'
 import { ToolbarButtonProps, CollapseItemProps, ToolbarColorProps, ToolbarDropdownProps, GroupDataProps, ToolbarCollapseGroupProps, toolbarProps } from '../types'
 import AmGroup from './group.vue'
 import locales from '../locales';
@@ -42,9 +42,12 @@ export default defineComponent({
 
           if(caluTimeoutRef.value) clearTimeout(caluTimeoutRef.value as NodeJS.Timeout);
           caluTimeoutRef.value = setTimeout(() => {
-            const rect = toolbarRef.value?.getBoundingClientRect()
-            const height = rect?.height || 0
-            mobileView.top = global.Math.max(document.body.scrollTop, document.documentElement.scrollTop) + (window.visualViewport.height || 0) - height
+			const element = toolbarRef.value!;
+			const rect = element.getBoundingClientRect();
+			const borderTop = removeUnit(getComputedStyle(element).borderTopWidth)
+			const borderBottom = removeUnit(getComputedStyle(element).borderBottomWidth)
+			const height = rect.height || 0;
+            mobileView.top = global.Math.max(document.body.scrollTop, document.documentElement.scrollTop) + (window.visualViewport.height || 0) - height + borderTop + borderBottom
           }, 100);
         }
         const update = () => {
@@ -175,6 +178,7 @@ export default defineComponent({
             if (isMobile) {
               props.engine.on('readonly', handleReadonly)
               props.engine.on('blur', hideMobileToolbar)
+			  if(!props.engine.isFocus()) hideMobileToolbar()
               document.addEventListener('scroll', hideMobileToolbar);
               visualViewport.addEventListener('resize', calcuMobileView);
               visualViewport.addEventListener('scroll', calcuMobileView);

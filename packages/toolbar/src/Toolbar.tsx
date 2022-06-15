@@ -8,7 +8,7 @@ import React, {
 	useRef,
 } from 'react';
 import classnames from 'classnames-es-ts';
-import { EngineInterface, isMobile } from '@aomao/engine';
+import { EngineInterface, isMobile, removeUnit } from '@aomao/engine';
 import ToolbarGroup from './group';
 import {
 	getToolbarDefaultConfig,
@@ -80,8 +80,15 @@ const Toolbar: React.FC<ToolbarProps> = ({
 		if (!engine.isFocus() || engine.readonly) return;
 		if (caluTimeoutRef.current) clearTimeout(caluTimeoutRef.current);
 		caluTimeoutRef.current = setTimeout(() => {
-			const rect = toolbarRef.current?.getBoundingClientRect();
-			const height = rect?.height || 0;
+			const element = toolbarRef.current!;
+			const rect = element.getBoundingClientRect();
+			const borderTop = removeUnit(
+				getComputedStyle(element).borderTopWidth,
+			);
+			const borderBottom = removeUnit(
+				getComputedStyle(element).borderBottomWidth,
+			);
+			const height = rect.height || 0;
 			setMobileView({
 				top:
 					global.Math.max(
@@ -89,7 +96,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
 						document.documentElement.scrollTop,
 					) +
 					(window.visualViewport.height || 0) -
-					height,
+					height +
+					borderTop +
+					borderBottom,
 			});
 		}, 100);
 	};
@@ -275,6 +284,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
 		if (isMobile) {
 			engine.on('readonly', handleReadonly);
 			engine.on('blur', hideMobileToolbar);
+			if (!engine.isFocus()) hideMobileToolbar();
 			document.addEventListener('scroll', hideMobileToolbar);
 			visualViewport.addEventListener('resize', calcuMobileView);
 			visualViewport.addEventListener('scroll', calcuMobileView);
