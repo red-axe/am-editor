@@ -119,6 +119,7 @@ class CollapseComponent implements CollapseComponentInterface {
 				return;
 			}
 			event.preventDefault();
+			event.stopImmediatePropagation();
 			const active = this.root?.find('.data-mention-item-active');
 			active?.get<HTMLElement>()?.click();
 		});
