@@ -6,7 +6,7 @@ import React, {
 } from 'react';
 import message from 'antd/es/message';
 import Modal from 'antd/es/modal';
-import Engine, { EngineInterface, EngineOptions } from '@aomao/engine';
+import Engine, { EngineInterface, EngineOptions, Parser } from '@aomao/engine';
 import 'antd/es/message/style';
 import 'antd/es/modal/style';
 
@@ -49,7 +49,8 @@ const EngineComponent: React.FC<EngineProps> = forwardRef<
 				});
 			});
 		};
-
+		window.engine = engine;
+		window.Parser = Parser;
 		engineRef.current = engine;
 		return engine;
 	};
