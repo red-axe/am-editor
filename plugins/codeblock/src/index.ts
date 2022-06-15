@@ -177,6 +177,9 @@ export default class<
 				false,
 			);
 			code = unescape(code.replace(/\u200b/g, ''));
+			if (code.endsWith('\n')) {
+				code = code.slice(0, -1);
+			}
 			editor.card.replaceNode<CodeBlockValue>(node, 'codeblock', {
 				mode: syntax || 'plain',
 				code,
