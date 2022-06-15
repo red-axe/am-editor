@@ -20,7 +20,7 @@ const engine = new Engine(渲染节点, {
 -   详细：语言配置，暂时支持 `zh-CN`、`en-US`。可使用 `locale` 配置
 
 ```ts
-const view = new View(渲染节点, {
+const engine = new Engine(渲染节点, {
 	lang: 'zh-CN',
 });
 ```
@@ -34,7 +34,7 @@ const view = new View(渲染节点, {
 语言包，默认语言包 [https://github.com/yanmao-cc/am-editor/blob/master/locale](https://github.com/yanmao-cc/am-editor/blob/master/locale)
 
 ```ts
-const view = new View(渲染节点, {
+const engine = new Engine(渲染节点, {
 	locale: {
 		'zh-CN': {
 			test: '测试',
@@ -44,7 +44,7 @@ const view = new View(渲染节点, {
 		},
 	},
 });
-console.log(view.language.get<string>('test'));
+console.log(engine.language.get<string>('test'));
 ```
 
 ### className
@@ -228,17 +228,35 @@ console.log(view.language.get<string>('test'));
 -   默认值：查找父级样式 `overflow` 或者 `overflow-y` 为 `auto` 或者 `scroll` 的节点，如果没有就取 `document.documentElement`
 -   详细：编辑器滚动条节点，主要用于监听 `scroll` 事件设置弹层浮动位置和主动设置滚动到编辑器目标位置
 
+或者使用 `setScrollNode` 设置
+
+```ts
+engine.setScrollNode(滚动条节点);
+```
+
 ### lazyRender
 
 -   类型: `boolena`
 -   默认值：`true`
--   详细：懒惰渲染卡片（仅限已启用 lazyRender 的卡片），默认为 true
+-   详细：懒惰渲染卡片（仅限已启用 lazyRender 的卡片），默认为 true。协同状态下可编辑卡片不会懒惰渲染
 
 ### iconFonts
 
 -   类型: `Record<'url' | 'format', string>[] | string | false`
 -   默认值：`url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff?t=1638071536645') format('woff'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype')`
 -   详细：定义 iconfont 文件的 url，默认使用 at.alicdn.com 的字体文件，如果需要使用其他位置的字体文件，可以使用此配置
+
+```ts
+const engine = new Engine(渲染节点, {
+	iconFonts: {
+		url: '//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645',
+		format: 'woff2',
+	},
+	// or
+	iconFonts:
+		"url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff?t=1638071536645') format('woff'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype')",
+});
+```
 
 ### autoPrepend
 

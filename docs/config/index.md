@@ -20,7 +20,7 @@ const engine = new Engine(render node, {
 -   Detailed: Language configuration, temporarily supports `zh-CN`, `en-US`. Can use `locale` configuration
 
 ```ts
-const view = new View(render node, {
+const engine = new Engine(render node, {
     lang:'zh-CN',
 });
 ```
@@ -34,7 +34,7 @@ const view = new View(render node, {
 Language pack, default language pack [https://github.com/yanmao-cc/am-editor/blob/master/locale](https://github.com/yanmao-cc/am-editor/blob/master/locale)
 
 ```ts
-const view = new View(render node, {
+const engine = new Engine(render node, {
      locale: {
          'zh-CN': {
              test:'Test',
@@ -44,7 +44,7 @@ const view = new View(render node, {
          },
      }
 });
-console.log(view.language.get<string>('test'));
+console.log(engine.language.get<string>('test'));
 ```
 
 ### className
@@ -239,6 +239,18 @@ After rendering, `View` loses all editing capabilities and collaboration capabil
 -   Type: `Record<'url' | 'format', string>[] | string | false`
 -   Default: `url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff ?t=1638071536645') format('woff'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype')`
 -   Detailed: define the url of the iconfont file, the font file of at.alicdn.com is used by default, if you need to use the font file of other location, you can use this configuration
+
+```ts
+const engine = new Engine(container, {
+	iconFonts: {
+		url: '//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645',
+		format: 'woff2',
+	},
+	// or
+	iconFonts:
+		"url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff?t=1638071536645') format('woff'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype')",
+});
+```
 
 ### autoPrepend
 
