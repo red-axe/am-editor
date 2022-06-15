@@ -87,9 +87,12 @@ export default class Paste {
 						node.remove();
 						if (parent.get<Element>()?.childNodes.length === 0)
 							parent.remove();
+						return;
 					} else if (/^\s+$/.test(text)) {
-						if (parent.get<Element>()?.childNodes.length === 1)
+						if (parent.get<Element>()?.childNodes.length === 1) {
 							parent.remove();
+							return;
+						}
 					} else if (/^\n$/.test(text)) {
 						if (nodeApi.isList(parent)) {
 							node.remove();
@@ -568,7 +571,8 @@ export default class Paste {
 						const plugin = topMarkPlugins.find(
 							(item) =>
 								item.plugin?.name === markPlugin.name &&
-								item.node.length > 0,
+								item.node.length > 0 &&
+								!item.node.equal(node),
 						);
 						if (plugin) {
 							if (

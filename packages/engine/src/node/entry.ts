@@ -955,11 +955,13 @@ class NodeEntry implements NodeInterface {
 				const result = callback(child);
 
 				if (result === false) {
+					if (onEnd) onEnd(child, next);
 					return;
 				}
 				if (result !== true) {
 					const isResultChild = result && typeof result !== 'boolean';
 					if (isResultChild) {
+						if (onEnd) onEnd(child, result);
 						child = result;
 					}
 					isCard = child.isCard();
