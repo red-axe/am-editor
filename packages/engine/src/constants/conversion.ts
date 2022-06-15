@@ -51,7 +51,7 @@ const defaultConversion: ConversionData = [
 	{
 		from: (_name, _styles, attributes) => {
 			return (
-				_name === 'div' &&
+				(_name === 'div' || _name === 'section') &&
 				(!attributes[CARD_KEY] || !attributes[READY_CARD_KEY]) &&
 				attributes[DATA_ELEMENT] !== ROOT
 			);
