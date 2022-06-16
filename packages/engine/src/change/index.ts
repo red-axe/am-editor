@@ -48,6 +48,17 @@ class ChangeModel implements ChangeInterface {
 		this.onSelect = (range?: RangeInterface) => {
 			const { mark, block, inline } = engine;
 			range = range || this.range.get();
+			const nodes = this.marks.concat(this.blocks).concat(this.inlines);
+			if (
+				nodes.length === 0 ||
+				nodes
+					.concat(this.inlines)
+					.some((node) => !node.get<Node>()?.isConnected)
+			) {
+				this.marks = mark.findMarks(range);
+				this.blocks = block.findBlocks(range);
+				this.inlines = inline.findInlines(range);
+			}
 			if (
 				prevRange?.startContainer === range.startContainer &&
 				prevRange?.startOffset === range.startOffset &&
@@ -61,9 +72,6 @@ class ChangeModel implements ChangeInterface {
 				endContainer: range.endContainer,
 				endOffset: range.endOffset,
 			};
-			this.marks = mark.findMarks(range);
-			this.blocks = block.findBlocks(range);
-			this.inlines = inline.findInlines(range);
 			if (this.options.onSelect) this.options.onSelect();
 		};
 		this.onSetValue = this.options.onSetValue || function () {};
