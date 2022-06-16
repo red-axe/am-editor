@@ -88,11 +88,6 @@ export default class Paste {
 						if (parent.get<Element>()?.childNodes.length === 0)
 							parent.remove();
 						return;
-					} else if (/^\s+$/.test(text)) {
-						if (parent.get<Element>()?.childNodes.length === 1) {
-							parent.remove();
-							return;
-						}
 					} else if (/^\n$/.test(text)) {
 						if (nodeApi.isList(parent)) {
 							node.remove();

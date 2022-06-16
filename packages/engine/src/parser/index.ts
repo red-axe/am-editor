@@ -370,6 +370,28 @@ class Parser implements ParserInterface {
 					//当前节点是 inline 节点，inline 节点不允许嵌套、不允许放入mark节点
 					return inlineApi.flat(node, schema);
 				}
+			} else if (node.isText()) {
+				const text = node.text();
+				if (/^\n/.test(text) || /^\s/.test(text)) {
+					const element = node.get<Text>()!;
+					const prev = element.previousSibling;
+					const next = element.nextSibling;
+					const prevType: string | undefined = prev
+						? schema.getType(prev)
+						: undefined;
+					const nextType: string | undefined = next
+						? schema.getType(next)
+						: undefined;
+					// 节点前面
+					if (!prev && next && (!nextType || nextType === 'block')) {
+						node.remove();
+						return;
+					}
+					// 节点后面
+					if (!next && prev && (!prevType || prevType === 'block')) {
+						node.remove();
+					}
+				}
 			}
 		});
 	}
