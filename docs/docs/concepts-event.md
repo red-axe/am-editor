@@ -113,6 +113,25 @@ Parse the DOM node, generate the editor value that meets the standard, and trigg
 ) => boolean | void
 ```
 
+### `parse:text`
+
+Parse the DOM node, generate the text, and trigger when it traverses the child nodes. Return false to skip the current node
+
+```ts
+/**
+* @param node The node currently traversed
+* @param attributes The filtered attributes of the current node
+* @param styles The filtered style of the current node
+* @param value The currently generated text
+*/
+(
+    node: NodeInterface,
+    attributes: {[key: string]: string },
+    styles: {[key: string]: string },
+    value: Array<string>,
+) => boolean | void
+```
+
 ### `parse:value-after`
 
 Analyze DOM nodes and generate editor values ​​that conform to the standard. Triggered after generating xml code

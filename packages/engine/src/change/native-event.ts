@@ -437,7 +437,6 @@ class NativeEvent {
 			//.disable(['strikethrough', 'emphasis', 'link', 'image', 'table', 'code', 'blockquote', 'hr', 'list', 'heading'])
 			const tokens = markdown.parse(text, {});
 			if (tokens.length === 0) return;
-			console.log(tokens);
 			return convertMarkdown(this.engine, markdown, tokens);
 		};
 

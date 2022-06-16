@@ -113,6 +113,25 @@ view.on('事件名称', '处理方法');
 ) => boolean | void
 ```
 
+### `parse:text`
+
+解析 DOM 节点，生成文本，遍历子节点时触发。返回 false 跳过当前节点
+
+```ts
+/**
+* @param node 当前遍历的节点
+* @param attributes 当前节点已过滤后的属性
+* @param styles 当前节点已过滤后的样式
+* @param value 当前已经生成的文本集合
+*/
+(
+    node: NodeInterface,
+    attributes: { [key: string]: string },
+    styles: { [key: string]: string },
+    value: Array<string>,
+) => boolean | void
+```
+
 ### `parse:value-after`
 
 解析 DOM 节点，生成符合标准的编辑器值。生成 xml 代码结束后触发

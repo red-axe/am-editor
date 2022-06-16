@@ -662,7 +662,18 @@ class Parser implements ParserInterface {
 			null,
 			null,
 			{
-				onOpen: (node, name) => {
+				onOpen: (node, name, attributes, styles) => {
+					if (
+						editor.trigger(
+							'parse:text',
+							node,
+							attributes,
+							styles,
+							result,
+						) === false
+					) {
+						return false;
+					}
 					if (name === 'br') {
 						result.push('\n');
 					}
@@ -681,6 +692,7 @@ class Parser implements ParserInterface {
 							result.push(getListStyle(styleType) + ' ');
 						}
 					}
+					return;
 				},
 				onText: (_, text) => {
 					text = unescape(text);

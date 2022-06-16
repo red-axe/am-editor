@@ -230,6 +230,23 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 		rewrite?: boolean,
 	): void;
 	/**
+	 * 解析DOM节点，生成文本，遍历子节点时触发。返回false跳过当前节点
+	 * @param node 当前遍历的节点
+	 * @param attributes 当前节点已过滤后的属性
+	 * @param styles 当前节点已过滤后的样式
+	 * @param value 当前已经生成的文本
+	 */
+	on(
+		eventType: 'parse:text',
+		listener: (
+			node: NodeInterface,
+			attributes: { [key: string]: string },
+			styles: { [key: string]: string },
+			value: Array<string>,
+		) => boolean | void,
+		rewrite?: boolean,
+	): void;
+	/**
 	 * 解析DOM节点，生成符合标准的 XML。生成xml代码结束后触发
 	 * @param value xml代码
 	 */
@@ -332,6 +349,22 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 		) => boolean | void,
 	): void;
 	/**
+	 * 解析DOM节点，生成文本，遍历子节点时触发。返回false跳过当前节点
+	 * @param node 当前遍历的节点
+	 * @param attributes 当前节点已过滤后的属性
+	 * @param styles 当前节点已过滤后的样式
+	 * @param value 当前已经生成的文本
+	 */
+	off(
+		eventType: 'parse:text',
+		listener: (
+			node: NodeInterface,
+			attributes: { [key: string]: string },
+			styles: { [key: string]: string },
+			value: Array<string>,
+		) => boolean | void,
+	): void;
+	/**
 	 * 解析DOM节点，生成符合标准的 XML。生成xml代码结束后触发
 	 * @param value xml代码
 	 */
@@ -403,6 +436,20 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 	 */
 	trigger(
 		eventType: 'parse:value',
+		node: NodeInterface,
+		attributes: { [key: string]: string },
+		styles: { [key: string]: string },
+		value: Array<string>,
+	): boolean | void;
+	/**
+	 * 解析DOM节点，生成文本，遍历子节点时触发。返回false跳过当前节点
+	 * @param node 当前遍历的节点
+	 * @param attributes 当前节点已过滤后的属性
+	 * @param styles 当前节点已过滤后的样式
+	 * @param value 当前已经生成的文本
+	 */
+	trigger(
+		eventType: 'parse:text',
 		node: NodeInterface,
 		attributes: { [key: string]: string },
 		styles: { [key: string]: string },
