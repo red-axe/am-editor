@@ -1,6 +1,6 @@
 import tinycolor from 'tinycolor2';
 import { NodeInterface } from '../types/node';
-import { DATA_ELEMENT, DATA_ID, EDITABLE } from '../constants/root';
+import { DATA_ELEMENT, DATA_ID, EDITABLE, UI } from '../constants/root';
 import { EditorInterface } from '../types/editor';
 import {
 	SchemaInterface,
@@ -12,7 +12,9 @@ import {
 } from '../types';
 import {
 	ANCHOR_SELECTOR,
+	CARD_EDITABLE_KEY,
 	CARD_ELEMENT_KEY,
+	CARD_KEY,
 	CARD_SELECTOR,
 	CURSOR_SELECTOR,
 	FOCUS_SELECTOR,
@@ -390,6 +392,10 @@ class Parser implements ParserInterface {
 			if (child.isElement()) {
 				let name = child.name;
 				let attributes = child.attributes();
+				if (attributes[DATA_ELEMENT] === UI) {
+					child = child.next();
+					continue;
+				}
 				let styles = getStyleMap(attributes.style || '');
 				//删除属性中的style属性
 				delete attributes.style;
@@ -451,7 +457,12 @@ class Parser implements ParserInterface {
 					}
 				}
 				// Card不遍历子节点
-				if (name !== 'card' || includeCard) {
+				if (
+					(name !== 'card' &&
+						(!attributes[CARD_KEY] ||
+							attributes[CARD_EDITABLE_KEY] === 'true')) ||
+					includeCard
+				) {
 					this.traverse(
 						child,
 						schema,
@@ -677,25 +688,26 @@ class Parser implements ParserInterface {
 					result.push(text);
 				},
 				onClose: (node, name) => {
+					const nodeApi = editor.node;
 					if (
 						name === 'p' ||
-						editor.node.isBlock(node, schema || editor.schema)
+						nodeApi.isBlock(node, schema || editor.schema)
 					) {
 						const children = Array.from(
 							node.get<HTMLElement>()!.childNodes,
 						);
 						// 子节点还有block节点，则不换行
 						if (
-							(children &&
-								children.some(
-									(child) => child.nodeName === 'BR',
-								)) ||
-							children.some((child) =>
-								editor.node.isBlock(
+							children.length === 0 ||
+							children.some((child) => {
+								if (child instanceof Text) return false;
+								if (child.nodeName === 'BR') return true;
+								const type = (schema || editor.schema).getType(
 									child,
-									schema || editor.schema,
-								),
-							)
+								);
+								if (!type || type === 'block') return true;
+								return false;
+							})
 						)
 							return;
 						result.push('\n');
