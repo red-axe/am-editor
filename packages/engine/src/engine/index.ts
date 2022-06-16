@@ -242,6 +242,13 @@ class Engine<T extends EngineOptions = EngineOptions>
 		return toJSON0(this.container);
 	}
 
+	getText(includeCard?: boolean) {
+		return new Parser(this.container, this).toText(
+			this.schema,
+			includeCard,
+		);
+	}
+
 	normalize(container: NodeInterface = this.container) {
 		let block = $('<p />');
 		// 保证所有行内元素都在段落内

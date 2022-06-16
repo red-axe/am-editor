@@ -10,7 +10,7 @@ import ChangeEvent from './event';
 import Parser from '../parser';
 import { ANCHOR_SELECTOR, CURSOR_SELECTOR, FOCUS_SELECTOR } from '../constants';
 import { combinText, convertMarkdown, createMarkdownIt } from '../utils';
-import { TRIGGER_CARD_ID } from '../constants/card';
+import { CARD_CENTER_SELECTOR, TRIGGER_CARD_ID } from '../constants/card';
 import { DATA_ID, EDITABLE_SELECTOR, UI_SELECTOR } from '../constants/root';
 import { SelectionInterface } from '../types/selection';
 import Selection from '../selection';
@@ -302,7 +302,7 @@ class ChangeModel implements ChangeInterface {
 	getOriginValue(container: NodeInterface = this.engine.container) {
 		const { schema, conversion } = this.engine;
 		return new Parser(
-			container.get<HTMLElement>()?.outerHTML || '',
+			container.clone(true),
 			this.engine,
 			undefined,
 			false,
@@ -320,14 +320,13 @@ class ChangeModel implements ChangeInterface {
 		} else {
 			let range = this.range.get();
 			let selection;
-			const container = this.engine.container.clone(true);
 			if (!range.inCard()) {
 				const path = range.toPath(true);
 				if (!path) return this.getOriginValue();
-				range = Range.fromPath(this.engine, path, true, container);
+				range = Range.fromPath(this.engine, path, true);
 				selection = range.createSelection();
 			}
-			value = this.getOriginValue(container);
+			value = this.getOriginValue();
 			selection?.move();
 		}
 		return value;
@@ -801,6 +800,12 @@ class ChangeModel implements ChangeInterface {
 			startNode.html('<p><br /></p>');
 			this.engine.nodeId.generate(startNode);
 		}
+		// 删除了卡片内的节点，就把卡片删除
+		if (
+			startNode.isCard() &&
+			startNode.find(CARD_CENTER_SELECTOR).length === 0
+		)
+			card.remove(startNode);
 		safeRange.collapse(true);
 		// 后续处理
 		startNode = safeRange

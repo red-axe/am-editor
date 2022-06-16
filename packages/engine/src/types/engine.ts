@@ -10,7 +10,6 @@ import { RangeInterface } from './range';
 import { Op } from 'sharedb';
 import { EditorInterface, EditorOptions } from './editor';
 import { HotkeyInterface } from './hotkey';
-import MarkdownIt from 'markdown-it';
 
 /**
  * 编辑器容器接口
@@ -201,6 +200,11 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * 获取JSON格式的值
 	 */
 	getJsonValue(): string | undefined | (string | {})[];
+	/**
+	 * 获取纯文本
+	 * @param includeCard 是否包含卡片内的
+	 */
+	getText(includeCard?: boolean): string;
 	/**
 	 * 展示 placeholder
 	 */
