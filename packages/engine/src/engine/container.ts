@@ -20,8 +20,8 @@ export type Options = {
 	autoAppend?: boolean;
 };
 
-const DATA_PLACEHOLDER = 'data-placeholder';
-const DATA_PLACEHOLDER_CLASS = 'am-engine-placeholder';
+export const DATA_PLACEHOLDER = 'data-placeholder';
+export const DATA_PLACEHOLDER_CLASS = 'am-engine-placeholder';
 class Container {
 	private options: Options;
 	private node: NodeInterface;

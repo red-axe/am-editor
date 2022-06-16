@@ -801,6 +801,10 @@ class ChangeModel implements ChangeInterface {
 			this.engine.nodeId.generate(startNode);
 		}
 		// 删除了卡片内的节点，就把卡片删除
+		startNode = safeRange
+			.shrinkToElementNode()
+			.shrinkToTextNode()
+			.enlargeToElementNode().startNode;
 		if (
 			startNode.isCard() &&
 			startNode.find(CARD_CENTER_SELECTOR).length === 0

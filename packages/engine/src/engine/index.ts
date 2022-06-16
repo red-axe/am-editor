@@ -20,7 +20,10 @@ import { toJSON0, toDOM } from '../ot/utils';
 import Parser from '../parser';
 import { TypingInterface } from '../types';
 import Typing from '../typing';
-import Container from './container';
+import Container, {
+	DATA_PLACEHOLDER,
+	DATA_PLACEHOLDER_CLASS,
+} from './container';
 import Selection from '../selection';
 import Editor from '../editor';
 import { $ } from '../node';
@@ -171,6 +174,8 @@ class Engine<T extends EngineOptions = EngineOptions>
 		node.removeAttributes('autocomplete');
 		node.removeAttributes('spellcheck');
 		node.removeAttributes('data-gramm');
+		node.removeAttributes(DATA_PLACEHOLDER);
+		node.removeClass(DATA_PLACEHOLDER_CLASS);
 		node.removeAttributes('role');
 		return new Parser(node, this).toHTML();
 	}
