@@ -124,11 +124,28 @@ class ChangeEvent implements ChangeEventInterface {
 			const { startNode } = range;
 			if (
 				isSafari &&
+				event.inputType === 'deleteCompositionText' &&
 				startNode.name === 'li' &&
+				startNode.length > 0 &&
 				!node.isCustomize(startNode)
 			) {
-				if (startNode.first()?.name !== 'br')
+				const childNodes = startNode[0].childNodes;
+				if (
+					childNodes.length === 1 &&
+					childNodes[0].nodeName !== 'BR'
+				) {
 					startNode.prepend('<br />');
+					setTimeout(() => {
+						const childNodes = startNode[0].childNodes;
+						if (
+							childNodes.length === 2 &&
+							childNodes[0].nodeName === 'BR' &&
+							childNodes[1].nodeName === 'BR'
+						) {
+							childNodes[0].remove();
+						}
+					}, 0);
+				}
 			}
 			// 安卓在自定义列表前组合输入的时候会出现字符错乱
 			// 解决：在列表下的自定义卡片后面插入一个零宽字符，等组合输入法完成后再删除
