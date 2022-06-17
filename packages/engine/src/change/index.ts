@@ -51,9 +51,13 @@ class ChangeModel implements ChangeInterface {
 			const nodes = this.marks.concat(this.blocks).concat(this.inlines);
 			if (
 				nodes.length === 0 ||
-				nodes
-					.concat(this.inlines)
-					.some((node) => !node.get<Node>()?.isConnected)
+				nodes.some(
+					(node) =>
+						!node.get<Node>()?.isConnected ||
+						!range?.commonAncestorContainer.contains(
+							node.get<Node>(),
+						),
+				)
 			) {
 				this.marks = mark.findMarks(range);
 				this.blocks = block.findBlocks(range);
