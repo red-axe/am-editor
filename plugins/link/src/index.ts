@@ -162,6 +162,8 @@ export default class<
 				inline.repairCursor(newNode);
 				return false;
 			}
+		} else if (child.name === 'a') {
+			child.attributes('target', '_blank');
 		}
 		return true;
 	};
