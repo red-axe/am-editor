@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-link-vue",
-  "version": "2.9.20",
+  "version": "2.9.21",
   "description": "> TODO: description",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
