@@ -48,10 +48,9 @@ export default defineComponent({
 			const borderBottom = removeUnit(getComputedStyle(element).borderBottomWidth)
 			const height = rect.height || 0;
             mobileView.top = global.Math.max(document.body.scrollTop, document.documentElement.scrollTop) + (window.visualViewport.height || 0) - height + borderTop + borderBottom
-          }, 100);
+          }, 10);
         }
         const update = () => {
-            if(isMobile) calcuMobileView()
             const data: Array<GroupDataProps> = [];
             const defaultConfig = getToolbarDefaultConfig(props.engine);
             props.items.forEach(group => {
@@ -179,7 +178,7 @@ export default defineComponent({
               props.engine.on('readonly', handleReadonly)
               props.engine.on('blur', hideMobileToolbar)
 			  if(!props.engine.isFocus()) hideMobileToolbar()
-              document.addEventListener('scroll', hideMobileToolbar);
+              document.addEventListener('scroll', calcuMobileView);
               visualViewport.addEventListener('resize', calcuMobileView);
               visualViewport.addEventListener('scroll', calcuMobileView);
             } else {
@@ -198,7 +197,7 @@ export default defineComponent({
             if (isMobile) {
               props.engine.off('readonly', handleReadonly)
               props.engine.off('blur', hideMobileToolbar)
-              document.removeEventListener('scroll', hideMobileToolbar);
+              document.removeEventListener('scroll', calcuMobileView);
               visualViewport.removeEventListener('resize', calcuMobileView);
               visualViewport.removeEventListener('scroll', calcuMobileView);
             } else {

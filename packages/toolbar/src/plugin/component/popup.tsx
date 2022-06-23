@@ -163,6 +163,10 @@ export default class Popup {
 
 	showContent(callback?: () => void) {
 		const result = this.#editor.trigger('toolbar-render', this.#options);
+		if (!result && (this.#options.items || []).length === 0) {
+			this.hide();
+			return;
+		}
 		ReactDOM.render(
 			typeof result === 'object' ? (
 				result

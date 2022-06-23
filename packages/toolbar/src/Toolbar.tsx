@@ -100,14 +100,13 @@ const Toolbar: React.FC<ToolbarProps> = ({
 					borderTop +
 					borderBottom,
 			});
-		}, 100);
+		}, 20);
 	};
 
 	/**
 	 * 更新状态
 	 */
 	const updateState = useCallback(() => {
-		if (isMobile) calcuMobileView();
 		const data: Array<GroupProps> = [];
 		const defaultConfig = getToolbarDefaultConfig(engine);
 		items.forEach((group) => {
@@ -285,7 +284,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
 			engine.on('readonly', handleReadonly);
 			engine.on('blur', hideMobileToolbar);
 			if (!engine.isFocus()) hideMobileToolbar();
-			document.addEventListener('scroll', hideMobileToolbar);
+			document.addEventListener('scroll', calcuMobileView);
 			visualViewport.addEventListener('resize', calcuMobileView);
 			visualViewport.addEventListener('scroll', calcuMobileView);
 		} else {
@@ -301,7 +300,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
 			if (isMobile) {
 				engine.off('readonly', handleReadonly);
 				engine.off('blur', hideMobileToolbar);
-				document.removeEventListener('scroll', hideMobileToolbar);
+				document.removeEventListener('scroll', calcuMobileView);
 				visualViewport.removeEventListener('resize', calcuMobileView);
 				visualViewport.removeEventListener('scroll', calcuMobileView);
 			} else {
