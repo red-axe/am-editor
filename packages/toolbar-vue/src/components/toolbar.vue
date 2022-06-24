@@ -51,6 +51,7 @@ export default defineComponent({
           }, 10);
         }
         const update = () => {
+			if(isMobile) calcuMobileView();
             const data: Array<GroupDataProps> = [];
             const defaultConfig = getToolbarDefaultConfig(props.engine);
             props.items.forEach(group => {

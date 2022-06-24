@@ -107,6 +107,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
 	 * 更新状态
 	 */
 	const updateState = useCallback(() => {
+		if (isMobile) calcuMobileView();
 		const data: Array<GroupProps> = [];
 		const defaultConfig = getToolbarDefaultConfig(engine);
 		items.forEach((group) => {
