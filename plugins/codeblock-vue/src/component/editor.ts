@@ -3,6 +3,7 @@ import debounce from 'lodash/debounce';
 import {
 	$,
 	EditorInterface,
+	escape,
 	isEngine,
 	isHotkey,
 	isMobile,
@@ -323,7 +324,7 @@ class CodeBlockEditor implements CodeBlockEditorInterface {
 			});
 			const spanElement = `<span ${
 				styleStr ? `style="${styleStr}"` : ''
-			}>${content}</span>`;
+			}>${escape(content)}</span>`;
 			html += spanElement;
 		} else {
 			html += content;
