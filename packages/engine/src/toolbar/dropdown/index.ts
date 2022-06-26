@@ -81,8 +81,8 @@ export default class Dropdown implements DropdownInterface {
 		}
 	}
 
-	renderDropdown(container: NodeInterface) {
-		this.dropdown = container.find('.dropdown-container');
+	renderDropdown() {
+		this.dropdown = this.root!.find('.dropdown-container');
 		const { items } = this.options;
 		items.forEach((item) => {
 			switch (item.type) {
@@ -103,7 +103,7 @@ export default class Dropdown implements DropdownInterface {
 		container.append(this.root);
 		this.initToggleEvent();
 		this.renderTooltip();
-		this.renderDropdown(container);
+		this.renderDropdown();
 		const { didMount } = this.options;
 		if (didMount) {
 			didMount(this.root);
