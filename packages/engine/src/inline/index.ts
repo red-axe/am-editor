@@ -16,7 +16,6 @@ import { getDocument, isEngine } from '../utils';
 import { Backspace, Left, Right } from './typing';
 import { $ } from '../node';
 import { isNode } from '../node/utils';
-import { isInlinePlugin } from '../plugin/inline';
 import { isRangeInterface } from '../range';
 import type { SchemaInterface } from '../types/schema';
 

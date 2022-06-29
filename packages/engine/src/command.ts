@@ -28,10 +28,7 @@ class Command implements CommandInterface {
 		const plugin = editor.plugin.components[name];
 		if (!plugin || plugin.disabled) return false;
 		// 只读状态下，如果插件没有指定为非禁用，一律禁用
-		if (
-			(!isEngine(editor) || editor.readonly || !editor.isFocus()) &&
-			plugin.disabled !== false
-		)
+		if ((!isEngine(editor) || editor.readonly) && plugin.disabled !== false)
 			return false;
 		const cardApi = editor.card;
 		// 当前激活非可编辑卡片时全部禁用
