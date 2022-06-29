@@ -49,6 +49,12 @@ export default class<T extends SubOptions = SubOptions> extends MarkPlugin<T> {
 		];
 	}
 
+	execute(...args: any): void {
+		const isSup = this.editor.command.queryState('sup');
+		if (isSup) this.editor.command.execute('sup');
+		super.execute(...args);
+	}
+
 	hotkey() {
 		return this.options.hotkey || 'mod+,';
 	}
