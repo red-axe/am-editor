@@ -50,6 +50,10 @@ class OTModel extends EventEmitter2 implements OTInterface {
 		}, 200);
 	}
 
+	get isCache() {
+		return this.mutation?.isCache ?? false;
+	}
+
 	colors = [
 		'#597EF7',
 		'#73D13D',

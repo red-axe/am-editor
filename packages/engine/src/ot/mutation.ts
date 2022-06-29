@@ -26,7 +26,7 @@ class Mutation extends EventEmitter2 implements MutationInterface {
 	isStopped: boolean;
 	private observer: MutationObserver;
 	private producer: Producer;
-	private isCache: boolean = false;
+	isCache: boolean = false;
 	private cache: MutationRecord[] = [];
 
 	constructor(node: NodeInterface, options: Options) {

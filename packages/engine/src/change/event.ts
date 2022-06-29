@@ -65,6 +65,7 @@ class ChangeEvent implements ChangeEventInterface {
 		// 处理中文输入法状态
 		// https://developer.mozilla.org/en-US-US/docs/Web/Events/compositionstart
 		this.onContainer('compositionstart', (event) => {
+			console.log('compositionstart');
 			if (this.engine.readonly) {
 				return;
 			}
@@ -92,15 +93,64 @@ class ChangeEvent implements ChangeEventInterface {
 			}
 			this.isComposing = true;
 		});
-		this.onContainer('compositionend', () => {
+
+		const submitInput = (e: Event) => {
+			if (!this.isComposing) {
+				// 清理输入前插入到自定义列表的卡片后的零宽字符
+				if (isAndroid && androidCustomeListComposingNode) {
+					const first = androidCustomeListComposingNode.first();
+					const next = first?.next();
+					if (next?.isText()) {
+						const text = next.text();
+						if (/^\u200b/.test(text)) {
+							const textNode = next.get<Text>();
+							textNode?.splitText(1);
+							textNode?.remove();
+						}
+					}
+					const range = this.engine.change.range.get();
+					const { startNode, startOffset } = range;
+					if (range.collapsed && startNode?.isText()) {
+						const text = startNode.text();
+						const sufix = text.substring(startOffset);
+						if (/^\u200b/.test(sufix)) {
+							startNode.text(
+								text.substring(0, startOffset) +
+									sufix.substring(1),
+							);
+							range.setOffset(
+								startNode,
+								startOffset,
+								startOffset,
+							);
+							this.engine.change.range.select(range);
+						}
+					}
+					androidCustomeListComposingNode = null;
+				}
+				callback(e);
+				// 组合输入法结束后提交协同
+				this.engine.ot.submitMutationCache();
+			}
+		};
+
+		this.onContainer('compositionend', (e) => {
+			console.log('compositionend');
 			if (this.engine.readonly) {
 				return;
 			}
 			this.isComposing = false;
+			// 日文输入法，input 后未即时触发 compositionend 方法，这里检测如果还在突变缓存中就提交
+			setTimeout(() => {
+				if (this.engine.ot.isCache) {
+					submitInput(e);
+				}
+			}, 20);
 		});
 		//对系统工具栏操作拦截，一般针对移动端的文本上下文工具栏
 		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
 		this.onContainer('beforeinput', (event: InputEvent) => {
+			console.log('beforeinput', event);
 			if (this.engine.readonly) return;
 			// safari 组合输入法会直接插入@字符，这里统一全部拦截输入@字符的时候再去触发@事件
 			const { change, card, node, block, list } = this.engine;
@@ -224,6 +274,7 @@ class ChangeEvent implements ChangeEventInterface {
 		});
 		let inputTimeout: NodeJS.Timeout | null = null;
 		this.onContainer('input', (e: InputEvent) => {
+			console.log('input', e);
 			if (this.engine.readonly) {
 				return;
 			}
@@ -239,43 +290,7 @@ class ChangeEvent implements ChangeEventInterface {
 			if (inputTimeout) clearTimeout(inputTimeout);
 
 			inputTimeout = setTimeout(() => {
-				if (!this.isComposing) {
-					// 清理输入前插入到自定义列表的卡片后的零宽字符
-					if (isAndroid && androidCustomeListComposingNode) {
-						const first = androidCustomeListComposingNode.first();
-						const next = first?.next();
-						if (next?.isText()) {
-							const text = next.text();
-							if (/^\u200b/.test(text)) {
-								const textNode = next.get<Text>();
-								textNode?.splitText(1);
-								textNode?.remove();
-							}
-						}
-						const range = this.engine.change.range.get();
-						const { startNode, startOffset } = range;
-						if (range.collapsed && startNode?.isText()) {
-							const text = startNode.text();
-							const sufix = text.substring(startOffset);
-							if (/^\u200b/.test(sufix)) {
-								startNode.text(
-									text.substring(0, startOffset) +
-										sufix.substring(1),
-								);
-								range.setOffset(
-									startNode,
-									startOffset,
-									startOffset,
-								);
-								this.engine.change.range.select(range);
-							}
-						}
-						androidCustomeListComposingNode = null;
-					}
-					callback(e);
-					// 组合输入法结束后提交协同
-					this.engine.ot.submitMutationCache();
-				}
+				submitInput(e);
 			}, 10);
 		});
 	}

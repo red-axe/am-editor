@@ -286,6 +286,10 @@ export interface MutationInterface extends EventEmitter2 {
 	 */
 	isStopped: boolean;
 	/**
+	 * 是否在缓存中
+	 */
+	isCache: boolean;
+	/**
 	 * 设置文档对象 OT 文档对象，或自定义文档对象
 	 * @param doc 文档对象
 	 */
@@ -447,6 +451,7 @@ export interface OTInterface extends EventEmitter2 {
 	selection: SelectionInterface;
 	doc: DocInterface | Doc | null;
 	isRemote: boolean;
+	readonly isCache: boolean;
 	getColors(): string[];
 	setColors(colors: string[]): void;
 	/**
