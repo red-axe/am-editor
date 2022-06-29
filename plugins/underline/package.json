@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-underline",
-  "version": "2.9.23",
+  "version": "2.9.24",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.9.23",
+    "@aomao/engine": "^2.9.24",
     "@babel/runtime": "^7.13.10"
   }
 }
