@@ -920,8 +920,10 @@ class NodeEntry implements NodeInterface {
 			const parentNode = node.parentNode;
 			if (!parentNode) return;
 			const newNode = isClone ? nodes[0].cloneNode(true) : nodes[0];
-			parentNode.replaceChild(newNode, node);
-			newNodes.push(newNode);
+			try {
+				parentNode.replaceChild(newNode, node);
+				newNodes.push(newNode);
+			} catch (error) {}
 		});
 		return new NodeEntry(newNodes);
 	}

@@ -6,11 +6,12 @@ import { CardInterface } from '../types/card';
 import { EngineInterface } from '../types/engine';
 import { RangeInterface } from '../types/range';
 import Range from '../range';
-import { CARD_ELEMENT_KEY } from '../constants/card';
+import { CARD_CENTER_SELECTOR, CARD_ELEMENT_KEY } from '../constants/card';
 import { ClipboardData } from '../types/clipboard';
 import { DATA_ELEMENT, UI } from '../constants';
 import { $ } from '../node';
 import { isAndroid, isMobile, isSafari } from '../utils';
+import { isBlockCard, isCard, isEditable, isRoot } from '../node/utils';
 
 type GlobalEventType = 'root' | 'window' | 'container' | 'document';
 class ChangeEvent implements ChangeEventInterface {
@@ -143,7 +144,7 @@ class ChangeEvent implements ChangeEventInterface {
 				if (this.engine.ot.isCache) {
 					submitInput(e);
 				}
-			}, 20);
+			}, 40);
 		});
 		//对系统工具栏操作拦截，一般针对移动端的文本上下文工具栏
 		//https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
@@ -238,6 +239,26 @@ class ChangeEvent implements ChangeEventInterface {
 						card.remove(range.endNode);
 				}
 			}
+			if (range.startNode.isRoot()) {
+				const startNode = range.getStartOffsetNode();
+				if (
+					startNode instanceof Element &&
+					isCard(startNode) &&
+					!startNode.querySelector(CARD_CENTER_SELECTOR)
+				) {
+					card.remove(startNode);
+				}
+				if (!range.collapsed && range.endNode.isRoot()) {
+					const endNode = range.getEndOffsetNode();
+					if (
+						endNode instanceof Element &&
+						isCard(endNode) &&
+						!endNode.querySelector(CARD_CENTER_SELECTOR)
+					) {
+						card.remove(endNode);
+					}
+				}
+			}
 			// 如果光标在自定义列表项节点前输入先自定义删除，不然排版不对
 			if (!range.collapsed && !this.isComposing) {
 				const startBlock = block.closest(range.startNode);
@@ -270,12 +291,12 @@ class ChangeEvent implements ChangeEventInterface {
 			});
 		});
 		let inputTimeout: NodeJS.Timeout | null = null;
-		this.onContainer('input', (e: InputEvent) => {
+		this.onContainer('input', (event: InputEvent) => {
 			if (this.engine.readonly) {
 				return;
 			}
 
-			if (this.isCardInput(e)) {
+			if (this.isCardInput(event)) {
 				return;
 			}
 			if (this.engine.isEmpty()) {
@@ -283,10 +304,27 @@ class ChangeEvent implements ChangeEventInterface {
 			} else {
 				this.engine.hidePlaceholder();
 			}
+			const { change, card } = this.engine;
+			if (
+				event.target instanceof Element &&
+				isEditable(event.target) &&
+				card.active &&
+				card.active.root.isBlockCard() &&
+				!card.active.isEditable &&
+				card.active.root.get<HTMLElement>()?.isContentEditable
+			) {
+				const range = change.range.get();
+				const newBlock = $(`<p><br /></p>`);
+				card.active.root.before(newBlock);
+				card.remove(card.active.root);
+				range.select(newBlock, true);
+				change.range.select(range);
+				return;
+			}
 			if (inputTimeout) clearTimeout(inputTimeout);
 
 			inputTimeout = setTimeout(() => {
-				submitInput(e);
+				submitInput(event);
 			}, 10);
 		});
 	}

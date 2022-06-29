@@ -35,7 +35,7 @@ class ChangeModel implements ChangeInterface {
 	inlines: Array<NodeInterface> = [];
 	changeTrigger: Array<string> = [];
 	range: ChangeRangeInterface;
-	#nativeEvent: NativeEvent;
+	nativeEvent: NativeEvent;
 
 	constructor(engine: EngineInterface, options: ChangeOptions = {}) {
 		this.options = options;
@@ -84,11 +84,11 @@ class ChangeModel implements ChangeInterface {
 				this.onSelect(range);
 			},
 		});
-		this.#nativeEvent = new NativeEvent(engine);
+		this.nativeEvent = new NativeEvent(engine);
 	}
 
 	init() {
-		this.#nativeEvent.init();
+		this.nativeEvent.init();
 	}
 
 	private _change() {
@@ -258,7 +258,7 @@ class ChangeModel implements ChangeInterface {
 
 	setHtml(html: string, callback?: (count: number) => void) {
 		const { card, container } = this.engine;
-		this.#nativeEvent.paste(
+		this.nativeEvent.paste(
 			html,
 			undefined,
 			callback,
@@ -289,7 +289,7 @@ class ChangeModel implements ChangeInterface {
 		let result = convertMarkdown(this.engine, markdown, tokens);
 		if (!result) result = text;
 		const { card, container } = this.engine;
-		this.#nativeEvent.paste(
+		this.nativeEvent.paste(
 			result,
 			undefined,
 			callback,
@@ -717,7 +717,7 @@ class ChangeModel implements ChangeInterface {
 		range?: RangeInterface,
 		callback?: (count: number) => void,
 	) {
-		this.#nativeEvent.paste(html, range, callback, true);
+		this.nativeEvent.paste(html, range, callback, true);
 	}
 
 	/**
