@@ -576,6 +576,10 @@ class ChangeModel implements ChangeInterface {
 				if (prev) {
 					prev.after(node);
 				} else {
+					if (this.engine.node.isInline(range.startNode)) {
+						range.setStartAfter(range.startNode);
+						range.collapse(true);
+					}
 					nodeApi.insert(node, range, true);
 				}
 				if (node.get()?.isConnected) appendNodes.push(node);
