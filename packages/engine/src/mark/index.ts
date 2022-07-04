@@ -825,6 +825,7 @@ class Mark implements MarkModelInterface {
 		node: NodeInterface,
 		mark: NodeInterface,
 		plugin: MarkInterface | undefined = this.findPlugin(mark),
+		root?: NodeInterface,
 	) {
 		const nodeApi = this.editor.node;
 		// 要包裹的节点是mark
@@ -936,7 +937,8 @@ class Mark implements MarkModelInterface {
 					parent
 						.children()
 						.toArray()
-						.filter((node) => !node.isCursor()).length === 1
+						.filter((node) => !node.isCursor()).length === 1 ||
+					(root && root.equal(parent))
 				) {
 					const curPlugin = this.findPlugin(parent);
 					//插件一样，并且并表明要合并值
@@ -1163,7 +1165,12 @@ class Mark implements MarkModelInterface {
 								return false;
 							}
 							const childIsMark = nodeApi.isMark(child);
-							const result = this.wrapByNode(child, mark, plugin);
+							const result = this.wrapByNode(
+								child,
+								mark,
+								plugin,
+								commonAncestorNode,
+							);
 							// 要包裹的节点是mark
 							if (
 								result &&
