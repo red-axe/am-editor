@@ -20,7 +20,6 @@
         "url": "https://github.com/yanmao-cc/am-editor/issues"
     },
     "dependencies": {
-        "@aomao/engine": "^2.9.25",
         "@babel/runtime": "^7.13.10",
         "antd": "^4.12.3",
         "classnames-es-ts": "^2.2.7",
@@ -34,5 +33,8 @@
         "@types/keymaster": "^1.6.28",
         "@types/lodash": "^4.14.178",
         "@types/tinycolor2": "^1.4.2"
-    }
+    },
+	"peerDependencies": {
+		"@aomao/engine": "^2.9.25"
+	}
 }

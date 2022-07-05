@@ -24,13 +24,15 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.9.25",
-    "@babel/runtime": "^7.13.10",
-    "ant-design-vue": "^2.2.6",
-    "vue": "^3.2.9"
+    "@babel/runtime": "^7.13.10"
   },
   "devDependencies": {
     "@types/markdown-it": "^12.2.3",
     "@vue/compiler-sfc": "^3.2.9"
+  },
+  "peerDependencies": {
+	  "@aomao/engine": "^2.9.25",
+	  "vue": "^3.2.9",
+	  "ant-design-vue": "^2.2.6"
   }
 }
