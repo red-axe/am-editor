@@ -26,7 +26,7 @@ class Request implements RequestInterface {
 		input.type = 'file';
 		input.accept = accept;
 		input.style.display = 'none';
-		input.multiple = multiple !== 1;
+		input.multiple = multiple > 1;
 
 		const remove = () => {
 			input.remove();
