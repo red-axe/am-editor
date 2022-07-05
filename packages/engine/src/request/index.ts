@@ -19,12 +19,14 @@ class Request implements RequestInterface {
 	getFiles(options?: OpenDialogOptions) {
 		let { event, accept, multiple } = options || {};
 		accept = accept || '*';
-		multiple = typeof multiple === undefined ? 100 : multiple;
+		if (multiple === false) multiple = 1;
+		else if (multiple === undefined || multiple === true) multiple = 100;
+
 		const input = document.createElement('input');
 		input.type = 'file';
 		input.accept = accept;
 		input.style.display = 'none';
-		input.multiple = multiple !== false;
+		input.multiple = multiple !== 1;
 
 		const remove = () => {
 			input.remove();
@@ -34,10 +36,13 @@ class Request implements RequestInterface {
 		return new Promise<Array<File>>((resolve) => {
 			const change = () => {
 				const files = [];
-				for (let i = 0; i < (input.files?.length || 0); i++) {
-					if (typeof multiple === 'number' && i > multiple) break;
-
-					files.push(input.files![i]);
+				const inputFiles = input.files ?? [];
+				const maxLength = Math.min(
+					inputFiles.length,
+					multiple as number,
+				);
+				for (let i = 0; i < maxLength; i++) {
+					files.push(inputFiles[i]);
 				}
 				input.removeEventListener('change', change);
 				remove();
