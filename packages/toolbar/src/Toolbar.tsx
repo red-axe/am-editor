@@ -91,7 +91,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
 			const height = rect.height || 0;
 			setMobileView({
 				top:
-					global.Math.max(
+					Math.max(
 						document.body.scrollTop,
 						document.documentElement.scrollTop,
 					) +

@@ -47,7 +47,7 @@ export default defineComponent({
 			const borderTop = removeUnit(getComputedStyle(element).borderTopWidth)
 			const borderBottom = removeUnit(getComputedStyle(element).borderBottomWidth)
 			const height = rect.height || 0;
-            mobileView.top = global.Math.max(document.body.scrollTop, document.documentElement.scrollTop) + (window.visualViewport.height || 0) - height + borderTop + borderBottom
+            mobileView.top = Math.max(document.body.scrollTop, document.documentElement.scrollTop) + (window.visualViewport.height || 0) - height + borderTop + borderBottom
           }, 10);
         }
         const update = () => {
