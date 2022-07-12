@@ -631,7 +631,9 @@ class NodeModel implements NodeModelInterface {
 							.shrinkToTextNode().startNode
 					: range.startNode,
 			);
-			if (
+			if (blockNode.isRoot() && !range.startNode.next()) {
+				blockNode.append(node);
+			} else if (
 				!blockNode.isCard() &&
 				schema.isAllowIn(blockNode.name, node.nodeName.toLowerCase())
 			) {
