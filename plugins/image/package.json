@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-image",
-    "version": "2.9.25",
+    "version": "2.9.26",
     "description": "图片",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
@@ -32,7 +32,7 @@
         "@types/markdown-it": "^12.2.3",
         "@types/photoswipe": "^4.1.1"
     },
-	"peerDependencies": {
-		"@aomao/engine": "^2.9.25"
-	}
+    "peerDependencies": {
+        "@aomao/engine": "^2.9.25"
+    }
 }

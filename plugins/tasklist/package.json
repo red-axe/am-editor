@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-tasklist",
-  "version": "2.9.25",
+  "version": "2.9.26",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -27,6 +27,6 @@
     "@types/markdown-it": "^12.2.3"
   },
   "peerDependencies": {
-	"@aomao/engine": "^2.9.25"
+    "@aomao/engine": "^2.9.25"
   }
 }

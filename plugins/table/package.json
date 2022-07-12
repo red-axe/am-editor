@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-table",
-  "version": "2.9.26",
+  "version": "2.9.27",
   "description": "table plugin",
   "author": "AoMao <me@aomao.com>",
   "homepage": "https://github.com/yanmao-cc/am-editor/tree/master/plugins/plugin-table#readme",
@@ -32,6 +32,6 @@
     "@types/tinycolor2": "^1.4.2"
   },
   "peerDependencies": {
-	  "@aomao/engine": "^2.9.25"
+    "@aomao/engine": "^2.9.25"
   }
 }

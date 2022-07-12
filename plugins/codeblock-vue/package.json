@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-codeblock-vue",
-  "version": "2.9.26",
+  "version": "2.9.27",
   "description": "代码块 Vue",
   "keywords": [
     "codeblock",
@@ -38,8 +38,8 @@
     "@vue/compiler-sfc": "^3.2.9"
   },
   "peerDependencies": {
-	  "@aomao/engine": "^2.9.25",
-	  "ant-design-vue": "^2.2.6",
-	  "vue": "^3.2.9"
+    "@aomao/engine": "^2.9.25",
+    "ant-design-vue": "^2.2.6",
+    "vue": "^3.2.9"
   }
 }

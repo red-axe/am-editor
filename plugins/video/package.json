@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-video",
-    "version": "2.9.26",
+    "version": "2.9.27",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
@@ -22,7 +22,7 @@
     "dependencies": {
         "@babel/runtime": "^7.13.10"
     },
-	"peerDependencies": {
-		"@aomao/engine": "^2.9.25"
-	}
+    "peerDependencies": {
+        "@aomao/engine": "^2.9.25"
+    }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-codeblock",
-  "version": "2.9.26",
+  "version": "2.9.27",
   "description": "代码块",
   "keywords": [
     "codeblock",
@@ -40,7 +40,7 @@
     "@types/markdown-it": "^12.2.3"
   },
   "peerDependencies": {
-	  "@aomao/engine": "^2.9.25",
-	  "antd": "^4.14.1"
+    "@aomao/engine": "^2.9.25",
+    "antd": "^4.14.1"
   }
 }

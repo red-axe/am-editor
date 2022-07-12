@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-link",
-  "version": "2.9.26",
+  "version": "2.9.27",
   "description": "> TODO: description",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -31,9 +31,9 @@
     "@types/markdown-it": "^12.2.3"
   },
   "peerDependencies": {
-	  "@aomao/engine": "^2.9.25",
-	  "react-dom": "^17.0.2",
-	  "react": "^17.0.1",
-	  "antd": "^4.12.3"
+    "@aomao/engine": "^2.9.25",
+    "antd": "^4.12.3",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.2"
   }
 }

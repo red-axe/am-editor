@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-mark-range",
-    "version": "2.9.25",
+    "version": "2.9.26",
     "description": "范围标记",
     "publishConfig": {
         "access": "public"
@@ -28,7 +28,7 @@
         "@types/tinycolor2": "^1.4.2",
         "tinycolor2": "^1.4.2"
     },
-	"peerDependencies": {
-		"@aomao/engine": "^2.9.25"
-	}
+    "peerDependencies": {
+        "@aomao/engine": "^2.9.25"
+    }
 }

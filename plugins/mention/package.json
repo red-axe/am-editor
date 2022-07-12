@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-mention",
-    "version": "2.9.27",
+    "version": "2.9.28",
     "description": "提到 @",
     "publishConfig": {
         "access": "public"
@@ -27,7 +27,7 @@
         "@babel/runtime": "^7.13.10",
         "keymaster": "^1.6.2"
     },
-	"peerDependencies": {
-		"@aomao/engine": "^2.9.25"
-	}
+    "peerDependencies": {
+        "@aomao/engine": "^2.9.25"
+    }
 }

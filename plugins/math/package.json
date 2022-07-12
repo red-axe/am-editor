@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-math",
-  "version": "2.9.25",
+  "version": "2.9.26",
   "description": "Math（数学公式）",
   "keywords": [
     "Math"
@@ -31,6 +31,6 @@
     "@types/lodash": "^4.14.178"
   },
   "peerDependencies": {
-	  "@aomao/engine": "^2.9.25"
+    "@aomao/engine": "^2.9.25"
   }
 }

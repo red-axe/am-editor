@@ -1,6 +1,6 @@
 {
     "name": "@aomao/toolbar-vue",
-    "version": "2.9.27",
+    "version": "2.9.28",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
@@ -31,9 +31,9 @@
         "@types/tinycolor2": "^1.4.2",
         "@vue/compiler-sfc": "^3.2.9"
     },
-	"peerDependencies": {
-		"@aomao/engine": "^2.9.25",
-		"vue": "^3.2.9",
-		"ant-design-vue": "^2.2.6"
-	}
+    "peerDependencies": {
+        "@aomao/engine": "^2.9.25",
+        "ant-design-vue": "^2.2.6",
+        "vue": "^3.2.9"
+    }
 }
