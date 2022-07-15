@@ -510,6 +510,13 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			if (callback) {
 				table = callback(table, value);
 			}
+
+			//添加table的容器id; table 添加外部包裹div;用于table过长导致 文本溢出
+			const tableId = table.attributes('data-id') + '-table';
+			table = $(
+				`<div class="editor-table-wrapper" style='width:100%;overflow:auto;' data-id='${tableId}'>`,
+			).append(table);
+
 			node.replaceWith(table);
 			results.push(table);
 		});
