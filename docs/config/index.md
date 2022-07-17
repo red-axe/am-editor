@@ -242,10 +242,13 @@ After rendering, `View` loses all editing capabilities and collaboration capabil
 
 ```ts
 const engine = new Engine(container, {
-	iconFonts: {
-		url: '//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645',
-		format: 'woff2',
-	},
+	iconFonts: [
+		{
+			url: '//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645',
+			format: 'woff2',
+			// ...
+		},
+	],
 	// or
 	iconFonts:
 		"url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645') format('woff2'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff?t=1638071536645') format('woff'), url('//at.alicdn.com/t/font_1456030_lnqmc6a6ca.ttf?t=1638071536645') format('truetype')",
