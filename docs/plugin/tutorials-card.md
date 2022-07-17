@@ -148,7 +148,7 @@ export default class extends Plugin<Options> {
 	}
 	// hotkey
 	hotkey() {
-		return this.options.hotkey || 'mod+shift+0';
+		return this.options.hotkey || 'mod+shift+f';
 	}
 	// Add the required schema when pasting
 	pasteSchema(schema: SchemaInterface) {
@@ -286,6 +286,119 @@ class Test extends Card {
 	}
 }
 export default Test;
+export type { TestValue };
+```
+
+Test Plugin file, main functions: unpacking, converting/parsing package
+
+`test/index.ts`
+
+```ts
+import {
+	$,
+	Plugin,
+	NodeInterface,
+	CARD_KEY,
+	isEngine,
+	SchemaInterface,
+	PluginOptions,
+	decodeCardValue,
+	encodeCardValue,
+} from '@aomao/engine';
+import TestComponent from './component';
+import type { TestValue } from './component';
+
+export interface Options extends PluginOptions {
+	hotkey?: string | Array<string>;
+}
+export default class extends Plugin<Options> {
+	static get pluginName() {
+		return 'test';
+	}
+	// initialization
+	init() {
+		// Listen for events parsed into html
+		this.editor.on('parse:html', this.parseHtml);
+		// Set the entrance of the schema rule when monitoring and pasting
+		this.editor.on('paste:schema', this.pasteSchema);
+		// monitor the node loop when pasting
+		this.editor.on('paste:each', this.pasteHtml);
+	}
+	// execution method
+	execute() {
+		if (!isEngine(this.editor)) return;
+		const { card } = this.editor;
+		card.insert<TestValue>(TestComponent.cardName, {
+			text: 'This is card value',
+		});
+	}
+	// hotkey
+	hotkey() {
+		return this.options.hotkey || 'mod+shift+f';
+	}
+	// Add the required schema when pasting
+	pasteSchema = (schema: SchemaInterface) => {
+		schema.add({
+			type: 'block',
+			name: 'div',
+			attributes: {
+				'data-type': {
+					required: true,
+					value: TestComponent.cardName,
+				},
+				'data-value': '*',
+			},
+		});
+	};
+	// parse the pasted html
+	pasteHtml = (node: NodeInterface) => {
+		if (!isEngine(this.editor)) return;
+		if (node.isElement()) {
+			const type = node.attributes('data-type');
+			if (type === TestComponent.cardName) {
+				const value = node.attributes('data-value');
+				const cardValue = decodeCardValue(value);
+				this.editor.card.replaceNode(
+					node,
+					TestComponent.cardName,
+					cardValue,
+				);
+				node.remove();
+				return false;
+			}
+		}
+		return true;
+	};
+	// parse into html
+	parseHtml = (root: NodeInterface) => {
+		root.find(
+			`[${CARD_KEY}="${TestComponent.cardName}"],[${READY_CARD_KEY}="${TestComponent.cardName}"]`,
+		).each((cardNode) => {
+			const node = $(cardNode);
+			const card = this.editor.card.find<TestValue, TestComponent>(node);
+			const value = card?.getValue();
+			if (value) {
+				node.empty();
+				const div = $(
+					`<div data-type="${
+						TestComponent.cardName
+					}" data-value="${encodeCardValue(value)}">${
+						value.text
+					}</div>`,
+				);
+				node.replaceWith(div);
+			} else node.remove();
+		});
+	};
+	// destroy event binding
+	destroy() {
+		this.editor.off('parse:html', this.parseHtml);
+		this.editor.off('paste:schema', this.pasteSchema);
+		this.editor.off('paste:each', this.pasteHtml);
+	}
+}
+export { TestComponent };
+export type { TestValue };
 ```
 
 Use card plugins
@@ -328,7 +441,7 @@ const EngineDemo = () => {
 export default EngineDemo;
 ```
 
-Use the shortcut key `mod+shift+0` defined in `test/index.ts` to insert the card component just defined in the editor
+Use the shortcut key `mod+shift+f` defined in `test/index.ts` to insert the card component just defined in the editor
 
 ### Vue2 rendering
 

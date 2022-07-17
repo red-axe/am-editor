@@ -252,7 +252,7 @@ export default class extends Plugin<Options> {
 	}
 	// 快捷键
 	hotkey() {
-		return this.options.hotkey || 'mod+shift+0';
+		return this.options.hotkey || 'mod+shift+f';
 	}
 	// 粘贴的时候添加需要的 schema
 	pasteSchema = (schema: SchemaInterface) => {
@@ -362,7 +362,7 @@ const EngineDemo = () => {
 export default EngineDemo;
 ```
 
-使用 `test/index.ts` 中定义的快捷键 `mod+shift+0` 就能在编辑器中插入刚才定义的卡片组件了
+使用 `test/index.ts` 中定义的快捷键 `mod+shift+f` 就能在编辑器中插入刚才定义的卡片组件了
 
 ### Vue2 渲染
 
