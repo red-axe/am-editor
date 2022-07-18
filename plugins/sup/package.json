@@ -20,11 +20,13 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@aomao/engine": "^2.9.26",
     "@babel/runtime": "^7.13.10",
     "markdown-it-sup": "^1.0.0"
   },
   "devDependencies": {
     "@types/markdown-it": "^12.2.3"
+  },
+  "peerDependencies": {
+	"@aomao/engine": "^2.9.26"
   }
 }
