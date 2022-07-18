@@ -157,7 +157,11 @@ export default class<
 			) {
 				const newNode = node.wrap(
 					child,
-					$(`<${this.tagName} target="_blank" href="${text}"></a>`),
+					$(
+						`<${this.tagName} target="_blank" href="${text
+							.trim()
+							.replace(/\u200b/g, '')}"></a>`,
+					),
 				);
 				inline.repairCursor(newNode);
 				return false;
