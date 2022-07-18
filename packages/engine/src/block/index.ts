@@ -81,9 +81,18 @@ class Block implements BlockModelInterface {
 		if (tokens.length === 0) return;
 		const content = convertMarkdown(editor, markdown, tokens, false);
 		if (content) {
+			const children = blockNode.children();
 			event.preventDefault();
 			range.select(blockNode, true);
 			change.paste(content, range);
+			const newBlock = this.closest(range.startNode);
+			if (!newBlock.isRoot() && !newBlock.isCard()) {
+				children.each((child, i) => {
+					if (i > 0) {
+						newBlock.append(child);
+					}
+				});
+			}
 			change.rangePathBeforeCommand = cacheRange;
 			change.range.select(range);
 			return false;
