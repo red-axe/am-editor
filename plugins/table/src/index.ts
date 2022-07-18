@@ -36,6 +36,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		editor.schema.add(this.schema());
 		editor.conversion.add('th', 'td');
 		editor.on('parse:html', this.parseHtml);
+		editor.on('paste:each', this.pasteEach);
 		editor.on('paste:each-after', this.pasteHtml);
 		editor.on('paste:schema', this.pasteSchema);
 		if (isEngine(editor)) {
@@ -220,7 +221,8 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				blockSchema.allowIn.push('td');
 			}
 		});
-		schema.find((r) => r.name === 'table')[0].attributes = {
+		const table = schema.find((r) => r.name === 'table')[0];
+		table.attributes = {
 			class: ['data-table'],
 			'data-table-no-border': '*',
 			'data-wdith': '@length',
@@ -229,6 +231,15 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				background: '@color',
 				'background-color': '@color',
 			},
+		};
+		const allowIn = (table as SchemaBlock).allowIn;
+		if (!allowIn) {
+			(table as SchemaBlock).allowIn = ['div'];
+		} else {
+			allowIn.push('div');
+		}
+		schema.find((r) => r.name === 'div')[0].attributes = {
+			class: ['editor-table-wrapper'],
 		};
 		schema.find((r) => r.name === 'tr')[0].attributes = {
 			class: ['data-table'],
@@ -282,6 +293,16 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		}
 		return value;
 	}
+
+	pasteEach = (node: NodeInterface) => {
+		if (
+			node.name === 'div' &&
+			node.hasClass('editor-table-wrapper') &&
+			node.first()?.name === 'table'
+		) {
+			this.editor.node.unwrap(node);
+		}
+	};
 
 	pasteHtml = (root: NodeInterface) => {
 		const editor = this.editor;
