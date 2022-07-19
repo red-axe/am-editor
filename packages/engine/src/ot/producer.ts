@@ -89,6 +89,7 @@ export default class Producer extends EventEmitter2 {
 		path: Path,
 		oldAttributes: Record<string, any>,
 		newAttributes: Record<string, any>,
+		isLoadingCard: boolean = false,
 	) {
 		const ops: TargetOp[] = [];
 		const oId = id === 'root' ? '' : id;
@@ -101,6 +102,7 @@ export default class Producer extends EventEmitter2 {
 				if (newAttr !== oldAttributes[key]) {
 					ops.push({
 						id: oId,
+						nl: isLoadingCard,
 						bi: oBi,
 						p: newPath,
 						oi: newAttr,
@@ -113,6 +115,7 @@ export default class Producer extends EventEmitter2 {
 			if (newAttr !== oldAttr) {
 				ops.push({
 					id: oId,
+					nl: isLoadingCard,
 					bi: oBi,
 					p: newPath,
 					od: oldAttr,
@@ -125,6 +128,7 @@ export default class Producer extends EventEmitter2 {
 			if (!newAttributes.hasOwnProperty(key)) {
 				ops.push({
 					id: oId,
+					nl: isLoadingCard,
 					bi: oBi,
 					p: path.concat(JSON0_INDEX.ATTRIBUTE, key),
 					od: oldAttributes[key],
@@ -148,6 +152,7 @@ export default class Producer extends EventEmitter2 {
 		path: Path,
 		newText: string,
 		oldChildren: any[],
+		isLoadingCard: boolean = false,
 	) => {
 		const ops: TargetOp[] = [];
 		const oldText = oldChildren[0];
@@ -163,6 +168,7 @@ export default class Producer extends EventEmitter2 {
 						Object.assign({}, tOps[i], {
 							id: oId,
 							bi: oBi,
+							nl: isLoadingCard,
 						}),
 					);
 				}
@@ -174,6 +180,7 @@ export default class Producer extends EventEmitter2 {
 			newPath[newPath.length - 1] = c + JSON0_INDEX.ELEMENT;
 			ops.push({
 				id: oId,
+				nl: isLoadingCard,
 				bi: oBi,
 				p: newPath,
 				ld: oldChild,
@@ -182,6 +189,7 @@ export default class Producer extends EventEmitter2 {
 		if (!isText)
 			ops.push({
 				id: oId,
+				nl: isLoadingCard,
 				bi: oBi,
 				p: path,
 				li: newText,
@@ -217,18 +225,18 @@ export default class Producer extends EventEmitter2 {
 		path: Path,
 		oldChildren: any[],
 		newChildren: any[],
+		isLoadingCard: boolean = false,
 	) => {
 		const ops: TargetOp[] = [];
 		const oId = id === 'root' ? '' : id;
 		const oBi = id === 'root' ? -1 : beginIndex;
-
-		if (this.isLoadingCard(newChildren)) return [];
 		// 2.1 旧节点没有子节点数据
 		if (oldChildren.length === 0) {
 			// 全部插入
 			for (let c = 0; c < newChildren.length; c++) {
 				ops.push({
 					id,
+					nl: isLoadingCard,
 					bi: oBi,
 					p: path.concat(c + JSON0_INDEX.ELEMENT),
 					li: newChildren[c],
@@ -243,6 +251,7 @@ export default class Producer extends EventEmitter2 {
 				for (let c = oldChildren.length - 1; c >= 0; c--) {
 					ops.push({
 						id: oId,
+						nl: isLoadingCard,
 						bi: oBi,
 						p: path.concat(c + JSON0_INDEX.ELEMENT),
 						ld: oldChildren[c],
@@ -261,6 +270,7 @@ export default class Producer extends EventEmitter2 {
 						path.concat(JSON0_INDEX.ELEMENT),
 						newChildren[0],
 						oldChildren,
+						isLoadingCard,
 					),
 				);
 			}
@@ -290,6 +300,7 @@ export default class Producer extends EventEmitter2 {
 						if (!newChild) {
 							ops.push({
 								id: oId,
+								nl: isLoadingCard,
 								bi: oBi,
 								p: path.concat(c + JSON0_INDEX.ELEMENT),
 								ld: oldChild,
@@ -308,6 +319,7 @@ export default class Producer extends EventEmitter2 {
 						if (!oldChild) {
 							ops.push({
 								id,
+								nl: isLoadingCard,
 								bi: oBi,
 								p: path.concat(c + JSON0_INDEX.ELEMENT),
 								li: newChild,
@@ -333,10 +345,9 @@ export default class Producer extends EventEmitter2 {
 									newPath,
 									oldAttributes,
 									newAttributes,
+									isLoadingCard,
 								),
 							);
-							// 过滤掉正在渲染的卡片，不再遍历子节点
-							if (this.isLoadingCard(newChild)) continue;
 							// 比较子节点
 							ops.push(
 								...this.handleChildren(
@@ -345,6 +356,7 @@ export default class Producer extends EventEmitter2 {
 									newPath,
 									oldChild.slice(JSON0_INDEX.ELEMENT),
 									newChild.slice(JSON0_INDEX.ELEMENT),
+									isLoadingCard,
 								),
 							);
 						}
@@ -361,6 +373,7 @@ export default class Producer extends EventEmitter2 {
 						) {
 							ops.push({
 								id: oId,
+								nl: isLoadingCard,
 								bi: oBi,
 								p: path.concat(c + JSON0_INDEX.ELEMENT),
 								ld: oldChildren[c],
@@ -375,6 +388,7 @@ export default class Producer extends EventEmitter2 {
 						if (!oldChild) {
 							ops.push({
 								id,
+								nl: isLoadingCard,
 								bi: oBi,
 								p: path.concat(c + JSON0_INDEX.ELEMENT),
 								li: newChild,
@@ -404,10 +418,9 @@ export default class Producer extends EventEmitter2 {
 										newPath,
 										oldAttributes,
 										newAttributes,
+										isLoadingCard,
 									),
 								);
-								// 过滤掉正在渲染的卡片，不再遍历子节点
-								if (this.isLoadingCard(newChild)) continue;
 								// 比较子节点
 								ops.push(
 									...this.handleChildren(
@@ -416,18 +429,21 @@ export default class Producer extends EventEmitter2 {
 										newPath,
 										oldChild.slice(JSON0_INDEX.ELEMENT),
 										newChild.slice(JSON0_INDEX.ELEMENT),
+										isLoadingCard,
 									),
 								);
 							} else {
 								// 直接替换旧节点
 								ops.push({
 									id: oId,
+									nl: isLoadingCard,
 									bi: oBi,
 									p: path.concat(c + JSON0_INDEX.ELEMENT),
 									ld: oldChild,
 								});
 								ops.push({
 									id,
+									nl: isLoadingCard,
 									bi: oBi,
 									p: path.concat(c + JSON0_INDEX.ELEMENT),
 									li: newChild,
@@ -534,6 +550,7 @@ export default class Producer extends EventEmitter2 {
 		if (!oldValue) return [];
 		// 比较新旧数据
 		const { path } = oldValue;
+		const isLoadingCard = this.isLoadingCard(newJson);
 		// 1. 根节点属性变更
 		if (id !== 'root') {
 			const newAttributes = newJson[JSON0_INDEX.ATTRIBUTE] as Record<
@@ -548,10 +565,10 @@ export default class Producer extends EventEmitter2 {
 					path,
 					oldAttributes,
 					newAttributes,
+					isLoadingCard,
 				),
 			);
 		}
-		if (this.isLoadingCard(newJson)) return ops;
 		// 2. 子节点变更
 		const newChildren = newJson.slice(2);
 		const oldChildren = Array.isArray(oldValue)
@@ -564,6 +581,7 @@ export default class Producer extends EventEmitter2 {
 				path ?? [],
 				oldChildren,
 				newChildren,
+				isLoadingCard,
 			),
 		);
 		return ops;

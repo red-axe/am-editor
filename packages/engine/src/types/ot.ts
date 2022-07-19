@@ -272,6 +272,7 @@ export type RemoteAttr = {
 export type TargetOp = Op & {
 	id?: string;
 	bi?: number;
+	nl?: boolean;
 };
 
 export type RepairOp = TargetOp & {
