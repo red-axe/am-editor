@@ -95,12 +95,12 @@ class Parser implements ParserInterface {
 			// <paragraph><div>foo</div></paragraph>
 			source = source
 				.replace(/<p(>|\s+[^>]*>)/gi, '<paragraph$1')
-				.replace(/<\/p>/gi, '</paragraph>');
+				.replace(/<\/p(>|\s+[^>]*>)/gi, '</paragraph$1');
 			source = transformCustomTags(source);
 			const doc = new DOMParser().parseFromString(source, 'text/html');
 			const html = doc.body.innerHTML
 				.replace(/<paragraph(>|\s+[^>]*>)/gi, '<p$1')
-				.replace(/<\/paragraph>/gi, '</p>');
+				.replace(/<\/paragraph(>|\s+[^>]*>)/gi, '</p$1');
 			this.root = $(`<div>${html}</div>`);
 		} else if (isNodeEntry(source)) {
 			this.root = source;
