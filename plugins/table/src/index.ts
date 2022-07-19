@@ -239,7 +239,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			allowIn.push('div');
 		}
 		schema.find((r) => r.name === 'div')[0].attributes = {
-			class: ['editor-table-wrapper'],
+			class: { required: true, value: ['editor-table-wrapper'] },
 		};
 		schema.find((r) => r.name === 'tr')[0].attributes = {
 			class: ['data-table'],
