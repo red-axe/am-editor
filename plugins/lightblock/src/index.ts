@@ -9,6 +9,7 @@ import {
 	decodeCardValue,
 	encodeCardValue,
 	READY_CARD_KEY,
+	Parser,
 } from '@aomao/engine';
 import locales from './locale';
 import LightblockComponent from './component';
@@ -95,7 +96,10 @@ export default class extends Plugin<LightblockOptions> {
 	};
 
 	renderHtml = (value: LightblockValue, cardName: string) => {
-		const htmlstring = value.text;
+		const htmlstring = new Parser(
+			value.html || value.text,
+			this.editor,
+		).toHTML();
 		return $(
 			`<div data-type="${cardName}" data-value="${encodeCardValue(
 				value,
