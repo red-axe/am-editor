@@ -78,6 +78,7 @@ export default (opts: {
 					'/plugin/plugin-image',
 					'/plugin/plugin-link',
 					'/plugin/plugin-line-height',
+					'/plugin/plugin-lightblock',
 					{
 						title: '@aomao/plugin-mark',
 						path: '/plugin/plugin-mark',

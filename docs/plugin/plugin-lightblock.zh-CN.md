@@ -5,7 +5,7 @@
 ## 安装
 
 ```bash
-$ yarn add @aomao/plugin-lightblock
+yarn add @aomao/plugin-lightblock
 ```
 
 添加到引擎
