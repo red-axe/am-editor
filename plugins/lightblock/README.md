@@ -12,7 +12,7 @@ $ yarn add @aomao/plugin-lightblock
 
 ```ts
 import Engine, { EngineInterface } from '@aomao/engine';
-import lightblock from '@aomao/plugin-removeformat';
+import lightblock from '@aomao/plugin-lightblock';
 
 new Engine(...,{ plugins:[lightblock] })
 ```

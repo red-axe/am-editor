@@ -228,5 +228,8 @@ export default {
 		searchEmtpy: {
 			title: '无匹配卡片',
 		},
+		lightblock: {
+			theme: '主题',
+		},
 	},
 };
