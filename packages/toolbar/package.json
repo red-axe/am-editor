@@ -21,12 +21,9 @@
     },
     "dependencies": {
         "@babel/runtime": "^7.13.10",
-        "antd": "^4.12.3",
         "classnames-es-ts": "^2.2.7",
         "keymaster": "^1.6.2",
         "lodash": "^4.17.21",
-        "react": "^17.0.1",
-        "react-dom": "^17.0.1",
         "tinycolor2": "^1.4.2"
     },
     "devDependencies": {
@@ -35,6 +32,9 @@
         "@types/tinycolor2": "^1.4.2"
     },
     "peerDependencies": {
-        "@aomao/engine": ">=2.9"
+        "@aomao/engine": ">=2.9",
+        "antd": "^4.12.3",
+		"react": ">=17.0.1",
+		"react-dom": ">=17.0.2"
     }
 }
