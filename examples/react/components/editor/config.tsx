@@ -80,7 +80,7 @@ import type { MentionOptions } from '@aomao/plugin-mention';
 import Embed, { EmbedComponent } from '@aomao/plugin-embed';
 // import type { EmbedOptions } from '@aomao/plugin-embed'
 import Test, { TestComponent } from './plugins/test';
-import Reminder, { ReminderComponent } from '@aomao/plugin-reminder';
+import Lightblock, { LightblockComponent } from '@aomao/plugin-lightblock';
 
 import {
 	ToolbarPlugin,
@@ -137,7 +137,7 @@ export const plugins: Array<PluginEntry> = [
 	Mention,
 	Embed,
 	Test,
-	Reminder,
+	Lightblock,
 ];
 
 export const cards: CardEntry[] = [
@@ -154,7 +154,7 @@ export const cards: CardEntry[] = [
 	MentionComponent,
 	TestComponent,
 	EmbedComponent,
-	ReminderComponent,
+	LightblockComponent,
 ];
 
 export const tableOptions: TableOptions = {
@@ -333,7 +333,7 @@ export const toolbarOptions: ToolbarOptions = (lang: string) => ({
 				'video-uploader',
 				'status',
 				{
-					name: 'remind',
+					name: 'lightblock',
 					icon: (
 						<span>
 							<svg

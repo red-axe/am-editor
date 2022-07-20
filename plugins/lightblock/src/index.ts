@@ -11,8 +11,8 @@ import {
 	READY_CARD_KEY,
 } from '@aomao/engine';
 import locales from './locale';
-import ReminderComponent from './component';
-import type { RemindValue } from './component';
+import LightblockComponent from './component';
+import type { LightblockValue } from './component';
 
 export interface Options extends PluginOptions {
 	hotkey?: string | Array<string>;
@@ -20,7 +20,7 @@ export interface Options extends PluginOptions {
 
 export default class extends Plugin<Options> {
 	static get pluginName() {
-		return 'remind';
+		return 'lightblock';
 	}
 	init() {
 		const editor = this.editor;
@@ -37,7 +37,7 @@ export default class extends Plugin<Options> {
 		if (!isEngine(editor) || editor.readonly) return;
 		const { card } = editor;
 
-		card.insert<RemindValue>(ReminderComponent.cardName, {
+		card.insert<LightblockValue>(LightblockComponent.cardName, {
 			borderColor: '#fed4a4',
 			backgroundColor: '#fff5eb',
 			text: 'light-block',
@@ -55,7 +55,7 @@ export default class extends Plugin<Options> {
 			attributes: {
 				'data-type': {
 					required: true,
-					value: ReminderComponent.cardName,
+					value: LightblockComponent.cardName,
 				},
 				'data-value': '*',
 			},
@@ -64,7 +64,7 @@ export default class extends Plugin<Options> {
 
 	pasteHtml = (node: NodeInterface) => {
 		const editor = this.editor;
-		const cardName = ReminderComponent.cardName;
+		const cardName = LightblockComponent.cardName;
 
 		if (!isEngine(editor) || editor.readonly) return;
 		if (node.isElement()) {
@@ -81,15 +81,16 @@ export default class extends Plugin<Options> {
 	};
 
 	parseHtml = (root: NodeInterface) => {
-		const cardName = ReminderComponent.cardName;
+		const cardName = LightblockComponent.cardName;
 
 		root.find(
 			`[${CARD_KEY}="${cardName}"],[${READY_CARD_KEY}="${cardName}"]`,
 		).each((cardNode) => {
 			const node = $(cardNode);
-			const card = this.editor.card.find<RemindValue, ReminderComponent>(
-				node,
-			);
+			const card = this.editor.card.find<
+				LightblockValue,
+				LightblockComponent
+			>(node);
 			const value = card?.getValue();
 			if (value) {
 				node.empty();
@@ -99,7 +100,7 @@ export default class extends Plugin<Options> {
 		});
 	};
 
-	renderHtml = (value: RemindValue, cardName: string) => {
+	renderHtml = (value: LightblockValue, cardName: string) => {
 		const htmlstring = value.text;
 		return $(
 			`<div data-type="${cardName}" data-value="${encodeCardValue(
@@ -116,5 +117,5 @@ export default class extends Plugin<Options> {
 		editor.off('paste:each', this.pasteHtml);
 	}
 }
-export { ReminderComponent };
-export type { RemindValue };
+export { LightblockComponent };
+export type { LightblockValue };

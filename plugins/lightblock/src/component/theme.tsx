@@ -1,3 +1,4 @@
+import React from 'react';
 import { useMemo, useState, useRef } from 'react';
 import { IThemeProp } from './types';
 import './style.css';
@@ -24,7 +25,6 @@ const colorMatch = {
 };
 
 export default function Theme({ value, language, onChange }: IThemeProp) {
-	console.log(language, '||||||');
 	const ref = useRef<HTMLDivElement>(null);
 	const { border, background } = colorMatch;
 	const { borderColor, backgroundColor } = value;
@@ -63,19 +63,19 @@ export default function Theme({ value, language, onChange }: IThemeProp) {
 
 	const renderContent = useMemo(() => {
 		return (
-			<div className="remind-theme-content" ref={ref}>
-				<div className="remind-theme-random" onClick={randomColor}>
+			<div className="lightblock-theme-content" ref={ref}>
+				<div className="lightblock-theme-random" onClick={randomColor}>
 					<span className="data-icon icon-reload">&#xe77f;</span>
 					{language['random']}
 				</div>
-				<div className="remind-theme-title">
+				<div className="lightblock-theme-title">
 					{language['borderColor']}
 				</div>
-				<div className="remind-theme-box">
+				<div className="lightblock-theme-box">
 					{border.map((color, key) => (
 						<span
 							key={color}
-							className={`remind-theme-box-item  ${
+							className={`lightblock-theme-box-item  ${
 								bdColor === color ? 'active' : ''
 							}`}
 							onClick={() => {
@@ -87,14 +87,14 @@ export default function Theme({ value, language, onChange }: IThemeProp) {
 					))}
 				</div>
 				<div style={{ height: '8px' }} />
-				<div className="remind-theme-title">
+				<div className="lightblock-theme-title">
 					{language['backgroundColor']}
 				</div>
-				<div className="remind-theme-box">
+				<div className="lightblock-theme-box">
 					{background.map((color) => (
 						<span
 							key={color}
-							className={`remind-theme-box-item ${
+							className={`lightblock-theme-box-item ${
 								bgColor === color ? 'active' : ''
 							}`}
 							onClick={() => {
@@ -110,7 +110,7 @@ export default function Theme({ value, language, onChange }: IThemeProp) {
 	}, [bdColor, bgColor]);
 
 	return (
-		<span className="remind-icon-theme">
+		<span className="lightblock-icon-theme">
 			<svg
 				className="icon"
 				viewBox="0 0 1024 1024"
@@ -126,18 +126,18 @@ export default function Theme({ value, language, onChange }: IThemeProp) {
 					p-id="1778"
 				></path>
 			</svg>
-			<div className="remind-theme-contain">{renderContent}</div>
+			<div className="lightblock-theme-contain">{renderContent}</div>
 		</span>
 	);
 }
 
-export const themeIcon = `<span class="remind-icon-theme">
+export const themeIcon = `<span class="lightblock-icon-theme">
 <svg class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1777" width="16" height="16">
 <path d="M515.100444 911.758222c-161.393778 0-260.494222-23.495111-302.990222-71.793778-22.442667-25.486222-21.333333-49.521778-20.48-56.291555 0.455111-6.030222 15.530667-189.923556 28.216889-275.655111-4.608-3.128889-14.392889-7.054222-20.053333-9.329778a229.831111 229.831111 0 0 1-13.880889-5.888c-18.716444-8.789333-57.571556-28.046222-57.571556-28.046222-48.298667-22.186667-76.942222-50.403556-83.996444-83.399111-5.660444-26.424889 3.982222-49.180444 14.876444-61.696 1.308444-1.479111 2.702222-2.872889 4.181334-4.124445l227.072-193.735111a39.907556 39.907556 0 0 1 63.800889 17.607111c24.888889 73.699556 97.024 84.736 137.841777 84.736 10.865778 0 17.777778-0.853333 17.834667-0.881778 3.441778-0.426667 7.111111-0.426667 10.552889 0.028445 0 0 6.769778 0.824889 17.265778 0.824889 40.021333 0 110.791111-10.979556 135.253333-84.565334a39.964444 39.964444 0 0 1 64.085333-17.607111l223.800889 193.735111c1.479111 1.28 2.872889 2.673778 4.124445 4.152889 10.780444 12.515556 20.280889 35.299556 14.592 61.639111-7.054222 32.824889-35.299556 60.984889-83.939556 83.626667 0 0.028444-37.489778 18.887111-55.694222 27.562667-4.096 1.934222-8.760889 3.868444-13.710222 5.888-5.518222 2.247111-15.104 6.144-19.598223 9.244444 12.572444 86.471111 27.392 269.880889 28.017778 277.703111 0.682667 5.006222 1.735111 29.184-20.878222 54.812445-42.325333 48.099556-140.032 71.452444-298.723556 71.452444z m-243.541333-125.354666c6.712889 7.936 48.952889 45.425778 243.541333 45.425777 192.227556 0 233.187556-37.575111 239.530667-45.312-2.986667-35.925333-16.384-195.242667-27.249778-268.686222-9.102222-61.582222 47.530667-84.593778 68.835556-93.240889 3.413333-1.393778 6.656-2.673778 9.472-4.010666 17.92-8.533333 55.096889-27.249778 55.153778-27.278223 24.462222-11.434667 34.474667-20.565333 38.4-25.287111l-175.36-151.779555c-52.792889 78.193778-144.355556 87.808-186.083556 87.808-9.927111 0-17.834667-0.540444-22.698667-0.967111a255.601778 255.601778 0 0 1-22.983111 0.967111c-42.325333 0-135.253333-9.671111-188.643555-88.291556l-178.488889 152.291556c4.067556 4.750222 14.108444 13.710222 37.831111 24.604444 1.137778 0.540444 38.855111 19.285333 57.059556 27.818667 2.872889 1.336889 6.172444 2.645333 9.642666 4.039111 21.589333 8.647111 78.904889 31.601778 69.660445 93.411555-11.178667 74.24-24.945778 236.344889-27.619556 268.487112z" fill="#595959" p-id="1778"></path>
 </svg>
 </span>`;
 
-export const ReminDIcon = () => {
+export const LightblockIcon = () => {
 	return (
 		<svg
 			viewBox="0 0 1024 1024"

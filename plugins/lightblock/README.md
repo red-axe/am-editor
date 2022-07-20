@@ -1,20 +1,20 @@
-# @aomao/plugin-reminder
+# @aomao/plugin-lightblock
 
 高亮块、提示框插件
 
 ## 安装
 
 ```bash
-$ yarn add @aomao/plugin-reminder
+$ yarn add @aomao/plugin-lightblock
 ```
 
 添加到引擎
 
 ```ts
 import Engine, { EngineInterface } from '@aomao/engine';
-import Reminder from '@aomao/plugin-removeformat';
+import lightblock from '@aomao/plugin-removeformat';
 
-new Engine(...,{ plugins:[Reminder] })
+new Engine(...,{ plugins:[lightblock] })
 ```
 
 ## 可选项
@@ -29,7 +29,7 @@ hotkey?: string | Array<string>;
 //使用配置
 new Engine(...,{
     config:{
-        "remind":{
+        "lightblock":{
             //修改快捷键
             hotkey:"快捷键"
         }
@@ -41,5 +41,5 @@ new Engine(...,{
 
 ```ts
 //使用 command 执行插件
-engine.command.execute('remind');
+engine.command.execute('lightblock');
 ```

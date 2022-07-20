@@ -1,6 +1,6 @@
 export default {
 	'en-US': {
-		remind: {
+		lightblock: {
 			theme: 'theme',
 			borderColor: 'border color',
 			backgroundColor: 'background color',
@@ -8,7 +8,7 @@ export default {
 		},
 	},
 	'zh-CN': {
-		remind: {
+		lightblock: {
 			theme: '主题',
 			borderColor: '边框颜色',
 			backgroundColor: '背景颜色',

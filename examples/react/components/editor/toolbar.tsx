@@ -96,7 +96,7 @@ const defaultItems: ToolbarItemProps = (lang: string) => {
 									'video-uploader',
 									'status',
 									{
-										name: 'remind',
+										name: 'lightblock',
 										icon: (
 											<span>
 												<svg

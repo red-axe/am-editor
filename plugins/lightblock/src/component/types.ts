@@ -1,14 +1,14 @@
 import { CardValue } from '@aomao/engine';
 
-export interface RemindValue extends CardValue {
+export interface LightblockValue extends CardValue {
 	borderColor: string;
 	backgroundColor: string;
 	text: string;
 	html?: string;
 }
 
-export interface IRemindProp {
-	value: RemindValue;
+export interface ILightblockProp {
+	value: LightblockValue;
 }
 
 interface IChangeParam {
@@ -18,6 +18,6 @@ interface IChangeParam {
 
 export interface IThemeProp {
 	language: { [key: string]: string };
-	value: RemindValue;
+	value: LightblockValue;
 	onChange?: (val: IChangeParam) => void;
 }

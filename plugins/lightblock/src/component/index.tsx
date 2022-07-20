@@ -1,3 +1,4 @@
+import React from 'react';
 import {
 	$,
 	Card,
@@ -8,13 +9,13 @@ import {
 	ToolbarItemOptions,
 } from '@aomao/engine';
 import ReactDOM from 'react-dom';
-import type { RemindValue } from './types';
-import Theme, { themeIcon, ReminDIcon } from './theme';
+import type { LightblockValue } from './types';
+import Theme, { themeIcon, LightblockIcon } from './theme';
 import './style.css';
 
-class Reminder extends Card<RemindValue> {
+class Lightblock extends Card<LightblockValue> {
 	static get cardName() {
-		return 'remind';
+		return 'lightblock';
 	}
 
 	static get cardType() {
@@ -29,7 +30,7 @@ class Reminder extends Card<RemindValue> {
 		return false;
 	}
 
-	contenteditable = ['div.remind-editor-container'];
+	contenteditable = ['div.lightblock-editor-container'];
 
 	#container?: NodeInterface;
 
@@ -37,7 +38,7 @@ class Reminder extends Card<RemindValue> {
 		if (!isEngine(this.editor) || this.editor.readonly) return [];
 
 		const value = this.getValue();
-		const language = this.editor.language.get('remind');
+		const language = this.editor.language.get('lightblock');
 
 		return [
 			{ type: 'dnd' },
@@ -48,7 +49,7 @@ class Reminder extends Card<RemindValue> {
 				title: language['theme'],
 				node: $(themeIcon),
 				didMount: (node) => {
-					if (node[0]) {
+					if (node?.get()) {
 						ReactDOM.render(
 							<Theme
 								language={language}
@@ -61,7 +62,7 @@ class Reminder extends Card<RemindValue> {
 									});
 								}}
 							/>,
-							node[0],
+							node?.get(),
 						);
 					}
 				},
@@ -74,7 +75,7 @@ class Reminder extends Card<RemindValue> {
 		const { borderColor, backgroundColor } = value;
 
 		this.#container = $(
-			`<div class="remind-container" style="border-color: ${borderColor};background-color:${backgroundColor};"><div class="remind-icon">...</div><div class="remind-editor-container"><br/></div></div>`,
+			`<div class="lightblock-container" style="border-color: ${borderColor};background-color:${backgroundColor};"><div class="lightblock-icon">...</div><div class="lightblock-editor-container"><br/></div></div>`,
 		);
 
 		return this.#container;
@@ -82,10 +83,12 @@ class Reminder extends Card<RemindValue> {
 
 	didRender() {
 		super.didRender();
-		const iconContainer = this.#container.find('div.remind-icon')[0];
+		const iconContainer = this.#container
+			?.find('div.lightblock-icon')
+			?.get();
 
 		if (iconContainer) {
-			ReactDOM.render(<ReminDIcon />, iconContainer);
+			ReactDOM.render(<LightblockIcon />, iconContainer);
 		}
 	}
 
@@ -93,9 +96,9 @@ class Reminder extends Card<RemindValue> {
 		super.destroy();
 		this.#container &&
 			ReactDOM.unmountComponentAtNode(
-				this.#container.find('div.remind-icon')[0],
+				this.#container.find('div.lightblock-icon')?.get(),
 			);
 	}
 }
-export default Reminder;
-export type { RemindValue };
+export default Lightblock;
+export type { LightblockValue };
