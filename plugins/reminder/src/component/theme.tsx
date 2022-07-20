@@ -2,13 +2,32 @@ import { useMemo, useState, useRef } from 'react';
 import { IThemeProp } from './types';
 import './style.css';
 
-export default function Theme({ value, onChange }: IThemeProp) {
+const colorMatch = {
+	border: [
+		'#eff0f1',
+		'#fbbfbc',
+		'#fed4a4',
+		'#fff67a',
+		'#b7edb1',
+		'#bacefd',
+		'#cdb2fa',
+	],
+	background: [
+		'#f2f3f5',
+		'#fef1f1',
+		'#fff5eb',
+		'#fefff0',
+		'#f0fbef',
+		'#f0f4ff',
+		'#f6f1fe',
+	],
+};
+
+export default function Theme({ value, language, onChange }: IThemeProp) {
+	console.log(language, '||||||');
 	const ref = useRef<HTMLDivElement>(null);
-	const {
-		colorMatch: { border, background },
-		borderColor,
-		backgroundColor,
-	} = value;
+	const { border, background } = colorMatch;
+	const { borderColor, backgroundColor } = value;
 	const [bdColor, setBdColor] = useState(borderColor);
 	const [bgColor, setBgColor] = useState(backgroundColor);
 
@@ -46,9 +65,12 @@ export default function Theme({ value, onChange }: IThemeProp) {
 		return (
 			<div className="remind-theme-content" ref={ref}>
 				<div className="remind-theme-random" onClick={randomColor}>
-					<span className="data-icon icon-reload">&#xe77f;</span>随机
+					<span className="data-icon icon-reload">&#xe77f;</span>
+					{language['random']}
 				</div>
-				<div className="remind-theme-title">边框颜色</div>
+				<div className="remind-theme-title">
+					{language['borderColor']}
+				</div>
 				<div className="remind-theme-box">
 					{border.map((color, key) => (
 						<span
@@ -65,7 +87,9 @@ export default function Theme({ value, onChange }: IThemeProp) {
 					))}
 				</div>
 				<div style={{ height: '8px' }} />
-				<div className="remind-theme-title">背景颜色</div>
+				<div className="remind-theme-title">
+					{language['backgroundColor']}
+				</div>
 				<div className="remind-theme-box">
 					{background.map((color) => (
 						<span

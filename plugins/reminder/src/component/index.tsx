@@ -51,6 +51,7 @@ class Reminder extends Card<RemindValue> {
 					if (node[0]) {
 						ReactDOM.render(
 							<Theme
+								language={language}
 								value={value}
 								onChange={(data) => {
 									this.setValue({ ...value, ...data });

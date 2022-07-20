@@ -3,10 +3,6 @@ import { CardValue } from '@aomao/engine';
 export interface RemindValue extends CardValue {
 	borderColor: string;
 	backgroundColor: string;
-	colorMatch: {
-		border: string[];
-		background: string[];
-	};
 	text: string;
 	html?: string;
 }
@@ -21,6 +17,7 @@ interface IChangeParam {
 }
 
 export interface IThemeProp {
+	language: { [key: string]: string };
 	value: RemindValue;
 	onChange?: (val: IChangeParam) => void;
 }

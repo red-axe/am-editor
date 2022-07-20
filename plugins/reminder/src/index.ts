@@ -36,29 +36,10 @@ export default class extends Plugin<Options> {
 
 		if (!isEngine(editor) || editor.readonly) return;
 		const { card } = editor;
+
 		card.insert<RemindValue>(ReminderComponent.cardName, {
 			borderColor: '#fed4a4',
 			backgroundColor: '#fff5eb',
-			colorMatch: {
-				border: [
-					'#eff0f1',
-					'#fbbfbc',
-					'#fed4a4',
-					'#fff67a',
-					'#b7edb1',
-					'#bacefd',
-					'#cdb2fa',
-				],
-				background: [
-					'#f2f3f5',
-					'#fef1f1',
-					'#fff5eb',
-					'#fefff0',
-					'#f0fbef',
-					'#f0f4ff',
-					'#f6f1fe',
-				],
-			},
 			text: 'light-block',
 		});
 	}
