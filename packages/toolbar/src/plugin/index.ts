@@ -42,6 +42,7 @@ const defaultConfig = (editor: EditorInterface): Config => {
 				'video-uploader',
 				'math',
 				'status',
+				'lightblock',
 			],
 		},
 	];
