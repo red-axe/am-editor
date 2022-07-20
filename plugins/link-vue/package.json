@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-link-vue",
-  "version": "2.9.28",
+  "version": "2.9.29",
   "description": "> TODO: description",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -29,8 +29,8 @@
   "devDependencies": {
     "@types/markdown-it": "^12.2.3",
     "@vue/compiler-sfc": "^3.2.9",
-	"ant-design-vue": ">=2.2.6",
-	"vue": ">=3.2.9"
+    "ant-design-vue": ">=2.2.6",
+    "vue": ">=3.2.9"
   },
   "peerDependencies": {
     "@aomao/engine": ">=2.9",

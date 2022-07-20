@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-codeblock",
-  "version": "2.9.27",
+  "version": "2.9.28",
   "description": "代码块",
   "keywords": [
     "codeblock",
@@ -36,9 +36,9 @@
     "@types/codemirror": "^5.60.0",
     "@types/lodash": "^4.14.178",
     "@types/markdown-it": "^12.2.3",
-	"antd": "^4.12.3",
-	"react": ">=17.0.1",
-	"react-dom": ">=17.0.2"
+    "antd": "^4.12.3",
+    "react": ">=17.0.1",
+    "react-dom": ">=17.0.2"
   },
   "peerDependencies": {
     "@aomao/engine": ">=2.9",
