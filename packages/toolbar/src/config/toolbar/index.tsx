@@ -469,6 +469,13 @@ export const getToolbarDefaultConfig = (
 							),
 							title: language['lightblock']['title'],
 							search: 'light,lightblock,高亮块',
+							onDisabled: () => {
+								// 有激活卡片 或者没有启用插件
+								return (
+									!!engine.card.active ||
+									!engine.command.queryEnabled('lightblock')
+								);
+							},
 						},
 						/**{
 							name: 'mind',
