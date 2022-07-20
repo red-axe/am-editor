@@ -229,7 +229,7 @@ export default {
 			title: '无匹配卡片',
 		},
 		lightblock: {
-			theme: '主题',
+			title: '高亮块',
 		},
 	},
 };

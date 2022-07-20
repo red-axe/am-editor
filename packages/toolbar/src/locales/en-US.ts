@@ -229,7 +229,7 @@ export default {
 			title: 'No matching card',
 		},
 		lightblock: {
-			theme: 'theme',
+			title: 'Lightblock',
 		},
 	},
 };

@@ -459,7 +459,7 @@ export const getToolbarDefaultConfig = (
 									</svg>
 								</span>
 							),
-							title: language['lightblock']['theme'],
+							title: language['lightblock']['title'],
 							search: 'light,lightblock,高亮块',
 						},
 						/**{
