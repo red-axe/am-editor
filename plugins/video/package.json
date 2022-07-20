@@ -23,6 +23,6 @@
         "@babel/runtime": "^7.13.10"
     },
     "peerDependencies": {
-        "@aomao/engine": "^2.9.25"
+        "@aomao/engine": ">=2.9"
     }
 }

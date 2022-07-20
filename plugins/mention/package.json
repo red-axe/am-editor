@@ -28,6 +28,6 @@
         "keymaster": "^1.6.2"
     },
     "peerDependencies": {
-        "@aomao/engine": "^2.9.25"
+        "@aomao/engine": ">=2.9"
     }
 }

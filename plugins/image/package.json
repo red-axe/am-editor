@@ -33,6 +33,6 @@
         "@types/photoswipe": "^4.1.1"
     },
     "peerDependencies": {
-        "@aomao/engine": "^2.9.25"
+        "@aomao/engine": ">=2.9"
     }
 }

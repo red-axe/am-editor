@@ -29,6 +29,6 @@
         "tinycolor2": "^1.4.2"
     },
     "peerDependencies": {
-        "@aomao/engine": "^2.9.25"
+        "@aomao/engine": ">=2.9"
     }
 }

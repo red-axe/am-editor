@@ -27,6 +27,6 @@
     "@types/markdown-it": "^12.2.3"
   },
   "peerDependencies": {
-    "@aomao/engine": "^2.9.25"
+    "@aomao/engine": ">=2.9"
   }
 }
