@@ -14,11 +14,11 @@ import locales from './locale';
 import LightblockComponent from './component';
 import type { LightblockValue } from './component';
 
-export interface Options extends PluginOptions {
+export interface LightblockOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
 }
 
-export default class extends Plugin<Options> {
+export default class extends Plugin<LightblockOptions> {
 	static get pluginName() {
 		return 'lightblock';
 	}

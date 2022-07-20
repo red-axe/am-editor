@@ -52,11 +52,11 @@ class Lightblock extends Card<LightblockValue> {
 					if (node?.get()) {
 						ReactDOM.render(
 							<Theme
-								language={language}
+								language={language as {}}
 								value={value}
 								onChange={(data) => {
 									this.setValue({ ...value, ...data });
-									this.#container.css({
+									this.#container?.css({
 										borderColor: data.border,
 										backgroundColor: data.background,
 									});
@@ -94,10 +94,10 @@ class Lightblock extends Card<LightblockValue> {
 
 	destroy() {
 		super.destroy();
-		this.#container &&
-			ReactDOM.unmountComponentAtNode(
-				this.#container.find('div.lightblock-icon')?.get(),
-			);
+		const iconEl = this.#container
+			?.find('div.lightblock-icon')
+			?.get<HTMLDivElement>();
+		if (iconEl) ReactDOM.unmountComponentAtNode(iconEl);
 	}
 }
 export default Lightblock;
