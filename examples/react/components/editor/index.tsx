@@ -127,7 +127,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 		cards: props.cards || cards,
 		config: {
 			...props.config,
-			...pluginConfig,
+			...pluginConfig(props.lang),
 		},
 		// 编辑器值改变事件
 		onChange: useCallback(
