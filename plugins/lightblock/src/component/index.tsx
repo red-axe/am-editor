@@ -11,7 +11,7 @@ import {
 } from '@aomao/engine';
 import ReactDOM from 'react-dom';
 import type { LightblockValue } from './types';
-import Theme, { themeIcon, LightblockIcon } from './theme';
+import Theme, { themeIcon } from './theme';
 import './style.css';
 
 class Lightblock extends Card<LightblockValue> {
