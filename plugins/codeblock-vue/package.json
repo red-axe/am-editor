@@ -35,7 +35,9 @@
   "devDependencies": {
     "@types/codemirror": "^5.60.0",
     "@types/lodash": "^4.14.178",
-    "@vue/compiler-sfc": "^3.2.9"
+    "@vue/compiler-sfc": "^3.2.9",
+	"ant-design-vue": ">=2.2.6",
+	"vue": ">=3.2.9"
   },
   "peerDependencies": {
     "@aomao/engine": ">=2.9",

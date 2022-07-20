@@ -29,7 +29,9 @@
         "@types/keymaster": "^1.6.28",
         "@types/lodash": "^4.14.178",
         "@types/tinycolor2": "^1.4.2",
-        "@vue/compiler-sfc": "^3.2.9"
+        "@vue/compiler-sfc": "^3.2.9",
+        "ant-design-vue": ">=2.2.6",
+        "vue": ">=3.2.9"
     },
     "peerDependencies": {
         "@aomao/engine": ">=2.9",
