@@ -46,7 +46,6 @@ class Lightblock extends Card<LightblockValue> {
 		return [
 			{ type: 'dnd' },
 			{ type: 'copy' },
-			{ type: 'delete' },
 			{
 				type: 'node',
 				title: language['theme'],
@@ -71,6 +70,8 @@ class Lightblock extends Card<LightblockValue> {
 					}
 				},
 			},
+			{ type: 'separator' },
+			{ type: 'delete' },
 		];
 	}
 
