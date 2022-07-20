@@ -14,9 +14,7 @@ import locales from './locale';
 import LightblockComponent from './component';
 import type { LightblockValue } from './component';
 
-export interface LightblockOptions extends PluginOptions {
-	hotkey?: string | Array<string>;
-}
+export interface LightblockOptions extends PluginOptions {}
 
 export default class extends Plugin<LightblockOptions> {
 	static get pluginName() {
@@ -42,10 +40,6 @@ export default class extends Plugin<LightblockOptions> {
 			backgroundColor: '#fff5eb',
 			text: 'light-block',
 		});
-	}
-
-	hotkey() {
-		return this.options.hotkey || 'mod+shift+0';
 	}
 
 	pasteSchema = (schema: SchemaInterface) => {
