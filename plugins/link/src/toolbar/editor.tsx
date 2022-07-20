@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { LanguageInterface } from '@aomao/engine';
-import Input from 'antd/es/input';
+import Input, { InputRef } from 'antd/es/input';
 import Button from 'antd/es/button';
 import classnames from 'classnames-es-ts';
 import 'antd/es/input/style';
@@ -11,7 +11,7 @@ export type LinkEditorProps = {
 	defaultText?: string;
 	defaultLink?: string;
 	className?: string;
-	onLoad?: (element: Input) => void;
+	onLoad?: (element: InputRef) => void;
 	onOk: (text: string, link: string) => void;
 };
 
@@ -26,7 +26,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 	const [text, setText] = useState(defaultText || '');
 	const [link, setLink] = useState(defaultLink || '');
 
-	const linkRef = useRef<Input>(null);
+	const linkRef = useRef<InputRef>(null);
 
 	useEffect(() => {
 		linkRef.current?.focus();
@@ -38,7 +38,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 			data-element="ui"
 			className={classnames('data-link-editor', className)}
 		>
-			<p>{language.get('link', 'text')}</p>
+			<p>{language.get('link', 'text').toString()}</p>
 			<p>
 				<Input
 					className="data-link-input"
@@ -51,7 +51,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 					}}
 				/>
 			</p>
-			<p>{language.get('link', 'link')}</p>
+			<p>{language.get('link', 'link').toString()}</p>
 			<p>
 				<Input
 					ref={linkRef}
@@ -71,7 +71,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({
 					onClick={() => onOk(text, link)}
 					disabled={link.trim() === ''}
 				>
-					{language.get('link', 'ok_button')}
+					{language.get('link', 'ok_button').toString()}
 				</Button>
 			</p>
 		</div>

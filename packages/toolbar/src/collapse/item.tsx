@@ -91,11 +91,13 @@ const CollapseItem: React.FC<CollapseItemProps> = (props) => {
 				{title && (
 					<div className="toolbar-collapse-item-text">
 						<div className="toolbar-collapse-item-title">
-							{title}
+							{typeof title === 'function' ? title() : title}
 						</div>
 						{description && (
 							<div className="toolbar-collapse-item-description">
-								{description}
+								{typeof description === 'function'
+									? description()
+									: description}
 							</div>
 						)}
 					</div>

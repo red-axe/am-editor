@@ -149,11 +149,9 @@ class CollapseComponent implements CollapseComponentInterface {
 		ReactDOM.render(
 			data.length === 0 ? (
 				<div className="data-toolbar-component-list-empty">
-					{this.engine.language.get(
-						'toolbar',
-						'searchEmtpy',
-						'title',
-					)}
+					{this.engine.language
+						.get('toolbar', 'searchEmtpy', 'title')
+						.toString()}
 				</div>
 			) : (
 				<Collapse

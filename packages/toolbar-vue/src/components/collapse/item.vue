@@ -20,7 +20,7 @@
                     {{title}}
                 </div>
                 <div v-if="description" class="toolbar-collapse-item-description">
-                    {{description}}
+                    {{typeof description === 'function' ? description() : description }}
                 </div>
             </div>
         </div>

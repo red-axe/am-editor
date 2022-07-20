@@ -48,13 +48,15 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
 					onSelect={triggerSelect}
 				/>
 				<span className="colorpicker-default-text">
-					{engine.language.get(
-						'toolbar',
-						'colorPicker',
-						defaultColor === 'transparent'
-							? 'nonFillText'
-							: 'defaultText',
-					)}
+					{engine.language
+						.get(
+							'toolbar',
+							'colorPicker',
+							defaultColor === 'transparent'
+								? 'nonFillText'
+								: 'defaultText',
+						)
+						.toString()}
 				</span>
 			</div>
 			{colors.map((data, index) => {
