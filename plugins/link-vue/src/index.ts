@@ -159,7 +159,9 @@ export default class<
 				const newNode = node.wrap(
 					child,
 					$(
-						`<${this.tagName} target="_blank" href="${text
+						`<${this.tagName} target="_blank" href="${decodeURI(
+							text,
+						)
 							.trim()
 							.replace(/\u200b/g, '')}"></a>`,
 					),
@@ -168,7 +170,14 @@ export default class<
 				return false;
 			}
 		} else if (child.name === 'a') {
+			const href = child.attributes('href');
 			child.attributes('target', '_blank');
+			child.attributes(
+				'href',
+				decodeURI(href)
+					.trim()
+					.replace(/\u200b/g, ''),
+			);
 		}
 		return true;
 	};
