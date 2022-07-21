@@ -113,7 +113,7 @@ const CollapseItem: React.FC<CollapseItemProps> = (props) => {
 					onClick={(event) => {
 						if (props.onClick) {
 							event.preventDefault();
-							props.onClick(event, name);
+							props.onClick(event, name, engine);
 						}
 					}}
 				>
