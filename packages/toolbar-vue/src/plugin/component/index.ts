@@ -106,7 +106,7 @@ class ToolbarComponent<V extends ToolbarValue = ToolbarValue> extends Card<V> {
 								? collapseItem.onDisabled()
 								: !editor.command.queryEnabled(name),
 						});
-					}
+					} else if (typeof item === 'object') items.push(item);
 				});
 				data.push({
 					title,

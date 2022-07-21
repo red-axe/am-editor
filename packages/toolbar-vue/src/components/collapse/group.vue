@@ -5,7 +5,7 @@
         v-for="item in items"
         :key="item.name"
         :engine="engine"
-        v-bind="{...omit(item, 'onClick')}"
+        v-bind="{...omit(item, 'onClick', 'onDisabled')}"
         :on-click="onClick"
         />
     </div>
