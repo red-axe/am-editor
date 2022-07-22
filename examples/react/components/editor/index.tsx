@@ -98,6 +98,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 	//用户主动保存
 	const userSave = useCallback(() => {
 		if (!engine.current) return;
+		console.log(engine.current.getHtml());
 		//获取异步的值，有些组件可能还在处理中，比如正在上传
 		engine.current
 			.getValueAsync(false, (pluginName, card) => {
