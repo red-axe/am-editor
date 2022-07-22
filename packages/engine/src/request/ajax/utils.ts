@@ -96,6 +96,6 @@ export const toQueryString = (
 	return values.join('&').replace(/%20/g, '+');
 };
 
-export const isFormData = (data: any) => {
+export const isFormData = (data: any): data is FormData => {
 	return typeof FormData !== 'undefined' && data instanceof FormData;
 };

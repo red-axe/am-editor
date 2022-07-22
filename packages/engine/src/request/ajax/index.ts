@@ -290,10 +290,12 @@ class Ajax implements AjaxInterface {
 		}
 		if (
 			(this.options.contentType?.indexOf('json') || -1) > -1 &&
-			typeof data === 'object'
+			typeof data === 'object' &&
+			!isFormData(data)
 		) {
 			data = JSON.stringify(data);
 		}
+
 		data =
 			processData !== false &&
 			data &&
