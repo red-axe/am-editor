@@ -79,7 +79,7 @@ console.log(engine.language.get<string>('test'));
 
 ### config
 
--   类型: `{ [key: string]: PluginOptions }`
+-   类型: `{ [key: string]: PluginOptions }` 或者 `(editor) => { [key: string]: PluginOptions }`
 -   默认值：`{}`
 -   详细：每个插件的配置项，key 为插件名称，详细配置请参考每个插件的说明。 [配置案例](https://github.com/yanmao-cc/am-editor/blob/master/examples/react/components/editor/config.tsx)
 

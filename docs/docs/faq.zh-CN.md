@@ -113,7 +113,7 @@ icon 图标是直接通过 [iconfont](https://at.alicdn.com/t/project/1456030/0c
 new Engine(container, {
 	config: {
 		codeblock: {
-			cardToolbars: (items) => {
+			cardToolbars: (items, editor) => {
 				console.log(items);
 				return items.filter((item) => item.key === 'copy');
 			},

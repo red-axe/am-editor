@@ -24,7 +24,7 @@ The main functions of the `ImageUploader` plugin: select images, upload images, 
 `onBeforeRender` Modify the image address before the image is rendered
 
 ```ts
-onBeforeRender?: (status:'uploading' |'done', src: string) => string;
+onBeforeRender?: (status:'uploading' |'done', src: string, editor: EditorInterface) => string;
 ```
 
 `enableResizer` Whether the image size can be modified by dragging, the default is true

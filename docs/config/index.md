@@ -79,7 +79,7 @@ console.log(engine.language.get<string>('test'));
 
 ### config
 
--   Type: `{ [key: string]: PluginOptions }`
+-   Type: `{ [key: string]: PluginOptions }` or `(editor) => { [key: string]: PluginOptions }`
 -   Default value: `{}`
 -   Detailed: the configuration item of each plugin, the key is the name of the plugin, please refer to the description of each plugin for detailed configuration. [Configuration example](https://github.com/yanmao-cc/am-editor/blob/master/examples/react/components/editor/config.tsx)
 

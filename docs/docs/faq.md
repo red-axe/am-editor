@@ -113,7 +113,7 @@ In the plugin configuration item of the card component, configure the `cardToolb
 new Engine(container, {
 	config: {
 		codeblock: {
-			cardToolbars: (items) => {
+			cardToolbars: (items, editor) => {
 				console.log(items);
 				return items.filter((item) => item.key === 'copy');
 			},

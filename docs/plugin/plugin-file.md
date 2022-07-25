@@ -24,7 +24,7 @@ new Engine(...,{ plugins:[ File, FileUploader], cards:[ FileComponent ]})
 `onBeforeRender` can modify the address when previewing nearby or downloading attachments
 
 ```ts
-onBeforeRender?: (action:'download' |'preview', url: string) => string;
+onBeforeRender?: (action:'download' |'preview', url: string, editor: EditorInterface) => string;
 ```
 
 `onDownload` Triggered when the download attachment is clicked, by default the address link is used to jump
