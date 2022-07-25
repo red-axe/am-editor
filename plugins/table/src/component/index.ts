@@ -680,11 +680,16 @@ class TableComponent<V extends TableValue = TableValue>
 	maximize() {
 		super.maximize();
 		this.scrollbar?.refresh();
+		const { editor } = this;
+		if (isEngine(editor) && !isMobile) {
+			this.getCenter().on('scroll', this.updateScrollbar);
+		}
 	}
 
 	minimize() {
 		super.minimize();
 		this.scrollbar?.refresh();
+		this.getCenter().off('scroll', this.updateScrollbar);
 	}
 
 	getSelectionNodes() {
