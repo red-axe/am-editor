@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-mention",
-    "version": "2.9.29",
+    "version": "2.9.30",
     "description": "提到 @",
     "publishConfig": {
         "access": "public"
