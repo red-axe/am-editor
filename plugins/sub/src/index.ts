@@ -7,6 +7,7 @@ import {
 	PluginOptions,
 } from '@aomao/engine';
 import type MarkdownIt from 'markdown-it';
+import mdSub from 'markdown-it-sub';
 
 export interface SubOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
@@ -61,7 +62,7 @@ export default class<T extends SubOptions = SubOptions> extends MarkPlugin<T> {
 
 	markdownIt = (mardown: MarkdownIt) => {
 		if (this.options.markdown !== false) {
-			mardown.use(require('markdown-it-sub'));
+			mardown.use(mdSub);
 			mardown.enable('sub');
 		}
 	};

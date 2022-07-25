@@ -1,5 +1,6 @@
 import { isEngine, MarkPlugin, PluginOptions } from '@aomao/engine';
 import type MarkdownIt from 'markdown-it';
+import mdMark from 'markdown-it-mark';
 import './index.css';
 
 export interface MarkOptions extends PluginOptions {
@@ -30,7 +31,7 @@ export default class<
 
 	markdownIt = (mardown: MarkdownIt) => {
 		if (this.options.markdown !== false) {
-			mardown.use(require('markdown-it-mark'));
+			mardown.use(mdMark);
 			mardown.enable('mark');
 		}
 	};

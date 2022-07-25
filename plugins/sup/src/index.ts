@@ -7,6 +7,7 @@ import {
 	PluginOptions,
 } from '@aomao/engine';
 import type MarkdownIt from 'markdown-it';
+import mdSup from 'markdown-it-sup';
 
 export interface SupOptions extends PluginOptions {
 	hotkey?: string | Array<string>;
@@ -62,7 +63,7 @@ export default class<T extends SupOptions = SupOptions> extends MarkPlugin<T> {
 
 	markdownIt = (mardown: MarkdownIt) => {
 		if (this.options.markdown !== false) {
-			mardown.use(require('markdown-it-sup'));
+			mardown.use(mdSup);
 			mardown.enable('sup');
 		}
 	};
