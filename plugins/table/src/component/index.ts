@@ -106,7 +106,7 @@ class TableComponent<V extends TableValue = TableValue>
 
 					const range = change.range.get();
 					const td = range.endNode.closest('td');
-					if (td.length === 0) return;
+					if (td.length === 0 || !td.inEditor()) return;
 					const component = card.closest(td, true);
 					if (!component?.equal(this.root)) return;
 					const closestBlock = block.closest(range.endNode);
@@ -153,7 +153,7 @@ class TableComponent<V extends TableValue = TableValue>
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
-				if (td.length === 0) return;
+				if (td.length === 0 || !td.inEditor()) return;
 				const component = card.closest(td, true);
 				if (!component?.equal(this.root)) return;
 				const contentElement = td.find('.table-main-content');
@@ -221,7 +221,7 @@ class TableComponent<V extends TableValue = TableValue>
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
-				if (td.length === 0) return;
+				if (td.length === 0 || !td.inEditor()) return;
 				const component = card.closest(td, true);
 				if (!component?.equal(this.root)) return;
 				const contentElement = td.find('.table-main-content');
@@ -288,7 +288,7 @@ class TableComponent<V extends TableValue = TableValue>
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
-				if (td.length === 0) return;
+				if (td.length === 0 || !td.inEditor()) return;
 				const component = card.closest(td, true);
 				if (!component?.equal(this.root)) return;
 				const contentElement = td.find('.table-main-content');
@@ -306,7 +306,7 @@ class TableComponent<V extends TableValue = TableValue>
 
 				const range = change.range.get();
 				const td = range.endNode.closest('td');
-				if (td.length === 0) return;
+				if (td.length === 0 || !td.inEditor()) return;
 				const component = card.closest(td, true);
 				if (!component?.equal(this.root)) return;
 				const contentElement = td.find('.table-main-content');

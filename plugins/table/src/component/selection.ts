@@ -576,7 +576,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		const { change } = editor;
 		const target = $(event.target);
 		const td = target.closest('td');
-		if (td.length === 0) return;
+		if (td.length === 0 || !td.inEditor()) return;
 		const range = change.range.get();
 		const [row, col] = this.getCellPoint(td);
 		const isSelection = !!td.attributes('table-cell-selection');
@@ -697,6 +697,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		const dragoverTd = $(event.target).closest('td');
 		if (
 			dragoverTd.length === 0 ||
+			!dragoverTd.inEditor() ||
 			(this.prevOverTd && dragoverTd.equal(this.prevOverTd))
 		)
 			return;
@@ -721,7 +722,7 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		if (!event.target || !this.tableModel || !isEngine(this.editor)) return;
 		//获取单元格节点
 		const td = $(event.target).closest('td');
-		if (td.length === 0) {
+		if (td.length === 0 || !td.inEditor()) {
 			return;
 		}
 		//获取单元格位置
