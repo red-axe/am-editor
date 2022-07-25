@@ -1,6 +1,7 @@
 import {
 	CardToolbarItemOptions,
 	CardValue,
+	EditorInterface,
 	PluginOptions,
 	ToolbarItemOptions,
 } from '@aomao/engine';
@@ -43,10 +44,15 @@ export interface FileValue extends CardValue {
 }
 
 export interface FileOptions extends PluginOptions {
-	onBeforeRender?: (action: 'preview' | 'download', url: string) => string;
+	onBeforeRender?: (
+		action: 'preview' | 'download',
+		url: string,
+		editor: EditorInterface,
+	) => string;
 	onDownload?: (url: string, value: FileValue) => void;
 	onPreview?: (url: string, value: FileValue) => void;
 	cardToolbars?: (
 		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+		editor: EditorInterface,
 	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }

@@ -1,5 +1,6 @@
 import {
 	CardToolbarItemOptions,
+	EditorInterface,
 	PluginOptions,
 	RequestData,
 	RequestHeaders,
@@ -37,5 +38,6 @@ export interface MathOptions extends PluginOptions {
 
 	cardToolbars?: (
 		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+		editor: EditorInterface,
 	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }

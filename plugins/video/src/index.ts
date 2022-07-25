@@ -195,13 +195,19 @@ export default class VideoPlugin<
 				}"  data-value="${encodeCardValue(
 					value,
 				)}"><video controls src="${sanitizeUrl(
-					onBeforeRender ? onBeforeRender('query', url) : url,
+					onBeforeRender
+						? onBeforeRender('query', url, this.editor)
+						: url,
 				)}" poster="${
 					!cover
 						? 'none'
 						: sanitizeUrl(
 								onBeforeRender
-									? onBeforeRender('cover', cover)
+									? onBeforeRender(
+											'cover',
+											cover,
+											this.editor,
+									  )
 									: cover,
 						  )
 				}" webkit-playsinline="webkit-playsinline" playsinline="playsinline" style="outline:none;" /></div>`;

@@ -137,7 +137,7 @@ export default class<T extends ImageOptions = ImageOptions> extends Plugin<T> {
 				let src = value.src;
 				const { onBeforeRender } = this.options;
 				if (onBeforeRender) {
-					src = onBeforeRender(value.status, value.src);
+					src = onBeforeRender(value.status, value.src, this.editor);
 				}
 				const type = node.attributes(CARD_TYPE_KEY);
 				img.attributes('src', src);

@@ -50,7 +50,7 @@ class Hr<T extends HrValue = HrValue> extends Card<T> {
 		};
 		const options = editor.plugin.findPlugin<HrOptions>('hr')?.options;
 		if (options?.cardToolbars) {
-			return options.cardToolbars(getItems());
+			return options.cardToolbars(getItems(), this.editor);
 		}
 		return getItems();
 	}

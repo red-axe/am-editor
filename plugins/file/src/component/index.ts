@@ -67,7 +67,7 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 		const filePlugin = this.editor.plugin.findPlugin<FileOptions>('file');
 		if (filePlugin) {
 			const { onBeforeRender } = filePlugin.options || {};
-			if (onBeforeRender) return onBeforeRender(action, url);
+			if (onBeforeRender) return onBeforeRender(action, url, this.editor);
 		}
 		return url;
 	};
@@ -143,7 +143,7 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 			return items;
 		};
 		if (options?.cardToolbars) {
-			return options.cardToolbars(getItems());
+			return options.cardToolbars(getItems(), this.editor);
 		}
 		return getItems();
 	}

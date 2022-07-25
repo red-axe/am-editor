@@ -116,7 +116,7 @@ export default class MathCard<T extends MathValue = MathValue> extends Card<T> {
 		const options =
 			this.editor.plugin.findPlugin<MathOptions>('math')?.options;
 		if (options?.cardToolbars) {
-			return options.cardToolbars([]);
+			return options.cardToolbars([], this.editor);
 		}
 		return [];
 	}

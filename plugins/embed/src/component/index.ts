@@ -122,7 +122,7 @@ class EmbedComponent<V extends EmbedValue = EmbedValue> extends Card<V> {
 		const options =
 			editor.plugin.findPlugin<EmbedOptions>('embed')?.options;
 		if (options?.cardToolbars) {
-			return options.cardToolbars(getItems());
+			return options.cardToolbars(getItems(), this.editor);
 		}
 		return getItems();
 	}

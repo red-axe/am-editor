@@ -1,3 +1,4 @@
+import { EditorInterface } from '@aomao/engine';
 import {
 	CardInterface,
 	CardToolbarItemOptions,
@@ -201,6 +202,7 @@ export interface TableOptions extends PluginOptions {
 	markdown?: boolean;
 	cardToolbars?: (
 		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+		editor: EditorInterface,
 	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }
 

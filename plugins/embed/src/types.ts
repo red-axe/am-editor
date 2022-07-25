@@ -1,6 +1,7 @@
 import {
 	CardToolbarItemOptions,
 	CardValue,
+	EditorInterface,
 	PluginOptions,
 	ToolbarItemOptions,
 } from '@aomao/engine';
@@ -20,5 +21,6 @@ export interface EmbedOptions extends PluginOptions {
 	renderBefore?: EmbedRenderBeforeEvent;
 	cardToolbars?: (
 		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+		editor: EditorInterface,
 	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }

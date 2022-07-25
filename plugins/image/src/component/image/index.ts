@@ -78,7 +78,11 @@ export type Options = {
 	 * @param src 图片地址
 	 * @returns 图片地址
 	 */
-	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
+	onBeforeRender?: (
+		status: 'uploading' | 'done',
+		src: string,
+		editor: EditorInterface,
+	) => string;
 	onChange?: (size?: Size, loaded?: boolean) => void;
 	onError?: () => void;
 	onLoad?: () => void;
@@ -145,7 +149,7 @@ class Image {
 			}<span class="data-icon data-icon-copy"></span></span>`;
 		}
 		const src = onBeforeRender
-			? onBeforeRender(this.status, this.options.src)
+			? onBeforeRender(this.status, this.options.src, this.editor)
 			: this.options.src;
 		const progress = `<span class="data-image-progress">
                             <i class="data-anticon">
@@ -397,7 +401,7 @@ class Image {
 	getSrc = () => {
 		const { onBeforeRender } = this.options;
 		return onBeforeRender && this.status !== 'error'
-			? onBeforeRender(this.status, this.src)
+			? onBeforeRender(this.status, this.src, this.editor)
 			: this.src;
 	};
 
@@ -438,7 +442,8 @@ class Image {
 					: imageHeight * winPixelRatio;
 				let src = value['src'];
 				const { onBeforeRender } = this.options;
-				if (onBeforeRender) src = onBeforeRender('done', src);
+				if (onBeforeRender)
+					src = onBeforeRender('done', src, this.editor);
 				const msrc = image.attributes('src');
 				imageArray.push({
 					src,

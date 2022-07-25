@@ -245,7 +245,7 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 		const options =
 			editor.plugin.findPlugin<CodeBlockOptions>('codeblock')?.options;
 		if (options?.cardToolbars) {
-			return options.cardToolbars(getItems());
+			return options.cardToolbars(getItems(), this.editor);
 		}
 		return getItems();
 	}

@@ -315,7 +315,7 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 		const options =
 			this.editor.plugin.findPlugin<MentionOptions>('mention')?.options;
 		if (options?.cardToolbars) {
-			return options.cardToolbars([]);
+			return options.cardToolbars([], this.editor);
 		}
 		return [];
 	}

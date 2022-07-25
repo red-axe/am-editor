@@ -196,7 +196,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 			this.editor.plugin.findPlugin<VideoOptions>('video');
 		if (videoPlugin) {
 			const { onBeforeRender } = videoPlugin.options || {};
-			if (onBeforeRender) return onBeforeRender(action, url);
+			if (onBeforeRender) return onBeforeRender(action, url, this.editor);
 		}
 		return url;
 	};
@@ -335,7 +335,7 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		const options =
 			editor.plugin.findPlugin<VideoOptions>('video')?.options;
 		if (options?.cardToolbars) {
-			return options.cardToolbars(getItems());
+			return options.cardToolbars(getItems(), this.editor);
 		}
 		return getItems();
 	}

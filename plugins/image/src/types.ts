@@ -1,6 +1,7 @@
 import {
 	CardToolbarItemOptions,
 	CardType,
+	EditorInterface,
 	NodeInterface,
 	PluginOptions,
 	ToolbarItemOptions,
@@ -41,7 +42,11 @@ export interface ImageOptions extends PluginOptions {
 	/**
 	 * 图片渲染前调用，可以在这里修改图片链接
 	 */
-	onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
+	onBeforeRender?: (
+		status: 'uploading' | 'done',
+		src: string,
+		editor: EditorInterface,
+	) => string;
 	/**
 	 * 是否启用大小拖动，默认为 true
 	 */
@@ -60,5 +65,6 @@ export interface ImageOptions extends PluginOptions {
 	maxHeight?: number;
 	cardToolbars?: (
 		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+		editor: EditorInterface,
 	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }

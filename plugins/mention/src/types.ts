@@ -1,6 +1,7 @@
 import {
 	CardInterface,
 	CardToolbarItemOptions,
+	EditorInterface,
 	NodeInterface,
 	PluginOptions,
 	ToolbarItemOptions,
@@ -65,5 +66,6 @@ export interface MentionOptions extends PluginOptions {
 
 	cardToolbars?: (
 		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+		editor: EditorInterface,
 	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }

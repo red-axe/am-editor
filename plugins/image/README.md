@@ -24,7 +24,7 @@ new Engine(...,{ plugins:[ Image , ImageUploader ] , cards:[ ImageComponent ]})
 `onBeforeRender` 图片渲染前对图片地址进行修改
 
 ```ts
-onBeforeRender?: (status: 'uploading' | 'done', src: string) => string;
+onBeforeRender?: (status: 'uploading' | 'done', src: string, editor: EditorInterface) => string;
 ```
 
 `enableResizer` 图片大小是否可以拖动修改，默认为 true

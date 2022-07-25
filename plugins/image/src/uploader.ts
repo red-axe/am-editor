@@ -211,7 +211,8 @@ export default class<
 		const imagePlugin = this.editor.plugin.components['image'];
 		if (imagePlugin) {
 			const { onBeforeRender } = (imagePlugin['options'] || {}) as any;
-			if (onBeforeRender) return onBeforeRender(value.status, value.src);
+			if (onBeforeRender)
+				return onBeforeRender(value.status, value.src, this.editor);
 		}
 		return value.src;
 	}

@@ -43,7 +43,9 @@ export interface EditorOptions {
 	/**
 	 * 插件选项，每个插件具体选项请在插件查看
 	 */
-	config?: Record<string, PluginOptions>;
+	config?:
+		| Record<string, PluginOptions>
+		| ((editor: EditorInterface) => Record<string, PluginOptions>);
 	/**
 	 * 阅读器根节点，默认为阅读器所在节点的父节点
 	 */

@@ -1,5 +1,6 @@
 import {
 	CardToolbarItemOptions,
+	EditorInterface,
 	PluginOptions,
 	ToolbarItemOptions,
 } from '@aomao/engine';
@@ -9,5 +10,6 @@ export interface HrOptions extends PluginOptions {
 	markdown?: boolean;
 	cardToolbars?: (
 		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
+		editor: EditorInterface,
 	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
 }

@@ -256,7 +256,7 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 		const options =
 			editor.plugin.findPlugin<ImageOptions>('image')?.options;
 		if (options?.cardToolbars) {
-			return options.cardToolbars(getItems());
+			return options.cardToolbars(getItems(), this.editor);
 		}
 		return getItems();
 	}
@@ -307,7 +307,8 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 						editor.plugin.findPlugin<ImageOptions>('image');
 					if (imagePlugin) {
 						const { onBeforeRender } = imagePlugin.options || {};
-						if (onBeforeRender) return onBeforeRender(status, src);
+						if (onBeforeRender)
+							return onBeforeRender(status, src, this.editor);
 					}
 					return src;
 				},

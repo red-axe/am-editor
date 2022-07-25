@@ -489,7 +489,7 @@ class TableComponent<V extends TableValue = TableValue>
 		const options =
 			editor.plugin.findPlugin<TableOptions>('table')?.options;
 		if (options?.cardToolbars) {
-			return options.cardToolbars(getItems());
+			return options.cardToolbars(getItems(), this.editor);
 		}
 		return getItems();
 	}
