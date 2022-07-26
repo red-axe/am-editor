@@ -544,8 +544,10 @@ export default class<
 				return;
 			}
 			const imagePlugin = editor.plugin.findPlugin<ImageOptions>('image');
-			const width = node.attributes('width') ? node.css('width') : '';
-			const height = node.attributes('height') ? node.css('height') : '';
+			const attrWidth = attributes['width'];
+			const attrHeight = attributes['height'];
+			const width = attrWidth ? attrWidth : node.css('width');
+			const height = attrHeight ? attrHeight : node.css('height');
 			const dataTypeValue =
 				attributes['data-type'] || imagePlugin?.options.defaultType;
 			let type = CardType.INLINE;
