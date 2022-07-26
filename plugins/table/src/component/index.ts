@@ -561,6 +561,7 @@ class TableComponent<V extends TableValue = TableValue>
 	updateAlign(event: MouseEvent, align: 'top' | 'middle' | 'bottom' = 'top') {
 		event.preventDefault();
 		this.conltrollBar.setAlign(align);
+		this.onChange('local');
 		this.updateAlignText(align);
 	}
 
