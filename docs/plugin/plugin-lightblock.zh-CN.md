@@ -23,3 +23,10 @@ new Engine(...,{ plugins:[lightblock] })
 //使用 command 执行插件
 engine.command.execute('lightblock');
 ```
+
+## markdown
+
+```ts
+// 支持markdown快捷语法
+::: tip
+```

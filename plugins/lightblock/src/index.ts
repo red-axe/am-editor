@@ -12,8 +12,10 @@ import {
 	Parser,
 } from '@aomao/engine';
 import locales from './locale';
+import type MarkdownIt from 'markdown-it';
 import LightblockComponent from './component';
 import type { LightblockValue } from './component';
+import lightblockMk from './component/markdown';
 
 export interface LightblockOptions extends PluginOptions {}
 
@@ -28,6 +30,9 @@ export default class extends Plugin<LightblockOptions> {
 		editor.on('parse:html', this.parseHtml);
 		editor.on('paste:schema', this.pasteSchema);
 		editor.on('paste:each', this.pasteHtml);
+		if (isEngine(editor)) {
+			editor.on('markdown-it', this.markdownIt);
+		}
 	}
 
 	execute() {
@@ -42,6 +47,12 @@ export default class extends Plugin<LightblockOptions> {
 			text: 'light-block',
 		});
 	}
+
+	markdownIt = (markdown: MarkdownIt) => {
+		if (this.options.markdown !== false) {
+			lightblockMk(markdown);
+		}
+	};
 
 	pasteSchema = (schema: SchemaInterface) => {
 		schema.add({
