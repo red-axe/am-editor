@@ -23,3 +23,10 @@ new Engine(...,{ plugins:[lightblock] })
 // use command to execute the plugin
 engine.command.execute('lightblock');
 ```
+
+## Markdown
+
+```ts
+// use markdown syntax
+::: tip
+```

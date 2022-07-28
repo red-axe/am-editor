@@ -20,9 +20,11 @@
     "url": "https://github.com/yanmao-cc/am-editor/issues"
   },
   "dependencies": {
-    "@babel/runtime": "^7.13.10"
+    "@babel/runtime": "^7.13.10",
+    "markdown-it-container": "^3.0.0"
   },
   "devDependencies": {
+    "@types/markdown-it-container": "^2.0.5",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },
