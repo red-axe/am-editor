@@ -162,7 +162,7 @@ class Template implements TemplateInterface {
 					menuContent =
 						menuContent?.replace(
 							'$data',
-							`<input type='text' class="${MENUBAR_ITEM_INPUT_CALSS_NAME}" />`,
+							`<input type='text' maxlength="3" class="${MENUBAR_ITEM_INPUT_CALSS_NAME}" />`,
 						) || '';
 					break;
 			}

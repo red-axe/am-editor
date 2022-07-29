@@ -1447,8 +1447,9 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				const inputElement = inputNode.get<HTMLInputElement>()!;
 				inputNode
 					.on('blur', () => {
-						inputElement.value = (
-							parseInt(inputElement.value, 10) || 1
+						inputElement.value = Math.min(
+							parseInt(inputElement.value, 10) || 1,
+							100,
 						).toString();
 					})
 					.on('keydown', (event) => {
