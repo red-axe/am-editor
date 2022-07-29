@@ -593,6 +593,7 @@ class ChangeModel implements ChangeInterface {
 				}
 				if (!next && node.get()?.isConnected) {
 					range.select(node, true).collapse(false);
+					startRange = undefined;
 				}
 				// 被删除了重新设置开始节点位置
 				if (startRange && !startRange.node[0].isConnected) {
@@ -620,8 +621,8 @@ class ChangeModel implements ChangeInterface {
 				});
 			}
 			//range.shrinkToElementNode().collapse(false);
-			const component = card.find(range.startNode);
-			if (component) component.focus(range, false);
+			// const component = card.find(range.startNode);
+			// if (component) component.focus(range, false);
 		}
 		const getFirstChild = (node: NodeInterface) => {
 			let child = node.first();
