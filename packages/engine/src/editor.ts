@@ -186,12 +186,12 @@ class Editor<T extends EditorOptions = EditorOptions>
 		this.inline.init();
 		this.block.init();
 		this.list.init();
-		this.nodeId.init();
 		const { plugins, cards, config } = this.options;
 		this.card.init(cards ?? []);
 		const configData =
 			typeof config === 'function' ? config(this) : config ?? {};
 		this.plugin.init(plugins ?? [], configData);
+		this.nodeId.init();
 	}
 
 	setScrollNode(node?: HTMLElement) {

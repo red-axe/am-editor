@@ -865,7 +865,12 @@ class List implements ListModelInterface {
 			}
 		}
 		// 只有一行
-		if (fragment.childNodes.length === 0) {
+		if (
+			fragment.childNodes.length === 0 ||
+			(fragment.childNodes.length === 1 &&
+				node.isList(fragment.childNodes[0]) &&
+				fragment.childNodes[0].childNodes.length === 0)
+		) {
 			const parent = startLi.parent();
 			if (!beginNode.isBlockCard()) {
 				if (node.isCustomize(startLi)) {
