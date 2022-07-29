@@ -15,10 +15,16 @@ import {
 	toJSON0,
 	isTransientElement,
 } from './utils';
-import { CARD_LOADING_KEY, CARD_KEY, CARD_TYPE_KEY } from './../constants/card';
+import {
+	CARD_LOADING_KEY,
+	CARD_KEY,
+	CARD_TYPE_KEY,
+	CARD_VALUE_KEY,
+} from './../constants/card';
 import { DATA_ID, JSON0_INDEX } from '../constants';
 import { $ } from '../node';
 import { isRoot } from '../node/utils';
+import { decodeCardValue } from '../utils';
 
 export default class Producer extends EventEmitter2 {
 	private engine: EngineInterface;
@@ -113,9 +119,20 @@ export default class Producer extends EventEmitter2 {
 			const oldAttr = oldAttributes[key];
 			// 旧属性有，修改属性
 			if (newAttr !== oldAttr) {
+				let nl = isLoadingCard;
+				if (key === CARD_VALUE_KEY) {
+					const value = decodeCardValue(newAttr);
+					const component = this.engine.card.find(value.id);
+					if (
+						component?.writeHistoryOnValueChange &&
+						component.writeHistoryOnValueChange(value) === false
+					) {
+						nl = true;
+					}
+				}
 				ops.push({
 					id: oId,
-					nl: isLoadingCard,
+					nl,
 					bi: oBi,
 					p: newPath,
 					od: oldAttr,
@@ -586,37 +603,4 @@ export default class Producer extends EventEmitter2 {
 		);
 		return ops;
 	}
-
-	/**
-	 * 从 doc 中查找目标卡片
-	 * @param data
-	 * @param name
-	 * @param callback
-	 * @returns 返回卡片属性，以及是否已渲染
-	 */
-	findCardForDoc = (
-		data: any,
-		name: string,
-		callback?: (attributes: { [key: string]: string }) => boolean,
-	): { attributes: any; rendered: boolean } | void => {
-		const result = findFromDoc(data, (attributes) => {
-			if (attributes['data-card-key'] === name) {
-				if (callback) {
-					return callback(attributes);
-				}
-				return true;
-			}
-			return false;
-		});
-		if (result) {
-			const { attributes, children } = result;
-			return {
-				attributes,
-				rendered:
-					Array.isArray(children) &&
-					Array.isArray(children[2]) &&
-					Array.isArray(children[2][2]),
-			};
-		}
-	};
 }

@@ -116,8 +116,17 @@ class OTModel extends EventEmitter2 implements OTInterface {
 			ops = newOps;
 		}
 		this.submitOps(ops);
-		this.engine.history.handleSelfOps(
-			ops.filter((op) => !op['nl'] && !op.p.includes(READY_CARD_KEY)),
+		const { history, change } = this.engine;
+		history.handleSelfOps(
+			ops.filter((op) => {
+				if (
+					op['nl'] === true &&
+					op.p[op.p.length - 1] === CARD_VALUE_KEY
+				) {
+					history.handleNLCardValue(op);
+				}
+				return !op['nl'] && !op.p.includes(READY_CARD_KEY);
+			}),
 		);
 
 		this.engine.trigger('ops', ops);
@@ -127,7 +136,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 					('od' in op || 'oi' in op) && op.p.includes(CARD_VALUE_KEY),
 			)
 		) {
-			this.engine.change.change(false);
+			change.change(false);
 		}
 	};
 

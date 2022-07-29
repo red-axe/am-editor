@@ -509,6 +509,11 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 		return this.container;
 	}
 
+	writeHistoryOnValueChange() {
+		if (this.loading) return false;
+		return;
+	}
+
 	checker(
 		video_id: string,
 		success: (data?: {
@@ -744,7 +749,8 @@ class VideoComponent<T extends VideoValue = VideoValue> extends Card<T> {
 	}
 
 	didRender() {
-		super.didRender();
+		const value = this.getValue();
+		if (value.status === 'done') super.didRender();
 		this.onWindowResize();
 		const editor = this.editor;
 		window.addEventListener('resize', this.onWindowResize);

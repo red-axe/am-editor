@@ -372,3 +372,35 @@ export const findFromDoc = (
 	}
 	return null;
 };
+
+/**
+ * 从 doc 中查找目标卡片
+ * @param data
+ * @param name
+ * @param callback
+ * @returns 返回卡片属性，以及是否已渲染
+ */
+export const findCardForDoc = (
+	data: any,
+	callback?: (attributes: { [key: string]: string }) => boolean,
+): { attributes: any; rendered: boolean } | void => {
+	const result = findFromDoc(data, (attributes) => {
+		if (attributes['data-card-key']) {
+			if (callback) {
+				return callback(attributes);
+			}
+			return true;
+		}
+		return false;
+	});
+	if (result) {
+		const { attributes, children } = result;
+		return {
+			attributes,
+			rendered:
+				Array.isArray(children) &&
+				Array.isArray(children[2]) &&
+				Array.isArray(children[2][2]),
+		};
+	}
+};

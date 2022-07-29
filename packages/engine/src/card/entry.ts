@@ -372,6 +372,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		return this.onSelectByOther(activated, value);
 	}
 	onChange?(trigger: 'remote' | 'local', node: NodeInterface): void;
+	writeHistoryOnValueChange?(value: T): void | false;
 	private initToolbar() {
 		if (this.toolbar) {
 			if (!this.toolbarModel)

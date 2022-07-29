@@ -41,6 +41,11 @@ export interface HistoryInterface {
 	 */
 	handleRemoteOps(ops: TargetOp[]): void;
 	/**
+	 * 处理更新不计入历史操作中的卡片值
+	 * @param op
+	 */
+	handleNLCardValue(op: TargetOp): void;
+	/**
 	 * 获取最近的可撤销操作
 	 */
 	getUndoOp(): Operation | undefined;

@@ -227,6 +227,11 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 		else this.container?.removeClass('data-file-active');
 	}
 
+	writeHistoryOnValueChange() {
+		if (this.loading) return false;
+		return;
+	}
+
 	render(): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
@@ -270,7 +275,8 @@ export default class FileCard<V extends FileValue = FileValue> extends Card<V> {
 	}
 
 	didUpdate() {
-		super.didUpdate();
+		const value = this.getValue();
+		if (value.status === 'done') super.didUpdate();
 		this.toolbarModel?.getContainer()?.remove();
 		this.toolbarModel?.create();
 	}

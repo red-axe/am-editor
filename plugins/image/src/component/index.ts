@@ -284,6 +284,11 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 		return this.image?.root;
 	}
 
+	writeHistoryOnValueChange() {
+		if (this.loading) return false;
+		return;
+	}
+
 	render(loadingBg?: string): string | void | NodeInterface {
 		const value = this.getValue();
 		if (!value) return;
@@ -345,7 +350,8 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 	}
 
 	didRender() {
-		super.didRender();
+		const value = this.getValue();
+		if (value.status === 'done') super.didRender();
 		this.toolbarModel?.setDefaultAlign('top');
 	}
 }

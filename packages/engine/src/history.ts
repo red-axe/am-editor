@@ -4,12 +4,12 @@ import findLastIndex from 'lodash/findLastIndex';
 import { Op } from 'sharedb';
 import OTJSON from 'ot-json0';
 import { Operation, TargetOp } from './types/ot';
-import { random } from './utils';
-import { isReverseOp, isTransientElement } from './ot/utils';
+import { decodeCardValue, random } from './utils';
+import { findCardForDoc, isReverseOp, isTransientElement } from './ot/utils';
 import { EngineInterface } from './types/engine';
 import { HistoryInterface } from './types/history';
 import { $ } from './node';
-import { DATA_ID } from './constants';
+import { CARD_VALUE_KEY, DATA_ID } from './constants';
 
 /**
  * 历史记录管理器
@@ -229,6 +229,40 @@ class HistoryModel implements HistoryInterface {
 			} else if (callback === undefined) {
 				this.lazySave();
 			}
+		}
+	}
+
+	handleNLCardValue(op: TargetOp) {
+		const key = op.p[op.p.length - 1];
+		if (
+			op.nl === true &&
+			typeof key === 'string' &&
+			key === CARD_VALUE_KEY &&
+			op['oi']
+		) {
+			const oiVal = op['oi'];
+			const newVal = decodeCardValue(oiVal);
+			this.actionOps.forEach((action) => {
+				action.ops?.forEach((op) => {
+					if (op.p[op.p.length - 1] === CARD_VALUE_KEY && op['oi']) {
+						const oldVal = decodeCardValue(op['oi']);
+						if (newVal.id === oldVal.id) {
+							op['oi'] = newVal;
+						}
+					} else if (op['li']) {
+						findCardForDoc(op['li'], (attrs) => {
+							const value = decodeCardValue(
+								attrs[CARD_VALUE_KEY],
+							);
+							if (value.id === newVal.id) {
+								attrs[CARD_VALUE_KEY] = oiVal;
+								return true;
+							}
+							return false;
+						});
+					}
+				});
+			});
 		}
 	}
 

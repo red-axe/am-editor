@@ -310,6 +310,11 @@ export interface CardInterface<T extends CardValue = CardValue> {
 	 */
 	onChange?(trigger: 'remote' | 'local', node: NodeInterface): void;
 	/**
+	 * 卡片值变更时，返回false则阻止写入历史记录
+	 * @param value
+	 */
+	writeHistoryOnValueChange?(value: T): void | false;
+	/**
 	 * 设置卡片值
 	 * @param value 值
 	 */
