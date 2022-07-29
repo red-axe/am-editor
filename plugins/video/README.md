@@ -5,7 +5,7 @@
 ## 安装
 
 ```bash
-$ yarn add @aomao/plugin-video
+yarn add @aomao/plugin-video
 ```
 
 添加到引擎
@@ -27,6 +27,14 @@ new Engine(...,{ plugins:[ Video , VideoUploader ] , cards:[ VideoComponent ]})
 onBeforeRender?: (action: 'download' | 'query' | 'cover', url: string, editor: EditorInterface) => string;
 ```
 
+### 是否显示视频标题
+
+默认显示
+
+```ts
+showTitle?: boolean
+```
+
 ## `VideoUploader` 可选项
 
 ```ts
@@ -40,21 +48,13 @@ new Engine(...,{
  })
 ```
 
-### 是否显示视频标题
-
-默认显示
-
-```ts
-showTitle?: boolean
-```
-
 ### 文件上传
 
 `action`: 上传地址，始终使用 `POST` 请求
 
 `crossOrigin`: 是否跨域
 
-`withCredentials`: https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
+`withCredentials`: <https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials>
 
 `headers`: 请求头
 

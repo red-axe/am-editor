@@ -126,7 +126,9 @@ class CustomizeImageUploader extends ImageUploader {
 					const base64 =
 						typeof values.info.src !== 'string'
 							? window.btoa(
-									String.fromCharCode(...new Uint8Array(src)),
+									String.fromCharCode(
+										...new Uint8Array(values.info.src),
+									),
 							  )
 							: values.info.src;
 					const image = new Image();

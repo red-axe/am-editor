@@ -15,36 +15,36 @@ engine.request.upload(options: UploaderOptions, files: Array<File>, name?: strin
 // 上传可选项类型
 export type UploaderOptions = {
     // 上传地址
-	url: string;
+ url: string;
     // 请求类型，默认 json
-	type?: string;
+ type?: string;
     // 内容类型
-	contentType?: string;
+ contentType?: string;
     // 额外数据
-	data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
+ data?: Record<string, RequestDataValue> | FormData | (() => Promise<Record<string, RequestDataValue> | FormData>)
     // 跨域
-	crossOrigin?: boolean;
+ crossOrigin?: boolean;
     // 请求头
-	headers?: { [key: string]: string };
+ headers?: { [key: string]: string };
     // 上传前，可以做文件大小限制判断
-	onBefore?: (file: File) => Promise<boolean | void>;
+ onBefore?: (file: File) => Promise<boolean | void>;
     // 开始上传
-	onReady?: (fileInfo: FileInfo, file: File) => Promise<void>;
+ onReady?: (fileInfo: FileInfo, file: File) => Promise<void>;
     // 上传中
-	onUploading?: (file: File, progress: { percent: number }) => void;
+ onUploading?: (file: File, progress: { percent: number }) => void;
     // 上传错误
-	onError?: (error: Error, file: File) => void;
+ onError?: (error: Error, file: File) => void;
     // 上传成功
-	onSuccess?: (response: any, file: File) => void;
+ onSuccess?: (response: any, file: File) => void;
 };
 // FileInfo 类型
 export type FileInfo = {
-	uid: string;
-	src: string | ArrayBuffer | null;
-	name: string;
-	size: number;
-	type: string;
-	ext: string;
+ uid: string;
+ src: string | ArrayBuffer | null;
+ name: string;
+ size: number;
+ type: string;
+ ext: string;
 };
 ```
 
@@ -126,7 +126,9 @@ class CustomizeImageUploader extends ImageUploader {
 					const base64 =
 						typeof values.info.src !== 'string'
 							? window.btoa(
-									String.fromCharCode(...new Uint8Array(src)),
+									String.fromCharCode(
+										...new Uint8Array(values.info.src),
+									),
 							  )
 							: values.info.src;
 					const image = new Image();
