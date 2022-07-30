@@ -334,14 +334,18 @@ class Schema implements SchemaInterface {
 		 */
 		if (Array.isArray(rule)) {
 			if (attributesName === 'class') {
-				return (attributesValue || '')
-					.split(/\s+/)
-					.every((value) =>
-						value.trim() === ''
-							? true
-							: (rule as Array<string>).indexOf(value.trim()) >
-							  -1,
-					);
+				return (
+					!!attributesValue &&
+					attributesValue
+						.split(/\s+/)
+						.every((value) =>
+							value.trim() === ''
+								? true
+								: (rule as Array<string>).indexOf(
+										value.trim(),
+								  ) > -1,
+						)
+				);
 			}
 			return rule.indexOf(attributesValue) > -1;
 		}
