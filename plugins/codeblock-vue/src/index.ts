@@ -85,6 +85,7 @@ export default class<
 					[DATA_SYNTAX]: '*',
 					class: '*',
 					language: '*',
+					'auto-wrap': '*',
 				},
 			},
 			{
@@ -95,6 +96,7 @@ export default class<
 						required: true,
 						value: '*',
 					},
+					'auto-wrap': '*',
 				},
 			},
 			{
@@ -128,6 +130,7 @@ export default class<
 						required: true,
 						value: '*',
 					},
+					'auto-wrap': '*',
 				},
 			},
 		]);
@@ -183,6 +186,7 @@ export default class<
 			editor.card.replaceNode<CodeBlockValue>(node, 'codeblock', {
 				mode: syntax || 'plain',
 				code,
+				autoWrap: node.attributes('auto-wrap') === 'true',
 			});
 			node.remove();
 			return false;
@@ -235,6 +239,7 @@ export default class<
 				node.removeAttributes(CARD_TYPE_KEY);
 				node.removeAttributes(CARD_VALUE_KEY);
 				node.attributes(DATA_SYNTAX, value.mode || 'plain');
+				node.attributes('auto-wrap', value.autoWrap ? 'true' : 'false');
 				newContent
 					.removeClass(VIEW_CLASS_NAME)
 					.removeClass(contentClassName);
