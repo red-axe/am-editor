@@ -75,7 +75,9 @@ class TableComponent<V extends TableValue = TableValue>
 	rowMinHeight =
 		this.editor.plugin.findPlugin<TableOptions>('table')?.options
 			.rowMinHeight || 35;
-
+	maxInsertNum =
+		this.editor.plugin.findPlugin<TableOptions>('table')?.options
+			.maxInsertNum || 30;
 	wrapper?: NodeInterface;
 	helper: HelperInterface = new Helper(this.editor);
 	template: TemplateInterface = new Template(this);
@@ -83,6 +85,7 @@ class TableComponent<V extends TableValue = TableValue>
 	conltrollBar: ControllBarInterface = new ControllBar(this.editor, this, {
 		col_min_width: this.colMinWidth,
 		row_min_height: this.rowMinHeight,
+		max_insert_num: this.maxInsertNum,
 	});
 	command: TableCommandInterface = new TableCommand(this.editor, this);
 	scrollbar?: Scrollbar;

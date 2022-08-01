@@ -54,5 +54,8 @@
         "rollup-plugin-vue": "^6.0.0",
         "sharedb": "^2.2.5",
         "yorkie": "^2.0.0"
+    },
+    "dependencies": {
+        "markdown-it-container": "^3.0.0"
     }
 }

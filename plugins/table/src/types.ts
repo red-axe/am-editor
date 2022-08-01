@@ -199,6 +199,8 @@ export interface TableOptions extends PluginOptions {
 	};
 	colMinWidth?: number;
 	rowMinHeight?: number;
+	/**最大插入行、列 */
+	maxInsertNum?: number;
 	markdown?: boolean;
 	cardToolbars?: (
 		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
@@ -209,6 +211,8 @@ export interface TableOptions extends PluginOptions {
 export type ControllOptions = {
 	col_min_width: number;
 	row_min_height: number;
+	/**最大插入行、列 数 */
+	max_insert_num: number;
 };
 
 export type ControllDragging = {

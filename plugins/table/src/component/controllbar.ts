@@ -25,6 +25,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	private table: TableInterface;
 	private readonly COL_MIN_WIDTH: number;
 	private readonly ROW_MIN_HEIGHT: number;
+	private readonly MAX_INSERT_NUM: number;
 	tableRoot?: NodeInterface;
 	colsHeader?: NodeInterface;
 	rowsHeader?: NodeInterface;
@@ -65,6 +66,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.editor = editor;
 		this.COL_MIN_WIDTH = options.col_min_width;
 		this.ROW_MIN_HEIGHT = options.row_min_height;
+		this.MAX_INSERT_NUM = options.max_insert_num;
 	}
 
 	init() {
@@ -1449,7 +1451,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 					.on('blur', () => {
 						inputElement.value = Math.min(
 							parseInt(inputElement.value, 10) || 1,
-							100,
+							this.MAX_INSERT_NUM,
 						).toString();
 					})
 					.on('keydown', (event) => {
