@@ -1603,11 +1603,15 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			);
 			let args: undefined | number = undefined;
 			if (inputNode.length > 0) {
-				args = parseInt(
-					inputNode.get<HTMLInputElement>()?.value || '1',
-					10,
+				args = Math.min(
+					parseInt(
+						inputNode.get<HTMLInputElement>()?.value || '1',
+						10,
+					),
+					this.MAX_INSERT_NUM,
 				);
 			}
+
 			this.table.command[action](args);
 		}
 		this.hideContextMenu();
