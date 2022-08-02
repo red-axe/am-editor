@@ -1422,7 +1422,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		headerElement.removeChild(item);
 		this.tableRoot?.css('width', this.colsHeader?.css('width'));
 	}
-
+	private menuSets = new WeakSet<Node>();
 	showContextMenu(event: MouseEvent) {
 		const editor = this.editor;
 		if (
@@ -1447,18 +1447,23 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				);
 				if (inputNode.length === 0) return;
 				const inputElement = inputNode.get<HTMLInputElement>()!;
-				inputNode
-					.on('blur', () => {
-						inputElement.value = Math.min(
-							parseInt(inputElement.value, 10) || 1,
-							this.MAX_INSERT_NUM,
-						).toString();
-					})
-					.on('keydown', (event) => {
-						if (isHotkey('enter', event)) {
-							this.handleTriggerMenu(menuNode);
-						}
-					});
+				if (!this.menuSets.has(menu)) {
+					this.menuSets.add(menu);
+					inputNode
+						.on('blur', () => {
+							inputElement.value = Math.min(
+								parseInt(inputElement.value, 10) || 1,
+								this.MAX_INSERT_NUM,
+							).toString();
+						})
+						.on('keydown', (event) => {
+							if (isHotkey('enter', event)) {
+								this.handleTriggerMenu(menuNode);
+							}
+						});
+					inputNode.on('mousedown', this.onMenuInputMousedown);
+				}
+
 				const selectArea = selection.getSelectArea();
 				const isInsertCol =
 					['insertColLeft', 'insertColRight'].indexOf(action) > -1;
@@ -1474,7 +1479,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 						selectArea.end.row - selectArea.begin.row + 1
 					}`;
 				}
-				inputNode.on('mousedown', this.onMenuInputMousedown);
 			}
 		});
 		const splits = this.menuBar.find('div.split');
@@ -1546,14 +1550,6 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		}
 		const menuItems = this.menuBar?.find(Template.MENUBAR_ITEM_CLASS);
 		menuItems?.removeClass('disabled');
-		menuItems?.each((menu) => {
-			const menuNode = $(menu);
-			const inputNode = menuNode.find(
-				`input${Template.MENUBAR_ITEM_INPUT_CALSS}`,
-			);
-			if (inputNode.length === 0) return;
-			inputNode.removeAllEvents();
-		});
 		this.contextVisible = false;
 		this.menuBar?.css({
 			top: '-99999px',
