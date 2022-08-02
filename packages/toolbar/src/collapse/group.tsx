@@ -6,7 +6,11 @@ export type CollapseGroupProps = {
 	engine?: EngineInterface;
 	title?: React.ReactNode;
 	items: Array<Omit<CollapseItemProps, 'engine'>>;
-	onSelect?: (event: React.MouseEvent, name: string) => void | boolean;
+	onSelect?: (
+		event: React.MouseEvent,
+		name: string,
+		engine?: EngineInterface,
+	) => void | boolean;
 };
 
 const CollapseGroup: React.FC<CollapseGroupProps> = ({
@@ -26,11 +30,11 @@ const CollapseGroup: React.FC<CollapseGroupProps> = ({
 						key={item.name}
 						engine={engine}
 						{...item}
-						onClick={(event, name) => {
+						onClick={(event, name, engine) => {
 							let result;
 							if (item.onClick)
-								result = item.onClick(event, name);
-							if (onSelect) onSelect(event, name);
+								result = item.onClick(event, name, engine);
+							if (onSelect) onSelect(event, name, engine);
 							return result;
 						}}
 					/>
