@@ -52,6 +52,24 @@ overflow?: {
 };
 ```
 
+### 最小列宽
+
+```ts
+colMinWidth: number; //默认40
+```
+
+### 最小行高
+
+```ts
+rowMinHeight: number; //默认30
+```
+
+### 一次最大插入的行/列
+
+```ts
+maxInsertNum: number; //默认50
+```
+
 ## 命令
 
 ```ts

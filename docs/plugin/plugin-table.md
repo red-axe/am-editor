@@ -52,6 +52,24 @@ overflow?: {
 };
 ```
 
+### Minimum column width
+
+```ts
+colMinWidth: number; //default 40
+```
+
+### Minimum line height
+
+```ts
+rowMinHeight: number; //default 30
+```
+
+### Maximum row/column inserted at a time
+
+```ts
+maxInsertNum: number; //default 50
+```
+
 ## Command
 
 ```ts

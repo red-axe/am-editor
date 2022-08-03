@@ -40,7 +40,7 @@ const defaultHandles: Array<{
 	{
 		name: 'delete',
 		handle: Delete,
-		triggerName: 'keydown:backspace',
+		triggerName: 'keydown:delete',
 	},
 	{
 		name: 'tab',
