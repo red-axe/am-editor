@@ -562,11 +562,14 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		this.rowAddButton.show('flex');
 		this.rowAddButton.css('top', `${top}px`);
 		this.rowAddAlign = isEnd ? 'down' : 'up';
+
+		const viewportElement = this.viewport?.get<HTMLElement>()!;
 		const splitWidth =
 			(this.table.selection.tableModel?.width || 0) +
 			itemNode.width() +
 			4;
-		this.rowAddButtonSplit.css('width', `${splitWidth}px`);
+		let width = Math.min(viewportElement.offsetWidth + 4, splitWidth);
+		this.rowAddButtonSplit.css('width', `${width}px`);
 	}
 
 	/**
@@ -1005,7 +1008,13 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	renderRowSplitBars(row: NodeInterface, trigger: NodeInterface) {
 		const viewportElement = this.viewport?.get<HTMLElement>()!;
 		const tableWidth = this.table.selection.tableModel?.width || 0;
-		const width = Math.min(viewportElement.offsetWidth, tableWidth);
+
+		//获取table-viewport 宽度 去除 操作栏宽度
+		const width = Math.min(
+			viewportElement.offsetWidth - row.width(),
+			tableWidth,
+		);
+
 		trigger.addClass('dragging').css('width', `${width + row.width()}px`);
 	}
 
