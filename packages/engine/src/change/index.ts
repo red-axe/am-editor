@@ -409,7 +409,7 @@ class ChangeModel implements ChangeInterface {
 		callback: (range: RangeInterface) => void = () => {},
 		followActiveMark: boolean = true,
 	) {
-		const { block, list, card, schema, mark, inline } = this.engine;
+		const { block, list, schema, mark, inline } = this.engine;
 		const nodeApi = this.engine.node;
 		range = range || this.range.toTrusty();
 		const firstBlock = block.closest(range.startNode);
@@ -576,14 +576,18 @@ class ChangeModel implements ChangeInterface {
 				if (prev) {
 					prev.after(node);
 				} else {
-					if (this.engine.node.isInline(range.startNode)) {
+					if (nodeApi.isInline(range.startNode)) {
 						range.setStartAfter(range.startNode);
 						range.collapse(true);
 					}
 					nodeApi.insert(node, range, true);
+					if (nodeApi.isInline(node)) {
+						range.setEndAfter(node);
+						range.collapse(false);
+					}
 				}
 				if (node.get()?.isConnected) appendNodes.push(node);
-				if (!this.engine.node.isBlock(node) && !next?.isText()) {
+				if (!nodeApi.isBlock(node) && !next?.isText()) {
 					if (prev) {
 						range.select(node, true).collapse(false);
 					}
@@ -591,9 +595,12 @@ class ChangeModel implements ChangeInterface {
 				} else {
 					prev = node;
 				}
-				if (!next && node.get()?.isConnected) {
+				if (
+					!next &&
+					node.get()?.isConnected &&
+					!nodeApi.isInline(node)
+				) {
 					range.select(node, true).collapse(false);
-					startRange = undefined;
 				}
 				// 被删除了重新设置开始节点位置
 				if (startRange && !startRange.node[0].isConnected) {

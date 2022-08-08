@@ -25,7 +25,6 @@ import Parser, { TextParser } from '../parser';
 import Paste from './paste';
 import { CardActiveTrigger, CardType } from '../card/enum';
 import { convertMarkdown, createMarkdownIt, escape } from '../utils';
-import Token from 'markdown-it/lib/token';
 
 class NativeEvent {
 	engine: EngineInterface;
