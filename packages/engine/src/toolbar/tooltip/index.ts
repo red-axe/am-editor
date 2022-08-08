@@ -1,7 +1,9 @@
+import domAlign from 'dom-align';
 import { DATA_ELEMENT } from '../../constants/root';
 import { NodeInterface } from '../../types/node';
 import { Placement } from '../../types/position';
 import { $ } from '../../node';
+import placements from '../../position/placements';
 import './index.css';
 
 const template = (options: { placement: Placement }) => {
@@ -29,23 +31,22 @@ class Tooltip {
 		// 计算定位
 		const body = $(document.body);
 		body.append(root);
-		const element = root.get<Element>();
-		const width = element?.clientWidth || 0;
-		const height = element?.clientHeight || 0;
-		const nodeElement = node.get<Element>()!;
-		const nodeWidth = nodeElement.clientWidth;
-		const nodeRect = nodeElement.getBoundingClientRect();
-		const left = Math.round(
-			window.pageXOffset + nodeRect.left + nodeWidth / 2 - width / 2,
+		const rect = domAlign(
+			root.get<HTMLElement>(),
+			node.get<HTMLElement>(),
+			{
+				...placements[options.placement],
+			},
 		);
-		let top = Math.round(window.pageYOffset + nodeRect.top - height - 2);
-		if (options.placement === 'bottom') {
-			top += nodeRect.height + height + 2;
-		}
-		root.css({
-			left: left + 'px',
-			top: top + 'px',
+		const align = Object.keys(placements).find((p) => {
+			const points = placements[p].points;
+			return points[0] === rect.points[0] && points[1] === rect.points[1];
 		});
+		if (align !== options.placement) {
+			root.removeClass(
+				`data-tooltip-placement-${options.placement}`,
+			).addClass(`data-tooltip-placement-${align}`);
+		}
 		root.addClass('data-tooltip-active');
 	}
 	static hide() {

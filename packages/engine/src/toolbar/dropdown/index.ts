@@ -63,13 +63,24 @@ export default class Dropdown implements DropdownInterface {
 		this.dropdown?.removeClass('show');
 	}
 
+	getPlacement() {
+		const dataPlacement =
+			this.root!.closest('.data-toolbar').attributes('data-placement') ||
+			'top';
+		return dataPlacement.startsWith('top') ? 'top' : 'bottom';
+	}
+
 	renderTooltip() {
 		const { title } = this.options;
 		if (title) {
 			this.root!.on('mouseenter', () => {
+				const placement = this.getPlacement();
 				Tooltip.show(
 					this.root!,
 					typeof title === 'function' ? title() : title,
+					{
+						placement,
+					},
 				);
 			});
 			this.root!.on('mouseleave', () => {
