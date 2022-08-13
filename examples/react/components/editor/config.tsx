@@ -81,6 +81,9 @@ import Embed, { EmbedComponent } from '@aomao/plugin-embed';
 // import type { EmbedOptions } from '@aomao/plugin-embed'
 import Test, { TestComponent } from './plugins/test';
 import Lightblock, { LightblockComponent } from '@aomao/plugin-lightblock';
+import MulitCodeblock, {
+	MulitCodeblockComponent,
+} from '../../../../plugins/mulit-codeblock/src';
 
 import {
 	ToolbarPlugin,
@@ -138,6 +141,7 @@ export const plugins: Array<PluginEntry> = [
 	Embed,
 	Test,
 	Lightblock,
+	MulitCodeblock,
 ];
 
 export const cards: CardEntry[] = [
@@ -155,6 +159,7 @@ export const cards: CardEntry[] = [
 	TestComponent,
 	EmbedComponent,
 	LightblockComponent,
+	MulitCodeblockComponent,
 ];
 
 export const tableOptions: TableOptions = {
@@ -443,4 +448,7 @@ export const pluginConfig = (lang: string): Record<string, PluginOptions> => ({
 	[Fontsize.pluginName]: fontsizeOptions,
 	[Fontfamily.pluginName]: fontfamilyOptions,
 	[LineHeight.pluginName]: lineHeightOptions,
+	[MulitCodeblock.pluginName]: {
+		language: ['javascript', 'html', 'css'],
+	},
 });

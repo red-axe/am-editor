@@ -231,5 +231,8 @@ export default {
 		lightblock: {
 			title: '高亮块',
 		},
+		mulitCodeblock: {
+			title: '多功能代码块',
+		},
 	},
 };
