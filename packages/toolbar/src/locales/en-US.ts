@@ -231,5 +231,8 @@ export default {
 		lightblock: {
 			title: 'Lightblock',
 		},
+		mulitCodeblock: {
+			title: 'Mulit Codeblock',
+		},
 	},
 };

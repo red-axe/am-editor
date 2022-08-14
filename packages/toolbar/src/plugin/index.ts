@@ -43,6 +43,7 @@ const defaultConfig = (editor: EditorInterface): Config => {
 				'math',
 				'status',
 				'lightblock',
+				'mulit_codeblock',
 			],
 		},
 	];

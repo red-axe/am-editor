@@ -1,0 +1,315 @@
+.mulit-code-block {
+	position: relative;
+	margin-bottom: 8px;
+}
+
+.mulit-code-block:hover .mulit-code-block-resize,
+.mulit-code-block:hover .mulit-codeblock-copy {
+	display: flex;
+
+}
+
+.mulit-codeblock-copy {
+	position: absolute;
+	top: 44px;
+	right: 0;
+	width: 24px;
+	height: 24px;
+	display: none;
+	cursor: pointer;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, .7);
+	border-radius: 2px;
+	z-index: 10;
+}
+
+.mulit-codeblock-copy svg {
+	width: 20px;
+	height: 20px;
+	fill: #fff;
+}
+
+.mulit-code-block-header {
+	display: flex;
+	border-radius: 4px;
+	overflow: hidden;
+	align-items: center;
+	margin: 0 16px 4px;
+	overflow-x: scroll;
+}
+
+.mulit-code-block-header .mulit-code-block-header-item-add {
+	cursor: pointer;
+	color: #595959;
+}
+
+.mulit-code-block-header .mulit-code-block-header-tool {
+	display: flex;
+	height: 38px;
+}
+
+.mulit-code-block-header-item {
+	height: 38px;
+	line-height: 38px;
+	padding: 0 12px;
+	cursor: grab;
+	min-width: 110px;
+	box-sizing: border-box;
+	text-align: center;
+	transition: .3 all;
+	position: relative;
+	margin-right: 8px;
+	background: rgb(250, 250, 250);
+}
+
+.mulit-code-block-header-item:hover {
+	border-radius: 4px;
+	background: rgba(245, 245, 245, .8);
+}
+
+.mulit-code-block-header-item:hover .mulit-code-block-header-item-close,
+.mulit-code-block-header-item:hover .mulit-code-block-header-item-drag {
+	display: block;
+	font-size: 12px;
+}
+
+.mulit-code-block-header-item.mulit-code-block-header-item-active {
+	background: rgb(240, 240, 240);
+	border-radius: 4px;
+}
+
+.mulit-code-block-header-item-close {
+	font-size: 16px;
+	line-height: 16px;
+	color: #999;
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	display: none;
+	cursor: pointer;
+}
+
+.mulit-code-block-header-item-drag {
+	font-size: 12px;
+	color: #aaa;
+	position: absolute;
+	top: 0;
+	left: 1px;
+	display: none;
+}
+
+.mulit-code-block-content {
+	min-height: 40px;
+	background: #f9f9f9;
+	border-radius: 4px;
+	position: relative;
+}
+
+.mulit-code-block-resize {
+	position: absolute;
+	bottom: -3px;
+	right: 0;
+	left: 0;
+	margin: 0 auto;
+	z-index: 2;
+	display: none;
+	align-items: center;
+	justify-content: center;
+}
+
+.mulit-code-block-resize .mulit-code-block-resize-btn {
+	background: #d9dbdd;
+	border-radius: 3px;
+	height: 6px;
+	padding: 0 50px;
+	display: block;
+}
+
+.mulit-code-block-resize-btn svg {
+	display: block;
+	color: #999;
+}
+
+.mulit-code-block-resize-btn:hover {
+	cursor: row-resize;
+}
+/* 默认代码样式 */
+
+.am-engine .cm-s-default .cm-header,
+.am-engine-view .cm-s-default .cm-header {
+     color: blue;
+
+}
+
+.am-engine .cm-s-default .cm-quote,
+.am-engine-view .cm-s-default .cm-quote {
+     color: #090;
+
+}
+
+.am-engine .cm-negative,
+.am-engine-view .cm-negative {
+     color: #d44;
+
+}
+
+.am-engine .cm-positive,
+.am-engine-view .cm-positive {
+     color: #292;
+
+}
+
+.am-engine .cm-header,
+.am-engine-view .cm-header,
+.am-engine .cm-strong,
+.am-engine-view .cm-strong {
+     font-weight: bold;
+
+}
+
+.am-engine .cm-em,
+.am-engine-view .cm-em {
+     font-style: italic;
+
+}
+
+.am-engine .cm-link,
+.am-engine-view .cm-link {
+     text-decoration: underline;
+
+}
+
+.am-engine .cm-strikethrough,
+.am-engine-view .cm-strikethrough {
+     text-decoration: line-through;
+
+}
+
+.am-engine .cm-s-default .cm-keyword,
+.am-engine-view .cm-s-default .cm-keyword {
+     color: #d73a49;
+
+}
+
+.am-engine .cm-s-default .cm-atom,
+.am-engine-view .cm-s-default .cm-atom {
+     color: #905;
+
+}
+
+.am-engine .cm-s-default .cm-number,
+.am-engine-view .cm-s-default .cm-number {
+     color: #005cc5;
+
+}
+
+.am-engine .cm-s-default .cm-def,
+.am-engine-view .cm-s-default .cm-def {
+     color: #005cc5;
+
+}
+
+.am-engine .cm-s-default .cm-variable-2,
+.am-engine-view .cm-s-default .cm-variable-2 {
+     color: #005cc5;
+
+}
+
+.am-engine .cm-s-default .cm-variable-3,
+.am-engine-view .cm-s-default .cm-variable-3,
+.am-engine .cm-s-default .cm-type,
+.am-engine-view .cm-s-default .cm-type {
+     color: #22863a;
+
+}
+
+.am-engine .cm-s-default .cm-comment,
+.am-engine-view .cm-s-default .cm-comment {
+     color: #6a737d;
+
+}
+
+.am-engine .cm-s-default .cm-string,
+.am-engine-view .cm-s-default .cm-string {
+     color: #690;
+
+}
+
+.am-engine .cm-s-default .cm-string-2,
+.am-engine-view .cm-s-default .cm-string-2 {
+     color: #690;
+
+}
+
+.am-engine .cm-s-default .cm-meta,
+.am-engine-view .cm-s-default .cm-meta {
+     color: #1f7f9a;
+
+}
+
+.am-engine .cm-s-default .cm-qualifier,
+.am-engine-view .cm-s-default .cm-qualifier {
+     color: #555;
+
+}
+
+.am-engine .cm-s-default .cm-builtin,
+.am-engine-view .cm-s-default .cm-builtin {
+     color: #6f42c1;
+
+}
+
+.am-engine .cm-s-default .cm-bracket,
+.am-engine-view .cm-s-default .cm-bracket {
+     color: #997;
+
+}
+
+.am-engine .cm-s-default .cm-tag,
+.am-engine-view .cm-s-default .cm-tag {
+     color: #22863a;
+
+}
+
+.am-engine .cm-s-default .cm-attribute,
+.am-engine-view .cm-s-default .cm-attribute {
+     color: #6f42c1;
+
+}
+
+.am-engine .cm-s-default .cm-hr,
+.am-engine-view .cm-s-default .cm-hr {
+     color: #999;
+
+}
+
+.am-engine .cm-s-default .cm-link,
+.am-engine-view .cm-s-default .cm-link {
+     color: #00c;
+
+}
+
+.am-engine .cm-s-default .cm-error,
+.am-engine-view .cm-s-default .cm-error {
+     color: #f00;
+
+}
+
+.am-engine .cm-invalidchar,
+.am-engine-view .cm-invalidchar {
+     color: #f00;
+
+}
+
+.am-engine .cm-s-default .cm-operator,
+.am-engine-view .cm-s-default .cm-operator {
+     color: #d73a49;
+
+}
+
+.am-engine .cm-s-default .cm-property,
+.am-engine-view .cm-s-default .cm-property {
+     color: #005cc5;
+
+}

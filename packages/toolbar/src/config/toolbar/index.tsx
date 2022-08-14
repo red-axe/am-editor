@@ -477,6 +477,51 @@ export const getToolbarDefaultConfig = (
 								);
 							},
 						},
+						{
+							name: 'mulit_codeblock',
+							icon: (
+								<span>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+									>
+										<g fill="none" fillRule="evenodd">
+											<rect
+												stroke="#E8E8E8"
+												fill="#FFF"
+												x=".5"
+												y=".5"
+												width="23"
+												height="23"
+												rx="2"
+											/>
+											<g transform="scale(0.02, 0.02) translate(90, 66)">
+												<path
+													d="M168.6 169v686h686.1V169H168.6z m640.1 46v146.7H214.6V215h594.1zM214.6 809V407.7h594.1V809H214.6z"
+													fill="#737373"
+												/>
+												<path
+													d="M255.6 267.2h64v46h-64zM383.6 267.2h64v46h-64zM511.7 267.2h64v46h-64zM417.4 532.9l-53-3.1L292 640.3 365.3 750h55.4l-73.5-109.9zM606.4 532.9l70.1 107.2-72.3 108.2 54.2 1.7 73.3-109.7-72.4-110.5zM445.4 774.9h48.2l83.7-268-47.6-1.8z"
+													fill="#737373"
+												/>
+											</g>
+										</g>
+									</svg>
+								</span>
+							),
+							title: language['mulitCodeblock']['title'],
+							search: '代码块,mulit,codeblock,mulit_codeblock',
+							onDisabled: () => {
+								// 有激活卡片 或者没有启用插件
+								return (
+									!!engine.card.active ||
+									!engine.command.queryEnabled(
+										'mulit_codeblock',
+									)
+								);
+							},
+						},
 						/**{
 							name: 'mind',
 							icon: (
