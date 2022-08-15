@@ -1,6 +1,6 @@
 {
 	"name": "@aomao/plugin-mulit-codeblock",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "多功能代码块",
 	"keywords": [
 		"codeblock",
@@ -30,12 +30,12 @@
 	},
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
-		"codemirror": "^5.61.1",
-		"clipboard": "^2.0.7",
 		"classnames": "^2.2.6",
+		"clipboard": "^2.0.7",
+		"codemirror": "^5.61.1",
 		"lodash": "^4.17.21",
-		"react-beautiful-dnd": "^13.1.0",
-		"markdown-it-container": "^3.0.0"
+		"markdown-it-container": "^3.0.0",
+		"react-beautiful-dnd": "^13.1.0"
 	},
 	"devDependencies": {
 		"@types/codemirror": "^5.60.0",
