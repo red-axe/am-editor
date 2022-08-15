@@ -8,6 +8,7 @@ import {
 	ToolbarItemOptions,
 	CardActiveTrigger,
 } from '@aomao/engine';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import MulitCodeComponent from './mulitcodeblock';
 import renderThemeSelect from './common/themeSelect';
