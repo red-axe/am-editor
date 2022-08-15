@@ -32,11 +32,10 @@
 
 .mulit-code-block-header {
 	display: flex;
-	border-radius: 4px;
-	overflow: hidden;
-	align-items: center;
-	margin: 0 16px 4px;
-	overflow-x: scroll;
+    border-radius: 4px;
+    overflow: hidden;
+    align-items: center;
+    overflow-x: auto;
 }
 
 .mulit-code-block-header .mulit-code-block-header-item-add {
