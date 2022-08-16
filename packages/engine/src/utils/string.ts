@@ -294,7 +294,7 @@ export const validUrl = (url: string) => {
 	}
 
 	if (
-		!!['http:', 'https:', 'data:', 'ftp:'].some((protocol) => {
+		!!['http:', 'https:', 'data:', 'ftp:', 'file:'].some((protocol) => {
 			return url.startsWith(protocol);
 		})
 	) {
