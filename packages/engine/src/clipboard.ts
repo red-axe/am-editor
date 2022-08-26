@@ -5,6 +5,7 @@ import { isEngine, isSafari } from './utils';
 import { $ } from './node';
 import Range from './range';
 import { DATA_ELEMENT, ROOT, VIEW_CLASS_NAME } from './constants';
+import Parser from './parser';
 
 export const isDragEvent = (
 	event: DragEvent | ClipboardEvent,
@@ -93,9 +94,23 @@ export default class Clipboard implements ClipboardInterface {
 
 	copy(data: Node | string, trigger: boolean = false) {
 		if (typeof data === 'string') {
-			return copyTo(data, {
-				format: /<[^>]+>/g.test(data) ? 'text/html' : 'text/plain',
-			});
+			const isHtml = /<[^>]+>/g.test(data);
+			if (isHtml) {
+				copyTo(data, {
+					format: 'text/html',
+					onCopy: (clipboardData: any) => {
+						clipboardData.setData(
+							'text/plain',
+							new Parser(data, this.editor).toText(),
+						);
+					},
+				});
+			} else {
+				copyTo(data, {
+					format: 'text/plain',
+				});
+			}
+			return true;
 		}
 		const editor = this.editor;
 		const selection = window.getSelection();
