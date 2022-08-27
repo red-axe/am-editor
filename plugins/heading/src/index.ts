@@ -186,7 +186,12 @@ export default class<
 
 	showAnchor = () => {
 		const editor = this.editor;
-		if (!isEngine(editor) || this.tagName.length === 0) return;
+		if (
+			!isEngine(editor) ||
+			this.tagName.length === 0 ||
+			this.options.showAnchor === false
+		)
+			return;
 		const { change, root, clipboard, language, card } = editor;
 		const range = change.range.get();
 		let button = root.find('.data-anchor-button');
