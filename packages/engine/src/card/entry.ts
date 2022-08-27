@@ -388,6 +388,9 @@ abstract class CardEntry<T extends CardValue = CardValue>
 	}
 	private initResize() {
 		if (this.resize) {
+			if (!this.resizeModel) {
+				this.resizeModel = new Resize(this.editor, this);
+			}
 			const container =
 				typeof this.resize === 'function'
 					? this.resize()
