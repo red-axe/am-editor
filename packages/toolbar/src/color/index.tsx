@@ -83,6 +83,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 
 	const toggleDropdown = (event: React.MouseEvent) => {
 		event.preventDefault();
+		triggerSelect(currentColor, event);
 		if (pickerVisible) {
 			hideDropdown();
 		} else {
@@ -139,28 +140,17 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 		>
 			<div
 				className={classNames(
-					'toolbar-dropdown-trigger colorpicker-button-group',
+					'toolbar-dropdown-trigger toolbar-dropdown-trigger-arrow',
 					{ 'colorpicker-button-group-active': pickerVisible },
 				)}
 			>
-				<Button
-					className="colorpicker-button-text"
-					name={name}
-					title={buttonTitle}
-					content={buttonContent}
-					disabled={disabled}
-					onClick={(event) => triggerSelect(currentColor, event)}
-					placement={placement}
-				/>
 				<Button
 					className="colorpicker-button-dropdown toolbar-dropdown-trigger-arrow"
 					name={name}
 					title={dropdownTitle}
 					disabled={disabled}
-					icon={
-						<span className="colorpicker-button-dropdown-empty" />
-					}
-					content={<span className="data-icon data-icon-arrow" />}
+					icon="arrow"
+					content={buttonContent}
 					onClick={toggleDropdown}
 					placement={placement}
 					ref={targetRef}
