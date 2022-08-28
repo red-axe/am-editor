@@ -147,7 +147,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 				<Button
 					className="colorpicker-button-dropdown toolbar-dropdown-trigger-arrow"
 					name={name}
-					title={dropdownTitle}
+					title={buttonTitle}
 					disabled={disabled}
 					icon="arrow"
 					content={buttonContent}
