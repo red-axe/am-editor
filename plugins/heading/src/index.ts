@@ -48,6 +48,8 @@ export default class<
 
 	disableMark = this.options.disableMark || ['fontsize', 'bold'];
 
+	closureRef = { current: {} };
+
 	static get pluginName() {
 		return 'heading';
 	}
@@ -196,6 +198,7 @@ export default class<
 		const range = change.range.get();
 		let button = root.find('.data-anchor-button');
 		const block = range.startNode.closest(this.tagName.join(','));
+		this.closureRef.current.block = block;
 
 		if (
 			block.length === 0 ||
@@ -263,7 +266,7 @@ export default class<
 		button.on('click', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			const id = block.attributes('id');
+			const id = this.closureRef.current.block.attributes('id');
 			const url = this.options.anchorCopy
 				? this.options.anchorCopy(id)
 				: window.location.href + '/' + id;
