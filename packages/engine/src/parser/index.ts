@@ -87,7 +87,7 @@ class Parser implements ParserInterface {
 			});
 			// 移除掉img事件绑定，img 标签在 DOMParser 中会加载 onload 和 onerror 事件
 			source = source?.replace(/<img .*>/gi, (str) => {
-				return str.replace(/on[a-zA-Z]{0,20}=/g, 'notallow=');
+				return str.replace(/\son[a-zA-Z]{1,20}=/g, 'notallow=');
 			});
 			// 在 p 里包含 div 标签时 DOMParser 解析错误
 			// <p><div>foo</div></p>
