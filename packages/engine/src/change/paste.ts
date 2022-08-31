@@ -656,7 +656,7 @@ export default class Paste {
 		);
 	}
 
-	normalize() {
+	normalize(forceGenerateAllId = true) {
 		const nodeApi = this.engine.node;
 		let fragment = this.parser();
 		this.elementNormalize(fragment);
@@ -744,7 +744,7 @@ export default class Paste {
 				this.engine.list.addStart(child);
 			}
 		});
-		this.engine.nodeId.generateAll($(fragment), true);
+		this.engine.nodeId.generateAll($(fragment), forceGenerateAllId);
 		return fragment;
 	}
 

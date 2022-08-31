@@ -265,6 +265,7 @@ class ChangeModel implements ChangeInterface {
 				});
 				this.change();
 			},
+			false,
 		);
 	}
 

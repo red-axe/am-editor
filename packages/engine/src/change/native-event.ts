@@ -632,9 +632,12 @@ class NativeEvent {
 			callback?: (range: RangeInterface) => void,
 			followActiveMark?: boolean,
 		) => void,
+		forceGenerateAllId = true,
 	) {
 		const { change } = this.engine;
-		const fragment = new Paste(source, this.engine).normalize();
+		const fragment = new Paste(source, this.engine).normalize(
+			forceGenerateAllId,
+		);
 		this.engine.trigger('paste:before', fragment);
 		if (insert) insert(fragment, range, undefined, followActiveMark);
 		else
