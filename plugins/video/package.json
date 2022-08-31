@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-video",
-    "version": "2.9.30",
+    "version": "2.9.31",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
