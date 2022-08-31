@@ -8,6 +8,7 @@ import {
 	DATA_ID,
 	DATA_ELEMENT,
 	UI,
+	NodeInterface,
 } from '@aomao/engine';
 import type MarkdownIt from 'markdown-it';
 import Outline from './outline';
@@ -48,7 +49,9 @@ export default class<
 
 	disableMark = this.options.disableMark || ['fontsize', 'bold'];
 
-	closureRef = { current: {} };
+	closureRef: Record<'current', Record<'block', NodeInterface | null>> = {
+		current: { block: null },
+	};
 
 	static get pluginName() {
 		return 'heading';
@@ -266,6 +269,7 @@ export default class<
 		button.on('click', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
+			if (!this.closureRef.current.block) return;
 			const id = this.closureRef.current.block.attributes('id');
 			const url = this.options.anchorCopy
 				? this.options.anchorCopy(id)
