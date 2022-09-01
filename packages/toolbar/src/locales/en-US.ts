@@ -234,5 +234,8 @@ export default {
 		mulitCodeblock: {
 			title: 'Mulit Codeblock',
 		},
+		tag: {
+			title: 'Tag',
+		},
 	},
 };

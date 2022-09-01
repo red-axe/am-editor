@@ -392,6 +392,55 @@ export const getToolbarDefaultConfig = (
 							search: '公式,数学公式,gongshi,formula,math,latex',
 						},
 						{
+							name: 'tag',
+							icon: (
+								<span>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+									>
+										<g fill="none" fillRule="evenodd">
+											<rect
+												stroke="#E8E8E8"
+												fill="#FFF"
+												x=".5"
+												y=".5"
+												width="23"
+												height="23"
+												rx="2"
+											/>
+											<g transform="translate(6 6)">
+												<path
+													d="M2.534 6.192L.53 4.34a.667.667 0 01-.144-.788L1.98.37A.667.667 0 012.575 0h9.714c.369 0 .667.298.667.667v5.036a.667.667 0 01-.667.666H2.986a.667.667 0 01-.452-.177z"
+													fill="#BFBFBF"
+												/>
+												<path
+													d="M.598 4.07a.267.267 0 00.02.226l4.125 7.146a.267.267 0 00.364.097l4.62-2.666a.267.267 0 00.097-.365L5.698 1.363a.267.267 0 00-.186-.13L2.095.648a.267.267 0 00-.295.17L.598 4.07z"
+													stroke="#595959"
+													strokeWidth=".8"
+													fill="#FFF"
+												/>
+												<path
+													d="M3.956 3.036a.667.667 0 11-1.333 0 .667.667 0 011.333 0z"
+													fill="#595959"
+												/>
+												<circle
+													fill="#595959"
+													transform="scale(-1 1) rotate(30 0 -9.207)"
+													cx="3.283"
+													cy="3.047"
+													r="1"
+												/>
+											</g>
+										</g>
+									</svg>
+								</span>
+							),
+							title: language['tag']['title'],
+							search: 'tag,label,标签',
+						},
+						{
 							name: 'status',
 							icon: (
 								<span>

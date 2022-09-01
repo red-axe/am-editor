@@ -85,6 +85,8 @@ import MulitCodeblock, {
 	MulitCodeblockComponent,
 } from '../../../../plugins/mulit-codeblock/src';
 
+import Tag, { TagComponent } from '../../../../plugins/tag/src';
+
 import {
 	ToolbarPlugin,
 	ToolbarComponent,
@@ -142,6 +144,7 @@ export const plugins: Array<PluginEntry> = [
 	Test,
 	Lightblock,
 	MulitCodeblock,
+	Tag,
 ];
 
 export const cards: CardEntry[] = [
@@ -160,6 +163,7 @@ export const cards: CardEntry[] = [
 	EmbedComponent,
 	LightblockComponent,
 	MulitCodeblockComponent,
+	TagComponent,
 ];
 
 export const tableOptions: TableOptions = {

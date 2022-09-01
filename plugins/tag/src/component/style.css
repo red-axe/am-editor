@@ -1,0 +1,91 @@
+.tag-plugin-contain {
+	background: #ffe8e6;
+	color: #820014;
+	padding: 0 6px;
+	border-radius: 4px;
+	font-size: 12px;
+	cursor: pointer;
+	position: relative;
+	top: -2px;
+}
+
+
+.tag-plugin-tooltip .ant-popover-inner-content {
+	padding: 8px 12px;
+}
+
+.tag-plugin-tooltip-contain .tag-plugin-tooltip-title {
+	font-size: 12px;
+	font-weight: bold;
+	margin-bottom: 4px;
+}
+
+.tag-plugin-tooltip-contain .tag-plugin-tooltip-default {
+	margin-bottom: 8px;
+}
+
+.tag-plugin-tooltip-default > span {
+	padding: 2px 4px;
+	font-size: 12px;
+	border-radius: 2px;
+	cursor: pointer;
+}
+
+.tag-plugin-tooltip-default > span + span {
+	margin-left: 8px;
+}
+
+.tag-plugin-tooltip-custom .ant-input-group-addon {
+	font-size: 12px;
+}
+
+.tag-plugin-tooltip-custom input {
+	font-size: 12px;
+	line-height: 22px;
+}
+
+.tag-plugin-tooltip-custom .tag-plugin-tooltip-custom-theme {
+	display: flex;
+	margin-bottom: 8px;
+}
+
+.tag-plugin-tooltip-custom-theme > span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	border-radius: 9px;
+	margin-right: 8px;
+	cursor: pointer;
+}
+
+.tag-plugin-tooltip-custom-theme > span svg {
+	position: relative;
+	top: -2px;
+}
+
+.tag-plugin-tooltip-custom-history {
+	margin-top: 8px;
+}
+
+.tag-plugin-tooltip-custom-history > span {
+	padding: 2px 4px;
+	font-size: 12px;
+	border-radius: 2px;
+	cursor: pointer;
+}
+
+.tag-plugin-tooltip-custom-history > span + span {
+	margin-left: 8px;
+}
+
+.tag-plugin-tooltip-custom-history-title {
+	font-size: 12px;
+	color: #999;
+	margin-bottom: 2px;
+}
+
+.tag-plugin-tooltip-custom-history-active {
+	border-width: 1px !important;
+}
