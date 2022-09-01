@@ -396,9 +396,9 @@ export const getToolbarDefaultConfig = (
 							icon: (
 								<span>
 									<svg
-										xmlns="http://www.w3.org/2000/svg"
 										width="24"
 										height="24"
+										xmlns="http://www.w3.org/2000/svg"
 									>
 										<g fill="none" fillRule="evenodd">
 											<rect
@@ -410,27 +410,20 @@ export const getToolbarDefaultConfig = (
 												height="23"
 												rx="2"
 											/>
-											<g transform="translate(6 6)">
+											<g transform="scale(0.3, 0.3) translate(16 16)">
 												<path
-													d="M2.534 6.192L.53 4.34a.667.667 0 01-.144-.788L1.98.37A.667.667 0 012.575 0h9.714c.369 0 .667.298.667.667v5.036a.667.667 0 01-.667.666H2.986a.667.667 0 01-.452-.177z"
-													fill="#BFBFBF"
-												/>
-												<path
-													d="M.598 4.07a.267.267 0 00.02.226l4.125 7.146a.267.267 0 00.364.097l4.62-2.666a.267.267 0 00.097-.365L5.698 1.363a.267.267 0 00-.186-.13L2.095.648a.267.267 0 00-.295.17L.598 4.07z"
+													d="M8 44L8 6C8 4.89543 8.89543 4 10 4H38C39.1046 4 40 4.89543 40 6V44L24 35.7273L8 44Z"
+													fill="none"
 													stroke="#595959"
-													strokeWidth=".8"
-													fill="#FFF"
+													stroke-width="2"
+													stroke-linejoin="round"
 												/>
 												<path
-													d="M3.956 3.036a.667.667 0 11-1.333 0 .667.667 0 011.333 0z"
-													fill="#595959"
-												/>
-												<circle
-													fill="#595959"
-													transform="scale(-1 1) rotate(30 0 -9.207)"
-													cx="3.283"
-													cy="3.047"
-													r="1"
+													d="M16 18H32"
+													stroke="#595959"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
 												/>
 											</g>
 										</g>
