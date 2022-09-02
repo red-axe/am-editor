@@ -234,5 +234,8 @@ export default {
 		mulitCodeblock: {
 			title: '多功能代码块',
 		},
+		tag: {
+			title: '标签',
+		},
 	},
 };

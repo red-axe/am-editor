@@ -392,6 +392,48 @@ export const getToolbarDefaultConfig = (
 							search: '公式,数学公式,gongshi,formula,math,latex',
 						},
 						{
+							name: 'tag',
+							icon: (
+								<span>
+									<svg
+										width="24"
+										height="24"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<g fill="none" fillRule="evenodd">
+											<rect
+												stroke="#E8E8E8"
+												fill="#FFF"
+												x=".5"
+												y=".5"
+												width="23"
+												height="23"
+												rx="2"
+											/>
+											<g transform="scale(0.3, 0.3) translate(16 16)">
+												<path
+													d="M8 44L8 6C8 4.89543 8.89543 4 10 4H38C39.1046 4 40 4.89543 40 6V44L24 35.7273L8 44Z"
+													fill="none"
+													stroke="#595959"
+													stroke-width="2"
+													stroke-linejoin="round"
+												/>
+												<path
+													d="M16 18H32"
+													stroke="#595959"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</g>
+										</g>
+									</svg>
+								</span>
+							),
+							title: language['tag']['title'],
+							search: 'tag,label,标签',
+						},
+						{
 							name: 'status',
 							icon: (
 								<span>
