@@ -88,9 +88,9 @@ class MulitCode extends Card<MulitCodeblockValue> {
 		CM?.setOption('theme', theme);
 		this.setValue({ theme });
 
-		// setTimeout(() => {
-		//   CM?.focus();
-		// }, 16);
+		setTimeout(() => {
+			CM?.focus();
+		}, 16);
 	}
 
 	wrapChangeRefreshHtml() {

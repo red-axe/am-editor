@@ -8,6 +8,7 @@ export default function renderHTMLTemplate(
 	props: MulitCodeblockValue,
 ) {
 	const { langs, height, theme } = props;
+	delete props.isFocus;
 
 	function renderHeader() {
 		let headerHtml = '';

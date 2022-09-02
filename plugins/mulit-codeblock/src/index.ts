@@ -72,6 +72,7 @@ export default class extends Plugin<MulitCodeblockOptions> {
 			wrap: false,
 			theme: 'default',
 			height: 'auto',
+			isFocus: true,
 		});
 	}
 

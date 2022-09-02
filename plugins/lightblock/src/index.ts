@@ -45,6 +45,7 @@ export default class extends Plugin<LightblockOptions> {
 			borderColor: '#fed4a4',
 			backgroundColor: '#fff5eb',
 			text: 'light-block',
+			isFocus: true,
 		});
 	}
 
@@ -107,10 +108,13 @@ export default class extends Plugin<LightblockOptions> {
 	};
 
 	renderHtml = (value: LightblockValue, cardName: string) => {
+		delete value.isFocus;
+
 		const htmlstring = new Parser(
 			value.html || value.text,
 			this.editor,
 		).toHTML();
+
 		return $(
 			`<div data-type="${cardName}" data-value="${encodeCardValue(
 				value,
