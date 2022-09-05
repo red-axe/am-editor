@@ -292,6 +292,7 @@ abstract class CardEntry<T extends CardValue = CardValue>
 		if (!textNode) return;
 		range.setStart(textNode, toStart ? 0 : 1);
 		range.collapse(true);
+		if (isEngine(this.editor)) this.editor.change.range.select(range);
 		if (this.onFocus) this.onFocus();
 	}
 

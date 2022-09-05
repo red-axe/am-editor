@@ -310,7 +310,6 @@ class CardModel implements CardModelInterface {
 			);
 		}
 		this.components.push(card);
-		card.focus(range);
 		// 矫正错误 HTML 结构
 		const rootParent = card.root.parent();
 		if (
@@ -322,6 +321,7 @@ class CardModel implements CardModelInterface {
 			block.unwrap(rootParent, range);
 		}
 		this.renderComponent(card, ...args);
+		card.focus(range, false);
 		if (card.didInsert) {
 			card.didInsert();
 		}
