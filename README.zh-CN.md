@@ -36,11 +36,11 @@
 
 `广告`：[科学上网，方便、快捷的上网冲浪](https://xiyou4you.us/r/?s=18517120) 稳定、可靠，访问 Github 或者其它外网资源很方便。
 
-**`Vue2`** 案例 [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
+**`Vue2`** DEMO [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
 
-**`Vue3`** 案例 [https://github.com/red-axe/am-editor-vue](https://github.com/red-axe/am-editor-vue)
+**`Vue3`** DEMO [https://github.com/red-axe/am-editor-vue3-demo](https://github.com/red-axe/am-editor-vue3-demo)
 
-**`React`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+**`React`** DEMO [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
 **`Vue2 DEMO`** [https://github.com/yanmao-cc/am-editor-demo-vue2](https://github.com/yanmao-cc/am-editor-demo-vue2)
 
@@ -352,15 +352,15 @@ return (
 
 服务端是 `NodeJs` 环境，使用 `express` + `WebSocket` 搭建的网络服务。
 
-#### 案例
+#### DEMO
 
-案例中我们已经一份比较基础的客户端代码
+DEMO 中我们已经一份比较基础的客户端代码
 
-[查看 React 完整案例](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+[查看 React 完整 DEMO](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
-[查看 Vue3 完整案例](https://github.com/red-axe/am-editor-vue)
+[查看 Vue3 完整 DEMO](https://github.com/red-axe/am-editor-vue3-demo)
 
-[查看 Vue2 完整案例](https://github.com/zb201307/am-editor-vue2)
+[查看 Vue2 完整 DEMO](https://github.com/zb201307/am-editor-vue2)
 
 ```tsx
 //实例化协作编辑客户端，传入当前编辑器引擎实例

@@ -16,7 +16,7 @@ export default class extends Card {
 }
 ```
 
-## 案例
+## DEMO
 
 ### `渲染`
 

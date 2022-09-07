@@ -42,11 +42,11 @@
 
 通过 `MutationObserver` 监听编辑区域内的 `DOM` 树的改变，并生成 `json0` 类型的数据格式与 [ShareDB](https://github.com/share/sharedb) 库进行交互，从而达到协同编辑的需要。
 
-**`Vue2`** 案例 [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
+**`Vue2`** DEMO [https://github.com/zb201307/am-editor-vue2](https://github.com/zb201307/am-editor-vue2)
 
-**`Vue3`** 案例 [https://github.com/red-axe/am-editor-vue](https://github.com/red-axe/am-editor-vue)
+**`Vue3`** DEMO [https://github.com/red-axe/am-editor-vue3-demo](https://github.com/red-axe/am-editor-vue3-demo)
 
-**`React`** 案例 [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+**`React`** DEMO [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
 ## 特性
 
@@ -252,15 +252,15 @@ return (
 
 服务端是 `NodeJs` 环境，使用 `express` + `WebSocket` 搭建的网络服务。
 
-#### 案例
+#### DEMO
 
-案例中我们已经一份比较基础的客户端代码
+DEMO 中我们已经一份比较基础的客户端代码
 
-[查看 React 完整案例](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+[查看 React 完整 DEMO](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
 
-[查看 Vue3 完整案例](https://github.com/red-axe/am-editor-vue)
+[查看 Vue3 完整 DEMO](https://github.com/red-axe/am-editor-vue3-demo)
 
-[查看 Vue2 完整案例](https://github.com/zb201307/am-editor-vue2)
+[查看 Vue2 完整 DEMO](https://github.com/zb201307/am-editor-vue2)
 
 ```tsx
 //实例化协作编辑客户端，传入当前编辑器引擎实例
@@ -310,7 +310,7 @@ yarn serve
 -   在 am-editor 根目录下执行安装所有依赖命令，例如：`yarn`
 -   最后在 examples/vue 中重新启动
 
-`Vue` 案例中没有配置任何后端 API，具体可以参考 `React` 和 `site-ssr`
+`Vue` DEMO 中没有配置任何后端 API，具体可以参考 `React` 和 `site-ssr`
 
 ## 贡献
 

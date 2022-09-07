@@ -10,7 +10,7 @@ toc: menu
 
 ## 客户端
 
-在演示案例中已经有根据常用需求提供了一份编辑器通过 `WebSocket` 与 `sharedb` 使用 `json0` 协议交互的客户端代码
+在演示 DEMO 中已经有根据常用需求提供了一份编辑器通过 `WebSocket` 与 `sharedb` 使用 `json0` 协议交互的客户端代码
 
 [React & Vue 通用](https://github.com/yanmao-cc/am-editor/blob/master/examples/react/components/editor/ot/client.ts)
 
@@ -40,7 +40,7 @@ https://github.com/red-axe/am-editor/blob/master/examples/react/editor.tsx#L102 
 
 [ot-server](https://github.com/yanmao-cc/am-editor/tree/master/ot-server)
 
-演示案例中仅提供了模拟的用户数据，在生产环境中我们需要客户端传输`token`参数进行身份效验
+演示 DEMO 中仅提供了模拟的用户数据，在生产环境中我们需要客户端传输`token`参数进行身份效验
 
 使用命令
 
@@ -65,7 +65,7 @@ yarn start
 
 如果需要使用内存存储测试，[ot-server -> client](https://github.com/yanmao-cc/am-editor/blob/master/ot-server/src/client.js) 文件中的这段代码 `constructor(backend = new ShareDB({ db: mongodb }))` 的 `{db: mongodb}` 删除即可，相应的也需要把 `mongodb` 上面的引用及实例化删除
 
-演示案例中使用了 `mongodb` 数据库保存了所有的数据持久化，所以我们需要安装 `mongodb` 数据库
+演示 DEMO 中使用了 `mongodb` 数据库保存了所有的数据持久化，所以我们需要安装 `mongodb` 数据库
 
 -   可以在 [MongoDB 官网下载](https://www.mongodb.com/try/download/community) 安装符合自己环境的数据库版本
 -   安装完成后，创建一个数据库，并设置用户名、密码等权限
