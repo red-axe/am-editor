@@ -92,7 +92,7 @@ export default defineComponent({
         };
 
         const hideDropdown = (event?: MouseEvent) => {
-            if(event && targetRef.value?.element && targetRef.value.element.contains(event.target as Node)) return;
+            if(event && targetRef.value && targetRef.value.element && targetRef.value.element.contains(event.target as Node)) return;
             visible.value = false
         };
 
@@ -123,7 +123,8 @@ export default defineComponent({
                         commandArgs = props.command;
                     }
                 }
-                props.engine?.command.execute(commandName, ...commandArgs);
+				if(props.engine)
+                props.engine.command.execute(commandName, ...commandArgs);
             }
             if (props.onSelect) props.onSelect(color, event);
         };
@@ -188,7 +189,7 @@ export default defineComponent({
     margin-left: -1px;
     border-radius: 0 3px 3px 0;
 }
-  
+
 .colorpicker-button-group .colorpicker-button-dropdown:hover,
 .colorpicker-button-group .colorpicker-button-dropdown:active {
     background-color: #e8e8e8;

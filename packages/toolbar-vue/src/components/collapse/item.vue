@@ -67,7 +67,8 @@ export default defineComponent({
                         commandArgs = props.command;
                     }
                 }
-                props.engine?.command.execute(commandName, ...commandArgs);
+				if(props.engine)
+                props.engine.command.execute(commandName, ...commandArgs);
             }
         };
 
@@ -79,7 +80,7 @@ export default defineComponent({
             active.value = false
         }
         return {
-            iconIsHtml:/^<.*>/.test(props.icon?.trim() || ""),
+            iconIsHtml:/^<.*>/.test((props.icon || "").trim()),
             active,
             disabled: props.disabled,
             handleClick,

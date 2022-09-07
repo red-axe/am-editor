@@ -62,9 +62,9 @@ export default defineComponent({
 
 
 		onMounted(() => {
-			if (element.value) {
+			if (element.value && props.engine && props.engine.scrollNode) {
 				const ev = element.value
-				const scrollElement = props.engine?.scrollNode?.get<HTMLElement>();
+				const scrollElement = props.engine.scrollNode.get<HTMLElement>();
 				if (!scrollElement) return;
 				const rect = ev.getBoundingClientRect();
 				const scrollRect = scrollElement.getBoundingClientRect();
@@ -99,7 +99,8 @@ export default defineComponent({
                         commandArgs = commandArgs.concat(command);
                     }
                 }
-                this.engine?.command.execute(commandName, ...commandArgs);
+				if(this.engine)
+                this.engine.command.execute(commandName, ...commandArgs);
             }
         }
     }

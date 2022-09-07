@@ -95,7 +95,7 @@ export default defineComponent({
                 buttonContent.value = {icon:defaultItem.icon,content:typeof defaultItem.content === "function" ? defaultItem.content(props.engine) : defaultItem.content}
             }
             valuesVar.value = values ||
-						(props.icon || props.content ? '' : defaultItem?.key || '')
+						(props.icon || props.content ? '' : defaultItem ? defaultItem.key : '')
         }
 
         const triggerMouseDown = (event: MouseEvent) => {
@@ -116,7 +116,7 @@ export default defineComponent({
             visible.value = true
         }
         const hide = (event?: MouseEvent) => {
-            if(event && targetRef.value?.element && targetRef.value.element.contains(event.target as Node)) return;
+            if(event && targetRef.value && targetRef.value.element && targetRef.value.element.contains(event.target as Node)) return;
             visible.value = false
         }
 

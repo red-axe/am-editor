@@ -27,7 +27,7 @@ export default defineComponent({
         const onClick = (event:MouseEvent, name:string, engine?: EngineInterface) => {
             let result;
             const item = props.items.find(item => item.name === name)
-            if (item?.onClick)
+            if (item && item.onClick)
                 result = item.onClick(event, name, engine);
             if (props.onSelect) props.onSelect(event, name, engine);
             return result;

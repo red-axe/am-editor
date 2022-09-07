@@ -50,7 +50,7 @@ export default defineComponent({
         const visible = ref(false)
 
         return {
-            iconIsHtml:/^<.*>/.test(props.icon?.trim() || ""),
+            iconIsHtml:/^<.*>/.test((props.icon || "").trim()),
             isMobile,
             visible,
             hotkeyText:hotkey,
@@ -94,7 +94,8 @@ export default defineComponent({
                         commandArgs = this.command;
                     }
                 }
-                this.engine?.command.execute(commandName, ...commandArgs);
+				if(this.engine)
+                this.engine.command.execute(commandName, ...commandArgs);
             }
         }
     }
