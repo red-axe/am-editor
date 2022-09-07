@@ -117,9 +117,9 @@ class Lightblock extends Card<LightblockValue> {
 		}, 50);
 	};
 
-	render() {
+	render(isFoucs?: boolean) {
 		const value = this.getValue();
-		const { borderColor, backgroundColor, isFocus } = value;
+		const { borderColor, backgroundColor } = value;
 		const childValue = value.html
 			? new Parser(value.html, this.editor).toValue()
 			: '<br />';
@@ -175,7 +175,7 @@ class Lightblock extends Card<LightblockValue> {
 			</div>`,
 		);
 
-		if (isFocus) {
+		if (isFoucs) {
 			setTimeout(() => {
 				this.#container
 					?.find('.lightblock-editor-container')

@@ -5,5 +5,4 @@ export interface TagValue extends CardValue {
 	tagType: IType;
 	tagValue: string;
 	isCustom?: boolean;
-	show?: boolean;
 }

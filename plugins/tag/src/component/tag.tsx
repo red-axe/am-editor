@@ -18,6 +18,7 @@ type TagVauleItem = ValueItem & { isCustom: boolean };
 interface IProps {
 	value: TagValue;
 	editor: EditorInterface;
+	defaultVisible?: boolean;
 	onChange?: (item: TagVauleItem) => void;
 }
 
@@ -82,8 +83,13 @@ const getTagList = () => {
 	}
 };
 
-export default function Tag({ value, editor, onChange }: IProps) {
-	const { tagType, tagValue, isCustom, show } = value;
+export default function Tag({
+	value,
+	editor,
+	onChange,
+	defaultVisible = false,
+}: IProps) {
+	const { tagType, tagValue, isCustom } = value;
 	const local = editor.language.get<{}>('tag');
 	const initData = useMemo(() => {
 		return defaultValue.map((item) => ({
@@ -99,7 +105,7 @@ export default function Tag({ value, editor, onChange }: IProps) {
 	const [type, setType] = useState(tagType);
 	const [activeValue, setActiveValue] = useState(data);
 	const [customText, setCustomText] = useState(description);
-	const [visible, setVisible] = useState(Boolean(show));
+	const [visible, setVisible] = useState(defaultVisible);
 
 	const hide = () => {
 		setVisible(false);

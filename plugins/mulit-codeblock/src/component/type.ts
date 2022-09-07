@@ -11,7 +11,6 @@ export interface MulitCodeblockValue extends CardValue {
 	wrap: boolean;
 	theme: string;
 	height: string;
-	isFocus?: boolean;
 }
 
 export type FillMulitLang = Partial<MulitLangItem>;

@@ -33,8 +33,11 @@ class Tag extends Card<TagValue> {
 
 	#container?: NodeInterface;
 
-	render() {
+	defaultVisible = false;
+
+	render(visible?: boolean) {
 		this.#container = $('<div>Loading</div>');
+		this.defaultVisible = visible ?? false;
 		return this.#container;
 	}
 
@@ -47,6 +50,7 @@ class Tag extends Card<TagValue> {
 			<TagComponent
 				value={value}
 				editor={editor}
+				defaultVisible={this.defaultVisible}
 				onChange={(item) => {
 					this.setValue({
 						tagType: item.type,

@@ -109,8 +109,6 @@ export function useMirrorEditor({
 		(mirror.current as unknown) = CM;
 
 		init(CM);
-		// 创建时才聚焦
-		value.isFocus && CM.focus();
 		// codemirorr 监听事件
 		CM.on('focus', () => {
 			const { onFocus } = options;

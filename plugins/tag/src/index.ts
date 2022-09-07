@@ -39,12 +39,15 @@ export default class extends Plugin<Options> {
 			return;
 		}
 		const { card } = editor;
-		card.insert<TagValue>(TagComponent.cardName, {
-			tagType: '',
-			tagValue: '',
-			isCustom: false,
-			show: true,
-		});
+		card.insert<TagValue>(
+			TagComponent.cardName,
+			{
+				tagType: '',
+				tagValue: '',
+				isCustom: false,
+			},
+			true,
+		);
 	}
 
 	hotkey() {
@@ -95,7 +98,6 @@ export default class extends Plugin<Options> {
 				const value = card?.getValue();
 				if (value) {
 					node.empty();
-					delete value?.show;
 
 					const hideClass = value.tagValue ? '' : 'qz-tag-hide';
 					const data =

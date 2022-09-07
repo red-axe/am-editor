@@ -40,6 +40,8 @@ class MulitCode extends Card<MulitCodeblockValue> {
 
 	#container?: NodeInterface;
 
+	defaultFocus = false;
+
 	toolbar(): Array<ToolbarItemOptions | CardToolbarItemOptions> {
 		if (!isEngine(this.editor) || this.editor.readonly) {
 			return [];
@@ -195,8 +197,9 @@ class MulitCode extends Card<MulitCodeblockValue> {
 		};
 	}
 
-	render() {
+	render(focus?: boolean) {
 		this.#container = $('<div>Loading</div>');
+		this.defaultFocus = focus ?? false;
 		return this.#container;
 	}
 
@@ -209,6 +212,7 @@ class MulitCode extends Card<MulitCodeblockValue> {
 			<MulitCodeComponent
 				init={(CM) => {
 					this.#mulitCode = CM;
+					if (this.defaultFocus) CM.focus();
 				}}
 				value={value}
 				editor={editor}

@@ -41,12 +41,15 @@ export default class extends Plugin<LightblockOptions> {
 		if (!isEngine(editor) || editor.readonly) return;
 		const { card } = editor;
 
-		card.insert<LightblockValue>(LightblockComponent.cardName, {
-			borderColor: '#fed4a4',
-			backgroundColor: '#fff5eb',
-			text: 'light-block',
-			isFocus: true,
-		});
+		card.insert<LightblockValue>(
+			LightblockComponent.cardName,
+			{
+				borderColor: '#fed4a4',
+				backgroundColor: '#fff5eb',
+				text: 'light-block',
+			},
+			true,
+		);
 	}
 
 	markdownIt = (markdown: MarkdownIt) => {
@@ -108,8 +111,6 @@ export default class extends Plugin<LightblockOptions> {
 	};
 
 	renderHtml = (value: LightblockValue, cardName: string) => {
-		delete value.isFocus;
-
 		const htmlstring = new Parser(
 			value.html || value.text,
 			this.editor,

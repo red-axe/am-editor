@@ -67,13 +67,16 @@ export default class extends Plugin<MulitCodeblockOptions> {
 			config.language = language;
 		}
 
-		card.insert<MulitCodeblockValue>(MulitCodeblockComponent.cardName, {
-			...config,
-			wrap: false,
-			theme: 'default',
-			height: 'auto',
-			isFocus: true,
-		});
+		card.insert<MulitCodeblockValue, MulitCodeblockComponent>(
+			MulitCodeblockComponent.cardName,
+			{
+				...config,
+				wrap: false,
+				theme: 'default',
+				height: 'auto',
+			},
+			true,
+		);
 	}
 
 	hotkey() {
