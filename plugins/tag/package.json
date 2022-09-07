@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-tag",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -30,9 +30,9 @@
   },
   "peerDependencies": {
     "@aomao/engine": ">=^2.9",
+    "@types/lodash": "^4.14.178",
     "antd": "^4.14.1",
     "react": ">=17.0.0",
-    "react-dom": ">=17.0.0",
-    "@types/lodash": "^4.14.178"
+    "react-dom": ">=17.0.0"
   }
 }
