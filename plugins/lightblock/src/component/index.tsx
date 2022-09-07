@@ -178,8 +178,9 @@ class Lightblock extends Card<LightblockValue> {
 		if (isFocus) {
 			setTimeout(() => {
 				this.#container
-					.find('.lightblock-editor-container')?.[0]
-					.focus?.();
+					?.find('.lightblock-editor-container')
+					?.get<HTMLElement>()
+					?.focus?.();
 			}, 0);
 		}
 

@@ -84,7 +84,7 @@ const getTagList = () => {
 
 export default function Tag({ value, editor, onChange }: IProps) {
 	const { tagType, tagValue, isCustom, show } = value;
-	const local = editor.language.get('tag');
+	const local = editor.language.get<{}>('tag');
 	const initData = useMemo(() => {
 		return defaultValue.map((item) => ({
 			...item,
