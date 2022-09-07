@@ -65,7 +65,8 @@ class Tag extends Card<TagValue> {
 
 	destroy() {
 		super.destroy();
-		ReactDOM.unmountComponentAtNode(this.#container?.get() as HTMLElement);
+		const container = this.#container?.get<HTMLElement>();
+		if (container) ReactDOM.unmountComponentAtNode(container);
 	}
 }
 export default Tag;

@@ -224,10 +224,8 @@ class MulitCode extends Card<MulitCodeblockValue> {
 
 	destroy() {
 		super.destroy();
-		this.#container &&
-			ReactDOM.unmountComponentAtNode(
-				this.#container.get?.() as HTMLElement,
-			);
+		const container = this.#container?.get<HTMLElement>();
+		if (container) ReactDOM.unmountComponentAtNode(container);
 	}
 }
 export default MulitCode;
