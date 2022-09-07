@@ -554,7 +554,9 @@ class NativeEvent {
 							rowCount++;
 
 							if (
-								/^(#|\*|-|\+|\[ \]|\[x\]|>){1}\s+/.test(rowText)
+								/^(#|\*|-|\+|\[ \]|\[x\]|>){1,}\s+/.test(
+									rowText,
+								)
 							) {
 								validCount++;
 							} else if (/^\d\.\s+/.test(rowText)) {
