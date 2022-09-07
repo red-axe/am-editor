@@ -5,7 +5,7 @@ export interface LightblockValue extends CardValue {
 	backgroundColor: string;
 	text: string;
 	html?: string;
-	isFocus?: string;
+	isFocus?: boolean;
 }
 
 export interface ILightblockProp {

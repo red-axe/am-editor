@@ -69,7 +69,10 @@ export const convertMarkdown = (
 			content = renderer.renderInline(children, options, {});
 			if (
 				checkInline &&
-				children.find((child) => child.type.endsWith('_open'))
+				children.find(
+					(child) =>
+						child.type === 'image' || child.type.endsWith('_open'),
+				)
 			) {
 				isHit = true;
 			}
