@@ -87,13 +87,14 @@ class NativeEvent {
 		if (startNode.isText() && parent && node.isMark(parent)) {
 			let textNode = startNode.get<Text>()!;
 			let text = startNode.text();
-
+			const { inputType } = event;
 			//mark 插件禁止跟随样式时，将输入字符设置到mark标签外
 			//输入光标在mark节点末尾
 			if (
 				startOffset === text.length &&
 				event.data &&
-				event.inputType.indexOf('insert') === 0
+				inputType &&
+				inputType.indexOf('insert') === 0
 			) {
 				let markParent: NodeInterface | undefined = parent;
 				let markTops: Array<NodeInterface> = [];
@@ -174,7 +175,8 @@ class NativeEvent {
 			else if (
 				event.data &&
 				startOffset === event.data.length &&
-				event.inputType.indexOf('insert') === 0
+				inputType &&
+				inputType.indexOf('insert') === 0
 			) {
 				let markParent: NodeInterface | undefined = parent;
 				let markTops: Array<NodeInterface> = [];

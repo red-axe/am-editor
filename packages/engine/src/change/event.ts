@@ -274,21 +274,26 @@ class ChangeEvent implements ChangeEventInterface {
 			}
 			const { inputType } = event;
 			// 在组合输入法未正常执行结束命令插入就先提交协同
-			if (this.isComposing && !inputType.includes('Composition')) {
+			if (
+				this.isComposing &&
+				(!inputType || !inputType.includes('Composition'))
+			) {
 				this.engine.ot.submitMutationCache();
 			}
 			const commandTypes = ['format', 'history'];
-			commandTypes.forEach((type) => {
-				if (inputType.indexOf(type) === 0) {
-					event.preventDefault();
-					const commandName = inputType
-						.substring(type.length)
-						.toLowerCase();
-					if (this.engine.command.queryEnabled(commandName)) {
-						this.engine.command.execute(commandName);
+			if (inputType) {
+				commandTypes.forEach((type) => {
+					if (inputType.indexOf(type) === 0) {
+						event.preventDefault();
+						const commandName = inputType
+							.substring(type.length)
+							.toLowerCase();
+						if (this.engine.command.queryEnabled(commandName)) {
+							this.engine.command.execute(commandName);
+						}
 					}
-				}
-			});
+				});
+			}
 		});
 		let inputTimeout: NodeJS.Timeout | null = null;
 		this.onContainer('input', (event: InputEvent) => {
