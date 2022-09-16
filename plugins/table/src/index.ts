@@ -225,7 +225,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		table.attributes = {
 			class: ['data-table'],
 			'data-table-no-border': '*',
-			'data-wdith': '@length',
+			'data-width': '@length',
 			style: {
 				width: '@length',
 				background: '@color',
@@ -383,6 +383,8 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 					}
 				});
 			});
+			const dataWidth = node.attributes('data-width');
+			if (dataWidth) node.css('width', dataWidth);
 			node = helper.normalizeTable(node);
 			clearWH(node);
 			clearWH(node, 'height');
