@@ -1081,11 +1081,13 @@ class ChangeModel implements ChangeInterface {
 		// 前面是 void 节点
 		if (nodeApi.isVoid(prevBlock)) {
 			prevBlock.remove();
+			this.apply(range);
 			return;
 		}
 		// 前面是空段落
 		if (nodeApi.isRootBlock(prevBlock) && nodeApi.isEmpty(prevBlock)) {
 			prevBlock.remove();
+			this.apply(range);
 			return;
 		}
 
