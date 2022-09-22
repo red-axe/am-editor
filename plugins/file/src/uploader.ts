@@ -98,7 +98,7 @@ export default class<
 			editor.on(PASTE_EVENT, this.pasteFiles);
 			editor.on(PASTE_EACH, this.pasteEach);
 		}
-		let accept = this.options?.accept || this.options?.file?.accept || '*';
+		let accept = this.options?.accept || this.options?.file?.accept;
 		if (typeof accept === 'string') accept = accept.split(',');
 		if (Array.isArray(accept)) {
 			const names: string[] = [];
