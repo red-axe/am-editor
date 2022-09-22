@@ -33,7 +33,7 @@ export const getToolbarDefaultConfig = (
 										<g fill="none" fill-rule="evenodd">
 											<rect
 												stroke="#E8E8E8"
-												stroke-width=".667"
+												strokeWidth=".667"
 												fill="#FFF"
 												x=".333"
 												y=".333"
@@ -140,7 +140,7 @@ export const getToolbarDefaultConfig = (
 								>
 									<g
 										stroke="none"
-										stroke-width="1"
+										strokeWidth="1"
 										fill="none"
 										fill-rule="evenodd"
 									>
@@ -151,7 +151,7 @@ export const getToolbarDefaultConfig = (
 														<g>
 															<rect
 																stroke="#E8E8E8"
-																stroke-width="0.666666667"
+																strokeWidth="0.666666667"
 																fill="#FFFFFF"
 																x="0.333333333"
 																y="0.333333333"
@@ -169,7 +169,7 @@ export const getToolbarDefaultConfig = (
 																	d="M0.25,2.75 L13.25,2.75 L13.25,0.75 C13.25,0.473857625 13.0261424,0.25 12.75,0.25 L0.75,0.25 C0.473857625,0.25 0.25,0.473857625 0.25,0.75 L0.25,2.75 Z"
 																	id="Rectangle"
 																	stroke="#595959"
-																	stroke-width="0.5"
+																	strokeWidth="0.5"
 																	fill-opacity="0.15"
 																	fill="#25B864"
 																></path>
@@ -208,7 +208,7 @@ export const getToolbarDefaultConfig = (
 																<rect
 																	id="Rectangle"
 																	stroke="#737373"
-																	stroke-width="0.75"
+																	strokeWidth="0.75"
 																	x="0.375"
 																	y="0.375"
 																	width="12.75"
@@ -219,13 +219,13 @@ export const getToolbarDefaultConfig = (
 																	d="M3.5,10.25 L3.5,0.25 L0.75,0.25 C0.473857625,0.25 0.25,0.473857625 0.25,0.75 L0.25,9.75 C0.25,10.0261424 0.473857625,10.25 0.75,10.25 L3.5,10.25 Z"
 																	id="Rectangle"
 																	stroke="#737373"
-																	stroke-width="0.5"
+																	strokeWidth="0.5"
 																></path>
 																<path
 																	d="M0.25,2.75 L13.25,2.75 L13.25,0.75 C13.25,0.473857625 13.0261424,0.25 12.75,0.25 L0.75,0.25 C0.473857625,0.25 0.25,0.473857625 0.25,0.75 L0.25,2.75 Z"
 																	id="Rectangle"
 																	stroke="#737373"
-																	stroke-width="0.5"
+																	strokeWidth="0.5"
 																></path>
 															</g>
 														</g>
@@ -274,7 +274,7 @@ export const getToolbarDefaultConfig = (
 							name: 'video-uploader',
 							icon: `<span>
 									<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <g stroke="none" strokeWidth="1" fill="none" fill-rule="evenodd">
                                             <g transform="translate(-16.000000, -641.000000)">
                                                 <g>
                                                     <g transform="translate(16.000000, 641.000000)">
@@ -306,7 +306,7 @@ export const getToolbarDefaultConfig = (
 						{
 							name: 'status',
 							icon: `<span>
-									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><g fill="none" fill-rule="evenodd"><rect stroke="#E8E8E8" stroke-width=".667" fill="#FFF" x=".333" y=".333" width="23.333" height="23.333" rx="1.333"/><g transform="translate(6 6)"><path d="M2.534 6.192L.53 4.34a.667.667 0 01-.144-.788L1.98.37A.667.667 0 012.575 0h9.714c.369 0 .667.298.667.667v5.036a.667.667 0 01-.667.666H2.986a.667.667 0 01-.452-.177z" fill="#BFBFBF"/><path d="M.598 4.07a.267.267 0 00.02.226l4.125 7.146a.267.267 0 00.364.097l4.62-2.666a.267.267 0 00.097-.365L5.698 1.363a.267.267 0 00-.186-.13L2.095.648a.267.267 0 00-.295.17L.598 4.07z" stroke="#595959" stroke-width=".8" fill="#FFF"/><path d="M3.956 3.036a.667.667 0 11-1.333 0 .667.667 0 011.333 0z" fill="#595959"/><circle fill="#595959" transform="scale(-1 1) rotate(30 0 -9.207)" cx="3.283" cy="3.047" r="1"/></g></g></svg>
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><g fill="none" fill-rule="evenodd"><rect stroke="#E8E8E8" strokeWidth=".667" fill="#FFF" x=".333" y=".333" width="23.333" height="23.333" rx="1.333"/><g transform="translate(6 6)"><path d="M2.534 6.192L.53 4.34a.667.667 0 01-.144-.788L1.98.37A.667.667 0 012.575 0h9.714c.369 0 .667.298.667.667v5.036a.667.667 0 01-.667.666H2.986a.667.667 0 01-.452-.177z" fill="#BFBFBF"/><path d="M.598 4.07a.267.267 0 00.02.226l4.125 7.146a.267.267 0 00.364.097l4.62-2.666a.267.267 0 00.097-.365L5.698 1.363a.267.267 0 00-.186-.13L2.095.648a.267.267 0 00-.295.17L.598 4.07z" stroke="#595959" strokeWidth=".8" fill="#FFF"/><path d="M3.956 3.036a.667.667 0 11-1.333 0 .667.667 0 011.333 0z" fill="#595959"/><circle fill="#595959" transform="scale(-1 1) rotate(30 0 -9.207)" cx="3.283" cy="3.047" r="1"/></g></g></svg>
 								</span>`,
 							title: language['status']['title'],
 							search: 'status,label,状态',
@@ -560,14 +560,14 @@ export const getToolbarDefaultConfig = (
 						<g
 							id="color-font"
 							stroke="none"
-							stroke-width="1"
+							strokeWidth="1"
 							fill="none"
 							fill-rule="evenodd"
 						>
 							<rect
 								id="Rectangle-55"
 								stroke=${stroke}
-								stroke-width="0.5"
+								strokeWidth="0.5"
 								fill=${color}
 								x="2"
 								y="12.75"
@@ -602,8 +602,8 @@ export const getToolbarDefaultConfig = (
                     viewBox="0 0 16 16"
                     style="margin-bottom: -2"
 					>
-                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                    <rect stroke="${stroke}" stroke-width="0.5" fill="${color}" x="2" y="12.75" width="12" height="1.5" rx="0.125"></rect>
+                    <g stroke="none" strokeWidth="1" fill="none" fill-rule="evenodd">
+                    <rect stroke="${stroke}" strokeWidth="0.5" fill="${color}" x="2" y="12.75" width="12" height="1.5" rx="0.125"></rect>
                     <g transform="translate(2.781250, 1.375000)" fill-rule="nonzero"><path fill="#595959" d="M2.86079849,6.64817222 L2.05713835,5.84451208 C2.00832281,5.79569655 2.00832281,5.71655092 2.05713835,5.66773539 L3.61029491,4.11457882 L3.11963835,3.62392225 C3.07082281,3.57510672 3.07082281,3.49596109 3.11963835,3.44714556 L6.47839556,0.0883883476 C6.52721109,0.0395728112 6.60635672,0.0395728112 6.65517225,0.0883883476 L11.5165314,4.94974747 C11.5653469,4.998563 11.5653469,5.07770863 11.5165314,5.12652416 L8.15777416,8.48528137 C8.10895863,8.53409691 8.029813,8.53409691 7.98099747,8.48528137 L7.38889678,7.89318068 L5.83574021,9.44633725 C5.78692467,9.49515278 5.70777905,9.49515278 5.65896351,9.44633725 L5.0267407,8.81411444 L4.48856529,9.35326519 C4.39477378,9.44720966 4.26747335,9.5 4.13472392,9.5 L0.608857988,9.5 C0.470786801,9.5 0.358857988,9.38807119 0.358857988,9.25 C0.358857988,9.18363253 0.385247413,9.11998865 0.432210608,9.07309408 L2.86079849,6.64817222 Z M6.56678391,1.67937861 L4.71062861,3.53553391 L8.06938582,6.89429112 L9.92554112,5.03813582 L6.56678391,1.67937861 Z M3.64812861,5.75612373 L5.74735186,7.85534699 L6.54284699,7.05985186 L4.44362373,4.96062861 L3.64812861,5.75612373 Z" id="Combined-Shape"></path></g></g>
 					</svg>`;
 			},

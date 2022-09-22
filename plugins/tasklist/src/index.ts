@@ -165,7 +165,7 @@ export default class<
 				'vertical-align': 'middle',
 				width: '16px',
 				height: '16px',
-				color: 'color: rgba(0, 0, 0, 0.65)',
+				color: 'rgba(0, 0, 0, 0.65)',
 			});
 			node.empty();
 			if (callback) {

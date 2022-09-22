@@ -103,7 +103,14 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 	setSize(size: Size, loaded?: boolean) {
 		if (!size.width || !size.height) return;
 		const value = this.getValue();
-		if (!loaded || !value.size || !value.size.height || !value.size.width)
+		if (
+			!loaded ||
+			!value.size ||
+			!value.size.height ||
+			!value.size.width ||
+			!value.size.naturalWidth ||
+			!value.size.naturalHeight
+		)
 			this.setValue({ size } as T);
 		if (this.widthInput) {
 			this.widthInput.get<HTMLInputElement>()!.value =
@@ -326,6 +333,21 @@ class ImageComponent<T extends ImageValue = ImageValue> extends Card<T> {
 					this.didUpdate();
 				},
 				onLoad: () => {
+					if (
+						this.image?.size &&
+						(!value.size?.naturalHeight ||
+							!value.size?.naturalWidth)
+					) {
+						const { naturalHeight, naturalWidth } = this.image.size;
+						this.setSize(
+							{
+								...value.size,
+								naturalHeight,
+								naturalWidth,
+							} as Size,
+							true,
+						);
+					}
 					if (this.activated) this.image?.focus();
 				},
 				maxHeight: imagePlugin?.options?.maxHeight,
