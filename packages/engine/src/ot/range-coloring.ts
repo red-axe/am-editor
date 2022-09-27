@@ -575,7 +575,9 @@ class RangeColoring implements RangeColoringInterface {
 		if (cardInfo && !cardInfo.isEditable) {
 			const root =
 				this.setCardActivatedByOther(cardInfo, member) || cardInfo.root;
-
+			this.root
+				.find(`.${USER_CURSOR_CLASS}[${DATA_UUID}="${uuid}"]`)
+				.remove();
 			const collab = (cardInfo.constructor as CardEntry).collab;
 			if (collab === undefined || collab === true) {
 				const cursor = this.drawCursor(root, member, showInfo);
@@ -586,6 +588,9 @@ class RangeColoring implements RangeColoringInterface {
 			//可编辑卡片
 			if (cardInfo) {
 				this.drawBackground(range, member);
+				this.root
+					.find(`.${USER_CURSOR_CLASS}[${DATA_UUID}="${uuid}"]`)
+					.remove();
 				return;
 			}
 			card.each((cardComponent) => {

@@ -12,7 +12,6 @@ import Range from '../range';
 
 class OTSelection extends EventEmitter2 implements SelectionInterface {
 	private engine: EngineInterface;
-	private prevRange: Record<string, Node | number> | null = null;
 	private rangeColoring: RangeColoring;
 	currentRangePath?: { start: RangePath; end: RangePath };
 	data: Map<string, Attribute> = new Map();
@@ -94,12 +93,6 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 				this.observer = new ResizeObserver(() => {
 					newRange = this.getCardResizeRange(card);
 					if (newRange) {
-						this.prevRange = {
-							startContainer: newRange.startContainer,
-							endContainer: newRange.endContainer,
-							startOffset: newRange.startOffset,
-							endOffset: newRange.endOffset,
-						};
 						this.onSelectionChange(newRange, true, refreshBG);
 					} else {
 						this.observer?.disconnect();
@@ -110,27 +103,12 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 		}
 
 		if (
-			this.prevRange?.startContainer === current.startContainer &&
-			this.prevRange.endContainer === current.endContainer &&
-			this.prevRange.startOffset === current.startOffset &&
-			this.prevRange.endOffset === current.endOffset
-		)
-			return;
-
-		if (
 			!current.commonAncestorNode.isRoot() &&
 			!current.commonAncestorNode.inEditor()
 		) {
 			if (this.current) this.removeAttirbute(this.current.uuid);
-			this.prevRange = null;
 		} else {
-			this.prevRange = {
-				startContainer: current.startContainer,
-				endContainer: current.endContainer,
-				startOffset: current.startOffset,
-				endOffset: current.endOffset,
-			};
-			this.onSelectionChange(current, false, refreshBG);
+			this.onSelectionChange(current, true, refreshBG, false);
 		}
 	};
 
@@ -138,7 +116,12 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 		this.current = member;
 	}
 
-	setAttribute(attr: Attribute, member: Member, refreshBG = false) {
+	setAttribute(
+		attr: Attribute,
+		member: Member,
+		refreshBG = false,
+		showInfo = false,
+	) {
 		const item = this.data.get(attr.uuid);
 		if (attr.force || !isEqual(item || {}, attr)) {
 			this.data.set(
@@ -149,7 +132,7 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 				if (refreshBG === true) this.rangeColoring.updatePosition();
 				this.emit('change', attr);
 			} else {
-				this.rangeColoring.render(attr, member);
+				this.rangeColoring.render(attr, member, showInfo);
 			}
 		}
 	}
@@ -166,7 +149,12 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 		return this.data.get(uuid);
 	}
 
-	onSelectionChange(range: RangeInterface, force = false, refreshBG = false) {
+	onSelectionChange(
+		range: RangeInterface,
+		force = false,
+		refreshBG = false,
+		showInfo = false,
+	) {
 		if (!this.current) return;
 		const { card } = this.engine;
 		range = range.cloneRange();
@@ -209,6 +197,7 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 			}),
 			this.current,
 			refreshBG,
+			showInfo,
 		);
 		this.rangeColoring.updateBackgroundAlpha(range);
 	}
