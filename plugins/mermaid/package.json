@@ -1,0 +1,41 @@
+{
+	"name": "@aomao/plugin-mermaid",
+	"version": "0.0.1",
+	"description": "mermaid",
+	"keywords": [
+		"mermaid",
+		"editor"
+	],
+	"main": "dist/index.js",
+	"module": "dist/index.esm.js",
+	"typings": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"lib"
+	],
+	"author": "18576648902@163.com",
+	"license": "MIT",
+	"homepage": "https://github.com/yanmao-cc/am-editor#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/yanmao-cc/am-editor.git"
+	},
+	"scripts": {
+		"test": "echo \"Error: run tests from root\" && exit 1"
+	},
+	"bugs": {
+		"url": "https://github.com/yanmao-cc/am-editor/issues"
+	},
+	"dependencies": {
+		"@babel/runtime": "^7.13.10",
+		"markdown-it": "^13.0.1",
+		"mermaid": "^9.1.7",
+		"murmurhash-js": "^1.0.0"
+	},
+	"devDependencies": {
+		"@types/markdown-it": "^12.2.3"
+	},
+	"peerDependencies": {
+		"@aomao/engine": ">=2.9"
+	}
+}

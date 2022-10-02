@@ -1,0 +1,62 @@
+.data-mermaid {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	line-height: 0 !important;
+	cursor: pointer;
+}
+
+.data-mermaid-active {
+	line-height: 0;
+	user-select: none;
+}
+
+.data-mermaid-active svg {
+	/* outline: 2px solid #1890ff; */
+}
+
+.data-mermaid .data-mermaid-content {
+	position: relative;
+	width: 100%;
+}
+
+.data-mermaid .data-mermaid-content .data-mermaid-mask {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 1;
+	cursor: pointer;
+	/* display: none; */
+}
+
+.data-mermaid .data-mermaid-content svg {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	border: none;
+	overflow: hidden;
+}
+
+.data-mermaid .data-mermaid-content svg .label div {
+	height: 100%;
+}
+
+.data-mermaid .data-mermaid-content .data-resizer {
+	z-index: inherit;
+}
+
+.data-mermaid .data-mermaid-content .data-resizer .data-resizer-holder {
+	z-index: 2;
+}
+
+.data-mermaid .data-mermaid-content .data-resizing {
+	z-index: 3;
+}
+
+.data-mermaid-blcok .data-mermaid-content {
+	display: flex;
+	justify-content: center;
+}

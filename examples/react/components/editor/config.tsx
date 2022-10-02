@@ -98,6 +98,7 @@ import ReactDOM from 'react-dom';
 import Empty from 'antd/es/empty';
 import 'antd/es/empty/style';
 import { ImageUploaderOptions } from 'plugins/image/dist/uploader';
+import Mermaid, { MermaidComponent } from '@aomao/plugin-mermaid';
 
 export const plugins: Array<PluginEntry> = [
 	Redo,
@@ -145,6 +146,7 @@ export const plugins: Array<PluginEntry> = [
 	Lightblock,
 	MulitCodeblock,
 	Tag,
+	Mermaid,
 ];
 
 export const cards: CardEntry[] = [
@@ -164,6 +166,7 @@ export const cards: CardEntry[] = [
 	LightblockComponent,
 	MulitCodeblockComponent,
 	TagComponent,
+	MermaidComponent,
 ];
 
 export const tableOptions: TableOptions = {
