@@ -33,7 +33,9 @@
 		"murmurhash-js": "^1.0.0"
 	},
 	"devDependencies": {
-		"@types/markdown-it": "^12.2.3"
+		"@types/markdown-it": "^12.2.3",
+		"@types/mermaid": "^9.1.0",
+		"@types/murmurhash-js": "^1.0.3"
 	},
 	"peerDependencies": {
 		"@aomao/engine": ">=2.9"
