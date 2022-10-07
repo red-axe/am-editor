@@ -87,6 +87,7 @@ export default (opts: {
 					'/plugin/plugin-mark-range',
 					'/plugin/plugin-math',
 					'/plugin/plugin-mention',
+					'/plugin/plugin-mermaid',
 					'/plugin/plugin-orderedlist',
 					'/plugin/plugin-paintformat',
 					'/plugin/plugin-quote',
