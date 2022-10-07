@@ -31,7 +31,7 @@ export default class Popup {
 			this.#editor.scrollNode?.get<HTMLElement>() || document.body
 		).appendChild(this.#root[0]);
 		if (isEngine(editor)) {
-			this.#editor.on('select', this.onSelect);
+			this.#editor.on('selectEnd', this.onSelect);
 		} else {
 			document.addEventListener('selectionchange', this.onSelect);
 		}
