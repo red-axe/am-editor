@@ -367,24 +367,32 @@ class NativeEvent {
 		change.event.onDocument('selectionchange', () => {
 			this.handleSelectionChange();
 		});
-		change.event.onSelect((event: any) => {
-			const range = change.range.get();
-			if (range.startNode.closest(ROOT_SELECTOR).length === 0) return;
-			if (range.collapsed && range.containsCard()) {
-				change.range.toTrusty(range);
-			}
-			change.range.select(range);
-			// 方向键选择不触发 card 激活
-			if (
-				!isHotkey('shift+left', event) &&
-				!isHotkey('shift+right', event) &&
-				!isHotkey('shift+up', event) &&
-				!isHotkey('shift+down', event)
-			) {
-				card.activate(range.commonAncestorNode);
-			}
-			change.onSelect(range);
-		});
+		change.event.onSelect(
+			(event: any) => {
+				const range = change.range.get();
+				if (range.startNode.closest(ROOT_SELECTOR).length === 0) return;
+				if (range.collapsed && range.containsCard()) {
+					change.range.toTrusty(range);
+				}
+				change.range.select(range);
+				// 方向键选择不触发 card 激活
+				if (
+					!isHotkey('shift+left', event) &&
+					!isHotkey('shift+right', event) &&
+					!isHotkey('shift+up', event) &&
+					!isHotkey('shift+down', event)
+				) {
+					card.activate(range.commonAncestorNode);
+				}
+				change.onSelect(range);
+			},
+			() => {
+				change.onSelectStart();
+			},
+			() => {
+				change.onSelectEnd();
+			},
+		);
 
 		change.event.onDocument('mousedown', (e: MouseEvent) => {
 			if (!e.target) return;

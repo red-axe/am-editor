@@ -28,6 +28,8 @@ class ChangeModel implements ChangeInterface {
 	onChange: (trigger: 'remote' | 'local' | 'both') => void;
 	onRealtimeChange: (trigger: 'remote' | 'local') => void;
 	onSelect: (range?: RangeInterface) => void;
+	onSelectStart: () => void;
+	onSelectEnd: () => void;
 	onSetValue: () => void;
 	rangePathBeforeCommand?: { start: RangePath; end: RangePath };
 	marks: Array<NodeInterface> = [];
@@ -65,6 +67,12 @@ class ChangeModel implements ChangeInterface {
 				endOffset: range.endOffset,
 			};
 			if (this.options.onSelect) this.options.onSelect();
+		};
+		this.onSelectStart = () => {
+			if (this.options.onSelectStart) this.options.onSelectStart();
+		};
+		this.onSelectEnd = () => {
+			if (this.options.onSelectEnd) this.options.onSelectEnd();
 		};
 		this.onSetValue = this.options.onSetValue || function () {};
 		this.range = new ChangeRange(engine, {

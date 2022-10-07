@@ -29,7 +29,11 @@ export interface ChangeEventInterface {
 	 * 选择事件
 	 * @param callback
 	 */
-	onSelect(callback: (event: Event) => void): void;
+	onSelect(
+		callback: (event: Event) => void,
+		onStart?: EventListener,
+		onEnd?: EventListener,
+	): void;
 	/**
 	 * 粘贴事件
 	 * @param callback
@@ -107,6 +111,8 @@ export type ChangeOptions = {
 	 * 光标选择事件
 	 */
 	onSelect?: () => void;
+	onSelectStart?: () => void;
+	onSelectEnd?: () => void;
 	/**
 	 * 值实时变化事件
 	 */
@@ -194,6 +200,8 @@ export interface ChangeInterface {
 	 * 编辑器中光标改变触发
 	 */
 	onSelect: (range?: RangeInterface) => void;
+	onSelectStart: () => void;
+	onSelectEnd: () => void;
 	/**
 	 * 设置编辑器值后触发
 	 */

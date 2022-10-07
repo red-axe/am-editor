@@ -93,6 +93,8 @@ class Engine<T extends EngineOptions = EngineOptions>
 		this.change = new Change(this, {
 			onChange: (trigger) => this.trigger('change', trigger),
 			onSelect: () => this.trigger('select'),
+			onSelectStart: () => this.trigger('selectStart'),
+			onSelectEnd: () => this.trigger('selectEnd'),
 			onRealtimeChange: (trigger) => {
 				this.trigger('realtimeChange', trigger);
 			},

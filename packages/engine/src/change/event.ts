@@ -334,7 +334,11 @@ class ChangeEvent implements ChangeEventInterface {
 		});
 	}
 
-	onSelect(callback: EventListener) {
+	onSelect(
+		callback: EventListener,
+		onStart?: EventListener,
+		onEnd?: EventListener,
+	) {
 		const { bindSelect } = this.options;
 		if (bindSelect && !bindSelect()) return;
 		// 模拟 selection change 事件
@@ -345,6 +349,7 @@ class ChangeEvent implements ChangeEventInterface {
 					return;
 				}
 				this.isSelecting = true;
+				if (onStart) onStart(event);
 			},
 		);
 		this.onDocument(isMobile ? 'touchend' : 'mouseup', (e) => {
@@ -354,7 +359,8 @@ class ChangeEvent implements ChangeEventInterface {
 			this.isSelecting = false;
 			// mouseup 瞬间选择状态不会马上被取消，需要延迟
 			window.setTimeout(() => {
-				return callback(e);
+				callback(e);
+				if (onEnd) onEnd(e);
 			}, 10);
 		});
 		this.onContainer('keydown', () => {
