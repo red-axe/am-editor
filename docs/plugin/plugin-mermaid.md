@@ -2,13 +2,13 @@
 
 mermaid plugin (support markdown syntax to generate mermaid charts)
 
-## 安装
+## Install
 
 ```bash
 yarn add @aomao/plugin-mermaid
 ```
 
-添加到引擎
+add to engine
 
 ```ts
 import Engine, { EngineInterface } from '@aomao/engine';
@@ -17,7 +17,7 @@ import Mermaid , { MermaidComponent } from '@aomao/plugin-mermaid';
 new Engine(...,{ plugins:[Mermaid] , cards:[MermaidComponent]})
 ```
 
-## 语法
+## Grammar
 
 ```mermaid
  mermaid syntax (currently supports flowchart, sequence diagram, pie chart, Gantt chart, gitGraph, erDiagram, journey, stateDiagram)
@@ -43,7 +43,7 @@ Syntax reference:
   Bob-->>John: Jolly good!
 ```
 
-## 命令
+## Command
 
 ```ts
 // can carry parameters, the second mermaid syntax
