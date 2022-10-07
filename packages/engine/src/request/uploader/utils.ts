@@ -29,26 +29,23 @@ export const getFileSize = (
 	size: number,
 	base: number = isWindows ? 2 : 10,
 ) => {
+	const options = {
+		exponent: 2,
+		round: 1,
+	};
 	//1KB以下
 	if (size < 1024) {
-		return filesize(size, {
-			base,
-			exponent: -1,
-			round: 0,
-		});
+		options.exponent = -1;
+		options.round = 0;
 	}
 	//1M以下
 	if (size < 1048576) {
-		return filesize(size, {
-			base,
-			exponent: 1,
-			round: 0,
-		});
+		options.exponent = 1;
+		options.round = 0;
 	}
 
 	return filesize(size, {
 		base,
-		exponent: 2,
-		round: 1,
+		...options,
 	});
 };
