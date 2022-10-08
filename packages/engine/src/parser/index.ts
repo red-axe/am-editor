@@ -643,7 +643,7 @@ class Parser implements ParserInterface {
 		editor.trigger('parse:html-before', this.root);
 		editor.trigger('parse:html', element);
 		editor.trigger('parse:html-after', element);
-		return element.html();
+		return element.html().replace(/\u200b/g, '');
 	}
 
 	/**
@@ -719,6 +719,7 @@ class Parser implements ParserInterface {
 				onText: (_, text) => {
 					text = unescape(text);
 					text = text.replace(/\u00a0/g, ' ');
+					text = text.replace(/\u200b/g, '');
 					result.push(text);
 				},
 				onClose: (node, name) => {
