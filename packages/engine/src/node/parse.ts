@@ -24,7 +24,7 @@ function domParser(
 			const isTr = selector.indexOf('<tr') === 0;
 			const isTd = selector.indexOf('<td') === 0;
 			//替换注释
-			selector = selector.trim().replace(/<!--[^>]*-->/g, '');
+			selector = selector.replace(/<!--[^>]*-->/g, '');
 
 			const cacheNode = nodeCaches.get(selector);
 			if (cacheNode) {
