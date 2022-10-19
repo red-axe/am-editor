@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-quote",
-  "version": "2.9.27",
+  "version": "2.9.28",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
