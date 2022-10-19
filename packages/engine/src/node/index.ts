@@ -1051,9 +1051,9 @@ class NodeModel implements NodeModelInterface {
 		}
 
 		node.each((node) => {
-			const element = <Element>node;
-			element.innerHTML = val;
-			this.editor.nodeId.generateAll(element);
+			if (!(node instanceof Element)) return;
+			node.innerHTML = val;
+			this.editor.nodeId.generateAll(node);
 		});
 		return node;
 	}
@@ -1118,9 +1118,9 @@ class NodeModel implements NodeModelInterface {
 			if (
 				text.charCodeAt(1) === 0x200b &&
 				next &&
-				next.nodeType === Node.ELEMENT_NODE &&
+				next instanceof Element &&
 				[ANCHOR, FOCUS, CURSOR].indexOf(
-					(<Element>next).getAttribute(DATA_ELEMENT) || '',
+					next.getAttribute(DATA_ELEMENT) || '',
 				) >= 0
 			) {
 				return;

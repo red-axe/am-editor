@@ -572,9 +572,8 @@ class NodeEntry implements NodeInterface {
 	 */
 	removeAttributes(key: string): NodeInterface {
 		this.each((node) => {
-			if (node.nodeType !== Node.ELEMENT_NODE) return;
-			const element = <Element>node;
-			element.removeAttribute(key);
+			if (!(node instanceof Element)) return;
+			node.removeAttribute(key);
 		});
 		return this;
 	}
@@ -605,8 +604,8 @@ class NodeEntry implements NodeInterface {
 	 */
 	addClass(className: string): NodeInterface {
 		this.each((node) => {
-			const element = <Element>node;
-			element.classList.add(className);
+			if (!(node instanceof Element)) return;
+			node.classList.add(className);
 		});
 		return this;
 	}
@@ -618,8 +617,8 @@ class NodeEntry implements NodeInterface {
 	 */
 	removeClass(className: string): NodeEntry {
 		this.each((node) => {
-			const element = <Element>node;
-			element.classList.remove(className);
+			if (!(node instanceof Element)) return;
+			node.classList.remove(className);
 		});
 		return this;
 	}
