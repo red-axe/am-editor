@@ -20,11 +20,15 @@ function domParser(
 	//文本字符串
 	if (typeof selector === 'string') {
 		//特殊字符，或者html代码
-		if (!context || /<[^>]+>/g.test(selector)) {
+		let isTag = false;
+		if (!context || (isTag = /<[^>]+>/g.test(selector))) {
 			const isTr = selector.indexOf('<tr') === 0;
 			const isTd = selector.indexOf('<td') === 0;
 			//替换注释
-			selector = selector.replace(/<!--[^>]*-->/g, '');
+			selector = (isTag ? selector.trim() : selector).replace(
+				/<!--[^>]*-->/g,
+				'',
+			);
 
 			const cacheNode = nodeCaches.get(selector);
 			if (cacheNode) {
