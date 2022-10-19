@@ -558,9 +558,9 @@ class NodeEntry implements NodeInterface {
 		}
 		const isRemoveStyle = key === 'style' && val === '';
 		this.each((node) => {
-			const element = node as Element;
-			if (isRemoveStyle) element.removeAttribute('style');
-			else element.setAttribute(key, val.toString());
+			if (!(node instanceof Element)) return;
+			if (isRemoveStyle) node.removeAttribute('style');
+			else node.setAttribute(key, val.toString());
 		});
 		return this;
 	}
@@ -718,7 +718,9 @@ class NodeEntry implements NodeInterface {
 			});
 			return this;
 		}
-		return this.length > 0 ? (this[0] as Element).innerHTML : '';
+		return this.length > 0 && this[0] instanceof Element
+			? this[0].innerHTML
+			: '';
 	}
 	/**
 	 * 获取或设置元素节点文本
@@ -854,7 +856,7 @@ class NodeEntry implements NodeInterface {
 			for (let i = 0; i < nodes.length; i++) {
 				const child = isClone ? nodes[i].cloneNode(true) : nodes[i];
 				if (typeof selector === 'string') {
-					(node as Element).append(child);
+					if (node instanceof Element) node.append(child);
 				} else {
 					node.appendChild(child);
 				}
