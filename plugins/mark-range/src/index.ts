@@ -38,7 +38,7 @@ export default class<
 	private MARK_KEY = `data-mark-key`;
 	private MARK_UUID = `data-mark-uuid`;
 	private ids: { [key: string]: Array<string> } = {};
-	private m_uuid = uuid(18, 24);
+	private m_uuid = uuid();
 
 	readonly followStyle: boolean = false;
 

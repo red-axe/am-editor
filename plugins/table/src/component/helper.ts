@@ -269,6 +269,11 @@ class Helper implements HelperInterface {
 		});
 		//补充可编辑器区域
 		const tds = table.find('td');
+		const emptyTd = $(
+			Template.EmptyCell(
+				!isEngine(this.#editor) || this.#editor.readonly,
+			),
+		);
 		tds.each((_, index) => {
 			const tdNode = tds.eq(index);
 			if (!tdNode) return;
@@ -278,15 +283,11 @@ class Helper implements HelperInterface {
 			);
 			let editableElement = tdNode.find(EDITABLE_SELECTOR);
 			if (editableElement.length === 0) {
-				const content = tdNode.html();
-				tdNode.empty();
-				tdNode.append(
-					Template.EmptyCell(
-						!isEngine(this.#editor) || this.#editor.readonly,
-					),
-				);
+				const children = tdNode.children();
+				tdNode.append(emptyTd.clone(true));
 				editableElement = tdNode.find(EDITABLE_SELECTOR);
-				editableElement.html(content);
+				editableElement.empty();
+				editableElement.append(children);
 			}
 			editableElement.find('p').each((pNode) => {
 				if (pNode.childNodes.length === 0) {
