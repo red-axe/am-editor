@@ -210,8 +210,8 @@ class Schema implements SchemaInterface {
 		else id = id.split('-')[0];
 		if (element.nodeName !== 'CARD' && ~this._invalidKeys.indexOf(id))
 			return undefined;
-		if (!!this._typeMap[id] && (!filter || filter(this._typeMap[id]!)))
-			return this._typeMap[id].type;
+		const map = this._typeMap[id];
+		if (!!map && (!filter || filter(map))) return map.type;
 		const reuslt = this.getRule(element, filter);
 		if (reuslt) this._typeMap[id] = reuslt;
 		else this._invalidKeys.push(id);
