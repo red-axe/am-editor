@@ -1,7 +1,7 @@
 import { NodeInterface } from '../types';
 import { DATA_ID } from '../constants';
 
-const _counters: { [key: string]: number } = {};
+let _counters = 0;
 
 export const uuid = (n = 0): string => {
 	return Number(
@@ -37,11 +37,37 @@ export default (
 	if (!cachePerfix) {
 		const base64 = window.btoa(encodeURIComponent(value)).replace(/=/g, '');
 		const indexs: number[] = [];
-		for (let i = 1; i <= 26; i++) {
-			const char = String.fromCharCode(i + 64).toLowerCase();
+		[
+			'a',
+			'b',
+			'c',
+			'd',
+			'e',
+			'f',
+			'g',
+			'h',
+			'i',
+			'j',
+			'k',
+			'l',
+			'm',
+			'n',
+			'o',
+			'p',
+			'q',
+			'r',
+			's',
+			't',
+			'u',
+			'v',
+			'w',
+			'x',
+			'y',
+			'z',
+		].forEach((char, i) => {
 			const index = base64.indexOf(char);
-			indexs.push(~index ? index : i % 2 ? 0 : 1);
-		}
+			indexs.push(~index ? index : base64.length % i ? 0 : 1);
+		});
 		const str = Number(indexs.join('')).toString(36).replace(/0/g, '');
 		prefix = prefix + str.substr(0, 4) + str.substr(-4);
 		valueCaches.set(value, prefix);
@@ -50,9 +76,9 @@ export default (
 	}
 	const hash = prefix;
 	if (unique) {
-		const counter = _counters[hash] || 0;
-		_counters[hash] = counter + 1;
-		return `${hash}-${uuid(_counters[hash])}`;
+		const key = `${hash}-${uuid(_counters)}`;
+		_counters++;
+		return key;
 	}
 
 	return hash;
