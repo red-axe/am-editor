@@ -36,7 +36,6 @@ export default (
 	const cachePerfix = valueCaches.get(value);
 	if (!cachePerfix) {
 		const base64 = window.btoa(encodeURIComponent(value)).replace(/=/g, '');
-		prefix = prefix + base64.substr(0, 4);
 		const indexs: number[] = [];
 		for (let i = 1; i <= 26; i++) {
 			const char = String.fromCharCode(i + 64).toLowerCase();
