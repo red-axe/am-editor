@@ -77,7 +77,9 @@ class Container {
 		// 编辑器文档尾部始终保持一行
 		this.node.on('click', this.handleClick);
 		document.addEventListener('mousedown', this.docMouseDown);
-		this.node.on(isMobile ? 'touchstart' : 'mousedown', this.triggerFoucs);
+		this.node.on(isMobile ? 'touchstart' : 'mousedown', this.triggerFoucs, {
+			passive: true,
+		});
 		this.node.on('focus', this.handleFocus);
 	}
 

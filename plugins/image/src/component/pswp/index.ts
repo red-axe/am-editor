@@ -161,7 +161,7 @@ class Pswp extends EventEmitter2 implements PswpInterface {
 				this.close();
 			}
 		};
-		this.root.on('click', onClick);
+		this.root.on('click', onClick, { passive: true });
 		this.closeUI.on('click', this.close);
 	}
 

@@ -19,10 +19,11 @@ import NativeEvent from './native-event';
 import ChangeRange from './range';
 import Range from '../range';
 
+const FLUSHING: WeakMap<EngineInterface, boolean> = new WeakMap();
+const SELECT_FLUSHING: WeakMap<EngineInterface, boolean> = new WeakMap();
 class ChangeModel implements ChangeInterface {
 	private engine: EngineInterface;
 	private options: ChangeOptions;
-	private changeTimer: NodeJS.Timeout | null = null;
 	event: ChangeEvent;
 	valueCached: string | null = null;
 	onChange: (trigger: 'remote' | 'local' | 'both') => void;
@@ -66,7 +67,13 @@ class ChangeModel implements ChangeInterface {
 				endContainer: range.endContainer,
 				endOffset: range.endOffset,
 			};
-			if (this.options.onSelect) this.options.onSelect();
+			if (!SELECT_FLUSHING.get(this.engine)) {
+				SELECT_FLUSHING.set(this.engine, true);
+				Promise.resolve().then(() => {
+					SELECT_FLUSHING.set(this.engine, false);
+					if (this.options.onSelect) this.options.onSelect();
+				});
+			}
 		};
 		this.onSelectStart = () => {
 			if (this.options.onSelectStart) this.options.onSelectStart();
@@ -150,14 +157,13 @@ class ChangeModel implements ChangeInterface {
 		this.onRealtimeChange(trigger);
 		if (this.changeTrigger.indexOf(trigger) < 0)
 			this.changeTrigger.push(trigger);
-		this.clearChangeTimer();
-		this.changeTimer = setTimeout(() => {
-			this._change();
-		}, 50);
-	}
-
-	private clearChangeTimer() {
-		if (this.changeTimer) clearTimeout(this.changeTimer);
+		if (!FLUSHING.get(this.engine)) {
+			FLUSHING.set(this.engine, true);
+			Promise.resolve().then(() => {
+				FLUSHING.set(this.engine, false);
+				this._change();
+			});
+		}
 	}
 
 	isComposing() {
@@ -1134,7 +1140,6 @@ class ChangeModel implements ChangeInterface {
 
 	destroy() {
 		this.event.destroy();
-		this.clearChangeTimer();
 	}
 }
 

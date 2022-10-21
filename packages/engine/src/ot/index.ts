@@ -12,7 +12,6 @@ import {
 	MutationInterface,
 	OTInterface,
 	SelectionInterface,
-	TargetOp,
 } from '../types/ot';
 import OTSelection from './selection';
 import OTDoc from './doc';
@@ -22,6 +21,7 @@ import { random } from '../utils';
 import { CARD_VALUE_KEY, READY_CARD_KEY } from '../constants';
 import './index.css';
 
+const FLUSHING: WeakMap<EngineInterface, boolean> = new WeakMap();
 class OTModel extends EventEmitter2 implements OTInterface {
 	private engine: EngineInterface;
 	private members: Array<Member>;
@@ -361,20 +361,28 @@ class OTModel extends EventEmitter2 implements OTInterface {
 	}
 
 	renderSelection(attributes: Attribute[] | Attribute) {
-		if (!Array.isArray(attributes)) attributes = [attributes];
-		attributes.forEach((attribute) => {
-			if (
-				this.currentMember &&
-				attribute.uuid === this.currentMember.uuid
-			)
-				return;
-			const member = this.members.find((m) => m.uuid === attribute.uuid);
-			if ('remove' in attribute || !member)
-				this.selection.removeAttirbute(attribute.uuid);
-			else {
-				this.selection.setAttribute(attribute, member);
-			}
-		});
+		if (!FLUSHING.get(this.engine)) {
+			FLUSHING.set(this.engine, true);
+			Promise.resolve().then(() => {
+				FLUSHING.set(this.engine, false);
+				if (!Array.isArray(attributes)) attributes = [attributes];
+				attributes.forEach((attribute) => {
+					if (
+						this.currentMember &&
+						attribute.uuid === this.currentMember.uuid
+					)
+						return;
+					const member = this.members.find(
+						(m) => m.uuid === attribute.uuid,
+					);
+					if ('remove' in attribute || !member)
+						this.selection.removeAttirbute(attribute.uuid);
+					else {
+						this.selection.setAttribute(attribute, member);
+					}
+				});
+			});
+		}
 	}
 
 	destroy() {

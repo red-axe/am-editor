@@ -415,10 +415,14 @@ class Scrollbar extends EventEmitter2 {
 		if (isMobile) {
 			// 在节点上滑动手指
 			if (this.x) {
-				this.container.on('touchstart', this.bindContainerTouchX);
+				this.container.on('touchstart', this.bindContainerTouchX, {
+					passive: true,
+				});
 			}
 			if (this.y) {
-				this.container.on('touchstart', this.bindContainerTouchY);
+				this.container.on('touchstart', this.bindContainerTouchY, {
+					passive: true,
+				});
 			}
 		} else {
 			// 在节点上滚动鼠标滚轮
@@ -427,7 +431,9 @@ class Scrollbar extends EventEmitter2 {
 				this.bindWheelScroll,
 			);
 		}
-		this.container.on('scroll', this.scroll);
+		this.container.on('scroll', this.scroll, {
+			passive: true,
+		});
 		const containerElement = this.container.get<HTMLElement>();
 		if (!containerElement) return;
 		// this.#observer = new ResizeObserver(() => {
@@ -541,10 +547,12 @@ class Scrollbar extends EventEmitter2 {
 		document.body.addEventListener(
 			isMobile ? 'touchmove' : 'mousemove',
 			this.scrollX,
+			{ passive: true },
 		);
 		document.body.addEventListener(
 			isMobile ? 'touchend' : 'mouseup',
 			this.scrollXEnd,
+			{ passive: true },
 		);
 	};
 
@@ -558,10 +566,12 @@ class Scrollbar extends EventEmitter2 {
 		document.body.addEventListener(
 			isMobile ? 'touchmove' : 'mousemove',
 			this.scrollY,
+			{ passive: true },
 		);
 		document.body.addEventListener(
 			isMobile ? 'touchend' : 'mouseup',
 			this.scrollYEnd,
+			{ passive: true },
 		);
 	};
 
@@ -570,6 +580,7 @@ class Scrollbar extends EventEmitter2 {
 			this.slideX?.on(
 				isMobile ? 'touchstart' : 'mousedown',
 				this.scrollXStart,
+				{ passive: true },
 			);
 		}
 	};
@@ -579,6 +590,7 @@ class Scrollbar extends EventEmitter2 {
 			this.slideY?.on(
 				isMobile ? 'touchstart' : 'mousedown',
 				this.scrollYStart,
+				{ passive: true },
 			);
 		}
 	};

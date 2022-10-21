@@ -127,6 +127,8 @@ class RangeColoring implements RangeColoringInterface {
 			position: 'absolute',
 			top: 0,
 			left: 0,
+			transform: 'translateX(0) translateY(0)',
+			'will-change': 'transform',
 			'pointer-events': 'none',
 		});
 		child[0]['__range'] = range.cloneRange();
@@ -159,7 +161,10 @@ class RangeColoring implements RangeColoringInterface {
 							parentWidth - result.x,
 							parentHeight,
 						);
-						child.css('left', `${result.x}px`);
+						child.css(
+							'transform',
+							`translateX(${result.x}px) translateY(0)`,
+						);
 						result.x = 0;
 					}
 					targetCanvas.clearRect(result);
@@ -272,11 +277,23 @@ class RangeColoring implements RangeColoringInterface {
 	setCursorRect(node: NodeInterface, rect: CursorRect) {
 		if (-1 !== rect.height) {
 			if (0 === rect.height) {
-				node.css(rect);
+				node.css({
+					top: 0,
+					left: 0,
+					height: rect.height,
+					transform: `translateX(${rect.left}) translateY(${rect.top})`,
+					'will-change': 'transform, height',
+				});
 				node.addClass(USER_CURSOR_CARD_CLASS);
 				return;
 			}
-			node.css(rect);
+			node.css({
+				top: 0,
+				left: 0,
+				height: rect.height,
+				transform: `translateX(${rect.left}) translateY(${rect.top})`,
+				'will-change': 'transform, height',
+			});
 			node.removeClass(USER_CURSOR_CARD_CLASS);
 		} else node.remove();
 	}
@@ -417,8 +434,12 @@ class RangeColoring implements RangeColoringInterface {
 		if (mask && mask.length > 0) {
 			mask[0]['__node'] = node[0];
 			mask.css({
-				left: nodeRect.left - parentRect.left + 'px',
-				top: nodeRect.top - parentRect.top + 'px',
+				left: 0,
+				top: 0,
+				transform: `translateX(${
+					nodeRect.left - parentRect.left
+				}) translateY(${nodeRect.top - parentRect.top}px)`,
+				'will-change': 'transform',
 			});
 			return;
 		}
@@ -443,20 +464,28 @@ class RangeColoring implements RangeColoringInterface {
 					}, 20);
 				} else {
 					mask.css({
-						left: nodeRect.left - parentRect.left + 'px',
-						top: nodeRect.top - parentRect.top + 'px',
+						transform: `translateX(${
+							nodeRect.left - parentRect.left
+						}px) translateY(${nodeRect.top - parentRect.top}px)`,
+						left: 0,
+						top: 0,
 						width: nodeRect.width + 'px',
 						height: nodeRect.height + 'px',
+						'will-change': 'transform, width, height',
 					});
 				}
 			};
 			getRect();
 		} else {
 			mask.css({
-				left: nodeRect.left - parentRect.left + 'px',
-				top: nodeRect.top - parentRect.top + 'px',
+				transform: `translateX(${
+					nodeRect.left - parentRect.left
+				}px) translateY(${nodeRect.top - parentRect.top}px)`,
+				left: 0,
+				top: 0,
 				width: nodeRect.width + 'px',
 				height: nodeRect.height + 'px',
+				'will-change': 'transform, width, height',
 			});
 		}
 
@@ -470,8 +499,12 @@ class RangeColoring implements RangeColoringInterface {
 		mask.on('mousemove', (event: MouseEvent) => {
 			const tooltipElement = $(`div[${DATA_ELEMENT}=tooltip]`);
 			tooltipElement.css({
-				left: event.pageX - 16 + 'px',
-				top: event.pageY + 32 + 'px',
+				left: 0,
+				top: 0,
+				transform: `translateX(${event.pageX - 16}px) translateY(${
+					event.pageY + 32
+				}px)`,
+				'will-change': 'transform',
 			});
 		});
 

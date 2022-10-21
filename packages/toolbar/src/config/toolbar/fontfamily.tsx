@@ -1,6 +1,6 @@
 import React from 'react';
 import { DropdownListItem } from '../../dropdown/list';
-import { isSupportFontFamily } from '../../utils';
+import { checkSupportFontFamily } from '../../utils';
 
 export const defaultData = [
 	{
@@ -105,25 +105,27 @@ export default (
 	data: Array<{ key: string; value: string }>,
 	language?: { [key: string]: string },
 ): Array<DropdownListItem> => {
-	return data.map(({ key, value }) => {
-		const disabled =
-			key !== 'default'
-				? !value.split(',').some((v) => isSupportFontFamily(v.trim()))
-				: false;
-		return {
-			key: value,
-			faimlyName: language ? language[key] : key,
-			content: () => (
-				<span style={{ fontFamily: value }}>
-					{language ? language[key] : key}
-				</span>
-			),
-			hotkey: false,
-			disabled,
-			title: disabled
-				? (language && language['notInstalled']) ||
-				  'The font may not be installed'
-				: undefined,
-		};
+	return checkSupportFontFamily((check) => {
+		return data.map(({ key, value }) => {
+			const disabled =
+				key !== 'default'
+					? !value.split(',').some((v) => check(v.trim()))
+					: false;
+			return {
+				key: value,
+				faimlyName: language ? language[key] : key,
+				content: () => (
+					<span style={{ fontFamily: value }}>
+						{language ? language[key] : key}
+					</span>
+				),
+				hotkey: false,
+				disabled,
+				title: disabled
+					? (language && language['notInstalled']) ||
+					  'The font may not be installed'
+					: undefined,
+			};
+		});
 	});
 };

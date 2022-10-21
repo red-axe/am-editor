@@ -686,7 +686,9 @@ class TableComponent<V extends TableValue = TableValue>
 		this.scrollbar?.refresh();
 		const { editor } = this;
 		if (isEngine(editor) && !isMobile) {
-			this.getCenter().on('scroll', this.updateScrollbar);
+			this.getCenter().on('scroll', this.updateScrollbar, {
+				passive: true,
+			});
 		}
 	}
 
@@ -808,10 +810,15 @@ class TableComponent<V extends TableValue = TableValue>
 			}
 		};
 		this.scrollbar.on('change', handleScrollbarChange);
-		if (!isMobile) window.addEventListener('scroll', this.updateScrollbar);
+		if (!isMobile)
+			window.addEventListener('scroll', this.updateScrollbar, {
+				passive: true,
+			});
 		window.addEventListener('resize', this.updateScrollbar);
 		if (isEngine(editor) && !isMobile) {
-			editor.scrollNode?.on('scroll', this.updateScrollbar);
+			editor.scrollNode?.on('scroll', this.updateScrollbar, {
+				passive: true,
+			});
 		}
 	}
 

@@ -107,11 +107,17 @@ class CardModel implements CardModelInterface {
 			this.classes[card.cardName] = card;
 		});
 		if (!this.lazyRender) return;
-		window.addEventListener('resize', this.renderAsyncComponents);
+		window.addEventListener('resize', this.renderAsyncComponents, {
+			passive: true,
+		});
 		editor.scrollNode
 			?.get<HTMLElement>()
-			?.addEventListener('scroll', this.renderAsyncComponents);
-		window.addEventListener('scroll', this.renderAsyncComponents);
+			?.addEventListener('scroll', this.renderAsyncComponents, {
+				passive: true,
+			});
+		window.addEventListener('scroll', this.renderAsyncComponents, {
+			passive: true,
+		});
 		editor.on('card:async-render', this.renderAsyncComponents);
 	}
 

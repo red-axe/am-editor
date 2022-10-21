@@ -222,45 +222,45 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * 绑定事件
 	 * @param eventType 事件类型
 	 * @param listener 事件回调
-	 * @param rewrite 是否重写
+	 * @param options 是否重写
 	 */
 	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,
 		listener: F,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 全选ctrl+a键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:all',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 卡片最小化时触发
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'card:minimize',
 		listener: (card: CardInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 卡片最大化时触发
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'card:maximize',
 		listener: (card: CardInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析DOM节点，生成符合标准的 XML 代码之前触发
@@ -269,7 +269,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'parse:value-before',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
@@ -286,7 +286,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 			styles: { [key: string]: string },
 			value: Array<string>,
 		) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析DOM节点，生成文本，遍历子节点时触发。返回false跳过当前节点
@@ -303,7 +303,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 			styles: { [key: string]: string },
 			value: Array<string>,
 		) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析DOM节点，生成符合标准的 XML。生成xml代码结束后触发
@@ -312,7 +312,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'parse:value-after',
 		listener: (value: Array<string>) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 转换为HTML代码之前触发
@@ -321,7 +321,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'parse:html-before',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 转换为HTML代码
@@ -330,7 +330,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'parse:html',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 转换为HTML代码之后触发
@@ -339,7 +339,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'parse:html-after',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 当粘贴到编辑器事件发生时触发，返回false，将不在处理粘贴
@@ -352,7 +352,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 			data: ClipboardData & { isPasteText: boolean },
 			source: string,
 		) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 设置本次粘贴所需保留标签的白名单，以及属性
@@ -361,7 +361,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'paste:schema',
 		listener: (schema: SchemaInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析粘贴数据，还未生成符合编辑器数据的片段之前触发
@@ -370,7 +370,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'paste:origin',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析粘贴数据，生成符合编辑器数据的片段之后扁平化阶段触发
@@ -379,7 +379,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'paste:each',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析粘贴数据，生成符合编辑器数据的片段之后扁平化阶段触发
@@ -388,7 +388,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'paste:each-after',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 生成粘贴数据DOM片段后，还未写入到编辑器之前触发
@@ -397,7 +397,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'paste:before',
 		listener: (fragment: DocumentFragment) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 插入当前粘贴的片段后触发，此时还未渲染卡片
@@ -406,12 +406,12 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'paste:insert',
 		listener: (range: RangeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 粘贴完成后触发
 	 */
-	on(eventType: 'paste:after', listener: () => void, rewrite?: boolean): void;
+	on(eventType: 'paste:after', listener: () => void, options?: boolean): void;
 	/**
 	 * 复制DOM节点时触发
 	 * @param node 当前遍历的子节点
@@ -419,7 +419,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'copy',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * DOM改变触发
@@ -429,7 +429,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'ops',
 		listener: (ops: Op[]) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 移除绑定事件
@@ -741,264 +741,264 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * 回车键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:enter',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 删除键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:backspace',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * Tab键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:tab',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * Shift-Tab键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:shift-tab',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * @ 符合键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:at',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 空格键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:space',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 反斜杠键按下，唤出Toolbar，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:slash',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 左方向键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:left',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 右方向键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:right',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 上方向键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:up',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 下方向键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:down',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 回车键按下弹起，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keyup:enter',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 删除键按下弹起，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keyup:backspace',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * Tab键按下弹起，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keyup:tab',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 空格键按下弹起，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keyup:space',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 编辑器光标选择变化时触发
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
-	on(eventType: 'select', listener: () => void, rewrite?: boolean): void;
+	on(eventType: 'select', listener: () => void, options?: boolean): void;
 	/**
 	 * 编辑器值变化时触发
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'change',
 		listener: (value: string, trigger: 'remote' | 'local' | 'both') => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 编辑器值有变化时就触发，与 change 相比，change 需要在组合输入法完成输入后才会触发，在一定时间内如果内容没有改版也不会触发 change
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'realtimeChange',
 		listener: (trigger: 'remote' | 'local') => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 设置编辑器值之前
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'beforeSetValue',
 		listener: (value: string) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 设置编辑器值之后
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'afterSetValue',
 		listener: () => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 编辑器聚焦
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
+	 * @param options
 	 */
-	on(eventType: 'focus', listener: () => void, rewrite?: boolean): void;
+	on(eventType: 'focus', listener: () => void, options?: boolean): void;
 	/**
 	 * 编辑器失去焦点
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
+	 * @param options
 	 */
-	on(eventType: 'blur', listener: () => void, rewrite?: boolean): void;
+	on(eventType: 'blur', listener: () => void, options?: boolean): void;
 	/**
 	 * 编辑器只读切换时
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'readonly',
 		listener: (readonly: boolean) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 执行命令之前
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'beforeCommandExecute',
 		listener: (name: string, ...args: any) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 执行命令之后
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'afterCommandExecute',
 		listener: (name: string, ...args: any) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 拖动文件到编辑器时触发
@@ -1007,29 +1007,29 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	on(
 		eventType: 'drop:files',
 		listener: (files: Array<File>) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 历史撤销
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'undo',
 		listener: () => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 历史重做
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'redo',
 		listener: () => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 回车键按下，返回false，终止处理其它监听
@@ -1186,7 +1186,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * 编辑器值有变化时就触发，与 change 相比，change 需要在组合输入法完成输入后才会触发，在一定时间内如果内容没有改版也不会触发 change
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	off(
 		eventType: 'realtimeChange',
@@ -1373,7 +1373,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * 编辑器值有变化时就触发，与 change 相比，change 需要在组合输入法完成输入后才会触发，在一定时间内如果内容没有改版也不会触发 change
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	trigger(
 		eventType: 'realtimeChange',

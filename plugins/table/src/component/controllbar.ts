@@ -322,6 +322,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			?.on(
 				isMobile ? 'touchstart' : 'mousedown',
 				this.onMouseDownColsHeader,
+				{ passive: true },
 			)
 			.on('mouseup', this.onClickColsHeader)
 			.on('dragstart', this.onDragStartColsHeader);
@@ -329,6 +330,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			?.on(
 				isMobile ? 'touchstart' : 'mousedown',
 				this.onMouseDownRowsHeader,
+				{ passive: true },
 			)
 			.on('mouseup', this.onClickRowsHeader)
 			.on('dragstart', this.onDragStartRowsHeader);
@@ -877,10 +879,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		document.addEventListener(
 			isMobile ? 'touchmove' : 'mousemove',
 			this.onChangeSize,
+			{ passive: true },
 		);
 		document.addEventListener(
 			isMobile ? 'touchend' : 'mouseup',
 			this.onChangeSizeEnd,
+			{ passive: true },
 		);
 		if (!isMobile)
 			document.addEventListener('mouseleave', this.onChangeSizeEnd);

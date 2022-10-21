@@ -165,45 +165,45 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 	 * 绑定事件
 	 * @param eventType 事件类型
 	 * @param listener 事件回调
-	 * @param rewrite 是否重写
+	 * @param options 是否重写
 	 */
 	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,
 		listener: F,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 全选ctrl+a键按下，返回false，终止处理其它监听
 	 * @param eventType
 	 * @param listener
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'keydown:all',
 		listener: (event: KeyboardEvent) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 卡片最小化时触发
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'card:minimize',
 		listener: (card: CardInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 卡片最大化时触发
 	 * @param eventType
 	 * @param listener name:插件名称、args:参数
-	 * @param rewrite
+	 * @param options
 	 */
 	on(
 		eventType: 'card:maximize',
 		listener: (card: CardInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析DOM节点，生成符合标准的 XML 代码之前触发
@@ -212,7 +212,7 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 	on(
 		eventType: 'parse:value-before',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析DOM节点，生成符合标准的 XML，遍历子节点时触发。返回false跳过当前节点
@@ -229,7 +229,7 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 			styles: { [key: string]: string },
 			value: Array<string>,
 		) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析DOM节点，生成文本，遍历子节点时触发。返回false跳过当前节点
@@ -246,7 +246,7 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 			styles: { [key: string]: string },
 			value: Array<string>,
 		) => boolean | void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析DOM节点，生成符合标准的 XML。生成xml代码结束后触发
@@ -255,7 +255,7 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 	on(
 		eventType: 'parse:value-after',
 		listener: (value: Array<string>) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 转换为HTML代码之前触发
@@ -264,7 +264,7 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 	on(
 		eventType: 'parse:html-before',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 转换为HTML代码
@@ -273,7 +273,7 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 	on(
 		eventType: 'parse:html',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 转换为HTML代码之后触发
@@ -282,7 +282,7 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 	on(
 		eventType: 'parse:html-after',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 复制DOM节点时触发
@@ -291,7 +291,7 @@ export interface EditorInterface<T extends EditorOptions = EditorOptions> {
 	on(
 		eventType: 'copy',
 		listener: (root: NodeInterface) => void,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 移除绑定事件

@@ -19,7 +19,7 @@ export interface EventInterface {
 	 * 绑定事件
 	 * @param eventType 事件名称
 	 * @param listener 事件处理方法
-	 * @param rewrite 是否重写事件
+	 * @param options 是否重写事件
 	 */
 	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,

@@ -23,7 +23,9 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 		this.rangeColoring = new RangeColoring(engine);
 		engine.container.on('keyup', this.emitSelectChange);
 		engine.container.on('mousedown', this.handleMouseDown);
-		engine.on('scroll', this.handleScroll);
+		engine.on('scroll', this.handleScroll, {
+			passive: true,
+		});
 	}
 
 	handleScroll = (node: NodeInterface) => {

@@ -201,9 +201,9 @@ class Editor<T extends EditorOptions = EditorOptions>
 	on<R = any, F extends EventListener<R> = EventListener<R>>(
 		eventType: string,
 		listener: F,
-		rewrite?: boolean,
+		options?: boolean | AddEventListenerOptions,
 	) {
-		this.event.on(eventType, listener, rewrite);
+		this.event.on(eventType, listener, options);
 		return this;
 	}
 

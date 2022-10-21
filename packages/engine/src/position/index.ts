@@ -37,10 +37,15 @@ class Position {
 		this.#root.append(this.#container);
 		this.#editor.root.append(this.#root);
 		this.#onUpdate = onUpdate;
-		if (!isMobile) window.addEventListener('scroll', this.updateListener);
+		if (!isMobile)
+			window.addEventListener('scroll', this.updateListener, {
+				passive: true,
+			});
 		window.addEventListener('resize', this.updateListener);
 		if (isEngine(this.#editor) && !isMobile) {
-			this.#editor.scrollNode?.on('scroll', this.updateListener);
+			this.#editor.scrollNode?.on('scroll', this.updateListener, {
+				passive: true,
+			});
 		}
 		if (target && target.length > 0) {
 			let size = { width: target.width(), height: target.height() };

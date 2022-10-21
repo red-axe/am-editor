@@ -99,6 +99,7 @@ class StatusEditor {
 				//event.preventDefault();
 				//input.get<HTMLInputElement>()?.focus();
 			},
+			{ passive: true },
 		);
 		if (onOk) {
 			input.on('keydown', (event) => {
@@ -115,18 +116,18 @@ class StatusEditor {
 		colors.forEach((color) => {
 			const item = $(`<span><span style="background-color:${
 				color.background
-			}"><svg 
+			}"><svg
             style="fill: ${
 				color.background.toUpperCase() === '#8C8C8C'
 					? '#FFFFFF'
 					: '#8C8C8C'
-			}; 
+			};
             display: ${
 				color.background === defaultColor.background &&
 				color.color === defaultColor.color
 					? 'block'
 					: 'none'
-			};" 
+			};"
             viewBox="0 0 18 18"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" /></svg></span></span>`);
 
 			item.on('mousedown', (event: MouseEvent) => {

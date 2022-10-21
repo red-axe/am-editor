@@ -671,10 +671,12 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		document.addEventListener(
 			isMobile ? 'touchend' : 'mouseup',
 			this.removeDragEvent,
+			{ passive: true },
 		);
 		document.addEventListener(
 			isMobile ? 'touchmove' : 'mousemove',
 			this.onDragMove,
+			{ passive: true },
 		);
 	}
 

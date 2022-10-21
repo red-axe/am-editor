@@ -28,9 +28,14 @@ export default class Popup {
 		} else {
 			document.addEventListener('selectionchange', this.onSelect);
 		}
-		if (!isMobile) window.addEventListener('scroll', this.onSelect);
+		if (!isMobile)
+			window.addEventListener('scroll', this.onSelect, {
+				passive: true,
+			});
 		window.addEventListener('resize', this.onSelect);
-		this.#editor.scrollNode?.on('scroll', this.onSelect);
+		this.#editor.scrollNode?.on('scroll', this.onSelect, {
+			passive: true,
+		});
 		document.addEventListener('mousedown', this.hide);
 	}
 
