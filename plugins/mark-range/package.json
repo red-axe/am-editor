@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-mark-range",
-    "version": "2.9.27",
+    "version": "2.9.28",
     "description": "范围标记",
     "publishConfig": {
         "access": "public"

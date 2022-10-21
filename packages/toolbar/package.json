@@ -1,6 +1,6 @@
 {
     "name": "@aomao/toolbar",
-    "version": "2.10.7",
+    "version": "2.10.8",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
