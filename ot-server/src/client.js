@@ -138,7 +138,15 @@ class Client {
 													id,
 												data,
 											);
-											if (node) return false;
+											if (
+												node &&
+												node.path.length ===
+													o.p.length &&
+												node.path.every(
+													(p, i) => p === o.p[i],
+												)
+											)
+												return false;
 										}
 									}
 									return true;
