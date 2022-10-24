@@ -112,7 +112,10 @@ class RangeColoring implements RangeColoringInterface {
 		if (child && child.length > 0) {
 			child.attributes(DATA_COLOR, color.toString());
 			targetCanvas = child[0]['__canvas'];
-			targetCanvas.clear();
+			if (!child[0]['__clear']) {
+				targetCanvas.clear();
+				child[0]['__clear'] = true;
+			}
 		} else {
 			child = $(
 				`<div class="${USER_BACKGROUND_CLASS}" ${DATA_UUID}="${uuid}" ${DATA_COLOR}="${color}" />`,
@@ -140,6 +143,7 @@ class RangeColoring implements RangeColoringInterface {
 		const parentHeight = this.root.height();
 		targetCanvas.resize(parentWidth, parentHeight);
 		if (range.collapsed) return [range];
+		child[0]['__clear'] = false;
 		let cardInfo = card.find(range.commonAncestorNode, true);
 		//如果是卡片，并且选区不在内容模块中，而是在卡片两侧的光标位置处，就不算作卡片
 		if (cardInfo && !cardInfo.isCenter(range.commonAncestorNode)) {
