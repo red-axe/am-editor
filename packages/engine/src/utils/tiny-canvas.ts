@@ -1,4 +1,8 @@
-import { DrawOptions, TinyCanvasInterface } from '../types/tiny-canvas';
+import {
+	DrawOptions,
+	DrawStyle,
+	TinyCanvasInterface,
+} from '../types/tiny-canvas';
 
 type Options = {
 	container?: HTMLElement;
@@ -34,6 +38,7 @@ class TinyCanvas implements TinyCanvasInterface {
 			canvas?.parentElement?.removeChild(canvas);
 		});
 		this.options.canvasCache = [];
+		this.options.canvasCount = 0;
 	}
 
 	private getCanvas(key: number) {
@@ -68,16 +73,21 @@ class TinyCanvas implements TinyCanvasInterface {
 				canvasCache.push(canvas);
 			}
 			this.options.canvasCache = canvasCache;
+			this.options.canvasCount = canvasCache.length;
 		} else {
 			const canvas = this.getCanvas(index);
 			canvasCache?.forEach((can) => {
-				can.setAttribute('width', width.toString());
+				const w = can.getAttribute('width');
+				if (!w || parseInt(w) !== width) {
+					can.setAttribute('width', width.toString());
+				}
 			});
 			if (canvas) {
-				canvas.setAttribute(
-					'height',
-					(height % (limitHeight || 0)).toString(),
-				);
+				const h = canvas.getAttribute('height');
+				const nh = height % (limitHeight || 0);
+				if (!h || parseInt(h) !== nh) {
+					canvas.setAttribute('height', nh.toString());
+				}
 			}
 		}
 	}
@@ -94,27 +104,34 @@ class TinyCanvas implements TinyCanvasInterface {
 				width,
 				height,
 			);
-			callback({
-				...rect.toJSON(),
-				context,
-			});
+			callback(
+				Object.assign({}, rect.toJSON(), {
+					context,
+				}),
+			);
 		}
+	}
+
+	handleFillRect(options: CallbackOptions & DrawStyle) {
+		const { context, x, y, width, height, fill, stroke } = options;
+		if (!context) return;
+		context.fillStyle = fill === undefined ? '#FFEC3D' : fill;
+		context.strokeStyle = stroke === undefined ? '#FFEC3D' : stroke;
+		context.fillRect(x, y, width, height);
 	}
 
 	drawRect(options: DrawOptions) {
 		const { x, y, width, height, fill, stroke } = options;
-		const callback = (opts: CallbackOptions) => {
-			const { context } = opts;
-			if (!context) return;
-			context.fillStyle = fill === undefined ? '#FFEC3D' : fill;
-			context.strokeStyle = stroke === undefined ? '#FFEC3D' : stroke;
-			context.fillRect(opts.x, opts.y, opts.width, opts.height);
-		};
 		const rect = new DOMRect(x, y, width, height);
-		this.handleRect({
-			...rect.toJSON(),
-			callback,
-		});
+		this.handleRect(
+			Object.assign({}, rect.toJSON(), {
+				callback: (options: CallbackOptions) => {
+					this.handleFillRect(
+						Object.assign({}, options, { fill, stroke }),
+					);
+				},
+			}),
+		);
 	}
 
 	private handleRect(options: HandleOptions) {
@@ -127,13 +144,20 @@ class TinyCanvas implements TinyCanvasInterface {
 		const dftIndex = Math.ceil(y / (limitHeight || 0));
 		const lastIndex = Math.ceil(last.y / (limitHeight || 0));
 		const rect = new DOMRect(x, y, width, height);
-		this.handleSingleRect({ ...rect.toJSON(), index: dftIndex, callback });
-		if (dftIndex !== lastIndex) {
-			this.handleSingleRect({
-				...rect.toJSON(),
-				index: lastIndex,
+		const rectJson = rect.toJSON();
+		this.handleSingleRect(
+			Object.assign({}, rectJson, {
+				index: dftIndex,
 				callback,
-			});
+			}),
+		);
+		if (dftIndex !== lastIndex) {
+			this.handleSingleRect(
+				Object.assign({}, rectJson, {
+					index: lastIndex,
+					callback,
+				}),
+			);
 		}
 	}
 
@@ -146,17 +170,19 @@ class TinyCanvas implements TinyCanvasInterface {
 		return context?.getImageData(x, y, width, height);
 	}
 
+	handleClear = (opts: CallbackOptions) => {
+		const { context, x, y, width, height } = opts;
+		context?.clearRect(x, y, width, height);
+	};
+
 	clearRect(options: DOMRect) {
 		const { x, y, width, height } = options;
-		const callback = (opts: CallbackOptions) => {
-			const { context, x, y, width, height } = opts;
-			context?.clearRect(x, y, width, height);
-		};
 		const rect = new DOMRect(x, y, width, height);
-		this.handleRect({
-			...rect.toJSON(),
-			callback,
-		});
+		this.handleRect(
+			Object.assign({}, rect.toJSON(), {
+				callback: this.handleClear,
+			}),
+		);
 	}
 
 	clear() {

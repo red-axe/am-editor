@@ -108,6 +108,7 @@ class RangeColoring implements RangeColoringInterface {
 		let child = (this.engine.scrollNode ?? this.root).find(
 			`.${USER_BACKGROUND_CLASS}[${DATA_UUID}="${uuid}"]`,
 		);
+		const containerElement = this.engine.scrollNode ?? this.root;
 		if (child && child.length > 0) {
 			child.attributes(DATA_COLOR, color.toString());
 			targetCanvas = child[0]['__canvas'];
@@ -116,7 +117,7 @@ class RangeColoring implements RangeColoringInterface {
 			child = $(
 				`<div class="${USER_BACKGROUND_CLASS}" ${DATA_UUID}="${uuid}" ${DATA_COLOR}="${color}" />`,
 			);
-			(this.engine.scrollNode ?? this.root).append(child);
+			containerElement.append(child);
 			targetCanvas = new TinyCanvas({
 				container: child.get<HTMLElement>()!,
 			});
@@ -132,12 +133,13 @@ class RangeColoring implements RangeColoringInterface {
 			'pointer-events': 'none',
 		});
 		child[0]['__range'] = range.cloneRange();
-		const containerElement = this.engine.scrollNode ?? this.root;
+
 		const parentWidth =
 			containerElement.get<Element>()?.clientWidth ||
 			containerElement.width();
 		const parentHeight = this.root.height();
 		targetCanvas.resize(parentWidth, parentHeight);
+		if (range.collapsed) return [range];
 		let cardInfo = card.find(range.commonAncestorNode, true);
 		//如果是卡片，并且选区不在内容模块中，而是在卡片两侧的光标位置处，就不算作卡片
 		if (cardInfo && !cardInfo.isCenter(range.commonAncestorNode)) {
@@ -182,7 +184,7 @@ class RangeColoring implements RangeColoringInterface {
 			} else {
 				const rect = this.getRectWithRange(child, subRange);
 				targetCanvas.clearRect(rect);
-				targetCanvas.drawRect({ ...rect.toJSON(), ...fill });
+				targetCanvas.drawRect(Object.assign({}, rect.toJSON(), fill));
 			}
 		});
 		return subRanges;

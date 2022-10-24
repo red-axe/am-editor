@@ -26,7 +26,14 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 		engine.on('scroll', this.handleScroll, {
 			passive: true,
 		});
+		window.addEventListener('resize', this.handleResize, {
+			passive: true,
+		});
 	}
+
+	handleResize = () => {
+		this.rangeColoring.updatePosition();
+	};
 
 	handleScroll = (node: NodeInterface) => {
 		const children = this.engine.container.get<Element>()?.childNodes;
@@ -220,6 +227,7 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 		container.off('keyup', this.emitSelectChange);
 		container.off('mousedown', this.handleMouseDown);
 		this.engine.off('scroll', this.handleScroll);
+		window.removeEventListener('resize', this.handleResize);
 	}
 }
 
