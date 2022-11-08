@@ -89,12 +89,10 @@ class Resizer implements ResizerInterface {
 		document.addEventListener(
 			isMobile ? 'touchmove' : 'mousemove',
 			this.onMouseMove,
-			{ passive: true },
 		);
 		document.addEventListener(
 			isMobile ? 'touchend' : 'mouseup',
 			this.onMouseUp,
-			{ passive: true },
 		);
 	}
 
@@ -187,34 +185,26 @@ class Resizer implements ResizerInterface {
 	render() {
 		const { width, height } = this.options;
 		this.setSize(width, height);
-		this.root.find('.data-resizer-holder-right-top').on(
-			isMobile ? 'touchstart' : 'mousedown',
-			(event) => {
+		this.root
+			.find('.data-resizer-holder-right-top')
+			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'right-top');
-			},
-			{ passive: true },
-		);
-		this.root.find('.data-resizer-holder-right-bottom').on(
-			isMobile ? 'touchstart' : 'mousedown',
-			(event) => {
+			});
+		this.root
+			.find('.data-resizer-holder-right-bottom')
+			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'right-bottom');
-			},
-			{ passive: true },
-		);
-		this.root.find('.data-resizer-holder-left-bottom').on(
-			isMobile ? 'touchstart' : 'mousedown',
-			(event) => {
+			});
+		this.root
+			.find('.data-resizer-holder-left-bottom')
+			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'left-bottom');
-			},
-			{ passive: true },
-		);
-		this.root.find('.data-resizer-holder-left-top').on(
-			isMobile ? 'touchstart' : 'mousedown',
-			(event) => {
+			});
+		this.root
+			.find('.data-resizer-holder-left-top')
+			.on(isMobile ? 'touchstart' : 'mousedown', (event) => {
 				return this.onMouseDown(event, 'left-top');
-			},
-			{ passive: true },
-		);
+			});
 		return this.root;
 	}
 

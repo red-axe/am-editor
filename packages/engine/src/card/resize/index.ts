@@ -30,10 +30,10 @@ class Resize implements ResizeInterface {
 		);
 
 		if (isMobile) {
-			component.on('touchstart', this.touchStart, { passive: true });
-			component.on('touchmove', this.touchMove, { passive: true });
-			component.on('touchend', this.dragEnd, { passive: true });
-			component.on('touchcancel', this.dragEnd, { passive: true });
+			component.on('touchstart', this.touchStart);
+			component.on('touchmove', this.touchMove);
+			component.on('touchend', this.dragEnd);
+			component.on('touchcancel', this.dragEnd);
 		} else {
 			component.on('dragstart', this.dragStart);
 			document.addEventListener('mousemove', this.dragMove);
