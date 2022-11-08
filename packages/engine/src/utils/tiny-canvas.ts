@@ -26,6 +26,9 @@ class TinyCanvas implements TinyCanvasInterface {
 		canvasCount: 0,
 	};
 
+	private width: number = 0;
+	private height: number = 0;
+
 	constructor(options: Options) {
 		if (!options.container) throw new Error('need a cantainer!');
 		this.options = { ...this.options, ...options };
@@ -48,6 +51,9 @@ class TinyCanvas implements TinyCanvasInterface {
 	}
 
 	resize(width: number, height: number) {
+		if (this.width === width && this.height === height) return;
+		this.width = width;
+		this.height = height;
 		const { limitHeight, canvasCount, container } = this.options;
 		let { canvasCache } = this.options;
 		const index = Math.ceil(height / (limitHeight || 0));

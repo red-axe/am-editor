@@ -29,6 +29,9 @@ const USER_MASK_CLASS = 'ot-card-mask';
 const USER_CURSOR_TRIGGER_CLASS = 'ot-user-cursor-trigger';
 const USER_CURSOR_TRIGGER_ACTIVE_CLASS = 'ot-user-cursor-trigger-active';
 
+const BACKGROUND_TO_ELEMNT = new Map<string, NodeInterface>();
+const CURSOR_TO_ELEMNT = new Map<string, NodeInterface>();
+const MASK_TO_ELEMNT = new Map<string, NodeInterface>();
 class RangeColoring implements RangeColoringInterface {
 	private engine: EngineInterface;
 	private root: NodeInterface;
@@ -43,10 +46,18 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	destroy() {
-		const body = this.engine.scrollNode ?? this.root;
-		body.find(`.${USER_BACKGROUND_CLASS}`).remove();
-		body.find(`.${USER_CURSOR_CLASS}`).remove();
-		body.find(`.${USER_MASK_CLASS}`).remove();
+		for (const [key, child] of BACKGROUND_TO_ELEMNT) {
+			child.remove();
+			BACKGROUND_TO_ELEMNT.delete(key);
+		}
+		for (const [key, child] of CURSOR_TO_ELEMNT) {
+			child.remove();
+			CURSOR_TO_ELEMNT.delete(key);
+		}
+		for (const [key, child] of MASK_TO_ELEMNT) {
+			child.remove();
+			MASK_TO_ELEMNT.delete(key);
+		}
 	}
 
 	getRectWithRange(node: NodeInterface, range: RangeInterface) {
@@ -105,22 +116,35 @@ class RangeColoring implements RangeColoringInterface {
 		tinyColor.setAlpha(0.3);
 		let targetCanvas: TinyCanvasInterface;
 		const rgb = tinyColor.toRgbString();
-		let child = (this.engine.scrollNode ?? this.root).find(
-			`.${USER_BACKGROUND_CLASS}[${DATA_UUID}="${uuid}"]`,
-		);
+		let child = BACKGROUND_TO_ELEMNT.get(uuid);
+
 		const containerElement = this.engine.scrollNode ?? this.root;
-		if (child && child.length > 0) {
-			child.attributes(DATA_COLOR, color.toString());
-			targetCanvas = child[0]['__canvas'];
-			if (!child[0]['__clear']) {
-				targetCanvas.clear();
-				child[0]['__clear'] = true;
+
+		const clear = () => {
+			if (child && child.length > 0) {
+				child.attributes(DATA_COLOR, color.toString());
+				const canvas = child[0]['__canvas'];
+				if (!child[0]['__clear']) {
+					canvas.clear();
+					child[0]['__clear'] = true;
+				}
+				return canvas;
 			}
+		};
+
+		if (range.collapsed) {
+			clear();
+			return [range];
+		}
+
+		if (child && child.length > 0) {
+			targetCanvas = clear();
 		} else {
 			child = $(
 				`<div class="${USER_BACKGROUND_CLASS}" ${DATA_UUID}="${uuid}" ${DATA_COLOR}="${color}" />`,
 			);
 			containerElement.append(child);
+			BACKGROUND_TO_ELEMNT.set(uuid, child);
 			targetCanvas = new TinyCanvas({
 				container: child.get<HTMLElement>()!,
 			});
@@ -136,13 +160,11 @@ class RangeColoring implements RangeColoringInterface {
 			'pointer-events': 'none',
 		});
 		child[0]['__range'] = range.cloneRange();
-
 		const parentWidth =
 			containerElement.get<Element>()?.clientWidth ||
 			containerElement.width();
 		const parentHeight = this.root.height();
 		targetCanvas.resize(parentWidth, parentHeight);
-		if (range.collapsed) return [range];
 		child[0]['__clear'] = false;
 		let cardInfo = card.find(range.commonAncestorNode, true);
 		//如果是卡片，并且选区不在内容模块中，而是在卡片两侧的光标位置处，就不算作卡片
@@ -184,9 +206,9 @@ class RangeColoring implements RangeColoringInterface {
 
 		subRanges.forEach((subRange) => {
 			if (this.isWrapByRange(subRange)) {
-				this.drawSubRang(child, targetCanvas, subRange, fill);
+				this.drawSubRang(child!, targetCanvas, subRange, fill);
 			} else {
-				const rect = this.getRectWithRange(child, subRange);
+				const rect = this.getRectWithRange(child!, subRange);
 				targetCanvas.clearRect(rect);
 				targetCanvas.drawRect(Object.assign({}, rect.toJSON(), fill));
 			}
@@ -333,9 +355,7 @@ class RangeColoring implements RangeColoringInterface {
 	) {
 		const { uuid, name, color } = member;
 		let cursorRect = this.getCursorRect(selector);
-		let childCursor = this.root.children(
-			`.${USER_CURSOR_CLASS}[${DATA_UUID}="${uuid}"]`,
-		);
+		let childCursor = CURSOR_TO_ELEMNT.get(uuid);
 		if (childCursor && childCursor.length > 0) {
 			this.setCursorRect(childCursor, cursorRect);
 		} else {
@@ -346,6 +366,7 @@ class RangeColoring implements RangeColoringInterface {
 			)}</div>
             </div>`;
 			childCursor = $(userCursor);
+			CURSOR_TO_ELEMNT.set(uuid, childCursor);
 			const trigger = childCursor.find(`.${USER_CURSOR_TRIGGER_CLASS}`);
 
 			if (cursorRect.elementHeight === 0) {
@@ -359,7 +380,7 @@ class RangeColoring implements RangeColoringInterface {
 							getRect();
 						}, 20);
 					} else {
-						this.setCursorRect(childCursor, cursorRect);
+						this.setCursorRect(childCursor!, cursorRect);
 					}
 				};
 				getRect();
@@ -434,9 +455,7 @@ class RangeColoring implements RangeColoringInterface {
 			width: 0,
 			height: 0,
 		};
-		let mask = this.root.children(
-			`.${USER_MASK_CLASS}[${DATA_UUID}="${member.uuid}"]`,
-		);
+		let mask = MASK_TO_ELEMNT.get(member.uuid);
 		if (mask && mask.length > 0) {
 			mask[0]['__node'] = node[0];
 			mask.css({
@@ -452,6 +471,7 @@ class RangeColoring implements RangeColoringInterface {
 		mask = $(
 			`<div class="${USER_MASK_CLASS}" ${DATA_UUID}="${member.uuid}" />`,
 		);
+		MASK_TO_ELEMNT.set(member.uuid, mask);
 		mask[0]['__node'] = node[0];
 		if (nodeRect.height === 0) {
 			// 刚加载获取不到高度，就定时循环获取，获取次数超过50次就不再获取
@@ -469,7 +489,7 @@ class RangeColoring implements RangeColoringInterface {
 						getRect();
 					}, 20);
 				} else {
-					mask.css({
+					mask?.css({
 						transform: `translateX(${
 							nodeRect.left - parentRect.left
 						}px) translateY(${nodeRect.top - parentRect.top}px)`,
@@ -497,7 +517,7 @@ class RangeColoring implements RangeColoringInterface {
 
 		mask.on('mouseenter', () => {
 			this.showCursorInfo(cursor, member);
-			Tooltip.show(mask, language.get('card', 'lockAlert').toString(), {
+			Tooltip.show(mask!, language.get('card', 'lockAlert').toString(), {
 				placement: 'bottomLeft',
 			});
 		});
@@ -585,6 +605,7 @@ class RangeColoring implements RangeColoringInterface {
 		if (cardInfo && !cardInfo.isCenter(commonAncestorNode)) {
 			cardInfo = undefined;
 		}
+		// 移除类似表格类的遮罩层
 		const removeCardMasks: string[] = [];
 		card.each((cardComponent) => {
 			if (cardComponent.isEditable) return;
@@ -596,27 +617,20 @@ class RangeColoring implements RangeColoringInterface {
 			}
 		});
 		if (removeCardMasks.length > 0) {
-			this.root
-				.get<Element>()
-				?.querySelectorAll(
-					removeCardMasks
-						.map(
-							(uuid) =>
-								`.${USER_MASK_CLASS}[${DATA_UUID}="${uuid}"]`,
-						)
-						.join(','),
-				)
-				?.forEach((child) => {
-					child.parentNode?.removeChild(child);
-					Tooltip.hide();
-				});
+			for (let i = 0; i < removeCardMasks.length; i++) {
+				const uuid = removeCardMasks[i];
+				const child = MASK_TO_ELEMNT.get(uuid);
+				child?.remove();
+				MASK_TO_ELEMNT.delete(uuid);
+			}
+			Tooltip.hide();
 		}
+		// 不是可编辑卡片
 		if (cardInfo && !cardInfo.isEditable) {
 			const root =
 				this.setCardActivatedByOther(cardInfo, member) || cardInfo.root;
-			this.root
-				.find(`.${USER_CURSOR_CLASS}[${DATA_UUID}="${uuid}"]`)
-				.remove();
+			CURSOR_TO_ELEMNT.get(uuid)?.remove();
+			CURSOR_TO_ELEMNT.delete(uuid);
 			const collab = (cardInfo.constructor as CardEntry).collab;
 			if (collab === undefined || collab === true) {
 				const cursor = this.drawCursor(root, member, showInfo);
@@ -627,11 +641,11 @@ class RangeColoring implements RangeColoringInterface {
 			//可编辑卡片
 			if (cardInfo) {
 				this.drawBackground(range, member);
-				this.root
-					.find(`.${USER_CURSOR_CLASS}[${DATA_UUID}="${uuid}"]`)
-					.remove();
+				CURSOR_TO_ELEMNT.get(uuid)?.remove();
+				CURSOR_TO_ELEMNT.delete(uuid);
 				return;
 			}
+			// 循环卡片设置选中或者非选中效果
 			card.each((cardComponent) => {
 				const centerNode = cardComponent.getCenter();
 				if (centerNode && centerNode.length > 0) {
@@ -691,41 +705,40 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	updateBackgroundPosition() {
-		(this.engine.scrollNode?.get<Element>() ?? this.root.get<Element>())
-			?.querySelectorAll(`.${USER_BACKGROUND_CLASS}`)
-			.forEach((child) => {
-				const node = $(child);
-				const range = child['__range'];
-				const uuid = node.attributes(DATA_UUID);
-				const color = node.attributes(DATA_COLOR);
-				this.drawBackground(range, {
-					uuid,
-					color,
-				});
+		for (const child of BACKGROUND_TO_ELEMNT.values()) {
+			const node = $(child);
+			const range = child['__range'];
+			const uuid = node.attributes(DATA_UUID);
+			const color = node.attributes(DATA_COLOR);
+			this.drawBackground(range, {
+				uuid,
+				color,
 			});
+		}
 	}
 
 	updateCursorPosition() {
-		this.root
-			.get<Element>()
-			?.querySelectorAll(`.${USER_CURSOR_CLASS}`)
-			.forEach((child) => {
-				const node = $(child);
-				let target = child['__target'];
-				if (!target) {
-					node.remove();
-					return;
-				}
-				if (!target.name)
-					target = Range.fromPath(this.engine, target, true);
-				if (
-					target.startContainer ||
-					0 !== $(target).closest('body').length
-				) {
-					const rect = this.getCursorRect(target);
-					this.setCursorRect(node, rect);
-				} else node.remove();
-			});
+		for (const [key, node] of CURSOR_TO_ELEMNT) {
+			const child = node.get<HTMLElement>();
+			if (!child || !(child instanceof HTMLElement)) continue;
+
+			let target = child['__target'];
+			if (!target) {
+				node.remove();
+				CURSOR_TO_ELEMNT.delete(key);
+				return;
+			}
+			// range
+			if (!target.name)
+				target = Range.fromPath(this.engine, target, true);
+			if (target.startContainer || target[0].isConnected) {
+				const rect = this.getCursorRect(target);
+				this.setCursorRect(node, rect);
+			} else {
+				node.remove();
+				CURSOR_TO_ELEMNT.delete(key);
+			}
+		}
 	}
 
 	updateCardPosition() {
@@ -735,17 +748,19 @@ class RangeColoring implements RangeColoringInterface {
 			left: 0,
 			top: 0,
 		};
-		this.root
-			.get<Element>()
-			?.querySelectorAll<HTMLElement>(`.${USER_MASK_CLASS}`)
-			.forEach((child) => {
-				const target: Element | undefined = child['__node'];
-				if (target?.isConnected) {
-					const rect = target.getBoundingClientRect();
-					child.style.left = rect.left - parentRect.left + 'px';
-					child.style.top = rect.top - parentRect.top + 'px';
-				} else child.parentNode?.removeChild(child);
-			});
+		for (const [key, node] of MASK_TO_ELEMNT) {
+			const child = node.get<HTMLElement>();
+			if (!child || !(child instanceof HTMLElement)) continue;
+			const target: Element | undefined = child['__node'];
+			if (target?.isConnected) {
+				const rect = target.getBoundingClientRect();
+				child.style.left = rect.left - parentRect.left + 'px';
+				child.style.top = rect.top - parentRect.top + 'px';
+			} else {
+				child.parentNode?.removeChild(child);
+				MASK_TO_ELEMNT.delete(key);
+			}
+		}
 	}
 
 	updatePosition() {
@@ -756,25 +771,24 @@ class RangeColoring implements RangeColoringInterface {
 
 	updateBackgroundAlpha(range: RangeInterface) {
 		const cursorRect = this.getCursorRect(range);
-		this.root
-			.get<Element>()
-			?.querySelectorAll<HTMLElement>(`.${USER_CURSOR_CLASS}`)
-			.forEach((child) => {
-				const trigger = child.querySelector<HTMLElement>(
-					`.${USER_CURSOR_TRIGGER_CLASS}`,
-				);
-				const left = child.style.left;
-				const top = child.style.top;
-				const bgColor = tinycolor2(child.style.backgroundColor);
-				if (cursorRect.left === left && cursorRect.top === top) {
-					bgColor.setAlpha(0.3);
-				} else {
-					bgColor.setAlpha(1);
-				}
-				const bgs = bgColor.toRgbString();
-				child.style.backgroundColor = bgs;
-				if (trigger) trigger.style.backgroundColor = bgs;
-			});
+		for (const node of CURSOR_TO_ELEMNT.values()) {
+			const child = node.get<HTMLElement>();
+			if (!child || !(child instanceof HTMLElement)) continue;
+			const trigger = child.querySelector<HTMLElement>(
+				`.${USER_CURSOR_TRIGGER_CLASS}`,
+			);
+			const left = child.style.left;
+			const top = child.style.top;
+			const bgColor = tinycolor2(child.style.backgroundColor);
+			if (cursorRect.left === left && cursorRect.top === top) {
+				bgColor.setAlpha(0.3);
+			} else {
+				bgColor.setAlpha(1);
+			}
+			const bgs = bgColor.toRgbString();
+			child.style.backgroundColor = bgs;
+			if (trigger) trigger.style.backgroundColor = bgs;
+		}
 	}
 
 	render(attribute: Attribute, member: Member, showInfo?: boolean) {

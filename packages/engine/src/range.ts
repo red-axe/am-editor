@@ -801,12 +801,13 @@ class Range implements RangeInterface {
 			const element = $(node);
 			if (
 				includeCardCursor &&
-				['left', 'right', 'center', 'body'].includes(
-					element.attributes(CARD_ELEMENT_KEY),
+				node instanceof HTMLElement &&
+				~['left', 'right', 'center', 'body'].indexOf(
+					node.getAttribute('data-element') || '',
 				)
 			) {
 				const cardElement = this.editor.card.closest(element);
-				if (cardElement && cardElement?.length > 0)
+				if (cardElement && cardElement.length > 0)
 					cardCaches.push(cardElement);
 				return true;
 			}
