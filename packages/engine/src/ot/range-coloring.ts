@@ -112,10 +112,7 @@ class RangeColoring implements RangeColoringInterface {
 	) {
 		const { card } = this.engine;
 		const { uuid, color } = options;
-		const tinyColor = tinycolor2(color);
-		tinyColor.setAlpha(0.3);
 		let targetCanvas: TinyCanvasInterface;
-		const rgb = tinyColor.toRgbString();
 		let child = BACKGROUND_TO_ELEMNT.get(uuid);
 
 		const containerElement = this.engine.scrollNode ?? this.root;
@@ -151,14 +148,8 @@ class RangeColoring implements RangeColoringInterface {
 
 			child[0]['__canvas'] = targetCanvas;
 		}
-		child.css({
-			position: 'absolute',
-			top: 0,
-			left: 0,
-			transform: 'translateX(0) translateY(0)',
-			'will-change': 'transform',
-			'pointer-events': 'none',
-		});
+		child.get<HTMLElement>()!.style.cssText =
+			'position: absolute; top: 0; left: 0; transform: translateX(0) translateY(0); will-change: transform; pointer-events: none;';
 		child[0]['__range'] = range.cloneRange();
 		const parentWidth =
 			containerElement.get<Element>()?.clientWidth ||
@@ -172,6 +163,9 @@ class RangeColoring implements RangeColoringInterface {
 			cardInfo = undefined;
 		}
 
+		const tinyColor = tinycolor2(color);
+		tinyColor.setAlpha(0.3);
+		const rgb = tinyColor.toRgbString();
 		const fill = {
 			fill: rgb,
 		};
@@ -302,28 +296,20 @@ class RangeColoring implements RangeColoringInterface {
 		};
 	}
 
-	setCursorRect(node: NodeInterface, rect: CursorRect) {
+	setCursorRect(uuid: string, node: NodeInterface, rect: CursorRect) {
+		const element = node.get<HTMLElement>();
+		if (!element) return;
 		if (-1 !== rect.height) {
+			element.style.cssText += `top: 0; left: 0; height: ${rect.height}; transform: translateX(${rect.left}) translateY(${rect.top}); will-change: transform, height;`;
 			if (0 === rect.height) {
-				node.css({
-					top: 0,
-					left: 0,
-					height: rect.height,
-					transform: `translateX(${rect.left}) translateY(${rect.top})`,
-					'will-change': 'transform, height',
-				});
 				node.addClass(USER_CURSOR_CARD_CLASS);
 				return;
 			}
-			node.css({
-				top: 0,
-				left: 0,
-				height: rect.height,
-				transform: `translateX(${rect.left}) translateY(${rect.top})`,
-				'will-change': 'transform, height',
-			});
 			node.removeClass(USER_CURSOR_CARD_CLASS);
-		} else node.remove();
+		} else {
+			node.remove();
+			CURSOR_TO_ELEMNT.delete(uuid);
+		}
 	}
 
 	showCursorInfo(node: NodeInterface, member: Member) {
@@ -357,7 +343,7 @@ class RangeColoring implements RangeColoringInterface {
 		let cursorRect = this.getCursorRect(selector);
 		let childCursor = CURSOR_TO_ELEMNT.get(uuid);
 		if (childCursor && childCursor.length > 0) {
-			this.setCursorRect(childCursor, cursorRect);
+			this.setCursorRect(uuid, childCursor, cursorRect);
 		} else {
 			const userCursor = `
             <div class="${USER_CURSOR_CLASS}" ${DATA_UUID}="${uuid}">
@@ -380,12 +366,12 @@ class RangeColoring implements RangeColoringInterface {
 							getRect();
 						}, 20);
 					} else {
-						this.setCursorRect(childCursor!, cursorRect);
+						this.setCursorRect(uuid, childCursor!, cursorRect);
 					}
 				};
 				getRect();
 			} else {
-				this.setCursorRect(childCursor, cursorRect);
+				this.setCursorRect(uuid, childCursor, cursorRect);
 			}
 			childCursor.on('mouseenter', () => {
 				return this.showCursorInfo(childCursor!, member);
@@ -455,17 +441,15 @@ class RangeColoring implements RangeColoringInterface {
 			width: 0,
 			height: 0,
 		};
+		const cssText = `top: 0; left: 0; transform: translateX(${
+			nodeRect.left - parentRect.left
+		}px) translateY(${
+			nodeRect.top - parentRect.top
+		}px); will-change: transform;`;
 		let mask = MASK_TO_ELEMNT.get(member.uuid);
 		if (mask && mask.length > 0) {
 			mask[0]['__node'] = node[0];
-			mask.css({
-				left: 0,
-				top: 0,
-				transform: `translateX(${
-					nodeRect.left - parentRect.left
-				}) translateY(${nodeRect.top - parentRect.top}px)`,
-				'will-change': 'transform',
-			});
+			mask.get<HTMLElement>()!.style.cssText = cssText;
 			return;
 		}
 		mask = $(
@@ -488,31 +472,17 @@ class RangeColoring implements RangeColoringInterface {
 					setTimeout(() => {
 						getRect();
 					}, 20);
-				} else {
-					mask?.css({
-						transform: `translateX(${
-							nodeRect.left - parentRect.left
-						}px) translateY(${nodeRect.top - parentRect.top}px)`,
-						left: 0,
-						top: 0,
-						width: nodeRect.width + 'px',
-						height: nodeRect.height + 'px',
-						'will-change': 'transform, width, height',
-					});
+				} else if (mask) {
+					mask.get<HTMLElement>()!.style.cssText =
+						cssText +
+						`height: ${nodeRect.height}px; width: ${nodeRect.width}px;`;
 				}
 			};
 			getRect();
 		} else {
-			mask.css({
-				transform: `translateX(${
-					nodeRect.left - parentRect.left
-				}px) translateY(${nodeRect.top - parentRect.top}px)`,
-				left: 0,
-				top: 0,
-				width: nodeRect.width + 'px',
-				height: nodeRect.height + 'px',
-				'will-change': 'transform, width, height',
-			});
+			mask.get<HTMLElement>()!.style.cssText =
+				cssText +
+				`height: ${nodeRect.height}px; width: ${nodeRect.width}px;`;
 		}
 
 		mask.on('mouseenter', () => {
@@ -524,14 +494,9 @@ class RangeColoring implements RangeColoringInterface {
 
 		mask.on('mousemove', (event: MouseEvent) => {
 			const tooltipElement = $(`div[${DATA_ELEMENT}=tooltip]`);
-			tooltipElement.css({
-				left: 0,
-				top: 0,
-				transform: `translateX(${event.pageX - 16}px) translateY(${
-					event.pageY + 32
-				}px)`,
-				'will-change': 'transform',
-			});
+			tooltipElement.get<HTMLElement>()!.style.cssText = `left: 0; top: 0; transform: translateX(${
+				event.pageX - 16
+			}px) translateY(${event.pageY + 32}px); will-change: transform;`;
 		});
 
 		mask.on('mouseleave', () => {
@@ -733,7 +698,7 @@ class RangeColoring implements RangeColoringInterface {
 				target = Range.fromPath(this.engine, target, true);
 			if (target.startContainer || target[0].isConnected) {
 				const rect = this.getCursorRect(target);
-				this.setCursorRect(node, rect);
+				this.setCursorRect(key, node, rect);
 			} else {
 				node.remove();
 				CURSOR_TO_ELEMNT.delete(key);

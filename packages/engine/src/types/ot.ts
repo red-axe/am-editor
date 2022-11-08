@@ -177,7 +177,7 @@ export interface RangeColoringInterface {
 	 * @param node
 	 * @param rect
 	 */
-	setCursorRect(node: NodeInterface, rect: CursorRect): void;
+	setCursorRect(uuid: string, node: NodeInterface, rect: CursorRect): void;
 	/**
 	 * 展示协作者信息
 	 * @param node
