@@ -670,8 +670,9 @@ class RangeColoring implements RangeColoringInterface {
 	}
 
 	updateBackgroundPosition() {
-		for (const child of BACKGROUND_TO_ELEMNT.values()) {
-			const node = $(child);
+		for (const node of BACKGROUND_TO_ELEMNT.values()) {
+			const child = node.get<HTMLElement>();
+			if (!child) continue;
 			const range = child['__range'];
 			const uuid = node.attributes(DATA_UUID);
 			const color = node.attributes(DATA_COLOR);
