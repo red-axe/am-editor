@@ -16,6 +16,7 @@ import modeDatas from './mode';
 import { CodeBlockEditorInterface } from './types';
 import './index.css';
 import { CodeBlockOptions } from '@/types';
+import { toRaw } from 'vue';
 
 export interface CodeBlockValue extends CardValue {
 	mode?: string;
@@ -214,8 +215,11 @@ class CodeBlcok<V extends CodeBlockValue = CodeBlockValue> extends Card<V> {
 								(mode) => {
 									setTimeout(() => {
 										this.focusEditor();
-										this.codeEditor?.update(mode);
-									}, 10);
+										// 解决vue自动给 this.codeEditor 包 Proxy 的问题
+										if (this.codeEditor) {
+											toRaw(this.codeEditor).update(mode);
+										}
+									}, 100);
 								},
 							);
 						}, 100);
