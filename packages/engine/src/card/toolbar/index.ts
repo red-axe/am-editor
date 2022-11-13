@@ -36,6 +36,7 @@ class CardToolbar implements CardToolbarInterface {
 	private editor: EditorInterface;
 	private offset?: Array<number>;
 	private position: Position;
+	private dndPosition: Position;
 	#hideTimeout: NodeJS.Timeout | null = null;
 	#showTimeout: NodeJS.Timeout | null = null;
 	#defaultAlign: keyof typeof placements = 'topLeft';
@@ -45,6 +46,7 @@ class CardToolbar implements CardToolbarInterface {
 		this.editor = editor;
 		this.card = card;
 		this.position = new Position(editor);
+		this.dndPosition = new Position(editor);
 		this.unbindEnterShow();
 		if (!isEngine(editor) || editor.readonly) {
 			this.bindEnterShow();
@@ -267,6 +269,7 @@ class CardToolbar implements CardToolbarInterface {
 
 	hide() {
 		this.#dndNode?.remove();
+		this.dndPosition.destroy();
 		this.hideCardToolbar();
 	}
 
@@ -286,7 +289,7 @@ class CardToolbar implements CardToolbarInterface {
 			if (this.#dndNode.length > 0) {
 				this.#dndNode.addClass('data-card-dnd-active');
 				setTimeout(() => {
-					this.position.bind(
+					this.dndPosition.bind(
 						this.#dndNode!,
 						this.card.root,
 						'leftTop',
@@ -381,6 +384,7 @@ class CardToolbar implements CardToolbarInterface {
 
 	destroy() {
 		this.unbindEnterShow();
+		this.dndPosition.destroy();
 		this.position.destroy();
 	}
 }
