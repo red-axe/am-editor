@@ -541,7 +541,7 @@ class Mark implements MarkModelInterface {
 			});
 			const nodeApi = node;
 			//移除多余的零宽字符
-			if (zeroWidthNode[0].parentNode) {
+			if (zeroWidthNode[0].parentElement ?? zeroWidthNode[0].parentNode) {
 				const at = zeroWidthNode[0];
 				let atText: string | null = null;
 				let atTextLen: number = 0;
@@ -556,14 +556,16 @@ class Mark implements MarkModelInterface {
 						const alignNode = getAlignNode(node);
 						if (node.textContent === atText) {
 							//inline 节点位置的零宽字符跳过
+							const parent =
+								node.parentElement ?? node.parentNode;
 							if (
 								(alignNode && nodeApi.isInline(alignNode)) ||
 								(!alignNode &&
-									node.parentNode &&
-									nodeApi.isInline(node.parentNode))
+									parent &&
+									nodeApi.isInline(parent))
 							)
 								break;
-							node.parentNode?.removeChild(node);
+							parent?.removeChild(node);
 							node = alignNode;
 						} else {
 							if (findPrev) {
@@ -572,12 +574,14 @@ class Mark implements MarkModelInterface {
 									node.textContent?.endsWith(atText)
 								) {
 									//inline 节点位置的零宽字符跳过
+									const parent =
+										node.parentElement ?? node.parentNode;
 									if (
 										(alignNode &&
 											nodeApi.isInline(alignNode)) ||
 										(!alignNode &&
-											node.parentNode &&
-											nodeApi.isInline(node.parentNode))
+											parent &&
+											nodeApi.isInline(parent))
 									)
 										break;
 									node.textContent =
@@ -592,12 +596,14 @@ class Mark implements MarkModelInterface {
 									node.textContent?.startsWith(atText)
 								) {
 									//inline 节点位置的零宽字符跳过
+									const parent =
+										node.parentElement ?? node.parentNode;
 									if (
 										(alignNode &&
 											nodeApi.isInline(alignNode)) ||
 										(!alignNode &&
-											node.parentNode &&
-											nodeApi.isInline(node.parentNode))
+											parent &&
+											nodeApi.isInline(parent))
 									)
 										break;
 
@@ -608,7 +614,9 @@ class Mark implements MarkModelInterface {
 								}
 							}
 							if (node.textContent?.length !== 0) return;
-							node.parentNode?.removeChild(node);
+							const parent =
+								node.parentElement ?? node.parentNode;
+							parent?.removeChild(node);
 							node = alignNode;
 						}
 					}

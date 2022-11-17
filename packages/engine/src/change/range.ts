@@ -92,7 +92,8 @@ class ChangeRange implements ChangeRangeInterface {
 			if (
 				cardCenter &&
 				(!startNode.isElement() ||
-					startNode[0].parentNode !== component.root[0] ||
+					(startNode[0].parentElement ?? startNode[0].parentNode) !==
+						component.root[0] ||
 					startNode.attributes(CARD_ELEMENT_KEY))
 			) {
 				const comparePoint = () => {

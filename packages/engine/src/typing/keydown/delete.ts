@@ -9,13 +9,14 @@ class Delete extends DefaultKeydown implements TypingHandleInterface {
 	hotkey: string | string[] | ((event: KeyboardEvent) => boolean) = 'delete';
 
 	getNext(node: Node): Node | null {
+		const parent = node.parentElement ?? node.parentNode;
 		return $(node).isEditable()
 			? null
 			: node.nextSibling
 			? node.nextSibling
-			: node.parentNode === null
+			: parent === null
 			? null
-			: this.getNext(node.parentNode);
+			: this.getNext(parent);
 	}
 
 	getRange(node: Node, hasNext: boolean = false): RangeInterface | null {
@@ -41,7 +42,11 @@ class Delete extends DefaultKeydown implements TypingHandleInterface {
 				return range;
 			}
 			if (nodeDom.name === 'br') {
-				if (node.parentNode?.childNodes.length === 1) return null;
+				if (
+					(node.parentElement ?? node.parentNode)?.childNodes
+						.length === 1
+				)
+					return null;
 				if (!node.ownerDocument) return null;
 				const range = Range.create(this.engine, node.ownerDocument);
 				range.setStartAfter(node);

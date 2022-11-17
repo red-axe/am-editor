@@ -170,10 +170,9 @@ class Helper implements HelperInterface {
 				if (colElement.span > 1) {
 					let addCount = colElement.span - 1;
 					while (addCount--) {
-						cols[c].parentNode?.insertBefore(
-							cols[c].cloneNode(),
-							cols[c],
-						);
+						(
+							cols[c].parentElement ?? cols[c].parentNode
+						)?.insertBefore(cols[c].cloneNode(), cols[c]);
 					}
 				}
 			}
@@ -182,7 +181,9 @@ class Helper implements HelperInterface {
 				const lastCol = cols.length - 1;
 				let colsAddCount = model.cols - cols.length;
 				while (colsAddCount--) {
-					cols[0].parentNode?.appendChild(cols[lastCol].cloneNode());
+					(cols[0].parentElement ?? cols[0].parentNode)?.appendChild(
+						cols[lastCol].cloneNode(),
+					);
 				}
 			}
 			table.find('col').attributes('span', 1);
@@ -539,10 +540,9 @@ class Helper implements HelperInterface {
 				if (colElement.span > 1) {
 					let addCount = colElement.span - 1;
 					while (addCount--) {
-						cols[c].parentNode?.insertBefore(
-							cols[c].cloneNode(),
-							cols[c],
-						);
+						(
+							cols[c].parentElement ?? cols[c].parentNode
+						)?.insertBefore(cols[c].cloneNode(), cols[c]);
 					}
 				}
 			}
@@ -551,7 +551,9 @@ class Helper implements HelperInterface {
 				const lastCol = cols.length - 1;
 				let colsAddCount = model.cols - cols.length;
 				while (colsAddCount--) {
-					cols[0].parentNode?.appendChild(cols[lastCol].cloneNode());
+					(cols[0].parentElement ?? cols[0].parentNode)?.appendChild(
+						cols[lastCol].cloneNode(),
+					);
 				}
 			}
 			table.find('col').attributes('span', 1);

@@ -57,5 +57,5 @@ export const getParentInRoot = (node: Node) => {
 	return node.nodeType === getDocument().ELEMENT_NODE &&
 		(node as Element).getAttribute(DATA_ELEMENT) === ROOT
 		? undefined
-		: node.parentNode || undefined;
+		: (node.parentElement ?? node.parentNode) || undefined;
 };

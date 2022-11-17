@@ -1147,7 +1147,9 @@ class NodeModel implements NodeModelInterface {
 			if (text.charCodeAt(0) === 0x200b) {
 				const newNode = (<Text>node).splitText(1);
 				if (newNode.previousSibling)
-					newNode.parentNode?.removeChild(newNode.previousSibling);
+					(newNode.parentElement ?? newNode.parentNode)?.removeChild(
+						newNode.previousSibling,
+					);
 			}
 		});
 	}

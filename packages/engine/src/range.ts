@@ -488,7 +488,8 @@ class Range implements RangeInterface {
 				)
 					return;
 				const center = cardComponent.getCenter();
-				const body = center.get()?.parentNode;
+				const centerEl = center.get();
+				const body = centerEl?.parentElement ?? centerEl?.parentNode;
 				if (!body || !center.inEditor()) return;
 				const offset = center.index();
 				const childNode = child.get()!;
@@ -609,7 +610,10 @@ class Range implements RangeInterface {
 
 	scrollRangeIntoView = () => {
 		const node = this.getEndOffsetNode();
-		const root = node.nodeType === Node.TEXT_NODE ? node.parentNode : node;
+		const root =
+			node.nodeType === Node.TEXT_NODE
+				? node.parentElement ?? node.parentNode
+				: node;
 		const rect = this.collapsed
 			? (root as Element).getBoundingClientRect()
 			: this.getClientRect();

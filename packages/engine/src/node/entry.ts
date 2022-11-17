@@ -231,7 +231,8 @@ class NodeEntry implements NodeInterface {
 	 * @return 父节点
 	 */
 	parent(): NodeInterface | undefined {
-		const node = this.get()?.parentNode;
+		const thisEl = this.get();
+		const node = thisEl?.parentElement ?? thisEl?.parentNode;
 		return node ? new NodeEntry(node) : undefined;
 	}
 
@@ -373,7 +374,9 @@ class NodeEntry implements NodeInterface {
 
 		if (domNode === this[0]) return true;
 
-		while ((domNode = domNode?.parentNode || null)) {
+		while (
+			(domNode = (domNode?.parentElement ?? domNode?.parentNode) || null)
+		) {
 			if (domNode === this[0]) {
 				return true;
 			}
@@ -404,7 +407,7 @@ class NodeEntry implements NodeInterface {
 	closest(
 		selector: string,
 		callback: (node: Node) => Node | undefined = (node) => {
-			return node.parentNode || undefined;
+			return node.parentElement ?? (node.parentNode || undefined);
 		},
 	): NodeInterface {
 		const nodeList: Array<Node> = [];
@@ -779,10 +782,11 @@ class NodeEntry implements NodeInterface {
 	 */
 	remove(): NodeInterface {
 		this.each((node, index) => {
-			if (!node.parentNode) {
+			const parent = node.parentElement ?? node.parentNode;
+			if (!parent) {
 				return;
 			}
-			node.parentNode.removeChild(node);
+			parent.removeChild(node);
 			delete this[index];
 		});
 		return this;
@@ -873,7 +877,7 @@ class NodeEntry implements NodeInterface {
 		const nodes = $(selector, this.context);
 		const isClone = typeof selector === 'string' && /<.+>/.test(selector);
 		this.each((node) => {
-			const parentNode = node.parentNode;
+			const parentNode = node.parentElement ?? node.parentNode;
 			if (!parentNode) return;
 			nodes.forEach((child) => {
 				if (isClone) child = child.cloneNode(true);
@@ -893,7 +897,7 @@ class NodeEntry implements NodeInterface {
 		const nodes = $(selector, this.context);
 		const isClone = typeof selector === 'string' && /<.+>/.test(selector);
 		this.each((node) => {
-			const parentNode = node.parentNode;
+			const parentNode = node.parentElement ?? node.parentNode;
 			if (!parentNode) return;
 			nodes.forEach((child) => {
 				if (isClone) child = child.cloneNode(true);
@@ -918,7 +922,7 @@ class NodeEntry implements NodeInterface {
 		const nodes = $(selector, this.context);
 		const isClone = typeof selector === 'string' && /<.+>/.test(selector);
 		this.each((node) => {
-			const parentNode = node.parentNode;
+			const parentNode = node.parentElement ?? node.parentNode;
 			if (!parentNode) return;
 			const newNode = isClone ? nodes[0].cloneNode(true) : nodes[0];
 			try {
@@ -1021,7 +1025,8 @@ class NodeEntry implements NodeInterface {
 	}
 
 	getIndex(filter?: (node: Node) => boolean) {
-		const parent = this[0].parentNode;
+		const el = this[0];
+		const parent = el.parentElement ?? el.parentNode;
 		if (!parent) return 0;
 		let i = 0;
 		for (const child of parent.childNodes) {
@@ -1036,12 +1041,17 @@ class NodeEntry implements NodeInterface {
 		container: Node | NodeInterface = this.closest(ROOT_SELECTOR),
 	): NodeInterface | null {
 		const element = (container[0] ?? container) as Node;
-		if (this.length === 0 || !element.parentNode) return null;
+		let parent = element.parentElement ?? element.parentNode;
+		if (this.length === 0 || !parent) return null;
 		let node: Node = this[0];
-		while (node.parentNode !== element) {
-			if (!node.parentNode) return null;
-			node = node.parentNode;
+		while (
+			(parent = node.parentElement ?? node.parentNode) &&
+			parent !== element
+		) {
+			node = parent;
 		}
+
+		if (!parent) return null;
 		return new NodeEntry(node);
 	}
 
@@ -1090,10 +1100,11 @@ class NodeEntry implements NodeInterface {
 		if (view.type !== Node.ELEMENT_NODE) {
 			if (!view.document) return false;
 			viewNode = view.document.createElement('span');
+			const parent = view[0].parentElement ?? view[0].parentNode;
 			if (view.next()) {
-				view[0].parentNode?.insertBefore(viewNode, view[0].nextSibling);
+				parent?.insertBefore(viewNode, view[0].nextSibling);
 			} else {
-				view[0].parentNode?.appendChild(viewNode);
+				parent?.appendChild(viewNode);
 			}
 			view = new NodeEntry(viewNode);
 		}
@@ -1102,7 +1113,10 @@ class NodeEntry implements NodeInterface {
 		const { top, left, right, bottom } =
 			viewElement.getBoundingClientRect();
 		const vp = this.getViewport();
-		if (viewNode) viewNode.parentNode?.removeChild(viewNode);
+		if (viewNode)
+			(viewNode.parentElement ?? viewNode.parentNode)?.removeChild(
+				viewNode,
+			);
 		// 简单模式，只判断任一方向是否在视口内
 		if (simpleMode) {
 			return (
@@ -1132,7 +1146,10 @@ class NodeEntry implements NodeInterface {
 			) {
 				viewElement = view.document.createElement('span');
 				viewElement.innerHTML = '&nbsp;';
-				view[0].parentNode?.insertBefore(viewElement, view[0]);
+				(view[0].parentElement ?? view[0].parentNode)?.insertBefore(
+					viewElement,
+					view[0],
+				);
 				view = new NodeEntry(viewElement);
 			}
 			if (!this.inViewport(view)) {
@@ -1141,7 +1158,10 @@ class NodeEntry implements NodeInterface {
 					inline: align,
 				});
 			}
-			if (viewElement) viewElement.parentNode?.removeChild(viewElement);
+			if (viewElement)
+				(
+					viewElement.parentElement ?? viewElement.parentNode
+				)?.removeChild(viewElement);
 		}
 	}
 }

@@ -189,7 +189,9 @@ export default class Clipboard implements ClipboardInterface {
 					'' === (child as HTMLElement).innerText ||
 					(isSafari && '\n' === (child as HTMLElement).innerText)
 				) {
-					child.parentNode?.removeChild(child);
+					(child.parentElement ?? child.parentNode)?.removeChild(
+						child,
+					);
 				}
 			});
 			if (list.get<Node>()?.childNodes.length === 0) {

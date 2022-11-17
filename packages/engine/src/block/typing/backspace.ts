@@ -62,8 +62,10 @@ class Backspace {
 					) {
 						range = range.cloneRange();
 						if (
-							(commonAncestorContainer.parentNode?.childNodes
-								?.length || 0) <= 1 &&
+							((
+								commonAncestorContainer.parentElement ??
+								commonAncestorContainer.parentNode
+							)?.childNodes?.length || 0) <= 1 &&
 							1 === commonAncestorContainer.textContent?.length
 						) {
 							const { startNode, startOffset } = range;

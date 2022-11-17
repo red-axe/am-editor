@@ -266,7 +266,10 @@ class Consumer implements ConsumerInterface {
 			startNode && startNode.nodeValue ? startNode.nodeValue : '';
 		const value =
 			nodeValue.substring(0, offset) + text + nodeValue.substring(offset);
-		if (startNode && startNode.parentNode === endNode)
+		if (
+			startNode &&
+			(startNode.parentElement ?? startNode.parentNode) === endNode
+		)
 			startNode.nodeValue = value;
 		else if (!!value) {
 			const textNode = document.createTextNode(value);

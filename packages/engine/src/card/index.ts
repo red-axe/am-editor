@@ -190,7 +190,7 @@ class CardModel implements CardModelInterface {
 				) {
 					return;
 				}
-				return node.parentNode || undefined;
+				return (node.parentElement ?? node.parentNode) || undefined;
 			});
 			if (!card || card.length === 0) return;
 			selector = card;

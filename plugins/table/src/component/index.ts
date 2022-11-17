@@ -897,7 +897,7 @@ class TableComponent<V extends TableValue = TableValue>
 		if (
 			!this.wrapper ||
 			this.wrapper.length === 0 ||
-			!this.wrapper[0].parentNode
+			!(this.wrapper[0].parentElement ?? this.wrapper[0].parentNode)
 		)
 			return;
 		// 重新绘制列头部和行头部
@@ -983,7 +983,7 @@ class TableComponent<V extends TableValue = TableValue>
 		if (
 			this.wrapper &&
 			this.wrapper.length > 0 &&
-			!!this.wrapper[0].parentNode
+			!!(this.wrapper[0].parentElement ?? this.wrapper[0].parentNode)
 		) {
 			this.remoteRefresh();
 			return;

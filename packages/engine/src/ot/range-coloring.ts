@@ -723,7 +723,7 @@ class RangeColoring implements RangeColoringInterface {
 				child.style.left = rect.left - parentRect.left + 'px';
 				child.style.top = rect.top - parentRect.top + 'px';
 			} else {
-				child.parentNode?.removeChild(child);
+				(child.parentElement ?? child.parentNode)?.removeChild(child);
 				MASK_TO_ELEMNT.delete(key);
 			}
 		}
@@ -785,7 +785,9 @@ class RangeColoring implements RangeColoringInterface {
 						this.setCardActivatedByOther(component);
 					}
 				}
-				dataElement.parentNode?.removeChild(dataElement);
+				(
+					dataElement.parentElement ?? dataElement.parentNode
+				)?.removeChild(dataElement);
 			});
 		this.engine.card.each((component) => {
 			if (component.isEditable || component.selectedByOther !== uuid)

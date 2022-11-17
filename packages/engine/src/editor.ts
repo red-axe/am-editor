@@ -242,7 +242,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 		let card = range.startNode.closest(`[${CARD_KEY}]`, (node) => {
 			return $(node).isEditable()
 				? undefined
-				: node.parentNode || undefined;
+				: (node.parentElement ?? node.parentNode) || undefined;
 		});
 		if (card.length > 0 && !range.collapsed && range.endOffset === 0) {
 			if (range.endContainer.previousSibling) {
@@ -258,7 +258,8 @@ class Editor<T extends EditorOptions = EditorOptions>
 					(node) => {
 						return $(node).isEditable()
 							? undefined
-							: node.parentNode || undefined;
+							: (node.parentElement ?? node.parentNode) ||
+									undefined;
 					},
 				);
 				if (cardCenter.length > 0) {
@@ -275,7 +276,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 		card = root.closest(`[${CARD_KEY}]`, (node) => {
 			return $(node).isEditable()
 				? undefined
-				: node.parentNode || undefined;
+				: (node.parentElement ?? node.parentNode) || undefined;
 		});
 		if (card.length > 0) {
 			const cardCenter = root.closest(
@@ -283,7 +284,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 				(node) => {
 					return $(node).isEditable()
 						? undefined
-						: node.parentNode || undefined;
+						: (node.parentElement ?? node.parentNode) || undefined;
 				},
 			);
 			if (cardCenter.length === 0) {
@@ -309,7 +310,7 @@ class Editor<T extends EditorOptions = EditorOptions>
 		};
 
 		card = root.closest(`[${CARD_KEY}]`, (node) => {
-			return node.parentNode || undefined;
+			return (node.parentElement ?? node.parentNode) || undefined;
 		});
 		if (card.length > 0) {
 			const compnoent = this.card.find(card);

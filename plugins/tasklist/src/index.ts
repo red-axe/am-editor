@@ -113,17 +113,18 @@ export default class<
 				});
 			}
 			selection.move();
+			const parent =
+				range.startContainer.parentElement ??
+				range.startContainer.parentNode;
 			if (
 				range.collapsed &&
 				range.startContainer.nodeType === Node.ELEMENT_NODE &&
 				range.startContainer.childNodes.length === 0 &&
-				range.startContainer.parentNode
+				parent
 			) {
 				const brNode = document.createElement('br');
 				range.startNode.before(brNode);
-				range.startContainer.parentNode.removeChild(
-					range.startContainer,
-				);
+				parent.removeChild(range.startContainer);
 				range.select(brNode);
 				range.collapse(false);
 			}
