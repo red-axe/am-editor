@@ -949,6 +949,7 @@ class NodeEntry implements NodeInterface {
 		const walk = (node: NodeInterface) => {
 			let isCard = node.isCard();
 			if (
+				!node.fragment &&
 				isCard &&
 				(!includeCard ||
 					(includeCard === 'editable' && !node.isEditableCard()))
