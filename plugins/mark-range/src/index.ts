@@ -617,6 +617,11 @@ export default class<
 		if (!selection) return;
 		const range = Range.from(editor, selection);
 		if (!range) return;
+		if (
+			isView(editor) &&
+			!range.commonAncestorNode.inEditor(editor.container)
+		)
+			return;
 
 		//不在编辑器内
 		if (
