@@ -113,6 +113,7 @@ export default class<
 				return;
 			});
 		} else if (isView(editor)) {
+			editor.on(`${PLUGIN_NAME}:set-range`, this.onSelectionChange);
 			editor.container.document?.addEventListener(
 				'selectionchange',
 				this.onSelectionChange,
@@ -914,6 +915,7 @@ export default class<
 			editor.off('parse:value', this.parseValue);
 			editor.off('afterSetValue', this.onAfterSetValue);
 		} else if (isView(editor)) {
+			editor.off(`${PLUGIN_NAME}:set-range`, this.onSelectionChange);
 			editor.container.document?.removeEventListener(
 				'selectionchange',
 				this.onSelectionChange,
