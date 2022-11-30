@@ -205,6 +205,9 @@ class Template implements TemplateInterface {
 	}
 
 	htmlView({ html, noBorder, overflow }: TableValue) {
+		html = transformCustomTags(html ?? '');
+		const table = $(html);
+		table.find('td').attributes(DATA_ELEMENT, EDITABLE);
 		return `<div class="${TABLE_WRAPPER_CLASS_NAME} ${
 			overflow !== false ? TABLE_OVERFLOW_CLASS_NAME : ''
 		}"><div class="${VIEWPORT_READER}"${
