@@ -116,10 +116,14 @@ export default class<
 			editor.on(`${PLUGIN_NAME}:set-range`, this.onSelectionChange);
 			editor.container.document?.addEventListener(
 				'selectionchange',
-				this.onSelectionChange,
+				this.handelSelectionChange,
 			);
 		}
 	}
+
+	handelSelectionChange = () => {
+		this.onSelectionChange();
+	};
 
 	onBeforeCommandExecute = (name: string) => {
 		this.executeBySelf = name === PLUGIN_NAME;
@@ -609,14 +613,16 @@ export default class<
 	 * 光标选择改变触发
 	 * @returns
 	 */
-	onSelectionChange = () => {
+	onSelectionChange = (range?: RangeInterface | null) => {
 		if (this.executeBySelf) return;
 		const editor = this.editor;
-		const { window } = editor.container;
-		const selection = window?.getSelection();
+		if (!range) {
+			const { window } = editor.container;
+			const selection = window?.getSelection();
 
-		if (!selection) return;
-		const range = Range.from(editor, selection);
+			if (!selection) return;
+			range = Range.from(editor, selection);
+		}
 		if (!range) return;
 		if (
 			isView(editor) &&
@@ -918,7 +924,7 @@ export default class<
 			editor.off(`${PLUGIN_NAME}:set-range`, this.onSelectionChange);
 			editor.container.document?.removeEventListener(
 				'selectionchange',
-				this.onSelectionChange,
+				this.handelSelectionChange,
 			);
 		}
 	}
