@@ -655,7 +655,6 @@ class TableComponent<V extends TableValue = TableValue>
 
 	handleChange = (trigger: 'remote' | 'local' = 'local') => {
 		const editor = this.editor;
-		if (!isEngine(editor)) return;
 		this.conltrollBar.refresh();
 		this.selection.render('change');
 		const oldValue = super.getValue();
