@@ -172,6 +172,7 @@ export const cards: CardEntry[] = [
 export const tableOptions: TableOptions = {
 	overflow: {
 		maxLeftWidth: () => {
+			if (isMobile) return 0;
 			// 编辑区域位置
 			const rect = $('.am-engine')
 				.get<HTMLElement>()
@@ -183,6 +184,7 @@ export const tableOptions: TableOptions = {
 			return width <= 0 ? 0 : width - 16;
 		},
 		maxRightWidth: () => {
+			if (isMobile) return 0;
 			// 编辑区域位置
 			const rect = $('.am-engine')
 				.get<HTMLElement>()
