@@ -949,8 +949,9 @@ class NodeEntry implements NodeInterface {
 		const walk = (node: NodeInterface) => {
 			let isCard = node.isCard();
 			if (
-				!node.fragment &&
+				// 不能是 fragment 或者 fragment 只有一个子节点，且子节点是 card
 				isCard &&
+				(!node.fragment || node.fragment.childNodes.length === 1) &&
 				(!includeCard ||
 					(includeCard === 'editable' && !node.isEditableCard()))
 			) {
