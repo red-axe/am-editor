@@ -5,6 +5,7 @@ import {
 	CardType,
 	closest,
 	DATA_CONTENTEDITABLE_KEY,
+	DATA_ELEMENT,
 	EDITABLE_SELECTOR,
 	getComputedStyle,
 	isEngine,
@@ -587,7 +588,9 @@ class TableComponent<V extends TableValue = TableValue>
 		const parser = new Parser(container, editor, (node) => {
 			node.find(Template.TABLE_TD_BG_CLASS).remove();
 			node.find(EDITABLE_SELECTOR).each((root) => {
-				editor.node.unwrap($(root));
+				if (root.nodeName === 'TD') {
+					$(root).removeAttributes(DATA_ELEMENT);
+				} else editor.node.unwrap($(root));
 			});
 		});
 		const { rows, cols, height, width } = tableModel;
