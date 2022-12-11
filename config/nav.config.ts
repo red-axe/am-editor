@@ -33,6 +33,10 @@ export default () => {
 				title: 'Github',
 				path: 'https://github.com/yanmao-cc/am-editor',
 			},
+			{
+				title: 'Editable',
+				path: 'https://docs.editablejs.com/playground',
+			},
 		],
 		'zh-CN': [
 			{
@@ -66,6 +70,10 @@ export default () => {
 			{
 				title: 'Github',
 				path: 'https://github.com/yanmao-cc/am-editor',
+			},
+			{
+				title: 'Editable',
+				path: 'https://docs.editablejs.com/playground',
 			},
 		],
 	};
