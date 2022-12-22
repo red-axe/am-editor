@@ -626,7 +626,8 @@ export default class<
 		if (!range) return;
 		if (
 			isView(editor) &&
-			!range.commonAncestorNode.inEditor(editor.container)
+			!range.commonAncestorNode.inEditor(editor.container) &&
+			!range.commonAncestorNode.isRoot()
 		)
 			return;
 
