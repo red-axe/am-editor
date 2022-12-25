@@ -493,9 +493,9 @@ class List implements ListModelInterface {
 				const block = blocks[0].closest('ul,ol');
 				this.addStart(block);
 			}
-			selection?.move();
-			if (!range && selection !== undefined) change.apply(cloneRange);
 		}
+		selection?.move();
+		if (!range && selection !== undefined) change.apply(cloneRange);
 	}
 	/**
 	 * 给列表添加start序号
