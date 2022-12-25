@@ -14,6 +14,11 @@ abstract class ListEntry<T extends PluginOptions = PluginOptions>
 	cardName?: string;
 	private isPasteList: boolean = false;
 
+	/**
+	 * 是否能够自动合并
+	 */
+	canMerge = true;
+
 	init() {
 		super.init();
 		const editor = this.editor;
