@@ -457,16 +457,19 @@ class List implements ListModelInterface {
 	merge(blocks?: Array<NodeInterface>, range?: RangeInterface) {
 		const editor = this.editor;
 		if (!isEngine(editor)) return;
-		const { change, block, node } = editor;
+		const { change, block, node, schema } = editor;
+		const tags = schema.getCanMergeTags();
+		if (tags.length === 0) return;
 		const safeRange = range || change.range.toTrusty();
 		const cloneRange = safeRange.cloneRange();
 		const selection = blocks
 			? undefined
 			: cloneRange.shrinkToElementNode().createSelection();
 		blocks = blocks || block.getBlocks(safeRange);
+		let hasMerged = false;
 		blocks.forEach((block) => {
 			block = block.closest('ul,ol');
-			if (!node.isList(block)) {
+			if (!node.isList(block) || tags.indexOf(block.name) === -1) {
 				return;
 			}
 			const prevBlock = block.prev();
@@ -476,19 +479,23 @@ class List implements ListModelInterface {
 				node.merge(prevBlock, block);
 				// 原来 block 已经被移除，重新指向
 				block = prevBlock;
+				hasMerged = true;
 			}
 
 			if (nextBlock && this.isSame(nextBlock, block)) {
 				node.merge(block, nextBlock);
+				hasMerged = true;
 			}
 		});
-		blocks = block.getBlocks(safeRange);
-		if (blocks.length > 0) {
-			const block = blocks[0].closest('ul,ol');
-			this.addStart(block);
+		if (hasMerged) {
+			blocks = block.getBlocks(safeRange);
+			if (blocks.length > 0) {
+				const block = blocks[0].closest('ul,ol');
+				this.addStart(block);
+			}
+			selection?.move();
+			if (!range && selection !== undefined) change.apply(cloneRange);
 		}
-		selection?.move();
-		if (!range && selection !== undefined) change.apply(cloneRange);
 	}
 	/**
 	 * 给列表添加start序号
