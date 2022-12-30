@@ -407,13 +407,13 @@ class Helper implements HelperInterface {
 	copyCss(from: NodeInterface | Node, to: NodeInterface | Node) {
 		if (isNode(from)) from = $(from);
 		if (isNode(to)) to = $(to);
-		to.css('text-align', from.css('text-align'));
+		// to.css('text-align', from.css('text-align'));
 		to.css('vertical-align', from.css('vertical-align'));
 		let tdBgColor = from.css('background-color');
-		tdBgColor = tdBgColor !== 'rgba(0, 0, 0, 0)' ? tdBgColor : '#fff';
+		tdBgColor = tdBgColor !== 'rgba(0, 0, 0, 0)' ? tdBgColor : '';
 		to.css('background-color', tdBgColor);
-		to.css('color', from.css('color'));
-		to.css('font-weight', from.css('font-weight'));
+		// to.css('color', from.css('color'));
+		// to.css('font-weight', from.css('font-weight'));
 	}
 
 	/**
@@ -444,7 +444,7 @@ class Helper implements HelperInterface {
 		if (to.name === 'td') {
 			to.attributes('data-transient-attributes', 'table-cell-selection');
 		}
-		//this.copyCss(from, to)
+		this.copyCss(from, to);
 	}
 
 	/**
