@@ -71,13 +71,31 @@ export default class<
 		const globals: Array<SchemaGlobal> = [];
 		const optionKeys = this.options?.keys || [];
 		optionKeys.forEach((key) => {
-			globals.push({
-				type: 'mark',
-				attributes: {
-					[this.getIdName(key)]: '*',
-					[this.MARK_KEY]: key,
+			const attributes = {
+				[this.getIdName(key)]: '*',
+				[this.MARK_KEY]: key,
+				[this.MARK_UUID]: '*',
+			};
+			globals.push(
+				{
+					type: 'mark',
+					attributes: {
+						...attributes,
+					},
 				},
-			});
+				{
+					type: 'inline',
+					attributes: {
+						...attributes,
+					},
+				},
+				{
+					type: 'block',
+					attributes: {
+						...attributes,
+					},
+				},
+			);
 		});
 		const editor = this.editor;
 		editor.schema.add(globals);
