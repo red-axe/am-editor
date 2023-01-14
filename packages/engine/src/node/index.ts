@@ -576,10 +576,11 @@ class NodeModel implements NodeModelInterface {
 				((prev && !this.isInline(prev)) ||
 					(!prev && parent && !this.isInline(parent)))
 			) {
-				startNode
-					.get<Text>()!
-					.splitText(text.length - 1)
-					.remove();
+				const textNode = startNode.get<Text>()!;
+				const splitNode = textNode.splitText(startOffset - 1);
+				const splitText = splitNode.textContent;
+				if (splitText && splitText.length > 0) splitNode.splitText(1);
+				splitNode.remove();
 			}
 		}
 		// 是否在卡片上，卡片还没有渲染
