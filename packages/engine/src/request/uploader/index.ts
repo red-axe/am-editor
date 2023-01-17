@@ -34,12 +34,6 @@ class Uploader implements UploaderInterface {
 	private async upload(files: Array<File>, name: string = 'file') {
 		files.forEach(async (file) => {
 			const formData = new FormData();
-			formData.append(name, file, file.name);
-			if (file.data) {
-				Object.keys(file.data).forEach((key) => {
-					formData.append(key, file.data![key]);
-				});
-			}
 			const {
 				url,
 				onUploading,
@@ -64,6 +58,13 @@ class Uploader implements UploaderInterface {
 					});
 				}
 			}
+			if (file.data) {
+				Object.keys(file.data).forEach((key) => {
+					formData.append(key, file.data![key]);
+				});
+			}
+			formData.append(name, file, file.name);
+
 			await new Ajax({
 				xhr: () => {
 					const xhr = new window.XMLHttpRequest();
