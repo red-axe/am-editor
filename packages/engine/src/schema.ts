@@ -60,6 +60,7 @@ class Schema implements SchemaInterface {
 		}
 
 		rules.forEach((rule) => {
+			const rules = this.data[`${rule.type}s`];
 			if (isSchemaRule(rule)) {
 				//删除全局属性已有的规则
 				if (rule.attributes) {
@@ -88,23 +89,22 @@ class Schema implements SchemaInterface {
 						}
 					});
 				}
-				const rules = this.data[`${rule.type}s`];
 				if (rules) {
 					if (isMerge) {
-						this.data[`${rule.type}s`].map((item) => {
+						this.data[`${rule.type}s`] = rules.map((item) => {
 							if (item.name === rule.name) {
 								item.attributes = merge(
 									Object.assign({}, item.attributes),
 									rule.attributes,
 								);
 							}
-							item;
+							return item;
 						});
 					} else {
-						this.data[`${rule.type}s`].push(rule);
+						rules.push(rule);
 					}
 				}
-			} else if (!!this.data[`${rule.type}s`]) {
+			} else if (!!rules) {
 				this.data.globals[rule.type] = merge(
 					Object.assign({}, this.data.globals[rule.type]),
 					rule.attributes,
