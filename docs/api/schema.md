@@ -28,9 +28,11 @@ Increase rule constraints
 * Added rules, div tags are not allowed, div will be used as card
 * When only type and attributes are used, they will be regarded as global attributes of this type, and will be merged with all other label attributes of the same type
 * @param rules
+* @param isMerge Whether to merge, the default is false. If true, it will be merged into the existing rules
 */
 add(
     rules: SchemaRule | SchemaGlobal | Array<SchemaRule | SchemaGlobal>,
+	isMerge?: boolean,
 ): void;
 ```
 
