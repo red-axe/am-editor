@@ -43,7 +43,7 @@
     "devDependencies": {
         "@types/sharedb": "^2.2.0",
         "@umijs/test": "^3.0.5",
-        "antd": "^4.15.5",
+        "antd": "^5.0.0-rc.3",
         "dumi": "^1.1.17",
         "father-build": "^1.19.4",
         "gh-pages": "^3.0.0",
