@@ -372,7 +372,7 @@ class Parser implements ParserInterface {
 				}
 			} else if (node.isText()) {
 				const text = node.text();
-				if (/^\n/.test(text) || /^\s/.test(text)) {
+				if (/^\n+$/.test(text) || /^\s+$/.test(text)) {
 					const element = node.get<Text>()!;
 					const prev = element.previousSibling;
 					const next = element.nextSibling;
