@@ -34,7 +34,7 @@ export const isTransientElement = (
 	node: NodeInterface | Node,
 	transientElements?: Array<Node>,
 	loadingCards?: NodeInterface[],
-) => {
+): boolean => {
 	const element = (isNode(node) ? node : node[0]) as Element;
 	if (element.nodeType === Node.ELEMENT_NODE) {
 		const dataElement = element.getAttribute(DATA_ELEMENT) || '';
@@ -106,6 +106,9 @@ export const isTransientElement = (
 		if (parentCard && isCard(parentCard) && !isEditableCard(parentCard)) {
 			return true;
 		}
+	} else if (element.nodeType === Node.TEXT_NODE) {
+		const parent = element.parentElement;
+		return !!parent && isTransientElement(parent);
 	}
 	return false;
 };

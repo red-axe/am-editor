@@ -387,7 +387,7 @@ class OTModel extends EventEmitter2 implements OTInterface {
 
 	destroy() {
 		if (this.doc) this.doc.destroy();
-		this.selection.destory();
+		this.selection.destroy();
 		this.mutation?.off('onChange', this.handleChange);
 		this.mutation?.destroyCache();
 		this.stopMutation();

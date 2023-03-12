@@ -566,16 +566,20 @@ export default class<
 
 	startMutation() {
 		const editor = this.editor;
-		if (isEngine(editor) && editor.ot.isStopped()) {
-			editor.ot.startMutation();
+		if (isEngine(editor) && editor.model.mutation.isStopped) {
+			editor.model.mutation.start();
 		}
 	}
 
 	stopMutation() {
 		const editor = this.editor;
 		setTimeout(() => {
-			if (isEngine(editor) && editor.readonly && !editor.ot.isStopped()) {
-				editor.ot.stopMutation();
+			if (
+				isEngine(editor) &&
+				editor.readonly &&
+				!editor.model.mutation.isStopped
+			) {
+				editor.model.mutation.stop();
 			}
 		}, 10);
 	}

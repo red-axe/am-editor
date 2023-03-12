@@ -220,7 +220,7 @@ class OTSelection extends EventEmitter2 implements SelectionInterface {
 		});
 	}
 
-	destory() {
+	destroy() {
 		const container = this.engine.container;
 		container.off('mouseup', this.handleMouseUp);
 		container.off('mousemove', this.emitSelectChange);

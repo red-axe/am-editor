@@ -113,7 +113,7 @@ export interface SelectionInterface extends EventEmitter2 {
 
 	refreshAttributes(...members: Member[]): void;
 
-	destory(): void;
+	destroy(): void;
 }
 
 export type CursorRect = {

@@ -50,6 +50,8 @@ const EditorComponent: React.FC<EditorProps> = ({
 	...props
 }) => {
 	const engine = useRef<EngineInterface | null>(null);
+
+	const engineRef = useRef<EngineInterface | null>(null);
 	const otClient = useRef<OTClient | null>(null);
 	const comment = useRef<CommentRef | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -140,21 +142,21 @@ const EditorComponent: React.FC<EditorProps> = ({
 				if (IS_DEV) {
 					const value = engine.current?.getValue();
 					// 获取编辑器的值
-					console.log(`value ${trigger} update:`, value);
-					// 获取当前所有at插件中的名单
-					console.log(
-						'mention:',
-						engine.current?.command.executeMethod(
-							'mention',
-							'getList',
-						),
-					);
-					// 获取编辑器的html
-					console.log('html:', engine.current?.getHtml());
-					// 获取编辑器的json
-					console.log('json:', engine.current?.getJsonValue());
-					// 获取编辑器的text
-					console.log('text:', engine.current?.getText());
+					// console.log(`value ${trigger} update:`, value);
+					// // 获取当前所有at插件中的名单
+					// console.log(
+					// 	'mention:',
+					// 	engine.current?.command.executeMethod(
+					// 		'mention',
+					// 		'getList',
+					// 	),
+					// );
+					// // 获取编辑器的html
+					// console.log('html:', engine.current?.getHtml());
+					// // 获取编辑器的json
+					// console.log('json:', engine.current?.getJsonValue());
+					// // 获取编辑器的text
+					// console.log('text:', engine.current?.getText());
 				}
 			},
 			[loading, autoSave, props.onChange],
@@ -252,10 +254,16 @@ const EditorComponent: React.FC<EditorProps> = ({
 				userSave();
 			}
 		};
+		const onChange = (operations) => {
+			engineRef.current?.model.mutation.stop();
+			engineRef.current?.model.apply(operations);
+		};
+		engine.current.model.onChange(onChange);
 		// 手动保存
 		document.addEventListener('keydown', keydown);
 		return () => {
 			document.removeEventListener('keydown', keydown);
+			engine.current.model.offChange(onChange);
 		};
 	}, [engine, userSave, loading]);
 	// 协同事件绑定
@@ -360,16 +368,33 @@ const EditorComponent: React.FC<EditorProps> = ({
 						<div
 							className="editor-content"
 							onMouseDown={editorAreaClick}
+							style={{
+								display: 'flex',
+								margin: '0px 20px',
+								gap: 20,
+								width: 'auto',
+							}}
 						>
-							{
-								<EngineComponent
-									ref={engine}
-									{...engineProps}
-									defaultValue=""
-								/>
-							}
+							<div style={{ width: 800 }}>
+								{
+									<EngineComponent
+										ref={engine}
+										{...engineProps}
+										defaultValue=""
+									/>
+								}
+							</div>
+							<div style={{ width: 800 }}>
+								{
+									<EngineComponent
+										ref={engineRef}
+										{...engineProps}
+										defaultValue=""
+									/>
+								}
+							</div>
 						</div>
-						{engine.current && !isMobile && props.comment && (
+						{/* {engine.current && !isMobile && props.comment && (
 							<CommentLayer
 								ref={comment}
 								editor={engine.current}
@@ -383,11 +408,11 @@ const EditorComponent: React.FC<EditorProps> = ({
 								onUpdate={onCommentRequestUpdate}
 								{...props.comment}
 							/>
-						)}
+						)} */}
 					</div>
-					{engine.current && !isMobile && props.toc && (
+					{/* {engine.current && !isMobile && props.toc && (
 						<Toc editor={engine.current} />
-					)}
+					)} */}
 				</div>
 			</>
 		</Loading>

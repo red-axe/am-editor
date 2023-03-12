@@ -144,19 +144,6 @@ class CardModel implements CardModelInterface {
 						if (card.destroy) card.destroy();
 						card.getCenter().empty();
 						this.renderComponent(card);
-						if (
-							isEngine(editor) &&
-							editor.readonly &&
-							!editor.ot.isRemote
-						) {
-							if (!editor.ot.doc?.type) {
-								editor.ot.doc?.create(
-									toJSON0(editor.container),
-								);
-							} else {
-								editor.ot.doc.data = toJSON0(editor.container);
-							}
-						}
 					}
 				}
 			});
@@ -552,7 +539,11 @@ class CardModel implements CardModelInterface {
 		const parent = card.root.parent();
 		this.removeNode(card);
 		list.addBr(range.startNode);
-		if (parent && node.isEmpty(parent) && !editor.ot.isStopped) {
+		if (
+			parent &&
+			node.isEmpty(parent) &&
+			!editor.model.mutation.isStopped
+		) {
 			if (parent.isEditable()) {
 				node.html(parent, '<p><br /></p>');
 				range.select(parent, true);
@@ -581,7 +572,11 @@ class CardModel implements CardModelInterface {
 
 		const parent = card.root.parent();
 		this.removeNode(card);
-		if (parent && node.isEmpty(parent) && !editor.ot.isStopped) {
+		if (
+			parent &&
+			node.isEmpty(parent) &&
+			!editor.model.mutation.isStopped
+		) {
 			if (parent.isEditable()) {
 				node.html(parent, '<p><br /></p>');
 			} else {
@@ -783,13 +778,12 @@ class CardModel implements CardModelInterface {
 			}
 		});
 		let isTriggerRenderAsync = false;
-		const isRemote = isEngine(this.editor) && this.editor.ot.isRemote;
 		asyncRenderCards.forEach((card) => {
-			// 可编辑卡片在远程模式下不进行异步渲染
+			// 可编辑卡片不进行异步渲染
 			if (
 				lazyRender &&
 				(card.constructor as CardEntry).lazyRender &&
-				(!card.isEditable || !isRemote)
+				!card.isEditable
 			) {
 				if (card.beforeRender) {
 					const result = card.beforeRender();

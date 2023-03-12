@@ -1,6 +1,6 @@
 import { NodeInterface, Selector, EventListener } from './node';
 import { ChangeInterface } from './change';
-import { OTInterface } from './ot';
+// import { OTInterface } from './ot';
 import { SchemaInterface } from './schema';
 import { HistoryInterface } from './history';
 import { CardInterface } from './card';
@@ -10,6 +10,7 @@ import { RangeInterface } from './range';
 import { Op } from 'sharedb';
 import { EditorInterface, EditorOptions } from './editor';
 import { HotkeyInterface } from './hotkey';
+import { Model } from 'src/model';
 
 /**
  * 编辑器容器接口
@@ -115,8 +116,8 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	/**
 	 * 协同编辑
 	 */
-	ot: OTInterface;
-
+	// ot: OTInterface;
+	model: Model;
 	/**
 	 * 历史记录
 	 */

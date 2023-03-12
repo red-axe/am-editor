@@ -29,6 +29,7 @@ import Editor from '../editor';
 import { $ } from '../node';
 import { DATA_CONTENTEDITABLE_KEY } from '../constants';
 import './index.css';
+import { Model, Node } from '../model';
 
 class Engine<T extends EngineOptions = EngineOptions>
 	extends Editor<T>
@@ -39,7 +40,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 	readonly kind = 'engine';
 
 	typing: TypingInterface;
-	ot: OTInterface;
+	model: Model;
 	change: ChangeInterface;
 	history: HistoryInterface;
 	hotkey: HotkeyInterface;
@@ -53,11 +54,11 @@ class Engine<T extends EngineOptions = EngineOptions>
 		if (readonly) {
 			this.hotkey.disable();
 			this._container.setReadonly(true);
-			this.ot.stopMutation();
+			this.model.mutation.stop();
 		} else {
 			this.hotkey.enable();
 			this._container.setReadonly(false);
-			this.ot.startMutation();
+			this.model.mutation.start();
 		}
 		this._readonly = readonly;
 		this.card.reRender();
@@ -110,13 +111,12 @@ class Engine<T extends EngineOptions = EngineOptions>
 		// 快捷键
 		this.hotkey = new Hotkey(this);
 		this.init();
-		// 协同
-		this.ot = new OT(this);
 
 		if (this.isEmpty()) {
 			this._container.showPlaceholder();
 		}
-		this.ot.initLocal();
+		this.model = Model.from(this);
+		this.model.resetRoot();
 	}
 
 	isFocus() {
@@ -183,12 +183,8 @@ class Engine<T extends EngineOptions = EngineOptions>
 	}
 
 	initDocOnReadonly() {
-		if (this.readonly && !this.ot.isRemote) {
-			if (!this.ot.doc?.type) {
-				this.ot.doc?.create(toJSON0(this.container));
-			} else {
-				this.ot.doc.data = toJSON0(this.container);
-			}
+		if (this.readonly) {
+			this.model.resetRoot();
 		}
 	}
 
@@ -316,9 +312,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 		this.change.destroy();
 		this.hotkey.destroy();
 		this.typing.destroy();
-		if (this.ot) {
-			this.ot.destroy();
-		}
+		this.model.destroy();
 		super.destroy();
 	}
 }

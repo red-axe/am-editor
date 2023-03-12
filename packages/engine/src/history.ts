@@ -92,7 +92,7 @@ class HistoryModel implements HistoryInterface {
 		const undoOp = this.getUndoOp();
 		if (undoOp) {
 			let isUndo = false;
-			this.engine.ot.stopMutation();
+			this.engine.model.mutation.stop();
 			try {
 				const { ot } = this.engine;
 				ot.submitOps(undoOp.ops || []);
@@ -112,7 +112,7 @@ class HistoryModel implements HistoryInterface {
 				this.engine.change.change();
 				this.engine.trigger('undo');
 			}
-			this.engine.ot.startMutation();
+			this.engine.model.mutation.start();
 		}
 	}
 
@@ -124,7 +124,7 @@ class HistoryModel implements HistoryInterface {
 		const redoOp = this.getRedoOp();
 		if (redoOp) {
 			let isRedo = false;
-			this.engine.ot.stopMutation();
+			this.engine.model.mutation.stop();
 			try {
 				const { ot } = this.engine;
 				ot.submitOps(redoOp.ops || []);
@@ -143,7 +143,7 @@ class HistoryModel implements HistoryInterface {
 				this.engine.change.change();
 				this.engine.trigger('redo');
 			}
-			this.engine.ot.startMutation();
+			this.engine.model.mutation.start();
 		}
 	}
 
