@@ -88,9 +88,11 @@ export interface SchemaInterface {
 	 * 增加规则，不允许设置div标签，div将用作card使用
 	 * 只有 type 和 attributes 时，将作为此类型全局属性，与其它所有同类型标签属性将合并
 	 * @param rules 规则
+	 * @param isMerge 是否合并
 	 */
 	add(
 		rules: SchemaRule | SchemaGlobal | Array<SchemaRule | SchemaGlobal>,
+		isMerge?: boolean,
 	): void;
 	/**
 	 * 移除一个规则
