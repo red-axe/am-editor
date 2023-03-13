@@ -255,15 +255,30 @@ const EditorComponent: React.FC<EditorProps> = ({
 			}
 		};
 		const onChange = (operations) => {
-			engineRef.current?.model.mutation.stop();
-			engineRef.current?.model.apply(operations);
+			engineRef.current?.model.applyRemote(operations);
 		};
+		const onSelectionChange = (selection) => {
+			engineRef.current?.model.drawCursor(selection);
+		};
+		engine.current.model.member.add({
+			uuid: '234234',
+			name: 'test',
+			color: '#red',
+		});
+		engineRef.current?.model.member.add({
+			uuid: '234234',
+			name: 'test',
+			color: '#red',
+		});
+		engine.current.model.member.setCurrent('234234');
 		engine.current.model.onChange(onChange);
+		engine.current.model.onSelectionChange(onSelectionChange);
 		// 手动保存
 		document.addEventListener('keydown', keydown);
 		return () => {
 			document.removeEventListener('keydown', keydown);
 			engine.current.model.offChange(onChange);
+			engine.current.model.offSelectionChange(onSelectionChange);
 		};
 	}, [engine, userSave, loading]);
 	// 协同事件绑定

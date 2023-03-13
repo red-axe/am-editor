@@ -1,5 +1,5 @@
 import { toHex } from '../utils';
-import { isTransientAttribute, isTransientElement } from '../ot/utils';
+import { isTransientAttribute, isTransientElement } from './utils';
 import { DOMNode, isDOMElement, isDOMHTMLElement } from './dom';
 import { Element } from './element';
 import { Text } from './text';
@@ -41,13 +41,29 @@ export const Node = {
 				const child = children[i];
 				Path.setPath(child, element, i);
 			}
-			DOMNODE_TO_NODE.set(domNode, element);
+			Node.setDOM(element, domNode);
 			return element;
 		}
 		const text = Text.create(String(nodeValue));
-		DOMNODE_TO_NODE.set(domNode, text);
+		Node.setDOM(text, domNode);
 		return text;
 	},
 
 	findNode: (domNode: DOMNode) => DOMNODE_TO_NODE.get(domNode),
+
+	setDOM: (node: Node, domNode: DOMNode) => {
+		DOMNODE_TO_NODE.set(domNode, node);
+	},
+
+	findByPath: (root: Node, path: Path) => {
+		let node = root;
+		for (const index of path) {
+			if (Element.isElement(node)) {
+				node = node.children[index];
+			} else {
+				throw new Error('Cannot find element');
+			}
+		}
+		return node;
+	},
 };

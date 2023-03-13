@@ -38,4 +38,37 @@ export const Path = {
 		if (index === undefined) throw new Error(`Invalid index in ${node}`);
 		return index;
 	},
+
+	isEqual(path: Path, other: Path): boolean {
+		if (path.length !== other.length) return false;
+
+		return path.every((p, i) => p === other[i]);
+	},
+
+	isReverse(path: Path, other: Path, offset = 1): boolean {
+		if (path.length !== other.length) return false;
+		const index = path.length - 1;
+		const clone = other.slice();
+		clone[index] = clone[index] - offset;
+
+		return Path.isEqual(path, clone);
+	},
+
+	commonLength(path: Path, other: Path): number | null {
+		let alen = path.length;
+		let blen = other.length;
+
+		if (alen === 0) return -1;
+		if (blen === 0) return null;
+
+		alen--;
+		blen--;
+
+		for (var i = 0; i < alen; i++) {
+			var p = path[i];
+			if (i >= blen || p !== other[i]) return null;
+		}
+
+		return alen;
+	},
 };

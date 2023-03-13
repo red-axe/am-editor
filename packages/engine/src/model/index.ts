@@ -1,41 +1,150 @@
 import EventEmitter2 from 'eventemitter2';
-import { EngineInterface } from '../types';
-import { applyToDOM } from './apply-to-dom';
+import cloneDeep from 'lodash/cloneDeep';
+import { CARD_VALUE_KEY, READY_CARD_KEY } from '../constants';
+import { EngineInterface, NodeInterface } from '../types';
+import { applyToDOM, findDOMByPath } from './apply-to-dom';
+import { DOMNode } from './dom';
 import { Element } from './element';
+import { CursorAttribute, CollaborationMember } from './member';
 import { Mutation } from './mutation';
 import { Node } from './node';
 import { Operation } from './operation';
 import { Path } from './path';
+import ModelSelection from './selection';
 
 const ENGINE_TO_MODEL: WeakMap<EngineInterface, Model> = new WeakMap();
-
+const FLUSHING: WeakMap<EngineInterface, boolean> = new WeakMap();
 export interface Model {
 	root: Element;
 	mutation: Mutation;
+	selection: ModelSelection;
+	member: ReturnType<typeof CollaborationMember.fromEngine>;
 	resetRoot(): void;
 	onChange(fn: (operations: Operation[]) => void): void;
 	offChange(fn: (operations: Operation[]) => void): void;
+	emitChange(operations: Operation[]): void;
+	onSelectionChange(fn: (path: Path[]) => void): void;
+	offSelectionChange(fn: (path: Path[]) => void): void;
 	findNode(path: Path): Node | undefined;
 	apply(operations: Operation[]): void;
+	applyRemote(operations: Operation[]): void;
+	drawCursor(attributes: CursorAttribute[] | CursorAttribute): void;
 	destroy(): void;
 }
 
 const createModel = (engine: EngineInterface, root: Element) => {
 	const ee = new EventEmitter2();
-
+	const { history, change } = engine;
 	const mutation = Mutation.from(engine);
 	mutation.onChange((records) => {
 		const operations = Operation.transform(engine, records);
 		if (operations.length === 0) return;
-		console.log('operations', operations);
+
 		ee.emit('change', operations);
+		history.handleSelfOps(
+			operations.filter((op) => {
+				if (
+					op.undoable === true &&
+					op.type === 'set_node' &&
+					!!op.newProperties[CARD_VALUE_KEY]
+				) {
+					history.handleNLCardValue(op);
+				}
+				return (
+					!op.undoable &&
+					(op.type !== 'set_node' ||
+						!op.newProperties[READY_CARD_KEY])
+				);
+			}),
+		);
+
+		engine.trigger('ops', operations);
+		if (
+			operations.find(
+				(op) => op.type === 'set_node' && op[CARD_VALUE_KEY],
+			)
+		) {
+			change.change(false);
+		}
 	});
 
 	if (!engine.readonly) mutation.start();
 
+	const selection = new ModelSelection(engine);
+
+	selection.on('change', (attr) => {
+		ee.emit('selection-change', attr);
+	});
+
+	const member = CollaborationMember.fromEngine(engine);
+
+	const applyOperations = (operations: Operation[]) => {
+		const applyNodes: NodeInterface[] = [];
+		for (const op of operations) {
+			const operation = cloneDeep(op);
+			const applyNode = applyToDOM(engine, operation, false);
+			if (applyNode && applyNode.length > 0) {
+				applyNodes.push(applyNode);
+			}
+			if (
+				operation.type === 'insert_node' ||
+				operation.type === 'remove_node'
+			) {
+				const { path, node } = operation;
+				const parent = Node.findByPath(
+					model.root,
+					path.slice(0, path.length - 1),
+				);
+				if (Element.isElement(parent)) {
+					const index = path[path.length - 1];
+					parent.children.splice(index, 1, node);
+					if (
+						operation.type === 'insert_node' &&
+						applyNode &&
+						applyNode.length > 0
+					) {
+						const setDOM = (
+							node: Node,
+							parent: Element,
+							index: number,
+							domNode: DOMNode,
+						) => {
+							Node.setDOM(node, domNode);
+							Path.setPath(node, parent, index);
+							if (Element.isElement(node)) {
+								for (let i = 0; i < node.children.length; i++) {
+									const child = node.children[i];
+									const { node: dom } = findDOMByPath(
+										engine,
+										domNode,
+										[i],
+									);
+									setDOM(child, node, index, dom);
+								}
+							}
+						};
+						setDOM(node, parent, index, applyNode[0]);
+					}
+					for (
+						let i = path[path.length - 1];
+						i < parent.children.length;
+						i++
+					) {
+						const child = parent.children[i];
+						Path.setPath(child, parent, i);
+					}
+				}
+			}
+		}
+
+		return applyNodes;
+	};
+
 	const model: Model = {
 		root,
 		mutation,
+		selection,
+		member,
 		resetRoot: () => {
 			const root = Node.createFromDOM(engine.container[0]);
 			if (Element.isElement(root)) model.root = root;
@@ -46,6 +155,15 @@ const createModel = (engine: EngineInterface, root: Element) => {
 		offChange: (fn) => {
 			ee.off('change', fn);
 		},
+		emitChange: (operations) => {
+			ee.emit('change', operations);
+		},
+		onSelectionChange: (fn) => {
+			ee.on('selection-change', fn);
+		},
+		offSelectionChange: (fn) => {
+			ee.off('selection-change', fn);
+		},
 		findNode: (path) => {
 			let node: Node = model.root;
 			for (const p of path) {
@@ -55,15 +173,44 @@ const createModel = (engine: EngineInterface, root: Element) => {
 			return node;
 		},
 		apply: (operations) => {
-			for (const operation of operations) {
-				let container = engine.container[0];
-				const { path } = operation;
-
-				applyToDOM(engine, operation, false);
+			const applyNodes = applyOperations(operations);
+			engine.change.change(false, applyNodes);
+			return applyNodes;
+		},
+		applyRemote: (operations) => {
+			mutation.stop();
+			const applyNodes = applyOperations(operations);
+			Promise.resolve().then(() => {
+				mutation.start();
+			});
+			engine.change.change(true, applyNodes);
+			return applyNodes;
+		},
+		drawCursor(attributes) {
+			if (!FLUSHING.get(engine)) {
+				FLUSHING.set(engine, true);
+				Promise.resolve().then(() => {
+					FLUSHING.set(engine, false);
+					if (!Array.isArray(attributes)) attributes = [attributes];
+					const current = member.getCurrent();
+					const members = member.getMembers();
+					attributes.forEach((attribute) => {
+						if (current && attribute.uuid === current.uuid) return;
+						const member = members.find(
+							(m) => m.uuid === attribute.uuid,
+						);
+						if ('remove' in attribute || !member)
+							selection.removeAttirbute(attribute.uuid);
+						else {
+							selection.setAttribute(attribute, member);
+						}
+					});
+				});
 			}
 		},
 		destroy: () => {
 			mutation.destroy();
+			selection.destroy();
 			ENGINE_TO_MODEL.delete(engine);
 		},
 	};

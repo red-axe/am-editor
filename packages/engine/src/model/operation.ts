@@ -1,6 +1,7 @@
+import isEqual from 'lodash/isEqual';
 import { EngineInterface } from '../types';
 import { isRoot } from '../node/utils';
-import { isTransientAttribute, isTransientElement } from '../ot/utils';
+import { isTransientAttribute, isTransientElement } from './utils';
 import { DOMElement, DOMNode, isDOMElement } from './dom';
 import { Node } from './node';
 import { Element } from './element';
@@ -242,7 +243,10 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 		const { node } = mutationNode;
 		let { previousSibling, nextSibling } = mutationNode;
 		const parentNode = Node.findNode(node);
-		if (!parentNode) throw new Error('parentNode is null');
+		if (!parentNode) {
+			debugger;
+			throw new Error('parentNode is null');
+		}
 		if (!Element.isElement(parentNode))
 			throw new Error('parentNode is not an element');
 		const parentPath = Path.getPath(parentNode);
@@ -289,7 +293,7 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 			next = next.nextSibling;
 		}
 		const start = previousIndex + 1;
-		const end = nextIndex - 1;
+		// const end = nextIndex - 1;
 		const oldChildren = parentNode.children.slice(start, nextIndex);
 		operations.push(
 			...diff(engine, oldChildren, children, parentPath, start),
@@ -490,4 +494,69 @@ const isLoadingCard = (engine: EngineInterface, element: Element) => {
 export const Operation = {
 	transform,
 	diff,
+	inverse: (operation: Operation): Operation => {
+		switch (operation.type) {
+			case 'insert_node': {
+				return {
+					...operation,
+					type: 'remove_node',
+				};
+			}
+			case 'remove_node': {
+				return {
+					...operation,
+					type: 'insert_node',
+				};
+			}
+			case 'insert_text': {
+				return {
+					...operation,
+					type: 'remove_text',
+				};
+			}
+			case 'remove_text': {
+				return {
+					...operation,
+					type: 'insert_text',
+				};
+			}
+			case 'set_node': {
+				const { properties, newProperties } = operation;
+				return {
+					...operation,
+					type: 'set_node',
+					properties: newProperties,
+					newProperties: properties,
+				};
+			}
+		}
+	},
+	isReverse: (a: Operation, b: Operation): boolean => {
+		if (
+			(a.type === 'insert_node' && b.type === 'remove_node') ||
+			(a.type === 'remove_node' && b.type === 'insert_node')
+		) {
+			return isEqual(a.node, b.node) && Path.isEqual(a.path, b.path);
+		}
+		if (a.type === 'insert_text' && b.type === 'remove_text') {
+			const aPath = a.path.concat(a.offset);
+			const bPath = b.path.concat(b.offset);
+			return (
+				isEqual(a.text, b.text) &&
+				(isEqual(aPath, bPath) ||
+					Path.isReverse(aPath, bPath, a.text.length) ||
+					Path.isReverse(bPath, aPath, a.text.length))
+			);
+		}
+		if (a.type === 'remove_text' && b.type === 'insert_text') {
+			const aPath = a.path.concat(a.offset);
+			const bPath = b.path.concat(b.offset);
+			return isEqual(a.text, b.text) && isEqual(aPath, bPath);
+		}
+		return false;
+	},
+
+	canOpAffectPath(operation: Operation, path: Path): boolean {
+		return Path.commonLength(path, operation.path) !== null;
+	},
 };

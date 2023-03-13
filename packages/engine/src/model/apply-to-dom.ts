@@ -1,8 +1,8 @@
-import { isTransientElement } from '../ot/utils';
+import { isTransientElement } from './utils';
 import {
 	CARD_KEY,
 	CARD_LOADING_KEY,
-	EDITABLE_SELECTOR,
+	DATA_ID,
 	READY_CARD_KEY,
 } from '../constants';
 import { EngineInterface } from '../types';
@@ -13,9 +13,9 @@ import { DOMElement, DOMNode, isDOMElement, isDOMText } from './dom';
 import { Node } from './node';
 import { Text } from './text';
 import { Element } from './element';
-import { isCard, isEditableCard, isRoot } from '../node/utils';
+import { isCard, isRoot } from '../node/utils';
 
-const findDOMByPath = (
+export const findDOMByPath = (
 	engine: EngineInterface,
 	root: DOMNode,
 	path: Path,
@@ -110,8 +110,11 @@ export const applyToDOM = (
 				isRemote ? 'remote' : 'true',
 			);
 		}
+		const id = node[DATA_ID];
 		engine.card.render($element);
-		return $element;
+		if ($element[0].isConnected || !id) return $element;
+		const el = parent.querySelector(`[${DATA_ID}="${id}"]`);
+		return el ? $(el) : $element;
 		// }
 		// return;
 	} else if (operation.type === 'remove_node') {
