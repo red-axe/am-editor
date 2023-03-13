@@ -70,7 +70,7 @@ div[data-card-key="table"].card-selected .data-table, div[data-card-key="table"]
 }
 
 .table-wrapper.active {
-    margin-top: -42px;
+    margin-top: -41px;
     width: 100%;
 }
 
