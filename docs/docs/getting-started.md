@@ -18,7 +18,7 @@ The following three plugins are different
 
 **`Vue3`** example [https://github.com/red-axe/am-editor-vue3-demo](https://github.com/red-axe/am-editor-vue3-demo)
 
-**`React`** example [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+**`React`** example [https://github.com/big-camel/am-editor/tree/master/examples/react](https://github.com/big-camel/am-editor/tree/master/examples/react)
 
 ### Installation
 
@@ -354,9 +354,9 @@ export default EngineDemo;
 
 ### Collaborative editing
 
-Collaborative editing is based on [ShareDB](https://github.com/share/sharedb). Each editor acts as [client](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/ot-client.ts) through `WebSocket` and [server](https://github.com/yanmao-cc/am-editor/tree/master/ot-server) to exchange data. The editor processes and renders data.
+Collaborative editing is based on [ShareDB](https://github.com/share/sharedb). Each editor acts as [client](https://github.com/big-camel/am-editor/blob/master/docs/demo/ot-client.ts) through `WebSocket` and [server](https://github.com/big-camel/am-editor/tree/master/ot-server) to exchange data. The editor processes and renders data.
 
-We need to set up the server and then configure the client. [View full example](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/engine.tsx)
+We need to set up the server and then configure the client. [View full example](https://github.com/big-camel/am-editor/blob/master/docs/demo/engine.tsx)
 
 ```tsx | pure
 //Instantiate the collaborative editing client and pass in the current editor engine instance

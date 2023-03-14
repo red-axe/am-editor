@@ -34,7 +34,6 @@ import { Backspace, Enter, Left, Right, Up, Down, Default } from './typing';
 import { $ } from '../node';
 import { isNode } from '../node/utils';
 import { CardActiveTrigger, CardType } from './enum';
-import { toJSON0 } from '../ot/utils';
 import './index.css';
 
 class CardModel implements CardModelInterface {

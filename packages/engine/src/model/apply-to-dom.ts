@@ -54,7 +54,7 @@ export const findDOMByPath = (
 	};
 };
 
-const toDOM = (node: Node) => {
+export const toDOM = (node: Node) => {
 	if (Text.isText(node)) {
 		return document.createTextNode(node.text);
 	} else if (Element.isElement(node)) {

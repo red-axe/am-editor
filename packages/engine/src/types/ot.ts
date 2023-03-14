@@ -81,6 +81,41 @@ export interface DocInterface<T = any> extends EventEmitter2 {
 	destroy(): void;
 }
 
+export interface SelectionInterface extends EventEmitter2 {
+	/**
+	 * 当前光标路径
+	 */
+	currentRangePath?: { start: RangePath; end: RangePath };
+	/**
+	 * 触发选择改变
+	 */
+	emitSelectChange: (refreshBG?: boolean) => void;
+	/**
+	 * 设置当前用户id
+	 * @param uuid
+	 */
+	setCurrent(member: Member): void;
+	/**
+	 * 设置用户属性
+	 * @param attr
+	 */
+	setAttribute(attr: Attribute, member: Member, refreshBG?: boolean): void;
+	/**
+	 * 移除用户属性
+	 * @param uuid
+	 */
+	removeAttirbute(uuid: string): void;
+	/**
+	 * 获取用户属性
+	 * @param uuid
+	 */
+	getAttribute(uuid: string): Attribute | undefined;
+
+	refreshAttributes(...members: Member[]): void;
+
+	destory(): void;
+}
+
 export type CursorRect = {
 	top: string;
 	left: string;

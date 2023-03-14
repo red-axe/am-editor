@@ -20,8 +20,8 @@ import {
 	View,
 	EditorInterface,
 	CardInterface,
+	Path,
 } from '@aomao/engine';
-import { Path } from 'sharedb';
 
 export interface MarkRangeOptions extends PluginOptions {
 	keys: Array<string>;
@@ -110,8 +110,8 @@ export default class<
 			const keys = optionKeys.map((key) => this.getPreviewName(key));
 			editor.history.onFilter((op) => {
 				if (
-					('od' in op || 'oi' in op) &&
-					keys.includes(op.p[op.p.length - 1].toString())
+					op.type === 'set_node' &&
+					keys.some((key) => !!op.newProperties[key])
 				) {
 					return true;
 				}

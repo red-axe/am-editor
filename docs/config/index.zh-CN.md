@@ -31,7 +31,7 @@ const engine = new Engine(渲染节点, {
 -   默认值：`zh-CN`
 -   详细：配置额外语言包
 
-语言包，默认语言包 [https://github.com/yanmao-cc/am-editor/blob/master/locale](https://github.com/yanmao-cc/am-editor/blob/master/locale)
+语言包，默认语言包 [https://github.com/big-camel/am-editor/blob/master/locale](https://github.com/big-camel/am-editor/blob/master/locale)
 
 ```ts
 const engine = new Engine(渲染节点, {
@@ -81,7 +81,7 @@ console.log(engine.language.get<string>('test'));
 
 -   类型: `{ [key: string]: PluginOptions }` 或者 `(editor) => { [key: string]: PluginOptions }`
 -   默认值：`{}`
--   详细：每个插件的配置项，key 为插件名称，详细配置请参考每个插件的说明。 [配置 DEMO](https://github.com/yanmao-cc/am-editor/blob/master/examples/react/components/editor/config.tsx)
+-   详细：每个插件的配置项，key 为插件名称，详细配置请参考每个插件的说明。 [配置 DEMO](https://github.com/big-camel/am-editor/blob/master/examples/react/components/editor/config.tsx)
 
 一些插件需要额外属性的配置:
 

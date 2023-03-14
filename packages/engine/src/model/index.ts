@@ -2,9 +2,10 @@ import EventEmitter2 from 'eventemitter2';
 import cloneDeep from 'lodash/cloneDeep';
 import { CARD_VALUE_KEY, READY_CARD_KEY } from '../constants';
 import { EngineInterface, NodeInterface } from '../types';
-import { applyToDOM, findDOMByPath } from './apply-to-dom';
+import { applyToDOM, findDOMByPath, toDOM } from './apply-to-dom';
 import { DOMNode } from './dom';
 import { Element } from './element';
+import { Text } from './text';
 import { CursorAttribute, CollaborationMember } from './member';
 import { Mutation } from './mutation';
 import { Node } from './node';
@@ -58,7 +59,7 @@ const createModel = (engine: EngineInterface, root: Element) => {
 			}),
 		);
 
-		engine.trigger('ops', operations);
+		engine.trigger('operations', operations);
 		if (
 			operations.find(
 				(op) => op.type === 'set_node' && op[CARD_VALUE_KEY],
@@ -73,6 +74,7 @@ const createModel = (engine: EngineInterface, root: Element) => {
 	const selection = new ModelSelection(engine);
 
 	selection.on('change', (attr) => {
+		console.log(attr);
 		ee.emit('selection-change', attr);
 	});
 
@@ -91,7 +93,7 @@ const createModel = (engine: EngineInterface, root: Element) => {
 				operation.type === 'remove_node'
 			) {
 				const { path, node } = operation;
-				const parent = Node.findByPath(
+				const parent = Node.get(
 					model.root,
 					path.slice(0, path.length - 1),
 				);
@@ -237,4 +239,7 @@ export const Model = {
 	},
 };
 
-export { Node, Element, Operation };
+export { Node, Element, Path, Text, toDOM, CollaborationMember };
+export type { CursorAttribute };
+export * from './utils';
+export * from './operation';

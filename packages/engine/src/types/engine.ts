@@ -1,16 +1,14 @@
 import { NodeInterface, Selector, EventListener } from './node';
 import { ChangeInterface } from './change';
-// import { OTInterface } from './ot';
 import { SchemaInterface } from './schema';
 import { HistoryInterface } from './history';
 import { CardInterface } from './card';
 import { ClipboardData } from './clipboard';
 import { TypingInterface } from './typing';
 import { RangeInterface } from './range';
-import { Op } from 'sharedb';
 import { EditorInterface, EditorOptions } from './editor';
 import { HotkeyInterface } from './hotkey';
-import { Model } from 'src/model';
+import { Model, Operation, Element } from '../model';
 
 /**
  * 编辑器容器接口
@@ -194,13 +192,13 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * @param callback 异步渲染卡片后的回调
 	 */
 	setJsonValue(
-		value: Array<any>,
+		value: Element,
 		callback?: (count: number) => void,
 	): EngineInterface;
 	/**
 	 * 获取JSON格式的值
 	 */
-	getJsonValue(): string | undefined | (string | {})[];
+	getJsonValue(): Element;
 	/**
 	 * 获取纯文本
 	 * @param includeCard 是否包含卡片内的
@@ -429,7 +427,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 */
 	on(
 		eventType: 'ops',
-		listener: (ops: Op[]) => void,
+		listener: (ops: Operation[]) => void,
 		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
@@ -605,7 +603,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * @param eventType
 	 * @param ops
 	 */
-	off(eventType: 'ops', listener: (ops: Op[]) => void): void;
+	off(eventType: 'ops', listener: (ops: Operation[]) => void): void;
 	/**
 	 * 触发事件
 	 * @param eventType 事件名称
@@ -737,7 +735,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * @param eventType
 	 * @param ops
 	 */
-	trigger(eventType: 'ops', ops: Op[]): void;
+	trigger(eventType: 'ops', ops: Operation[]): void;
 	/**
 	 * 回车键按下，返回false，终止处理其它监听
 	 * @param eventType

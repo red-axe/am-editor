@@ -55,7 +55,7 @@ export const Node = {
 		DOMNODE_TO_NODE.set(domNode, node);
 	},
 
-	findByPath: (root: Node, path: Path) => {
+	get: (root: Node, path: Path) => {
 		let node = root;
 		for (const index of path) {
 			if (Element.isElement(node)) {

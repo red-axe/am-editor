@@ -7,7 +7,6 @@ import {
 	CARD_LEFT_SELECTOR,
 	CARD_RIGHT_SELECTOR,
 } from './constants/card';
-import { ANCHOR, CURSOR, FOCUS } from './constants/selection';
 import {
 	DATA_ELEMENT,
 	DATA_ID,
@@ -17,10 +16,10 @@ import {
 import Selection from './selection';
 import { SelectionInterface } from './types/selection';
 import { EditorInterface } from './types/editor';
-import { Path } from 'sharedb';
+import { Path } from './model';
 import { $ } from './node';
 import { CardEntry } from './types/card';
-import { isTransientElement } from './ot/utils';
+import { isTransientElement } from './model/utils';
 import { isNodeEntry } from './node/utils';
 
 class Range implements RangeInterface {

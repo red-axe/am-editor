@@ -263,12 +263,12 @@ const EditorComponent: React.FC<EditorProps> = ({
 		engine.current.model.member.add({
 			uuid: '234234',
 			name: 'test',
-			color: '#red',
+			color: '#597EF7',
 		});
 		engineRef.current?.model.member.add({
 			uuid: '234234',
 			name: 'test',
-			color: '#red',
+			color: '#597EF7',
 		});
 		engine.current.model.member.setCurrent('234234');
 		engine.current.model.onChange(onChange);

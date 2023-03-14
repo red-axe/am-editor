@@ -573,8 +573,8 @@ onDisabled?: () => boolean;
 
 These default configuration details can be found here:
 
-React: [https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx](https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx)
+React: [https://github.com/big-camel/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx](https://github.com/big-camel/am-editor/blob/master/packages/toolbar/src/config/toolbar/index.tsx)
 
-Vue3: [https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar-vue/src/config/index.ts](https://github.com/yanmao-cc/am-editor/blob/master/packages/toolbar-vue/src/config/index.ts)
+Vue3: [https://github.com/big-camel/am-editor/blob/master/packages/toolbar-vue/src/config/index.ts](https://github.com/big-camel/am-editor/blob/master/packages/toolbar-vue/src/config/index.ts)
 
 Vue2: [https://github.com/zb201307/am-editor-vue2/blob/main/packages/toolbar/src/config/index.ts](https://github.com/zb201307/am-editor-vue2/blob/main/packages/toolbar/src/config/index.ts)

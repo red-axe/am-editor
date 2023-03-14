@@ -18,7 +18,7 @@ title: 安装
 
 **`Vue3`** DEMO [https://github.com/red-axe/am-editor-vue3-demo](https://github.com/red-axe/am-editor-vue3-demo)
 
-**`React`** DEMO [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+**`React`** DEMO [https://github.com/big-camel/am-editor/tree/master/examples/react](https://github.com/big-camel/am-editor/tree/master/examples/react)
 
 ### 安装
 
@@ -354,9 +354,9 @@ export default EngineDemo;
 
 ### 协同编辑
 
-协同编辑基于[ShareDB](https://github.com/share/sharedb)实现。每位编辑者作为[客户端](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/ot-client.ts)通过`WebSocket`与[服务端](https://github.com/yanmao-cc/am-editor/tree/master/ot-server)通信交换数据。编辑器处理数据、渲染数据。
+协同编辑基于[ShareDB](https://github.com/share/sharedb)实现。每位编辑者作为[客户端](https://github.com/big-camel/am-editor/blob/master/docs/demo/ot-client.ts)通过`WebSocket`与[服务端](https://github.com/big-camel/am-editor/tree/master/ot-server)通信交换数据。编辑器处理数据、渲染数据。
 
-我们需要把服务端搭建好，然后配置客户端。[查看完整示例](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/engine.tsx)
+我们需要把服务端搭建好，然后配置客户端。[查看完整示例](https://github.com/big-camel/am-editor/blob/master/docs/demo/engine.tsx)
 
 ```tsx | pure
 //实例化协作编辑客户端，传入当前编辑器引擎实例
