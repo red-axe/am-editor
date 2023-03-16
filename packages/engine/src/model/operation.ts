@@ -110,7 +110,7 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 					currentPreviousSibling.compareDocumentPosition(
 						previousSibling,
 					) & globalThis.Node.DOCUMENT_POSITION_PRECEDING)) ||
-			currentNextSibling?.parentNode !== mutationNode.node
+			currentPreviousSibling?.parentNode !== mutationNode.node
 		) {
 			mutationNode.previousSibling = validSibling(
 				mutationNode.node,
