@@ -354,8 +354,6 @@ Visit localhost:7001 after startup
 
 [am-editor vue example](https://github.com/red-axe/am-editor-vue3-demo)
 
-> Vue example powered by [**modern-vue-template**](https://github.com/byoungd/modern-vue-template)
-
 ## Contribution
 
 Thanks [pleasedmi](https://github.com/pleasedmi)、[Elena211314](https://github.com/Elena211314)、[zb201307](https://github.com/zb201307)、[cheon](https://github.com/number317) for donation

@@ -2,7 +2,7 @@ import { Node, Operation } from '@aomao/engine';
 import * as Y from 'yjs';
 
 export type ApplyFunc<O extends Operation = Operation> = (
-	sharedRoot: Y.XmlText,
+	sharedRoot: Y.XmlElement,
 	editorRoot: Node,
 	op: O,
 ) => void;

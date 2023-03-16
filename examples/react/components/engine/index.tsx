@@ -19,6 +19,14 @@ message.config({
 	top: 240,
 	duration: 3,
 });
+
+declare global {
+	interface Window {
+		engine: EngineInterface;
+		Parser: typeof Parser;
+	}
+}
+
 const EngineComponent: React.FC<EngineProps> = forwardRef<
 	EngineInterface | null,
 	EngineProps

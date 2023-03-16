@@ -56,10 +56,8 @@ const createMember = () => {
 		add(collaborationMember: CollaborationMember) {
 			members.push(collaborationMember);
 		},
-		remove(collaborationMember: CollaborationMember) {
-			const index = members.findIndex(
-				(m) => m.uuid === collaborationMember.uuid,
-			);
+		remove(uuid: string) {
+			const index = members.findIndex((m) => m.uuid === uuid);
 			if (index !== -1) {
 				members.splice(index, 1);
 			}

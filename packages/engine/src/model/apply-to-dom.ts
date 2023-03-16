@@ -5,7 +5,7 @@ import {
 	DATA_ID,
 	READY_CARD_KEY,
 } from '../constants';
-import { EngineInterface } from '../types';
+import { EditorInterface, EngineInterface } from '../types';
 import { $ } from '../node';
 import { Operation } from './operation';
 import { Path } from './path';

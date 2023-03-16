@@ -12,6 +12,8 @@ import { Node } from './node';
 import { Operation } from './operation';
 import { Path } from './path';
 import ModelSelection from './selection';
+import './index.css';
+import { applyRangeByRemotePath, getRangeRemotePath } from './apply-range';
 
 const ENGINE_TO_MODEL: WeakMap<EngineInterface, Model> = new WeakMap();
 const FLUSHING: WeakMap<EngineInterface, boolean> = new WeakMap();
@@ -21,8 +23,8 @@ export interface Model {
 	selection: ModelSelection;
 	member: ReturnType<typeof CollaborationMember.fromEngine>;
 	resetRoot(): void;
-	onChange(fn: (operations: Operation[]) => void): void;
-	offChange(fn: (operations: Operation[]) => void): void;
+	onChange(fn: (operations: Operation[], root: Element) => void): void;
+	offChange(fn: (operations: Operation[], root: Element) => void): void;
 	emitChange(operations: Operation[]): void;
 	onSelectionChange(fn: (path: Path[]) => void): void;
 	offSelectionChange(fn: (path: Path[]) => void): void;
@@ -38,10 +40,11 @@ const createModel = (engine: EngineInterface, root: Element) => {
 	const { history, change } = engine;
 	const mutation = Mutation.from(engine);
 	mutation.onChange((records) => {
+		const cloneRoot = cloneDeep(engine.model.root);
 		const operations = Operation.transform(engine, records);
 		if (operations.length === 0) return;
-
-		ee.emit('change', operations);
+		console.log(operations);
+		ee.emit('change', operations, cloneRoot);
 		history.handleSelfOps(
 			operations.filter((op) => {
 				if (
@@ -82,8 +85,7 @@ const createModel = (engine: EngineInterface, root: Element) => {
 
 	const applyOperations = (operations: Operation[]) => {
 		const applyNodes: NodeInterface[] = [];
-		for (const op of operations) {
-			const operation = cloneDeep(op);
+		for (const operation of operations) {
 			const applyNode = applyToDOM(engine, operation, false);
 			if (applyNode && applyNode.length > 0) {
 				applyNodes.push(applyNode);
@@ -98,13 +100,11 @@ const createModel = (engine: EngineInterface, root: Element) => {
 					path.slice(0, path.length - 1),
 				);
 				if (Element.isElement(parent)) {
+					const isInsert = operation.type === 'insert_node';
 					const index = path[path.length - 1];
-					parent.children.splice(index, 1, node);
-					if (
-						operation.type === 'insert_node' &&
-						applyNode &&
-						applyNode.length > 0
-					) {
+					if (isInsert) parent.children.splice(index, 0, node);
+					else parent.children.splice(index, 1);
+					if (isInsert && applyNode && applyNode.length > 0) {
 						const setDOM = (
 							node: Node,
 							parent: Element,
@@ -134,6 +134,35 @@ const createModel = (engine: EngineInterface, root: Element) => {
 					) {
 						const child = parent.children[i];
 						Path.setPath(child, parent, i);
+					}
+				}
+			} else if (operation.type === 'set_node') {
+				const { path, properties, newProperties } = operation;
+				const node = Node.get(model.root, path);
+				if (node) {
+					for (const key in properties) {
+						delete node[key];
+					}
+					for (const key in newProperties) {
+						node[key] = newProperties[key];
+					}
+				}
+			} else if (
+				operation.type === 'insert_text' ||
+				operation.type === 'remove_text'
+			) {
+				const { path, offset, text } = operation;
+				const node = Node.get(model.root, path);
+				if (Text.isText(node)) {
+					if (operation.type === 'insert_text') {
+						node.text =
+							node.text.slice(0, offset) +
+							text +
+							node.text.slice(offset);
+					} else {
+						node.text =
+							node.text.slice(0, offset) +
+							node.text.slice(offset + text.length);
 					}
 				}
 			}
@@ -181,10 +210,17 @@ const createModel = (engine: EngineInterface, root: Element) => {
 		},
 		applyRemote: (operations) => {
 			mutation.stop();
+			const path = getRangeRemotePath(engine);
 			const applyNodes = applyOperations(operations);
 			Promise.resolve().then(() => {
 				mutation.start();
 			});
+			if (path && engine.isFocus())
+				applyRangeByRemotePath(
+					engine,
+					path,
+					selection.emitSelectChange,
+				);
 			engine.change.change(true, applyNodes);
 			return applyNodes;
 		},

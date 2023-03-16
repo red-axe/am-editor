@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { isServer, EngineInterface } from '@aomao/engine';
+import { isServer, EngineInterface, CollaborationMember } from '@aomao/engine';
 import Context from './context';
 import useDispatch from './hooks/use-dispatch';
 import useSelector from './hooks/use-selector';
@@ -11,17 +11,18 @@ import Button from 'antd/es/button';
 import 'antd/es/space/style';
 import 'antd/es/button/style';
 import './editor.less';
+import React from 'react';
 
 const localMember =
 	typeof localStorage === 'undefined' ? null : localStorage.getItem('member');
 
-const getMember = () => {
+const getMember = (): CollaborationMember => {
 	return !!localMember ? JSON.parse(localMember) : null;
 };
 
 const wsUrl =
 	IS_DEV && !isServer
-		? `ws://${window.location.hostname}:8080`
+		? `ws://${window.location.hostname}:1234`
 		: 'wss://collab.aomao.com';
 const member = getMember();
 
@@ -37,6 +38,10 @@ const setReadonlyValue = (readonly: boolean) => {
 	localStorage.setItem('engine-readonly', readonly ? 'true' : 'false');
 };
 
+const yjsConfig = {
+	url: wsUrl,
+	id: 'demo',
+};
 export default () => {
 	const dispatch = useDispatch();
 	const [engine, setEngine] = useState<EngineInterface | null>(null);
@@ -98,23 +103,8 @@ export default () => {
 				readonly={isReadonly}
 				onLoad={setEngine}
 				toc={true}
-				ot={
-					IS_DEV
-						? false
-						: {
-								url: `${wsUrl}${
-									member?.id ? '?uid=' + member.id : ''
-								}`,
-								docId: 'demo',
-								onReady: (member) => {
-									if (member)
-										localStorage.setItem(
-											'member',
-											JSON.stringify(member),
-										);
-								},
-						  }
-				}
+				member={member}
+				yjs={false ? false : yjsConfig}
 				onSave={onSave}
 			/>
 		</Context.Provider>

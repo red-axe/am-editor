@@ -10,7 +10,7 @@ const opMappers: OpMapper = {
 };
 
 export function applyEditorOp(
-	sharedRoot: Y.XmlText,
+	sharedRoot: Y.XmlElement,
 	editorRoot: Node,
 	op: Operation,
 ): void {

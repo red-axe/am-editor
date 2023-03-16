@@ -132,9 +132,7 @@ class Command implements CommandInterface {
 		const plugin = editor.plugin.components[name];
 		if (plugin && plugin[method]) {
 			try {
-				const change = isEngine(editor) ? editor.change : null;
 				const result = plugin[method](...args);
-				change?.combinText();
 				return result;
 			} catch (error: any) {
 				editor.messageError('command-excute-method', error);

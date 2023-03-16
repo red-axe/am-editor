@@ -1,16 +1,14 @@
 import { Node, RemoveTextOperation } from '@aomao/engine';
-import type Y from 'yjs';
+import * as Y from 'yjs';
 import { getYTarget } from '../../transform';
 
 export function removeText(
-	sharedRoot: Y.XmlText,
+	sharedRoot: Y.XmlElement,
 	editorRoot: Node,
 	op: RemoveTextOperation,
 ): void {
-	const { yParent: target, textRange } = getYTarget(
-		sharedRoot,
-		editorRoot,
-		op.path,
-	);
-	target.delete(textRange.start + op.offset, op.text.length);
+	const { yTarget } = getYTarget(sharedRoot, editorRoot, op.path);
+	if (yTarget instanceof Y.XmlText) {
+		yTarget.delete(op.offset, op.text.length);
+	}
 }

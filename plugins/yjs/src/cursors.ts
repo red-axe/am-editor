@@ -1,5 +1,5 @@
 import { EngineInterface, CursorAttribute } from '@aomao/engine';
-import { Awareness } from '@aomao/plugin-yjs-awareness';
+import { Awareness } from '@aomao/plugin-yjs-protocols/awareness';
 import { CursorState, CursorData } from './types';
 import { YjsEditor } from './yjs';
 
@@ -158,31 +158,29 @@ export function withYCursors<
 						...attribute.data,
 						uuid: String(attribute.clientId),
 					});
-				if (attribute)
+				if (attribute?.cursorAttribute)
 					attributes.push({
 						...attribute.cursorAttribute,
-						uuid: attribute.clientId,
+						uuid: String(attribute.clientId),
 					});
 			}
 			e.model.drawCursor(attributes);
 		}
 		if (clientIds.removed.length > 0) {
 			for (const id of clientIds.removed) {
-				const attribute = YCursorEditor.cursorState(e, id);
-				if (attribute?.cursorAttribute)
-					e.model.selection.removeAttirbute(
-						attribute.cursorAttribute.uuid,
-					);
+				const uuid = String(id);
+				e.model.selection.removeAttirbute(uuid);
+				e.model.member.remove(uuid);
 			}
 		}
 		if (clientIds.updated.length > 0) {
 			const attributes: CursorAttribute[] = [];
-			for (const id of clientIds.added) {
+			for (const id of clientIds.updated) {
 				const attribute = YCursorEditor.cursorState(e, id);
-				if (attribute)
+				if (attribute?.cursorAttribute)
 					attributes.push({
 						...attribute.cursorAttribute,
-						uuid: attribute.clientId,
+						uuid: String(attribute.clientId),
 					});
 			}
 			e.model.drawCursor(attributes);
@@ -193,7 +191,15 @@ export function withYCursors<
 	e.connect = () => {
 		connect();
 		e.awareness.on('change', awarenessChangeListener);
+		const uuid = String(e.awareness.clientID);
+		if (data) {
+			e.model.member.add({
+				...data,
+				uuid,
+			});
+		}
 
+		e.model.member.setCurrent(uuid);
 		awarenessChangeListener({
 			removed: [],
 			added: Array.from(e.awareness.getStates().keys()),
@@ -215,6 +221,7 @@ export function withYCursors<
 			updated: [],
 		});
 		disconnect();
+		e.model.member.remove(String(e.awareness.clientID));
 	};
 
 	e.model.selection.on('change', (cursorAttribute) => {

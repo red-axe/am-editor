@@ -21,7 +21,7 @@ export function editorPathOffsetToYOffset(
 }
 
 export function getYTarget(
-	yRoot: Y.XmlText,
+	yRoot: Y.XmlElement,
 	editorRoot: Node,
 	path: Path,
 ): YTarget {
@@ -35,37 +35,25 @@ export function getYTarget(
 
 	const [pathOffset, ...childPath] = path;
 
-	const yOffset = editorPathOffsetToYOffset(editorRoot, pathOffset);
 	const targetNode = editorRoot.children[pathOffset];
 
-	const delta = yTextToInsertDelta(yRoot);
-	const targetLength = getEditorNodeYLength(targetNode);
-
-	const targetDelta = sliceInsertDelta(delta, yOffset, targetLength);
-	if (targetDelta.length > 1) {
-		throw new Error(
-			"Path doesn't match yText, yTarget spans multiple nodes",
-		);
-	}
-
-	const yTarget = targetDelta[0]?.insert;
+	const yTarget = yRoot.get(pathOffset);
 	if (childPath.length > 0) {
-		if (!(yTarget instanceof Y.XmlText)) {
-			throw new Error(
-				"Path doesn't match yText, cannot descent into non-yText",
-			);
+		if (yTarget instanceof Y.XmlText) {
+			throw new Error('Cannot descent into Yjs text');
 		}
-
 		return getYTarget(yTarget, targetNode, childPath);
 	}
 
 	return {
 		yParent: yRoot,
-		textRange: { start: yOffset, end: yOffset + targetLength },
-		yTarget: yTarget instanceof Y.XmlText ? yTarget : undefined,
+		yTarget:
+			yTarget instanceof Y.XmlText || yTarget instanceof Y.XmlElement
+				? yTarget
+				: undefined,
+		yOffset: pathOffset,
 		editorParent: editorRoot,
 		editorTarget: targetNode,
-		targetDelta,
 	};
 }
 
@@ -115,11 +103,10 @@ export function yOffsetToEditorOffsets(
 }
 
 export function getEditorPath(
-	sharedRoot: Y.XmlText,
-	editorRoot: Node,
-	yText: Y.XmlText,
+	sharedRoot: Y.XmlElement,
+	yTarget: Y.XmlText | Y.XmlElement,
 ): Path {
-	const yNodePath = [yText];
+	const yNodePath = [yTarget];
 	while (yNodePath[0] !== sharedRoot) {
 		const { parent: yParent } = yNodePath[0];
 
@@ -127,7 +114,7 @@ export function getEditorPath(
 			throw new Error("yText isn't a descendant of root element");
 		}
 
-		if (!(yParent instanceof Y.XmlText)) {
+		if (!(yParent instanceof Y.XmlElement)) {
 			throw new Error('Unexpected y parent type');
 		}
 
@@ -138,30 +125,18 @@ export function getEditorPath(
 		return [];
 	}
 
-	let editorParent = editorRoot;
 	return yNodePath.reduce<Path>((path, yParent, idx) => {
 		const yChild = yNodePath[idx + 1];
 		if (!yChild) {
 			return path;
 		}
-
-		let yOffset = 0;
-		const currentDelta = yTextToInsertDelta(yParent);
-		for (const element of currentDelta) {
-			if (element.insert === yChild) {
-				break;
+		if (yParent instanceof Y.XmlElement) {
+			for (let i = 0; i < yParent.length; i++) {
+				if (yParent.get(i) === yChild) {
+					return path.concat(i);
+				}
 			}
-
-			yOffset +=
-				typeof element.insert === 'string' ? element.insert.length : 1;
 		}
-
-		if (Text.isText(editorParent)) {
-			throw new Error('Cannot descent into editor text');
-		}
-
-		const [pathOffset] = yOffsetToEditorOffsets(editorParent, yOffset);
-		editorParent = editorParent.children[pathOffset];
-		return path.concat(pathOffset);
+		return path;
 	}, []);
 }

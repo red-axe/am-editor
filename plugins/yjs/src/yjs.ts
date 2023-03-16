@@ -7,7 +7,7 @@ import {
 import * as Y from 'yjs';
 import { applyYjsEvents } from './apply-to-editor/apply-yjs-events';
 import { applyEditorOp } from './apply-to-yjs';
-import { assertDocumentAttachment, yTextToEditorElement } from './transform';
+import { assertDocumentAttachment, yElementToEditorElement } from './transform';
 
 type LocalChange = {
 	op: Operation;
@@ -22,14 +22,17 @@ const ORIGIN: WeakMap<EditorInterface, unknown> = new WeakMap();
 const LOCAL_CHANGES: WeakMap<EditorInterface, LocalChange[]> = new WeakMap();
 
 export type YjsEditor = EditorInterface & {
-	sharedRoot: Y.XmlText;
+	sharedRoot: Y.XmlElement;
 	undoManager: Y.UndoManager;
 	localOrigin: unknown;
 	positionStorageOrigin: unknown;
 
-	applyRemoteEvents: (events: Y.YEvent<Y.XmlText>[], origin: unknown) => void;
+	applyRemoteEvents: (
+		events: Y.YEvent<Y.XmlElement>[],
+		origin: unknown,
+	) => void;
 
-	storeLocalChange: (op: Operation) => void;
+	storeLocalChange: (op: Operation, root: Element) => void;
 	flushLocalChanges: () => void;
 
 	isLocalOrigin: (origin: unknown) => boolean;
@@ -41,20 +44,31 @@ export type YjsEditor = EditorInterface & {
 const CONNECTED: WeakSet<EditorInterface> = new WeakSet();
 
 export const YjsEditor = {
+	isYjsEditor(value: EditorInterface): value is YjsEditor {
+		return (
+			(value as YjsEditor).sharedRoot instanceof Y.XmlElement &&
+			'localOrigin' in value &&
+			'positionStorageOrigin' in value &&
+			typeof (value as YjsEditor).applyRemoteEvents === 'function' &&
+			typeof (value as YjsEditor).storeLocalChange === 'function' &&
+			typeof (value as YjsEditor).flushLocalChanges === 'function' &&
+			typeof (value as YjsEditor).isLocalOrigin === 'function'
+		);
+	},
 	localChanges(editor: YjsEditor): LocalChange[] {
 		return LOCAL_CHANGES.get(editor) ?? [];
 	},
 
 	applyRemoteEvents(
 		editor: YjsEditor,
-		events: Y.YEvent<Y.XmlText>[],
+		events: Y.YEvent<Y.XmlElement>[],
 		origin: unknown,
 	): void {
 		editor.applyRemoteEvents(events, origin);
 	},
 
-	storeLocalChange(editor: YjsEditor, op: Operation): void {
-		editor.storeLocalChange(op);
+	storeLocalChange(editor: YjsEditor, root: Element, op: Operation): void {
+		editor.storeLocalChange(op, root);
 	},
 
 	flushLocalChanges(editor: YjsEditor): void {
@@ -62,15 +76,17 @@ export const YjsEditor = {
 	},
 
 	connected(editor: YjsEditor): boolean {
-		return CONNECTED.has(editor);
+		return editor.connected();
 	},
 
 	connect(editor: YjsEditor): void {
 		CONNECTED.add(editor);
+		editor.connect();
 	},
 
 	disconnect(editor: YjsEditor): void {
 		CONNECTED.delete(editor);
+		editor.disconnect();
 	},
 
 	isLocal(editor: YjsEditor): boolean {
@@ -102,7 +118,7 @@ export type WithYjsOptions = {
 
 export const withYjs = <T extends EngineInterface>(
 	editor: EngineInterface,
-	sharedRoot: Y.XmlText,
+	sharedRoot: Y.XmlElement,
 	{
 		localOrigin,
 		positionStorageOrigin,
@@ -128,7 +144,7 @@ export const withYjs = <T extends EngineInterface>(
 	e.isLocalOrigin = (origin) => origin === e.localOrigin;
 
 	const handleYEvents = (
-		events: Y.YEvent<Y.XmlText>[],
+		events: Y.YEvent<Y.XmlElement>[],
 		transaction: Y.Transaction,
 	) => {
 		if (e.isLocalOrigin(transaction.origin)) {
@@ -148,10 +164,17 @@ export const withYjs = <T extends EngineInterface>(
 
 	e.connect = () => {
 		e.sharedRoot.observeDeep(handleYEvents);
-		const content = yTextToEditorElement(e.sharedRoot);
-
-		editor.setJsonValue(content);
+		const content = yElementToEditorElement(e.sharedRoot);
+		e.model.mutation.stop();
+		editor.container.empty();
+		if (content.children.length > 0) editor.setJsonValue(content);
+		e.model.resetRoot();
+		Promise.resolve().then(() => {
+			e.model.mutation.start();
+		});
 	};
+
+	e.connected = () => CONNECTED.has(e);
 
 	e.disconnect = () => {
 		if (autoConnectTimeoutId) {
@@ -162,10 +185,10 @@ export const withYjs = <T extends EngineInterface>(
 		if (e.connected()) e.sharedRoot.unobserveDeep(handleYEvents);
 	};
 
-	e.storeLocalChange = (op) => {
+	e.storeLocalChange = (op, root) => {
 		LOCAL_CHANGES.set(e, [
 			...YjsEditor.localChanges(e),
-			{ op, doc: editor.model.root, origin: YjsEditor.origin(e) },
+			{ op, doc: root, origin: YjsEditor.origin(e) },
 		]);
 	};
 
@@ -206,15 +229,13 @@ export const withYjs = <T extends EngineInterface>(
 		});
 	};
 
-	e.model.onChange((ops) => {
+	e.model.onChange((ops, root) => {
 		if (
 			YjsEditor.connected(e) &&
 			YjsEditor.isLocal(e) &&
 			!e.change.isComposing()
 		) {
-			ops.forEach((op) => YjsEditor.storeLocalChange(e, op));
-		}
-		if (YjsEditor.connected(e) && !e.change.isComposing()) {
+			ops.forEach((op) => YjsEditor.storeLocalChange(e, root, op));
 			YjsEditor.flushLocalChanges(e);
 		}
 	});

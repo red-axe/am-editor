@@ -61,3 +61,45 @@ export function editorElementToYText<T extends Element>({
 	});
 	return yElement;
 }
+
+export function editorTextToYText<T extends Text>({
+	text,
+	...attributes
+}: T): Y.XmlText {
+	const yText = new Y.XmlText();
+
+	Object.entries(attributes).forEach(([key, value]) => {
+		yText.setAttribute(key, value);
+	});
+
+	yText.insert(0, text);
+	return yText;
+}
+
+const childrenToYElementChildren = (children: Node[]) => {
+	const yElementChildren: (Y.XmlElement | Y.XmlText)[] = [];
+	for (let i = 0; i < children.length; i++) {
+		const child = children[i];
+		if (Text.isText(child)) {
+			yElementChildren.push(editorTextToYText(child));
+		} else {
+			yElementChildren.push(editorElementToYElement(child));
+		}
+	}
+	return yElementChildren;
+};
+
+export function editorElementToYElement<T extends Element>({
+	children,
+	type,
+	...attributes
+}: T): Y.XmlElement {
+	const yElement = new Y.XmlElement(type);
+
+	Object.entries(attributes).forEach(([key, value]) => {
+		yElement.setAttribute(key, String(value));
+	});
+
+	yElement.insert(0, childrenToYElementChildren(children));
+	return yElement;
+}

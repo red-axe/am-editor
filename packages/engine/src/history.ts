@@ -2,12 +2,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import findLastIndex from 'lodash/findLastIndex';
 import { decodeCardValue, getDocument, random } from './utils';
-import { isTransientElement } from './ot/utils';
 import { EngineInterface } from './types/engine';
 import { HirtoryOperation, HistoryInterface } from './types/history';
 import { $ } from './node';
 import { CARD_VALUE_KEY, DATA_ID, EDITABLE_SELECTOR } from './constants';
-import { Operation } from './model';
+import { isTransientElement, Operation } from './model';
 import { RangePath } from './types';
 
 const setRangeByPath = (

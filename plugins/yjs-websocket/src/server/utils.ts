@@ -59,7 +59,6 @@ class WSSharedDoc extends Y.Doc implements WSSharedDocInterface {
 	name: string;
 	conns: Map<WebSocket.WebSocket, Set<number>>;
 	awareness: awarenessProtocol.Awareness;
-	subDocs: Map<string, Y.Doc> = new Map();
 	/**
 	 * @param {string} name
 	 */
@@ -124,14 +123,7 @@ class WSSharedDoc extends Y.Doc implements WSSharedDocInterface {
 	}
 
 	destroy(): void {
-		this.subDocs.forEach((subDoc) => {
-			subDoc.destroy();
-		});
 		super.destroy();
-	}
-
-	getSubDoc(id: string) {
-		return this.subDocs.get(id);
 	}
 }
 

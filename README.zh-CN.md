@@ -395,7 +395,7 @@ yarn start
 
 ### Vue
 
-[am-editor vue example](https://github.com/byoungd/am-editor-vue/blob/main/README.zh-CN.md)
+[am-editor vue example](https://github.com/red-axe/am-editor-vue3-demo)
 
 ## 贡献
 

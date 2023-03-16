@@ -7,7 +7,8 @@ export function cloneInsertDeltaDeep(delta: InsertDelta): InsertDelta {
 		if (typeof element.insert === 'string') {
 			return element;
 		}
-
+		if (!(element.insert instanceof Y.XmlText))
+			throw new Error('Not implemented');
 		return { ...element, insert: cloneDeep(element.insert) };
 	});
 }

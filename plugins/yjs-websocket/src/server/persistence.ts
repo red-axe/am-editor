@@ -1,4 +1,8 @@
-import { editorElementToYText, Element } from '../model';
+import {
+	editorElementToYElement,
+	editorElementToYText,
+	Element,
+} from '../model';
 import { LeveldbPersistence } from 'y-leveldb';
 import * as Y from 'yjs';
 import { WSSharedDoc } from './types';
@@ -86,12 +90,12 @@ export const initPersistence = async (
 			ldb!.storeUpdate(docName, newUpdates);
 			const content = persistedYdoc.get(
 				contentField,
-				Y.XmlText,
-			) as Y.XmlText;
+				Y.XmlElement,
+			) as Y.XmlElement;
 			const updateContent = ydoc.get(
 				contentField,
-				Y.XmlText,
-			) as Y.XmlText;
+				Y.XmlElement,
+			) as Y.XmlElement;
 
 			Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
 			ydoc.on('update', (update) => {
@@ -101,10 +105,9 @@ export const initPersistence = async (
 			// init empty content
 			if (content._length === 0 && updateContent._length === 0) {
 				ydoc.transact(() => {
-					updateContent.insertEmbed(
-						0,
-						editorElementToYText(initialValue),
-					);
+					updateContent.insert(0, [
+						editorElementToYElement(initialValue),
+					]);
 				});
 			}
 		},

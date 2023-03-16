@@ -78,7 +78,10 @@ const validSibling = (
 	sibling: DOMNode | null,
 	defaultNode: DOMNode | null = null,
 ) => {
-	if (!sibling || !sibling.isConnected) return defaultNode;
+	if (!sibling || !sibling.isConnected) {
+		sibling = defaultNode;
+	}
+	if (!sibling) return defaultNode;
 
 	while (sibling.parentNode !== node) {
 		const parent: DOMNode | null = sibling.parentNode;
@@ -102,11 +105,12 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 			nextSibling: currentNextSibling,
 		} = mutationNode;
 		if (
-			previousSibling &&
-			(!currentPreviousSibling ||
-				currentPreviousSibling.compareDocumentPosition(
-					previousSibling,
-				) & globalThis.Node.DOCUMENT_POSITION_PRECEDING)
+			(previousSibling &&
+				(!currentPreviousSibling ||
+					currentPreviousSibling.compareDocumentPosition(
+						previousSibling,
+					) & globalThis.Node.DOCUMENT_POSITION_PRECEDING)) ||
+			currentNextSibling?.parentNode !== mutationNode.node
 		) {
 			mutationNode.previousSibling = validSibling(
 				mutationNode.node,
@@ -115,10 +119,11 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 			);
 		}
 		if (
-			nextSibling &&
-			(!currentNextSibling ||
-				currentNextSibling.compareDocumentPosition(nextSibling) &
-					globalThis.Node.DOCUMENT_POSITION_FOLLOWING)
+			(nextSibling &&
+				(!currentNextSibling ||
+					currentNextSibling.compareDocumentPosition(nextSibling) &
+						globalThis.Node.DOCUMENT_POSITION_FOLLOWING)) ||
+			currentNextSibling?.parentNode !== mutationNode.node
 		) {
 			mutationNode.nextSibling = validSibling(
 				mutationNode.node,
@@ -332,9 +337,9 @@ const diff = (
 		// remove node
 		else if (!newNode) {
 			if (removeIndex === -1) removeIndex = i;
-			operations.push({
+			operations.unshift({
 				type: 'remove_node',
-				path: path.concat(removeIndex + index),
+				path: path.concat(i + index),
 				node,
 			});
 		} else {
@@ -352,7 +357,7 @@ const diff = (
 				isElement !== newIsElement ||
 				(element && newElement && element.type !== newElement.type)
 			) {
-				operations.push({
+				operations.unshift({
 					type: 'remove_node',
 					path: currentPath,
 					node,

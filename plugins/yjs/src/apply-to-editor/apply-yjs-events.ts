@@ -1,26 +1,25 @@
-import { EngineInterface, Operation } from '@aomao/engine';
-import { translateYTextEvent } from './apply-text-event';
+import { Element, EngineInterface, Operation } from '@aomao/engine';
 import * as Y from 'yjs';
+import { translateYElementEvent } from './apply-element-event';
 
 export function translateYjsEvent(
-	sharedRoot: Y.XmlText,
-	editor: EngineInterface,
-	event: Y.YEvent<Y.XmlText>,
+	sharedRoot: Y.XmlElement,
+	root: Element,
+	event: Y.YEvent<Y.XmlElement | Y.XmlText>,
 ): Operation[] {
-	if (event instanceof Y.YTextEvent) {
-		return translateYTextEvent(sharedRoot, editor, event);
-	}
-
-	throw new Error('Unexpected Y event type');
+	return translateYElementEvent(sharedRoot, root, event);
 }
 
 export const applyYjsEvents = (
-	sharedRoot: Y.XmlText,
+	sharedRoot: Y.XmlElement,
 	editor: EngineInterface,
-	events: Y.YEvent<Y.XmlText>[],
+	events: Y.YEvent<Y.XmlElement>[],
 ) => {
 	const ops = events.reduceRight<Operation[]>((ops, event) => {
-		return [...ops, ...translateYjsEvent(sharedRoot, editor, event)];
+		return [
+			...ops,
+			...translateYjsEvent(sharedRoot, editor.model.root, event),
+		];
 	}, []);
-	editor.model.applyRemote(ops);
+	editor.model.applyRemote(ops.reverse());
 };

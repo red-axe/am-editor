@@ -3,14 +3,14 @@ import * as Y from 'yjs';
 import { getYTarget } from '../../transform';
 
 export function removeNode(
-	sharedRoot: Y.XmlText,
+	sharedRoot: Y.XmlElement,
 	editorRoot: Node,
 	op: RemoveNodeOperation,
 ): void {
-	const { yParent: parent, textRange } = getYTarget(
+	const { yParent: parent, yOffset } = getYTarget(
 		sharedRoot,
 		editorRoot,
 		op.path,
 	);
-	parent.delete(textRange.start, textRange.end - textRange.start);
+	parent.delete(yOffset, 1);
 }

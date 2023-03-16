@@ -7,6 +7,7 @@ import {
 	NodeInterface,
 	ToolbarItemOptions,
 } from '@aomao/engine';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import TestComponent from './test';
 import type { TestValue } from './types';
@@ -56,7 +57,7 @@ class Test extends Card<TestValue> {
 		const value = this.getValue();
 		ReactDOM.render(
 			<TestComponent value={value} />,
-			this.#container?.get<HTMLElement>(),
+			this.#container?.get<HTMLElement>()!,
 		);
 	}
 

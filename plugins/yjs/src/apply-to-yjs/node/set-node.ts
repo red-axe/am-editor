@@ -3,15 +3,11 @@ import * as Y from 'yjs';
 import { getYTarget } from '../../transform';
 
 export function setNode(
-	sharedRoot: Y.XmlText,
+	sharedRoot: Y.XmlElement,
 	editorRoot: Node,
 	op: SetNodeOperation,
 ): void {
-	const { yTarget, textRange, yParent } = getYTarget(
-		sharedRoot,
-		editorRoot,
-		op.path,
-	);
+	const { yTarget } = getYTarget(sharedRoot, editorRoot, op.path);
 
 	if (yTarget) {
 		Object.entries(op.newProperties).forEach(([key, value]) => {
@@ -28,15 +24,4 @@ export function setNode(
 			}
 		});
 	}
-
-	const unset = Object.fromEntries(
-		Object.keys(op.properties).map((key) => [key, null]),
-	);
-	const newProperties = { ...unset, ...op.newProperties };
-
-	yParent.format(
-		textRange.start,
-		textRange.end - textRange.start,
-		newProperties,
-	);
 }

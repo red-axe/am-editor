@@ -905,10 +905,7 @@ Range.fromPath = (
 	const startOffset = startPath.pop();
 	const endOffset = endPath.pop();
 
-	const getNode = (
-		path: Path,
-		context: Element = editor.container.get<Element>()!,
-	) => {
+	const getNode = (path: Path, context: Element = root.get<Element>()!) => {
 		let domNode: Node = context;
 		for (let i = 0; i < path.length; i++) {
 			let p = path[i];
