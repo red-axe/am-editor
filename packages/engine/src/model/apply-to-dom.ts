@@ -5,7 +5,7 @@ import {
 	DATA_ID,
 	READY_CARD_KEY,
 } from '../constants';
-import { EditorInterface, EngineInterface } from '../types';
+import { EngineInterface } from '../types';
 import { $ } from '../node';
 import { Operation } from './operation';
 import { Path } from './path';
@@ -19,9 +19,14 @@ export const findDOMByPath = (
 	engine: EngineInterface,
 	root: DOMNode,
 	path: Path,
+	isForceRenderCard = true,
 ): { parent: DOMElement; node: DOMNode; offset: number } => {
 	// 正在加载中的节点，直接渲染
-	if (isDOMElement(root) && root.hasAttribute(CARD_LOADING_KEY)) {
+	if (
+		isForceRenderCard &&
+		isDOMElement(root) &&
+		root.hasAttribute(CARD_LOADING_KEY)
+	) {
 		const { card } = engine;
 		const cardComponent = card.find(root);
 		if (cardComponent) {

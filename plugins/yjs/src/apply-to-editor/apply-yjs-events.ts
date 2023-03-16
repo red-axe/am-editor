@@ -21,5 +21,5 @@ export const applyYjsEvents = (
 			...translateYjsEvent(sharedRoot, editor.model.root, event),
 		];
 	}, []);
-	editor.model.applyRemote(ops.reverse());
+	editor.model.applyRemote(ops);
 };

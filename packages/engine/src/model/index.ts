@@ -77,7 +77,6 @@ const createModel = (engine: EngineInterface, root: Element) => {
 	const selection = new ModelSelection(engine);
 
 	selection.on('change', (attr) => {
-		console.log(attr);
 		ee.emit('selection-change', attr);
 	});
 
@@ -120,8 +119,9 @@ const createModel = (engine: EngineInterface, root: Element) => {
 										engine,
 										domNode,
 										[i],
+										false,
 									);
-									setDOM(child, node, index, dom);
+									setDOM(child, node, i, dom);
 								}
 							}
 						};
@@ -187,7 +187,7 @@ const createModel = (engine: EngineInterface, root: Element) => {
 			ee.off('change', fn);
 		},
 		emitChange: (operations) => {
-			ee.emit('change', operations);
+			ee.emit('change', operations, cloneDeep(engine.model.root));
 		},
 		onSelectionChange: (fn) => {
 			ee.on('selection-change', fn);

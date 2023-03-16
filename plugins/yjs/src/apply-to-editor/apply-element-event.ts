@@ -34,15 +34,13 @@ function applyDelta(node: Node, editorPath: Path, delta: Delta): Operation[] {
 			'retain' in change &&
 			Element.isElement(node)
 		) {
-			const [startPathOffset, startTextOffset] = yOffsetToEditorOffsets(
+			const [startPathOffset] = yOffsetToEditorOffsets(
 				node,
 				yOffset - change.retain,
 			);
-			const [endPathOffset, endTextOffset] = yOffsetToEditorOffsets(
-				node,
-				yOffset,
-				{ assoc: -1 },
-			);
+			const [endPathOffset] = yOffsetToEditorOffsets(node, yOffset, {
+				assoc: -1,
+			});
 
 			for (
 				let pathOffset = endPathOffset;
@@ -72,7 +70,7 @@ function applyDelta(node: Node, editorPath: Path, delta: Delta): Operation[] {
 
 		if ('delete' in change) {
 			const offset = yOffset - change.delete;
-			if (Text.isText(node) && change.delete !== node.text.length) {
+			if (Text.isText(node)) {
 				ops.push({
 					type: 'remove_text',
 					offset: offset,
@@ -80,15 +78,16 @@ function applyDelta(node: Node, editorPath: Path, delta: Delta): Operation[] {
 					path: editorPath,
 				});
 			} else {
-				for (let i = 0; i < change.delete; i++) {
+				for (let i = change.delete - 1; i >= 0; i--) {
 					ops.push({
 						type: 'remove_node',
-						node: node,
+						node: node.children[offset + i],
 						path: editorPath.concat(offset + i),
 					});
 				}
 			}
 
+			yOffset -= change.delete;
 			continue;
 		}
 
