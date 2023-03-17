@@ -1,8 +1,14 @@
 import * as Y from 'yjs';
 import { EngineInterface } from '@aomao/engine';
 import { Awareness } from '@aomao/plugin-yjs-protocols/awareness';
-import { WithCursorsOptions, withYCursors, YCursorEditor } from './cursors';
+import {
+	WithCursorsOptions,
+	withYCursors,
+	YCursorEditor,
+	CursorStateChangeEvent,
+} from './cursors';
 import { withYjs as withYjsPlguin, WithYjsOptions, YjsEditor } from './yjs';
+import { CursorData } from './types';
 
 export type WithYjsPluginOptions = WithYjsOptions & WithCursorsOptions;
 
@@ -17,3 +23,4 @@ export const withYjs = (
 };
 
 export { YjsEditor, YCursorEditor };
+export type { CursorStateChangeEvent, CursorData };

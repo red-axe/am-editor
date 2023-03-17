@@ -20,10 +20,16 @@ import {
 	CollaborationMember,
 } from '@aomao/engine';
 import { WebsocketProvider } from '@aomao/plugin-yjs-websocket';
-import { withYjs, YjsEditor } from '@aomao/plugin-yjs';
+import {
+	withYjs,
+	YjsEditor,
+	YCursorEditor,
+	CursorStateChangeEvent,
+	CursorData,
+} from '@aomao/plugin-yjs';
 import EngineComponent, { EngineProps } from '../engine';
-//协同客户端
-import OTComponent, { OTClient, Member, STATUS, ERROR } from './ot';
+
+import { Collaboration } from './collaborators';
 //Demo相关
 import { IS_DEV } from '../../config';
 import Loading from '../loading';
@@ -65,7 +71,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 	const comment = useRef<CommentRef | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [connected, setConnected] = useState(false);
-	const [members, setMembers] = useState<Array<Member>>([]);
+	const [members, setMembers] = useState<CursorData>([]);
 	const [connecting, setConnection] = useState(false);
 	const doc = useMemo(() => new Y.Doc(), []);
 	const provider = React.useMemo(() => {
@@ -291,6 +297,24 @@ const EditorComponent: React.FC<EditorProps> = ({
 			document.removeEventListener('keydown', keydown);
 		};
 	}, [engine, userSave, loading]);
+
+	useEffect(() => {
+		const e = engine.current;
+		if (!e) return;
+
+		const handleCursorChange = ({
+			added,
+			removed,
+		}: CursorStateChangeEvent) => {
+			if (added.length > 0 || removed.length > 0) {
+				setMembers(e.model.member.getMembers());
+			}
+		};
+
+		YCursorEditor.on(e, 'change', handleCursorChange);
+
+		return () => YCursorEditor.off(e, 'change', handleCursorChange);
+	}, []);
 	// 协同事件绑定
 	// useEffect(() => {
 	// 	if (!props.ot || !otClient.current || loading) return;
@@ -377,7 +401,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 			return;
 		}
 		ReactDOM.render(
-			<OTComponent members={members} />,
+			<Collaboration members={members} />,
 			headerOTMembersElement,
 		);
 	}, [members, yjs]);

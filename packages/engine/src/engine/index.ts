@@ -1,3 +1,4 @@
+import cloneDeep from 'lodash/cloneDeep';
 import Change from '../change';
 import { DATA_ELEMENT } from '../constants/root';
 import { Selector, NodeInterface } from '../types/node';
@@ -238,7 +239,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 	}
 
 	getJsonValue() {
-		return this.model.root;
+		return cloneDeep(this.model.root);
 	}
 
 	getText(includeCard?: boolean) {
