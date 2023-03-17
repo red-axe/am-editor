@@ -1,6 +1,13 @@
 import React from 'react';
 import classnames from 'classnames-es-ts';
-import tinycolor2, { ColorInput } from 'tinycolor2';
+import {
+	AnyColor,
+	Colord,
+	colord,
+	HslaColor,
+	HsvaColor,
+	RgbaColor,
+} from 'colord';
 import { EngineInterface } from '@aomao/engine';
 import Palette from './palette';
 
@@ -19,10 +26,19 @@ const ColorPickerItem: React.FC<ColorPickerItemProps> = ({
 	setStroke,
 	onSelect,
 }) => {
-	const toState = (color: ColorInput, oldHue?: number) => {
-		const tinyColor = color['hex']
-			? tinycolor2(color['hex'])
-			: tinycolor2(color);
+	const toState = (
+		color: (AnyColor | Colord) & {
+			hex?: string;
+			h?: string;
+			source?: string;
+		},
+		oldHue?: number,
+	) => {
+		let c = color.hex ?? color;
+		if (c === 'transparent') {
+			c = 'rgba(0,0,0,0)';
+		}
+		const tinyColor = colord(c);
 		const hsl = tinyColor.toHsl();
 		const hsv = tinyColor.toHsv();
 		const rgb = tinyColor.toRgb();
@@ -45,10 +61,10 @@ const ColorPickerItem: React.FC<ColorPickerItemProps> = ({
 	};
 
 	const getContrastingColor = (color: {
-		hsl: tinycolor2.ColorFormats.HSLA;
+		hsl: HslaColor;
 		hex: string;
-		rgb: tinycolor2.ColorFormats.RGBA;
-		hsv: tinycolor2.ColorFormats.HSVA;
+		rgb: RgbaColor;
+		hsv: HsvaColor;
 		oldHue: any;
 		source: any;
 	}) => {

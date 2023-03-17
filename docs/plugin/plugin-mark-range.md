@@ -4,7 +4,7 @@ Cursor area marking plugin
 
 Can be used to cooperate with development similar to comments, crossed comments
 
-[Annotation/Comment Case](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/comment/index.tsx)
+[Annotation/Comment Case](https://github.com/big-camel/am-editor/blob/master/docs/demo/comment/index.tsx)
 
 ## Installation
 

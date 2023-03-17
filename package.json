@@ -21,13 +21,13 @@
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
     "author": "me@aomao.com",
-    "homepage": "https://github.com/yanmao-cc/am-editor#readme",
+    "homepage": "https://github.com/big-camel/am-editor#readme",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/yanmao-cc/am-editor.git"
+        "url": "git+https://github.com/big-camel/am-editor.git"
     },
     "bugs": {
-        "url": "https://github.com/yanmao-cc/am-editor/issues"
+        "url": "https://github.com/big-camel/am-editor/issues"
     },
     "gitHooks": {
         "pre-commit": "lint-staged"
@@ -41,7 +41,6 @@
         ]
     },
     "devDependencies": {
-        "@types/sharedb": "^2.2.0",
         "@umijs/test": "^3.0.5",
         "antd": "^4.15.5",
         "dumi": "^1.1.17",
@@ -52,7 +51,6 @@
         "prettier": "2.3.1",
         "reconnecting-websocket": "^4.4.0",
         "rollup-plugin-vue": "^6.0.0",
-        "sharedb": "^2.2.5",
         "yorkie": "^2.0.0"
     },
     "dependencies": {

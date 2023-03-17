@@ -6,6 +6,7 @@ import './index.less';
 export type LoadingType = {
 	text?: string;
 	loading?: boolean;
+	children?: React.ReactNode;
 };
 
 const Loading: React.FC<LoadingType> = ({ text, loading, children }) => {

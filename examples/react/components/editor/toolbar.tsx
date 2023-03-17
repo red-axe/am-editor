@@ -1,10 +1,10 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 import { isMobile } from '@aomao/engine';
 import Toolbar, { ToolbarProps } from '@aomao/toolbar';
 
 export type ToolbarItemProps = ToolbarProps['items'];
 
-const defaultItems: ToolbarItemProps = (lang: string) => {
+const defaultItems = (): ToolbarItemProps => {
 	return isMobile
 		? [
 				['undo', 'redo'],
@@ -102,12 +102,12 @@ const defaultItems: ToolbarItemProps = (lang: string) => {
 
 const ToolbarExample: FC<
 	Omit<ToolbarProps, 'items'> & { items?: ToolbarItemProps }
-> = ({ engine, items, lang, className }) => {
+> = ({ engine, items, className }) => {
 	return (
 		<Toolbar
 			className={className}
 			engine={engine}
-			items={items || defaultItems(lang)}
+			items={items || defaultItems()}
 		/>
 	);
 };

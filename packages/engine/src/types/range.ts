@@ -1,4 +1,4 @@
-import { Path } from 'sharedb';
+import { Path } from '../model';
 import { EditorInterface } from './editor';
 import { NodeInterface } from './node';
 import { SelectionInterface } from './selection';

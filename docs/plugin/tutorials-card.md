@@ -869,7 +869,7 @@ Customizable toolbar UI types are:
 -   `input` input box
 -   `node` a node of type `NodeInterface`
 
-For the configuration of each type, please see its [Type Definition](https://github.com/yanmao-cc/am-editor/blob/master/packages/engine/src/types/toolbar.ts)
+For the configuration of each type, please see its [Type Definition](https://github.com/big-camel/am-editor/blob/master/packages/engine/src/types/toolbar.ts)
 
 ```ts
 import {

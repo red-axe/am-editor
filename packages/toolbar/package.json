@@ -11,25 +11,24 @@
     ],
     "author": "me@aomao.com",
     "license": "MIT",
-    "homepage": "https://github.com/yanmao-cc/am-editor#readme",
+    "homepage": "https://github.com/big-camel/am-editor#readme",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/yanmao-cc/am-editor.git"
+        "url": "git+https://github.com/big-camel/am-editor.git"
     },
     "bugs": {
-        "url": "https://github.com/yanmao-cc/am-editor/issues"
+        "url": "https://github.com/big-camel/am-editor/issues"
     },
     "dependencies": {
         "@babel/runtime": "^7.13.10",
         "classnames-es-ts": "^2.2.7",
         "keymaster": "^1.6.2",
         "lodash": "^4.17.21",
-        "tinycolor2": "^1.4.2"
+    	"colord": "^2.9.0"
     },
     "devDependencies": {
         "@types/keymaster": "^1.6.28",
         "@types/lodash": "^4.14.178",
-        "@types/tinycolor2": "^1.4.2",
         "antd": "^4.12.3",
         "react": "^17.0.0",
         "react-dom": ">=17.0.0"

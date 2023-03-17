@@ -1,39 +1,131 @@
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import findLastIndex from 'lodash/findLastIndex';
-import { Op } from 'sharedb';
-import OTJSON from 'ot-json0';
-import { Operation, TargetOp } from './types/ot';
-import { decodeCardValue, random } from './utils';
-import { findCardForDoc, isReverseOp, isTransientElement } from './ot/utils';
+import { decodeCardValue, getDocument, random } from './utils';
 import { EngineInterface } from './types/engine';
-import { HistoryInterface } from './types/history';
+import { HirtoryOperation, HistoryInterface } from './types/history';
 import { $ } from './node';
-import { CARD_VALUE_KEY, DATA_ID } from './constants';
+import { CARD_VALUE_KEY, DATA_ID, EDITABLE_SELECTOR } from './constants';
+import { isTransientElementCache, Operation } from './model';
+import { RangePath } from './types';
+
+const setRangeByPath = (
+	engine: EngineInterface,
+	path: { start: RangePath; end: RangePath },
+) => {
+	if (path) {
+		let { start, end } = path;
+		if (start && end) {
+			const beginOffset = start.path[start.path.length - 1] as number;
+			const endOffset = end.path[end.path.length - 1] as number;
+			const startClone = start.path.slice();
+			const endClone = end.path.slice();
+			startClone.pop();
+			endClone.pop();
+			const { container, change } = engine;
+			const startChild = start.id
+				? container.find(`[${DATA_ID}="${start.id}"]`).get<Node>()
+				: container.getChildByPath(
+						startClone,
+						(child) => !isTransientElementCache($(child)),
+				  );
+			if (!startChild) return;
+			const endChild = end.id
+				? container.find(`[${DATA_ID}="${end.id}"]`).get<Node>()
+				: container.getChildByPath(
+						endClone,
+						(child) => !isTransientElementCache($(child)),
+				  );
+			if (!endChild) return;
+			const getMaxOffset = (node: Node, offset: number) => {
+				if (node.nodeType === getDocument().TEXT_NODE) {
+					const text = node.textContent || '';
+					return text.length < offset ? text.length : offset;
+				} else {
+					const childNodes = node.childNodes;
+					return childNodes.length < offset
+						? childNodes.length
+						: offset;
+				}
+			};
+			try {
+				const range = change.range.get();
+				if (
+					startChild.nodeName === 'BR' ||
+					engine.node.isVoid(startChild)
+				) {
+					range.select(startChild).collapse(false);
+				} else {
+					range.setStart(
+						startChild,
+						getMaxOffset(startChild, beginOffset),
+					);
+					range.setEnd(endChild, getMaxOffset(endChild, endOffset));
+				}
+				if (!range.collapsed) {
+					const startCard = engine.card.find(range.startNode, true);
+					const endCard = engine.card.find(range.endNode, true);
+					if (
+						startCard &&
+						endCard &&
+						startCard?.root.equal(endCard.root)
+					) {
+						let startEditableElement =
+							range.startNode.closest(EDITABLE_SELECTOR);
+						if (startEditableElement.length === 0)
+							startEditableElement =
+								range.startNode.find(EDITABLE_SELECTOR);
+						let endEditableElement =
+							range.endNode.closest(EDITABLE_SELECTOR);
+						if (endEditableElement.length === 0)
+							endEditableElement =
+								range.endNode.find(EDITABLE_SELECTOR);
+						if (
+							startEditableElement.length > 0 &&
+							endEditableElement.length > 0 &&
+							!startEditableElement.equal(endEditableElement)
+						) {
+							range.collapse(true);
+						}
+					}
+				}
+
+				change.range.select(range);
+				range.scrollRangeIntoView();
+			} catch (error: any) {
+				engine.messageError('history setRangeByPath', error);
+			}
+		}
+	}
+};
 
 /**
  * 历史记录管理器
  */
 class HistoryModel implements HistoryInterface {
 	// 所有操作片段
-	private actionOps: Array<Operation> = [];
+	private actionOps: HirtoryOperation[] = [];
 	// 引擎实例
 	private engine: EngineInterface;
 	// 当前还未保存的所有操作
-	private currentAction: Operation = {};
+	private currentAction: HirtoryOperation = { ops: [] };
 	// 当前操作的索引
 	private currentActionIndex: number = 0;
 	// 监听的所有过滤事件
-	private filterEvents: ((op: Op) => boolean)[] = [];
+	private filterEvents: ((op: Operation) => boolean)[] = [];
 	// 监听的所有收集本地操作的事件
 	private selfEvents: ((
-		ops: Op[],
+		ops: Operation[],
 	) => Promise<boolean> | boolean | undefined)[] = [];
 	// 等待监听收集本地操作的回调
 	#selfWaiting?: Promise<boolean>;
 
 	constructor(engine: EngineInterface) {
 		this.engine = engine;
+	}
+
+	resetCurrentAction() {
+		this.currentAction = { ops: [] };
 	}
 
 	/**
@@ -48,7 +140,6 @@ class HistoryModel implements HistoryInterface {
 	 */
 	reset() {
 		this.actionOps = [];
-		this.currentAction = {};
 		this.currentActionIndex = 0;
 	}
 
@@ -56,7 +147,7 @@ class HistoryModel implements HistoryInterface {
 	 * 监听过滤事件
 	 * @param filter 事件
 	 */
-	onFilter(filter: (op: Op) => boolean) {
+	onFilter(filter: (op: Operation) => boolean) {
 		this.filterEvents.push(filter);
 	}
 
@@ -64,7 +155,9 @@ class HistoryModel implements HistoryInterface {
 	 * 监听收集本地操作事件
 	 * @param event 事件
 	 */
-	onSelf(event: (ops: Op[]) => Promise<boolean> | boolean | undefined) {
+	onSelf(
+		event: (ops: Operation[]) => Promise<boolean> | boolean | undefined,
+	) {
 		this.selfEvents.push(event);
 	}
 
@@ -92,27 +185,32 @@ class HistoryModel implements HistoryInterface {
 		const undoOp = this.getUndoOp();
 		if (undoOp) {
 			let isUndo = false;
-			this.engine.ot.stopMutation();
+			const engine = this.engine;
+			const change = engine.change;
+			const model = engine.model;
+			model.mutation.stop();
 			try {
-				const { ot } = this.engine;
-				ot.submitOps(undoOp.ops || []);
-				ot.consumer.handleSelfOperations(undoOp.ops!);
+				model.emitChange(undoOp.ops);
+				model.apply(undoOp.ops);
 				this.currentActionIndex--;
 				isUndo = true;
 			} catch (error: any) {
 				this.reset();
-				this.engine.messageError('history-undo', error);
+				engine.messageError('history-undo', error);
 			}
-			if (this.engine.isEmpty()) this.engine.change.initValue();
+			if (engine.isEmpty()) change.initValue();
 
 			if (isUndo) {
 				//清除操作前记录的range
-				this.engine.change.getRangePathBeforeCommand();
-				this.engine.ot.consumer.setRangeByPath(undoOp.startRangePath!);
-				this.engine.change.change();
-				this.engine.trigger('undo');
+				change.getRangePathBeforeCommand();
+				if (undoOp.startRangePath)
+					setRangeByPath(engine, undoOp.startRangePath);
+				change.change();
+				engine.trigger('undo');
 			}
-			this.engine.ot.startMutation();
+			Promise.resolve().then(() => {
+				model.mutation.start();
+			});
 		}
 	}
 
@@ -124,26 +222,32 @@ class HistoryModel implements HistoryInterface {
 		const redoOp = this.getRedoOp();
 		if (redoOp) {
 			let isRedo = false;
-			this.engine.ot.stopMutation();
+			const engine = this.engine;
+			const change = engine.change;
+			const model = engine.model;
 			try {
-				const { ot } = this.engine;
-				ot.submitOps(redoOp.ops || []);
-				ot.consumer.handleSelfOperations(redoOp.ops!);
+				model.mutation.stop();
+				model.emitChange(redoOp.ops);
+				model.apply(redoOp.ops);
+
 				this.currentActionIndex++;
 				isRedo = true;
 			} catch (error: any) {
 				this.reset();
-				this.engine.messageError('history-redo', error);
+				engine.messageError('history-redo', error);
 			}
 
 			if (isRedo) {
 				// 清除操作前记录的range
-				this.engine.change.getRangePathBeforeCommand();
-				this.engine.ot.consumer.setRangeByPath(redoOp.rangePath!);
-				this.engine.change.change();
-				this.engine.trigger('redo');
+				change.getRangePathBeforeCommand();
+				if (redoOp.rangePath)
+					setRangeByPath(this.engine, redoOp.rangePath);
+				change.change();
+				engine.trigger('redo');
 			}
-			this.engine.ot.startMutation();
+			Promise.resolve().then(() => {
+				model.mutation.start();
+			});
 		}
 	}
 
@@ -170,13 +274,13 @@ class HistoryModel implements HistoryInterface {
 				this.currentActionIndex = this.actionOps.length;
 				this.engine.trigger('historyChange');
 			}
-			this.currentAction = {};
+			this.resetCurrentAction();
 			// 保存成功后清除操作前记录的range
 			this.engine.change.getRangePathBeforeCommand();
 		}
 	}
 
-	handleSelfOps(ops: Op[]) {
+	handleSelfOps(ops: Operation[]) {
 		if (!this.currentAction?.self) this.saveOp();
 		let isSave = false;
 		ops.forEach((op) => {
@@ -194,7 +298,7 @@ class HistoryModel implements HistoryInterface {
 				}
 				const lastOp =
 					this.currentAction.ops[this.currentAction.ops.length - 1];
-				if (lastOp && isReverseOp(op, lastOp)) {
+				if (lastOp && Operation.isReverse(op, lastOp)) {
 					this.currentAction.ops.pop();
 				} else {
 					this.currentAction.ops.push(op);
@@ -213,7 +317,7 @@ class HistoryModel implements HistoryInterface {
 			if (typeof callback === 'boolean') {
 				if (callback) this.saveOp();
 				else {
-					this.currentAction = {};
+					this.resetCurrentAction();
 				}
 			} else if (typeof callback === 'object') {
 				this.#selfWaiting = callback;
@@ -222,7 +326,7 @@ class HistoryModel implements HistoryInterface {
 						if (s) {
 							this.saveOp();
 						} else {
-							this.currentAction = {};
+							this.resetCurrentAction();
 						}
 					})
 					.finally(() => (this.#selfWaiting = undefined));
@@ -232,34 +336,29 @@ class HistoryModel implements HistoryInterface {
 		}
 	}
 
-	handleNLCardValue(op: TargetOp) {
-		const key = op.p[op.p.length - 1];
-		if (
-			op.nl === true &&
-			typeof key === 'string' &&
-			key === CARD_VALUE_KEY &&
-			op['oi']
-		) {
-			const oiVal = op['oi'];
-			const newVal = decodeCardValue(oiVal);
+	handleNLCardValue(op: Operation) {
+		if (op.undoable === true && op.type === 'set_node') {
+			const { newProperties } = op;
+			const value = newProperties[CARD_VALUE_KEY];
+			if (!value) return;
+			const newValue = decodeCardValue(value);
 			this.actionOps.forEach((action) => {
-				action.ops?.forEach((op) => {
-					if (op.p[op.p.length - 1] === CARD_VALUE_KEY && op['oi']) {
-						const oldVal = decodeCardValue(op['oi']);
-						if (newVal.id === oldVal.id) {
-							op['oi'] = newVal;
+				action.ops.forEach((op) => {
+					if (op.type === 'set_node') {
+						const { newProperties } = op;
+						const value = newProperties[CARD_VALUE_KEY];
+						const oldValue = decodeCardValue(value);
+						if (newValue.id === oldValue.id) {
+							newProperties[CARD_VALUE_KEY] = newValue;
 						}
-					} else if (op['li']) {
-						findCardForDoc(op['li'], (attrs) => {
-							const value = decodeCardValue(
-								attrs[CARD_VALUE_KEY],
-							);
-							if (value.id === newVal.id) {
-								attrs[CARD_VALUE_KEY] = oiVal;
-								return true;
-							}
-							return false;
-						});
+					} else if (op.type === 'insert_node') {
+						const { node } = op;
+						const value = node[CARD_VALUE_KEY];
+						if (!value) return;
+						const oldValue = decodeCardValue(value);
+						if (newValue.id === oldValue.id) {
+							node[CARD_VALUE_KEY] = newValue;
+						}
 					}
 				});
 			});
@@ -272,7 +371,7 @@ class HistoryModel implements HistoryInterface {
 		bi: number,
 		isOp: boolean = true,
 		filter: (node: Node) => boolean = (node: Node) =>
-			!isTransientElement($(node)),
+			!isTransientElementCache($(node)),
 	) => {
 		const targetElement = this.engine.container.find(
 			`[${DATA_ID}="${id}"]`,
@@ -289,15 +388,10 @@ class HistoryModel implements HistoryInterface {
 		return path;
 	};
 
-	handleRemoteOps(ops: TargetOp[]) {
+	handleRemoteOps(ops: Operation[]) {
 		if (this.currentAction.self && !this.#selfWaiting) this.saveOp();
 		const range = this.engine.change.range.get();
 		this.actionOps.forEach((action) => {
-			action.ops?.forEach((op) => {
-				if (op.id && op.bi !== undefined) {
-					op.p = this.handlePath(op.p, op.id, op.bi);
-				}
-			});
 			if (action.rangePath) {
 				const { start, end } = action.rangePath;
 				if (start.id && start.bi !== undefined) {
@@ -347,14 +441,14 @@ class HistoryModel implements HistoryInterface {
 			}
 			const lastOp =
 				this.currentAction.ops[this.currentAction.ops.length - 1];
-			if (lastOp && isReverseOp(op, lastOp)) {
+			if (lastOp && Operation.isReverse(op, lastOp)) {
 				this.currentAction.ops.pop();
 			} else {
 				this.currentAction.ops.push(op);
 			}
 			this.actionOps.some((action, index) => {
 				const affect = action.ops?.some((actionOp) => {
-					return OTJSON.type.canOpAffectPath(op, actionOp.p);
+					return Operation.canOpAffectPath(op, actionOp.path);
 				});
 				if (affect) {
 					// this.actionOps.splice(index, this.actionOps.length - index)
@@ -363,7 +457,7 @@ class HistoryModel implements HistoryInterface {
 						const nextAction = this.actionOps[i];
 						const nextAffect = nextAction.ops?.some((actionOp) => {
 							return action.ops?.some((aop) =>
-								OTJSON.type.canOpAffectPath(actionOp, aop.p),
+								Operation.canOpAffectPath(actionOp, aop.path),
 							);
 						});
 						if (nextAffect) {
@@ -374,9 +468,9 @@ class HistoryModel implements HistoryInterface {
 								nextAction2 &&
 								nextAction2.ops?.some((actionOp) => {
 									return nextAction.ops?.some((aop) =>
-										OTJSON.type.canOpAffectPath(
+										Operation.canOpAffectPath(
 											actionOp,
-											aop.p,
+											aop.path,
 										),
 									);
 								})
@@ -399,7 +493,7 @@ class HistoryModel implements HistoryInterface {
 		});
 	}
 
-	getUndoOp(): Operation | undefined {
+	getUndoOp(): HirtoryOperation | undefined {
 		const prevIndex = this.currentActionIndex - 1;
 		if (this.actionOps[prevIndex]) {
 			let prevOp = cloneDeep(this.actionOps[prevIndex]);
@@ -409,12 +503,9 @@ class HistoryModel implements HistoryInterface {
 			);
 			if (opIndex !== -1) prevOp = this.actionOps[opIndex];
 			else opIndex = prevIndex;
-			const invertOps = OTJSON.type.invert(prevOp.ops || []);
-			invertOps.forEach((op, index) => {
-				const pOp = (prevOp.ops || [])[invertOps.length - index - 1];
-				op['id'] = pOp.id;
-				op['bi'] = pOp.bi;
-			});
+			const invertOps = prevOp.ops
+				.map((op) => Operation.inverse(op))
+				.reverse();
 
 			try {
 				return {
@@ -432,22 +523,15 @@ class HistoryModel implements HistoryInterface {
 		return;
 	}
 
-	getRedoOp(): Operation | undefined {
+	getRedoOp(): HirtoryOperation | undefined {
 		const currentIndex = this.currentActionIndex;
 		if (this.actionOps[currentIndex]) {
 			let currentOp = cloneDeep(this.actionOps[currentIndex]);
-			let invertOps: Op[] | undefined = [];
+			let invertOps: Operation[] | undefined = [];
 			if (currentOp.type === 'undo') {
-				// ops 倒置会丢失 id 和 bi
-				invertOps = OTJSON.type.invert(currentOp.ops || []);
-				// 重新赋值 id 和 bi
-				invertOps.forEach((op, index) => {
-					const pOp = (currentOp.ops || [])[
-						invertOps!.length - index - 1
-					];
-					op['id'] = pOp.id;
-					op['bi'] = pOp.bi;
-				});
+				invertOps = currentOp.ops
+					.map((op) => Operation.inverse(op))
+					.reverse();
 			} else {
 				invertOps = currentOp.ops;
 			}
@@ -468,8 +552,8 @@ class HistoryModel implements HistoryInterface {
 	}
 
 	getCurrentRangePath() {
-		const { ot, change } = this.engine;
-		const currentPath = ot.selection.currentRangePath;
+		const { model, change } = this.engine;
+		const currentPath = model.selection.currentRangePath;
 		return currentPath ? currentPath : change.range.get().toPath();
 	}
 

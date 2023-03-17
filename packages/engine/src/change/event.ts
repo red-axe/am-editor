@@ -70,7 +70,7 @@ class ChangeEvent implements ChangeEventInterface {
 				return;
 			}
 			if (!this.isCardInput(event)) {
-				this.engine.ot.startMutationCache();
+				this.engine.model.mutation.startCache();
 			}
 			// 组合输入法缓存协同
 			const { change, node, block, list } = this.engine;
@@ -130,7 +130,7 @@ class ChangeEvent implements ChangeEventInterface {
 				}
 				callback(e);
 				// 组合输入法结束后提交协同
-				this.engine.ot.submitMutationCache();
+				this.engine.model.mutation.submitCache();
 			}
 		};
 
@@ -141,7 +141,7 @@ class ChangeEvent implements ChangeEventInterface {
 			this.isComposing = false;
 			// 日文输入法，input 后未即时触发 compositionend 方法，这里检测如果还在突变缓存中就提交
 			setTimeout(() => {
-				if (this.engine.ot.isCache) {
+				if (this.engine.model.mutation.isCache) {
 					submitInput(e);
 				}
 			}, 40);
@@ -156,7 +156,7 @@ class ChangeEvent implements ChangeEventInterface {
 				// 如果没有要对 @ 字符处理的就不拦截
 				const result = this.engine.trigger('keydown:at', event);
 				if (result === false) {
-					this.engine.ot.submitMutationCache();
+					this.engine.model.mutation.submitCache();
 					event.preventDefault();
 				}
 			}
@@ -278,7 +278,7 @@ class ChangeEvent implements ChangeEventInterface {
 				this.isComposing &&
 				(!inputType || !inputType.includes('Composition'))
 			) {
-				this.engine.ot.submitMutationCache();
+				this.engine.model.mutation.submitCache();
 			}
 			const commandTypes = ['format', 'history'];
 			if (inputType) {

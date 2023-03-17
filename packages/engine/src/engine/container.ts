@@ -143,7 +143,7 @@ class Container {
 	handleFocus = () => {
 		const { engine } = this.options;
 		this.triggerFoucs();
-		if (!engine.ot.isStopped() && engine.isEmpty())
+		if (!engine.model.mutation.isStopped && engine.isEmpty())
 			engine.change.initValue();
 	};
 

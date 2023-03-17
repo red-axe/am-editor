@@ -9,7 +9,6 @@ export * from './history';
 export * from './hotkey';
 export * from './language';
 export * from './node';
-export * from './ot';
 export * from './plugin';
 export * from './range';
 export * from './schema';

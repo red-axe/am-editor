@@ -34,7 +34,7 @@ const view = new View(渲染节点, {
 -   默认值：`zh-CN`
 -   详细：配置额外语言包
 
-语言包，默认语言包 [https://github.com/yanmao-cc/am-editor/blob/master/locale](https://github.com/yanmao-cc/am-editor/blob/master/locale)
+语言包，默认语言包 [https://github.com/big-camel/am-editor/blob/master/locale](https://github.com/big-camel/am-editor/blob/master/locale)
 
 ```ts
 const view = new View(渲染节点, {

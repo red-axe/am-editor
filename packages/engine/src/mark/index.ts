@@ -1190,7 +1190,7 @@ class Mark implements MarkModelInterface {
 									selection?.focus &&
 									result
 										.find(
-											`[data-element="${selection.focus.attributes(
+											`[${DATA_ELEMENT}="${selection.focus.attributes(
 												DATA_ELEMENT,
 											)}"]`,
 										)

@@ -104,7 +104,11 @@ class Lightblock extends Card<LightblockValue> {
 
 	onChange = (trigger: 'remote' | 'local' = 'local') => {
 		const editor = this.editor;
-		if (isEngine(editor) && trigger === 'local' && editor.ot.isStopped())
+		if (
+			isEngine(editor) &&
+			trigger === 'local' &&
+			editor.model.mutation.isStopped
+		)
 			return;
 
 		if (this.#changeTimeout) clearTimeout(this.#changeTimeout);

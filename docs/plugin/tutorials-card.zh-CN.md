@@ -802,7 +802,7 @@ export default defineComponent({
 -   `input` 输入框
 -   `node` 一个类型为 `NodeInterface` 的节点
 
-每个类型的配置请看它的[类型定义](https://github.com/yanmao-cc/am-editor/blob/master/packages/engine/src/types/toolbar.ts)
+每个类型的配置请看它的[类型定义](https://github.com/big-camel/am-editor/blob/master/packages/engine/src/types/toolbar.ts)
 
 ```ts
 import {

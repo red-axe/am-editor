@@ -8,7 +8,14 @@ import {
 	EditorInterface,
 	Position,
 } from '@aomao/engine';
-import tinycolor2, { ColorInput } from 'tinycolor2';
+import {
+	AnyColor,
+	Colord,
+	colord,
+	HslaColor,
+	HsvaColor,
+	RgbaColor,
+} from 'colord';
 import Palette from './palette';
 
 export type Options = {
@@ -97,10 +104,19 @@ class Color {
 		if (onChange) onChange(color);
 	}
 
-	toState(color: ColorInput, oldHue?: number) {
-		const tinyColor = color['hex']
-			? tinycolor2(color['hex'])
-			: tinycolor2(color);
+	toState(
+		color: (AnyColor | Colord) & {
+			hex?: string;
+			h?: string;
+			source?: string;
+		},
+		oldHue?: number,
+	) {
+		let c = color.hex ?? color;
+		if (c === 'transparent') {
+			c = 'rgba(0,0,0,0)';
+		}
+		const tinyColor = colord(c);
 		const hsl = tinyColor.toHsl();
 		const hsv = tinyColor.toHsv();
 		const rgb = tinyColor.toRgb();

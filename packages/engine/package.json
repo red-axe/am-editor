@@ -11,13 +11,13 @@
   ],
   "author": "me@aomao.com",
   "license": "MIT",
-  "homepage": "https://github.com/yanmao-cc/am-editor#readme",
+  "homepage": "https://github.com/big-camel/am-editor#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yanmao-cc/am-editor.git"
+    "url": "git+https://github.com/big-camel/am-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/yanmao-cc/am-editor/issues"
+    "url": "https://github.com/big-camel/am-editor/issues"
   },
   "dependencies": {
     "@babel/runtime": "^7.13.10",
@@ -29,15 +29,12 @@
     "is-hotkey": "^0.2.0",
     "lodash": "^4.17.21",
     "markdown-it": "^13.0.1",
-    "ot-json0": "^1.1.0",
-    "tinycolor2": "^1.4.2"
+    "colord": "^2.9.0"
   },
   "devDependencies": {
     "@types/diff-match-patch": "^1.0.32",
     "@types/is-hotkey": "^0.1.2",
     "@types/lodash": "^4.14.178",
-    "@types/markdown-it": "^12.2.3",
-    "@types/sharedb": "^2.2.0",
-    "@types/tinycolor2": "^1.4.2"
+    "@types/markdown-it": "^12.2.3"
   }
 }

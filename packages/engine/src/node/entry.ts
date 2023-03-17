@@ -8,7 +8,7 @@ import {
 	getDocument,
 	removeUnit,
 } from '../utils';
-import { Path } from 'sharedb';
+import { Path } from '../model';
 import {
 	NodeInterface,
 	EventInterface,

@@ -31,7 +31,7 @@ const engine = new Engine(render node, {
 -   Default value: `zh-CN`
 -   Detailed: Configure additional language packs
 
-Language pack, default language pack [https://github.com/yanmao-cc/am-editor/blob/master/locale](https://github.com/yanmao-cc/am-editor/blob/master/locale)
+Language pack, default language pack [https://github.com/big-camel/am-editor/blob/master/locale](https://github.com/big-camel/am-editor/blob/master/locale)
 
 ```ts
 const engine = new Engine(render node, {
@@ -81,7 +81,7 @@ console.log(engine.language.get<string>('test'));
 
 -   Type: `{ [key: string]: PluginOptions }` or `(editor) => { [key: string]: PluginOptions }`
 -   Default value: `{}`
--   Detailed: the configuration item of each plugin, the key is the name of the plugin, please refer to the description of each plugin for detailed configuration. [Configuration example](https://github.com/yanmao-cc/am-editor/blob/master/examples/react/components/editor/config.tsx)
+-   Detailed: the configuration item of each plugin, the key is the name of the plugin, please refer to the description of each plugin for detailed configuration. [Configuration example](https://github.com/big-camel/am-editor/blob/master/examples/react/components/editor/config.tsx)
 
 Some plugins require the configuration of additional properties:
 

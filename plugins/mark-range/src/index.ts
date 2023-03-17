@@ -20,8 +20,8 @@ import {
 	View,
 	EditorInterface,
 	CardInterface,
+	Path,
 } from '@aomao/engine';
-import { Path } from 'sharedb';
 
 export interface MarkRangeOptions extends PluginOptions {
 	keys: Array<string>;
@@ -110,8 +110,8 @@ export default class<
 			const keys = optionKeys.map((key) => this.getPreviewName(key));
 			editor.history.onFilter((op) => {
 				if (
-					('od' in op || 'oi' in op) &&
-					keys.includes(op.p[op.p.length - 1].toString())
+					op.type === 'set_node' &&
+					keys.some((key) => !!op.newProperties[key])
 				) {
 					return true;
 				}
@@ -566,16 +566,20 @@ export default class<
 
 	startMutation() {
 		const editor = this.editor;
-		if (isEngine(editor) && editor.ot.isStopped()) {
-			editor.ot.startMutation();
+		if (isEngine(editor) && editor.model.mutation.isStopped) {
+			editor.model.mutation.start();
 		}
 	}
 
 	stopMutation() {
 		const editor = this.editor;
 		setTimeout(() => {
-			if (isEngine(editor) && editor.readonly && !editor.ot.isStopped()) {
-				editor.ot.stopMutation();
+			if (
+				isEngine(editor) &&
+				editor.readonly &&
+				!editor.model.mutation.isStopped
+			) {
+				editor.model.mutation.stop();
 			}
 		}, 10);
 	}

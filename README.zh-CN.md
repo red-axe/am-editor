@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yanmao-cc/am-editor/blob/master/README.md"><strong>English</strong></a> ·
+  <a href="https://github.com/big-camel/am-editor/blob/master/README.md"><strong>English</strong></a> ·
   <a href="https://editor.aomao.com"><strong>Demo</strong></a> ·
   <a href="https://editor.aomao.com/docs"><strong>文档</strong></a> ·
   <a href="#plugins"><strong>插件</strong></a> ·
@@ -40,11 +40,11 @@
 
 **`Vue3`** DEMO [https://github.com/red-axe/am-editor-vue3-demo](https://github.com/red-axe/am-editor-vue3-demo)
 
-**`React`** DEMO [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+**`React`** DEMO [https://github.com/big-camel/am-editor/tree/master/examples/react](https://github.com/big-camel/am-editor/tree/master/examples/react)
 
-**`Vue2 DEMO`** [https://github.com/yanmao-cc/am-editor-demo-vue2](https://github.com/yanmao-cc/am-editor-demo-vue2)
+**`Vue2 DEMO`** [https://github.com/big-camel/am-editor-demo-vue2](https://github.com/big-camel/am-editor-demo-vue2)
 
-**`Vue2 Nuxt DEMO`** [https://github.com/yanmao-cc/am-editor-nuxt](https://github.com/yanmao-cc/am-editor-nuxt)
+**`Vue2 Nuxt DEMO`** [https://github.com/big-camel/am-editor-nuxt](https://github.com/big-camel/am-editor-nuxt)
 
 ## 基本原理
 
@@ -344,11 +344,11 @@ return (
 
 #### 交互模式
 
-每位编辑者作为 [客户端](https://github.com/yanmao-cc/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 通过 `WebSocket` 与 [服务端](https://github.com/yanmao-cc/am-editor/tree/master/ot-server) 通信交换由编辑器生成的 `json0` 格式的数据。
+每位编辑者作为 [客户端](https://github.com/big-camel/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 通过 `WebSocket` 与 [服务端](https://github.com/big-camel/am-editor/tree/master/ot-server) 通信交换由编辑器生成的 `json0` 格式的数据。
 
 服务端会保留一份 `json` 格式的 `html` 结构数据，接收到来自客户端的指令后，再去修改这份数据，最后再转发到每个客户端。
 
-在启用协同编辑前，我们需要配置好 [客户端](https://github.com/yanmao-cc/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 和 [服务端](https://github.com/yanmao-cc/am-editor/tree/master/ot-server)
+在启用协同编辑前，我们需要配置好 [客户端](https://github.com/big-camel/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 和 [服务端](https://github.com/big-camel/am-editor/tree/master/ot-server)
 
 服务端是 `NodeJs` 环境，使用 `express` + `WebSocket` 搭建的网络服务。
 
@@ -356,7 +356,7 @@ return (
 
 DEMO 中我们已经一份比较基础的客户端代码
 
-[查看 React 完整 DEMO](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+[查看 React 完整 DEMO](https://github.com/big-camel/am-editor/tree/master/examples/react)
 
 [查看 Vue3 完整 DEMO](https://github.com/red-axe/am-editor-vue3-demo)
 
@@ -395,7 +395,7 @@ yarn start
 
 ### Vue
 
-[am-editor vue example](https://github.com/byoungd/am-editor-vue/blob/main/README.zh-CN.md)
+[am-editor vue example](https://github.com/red-axe/am-editor-vue3-demo)
 
 ## 贡献
 

@@ -250,7 +250,7 @@ class ChangeRange implements ChangeRangeInterface {
 		if (node.isCustomize(endNode) && endOffset === 0) {
 			range.setEnd(endNode, 1);
 		}
-		const otStopped = this.engine.ot.isStopped();
+		const otStopped = this.engine.model.mutation.isStopped;
 		// 空节点添加br
 		if (startNode.name === 'p' && !otStopped) {
 			if (startChildNodes.length === 0) startNode.append('<br />');
@@ -353,7 +353,7 @@ class ChangeRange implements ChangeRangeInterface {
 			startNode.isEditable() &&
 			!otStopped &&
 			startNode.get<Node>()?.childNodes.length === 0 &&
-			!this.engine.ot.isStopped
+			!this.engine.model.mutation.isStopped
 		) {
 			startNode.html('<p><br /></p>');
 		}

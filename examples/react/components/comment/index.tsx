@@ -15,20 +15,20 @@ import {
 	random,
 	NodeInterface,
 	isNode,
+	CollaborationMember,
 } from '@aomao/engine';
 import Loading from '../loading';
 import CommentButton from './button';
 import { CommentContent, DataItem, DataSourceItem } from './types';
-import { Member } from '../editor/ot/types';
 import CommentItem from './item';
 import context from '../../context';
 import { useDispatch, useSelector } from '../../hooks';
 import 'antd/es/message/style';
 import './index.css';
 
-export type CommentProps = {
+export type CommentProps<T = CollaborationMember> = {
 	editor: EditorInterface;
-	member: Member;
+	member: T;
 	onUpdate?: () => void;
 } & { ref: React.Ref<CommentRef> };
 
@@ -454,7 +454,7 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 		 * 设置评论项ref用于获取其dom节点
 		 */
 		const itemRef = useCallback(
-			(node) => {
+			(node: any) => {
 				if (node !== null) {
 					itemNodes.current.push(node);
 				}
