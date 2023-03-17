@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-mark-range",
-    "version": "2.9.33",
+    "version": "2.10.0",
     "description": "范围标记",
     "publishConfig": {
         "access": "public"
@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "@babel/runtime": "^7.13.10",
-    	"colord": "^2.9.0"
+        "colord": "^2.9.0"
     },
     "peerDependencies": {
         "@aomao/engine": ">=2.9"

@@ -1,8 +1,8 @@
 {
-    "name": "@aomao/plugin-yjs-protocols",
-    "version": "1.0.0",
-    "main": "./dist/index.js",
-    "exports": {
+	"name": "@aomao/plugin-yjs-protocols",
+	"version": "1.0.1",
+	"main": "./dist/index.js",
+	"exports": {
 		".": {
 			"import": {
 				"types": "./dist/index.d.ts",
@@ -37,29 +37,29 @@
 			]
 		}
 	},
-    "files": [
-        "dist",
-        "lib",
-        "src"
-    ],
-    "author": "me@aomao.com",
-    "license": "MIT",
-    "homepage": "https://github.com/big-camel/am-editor#readme",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/big-camel/am-editor.git"
-    },
-    "bugs": {
-        "url": "https://github.com/big-camel/am-editor/issues"
-    },
+	"files": [
+		"dist",
+		"lib",
+		"src"
+	],
+	"author": "me@aomao.com",
+	"license": "MIT",
+	"homepage": "https://github.com/big-camel/am-editor#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/big-camel/am-editor.git"
+	},
+	"bugs": {
+		"url": "https://github.com/big-camel/am-editor/issues"
+	},
 	"devDependencies": {
 		"yjs": ">=13.5"
 	},
-    "dependencies": {
-        "@babel/runtime": "^7.13.10",
+	"dependencies": {
+		"@babel/runtime": "^7.13.10",
 		"lib0": "^0.2.52"
-    },
-    "peerDependencies": {
+	},
+	"peerDependencies": {
 		"yjs": ">=13.5"
-    }
+	}
 }

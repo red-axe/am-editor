@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-yjs",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
@@ -19,15 +19,15 @@
     "bugs": {
         "url": "https://github.com/big-camel/am-editor/issues"
     },
-	"devDependencies": {
-		"yjs": ">=13.5"
-	},
+    "devDependencies": {
+        "yjs": ">=13.5"
+    },
     "dependencies": {
-        "@babel/runtime": "^7.13.10",
-		"@aomao/plugin-yjs-protocols": "^1.0.0"
+        "@aomao/plugin-yjs-protocols": "^1.0.1",
+        "@babel/runtime": "^7.13.10"
     },
     "peerDependencies": {
         "@aomao/engine": ">=2.9",
-		"yjs": ">=13.5"
+        "yjs": ">=13.5"
     }
 }

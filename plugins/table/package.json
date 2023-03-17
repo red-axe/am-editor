@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-table",
-  "version": "2.9.48",
+  "version": "2.10.0",
   "description": "table plugin",
   "author": "AoMao <me@aomao.com>",
   "homepage": "https://github.com/big-camel/am-editor/tree/master/plugins/plugin-table#readme",
@@ -22,9 +22,9 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.13.10",
+    "colord": "^2.9.0",
     "eventemitter2": "^6.4.4",
-    "lodash": "^4.17.21",
-    "colord": "^2.9.0"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.178",

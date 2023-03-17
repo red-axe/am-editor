@@ -1,6 +1,6 @@
 {
     "name": "@aomao/toolbar-vue",
-    "version": "2.9.36",
+    "version": "2.10.0",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
@@ -21,9 +21,9 @@
     },
     "dependencies": {
         "@babel/runtime": "^7.13.10",
+        "colord": "^2.9.0",
         "keymaster": "^1.6.2",
-        "lodash": "^4.17.21",
-    	"colord": "^2.9.0"
+        "lodash": "^4.17.21"
     },
     "devDependencies": {
         "@types/keymaster": "^1.6.28",

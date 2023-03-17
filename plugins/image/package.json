@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-image",
-    "version": "2.9.35",
+    "version": "2.10.0",
     "description": "图片",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",

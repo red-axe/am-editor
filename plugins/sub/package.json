@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-sub",
-  "version": "2.9.28",
+  "version": "2.10.0",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",

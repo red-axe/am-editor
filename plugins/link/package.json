@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-link",
-  "version": "2.9.31",
+  "version": "2.10.0",
   "description": "> TODO: description",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
