@@ -423,7 +423,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 	}, [members, yjs]);
 
 	return (
-		<Loading loading={loading}>
+		<Loading loading={loading && (!yjs || !connected)}>
 			<>
 				{engine.current && (
 					<Toolbar engine={engine.current} items={props.toolbar} />
