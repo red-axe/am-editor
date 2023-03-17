@@ -1,7 +1,7 @@
 import * as Y from 'yjs';
 import { EngineInterface } from '@aomao/engine';
 import { Awareness } from '@aomao/plugin-yjs-protocols/awareness';
-import { WithCursorsOptions, withYCursors } from './cursors';
+import { WithCursorsOptions, withYCursors, YCursorEditor } from './cursors';
 import { withYjs as withYjsPlguin, WithYjsOptions, YjsEditor } from './yjs';
 
 export type WithYjsPluginOptions = WithYjsOptions & WithCursorsOptions;
@@ -16,4 +16,4 @@ export const withYjs = (
 	return withYCursors(e, awareness, options);
 };
 
-export { YjsEditor };
+export { YjsEditor, YCursorEditor };

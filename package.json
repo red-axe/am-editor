@@ -41,7 +41,6 @@
         ]
     },
     "devDependencies": {
-        "@types/sharedb": "^2.2.0",
         "@umijs/test": "^3.0.5",
         "antd": "^4.15.5",
         "dumi": "^1.1.17",
@@ -52,7 +51,6 @@
         "prettier": "2.3.1",
         "reconnecting-websocket": "^4.4.0",
         "rollup-plugin-vue": "^6.0.0",
-        "sharedb": "^2.2.5",
         "yorkie": "^2.0.0"
     },
     "dependencies": {

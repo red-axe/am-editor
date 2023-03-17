@@ -25,7 +25,7 @@ import Selection from '../selection';
 import Editor from '../editor';
 import { $ } from '../node';
 import { DATA_CONTENTEDITABLE_KEY } from '../constants';
-import { Model, toDOM, Element } from '../model';
+import { Model, Element } from '../model';
 import './index.css';
 
 class Engine<T extends EngineOptions = EngineOptions>
@@ -229,8 +229,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 	}
 
 	setJsonValue(value: Element, callback?: (count: number) => void) {
-		const dom = $(toDOM(value));
-		const html = this.node.html(dom);
+		const html = this.model.toHTML(value);
 		this.change.setValue(html, undefined, callback);
 		this.normalize();
 		this.nodeId.generateAll(this.container);

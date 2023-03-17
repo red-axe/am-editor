@@ -2,7 +2,7 @@ import EventEmitter2 from 'eventemitter2';
 import cloneDeep from 'lodash/cloneDeep';
 import { CARD_VALUE_KEY, READY_CARD_KEY } from '../constants';
 import { EngineInterface, NodeInterface } from '../types';
-import { applyToDOM, findDOMByPath, toDOM } from './apply-to-dom';
+import { applyToDOM, findDOMByPath } from './apply-to-dom';
 import { DOMNode } from './dom';
 import { Element } from './element';
 import { Text } from './text';
@@ -14,6 +14,11 @@ import { Path } from './path';
 import ModelSelection from './selection';
 import './index.css';
 import { applyRangeByRemotePath, getRangeRemotePath } from './apply-range';
+import { toHTML } from './transform/to-html';
+import { toValue } from './transform/to-value';
+import { toDOM } from './transform/to-dom';
+import { toText } from './transform/to-text';
+import { $ } from '../node';
 
 const ENGINE_TO_MODEL: WeakMap<EngineInterface, Model> = new WeakMap();
 const FLUSHING: WeakMap<EngineInterface, boolean> = new WeakMap();
@@ -26,12 +31,16 @@ export interface Model {
 	onChange(fn: (operations: Operation[], root: Element) => void): void;
 	offChange(fn: (operations: Operation[], root: Element) => void): void;
 	emitChange(operations: Operation[]): void;
-	onSelectionChange(fn: (path: Path[]) => void): void;
-	offSelectionChange(fn: (path: Path[]) => void): void;
+	onSelectionChange(fn: (attribute: CursorAttribute) => void): void;
+	offSelectionChange(fn: (attribute: CursorAttribute) => void): void;
 	findNode(path: Path): Node | undefined;
 	apply(operations: Operation[]): void;
 	applyRemote(operations: Operation[]): void;
 	drawCursor(attributes: CursorAttribute[] | CursorAttribute): void;
+	toDOM(node?: Node): DOMNode;
+	toHTML(node?: Node): string;
+	toValue(node?: Node): string;
+	toText(node?: Node, intoCard?: boolean): string;
 	destroy(): void;
 }
 
@@ -43,7 +52,6 @@ const createModel = (engine: EngineInterface, root: Element) => {
 		const cloneRoot = cloneDeep(engine.model.root);
 		const operations = Operation.transform(engine, records);
 		if (operations.length === 0) return;
-		console.log(operations);
 		ee.emit('change', operations, cloneRoot);
 		history.handleSelfOps(
 			operations.filter((op) => {
@@ -110,7 +118,7 @@ const createModel = (engine: EngineInterface, root: Element) => {
 							index: number,
 							domNode: DOMNode,
 						) => {
-							Node.setDOM(node, domNode);
+							Node.setDOM(node, domNode, engine.schema);
 							Path.setPath(node, parent, index);
 							if (Element.isElement(node)) {
 								for (let i = 0; i < node.children.length; i++) {
@@ -177,7 +185,7 @@ const createModel = (engine: EngineInterface, root: Element) => {
 		selection,
 		member,
 		resetRoot: () => {
-			const root = Node.createFromDOM(engine.container[0]);
+			const root = Node.createFromDOM(engine.container[0], engine.schema);
 			if (Element.isElement(root)) model.root = root;
 		},
 		onChange: (fn) => {
@@ -246,6 +254,35 @@ const createModel = (engine: EngineInterface, root: Element) => {
 				});
 			}
 		},
+		toDOM: (node) => {
+			return toDOM(node ?? model.root);
+		},
+		toHTML: (node) => {
+			const html = !node ? toHTML(model.root) : toHTML(node);
+			const element = $(html);
+			if (!node) {
+				const style = engine.container.css();
+				element.css(style);
+			}
+			engine.trigger('parse:html-before', element);
+			engine.trigger('parse:html', element);
+			engine.trigger('parse:html-after', element);
+			return element.html().replace(/\u200b/g, '');
+		},
+		toValue: (node) => {
+			if (!node)
+				return model.root.children
+					.map((child) => toValue(child))
+					.join('');
+			return toValue(node);
+		},
+		toText: (node, intoCard) => {
+			if (!node)
+				return model.root.children
+					.map((child) => toText(child, intoCard))
+					.join('');
+			return toText(node, intoCard);
+		},
 		destroy: () => {
 			mutation.destroy();
 			selection.destroy();
@@ -275,7 +312,7 @@ export const Model = {
 	},
 };
 
-export { Node, Element, Path, Text, toDOM, CollaborationMember };
+export { Node, Element, Path, Text, CollaborationMember };
 export type { CursorAttribute };
 export * from './utils';
 export * from './operation';

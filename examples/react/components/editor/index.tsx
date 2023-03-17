@@ -199,6 +199,15 @@ const EditorComponent: React.FC<EditorProps> = ({
 					console.log('json:', engine.current?.getJsonValue());
 					// 获取编辑器的text
 					console.log('text:', engine.current?.getText());
+					// 获取model的html
+					console.log('model-html:', engine.current?.model?.toHTML());
+					// 获取model的value
+					console.log(
+						'model-value:',
+						engine.current?.model?.toValue(),
+					);
+					// 获取model的text
+					console.log('model-text:', engine.current?.model?.toText());
 				}
 			},
 			[loading, autoSave, props.onChange],

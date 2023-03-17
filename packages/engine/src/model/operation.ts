@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import { EngineInterface } from '../types';
 import { isRoot } from '../node/utils';
-import { isTransientAttribute, isTransientElement } from './utils';
+import { isTransientAttribute, isTransientElementCache } from './utils';
 import { DOMElement, DOMNode, isDOMElement } from './dom';
 import { Node } from './node';
 import { Element } from './element';
@@ -194,7 +194,7 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 		}
 		if (
 			!target.isConnected ||
-			isTransientElement(target) ||
+			isTransientElementCache(target) ||
 			(type === 'attributes' &&
 				(isEditorRoot ||
 					(attributeName &&
@@ -230,7 +230,7 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 
 			if (type === 'attributes' || !isDOMElement(target)) {
 				const parent = target.parentElement;
-				if (!parent || isTransientElement(parent)) continue;
+				if (!parent || isTransientElementCache(parent)) continue;
 				target = parent;
 			}
 		}
@@ -249,7 +249,6 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 		let { previousSibling, nextSibling } = mutationNode;
 		const parentNode = Node.findNode(node);
 		if (!parentNode) {
-			debugger;
 			throw new Error('parentNode is null');
 		}
 		if (!Element.isElement(parentNode))
@@ -258,7 +257,7 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 
 		if (previousSibling) {
 			while (
-				isTransientElement(previousSibling) ||
+				isTransientElementCache(previousSibling) ||
 				previousSibling === node.firstChild
 			) {
 				previousSibling = previousSibling.previousSibling;
@@ -267,7 +266,7 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 		}
 		if (nextSibling) {
 			while (
-				isTransientElement(nextSibling) ||
+				isTransientElementCache(nextSibling) ||
 				nextSibling === node.lastChild
 			) {
 				nextSibling = nextSibling.nextSibling;
@@ -291,7 +290,7 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 			previousIndex = -1;
 		}
 		while (next && next !== nextSibling) {
-			const node = Node.createFromDOM(next);
+			const node = Node.createFromDOM(next, engine.schema);
 			if (node) {
 				children.push(node);
 			}

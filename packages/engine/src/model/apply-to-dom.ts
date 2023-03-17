@@ -1,19 +1,12 @@
-import { isTransientElement } from './utils';
-import {
-	CARD_KEY,
-	CARD_LOADING_KEY,
-	DATA_ID,
-	READY_CARD_KEY,
-} from '../constants';
+import { isTransientElementCache } from './utils';
+import { CARD_LOADING_KEY, DATA_ID } from '../constants';
 import { EngineInterface } from '../types';
 import { $ } from '../node';
 import { Operation } from './operation';
 import { Path } from './path';
 import { DOMElement, DOMNode, isDOMElement, isDOMText } from './dom';
-import { Node } from './node';
-import { Text } from './text';
-import { Element } from './element';
 import { isCard, isRoot } from '../node/utils';
+import { toDOM } from './transform/to-dom';
 
 export const findDOMByPath = (
 	engine: EngineInterface,
@@ -38,7 +31,7 @@ export const findDOMByPath = (
 	let offset = path[0];
 	let index = 0;
 	for (const child of root.childNodes) {
-		if (isTransientElement(child)) continue;
+		if (isTransientElementCache(child)) continue;
 		if (offset === index) {
 			if (path.length === 1) {
 				return {
@@ -57,28 +50,6 @@ export const findDOMByPath = (
 		node: root,
 		offset,
 	};
-};
-
-export const toDOM = (node: Node) => {
-	if (Text.isText(node)) {
-		return document.createTextNode(node.text);
-	} else if (Element.isElement(node)) {
-		const { type, children } = node;
-		const element = document.createElement(type);
-		for (const [key, value] of Object.entries(node)) {
-			if (key === 'type' || key === 'children') continue;
-			element.setAttribute(key, value);
-		}
-		if (node[CARD_KEY] && !node[READY_CARD_KEY]) {
-			element.setAttribute(READY_CARD_KEY, node[CARD_KEY]);
-			element.removeAttribute(CARD_KEY);
-		}
-		for (const child of children) {
-			element.appendChild(toDOM(child));
-		}
-		return element;
-	}
-	throw new Error('Cannot convert node to DOM');
 };
 
 export const applyToDOM = (

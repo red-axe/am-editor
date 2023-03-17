@@ -19,7 +19,7 @@ import { EditorInterface } from './types/editor';
 import { Path } from './model';
 import { $ } from './node';
 import { CardEntry } from './types/card';
-import { isTransientElement } from './model/utils';
+import { isTransientElementCache } from './model/utils';
 import { isNodeEntry } from './node/utils';
 
 class Range implements RangeInterface {
@@ -806,7 +806,7 @@ class Range implements RangeInterface {
 				includeCardCursor &&
 				node instanceof HTMLElement &&
 				~['left', 'right', 'center', 'body'].indexOf(
-					node.getAttribute('data-element') || '',
+					node.getAttribute(CARD_ELEMENT_KEY) || '',
 				)
 			) {
 				const cardElement = this.editor.card.closest(element);
@@ -820,7 +820,7 @@ class Range implements RangeInterface {
 				cardCaches.includes(element)
 			)
 				return true;
-			return !isTransientElement(element);
+			return !isTransientElementCache(element);
 		};
 	}
 

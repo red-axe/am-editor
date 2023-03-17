@@ -114,7 +114,6 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	/**
 	 * 协同编辑
 	 */
-	// ot: OTInterface;
 	model: Model;
 	/**
 	 * 历史记录

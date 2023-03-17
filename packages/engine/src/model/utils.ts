@@ -49,6 +49,23 @@ export function isPlainObject(o: unknown): o is InspectableObject {
 	return true;
 }
 
+const transientWeakMap = new WeakMap<Node, boolean>();
+
+export const isTransientElementCache = (
+	node: NodeInterface | Node,
+	transientElements?: Array<Node>,
+	loadingCards?: NodeInterface[],
+): boolean => {
+	const element = (isNode(node) ? node : node[0]) as Element;
+	let isTransient = transientWeakMap.get(element);
+	if (isTransient !== undefined) {
+		return isTransient;
+	}
+	isTransient = isTransientElement(element, transientElements, loadingCards);
+	transientWeakMap.set(element, isTransient);
+	return isTransient;
+};
+
 export const isTransientElement = (
 	node: NodeInterface | Node,
 	transientElements?: Array<Node>,
@@ -127,7 +144,7 @@ export const isTransientElement = (
 		}
 	} else if (element.nodeType === Node.TEXT_NODE) {
 		const parent = element.parentElement;
-		return !!parent && isTransientElement(parent);
+		return !!parent && isTransientElementCache(parent);
 	}
 	return false;
 };
@@ -140,9 +157,7 @@ export const isTransientAttribute = (
 	if (isRoot(element)) return true;
 	if (
 		isCard(element) &&
-		['id', 'class', 'style', CARD_LOADING_KEY, CARD_EDITABLE_KEY].includes(
-			attr,
-		)
+		['id', 'class', 'style', CARD_LOADING_KEY].includes(attr)
 	)
 		return true;
 	const transient = element.getAttribute(DATA_TRANSIENT_ATTRIBUTES);

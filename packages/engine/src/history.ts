@@ -6,7 +6,7 @@ import { EngineInterface } from './types/engine';
 import { HirtoryOperation, HistoryInterface } from './types/history';
 import { $ } from './node';
 import { CARD_VALUE_KEY, DATA_ID, EDITABLE_SELECTOR } from './constants';
-import { isTransientElement, Operation } from './model';
+import { isTransientElementCache, Operation } from './model';
 import { RangePath } from './types';
 
 const setRangeByPath = (
@@ -27,14 +27,14 @@ const setRangeByPath = (
 				? container.find(`[${DATA_ID}="${start.id}"]`).get<Node>()
 				: container.getChildByPath(
 						startClone,
-						(child) => !isTransientElement($(child)),
+						(child) => !isTransientElementCache($(child)),
 				  );
 			if (!startChild) return;
 			const endChild = end.id
 				? container.find(`[${DATA_ID}="${end.id}"]`).get<Node>()
 				: container.getChildByPath(
 						endClone,
-						(child) => !isTransientElement($(child)),
+						(child) => !isTransientElementCache($(child)),
 				  );
 			if (!endChild) return;
 			const getMaxOffset = (node: Node, offset: number) => {
@@ -371,7 +371,7 @@ class HistoryModel implements HistoryInterface {
 		bi: number,
 		isOp: boolean = true,
 		filter: (node: Node) => boolean = (node: Node) =>
-			!isTransientElement($(node)),
+			!isTransientElementCache($(node)),
 	) => {
 		const targetElement = this.engine.container.find(
 			`[${DATA_ID}="${id}"]`,

@@ -1,7 +1,7 @@
 import { EventEmitter2 } from 'eventemitter2';
 import isEqual from 'lodash/isEqual';
 import { EngineInterface } from '../types/engine';
-import { isTransientElement } from './utils';
+import { isTransientElementCache } from './utils';
 import { RangeInterface, RangePath } from '../types/range';
 import { CardType } from '../card/enum';
 import RangeColoring from './range-coloring';
@@ -43,7 +43,7 @@ export interface SelectionInterface extends EventEmitter2 {
 
 	destroy(): void;
 }
-
+const FLUSHING: WeakMap<EngineInterface, boolean> = new WeakMap();
 class ModelSelection extends EventEmitter2 implements SelectionInterface {
 	private engine: EngineInterface;
 	private rangeColoring: RangeColoring;
@@ -174,8 +174,15 @@ class ModelSelection extends EventEmitter2 implements SelectionInterface {
 			);
 			const current = this.member.getCurrent();
 			if (attr.uuid === current?.uuid) {
-				if (refreshBG === true) this.rangeColoring.updatePosition();
-				this.emit('change', attr);
+				if (!FLUSHING.get(this.engine)) {
+					FLUSHING.set(this.engine, true);
+					Promise.resolve().then(() => {
+						FLUSHING.set(this.engine, false);
+						if (refreshBG === true)
+							this.rangeColoring.updatePosition();
+						this.emit('change', attr);
+					});
+				}
 			} else {
 				this.rangeColoring.render(attr, member, showInfo);
 			}
@@ -207,7 +214,7 @@ class ModelSelection extends EventEmitter2 implements SelectionInterface {
 		const activeCard = card.active;
 		if (activeCard && !activeCard.isEditable) {
 			const center = activeCard.getCenter();
-			if (isTransientElement(activeCard.root)) {
+			if (isTransientElementCache(activeCard.root)) {
 				const prev = activeCard.root.prev();
 				if (prev) {
 					range.select(prev, true).collapse(false);

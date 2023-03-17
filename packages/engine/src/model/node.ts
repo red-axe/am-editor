@@ -1,18 +1,21 @@
 import { toHex } from '../utils';
-import { isTransientAttribute, isTransientElement } from './utils';
+import { isTransientAttribute, isTransientElementCache } from './utils';
 import { DOMNode, isDOMElement, isDOMHTMLElement } from './dom';
 import { Element } from './element';
 import { Text } from './text';
 import { BaseNode } from './types';
 import { Path } from './path';
+import { SchemaInterface } from '../types';
 
 export type Node = BaseNode;
 
 const DOMNODE_TO_NODE: WeakMap<DOMNode, Node> = new WeakMap();
+const NODE_TO_SCHEMA_TYPE: WeakMap<Node, string> = new WeakMap();
+const NODE_TO_IS_VOID: WeakMap<Node, boolean> = new WeakMap();
 
 export const Node = {
-	createFromDOM: (domNode: DOMNode) => {
-		if (isTransientElement(domNode)) return;
+	createFromDOM: (domNode: DOMNode, schema?: SchemaInterface) => {
+		if (isTransientElementCache(domNode)) return;
 		const { nodeName, nodeValue } = domNode;
 		if (isDOMElement(domNode)) {
 			const { attributes, childNodes } = domNode;
@@ -27,7 +30,7 @@ export const Node = {
 			}
 			const children: Node[] = [];
 			for (const child of childNodes) {
-				const node = Node.createFromDOM(child);
+				const node = Node.createFromDOM(child, schema);
 				if (node) {
 					children.push(node);
 				}
@@ -41,7 +44,7 @@ export const Node = {
 				const child = children[i];
 				Path.setPath(child, element, i);
 			}
-			Node.setDOM(element, domNode);
+			Node.setDOM(element, domNode, schema);
 			return element;
 		}
 		const text = Text.create(String(nodeValue));
@@ -51,8 +54,54 @@ export const Node = {
 
 	findNode: (domNode: DOMNode) => DOMNODE_TO_NODE.get(domNode),
 
-	setDOM: (node: Node, domNode: DOMNode) => {
+	setDOM: (node: Node, domNode: DOMNode, schema?: SchemaInterface) => {
 		DOMNODE_TO_NODE.set(domNode, node);
+		if (schema && Element.isElement(node))
+			Node.setSchemaType(node, domNode, schema);
+	},
+
+	setSchemaType: (
+		element: Element,
+		node: DOMNode,
+		schema: SchemaInterface,
+	) => {
+		const type = schema.getType(node);
+		if (type) {
+			NODE_TO_SCHEMA_TYPE.set(element, type);
+		}
+		const isVoid =
+			schema.find(
+				(rule) => rule.name === element.type && rule.isVoid === true,
+			).length > 0;
+		NODE_TO_IS_VOID.set(element, isVoid);
+	},
+
+	isBlock: (node: Node) => {
+		if (Element.isElement(node)) {
+			return NODE_TO_SCHEMA_TYPE.get(node) === 'block';
+		}
+		return false;
+	},
+
+	isInline: (node: Node) => {
+		if (Element.isElement(node)) {
+			return NODE_TO_SCHEMA_TYPE.get(node) === 'inline';
+		}
+		return false;
+	},
+
+	isMark: (node: Node) => {
+		if (Element.isElement(node)) {
+			return NODE_TO_SCHEMA_TYPE.get(node) === 'mark';
+		}
+		return false;
+	},
+
+	isVoid: (node: Node) => {
+		if (Element.isElement(node)) {
+			return NODE_TO_IS_VOID.get(node) === true;
+		}
+		return false;
 	},
 
 	get: (root: Node, path: Path) => {
