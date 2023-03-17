@@ -34,6 +34,15 @@ export interface YCursorEditor<T extends CursorData = CursorData>
 }
 
 export const YCursorEditor = {
+	isYCursorEditor(value: EditorInterface): value is YCursorEditor {
+		return (
+			'awareness' in value &&
+			'cursorDataField' in value &&
+			'selectionStateField' in value &&
+			typeof (value as YCursorEditor).sendCursorPosition === 'function' &&
+			typeof (value as YCursorEditor).sendCursorData === 'function'
+		);
+	},
 	sendCursorPosition<T extends CursorData>(
 		editor: YCursorEditor<T>,
 		cursorAttribute: CursorAttribute,
@@ -45,8 +54,8 @@ export const YCursorEditor = {
 		editor.sendCursorData(data);
 	},
 
-	on<T extends CursorData>(
-		editor: YCursorEditor<T>,
+	on(
+		editor: EngineInterface,
 		event: 'change',
 		handler: RemoteCursorChangeEventListener,
 	) {
@@ -60,8 +69,8 @@ export const YCursorEditor = {
 		CURSOR_CHANGE_EVENT_LISTENERS.set(editor, listeners);
 	},
 
-	off<T extends CursorData>(
-		editor: YCursorEditor<T>,
+	off(
+		editor: EngineInterface,
 		event: 'change',
 		listener: RemoteCursorChangeEventListener,
 	) {
@@ -76,10 +85,11 @@ export const YCursorEditor = {
 	},
 
 	cursorState<T extends CursorData>(
-		editor: YCursorEditor<T>,
+		editor: EditorInterface,
 		clientId: number,
 	): CursorState<T> | null {
 		if (
+			!YCursorEditor.isYCursorEditor(editor) ||
 			clientId === editor.awareness.clientID ||
 			!YjsEditor.connected(editor)
 		) {
@@ -99,9 +109,12 @@ export const YCursorEditor = {
 	},
 
 	cursorStates<T extends CursorData>(
-		editor: YCursorEditor<T>,
+		editor: EditorInterface,
 	): Record<string, CursorState<T>> {
-		if (!YjsEditor.connected(editor)) {
+		if (
+			!YCursorEditor.isYCursorEditor(editor) ||
+			!YjsEditor.connected(editor)
+		) {
 			return {};
 		}
 

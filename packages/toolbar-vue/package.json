@@ -23,12 +23,11 @@
         "@babel/runtime": "^7.13.10",
         "keymaster": "^1.6.2",
         "lodash": "^4.17.21",
-        "tinycolor2": "^1.4.2"
+    	"colord": "^2.9.0"
     },
     "devDependencies": {
         "@types/keymaster": "^1.6.28",
         "@types/lodash": "^4.14.178",
-        "@types/tinycolor2": "^1.4.2",
         "@vue/compiler-sfc": "^3.2.9",
         "ant-design-vue": ">=2.2.6",
         "vue": "^3.2.9"

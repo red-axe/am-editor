@@ -71,7 +71,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 	const comment = useRef<CommentRef | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [connected, setConnected] = useState(false);
-	const [members, setMembers] = useState<CursorData>([]);
+	const [members, setMembers] = useState<Record<number, CursorData>>([]);
 	const [connecting, setConnection] = useState(false);
 	const doc = useMemo(() => new Y.Doc(), []);
 	const provider = React.useMemo(() => {
@@ -306,8 +306,24 @@ const EditorComponent: React.FC<EditorProps> = ({
 			added,
 			removed,
 		}: CursorStateChangeEvent) => {
-			if (added.length > 0 || removed.length > 0) {
-				setMembers(e.model.member.getMembers());
+			if (added.length > 0) {
+				setMembers((members) => {
+					for (const id of added) {
+						const newMember = YCursorEditor.cursorState(e, id);
+						if (newMember?.data) {
+							members[id] = newMember.data;
+						}
+					}
+					return { ...members };
+				});
+			}
+			if (removed.length > 0) {
+				setMembers((members) => {
+					for (const id of removed) {
+						delete members[id];
+					}
+					return { ...members };
+				});
 			}
 		};
 

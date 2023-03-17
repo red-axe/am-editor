@@ -24,12 +24,11 @@
     "@babel/runtime": "^7.13.10",
     "eventemitter2": "^6.4.4",
     "lodash": "^4.17.21",
-    "tinycolor2": "^1.4.2"
+    "colord": "^2.9.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.178",
-    "@types/markdown-it": "^12.2.3",
-    "@types/tinycolor2": "^1.4.2"
+    "@types/markdown-it": "^12.2.3"
   },
   "peerDependencies": {
     "@aomao/engine": ">=2.9"

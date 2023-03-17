@@ -1,4 +1,4 @@
-import tinycolor2 from 'tinycolor2';
+import { colord } from 'colord';
 import type { MarkInterface, NodeInterface, SchemaInterface } from '../types';
 import {
 	READY_CARD_KEY,
@@ -31,10 +31,10 @@ export default class Paste {
 
 	getDefaultStyle(container = this.engine.container) {
 		const defaultStyle = {
-			color: tinycolor2(container.css('color')).toHexString(),
-			'background-color': tinycolor2(
+			color: colord(container.css('color')).toHex(),
+			'background-color': colord(
 				container.css('background-color'),
-			).toHexString(),
+			).toHex(),
 			'font-size': container.css('font-size'),
 		};
 		return defaultStyle;
@@ -138,7 +138,7 @@ export default class Paste {
 					let value = styles[key];
 					if (!value) continue;
 					if (key.endsWith('color')) {
-						value = tinycolor2(value).toHexString();
+						value = colord(value).toHex();
 					}
 					if (
 						value.toLowerCase() === defaultStyle[key].toLowerCase()

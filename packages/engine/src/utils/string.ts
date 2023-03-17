@@ -1,4 +1,3 @@
-import tinycolor2 from 'tinycolor2';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import {
 	CARD_EDITABLE_KEY,

@@ -29,13 +29,12 @@
     "is-hotkey": "^0.2.0",
     "lodash": "^4.17.21",
     "markdown-it": "^13.0.1",
-    "tinycolor2": "^1.4.2"
+    "colord": "^2.9.0"
   },
   "devDependencies": {
     "@types/diff-match-patch": "^1.0.32",
     "@types/is-hotkey": "^0.1.2",
     "@types/lodash": "^4.14.178",
-    "@types/markdown-it": "^12.2.3",
-    "@types/tinycolor2": "^1.4.2"
+    "@types/markdown-it": "^12.2.3"
   }
 }

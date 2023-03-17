@@ -1,4 +1,4 @@
-import tinycolor2 from 'tinycolor2';
+import { colord } from 'colord';
 import { removeUnit, escape } from '../utils';
 import { TinyCanvas } from '../utils';
 import { Tooltip } from '../toolbar';
@@ -165,9 +165,8 @@ class RangeColoring {
 			cardInfo = undefined;
 		}
 
-		const tinyColor = tinycolor2(color);
-		tinyColor.setAlpha(0.3);
-		const rgb = tinyColor.toRgbString();
+		const tinyColor = colord(color);
+		const rgb = tinyColor.alpha(0.3).toRgbString();
 		const fill = {
 			fill: rgb,
 		};
@@ -525,9 +524,8 @@ class RangeColoring {
 	setCardSelectedByOther(card: CardInterface, member?: CollaborationMember) {
 		const { uuid, color } = member || {};
 		if (color) {
-			const tinyColor = tinycolor2(color);
-			tinyColor.setAlpha(0.3);
-			const rgb = tinyColor.toRgbString();
+			const tinyColor = colord(color);
+			const rgb = tinyColor.alpha(0.3).toRgbString();
 			let customNode;
 			if (!card.selectedByOther) {
 				customNode = card.onSelectByOther(true, {
@@ -548,9 +546,8 @@ class RangeColoring {
 		if (card.isEditable) return;
 		const { uuid, color } = member || {};
 		if (color) {
-			const tinyColor = tinycolor2(color);
-			tinyColor.setAlpha(0.3);
-			const rgb = tinyColor.toRgbString();
+			const tinyColor = colord(color);
+			const rgb = tinyColor.alpha(0.3).toRgbString();
 			let customNode;
 			if (!card.activatedByOther) {
 				customNode = card.onActivateByOther(true, {
@@ -755,11 +752,11 @@ class RangeColoring {
 			);
 			const left = child.style.left;
 			const top = child.style.top;
-			const bgColor = tinycolor2(child.style.backgroundColor);
+			const bgColor = colord(child.style.backgroundColor);
 			if (cursorRect.left === left && cursorRect.top === top) {
-				bgColor.setAlpha(0.3);
+				bgColor.alpha(0.3);
 			} else {
-				bgColor.setAlpha(1);
+				bgColor.alpha(1);
 			}
 			const bgs = bgColor.toRgbString();
 			child.style.backgroundColor = bgs;

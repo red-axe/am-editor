@@ -24,12 +24,11 @@
         "classnames-es-ts": "^2.2.7",
         "keymaster": "^1.6.2",
         "lodash": "^4.17.21",
-        "tinycolor2": "^1.4.2"
+    	"colord": "^2.9.0"
     },
     "devDependencies": {
         "@types/keymaster": "^1.6.28",
         "@types/lodash": "^4.14.178",
-        "@types/tinycolor2": "^1.4.2",
         "antd": "^4.12.3",
         "react": "^17.0.0",
         "react-dom": ">=17.0.0"

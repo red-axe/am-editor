@@ -1,4 +1,4 @@
-import tinycolor from 'tinycolor2';
+import { colord } from 'colord';
 import type {
 	PluginOptions,
 	ElementPluginInterface,
@@ -131,7 +131,7 @@ abstract class ElementPluginEntry<T extends PluginOptions = PluginOptions>
 				node = node as NodeInterface;
 				let value =
 					styleName.toLowerCase().indexOf('color') > -1
-						? tinycolor(node.css(styleName) || '').toHexString()
+						? colord(node.css(styleName) || '').toHex()
 						: node.css(styleName);
 				let styleValue = this.style![styleName];
 				if (typeof styleValue === 'object') {
