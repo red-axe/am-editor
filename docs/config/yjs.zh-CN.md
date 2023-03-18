@@ -9,7 +9,7 @@ toc: menu
 ## 安装
 
 ```bash
-yarn add yjs @aomao/plugin-yjs @aomao/yjs-websocket
+yarn add yjs @aomao/plugin-yjs @aomao/plugin-yjs-websocket
 ```
 
 ## 使用
@@ -86,10 +86,10 @@ YCursorEditor.on(e, 'change', handleCursorChange);
 
 ### 服务端
 
-`@aomao/yjs-websocket` 也提供了 `nodejs` 服务端的实现，可以直接使用
+`@aomao/plugin-yjs-websocket` 也提供了 `nodejs` 服务端的实现，可以直接使用
 
 ```ts
-yarn add yjs @aomao/yjs-websocket
+yarn add yjs @aomao/plugin-yjs-websocket
 ```
 
 简单配置即可使用

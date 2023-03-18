@@ -356,8 +356,8 @@ export default EngineDemo;
 
 This open-source library listens to changes in the `HTML` structure of the editing area (contenteditable root node), uses `MutationObserver` to reverse-engineer the data structure, and connects and interacts with [Yjs](https://github.com/yjs/yjs) through `WebSocket` to achieve multi-user collaborative editing.
 
-Each editor, as a [client](https://github.com/red-axe/am-editor/blob/master/examples/react/components/editor/index.tsx#L250), communicates and interacts with the [server](https://github.com/big-camel/am-editor/tree/master/yjs-server) through the `WebSocket` function in the `@aomao/yjs-websocket` plugin.
+Each editor, as a [client](https://github.com/red-axe/am-editor/blob/master/examples/react/components/editor/index.tsx#L250), communicates and interacts with the [server](https://github.com/big-camel/am-editor/tree/master/yjs-server) through the `WebSocket` function in the `@aomao/plugin-yjs-websocket` plugin.
 
 -   `@aomao/yjs` implements the conversion of editor and `Yjs` data
--   `@aomao/yjs-websocket` provides the `WebSocket` client function of the editor and `Yjs`
--   `@aomao/yjs-websocket/server` provides the `WebSocket` server of `Yjs`, written in Node.js, and supports data storage using `MongoDB` and `LevelDB`.
+-   `@aomao/plugin-yjs-websocket` provides the `WebSocket` client function of the editor and `Yjs`
+-   `@aomao/plugin-yjs-websocket/server` provides the `WebSocket` server of `Yjs`, written in Node.js, and supports data storage using `MongoDB` and `LevelDB`.

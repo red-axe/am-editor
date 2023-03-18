@@ -9,7 +9,7 @@ This open-source library listens to changes in the `HTML` structure of the editi
 ## Installation
 
 ```bash
-yarn add yjs @aomao/plugin-yjs @aomao/yjs-websocket
+yarn add yjs @aomao/plugin-yjs @aomao/plugin-yjs-websocket
 ```
 
 ## Usage
@@ -88,10 +88,10 @@ YCursorEditor.on(e, 'change', handleCursorChange);
 
 ### Server
 
-`@aomao/yjs-websocket` also provides an implementation of `nodejs` server that can be used directly
+`@aomao/plugin-yjs-websocket` also provides an implementation of `nodejs` server that can be used directly
 
 ```ts
-yarn add yjs @aomao/yjs-websocket
+yarn add yjs @aomao/plugin-yjs-websocket
 ```
 
 Simply configure it and use it

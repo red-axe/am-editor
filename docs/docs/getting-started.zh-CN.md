@@ -356,8 +356,8 @@ export default EngineDemo;
 
 该开源库通过监听编辑区域(contenteditable 根节点)内的 html 结构的变化，使用 `MutationObserver` 反推数据结构，并通过 `WebSocket` 与 [Yjs](https://github.com/yjs/yjs) 连接交互，实现多用户协同编辑的功能。
 
-每位编辑者作为 [客户端](https://github.com/red-axe/am-editor/blob/master/examples/react/components/editor/index.tsx#L250) 通过 `@aomao/yjs-websocket` 插件中的 `Websocket` 与 [服务端](https://github.com/big-camel/am-editor/tree/master/yjs-server) 进行通信交互。
+每位编辑者作为 [客户端](https://github.com/red-axe/am-editor/blob/master/examples/react/components/editor/index.tsx#L250) 通过 `@aomao/plugin-yjs-websocket` 插件中的 `Websocket` 与 [服务端](https://github.com/big-camel/am-editor/tree/master/yjs-server) 进行通信交互。
 
 -   `@aomao/yjs` 实现编辑器与 `Yjs` 数据的转换
--   `@aomao/yjs-websocket` 提供编辑器与 `Yjs` 的 `WebSocket` 客户端功能
--   `@aomao/yjs-websocket/server` 提供 `Yjs` 的 `WebSocket` 服务端，使用 Node.js 编写，并支持使用 `MongoDB` 和 `LevelDB` 存储数据。
+-   `@aomao/plugin-yjs-websocket` 提供编辑器与 `Yjs` 的 `WebSocket` 客户端功能
+-   `@aomao/plugin-yjs-websocket/server` 提供 `Yjs` 的 `WebSocket` 服务端，使用 Node.js 编写，并支持使用 `MongoDB` 和 `LevelDB` 存储数据。
