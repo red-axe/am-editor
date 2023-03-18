@@ -84,7 +84,7 @@ const handleCursorChange = ({ added, removed, updated }: CursorStateChangeEvent)
 YCursorEditor.on(e, 'change', handleCursorChange);
 ```
 
-## 服务端
+### 服务端
 
 `@aomao/yjs-websocket` 也提供了 `nodejs` 服务端的实现，可以直接使用
 
