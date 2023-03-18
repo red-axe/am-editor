@@ -1,9 +1,0 @@
-{
-	"mongodb": {
-		"user": "yanmao",
-		"pwd": "yanmao123456",
-		"db": "yanmao",
-		"url": "localhost:27017"
-	},
-	"collectionName": "aomao"
-}

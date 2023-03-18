@@ -28,25 +28,28 @@ title: 介绍
 当然，有些场景下为了方便操作，也提供了转换为 JSON 类型值的 API：
 
 ```json
-[
-	"div", // 节点名称
-	// 节点所有的属性
-	{
-		"data-element": "root",
-		"contenteditable": "true"
-	},
-	// 子节点1
-	[
-		// 子节点名称
-		"p",
-		// 子节点属性
-		{},
-		// 字节点的子节点
-		"Hello world!"
-	],
-	// 子节点2
-	["p", {}, ["br", {}]]
-]
+{
+	type: "div",
+	"data-element": "root",
+	"contenteditable": "true"
+	children: [
+		{
+			type: "p",
+			children: [{
+				text: "Hello world!"
+			}]
+		},
+		{
+			type: "p",
+			children: [
+				{
+					type: "br",
+					children: []
+				}
+			]
+		}
+	]
+}
 ```
 
 <Alert>
@@ -206,11 +209,7 @@ Html 相对于卡片那样的值，是无法提供异步渲染、无法使用其
 上一段带卡片节点的值，我们通过引擎提供的方法可以获取到以下 html
 
 ```html
-<div
-	data-element="root"
-	class="am-engine"
-	data-selection-5118985c-3395-3365-8228-d08540d1293e="%7B%22path%22%3A%7B%22start%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%2C%22end%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%7D%2C%22uuid%22%3A%225118985c-3395-3365-8228-d08540d1293e%22%2C%22active%22%3Atrue%7D"
->
+<div data-element="root" class="am-engine">
 	<div
 		data-id="de4bd68e-VhAUT2WQ"
 		data-card-editable="false"
@@ -243,7 +242,7 @@ Html 相对于卡片那样的值，是无法提供异步渲染、无法使用其
 ```typescript
 ...
 // 我们把这段html通过setHtml方法设置给编辑器，编辑器会自动解析成对应的卡片并且渲染
-engine.setHtml(`<div data-element="root" class="am-engine" data-selection-5118985c-3395-3365-8228-d08540d1293e="%7B%22path%22%3A%7B%22start%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%2C%22end%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%7D%2C%22uuid%22%3A%225118985c-3395-3365-8228-d08540d1293e%22%2C%22active%22%3Atrue%7D">
+engine.setHtml(`<div data-element="root" class="am-engine">
     <div data-id="de4bd68e-VhAUT2WQ" data-card-editable="false" class="" data-syntax="javascript"><div class="data-codeblock-content" style="border: 1px solid rgb(232, 232, 232); max-width: 750px; color: rgb(38, 38, 38); margin: 0px; padding: 0px; background: rgb(249, 249, 249);"><div class="CodeMirror" style="color: rgb(89, 89, 89); margin: 0px; padding: 16px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);"><pre class="cm-s-default" style="color: rgb(89, 89, 89); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);"><span class="cm-keyword" style="color: rgb(215, 58, 73); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);">const</span> <span class="cm-def" style="color: rgb(0, 92, 197); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);">a</span> <span class="cm-operator" style="color: rgb(215, 58, 73); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);">=</span> <span class="cm-number" style="color: rgb(0, 92, 197); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);">0</span>;</pre></div></div></div>
     <p data-id="pd157317-RSLJ4X6g"><br></p>
 </div> `)
@@ -257,45 +256,60 @@ console.log(engine.getHtml())
 除了以上两种 DOM 节点的值之外，还提供了 JSON 类型的值，JSON 相比较以上两种值会比较跟容易遍历和操作
 
 ```json
-[
-	"div",
-	{
-		"data-selection-5118985c-3395-3365-8228-d08540d1293e": "%7B%22path%22%3A%7B%22start%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%2C%22end%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%7D%2C%22uuid%22%3A%225118985c-3395-3365-8228-d08540d1293e%22%2C%22active%22%3Atrue%7D"
-	},
-	[
-		"div",
+{
+	"type": "div",
+	"children": [
 		{
+			"type": "div",
 			"data-card-value": "data:%7B%22id%22%3A%22ArADP%22%2C%22type%22%3A%22block%22%2C%22mode%22%3A%22javascript%22%2C%22code%22%3A%22const%20a%20%3D%200%3B%22%7D",
 			"data-card-type": "block",
 			"data-card-key": "codeblock",
-			"data-id": "de4bd68e-VhAUT2WQ"
-		}
-	],
-	[
-		"p",
-		{
-			"data-id": "pd157317-RSLJ4X6g"
+			"data-id": "de4bd68e-VhAUT2WQ",
+			"children": []
 		},
-		["br", {}]
+		{
+			"type": "p",
+			"data-id": "pd157317-RSLJ4X6g",
+			"children": [
+				{
+					"type": "br",
+					"children": []
+				}
+			]
+		}
 	]
-]
+}
 ```
 
-JSON 格式的值是一个 json 数组。
+JSON 格式的值是通过监听编辑区域(contenteditable 根节点)内的 html 结构的变化，使用 `MutationObserver` 反推出来的。
+
+我们可以通过 `engine.model` 来访问这个反推出来的数据模型
+
+#### Element
+
+节点的类型为 Element
 
 ```typescript
-[
-    //索引 0 表示节点的名称
-    "div",
-    // 索引 1 的位置是节点的所有属性
-    {
-        "data-id": "de4bd68e-VhAUT2WQ"
-    },
-    // 索引 2 的位置表示这个节点下的子节点
-    [
-       ...
-    ]
-]
+{
+	// 节点的类型
+	type: "div",
+	// 子节点
+	children: [
+		...
+	]
+	// ... 其它自定义属性
+}
+```
+
+#### Text
+
+文本节点的类型为 Text
+
+```typescript
+{
+	// 节点的文本
+	text: "hello world",
+}
 ```
 
 同样的我们可以通过编辑器提供的 getJsonValue 和 setJsonValue 对 json 类型的值进行获取和处理
@@ -303,39 +317,37 @@ JSON 格式的值是一个 json 数组。
 ```typescript
 ...
 // 我们把这段html通过setHtml方法设置给编辑器，编辑器会自动解析成对应的卡片并且渲染
-engine.setJsonValue([
-    "div",
-    {
-        "data-selection-5118985c-3395-3365-8228-d08540d1293e": "%7B%22path%22%3A%7B%22start%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%2C%22end%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%7D%2C%22uuid%22%3A%225118985c-3395-3365-8228-d08540d1293e%22%2C%22active%22%3Atrue%7D"
-    },
-    [
-        "div",
-        {
-            "data-card-value": "data:%7B%22id%22%3A%22ArADP%22%2C%22type%22%3A%22block%22%2C%22mode%22%3A%22javascript%22%2C%22code%22%3A%22const%20a%20%3D%200%3B%22%7D",
-            "data-card-type": "block",
-            "data-card-key": "codeblock",
-            "data-id": "de4bd68e-VhAUT2WQ"
-        }
-    ],
-    [
-        "p",
-        {
-            "data-id": "pd157317-RSLJ4X6g"
-        },
-        [
-            "br",
-            {}
-        ]
-    ]
-])
+engine.setJsonValue({
+		type: 'div',
+		children: [
+			{
+				type: 'div',
+				'data-card-value': 'data:%7B%22id%22%3A%22ArADP%22%2C%22type%22%3A%22block%22%2C%22mode%22%3A%22javascript%22%2C%22code%22%3A%22const%20a%20%3D%200%3B%22%7D',
+				'data-card-type': 'block',
+				'data-card-key': 'codeblock',
+				'data-id': 'de4bd68e-VhAUT2WQ',
+				children: []
+			},
+			{
+				type: 'p',
+				'data-id': 'pd157317-RSLJ4X6g',
+				children: [
+					{
+						type: 'br',
+						children: []
+					}
+				]
+			}
+		]
+	})
 // 通过 getJsonValue 方法，我们可以获取到当前编辑器中对应的 json，此时我们不需要考虑我们编辑器中是使用 setHtml 还是 setValue 设置的值，我们都能通过 getJsonValue 获取到对应的 json
 console.log(engine.getJsonValue())
 ...
 ```
 
-## 协同
+## 协同编辑
 
-通过 `MutationObserver` 监听编辑区域(contenteditable 根节点)内的 `html` 结构的突变反推 OT。通过`Websocket`与 [ShareDB](https://github.com/share/sharedb) 连接，然后使用命令对 ShareDB 保存的数据进行增、删、改、查。
+该开源库通过监听编辑区域(contenteditable 根节点)内的 html 结构的变化，使用 `MutationObserver` 反推数据结构，并通过 `WebSocket` 与 [Yjs](https://github.com/yjs/yjs) 连接交互，实现多用户协同编辑的功能。
 
 ## 特性
 

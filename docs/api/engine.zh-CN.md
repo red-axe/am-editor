@@ -28,11 +28,11 @@
 
 类型：`TypingInterface`
 
-### `ot`
+### `model`
 
-协同编辑相关
+数据模型相关
 
-类型：`OTInterface`
+类型：`Model`
 
 ### `history`
 

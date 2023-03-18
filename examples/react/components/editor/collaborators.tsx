@@ -25,7 +25,7 @@ export const Collaboration: React.FC<{ members: Record<number, CursorData> }> =
 
 			return (
 				<div style={{ maxHeight: 'calc(60vh)', overflowY: 'scroll' }}>
-					{moreMembers.map(({ name, color }, index) => (
+					{moreMembers.map(({ name, color, avatar }, index) => (
 						<div
 							key={index}
 							style={{
@@ -37,6 +37,7 @@ export const Collaboration: React.FC<{ members: Record<number, CursorData> }> =
 							<Avatar
 								size={24}
 								style={{ backgroundColor: color }}
+								src={avatar}
 							>
 								{name}
 							</Avatar>
@@ -73,19 +74,22 @@ export const Collaboration: React.FC<{ members: Record<number, CursorData> }> =
 		return (
 			<div className="editor-ot-users">
 				<Space className="editor-ot-users-content" size="small">
-					{Object.values(members).map((member, index) => {
-						if (maxCount && index >= maxCount) return;
-						return (
-							<Tooltip key={index} title={member.name}>
-								<Avatar
-									size={isMobile ? 24 : 30}
-									style={{ backgroundColor: member.color }}
-								>
-									{member['name']}
-								</Avatar>
-							</Tooltip>
-						);
-					})}
+					{Object.values(members).map(
+						({ name, color, avatar }, index) => {
+							if (maxCount && index >= maxCount) return;
+							return (
+								<Tooltip key={index} title={name}>
+									<Avatar
+										size={isMobile ? 24 : 30}
+										style={{ backgroundColor: color }}
+										src={avatar}
+									>
+										{name}
+									</Avatar>
+								</Tooltip>
+							);
+						},
+					)}
 					{renderMore()}
 				</Space>
 			</div>

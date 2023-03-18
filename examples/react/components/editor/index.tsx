@@ -11,14 +11,7 @@ import { Modal, ModalFuncProps } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import * as Y from 'yjs';
 //引入编辑器引擎
-import {
-	$,
-	EngineInterface,
-	isHotkey,
-	Path,
-	isMobile,
-	CollaborationMember,
-} from '@aomao/engine';
+import { $, EngineInterface, isHotkey, Path, isMobile } from '@aomao/engine';
 import { WebsocketProvider } from '@aomao/plugin-yjs-websocket';
 import {
 	withYjs,

@@ -12,28 +12,20 @@ Clone the am-editor repository on GitHub
 
 ```bash
 $ yarn
-
-//or
-
-$ npm install
+$ lerna bootstrap
 ```
 
 ### Startup project
 
 ```bash
-//Ordinary start
 $ yarn start
-
-//or
-//The server-side rendering mode is started and site-ssr will be called. To fully use ssr mode, you need to actively access port 7001 after startup
-$ yarn ssr
 ```
 
 ### Start collaborative service
 
 ```bash
-$ cd ot-server
-$ yarn start
+$ cd yjs-server
+$ yarn dev
 ```
 
 ### Compile

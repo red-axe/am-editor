@@ -28,11 +28,11 @@ Key processing
 
 Type: `TypingInterface`
 
-### `ot`
+### `model`
 
-Co-editing related
+Data model related
 
-Type: `OTInterface`
+Type: `Model`
 
 ### `history`
 
