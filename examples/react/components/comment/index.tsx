@@ -20,13 +20,14 @@ import {
 import Loading from '../loading';
 import CommentButton from './button';
 import { CommentContent, DataItem, DataSourceItem } from './types';
+import { CursorData } from '@aomao/plugin-yjs';
 import CommentItem from './item';
 import context from '../../context';
 import { useDispatch, useSelector } from '../../hooks';
 import 'antd/es/message/style';
 import './index.css';
 
-export type CommentProps<T = CollaborationMember> = {
+export type CommentProps<T = CursorData> = {
 	editor: EditorInterface;
 	member: T;
 	onUpdate?: () => void;

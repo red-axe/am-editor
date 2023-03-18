@@ -54,7 +54,7 @@ export type EditorProps = Omit<EngineProps, 'defaultValue'> & {
 				id: string;
 		  }
 		| false;
-	member?: CollaborationMember;
+	member?: CursorData;
 	comment?: boolean;
 	toc?: boolean;
 	toolbar?: ToolbarItemProps;
@@ -452,7 +452,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 										avatar: 'https://cdn-image.aomao.com/10016/avatar/2020/04/17/1587113793-da092550-5b12-477e-b229-631908d0ac2b.png',
 										name: 'test',
 										uuid: 'test',
-									} as unknown as CollaborationMember)
+									} as unknown as CursorData)
 								}
 								onUpdate={onCommentRequestUpdate}
 								{...(props.comment === true

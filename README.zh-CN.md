@@ -289,15 +289,15 @@ return (
 
 ### 协同编辑
 
-通过 `MutationObserver` 监听编辑区域(contenteditable 根节点)内的 `html` 结构的突变反推数据结构。通过`Websocket`与 [Yjs](https://github.com/yjs/yjs) 连接交互
+该开源库通过监听编辑区域(contenteditable 根节点)内的 html 结构的变化，使用 `MutationObserver` 反推数据结构，并通过 `WebSocket` 与 [Yjs](https://github.com/yjs/yjs) 连接交互，实现多用户协同编辑的功能。
 
 #### 交互模式
 
-每位编辑者作为 [客户端](https://github.com/red-axe/am-editor/blob/master/examples/react/components/editor/index.tsx#L250) 通过 `@aomao/yjs-websocket` 插件中的 `websocket` 与 [服务端](https://github.com/big-camel/am-editor/tree/master/yjs-server) 通信交互。
+每位编辑者作为 [客户端](https://github.com/red-axe/am-editor/blob/master/examples/react/components/editor/index.tsx#L250) 通过 `@aomao/yjs-websocket` 插件中的 `Websocket` 与 [服务端](https://github.com/big-camel/am-editor/tree/master/yjs-server) 进行通信交互。
 
--   @aomao/yjs 编辑器与`yjs`的数据转换
--   @aomao/yjs-websocket 编辑器与`yjs`的`websocket`客户端
--   @aomao/yjs-websocket/server `yjs`的`websocket`服务端，使用 nodejs 编写，可以配置 `mongodb` 和 `leveldb` 存储数据
+-   `@aomao/yjs` 实现编辑器与 `Yjs` 数据的转换
+-   `@aomao/yjs-websocket` 提供编辑器与 `Yjs` 的 `WebSocket` 客户端功能
+-   `@aomao/yjs-websocket/server` 提供 `Yjs` 的 `WebSocket` 服务端，使用 Node.js 编写，并支持使用 `MongoDB` 和 `LevelDB` 存储数据。
 
 ### 项目图标
 
@@ -307,18 +307,26 @@ return (
 
 ### React
 
-需要在 `am-editor 安装依赖
+在使用该开源库之前，需要先在项目根目录中安装依赖。
 
 ```base
-//依赖安装好后，只需要在根目录执行以下命令
+yarn install
 
+leran bootstrap
+```
+
+依赖安装好后，只需要在根目录执行以下命令即可启动项目：
+
+```base
 yarn start
 ```
 
--   `packages` 引擎和工具栏
--   `plugins` 所有的插件
--   `api` 支持一些插件所需要的 api 访问，默认使用 https://editor.aomao.com 作为 api 服务
--   `yjs-server` 协同服务端。启动：yarn dev
+该开源库的开发目录结构如下：
+
+-   `packages` 存放引擎和工具栏相关代码
+-   `plugins` 存放所有的插件
+-   `api` 提供一些插件所需要的 API 访问，默认使用 https://editor.aomao.com 作为 API 服务
+-   `yjs-server` 存放协同服务端代码，可通过 `yarn dev` 启动服务。
 
 ### Vue
 

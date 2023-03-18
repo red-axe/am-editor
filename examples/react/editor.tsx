@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import { isServer, EngineInterface, CollaborationMember } from '@aomao/engine';
+import { isServer, EngineInterface } from '@aomao/engine';
+import { CursorData } from '@aomao/plugin-yjs';
+import { faker } from '@faker-js/faker';
 import Context from './context';
 import useDispatch from './hooks/use-dispatch';
 import useSelector from './hooks/use-selector';
@@ -16,8 +18,18 @@ import React from 'react';
 const localMember =
 	typeof localStorage === 'undefined' ? null : localStorage.getItem('member');
 
-const getMember = (): CollaborationMember => {
-	return !!localMember ? JSON.parse(localMember) : null;
+const getMember = (): CursorData => {
+	if (localMember === null) {
+		const { name } = faker;
+		const member = {
+			name: `${name.firstName()} ${name.lastName()}`,
+			avatar: faker.image.avatar(),
+			color: faker.color.rgb(),
+		};
+		localStorage.setItem('member', JSON.stringify(member));
+		return member;
+	}
+	return JSON.parse(localMember);
 };
 
 const wsUrl =

@@ -54,6 +54,7 @@
         "yorkie": "^2.0.0"
     },
     "dependencies": {
+        "@faker-js/faker": "^7.6.0",
         "markdown-it-container": "^3.0.0"
     }
 }
