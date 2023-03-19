@@ -6,6 +6,7 @@ export interface WSSharedDoc extends Doc {
 	name: string;
 	conns: Map<WebSocket, Set<number>>;
 	awareness: awarenessProtocol.Awareness;
+	sendCustomMessage: (conn: WebSocket, message: Record<string, any>) => void;
 }
 
 export type ContentType = 'Array' | 'Map' | 'Text' | 'XmlFragment';

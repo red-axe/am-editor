@@ -108,6 +108,8 @@ startServer({
 	host: string;
 	// 监听的端口，默认为 1234
 	port: number;
+	// http server request listener
+	requestListener?: http.RequestListener;
 	// 自定义效验，返回 code !== 200 时，会终止连接
 	auth?: (
 		request: http.IncomingMessage,
@@ -131,7 +133,7 @@ startServer({
 	contentField?: string;
 	// 更新回调
 	callback?: UpdateCallback;
-	// 初始值
-	initialValue?: Element;
+	// 连接回调
+	onConnection?: (doc: WSSharedDoc, conn: WebSocket.WebSocket) => void;
 })
 ```

@@ -121,6 +121,13 @@ class WSSharedDoc extends Y.Doc implements WSSharedDocInterface {
 		}
 	}
 
+	sendCustomMessage(conn: WebSocket.WebSocket, message: Record<string, any>) {
+		const encoder = encoding.createEncoder();
+		encoding.writeVarUint(encoder, messageCustom);
+		encoding.writeAny(encoder, message);
+		send(this, conn, encoding.toUint8Array(encoder));
+	}
+
 	destroy(): void {
 		super.destroy();
 	}
@@ -248,6 +255,10 @@ interface SetupWSConnectionOptions {
 	gc?: boolean;
 	pingTimeout?: number;
 	callback?: UpdateCallback;
+	onConnection?: (
+		doc: WSSharedDocInterface,
+		conn: WebSocket.WebSocket,
+	) => void;
 }
 
 export const setupWSConnection = (
@@ -260,6 +271,7 @@ export const setupWSConnection = (
 		gc = true,
 		pingTimeout = 30000,
 		callback,
+		onConnection,
 	} = options ?? {};
 	conn.binaryType = 'arraybuffer';
 	// get doc, initialize if it does not exist yet
@@ -267,16 +279,16 @@ export const setupWSConnection = (
 		docName,
 		gc,
 		() => {
-			const encoder = encoding.createEncoder();
-			encoding.writeVarUint(encoder, messageCustom);
-			encoding.writeAny(encoder, {
+			doc.sendCustomMessage(conn, {
 				action: 'initValue',
 			});
-			send(doc, conn, encoding.toUint8Array(encoder));
 		},
 		callback,
 	);
 	doc.conns.set(conn, new Set());
+	if (onConnection) {
+		onConnection(doc, conn);
+	}
 	// listen and reply to events
 	conn.on('message', (message: ArrayBuffer) =>
 		messageListener(conn, doc, new Uint8Array(message)),

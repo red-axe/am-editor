@@ -110,6 +110,8 @@ startServer({
 	host: string;
 	// Port to listen on, default is 1234
 	port: number;
+	// http server request listener
+	requestListener?: http.RequestListener;
 	// Custom authentication, connection will be terminated if code !== 200 is returned
 	auth?: (request: http.IncomingMessage, ws: WebSocket) => Promise<void | { code: number; data: string | Buffer }>;
 	// Persistence options, false means no persistence
@@ -130,7 +132,7 @@ startServer({
 	contentField?: string;
 	// Update callback
 	callback?: UpdateCallback;
-	// Initial value
-	initialValue?: Element;
+	// Connection callback
+	onConnection?: (doc: WSSharedDoc, conn: WebSocket.WebSocket) => void;
 })
 ```

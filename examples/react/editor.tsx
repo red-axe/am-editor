@@ -116,7 +116,7 @@ export default () => {
 				onLoad={setEngine}
 				toc={true}
 				member={member}
-				yjs={IS_DEV ? false : yjsConfig}
+				yjs={false ? false : yjsConfig}
 				onSave={onSave}
 			/>
 		</Context.Provider>
