@@ -65,7 +65,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 	const [loading, setLoading] = useState(true);
 	const [connected, setConnected] = useState(false);
 	const [members, setMembers] = useState<Record<number, CursorData>>([]);
-	const [connecting, setConnection] = useState(false);
+
 	const doc = useMemo(() => new Y.Doc(), []);
 	const provider = React.useMemo(() => {
 		const provider =
@@ -83,29 +83,17 @@ const EditorComponent: React.FC<EditorProps> = ({
 		) => {
 			const { status } = event;
 			if (status === 'connected') {
-				setLoading(false);
-				setConnection(false);
 				setConnected(true);
 			} else if (status === 'connecting') {
-				setConnection(true);
 			} else if (status === 'disconnected') {
-				setLoading(false);
-				setConnection(false);
 				setConnected(false);
 			}
+			setLoading(false);
 		};
 		if (provider) provider.on('status', handleStatus);
 		return provider;
 	}, [doc, yjs]);
 
-	const errorModal = useRef<{
-		destroy: () => void;
-		update: (
-			configUpdate:
-				| ModalFuncProps
-				| ((prevConfig: ModalFuncProps) => ModalFuncProps),
-		) => void;
-	} | null>(null);
 	const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 	/**
 	 * 保存到服务器
@@ -226,42 +214,48 @@ const EditorComponent: React.FC<EditorProps> = ({
 		engine.current.on('card:minimize', onMinimize);
 
 		//设置编辑器值，还原评论标记
-		if (defaultValue) {
-			const value =
-				defaultValue.paths.length > 0
-					? engine.current.command.executeMethod(
-							'mark-range',
-							'action',
-							'comment',
-							'wrap',
-							defaultValue.paths,
-							defaultValue.value,
-					  )
-					: defaultValue.value;
+		const value: string | null = defaultValue
+			? defaultValue.paths.length > 0
+				? engine.current.command.executeMethod(
+						'mark-range',
+						'action',
+						'comment',
+						'wrap',
+						defaultValue.paths,
+						defaultValue.value,
+				  )
+				: defaultValue.value
+			: null;
+		//连接到协作服务端，demo文档
 
-			//连接到协作服务端，demo文档
-			if (yjs && provider) {
-				provider.connect();
-				const sharedType = doc.get(
-					'content',
-					Y.XmlElement,
-				) as Y.XmlElement;
-				withYjs(engine.current, sharedType, provider.awareness, {
-					data: member,
-				});
-			} else {
-				// 非协同编辑，设置编辑器值，异步渲染后回调
-				engine.current.setValue(value, (count) => {
-					console.log('setValue loaded:', count);
-					if (onLoad) onLoad(engine.current!);
-					return setLoading(false);
-				});
+		const handleCustomMessage = (message: Record<string, any>) => {
+			const { action } = message;
+			if (value && action === 'initValue') {
+				console.log('initValue');
+				engine.current?.setValue(value);
+				engine.current?.history.clear();
 			}
+		};
+		if (yjs && provider) {
+			provider.connect();
+			provider.on('customMessage', handleCustomMessage);
+			const sharedType = doc.get('content', Y.XmlElement) as Y.XmlElement;
+			withYjs(engine.current, sharedType, provider.awareness, {
+				data: member,
+			});
+		} else if (value) {
+			// 非协同编辑，设置编辑器值，异步渲染后回调
+			engine.current.setValue(value, (count) => {
+				console.log('setValue loaded:', count);
+				if (onLoad) onLoad(engine.current!);
+				return setLoading(false);
+			});
 		}
 
 		return () => {
 			engine.current?.off('card:maximize', onMaximize);
 			engine.current?.off('card:minimize', onMinimize);
+			provider?.off;
 			provider?.disconnect();
 		};
 	}, [engine, doc, yjs, provider]);
@@ -416,7 +410,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 	}, [members, yjs]);
 
 	return (
-		<Loading loading={loading && (!yjs || !connected)}>
+		<Loading loading={loading || (yjs && !connected)}>
 			<>
 				{engine.current && (
 					<Toolbar engine={engine.current} items={props.toolbar} />

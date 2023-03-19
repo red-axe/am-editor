@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+	CARD_KEY,
 	DATA_TRANSIENT_ELEMENT,
 	isEngine,
 	isSafari,
@@ -9,6 +10,7 @@ import type {
 	EditorInterface,
 	NodeInterface,
 	PluginOptions,
+	Node,
 } from '@aomao/engine';
 import type { CollapseItemProps } from '../collapse/item';
 import ToolbarComponent, { ToolbarPopup } from './component';
@@ -64,6 +66,7 @@ class ToolbarPlugin<
 		if (isEngine(editor)) {
 			editor.on('keydown:slash', this.onSlash);
 			editor.on('parse:value', this.paserValue);
+			editor.on('parse:node', this.paserNode);
 		}
 		editor.language.add(locales);
 		if (this.options.popup) {
@@ -81,6 +84,13 @@ class ToolbarPlugin<
 			return false;
 		}
 		return true;
+	};
+
+	paserNode = (node: Node) => {
+		if (node[CARD_KEY] === ToolbarComponent.cardName) {
+			return false;
+		}
+		return;
 	};
 
 	onSlash = (event: KeyboardEvent) => {
@@ -132,6 +142,7 @@ class ToolbarPlugin<
 		const editor = this.editor;
 		editor.off('keydown:slash', this.onSlash);
 		editor.off('parse:value', this.paserValue);
+		editor.off('parse:node', this.paserNode);
 	}
 }
 export { ToolbarComponent, ToolbarPopup };

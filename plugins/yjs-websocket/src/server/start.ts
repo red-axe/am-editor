@@ -20,8 +20,6 @@ export interface ServerOptions {
 	contentField?: string;
 	// 更新回调
 	callback?: UpdateCallback;
-	// 初始值
-	initialValue?: Element;
 }
 
 const SERVER_OPTIONS_WEAKMAP = new WeakMap<http.Server, ServerOptions>();
@@ -32,9 +30,8 @@ const server = http.createServer((request, response) => {
 });
 
 wss.on('connection', (conn, req) => {
-	const { initialValue, callback } = SERVER_OPTIONS_WEAKMAP.get(server) ?? {};
+	const { callback } = SERVER_OPTIONS_WEAKMAP.get(server) ?? {};
 	setupWSConnection(conn, req, {
-		initialValue,
 		callback,
 	});
 });

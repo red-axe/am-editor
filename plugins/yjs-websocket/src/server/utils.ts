@@ -2,7 +2,6 @@
 import WebSocket from 'ws';
 import http from 'http';
 import * as Y from 'yjs';
-import { Element } from '../model';
 import * as syncProtocol from '@aomao/plugin-yjs-protocols/sync';
 import * as awarenessProtocol from '@aomao/plugin-yjs-protocols/awareness';
 
@@ -15,7 +14,7 @@ import { WSSharedDoc as WSSharedDocInterface } from './types';
 
 import { callbackHandler, CallbackOptions } from './callback';
 import { getPersistence } from './persistence';
-import { messageAwareness, messageSync } from '../message';
+import { messageAwareness, messageCustom, messageSync } from '../message';
 
 const wsReadyStateConnecting = 0;
 const wsReadyStateOpen = 1;
@@ -133,7 +132,7 @@ class WSSharedDoc extends Y.Doc implements WSSharedDocInterface {
 export const getYDoc = (
 	docname: string,
 	gc: boolean = true,
-	initialValue?: Element,
+	onInitialValue?: (content: Y.XmlElement) => Promise<void> | void,
 	callback?: UpdateCallback,
 ): WSSharedDocInterface =>
 	map.setIfUndefined(docs, docname, () => {
@@ -141,7 +140,7 @@ export const getYDoc = (
 		doc.gc = gc;
 		const persistence = getPersistence();
 		if (persistence !== null) {
-			persistence.bindState(docname, doc, initialValue);
+			persistence.bindState(docname, doc, onInitialValue);
 		}
 		docs.set(docname, doc);
 		return doc;
@@ -247,7 +246,6 @@ const send = (
 interface SetupWSConnectionOptions {
 	docName?: string;
 	gc?: boolean;
-	initialValue?: Element;
 	pingTimeout?: number;
 	callback?: UpdateCallback;
 }
@@ -260,13 +258,24 @@ export const setupWSConnection = (
 	const {
 		docName = req.url!.slice(1).split('?')[0],
 		gc = true,
-		initialValue,
 		pingTimeout = 30000,
 		callback,
 	} = options ?? {};
 	conn.binaryType = 'arraybuffer';
 	// get doc, initialize if it does not exist yet
-	const doc = getYDoc(docName, gc, initialValue, callback);
+	const doc = getYDoc(
+		docName,
+		gc,
+		() => {
+			const encoder = encoding.createEncoder();
+			encoding.writeVarUint(encoder, messageCustom);
+			encoding.writeAny(encoder, {
+				action: 'initValue',
+			});
+			send(doc, conn, encoding.toUint8Array(encoder));
+		},
+		callback,
+	);
 	doc.conns.set(conn, new Set());
 	// listen and reply to events
 	conn.on('message', (message: ArrayBuffer) =>

@@ -5,7 +5,7 @@ import { toCardValue } from './to-card-value';
 import { CARD_KEY } from '../../constants';
 import { unescape } from '../../utils';
 
-export const toValue = (node: Node) => {
+export const toValue = (node: Node, filter?: (node: Node) => false | void) => {
 	if (Text.isText(node)) {
 		const { text } = node;
 		return unescape(text)
@@ -13,6 +13,7 @@ export const toValue = (node: Node) => {
 			.replace(/\u200b/g, '');
 	} else if (Element.isElement(node)) {
 		const { type, children } = node;
+		if (filter && filter(node) === false) return '';
 		const isCard = node[CARD_KEY];
 		if (isCard) return toCardValue(node);
 		let element = `<${type}`;

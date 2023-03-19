@@ -21,6 +21,7 @@ import {
 	EditorInterface,
 	CardInterface,
 	Path,
+	Node as ModelNode,
 } from '@aomao/engine';
 
 export interface MarkRangeOptions extends PluginOptions {
@@ -106,6 +107,7 @@ export default class<
 			editor.on('change', this.onChange);
 			editor.on('select', this.onSelectionChange);
 			editor.on('parse:value', this.parseValue);
+			editor.on('parse:node', this.parseNode);
 			editor.on('afterSetValue', this.onAfterSetValue);
 			const keys = optionKeys.map((key) => this.getPreviewName(key));
 			editor.history.onFilter((op) => {
@@ -159,6 +161,13 @@ export default class<
 		const key = node.attributes(this.MARK_KEY);
 		if (!!key) {
 			atts[DATA_TRANSIENT_ATTRIBUTES] = this.getPreviewName(key);
+		}
+	};
+
+	parseNode = (node: ModelNode) => {
+		const key = node[this.MARK_KEY];
+		if (!!key) {
+			node[DATA_TRANSIENT_ATTRIBUTES] = this.getPreviewName(key);
 		}
 	};
 
@@ -942,6 +951,7 @@ export default class<
 			editor.off('change', this.onChange);
 			editor.off('select', this.onSelectionChange);
 			editor.off('parse:value', this.parseValue);
+			editor.off('parse:node', this.parseNode);
 			editor.off('afterSetValue', this.onAfterSetValue);
 		} else if (isView(editor)) {
 			editor.off(`${PLUGIN_NAME}:set-range`, this.onSelectionChange);

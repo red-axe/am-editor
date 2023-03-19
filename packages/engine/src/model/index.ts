@@ -270,11 +270,14 @@ const createModel = (engine: EngineInterface, root: Element) => {
 			return element.html().replace(/\u200b/g, '');
 		},
 		toValue: (node) => {
+			const filter = (node: Node) => {
+				return engine.trigger('parse:node', node);
+			};
 			if (!node)
 				return model.root.children
-					.map((child) => toValue(child))
+					.map((child) => toValue(child, filter))
 					.join('');
-			return toValue(node);
+			return toValue(node, filter);
 		},
 		toText: (node, intoCard) => {
 			if (!node)

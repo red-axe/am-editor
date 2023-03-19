@@ -11,12 +11,15 @@ import {
 	encodeCardValue,
 	READY_CARD_KEY,
 	CARD_VALUE_KEY,
+	Element,
+	Node,
 } from '@aomao/engine';
 import MentionComponent, { MentionValue } from './component';
 import locales from './locales';
 import { MentionOptions } from './types';
 
 const PARSER_VALUE = 'parse:value';
+const PARSER_NODE = 'parse:node';
 const PARSER_HTML = 'parse:html';
 const PASTE_SCHEMA = 'paste:schema';
 const PASTE_EACH = 'paste:each';
@@ -32,6 +35,7 @@ class MentionPlugin<
 	init() {
 		const editor = this.editor;
 		editor.on(PARSER_VALUE, this.paserValue);
+		editor.on(PARSER_NODE, this.paserNode);
 		editor.on(PARSER_HTML, this.parseHtml);
 		editor.on(PASTE_EACH, this.pasteHtml);
 		editor.on(PASTE_SCHEMA, this.pasteSchema);
@@ -47,6 +51,17 @@ class MentionPlugin<
 			node.attributes('name') === MentionComponent.cardName
 		) {
 			const value = node.attributes('value');
+			const cardValue = decodeCardValue(value);
+			if (!cardValue || !cardValue['name']) return false;
+		}
+		return true;
+	};
+	paserNode = (node: Node) => {
+		if (
+			Element.isElement(node) &&
+			node[CARD_KEY] === MentionComponent.cardName
+		) {
+			const value = node[CARD_VALUE_KEY];
 			const cardValue = decodeCardValue(value);
 			if (!cardValue || !cardValue['name']) return false;
 		}
@@ -195,6 +210,7 @@ class MentionPlugin<
 	destroy() {
 		const editor = this.editor;
 		editor.off(PARSER_VALUE, this.paserValue);
+		editor.off(PARSER_NODE, this.paserNode);
 		editor.off(PARSER_HTML, this.parseHtml);
 		editor.off(PASTE_EACH, this.pasteHtml);
 		editor.off(PASTE_SCHEMA, this.pasteSchema);

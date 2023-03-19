@@ -14,6 +14,7 @@ import {
 	messageQueryAwareness,
 	messageAwareness,
 	messageAuth,
+	messageCustom,
 } from './message';
 
 type MessageHandler = (
@@ -113,6 +114,16 @@ messageHandlers[messageAuth] = (
 	);
 };
 
+messageHandlers[messageCustom] = (
+	_encoder,
+	decoder,
+	provider,
+	_emitSynced,
+	_messageType,
+) => {
+	provider.emit('customMessage', [decoding.readAny(decoder)]);
+};
+
 // @todo - this should depend on awareness.outdatedTime
 const messageReconnectTimeout = 30000;
 
@@ -132,7 +143,7 @@ const readMessage = (
 	const encoder = encoding.createEncoder();
 	const messageType = decoding.readVarUint(decoder);
 	const messageHandler = provider.messageHandlers[messageType];
-	if (/** @type {any} */ messageHandler) {
+	if (messageHandler) {
 		messageHandler(encoder, decoder, provider, emitSynced, messageType);
 	} else {
 		console.error('Unable to compute message');
@@ -412,23 +423,6 @@ export class WebsocketProvider extends Observable<string> {
 		};
 
 		/**
-		 * When dealing with subdocs, it is possible to race the websocket connection
-		 * where we are ready to load subdocuments but the connection is not yet ready to send
-		 * This function is just a quick and dirty retry function for when we can't be sure
-		 * if the connection is present
-		 * @param message
-		 * @param callback
-		 */
-		const waitSend = (message: any, callback: Function) => {
-			waitForConnection(() => {
-				this.ws?.send(message);
-				if (typeof callback !== 'undefined') {
-					callback();
-				}
-			}, 1000);
-		};
-
-		/**
 		 * @param {any} changed
 		 * @param {any} _origin
 		 */
@@ -595,5 +589,12 @@ export class WebsocketProvider extends Observable<string> {
 			setupWS(this);
 			this.connectBc();
 		}
+	}
+
+	broadcastCustomMessage(message: Record<string, any>) {
+		const encoder = encoding.createEncoder();
+		encoding.writeVarUint(encoder, messageCustom);
+		encoding.writeAny(encoder, message);
+		broadcastMessage(this, encoding.toUint8Array(encoder));
 	}
 }

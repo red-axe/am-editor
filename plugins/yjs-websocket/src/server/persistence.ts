@@ -16,7 +16,7 @@ interface Persistence {
 	bindState: (
 		docname: string,
 		doc: WSSharedDoc,
-		initialValue?: Element,
+		onInitialValue?: (content: Y.XmlElement) => Promise<void> | void,
 	) => void;
 	writeState: (
 		docname: string,
@@ -53,41 +53,30 @@ export const initPersistence = async (
 	options: PersistenceOptions,
 	contentField = 'content',
 ) => {
-	let ldb: PersistenceProvider | null = null;
+	let db: PersistenceProvider | null = null;
 	const { provider, ...others } = options;
 	if (provider === 'leveldb') {
 		const { dir = './db' } = others as LeveldbPersistenceOptions;
 		console.info('Persisting documents to "' + dir + '"');
-		ldb = new LeveldbPersistence(dir);
+		db = new LeveldbPersistence(dir);
 	} else if (provider === 'mongodb') {
 		const { url, flushSize, ...opts } = others as Omit<
 			MongodbPersistenceOptions,
 			'provider'
 		>;
-		ldb = new MongodbPersistence(url, { flushSize }, opts);
+		db = new MongodbPersistence(url, { flushSize }, opts);
 
 		console.info('Persisting documents to mongodb');
 	}
-	if (!ldb) throw new Error('No persistence provider found');
+	if (!db) throw new Error('No persistence provider found');
 
 	persistence = {
-		provider: ldb,
-		bindState: async (
-			docName,
-			ydoc,
-			initialValue = {
-				type: 'p',
-				children: [
-					{
-						type: 'br',
-						children: [],
-					},
-				],
-			},
-		) => {
-			const persistedYdoc = await ldb!.getYDoc(docName);
+		provider: db,
+		bindState: async (docName, ydoc, onInitialValue) => {
+			if (!db) return;
+			const persistedYdoc = await db.getYDoc(docName);
 			const newUpdates = Y.encodeStateAsUpdate(ydoc);
-			ldb!.storeUpdate(docName, newUpdates);
+			db.storeUpdate(docName, newUpdates);
 			const content = persistedYdoc.get(
 				contentField,
 				Y.XmlElement,
@@ -99,16 +88,12 @@ export const initPersistence = async (
 
 			Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
 			ydoc.on('update', (update) => {
-				ldb!.storeUpdate(docName, update);
+				db?.storeUpdate(docName, update);
 			});
 
 			// init empty content
 			if (content._length === 0 && updateContent._length === 0) {
-				ydoc.transact(() => {
-					updateContent.insert(0, [
-						editorElementToYElement(initialValue),
-					]);
-				});
+				if (onInitialValue) await onInitialValue(updateContent);
 			}
 		},
 		writeState: async (docName, ydoc) => {

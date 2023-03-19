@@ -133,6 +133,9 @@ class Engine<T extends EngineOptions = EngineOptions>
 		this.change.range.blur();
 	}
 
+	/**
+	 * @deprecated 请使用 model.toValue 性能更好
+	 */
 	getValue(ignoreCursor: boolean = false) {
 		const value = this.change.getValue({ ignoreCursor });
 		return ignoreCursor ? Selection.removeTags(value) : value;
@@ -166,6 +169,9 @@ class Engine<T extends EngineOptions = EngineOptions>
 		});
 	}
 
+	/**
+	 * @deprecated 请使用 model.toHTML 性能更好
+	 */
 	getHtml(): string {
 		const node = $(this.container[0].cloneNode(true));
 		node.removeAttributes(DATA_CONTENTEDITABLE_KEY);
@@ -242,6 +248,9 @@ class Engine<T extends EngineOptions = EngineOptions>
 		return cloneDeep(this.model.root);
 	}
 
+	/**
+	 * @deprecated 请使用 model.toText 性能更好
+	 */
 	getText(includeCard?: boolean) {
 		return new Parser(this.container, this).toText(
 			this.schema,
