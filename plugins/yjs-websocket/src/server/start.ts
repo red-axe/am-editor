@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import http from 'http';
-import { setupWSConnection, UpdateCallback } from './utils';
+import { getYDoc, setupWSConnection, UpdateCallback } from './utils';
 import { initPersistence, PersistenceOptions } from './persistence';
 import { WSSharedDoc } from './types';
 
@@ -11,15 +11,13 @@ export interface ServerOptions {
 	host: string;
 	// http server port
 	port: number;
-	// http server request listener
-	requestListener?: http.RequestListener;
 	// 效验
-	auth?: (
+	auth: (
 		request: http.IncomingMessage,
 		ws: WebSocket,
-	) => Promise<void | { code: number; data: string | Buffer }>;
-	// 连接回调
-	onConnection?: (doc: WSSharedDoc, conn: WebSocket.WebSocket) => void;
+	) => Promise<{ code: number; data: string } | string>;
+	// http server request listener
+	requestListener?: http.RequestListener;
 	// 持久化选项，false 为不持久化
 	persistenceOptions?: PersistenceOptions | false;
 	// 文档内容字段，默认为 content
@@ -30,11 +28,16 @@ export interface ServerOptions {
 
 const SERVER_OPTIONS_WEAKMAP = new WeakMap<http.Server, ServerOptions>();
 
+declare module 'http' {
+	interface Server {
+		getYDoc: (name: string) => WSSharedDoc;
+	}
+}
+
 export const startServer = (options: ServerOptions) => {
 	const {
-		auth = () => Promise.resolve(),
+		auth,
 		requestListener,
-		onConnection,
 		host,
 		port,
 		persistenceOptions = { provider: 'leveldb' },
@@ -50,12 +53,14 @@ export const startServer = (options: ServerOptions) => {
 	});
 
 	SERVER_OPTIONS_WEAKMAP.set(server, options);
-
+	const DOC_NAME_WEAKMAP = new WeakMap<WebSocket.WebSocket, string>();
 	wss.on('connection', (conn, req) => {
 		const { callback } = SERVER_OPTIONS_WEAKMAP.get(server) ?? {};
+		const name = DOC_NAME_WEAKMAP.get(conn);
+		if (!name) throw new Error('doc name not found');
 		setupWSConnection(conn, req, {
 			callback,
-			onConnection,
+			docname: name,
 		});
 	});
 
@@ -64,9 +69,12 @@ export const startServer = (options: ServerOptions) => {
 		// See https://github.com/websockets/ws#client-authentication
 		const handleAuth = (ws: WebSocket) => {
 			auth(request, ws).then((res) => {
-				if (res && res.code !== 200) {
-					ws.close(res.code, res.data);
+				const resObject =
+					typeof res === 'object' ? res : { code: 200, data: res };
+				if (resObject.code !== 200) {
+					ws.close(resObject.code, resObject.data);
 				} else {
+					DOC_NAME_WEAKMAP.set(ws, resObject.data);
 					wss.emit('connection', ws, request);
 				}
 			});
@@ -81,5 +89,11 @@ export const startServer = (options: ServerOptions) => {
 	server.listen(port, host, () => {
 		console.log(`running at '${host}' on port ${port}`);
 	});
+
+	server.getYDoc = (name) => {
+		const { callback } = SERVER_OPTIONS_WEAKMAP.get(server) ?? {};
+		return getYDoc(name, undefined, undefined, callback);
+	};
+
 	return server;
 };

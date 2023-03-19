@@ -128,6 +128,16 @@ class WSSharedDoc extends Y.Doc implements WSSharedDocInterface {
 		send(this, conn, encoding.toUint8Array(encoder));
 	}
 
+	broadcastCustomMessage(message: Record<string, any>) {
+		const encoder = encoding.createEncoder();
+		encoding.writeVarUint(encoder, messageCustom);
+		encoding.writeAny(encoder, message);
+		const buff = encoding.toUint8Array(encoder);
+		this.conns.forEach((_, conn) => {
+			send(this, conn, buff);
+		});
+	}
+
 	destroy(): void {
 		super.destroy();
 	}
@@ -139,7 +149,7 @@ class WSSharedDoc extends Y.Doc implements WSSharedDocInterface {
 export const getYDoc = (
 	docname: string,
 	gc: boolean = true,
-	onInitialValue?: (content: Y.XmlElement) => Promise<void> | void,
+	onInitialValue?: (doc: WSSharedDocInterface) => Promise<void> | void,
 	callback?: UpdateCallback,
 ): WSSharedDocInterface =>
 	map.setIfUndefined(docs, docname, () => {
@@ -251,15 +261,13 @@ const send = (
 };
 
 interface SetupWSConnectionOptions {
-	docName?: string;
+	docname: string;
 	gc?: boolean;
 	pingTimeout?: number;
 	callback?: UpdateCallback;
-	onConnection?: (
-		doc: WSSharedDocInterface,
-		conn: WebSocket.WebSocket,
-	) => void;
 }
+
+const INIT_VALUE_WAS_SENT = new WeakSet<Y.Doc>();
 
 export const setupWSConnection = (
 	conn: WebSocket.WebSocket,
@@ -267,28 +275,27 @@ export const setupWSConnection = (
 	options?: SetupWSConnectionOptions,
 ) => {
 	const {
-		docName = req.url!.slice(1).split('?')[0],
+		docname,
 		gc = true,
 		pingTimeout = 30000,
 		callback,
-		onConnection,
-	} = options ?? {};
+	} = options ?? { docname: 'default' };
 	conn.binaryType = 'arraybuffer';
 	// get doc, initialize if it does not exist yet
 	const doc = getYDoc(
-		docName,
+		docname,
 		gc,
-		() => {
-			doc.sendCustomMessage(conn, {
-				action: 'initValue',
-			});
+		(doc) => {
+			if (!INIT_VALUE_WAS_SENT.has(doc)) {
+				INIT_VALUE_WAS_SENT.add(doc);
+				doc.sendCustomMessage(conn, {
+					action: 'initValue',
+				});
+			}
 		},
 		callback,
 	);
 	doc.conns.set(conn, new Set());
-	if (onConnection) {
-		onConnection(doc, conn);
-	}
 	// listen and reply to events
 	conn.on('message', (message: ArrayBuffer) =>
 		messageListener(conn, doc, new Uint8Array(message)),

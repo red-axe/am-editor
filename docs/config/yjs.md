@@ -110,10 +110,11 @@ startServer({
 	host: string;
 	// Port to listen on, default is 1234
 	port: number;
-	// http server request listener
-	requestListener?: http.RequestListener;
 	// Custom authentication, connection will be terminated if code !== 200 is returned
-	auth?: (request: http.IncomingMessage, ws: WebSocket) => Promise<void | { code: number; data: string | Buffer }>;
+	// The document ID needs to be returned, and by default, it is extracted from the ws link in the format of ws:domain.com/docname, where docname is the document ID.
+	auth?: (request: http.IncomingMessage, ws: WebSocket) => Promise<void | { code: number; data: string |
+	// http server request listener
+	requestListener?: http.RequestListener;Buffer }>;
 	// Persistence options, false means no persistence
 	/**
 	* Default is leveldb
@@ -132,7 +133,88 @@ startServer({
 	contentField?: string;
 	// Update callback
 	callback?: UpdateCallback;
-	// Connection callback
-	onConnection?: (doc: WSSharedDoc, conn: WebSocket.WebSocket) => void;
 })
+```
+
+#### Configuration Options
+
+##### `auth` Custom authentication
+
+The connection will be terminated when code !== 200.
+
+The document ID needs to be returned, and by default, it is extracted from the ws link in the format of ws:domain.com/docname, where docname is the document ID.
+
+```ts
+const auth = async (request: http.IncomingMessage, ws: WebSocket) => {
+	const { url } = request;
+	const docname = url.split('/').pop();
+	if (!docname) return { code: 400, data: 'Not found' };
+	return docname;
+};
+
+startServer({ auth });
+```
+
+##### `requestListener` is used for customizing the request listener of the http server, which can be used for custom routing.
+
+```ts
+const app = express();
+app.get('/doc/:name', (req, res) => {
+	res.send('hello world');
+});
+
+startServer(app);
+```
+
+##### `persistenceOptions` is used for customizing the persistence method. Currently supports leveldb and mongodb.
+
+```ts
+startServer({
+	persistenceOptions: {
+		provider: 'leveldb',
+		dir: './db',
+	},
+});
+```
+
+```ts
+startServer({
+	persistenceOptions: {
+		provider: 'mongodb',
+		url: 'mongodb://localhost:27017',
+	},
+});
+```
+
+##### `contentField` is used to customize the field name of the document content. The default is `content`.
+
+```ts
+startServer({
+	contentField: 'content',
+});
+```
+
+##### `callback` is used for customizing the update callback.
+
+```ts
+startServer({
+	callback: {
+		// Or use `action: string` to receive post requests via a url
+		action: (data: Record<string, any>) => {
+			// `data` is the updated data
+		},
+		// Timeout duration, defaulting to 5000ms
+		timeout: 5000;
+		// ContentType can be "Array" | "Map" | "Text" | "XmlFragment"
+		// Corresponding data types to be sent
+		objects?: Record<string, ContentType>;
+	},
+});
+```
+
+##### `startServer` returns an `http.Server` instance, and you can get the corresponding `Y.Doc` instance via `server.getYDoc(name)`.
+
+```ts
+const server = startServer();
+const doc = server.getYDoc('docname');
 ```

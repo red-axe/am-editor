@@ -16,7 +16,7 @@ interface Persistence {
 	bindState: (
 		docname: string,
 		doc: WSSharedDoc,
-		onInitialValue?: (content: Y.XmlElement) => Promise<void> | void,
+		onInitialValue?: (doc: WSSharedDoc) => Promise<void> | void,
 	) => void;
 	writeState: (
 		docname: string,
@@ -72,11 +72,11 @@ export const initPersistence = async (
 
 	persistence = {
 		provider: db,
-		bindState: async (docName, ydoc, onInitialValue) => {
+		bindState: async (docname, ydoc, onInitialValue) => {
 			if (!db) return;
-			const persistedYdoc = await db.getYDoc(docName);
+			const persistedYdoc = await db.getYDoc(docname);
 			const newUpdates = Y.encodeStateAsUpdate(ydoc);
-			db.storeUpdate(docName, newUpdates);
+			db.storeUpdate(docname, newUpdates);
 			const content = persistedYdoc.get(
 				contentField,
 				Y.XmlElement,
@@ -88,15 +88,15 @@ export const initPersistence = async (
 
 			Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
 			ydoc.on('update', (update) => {
-				db?.storeUpdate(docName, update);
+				db?.storeUpdate(docname, update);
 			});
 
 			// init empty content
 			if (content._length === 0 && updateContent._length === 0) {
-				if (onInitialValue) await onInitialValue(updateContent);
+				if (onInitialValue) await onInitialValue(ydoc);
 			}
 		},
-		writeState: async (docName, ydoc) => {
+		writeState: async (docname, ydoc) => {
 			// This is called when all connections to the document are closed.
 			// In the future, this method might also be called in intervals or after a certain number of updates.
 			return new Promise((resolve) => {
