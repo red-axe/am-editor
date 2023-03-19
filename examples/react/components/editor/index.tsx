@@ -255,7 +255,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 		return () => {
 			engine.current?.off('card:maximize', onMaximize);
 			engine.current?.off('card:minimize', onMinimize);
-			provider?.off;
+			provider?.off('customMessage', handleCustomMessage);
 			provider?.disconnect();
 		};
 	}, [engine, doc, yjs, provider]);
