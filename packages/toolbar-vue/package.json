@@ -1,6 +1,6 @@
 {
     "name": "@aomao/toolbar-vue",
-    "version": "2.10.1",
+    "version": "2.10.2",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
