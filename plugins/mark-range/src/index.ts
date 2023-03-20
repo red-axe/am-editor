@@ -779,9 +779,11 @@ export default class<
 		const parser = new Parser(container, editor, undefined, false);
 		const { schema, conversion } = editor;
 		if (!range) {
+			const newValue = value ?? parser.toValue(schema, conversion);
+			editor.destroy();
 			container.remove();
 			return {
-				value: value ? value : parser.toValue(schema, conversion),
+				value: newValue,
 				paths: [],
 			};
 		}
@@ -838,7 +840,7 @@ export default class<
 				}
 			}
 		});
-		value = parser.toValue(schema, conversion);
+		value = value ?? parser.toValue(schema, conversion);
 		editor.destroy();
 		container.remove();
 		return {
@@ -881,8 +883,10 @@ export default class<
 		const parser = new Parser(container, editor, undefined, false);
 		const { schema, conversion } = editor;
 		if (!range) {
+			const newValue = value ? value : parser.toValue(schema, conversion);
+			editor.destroy();
 			container.remove();
-			return value ? value : parser.toValue(schema, conversion);
+			return newValue;
 		}
 
 		range.select(container, true).collapse(true);

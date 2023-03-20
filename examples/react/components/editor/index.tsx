@@ -121,7 +121,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 	const autoSave = useCallback(() => {
 		if (saveTimeout.current) clearTimeout(saveTimeout.current);
 		saveTimeout.current = setTimeout(() => {
-			const value = engine.current?.getValue() || '';
+			const value = engine.current?.model.toValue() || '';
 			save(value);
 		}, 60000);
 	}, [save]);
@@ -131,8 +131,8 @@ const EditorComponent: React.FC<EditorProps> = ({
 		if (!engine.current) return;
 		console.log(engine.current.getHtml());
 		//获取异步的值，有些组件可能还在处理中，比如正在上传
-		engine.current
-			.getValueAsync(false, (pluginName, card) => {
+		engine.current.model
+			.toValueAsync(undefined, (pluginName, card) => {
 				console.log(`${pluginName} 正在等待...`, card?.getValue());
 			})
 			.then((value) => {
@@ -145,7 +145,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 
 	useEffect(() => {
 		const unloadSave = () => {
-			save(engine.current?.getValue() || '');
+			save(engine.current?.model.toValue() || '');
 		};
 		window.addEventListener('beforeunload', unloadSave);
 		return () => {
@@ -169,7 +169,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 				if (trigger !== 'remote') autoSave();
 				if (props.onChange) props.onChange(trigger);
 				if (IS_DEV) {
-					const value = engine.current?.getValue();
+					const value = engine.current?.model.toValue();
 					// 获取编辑器的值
 					console.log(`value ${trigger} update:`, value);
 					// 获取当前所有at插件中的名单
@@ -180,12 +180,6 @@ const EditorComponent: React.FC<EditorProps> = ({
 							'getList',
 						),
 					);
-					// 获取编辑器的html
-					console.log('html:', engine.current?.getHtml());
-					// 获取编辑器的json
-					console.log('json:', engine.current?.getJsonValue());
-					// 获取编辑器的text
-					console.log('text:', engine.current?.getText());
 					// 获取model的html
 					console.log('model-html:', engine.current?.model?.toHTML());
 					// 获取model的value

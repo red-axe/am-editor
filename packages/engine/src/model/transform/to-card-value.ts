@@ -35,6 +35,6 @@ export const toCardValue = (node: Node) => {
 		if (value === undefined) continue;
 		card += `${name}="${attributes[name]}" `;
 	}
-	card += '/>';
+	card += '></card>';
 	return card;
 };

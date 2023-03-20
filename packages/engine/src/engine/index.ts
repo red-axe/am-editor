@@ -141,6 +141,12 @@ class Engine<T extends EngineOptions = EngineOptions>
 		return ignoreCursor ? Selection.removeTags(value) : value;
 	}
 
+	/**
+	 * @deprecated 请使用 model.toValueAsync 性能更好
+	 * @param ignoreCursor
+	 * @param callback
+	 * @returns
+	 */
 	async getValueAsync(
 		ignoreCursor: boolean = false,
 		callback?: (
@@ -319,6 +325,7 @@ class Engine<T extends EngineOptions = EngineOptions>
 		this.hotkey.destroy();
 		this.typing.destroy();
 		this.model.destroy();
+		this.history.reset();
 		super.destroy();
 	}
 }
