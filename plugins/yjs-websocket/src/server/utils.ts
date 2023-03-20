@@ -128,13 +128,16 @@ class WSSharedDoc extends Y.Doc implements WSSharedDocInterface {
 		send(this, conn, encoding.toUint8Array(encoder));
 	}
 
-	broadcastCustomMessage(message: Record<string, any>) {
+	broadcastCustomMessage(
+		message: Record<string, any>,
+		conn?: WebSocket.WebSocket,
+	) {
 		const encoder = encoding.createEncoder();
 		encoding.writeVarUint(encoder, messageCustom);
 		encoding.writeAny(encoder, message);
 		const buff = encoding.toUint8Array(encoder);
-		this.conns.forEach((_, conn) => {
-			send(this, conn, buff);
+		this.conns.forEach((_, _conn) => {
+			if (conn !== _conn) send(this, _conn, buff);
 		});
 	}
 
@@ -211,6 +214,10 @@ const messageListener = (
 					conn,
 				);
 				break;
+			}
+			case messageCustom: {
+				const message = decoding.readAny(decoder);
+				doc.broadcastCustomMessage(message, conn);
 			}
 		}
 	} catch (err) {

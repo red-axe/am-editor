@@ -1,7 +1,7 @@
 import EventEmitter2 from 'eventemitter2';
 import cloneDeep from 'lodash/cloneDeep';
 import { CARD_VALUE_KEY, READY_CARD_KEY } from '../constants';
-import { EngineInterface, NodeInterface } from '../types';
+import { CardInterface, EngineInterface, NodeInterface } from '../types';
 import { applyToDOM, findDOMByPath } from './apply-to-dom';
 import { DOMNode } from './dom';
 import { Element } from './element';
@@ -40,6 +40,14 @@ export interface Model {
 	toDOM(node?: Node): DOMNode;
 	toHTML(node?: Node): string;
 	toValue(node?: Node): string;
+	toValueAsync(
+		node?: Node,
+		callback?: (
+			name: string,
+			card?: CardInterface,
+			...args: any
+		) => boolean | number | void,
+	): Promise<string>;
 	toText(node?: Node, intoCard?: boolean): string;
 	destroy(): void;
 }
@@ -278,6 +286,27 @@ const createModel = (engine: EngineInterface, root: Element) => {
 					.map((child) => toValue(child, filter))
 					.join('');
 			return toValue(node, filter);
+		},
+
+		toValueAsync: (node, callback) => {
+			return new Promise(async (resolve, reject) => {
+				for (const pluginName in engine.plugin.components) {
+					const plugin = engine.plugin.components[pluginName];
+					const result = await new Promise((resolve) => {
+						if (plugin.waiting) {
+							plugin
+								.waiting(callback)
+								.then(() => resolve(true))
+								.catch(resolve);
+						} else resolve(true);
+					});
+					if (typeof result === 'object') {
+						reject(result);
+						return;
+					}
+				}
+				resolve(model.toValue(node));
+			});
 		},
 		toText: (node, intoCard) => {
 			if (!node)
