@@ -16,12 +16,12 @@ export const toHTML = (node: Node) => {
 			if (key === 'type' || key === 'children') continue;
 			element += ` ${key}="${value}"`;
 		}
-		const isZeroLength = children.length === 0;
-		element += isZeroLength ? '' : '>';
+		const isVoid = Node.isVoid(node);
+		element += isVoid ? '' : '>';
 		for (const child of children) {
 			element += toHTML(child);
 		}
-		element += isZeroLength ? ' />' : `</${type}>`;
+		element += isVoid ? ' />' : `</${type}>`;
 		return element.replace(/\u200b/g, '');
 	}
 	throw new Error('Cannot convert node to value');

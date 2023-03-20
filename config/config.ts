@@ -9,6 +9,7 @@ export default defineConfig({
 	outputPath: 'docs-dist',
 	hash: true,
 	mode: 'site',
+	dynamicImport: {},
 	locales: [
 		['en-US', 'English'],
 		['zh-CN', '中文'],
