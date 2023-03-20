@@ -1,6 +1,6 @@
 {
   "name": "@aomao/engine",
-  "version": "2.10.4",
+  "version": "2.10.5",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
