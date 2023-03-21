@@ -477,7 +477,7 @@ class RangeColoring {
 					setTimeout(() => {
 						getRect();
 					}, 20);
-				} else if (mask) {
+				} else if (mask && mask.length > 0) {
 					mask.get<HTMLElement>()!.style.cssText =
 						cssText +
 						`height: ${nodeRect.height}px; width: ${nodeRect.width}px;`;
