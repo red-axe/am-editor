@@ -249,7 +249,7 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 		let { previousSibling, nextSibling } = mutationNode;
 		const parentNode = Node.findNode(node);
 		if (!parentNode) {
-			throw new Error('parentNode is null');
+			continue;
 		}
 		if (!Element.isElement(parentNode))
 			throw new Error('parentNode is not an element');

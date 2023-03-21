@@ -39,31 +39,32 @@ const listToText = (node: Element) => {
 	const start = node['start'];
 	const classz = node['class'];
 	if (classz && classz.includes('data-list-task')) return elementToText(node);
-	let text = '';
 
 	const indent = getIndent(node);
 	const style = getListType(node.type, indent);
+	const space = toIndent(node);
 	let typeText = toIndent(node);
-	if (node.type === 'ol') {
-		const index = start ? parseInt(start) : 1;
-		typeText = `${getListStyle(style, index)}. `;
-	} else {
+	const isOrder = node.type === 'ol';
+	const index = start ? parseInt(start) : 1;
+	if (!isOrder) {
 		typeText = `${getListStyle(style)} `;
 	}
-
-	for (const child of node.children) {
+	let text = '';
+	node.children.forEach((child, _index) => {
 		if (Element.isElement(child)) {
 			if (child.type === 'li') {
-				text += typeText + elementToText(child);
+				if (isOrder) {
+					typeText = `${getListStyle(style, index + _index)}. `;
+				}
+				text += space + typeText + elementToText(child);
 			} else {
-				text += elementToText(child);
+				text += space + elementToText(child);
 			}
 		} else {
 			text += toText(child);
 		}
-	}
+	});
 
-	console.log(node);
 	return text;
 };
 
@@ -75,7 +76,7 @@ const elementToText = (node: Element, intoCard = false) => {
 	if (node[CARD_KEY] === 'checkbox') {
 		const value = decodeCardValue(node[CARD_VALUE_KEY]);
 		const checked = value.checked;
-		return (checked ? '✅' : '🔲') + ' ';
+		return checked ? '✅' : '🔲';
 	}
 	if (intoCard || !node[CARD_KEY] || node[CARD_EDITABLE_KEY] === 'true') {
 		for (const child of children) {
