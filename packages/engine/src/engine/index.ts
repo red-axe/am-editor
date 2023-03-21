@@ -242,8 +242,8 @@ class Engine<T extends EngineOptions = EngineOptions>
 	}
 
 	setJsonValue(value: Element, callback?: (count: number) => void) {
-		const html = this.model.toHTML(value);
-		this.change.setValue(html, undefined, callback);
+		const modelValue = this.model.toValue(value);
+		this.change.setValue(modelValue, undefined, callback);
 		this.normalize();
 		this.nodeId.generateAll(this.container);
 		this.initDocOnReadonly();
