@@ -6,7 +6,9 @@ export default (options: Partial<ServerOptions> = {}) => {
 		port = parseInt(process.env.PORT || '1234') || 1234,
 		auth = (request) =>
 			request.url
-				? Promise.resolve(request.url.slice(1).split('?')[0] || '')
+				? Promise.resolve(
+						request.url.split('?')[0].split('/').pop() || '',
+				  )
 				: Promise.reject('auth not implemented'),
 	} = options;
 	return startServer({
