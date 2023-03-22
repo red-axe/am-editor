@@ -696,7 +696,7 @@ export default class Paste {
 				this.engine.trigger('paste:each', node);
 			// 删除非block节点的换行 \r\n\r\n<span
 			if (node.isText()) {
-				const text = node.text();
+				let text = node.text();
 				if (/^(\r|\n)+$/.test(text)) {
 					const prev = node.prev();
 					const next = node.next();
@@ -711,13 +711,24 @@ export default class Paste {
 					)
 						node.remove();
 				}
-				const match = /((\n)+)/.exec(text);
-				if (match && match.index > 0 && match.index < text.length - 1) {
-					const nextReg = node.get<Text>()!.splitText(match.index);
+				let match = /((\n)+)/.exec(text);
+				let matchNode = node;
+				while (
+					match &&
+					match.index > 0 &&
+					match.index < text.length - 1
+				) {
+					const nextReg = matchNode
+						.get<Text>()!
+						.splitText(match.index);
 					const endReg = nextReg.splitText(match[0].length);
-					node.after(nextReg);
+					matchNode.after(nextReg);
 					nextReg.after(endReg);
-					if (!node.text()) node.remove();
+					if (!matchNode.text()) matchNode.remove();
+					const endNode = $(endReg);
+					matchNode = endNode;
+					text = endNode.text();
+					match = /((\n)+)/.exec(text);
 				}
 			}
 			// 删除包含Card的 pre 标签
