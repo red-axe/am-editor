@@ -286,7 +286,7 @@ class HistoryModel implements HistoryInterface {
 		ops.forEach((op) => {
 			isSave = true;
 			if (this.filterEvents.some((filter) => filter(op))) {
-				if (this.actionOps.length > 0 && !op['nl'])
+				if (this.actionOps.length > 0 && !op.undoable)
 					this.actionOps[this.actionOps.length - 1].ops?.push(op);
 			} else {
 				this.currentAction.self = true;

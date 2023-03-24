@@ -7,7 +7,7 @@ import Button, { ButtonProps } from '../button';
 import Dropdown, { DropdownProps } from '../dropdown';
 import ColorButton, { ColorButtonProps } from '../color';
 import Collapse, { CollapseProps as CollapseButtonProps } from '../collapse';
-import 'antd/es/popover/style';
+import 'antd/es/popover/style/css';
 import './index.css';
 
 export type GroupButtonProps = {

@@ -4,7 +4,7 @@ import classnames from 'classnames-es-ts';
 import { formatHotkey, isMobile } from '@aomao/engine';
 import type { EngineInterface, Placement } from '@aomao/engine';
 import { autoGetHotkey } from '../utils';
-import 'antd/es/tooltip/style';
+import 'antd/es/tooltip/style/css';
 import './index.css';
 
 export type ButtonProps = {

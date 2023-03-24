@@ -1,8 +1,8 @@
 import React from 'react';
 import Dropdown from 'antd/es/dropdown';
-import 'antd/es/dropdown/style';
+import 'antd/es/dropdown/style/css';
 import Tooltip from 'antd/es/tooltip';
-import 'antd/es/tooltip/style';
+import 'antd/es/tooltip/style/css';
 import Menu from 'antd/es/menu';
 import { MulitLangItem, MulitCodeProps } from '../type';
 import { formateLangStyle } from '../utils/index';

@@ -96,7 +96,7 @@ import type { ToolbarOptions } from '@aomao/toolbar';
 
 import ReactDOM from 'react-dom';
 import Empty from 'antd/es/empty';
-import 'antd/es/empty/style';
+import 'antd/es/empty/style/css';
 import { ImageUploaderOptions } from '@aomao/plugin-image';
 import Mermaid, { MermaidComponent } from '@aomao/plugin-mermaid';
 import React from 'react';

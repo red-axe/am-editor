@@ -3,7 +3,7 @@ import classnames from 'classnames-es-ts';
 import Tooltip from 'antd/es/tooltip';
 import { EngineInterface, formatHotkey, isMobile } from '@aomao/engine';
 import { autoGetHotkey } from '../utils';
-import 'antd/es/tooltip/style';
+import 'antd/es/tooltip/style/css';
 
 export type DropdownListItem = {
 	key: string;

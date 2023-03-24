@@ -4,7 +4,7 @@ import { $, View, ViewInterface, isMobile } from '@aomao/engine';
 import { plugins, cards } from '../editor/config';
 import Loading from '../loading';
 import Context from '../../context';
-import 'antd/es/message/style';
+import 'antd/es/message/style/css';
 import './index.less';
 
 export type ViewProps = {

@@ -54,14 +54,14 @@ redo(): void;
 
 ### `onFilter`
 
-监听过滤存入历史记录的 ops
+监听过滤存入历史记录的 operations
 
 ```ts
 /**
 * 监听过滤存入历史记录堆栈中
 * @param filter true 过滤排除，false 记录到历史堆栈中
 */
-onFilter(filter: (op: Op) => boolean): void
+onFilter(filter: (operation: Operation) => boolean): void
 ```
 
 ### `onSelf`
@@ -73,7 +73,7 @@ onFilter(filter: (op: Op) => boolean): void
 *
 * @param collect 方法 undefined 默认延时保存，true 立即保存，false 立即丢弃。Promise<boolean> 阻拦接下来的所有ops直到返回false或者true
 */
-onSelf(collect: (ops: Op[]) => Promise<boolean> | boolean | undefined): void
+onSelf(collect: (operations: Operation[]) => Promise<boolean> | boolean | undefined): void
 ```
 
 ### `clear`
@@ -98,9 +98,9 @@ saveOp(): void;
 
 ```ts
 /**
- * @param ops 操作集合
+ * @param operations 操作集合
  * */
-handleSelfOps(ops: Op[]): void;
+handleSelfOps(operations: Operation[]): void;
 ```
 
 ### `handleRemoteOps`
@@ -109,9 +109,9 @@ handleSelfOps(ops: Op[]): void;
 
 ```ts
 /**
- * @param ops 操作集合
+ * @param operations 操作集合
  * */
-handleRemoteOps(ops: Op[]): void;
+handleRemoteOps(operations: Operation[]): void;
 ```
 
 ### `getUndoOp`

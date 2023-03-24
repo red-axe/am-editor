@@ -3,10 +3,10 @@ import Avatar from 'antd/es/avatar';
 import Space from 'antd/es/space';
 import { CursorData } from '@aomao/plugin-yjs';
 import { isMobile } from '@aomao/engine';
-import 'antd/es/avatar/style';
-import 'antd/es/space/style';
-import 'antd/es/badge/style';
-import 'antd/es/tooltip/style';
+import 'antd/es/avatar/style/css';
+import 'antd/es/space/style/css';
+import 'antd/es/badge/style/css';
+import 'antd/es/tooltip/style/css';
 import { Popover, Tooltip } from 'antd';
 
 const maxCount = isMobile ? 2 : 5;

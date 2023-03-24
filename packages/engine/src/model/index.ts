@@ -81,7 +81,8 @@ const createModel = (engine: EngineInterface, root: Element) => {
 		engine.trigger('operations', operations);
 		if (
 			operations.find(
-				(op) => op.type === 'set_node' && op[CARD_VALUE_KEY],
+				(op) =>
+					op.type === 'set_node' && op.newProperties[CARD_VALUE_KEY],
 			)
 		) {
 			change.change(false);
