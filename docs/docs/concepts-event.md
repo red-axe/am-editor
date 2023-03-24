@@ -378,15 +378,15 @@ Triggered after the paste action is completed
 () => void
 ```
 
-### `ops`
+### `operations`
 
 Triggered by DOM changes, these operational changes are usually sent to the collaborative server for interaction
 
 ```ts
 /**
- * @param ops operation item
+ * @param operations operation item
  * */
-(ops: Op[]) => void
+(operations: Operation[]) => void
 ```
 
 ### `keydown:enter`

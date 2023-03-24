@@ -378,15 +378,15 @@ view.on('事件名称', '处理方法');
 () => void
 ```
 
-### `ops`
+### `operations`
 
 DOM 改变触发，这些操作改变通常用于发送到协同服务端交互
 
 ```ts
 /**
- * @param ops 操作项
+ * @param operations 操作项
  * */
-(ops: Op[]) => void
+(operations: Operation[]) => void
 ```
 
 ### `keydown:enter`

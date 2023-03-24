@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { TagValue, IType } from './type';
 import Popover from 'antd/es/popover/index';
-import 'antd/es/popover/style';
+import 'antd/es/popover/style/css';
 import Input from 'antd/es/input/index';
-import 'antd/es/input/style';
+import 'antd/es/input/style/css';
 import uniqBy from 'lodash/uniqBy';
 import { EditorInterface } from '@aomao/engine';
 

@@ -1,6 +1,6 @@
 {
 	"name": "@aomao/plugin-mermaid",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "mermaid",
 	"keywords": [
 		"mermaid",
@@ -15,16 +15,16 @@
 	],
 	"author": "18576648902@163.com",
 	"license": "MIT",
-	"homepage": "https://github.com/yanmao-cc/am-editor#readme",
+	"homepage": "https://github.com/big-camel/am-editor#readme",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/yanmao-cc/am-editor.git"
+		"url": "git+https://github.com/big-camel/am-editor.git"
 	},
 	"scripts": {
 		"test": "echo \"Error: run tests from root\" && exit 1"
 	},
 	"bugs": {
-		"url": "https://github.com/yanmao-cc/am-editor/issues"
+		"url": "https://github.com/big-camel/am-editor/issues"
 	},
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",

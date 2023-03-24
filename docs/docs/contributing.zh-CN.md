@@ -12,10 +12,7 @@
 
 ```bash
 $ yarn
-
-//or
-
-$ npm install
+$ lerna bootstrap
 ```
 
 ### 启动项目
@@ -27,8 +24,8 @@ $ yarn start
 ### 启动协同服务
 
 ```bash
-$ cd ot-server
-$ yarn start
+$ cd yjs-server
+$ yarn dev
 ```
 
 ### 编译

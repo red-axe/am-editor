@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { isServer, EngineInterface } from '@aomao/engine';
+import { CursorData } from '@aomao/plugin-yjs';
+import { faker } from '@faker-js/faker';
 import Context from './context';
 import useDispatch from './hooks/use-dispatch';
 import useSelector from './hooks/use-selector';
@@ -8,20 +10,31 @@ import Loading from './components/loading';
 import { IS_DEV, lang } from './config';
 import Space from 'antd/es/space';
 import Button from 'antd/es/button';
-import 'antd/es/space/style';
-import 'antd/es/button/style';
+import 'antd/es/space/style/css';
+import 'antd/es/button/style/css';
 import './editor.less';
+import React from 'react';
 
 const localMember =
 	typeof localStorage === 'undefined' ? null : localStorage.getItem('member');
 
-const getMember = () => {
-	return !!localMember ? JSON.parse(localMember) : null;
+const getMember = (): CursorData => {
+	if (localMember === null) {
+		const { name } = faker;
+		const member = {
+			name: `${name.firstName()} ${name.lastName()}`,
+			avatar: faker.image.avatar(),
+			color: faker.color.rgb(),
+		};
+		localStorage.setItem('member', JSON.stringify(member));
+		return member;
+	}
+	return JSON.parse(localMember);
 };
 
 const wsUrl =
 	IS_DEV && !isServer
-		? `ws://${window.location.hostname}:8080`
+		? `ws://${window.location.hostname}:1234`
 		: 'wss://collab.aomao.com';
 const member = getMember();
 
@@ -37,6 +50,10 @@ const setReadonlyValue = (readonly: boolean) => {
 	localStorage.setItem('engine-readonly', readonly ? 'true' : 'false');
 };
 
+const yjsConfig = {
+	url: wsUrl,
+	id: 'demo',
+};
 export default () => {
 	const dispatch = useDispatch();
 	const [engine, setEngine] = useState<EngineInterface | null>(null);
@@ -98,23 +115,8 @@ export default () => {
 				readonly={isReadonly}
 				onLoad={setEngine}
 				toc={true}
-				ot={
-					IS_DEV
-						? false
-						: {
-								url: `${wsUrl}${
-									member?.id ? '?uid=' + member.id : ''
-								}`,
-								docId: 'demo',
-								onReady: (member) => {
-									if (member)
-										localStorage.setItem(
-											'member',
-											JSON.stringify(member),
-										);
-								},
-						  }
-				}
+				member={member}
+				yjs={IS_DEV ? false : yjsConfig}
 				onSave={onSave}
 			/>
 		</Context.Provider>

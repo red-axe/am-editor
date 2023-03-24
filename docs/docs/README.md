@@ -26,25 +26,28 @@ So its value looks like this:
 Of course, in some scenarios, for the convenience of operation, an API that converts to a JSON type value is also provided:
 
 ```json
-[
-	"div", // node name
-	// All attributes of the node
-	{
-		"data-element": "root",
-		"contenteditable": "true"
-	},
-	// child node 1
-	[
-		// child node name
-		"p",
-		// Child node attributes
-		{},
-		// child node of byte point
-		"Hello world!"
-	],
-	// child node 2
-	["p", {}, ["br", {}]]
-]
+{
+	type: "div",
+	"data-element": "root",
+	"contenteditable": "true"
+	children: [
+		{
+			type: "p",
+			children: [{
+				text: "Hello world!"
+			}]
+		},
+		{
+			type: "p",
+			children: [
+				{
+					type: "br",
+					children: []
+				}
+			]
+		}
+	]
+}
 ```
 
 <Alert>
@@ -204,11 +207,7 @@ Compared with the value of the card, Html cannot provide asynchronous rendering,
 The value of the card node in the previous paragraph, we can get the following html through the method provided by the engine
 
 ```html
-<div
-	data-element="root"
-	class="am-engine"
-	data-selection-5118985c-3395-3365-8228-d08540d1293e="%7B%22path%22%3A%7B%22start%22%3A%7B% 22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%2C%22end%22%3A%7B%22path%22% 3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%7D%2C%22uuid%22%3A%225118985c-3395-3365-8228- d08540d1293e%22%2C%22active%22%3Atrue%7D"
->
+<div data-element="root" class="am-engine">
 	<div
 		data-id="de4bd68e-VhAUT2WQ"
 		data-card-editable="false"
@@ -241,7 +240,7 @@ It is also easier to restore a piece of html to a value with a card. The instant
 ```typescript
 ...
 // We set this html to the editor through the setHtml method, and the editor will automatically parse it into the corresponding card and render it
-engine.setHtml(`<div data-element="root" class="am-engine" data-selection-5118985c-3395-3365-8228-d08540d1293e="%7B%22path%22%3A%7B%22start%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%2C%22end%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%7D%2C%22uuid%22%3A%225118985c-3395-3365-8228-d08540d1293e%22%2C%22active%22%3Atrue%7D">
+engine.setHtml(`<div data-element="root" class="am-engine">
     <div data-id="de4bd68e-VhAUT2WQ" data-card-editable="false" class="" data-syntax="javascript"><div class="data-codeblock-content" style="border: 1px solid rgb(232, 232, 232); max-width: 750px; color: rgb(38, 38, 38); margin: 0px; padding: 0px; background: rgb(249, 249, 249);"><div class="CodeMirror" style="color: rgb(89, 89, 89); margin: 0px; padding: 16px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);"><pre class="cm-s-default" style="color: rgb(89, 89, 89); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);"><span class="cm-keyword" style="color: rgb(215, 58, 73); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);">const</span> <span class="cm-def" style="color: rgb(0, 92, 197); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);">a</span> <span class="cm-operator" style="color: rgb(215, 58, 73); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);">=</span> <span class="cm-number" style="color: rgb(0, 92, 197); margin: 0px; padding: 0px; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0);">0</span>;</pre></div></div></div>
     <p data-id="pd157317-RSLJ4X6g"><br></p>
 </div> `)
@@ -255,85 +254,97 @@ console.log(engine.getHtml())
 In addition to the values ​​of the above two DOM nodes, JSON-type values ​​are also provided. Compared with the above two values, JSON will be easier to traverse and operate.
 
 ```json
-[
-	"div",
-	{
-		"data-selection-5118985c-3395-3365-8228-d08540d1293e": "%7B%22path%22%3A%7B%22start%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C% 22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%2C%22end%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22% 3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%7D%2C%22uuid%22%3A%225118985c-3395-3365-8228-d08540d1293e%22%2C%22active%22%3Atrue%7D"
-	},
-	[
-		"div",
+{
+	"type": "div",
+	"children": [
 		{
-			"data-card-value": "data:%7B%22id%22%3A%22ArADP%22%2C%22type%22%3A%22block%22%2C%22mode%22%3A%22javascript%22%2C% 22code%22%3A%22const%20a%20%3D%200%3B%22%7D",
+			"type": "div",
+			"data-card-value": "data:%7B%22id%22%3A%22ArADP%22%2C%22type%22%3A%22block%22%2C%22mode%22%3A%22javascript%22%2C%22code%22%3A%22const%20a%20%3D%200%3B%22%7D",
 			"data-card-type": "block",
 			"data-card-key": "codeblock",
-			"data-id": "de4bd68e-VhAUT2WQ"
-		}
-	],
-	[
-		"p",
-		{
-			"data-id": "pd157317-RSLJ4X6g"
+			"data-id": "de4bd68e-VhAUT2WQ",
+			"children": []
 		},
-		["br", {}]
+		{
+			"type": "p",
+			"data-id": "pd157317-RSLJ4X6g",
+			"children": [
+				{
+					"type": "br",
+					"children": []
+				}
+			]
+		}
 	]
-]
+}
 ```
 
-The value in JSON format is a json array.
+The value in JSON format is derived from monitoring the changes in the html structure within the editing area (contenteditable root node) using MutationObserver.
+
+We can access this derived data model through `engine.model`.
+
+#### Element
+
+The node type is Element.
 
 ```typescript
-[
-    //Index 0 is the name of the node
-    "div",
-    // The position of index 1 is all the properties of the node
-    {
-        "data-id": "de4bd68e-VhAUT2WQ"
-    },
-    // The position of index 2 represents the child node under this node
-    [
-       ...
-    ]
-]
+{
+	// Node type
+	type: "div",
+	// Child nodes
+	children: [
+		...
+	]
+	// ... Other custom properties
+}
 ```
 
-Similarly, we can obtain and process the value of json type through the getJsonValue and setJsonValue provided by the editor
+#### Text
+
+The node type of the text is Text.
 
 ```typescript
-...
+{
+	// Text content of the node
+	text: "hello world",
+}
+```
+
+Similarly, we can use the getJsonValue and setJsonValue provided by the editor to retrieve and process values of the json type.
+
+```typescript
 // We set this html to the editor through the setHtml method, and the editor will automatically parse it into the corresponding card and render it
-engine.setJsonValue([
-    "div",
-    {
-        "data-selection-5118985c-3395-3365-8228-d08540d1293e": "%7B%22path%22%3A%7B%22start%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C% 22id%22%3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%2C%22end%22%3A%7B%22path%22%3A%5B1%2C0%5D%2C%22id%22% 3A%22pd157317-RSLJ4X6g%22%2C%22bi%22%3A1%7D%7D%2C%22uuid%22%3A%225118985c-3395-3365-8228-d08540d1293e%22%2C%22active%22%3Atrue%7D"
-    },
-    [
-        "div",
-        {
-            "data-card-value": "data:%7B%22id%22%3A%22ArADP%22%2C%22type%22%3A%22block%22%2C%22mode%22%3A%22javascript%22%2C% 22code%22%3A%22const%20a%20%3D%200%3B%22%7D",
-            "data-card-type": "block",
-            "data-card-key": "codeblock",
-            "data-id": "de4bd68e-VhAUT2WQ"
-        }
-    ],
-    [
-        "p",
-        {
-            "data-id": "pd157317-RSLJ4X6g"
-        },
-        [
-            "br",
-            {}
-        ]
-    ]
-])
+engine.setJsonValue({
+		type: 'div',
+		children: [
+			{
+				type: 'div',
+				'data-card-value': 'data:%7B%22id%22%3A%22ArADP%22%2C%22type%22%3A%22block%22%2C%22mode%22%3A%22javascript%22%2C%22code%22%3A%22const%20a%20%3D%200%3B%22%7D',
+				'data-card-type': 'block',
+				'data-card-key': 'codeblock',
+				'data-id': 'de4bd68e-VhAUT2WQ',
+				children: []
+			},
+			{
+				type: 'p',
+				'data-id': 'pd157317-RSLJ4X6g',
+				children: [
+					{
+						type: 'br',
+						children: []
+					}
+				]
+			}
+		]
+	})
 // Through the getJsonValue method, we can get the corresponding json in the current editor. At this time, we don't need to consider whether the value set by setHtml or setValue is used in our editor. We can get the corresponding json through getJsonValue.
 console.log(engine.getJsonValue())
 ...
 ```
 
-## Collaboration
+## Collaborative Editing
 
-Use the `MutationObserver` to monitor the mutation of the `html` structure in the editable area (contenteditable root node) to reverse infer OT. Connect to [ShareDB](https://github.com/share/sharedb) through `Websocket`, and then use commands to add, delete, modify, and check the data saved in ShareDB.
+This open-source library listens to changes in the `HTML` structure of the editing area (contenteditable root node), uses `MutationObserver` to reverse-engineer the data structure, and connects and interacts with [Yjs](https://github.com/yjs/yjs) through `WebSocket` to achieve multi-user collaborative editing.
 
 ## Features
 

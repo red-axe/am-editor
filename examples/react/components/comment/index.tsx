@@ -15,20 +15,21 @@ import {
 	random,
 	NodeInterface,
 	isNode,
+	CollaborationMember,
 } from '@aomao/engine';
 import Loading from '../loading';
 import CommentButton from './button';
 import { CommentContent, DataItem, DataSourceItem } from './types';
-import { Member } from '../editor/ot/types';
+import { CursorData } from '@aomao/plugin-yjs';
 import CommentItem from './item';
 import context from '../../context';
 import { useDispatch, useSelector } from '../../hooks';
-import 'antd/es/message/style';
+import 'antd/es/message/style/css';
 import './index.css';
 
-export type CommentProps = {
+export type CommentProps<T = CursorData> = {
 	editor: EditorInterface;
-	member: Member;
+	member: T;
 	onUpdate?: () => void;
 } & { ref: React.Ref<CommentRef> };
 
@@ -63,14 +64,13 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 			const tempList: Array<DataItem> = [];
 			dataSource.forEach((item: DataSourceItem) => {
 				//获取评论编号对应在编辑器中的所有节点
-				const elements: Array<NodeInterface> =
-					editor.command.executeMethod(
-						'mark-range',
-						'action', //插件名称
-						'comment', //标记类型
-						'find', //调用的方法
-						item.id,
-					);
+				const elements: Array<NodeInterface> = editor.command.executeMethod(
+					'mark-range',
+					'action', //插件名称
+					'comment', //标记类型
+					'find', //调用的方法
+					item.id,
+				);
 				if (elements.length === 0) return;
 				//获取目标评论在编辑器中的 top
 				const top = getRectTop(elements[0]);
@@ -454,7 +454,7 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 		 * 设置评论项ref用于获取其dom节点
 		 */
 		const itemRef = useCallback(
-			(node) => {
+			(node: any) => {
 				if (node !== null) {
 					itemNodes.current.push(node);
 				}

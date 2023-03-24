@@ -1,4 +1,4 @@
-import tinycolor from 'tinycolor2';
+import { colord } from 'colord';
 import { NodeInterface } from '../types/node';
 import { DATA_ELEMENT, DATA_ID, EDITABLE, UI } from '../constants/root';
 import { EditorInterface } from '../types/editor';
@@ -57,7 +57,7 @@ const stylesToString = (styles: { [k: string]: string }) => {
 		}
 
 		if (key.endsWith('color')) {
-			val = tinycolor(val).toHexString();
+			val = colord(val).toHex();
 		}
 
 		stylesString += ' '.concat(key, ': ').concat(val, ';');
@@ -372,7 +372,7 @@ class Parser implements ParserInterface {
 				}
 			} else if (node.isText()) {
 				const text = node.text();
-				if (/^\n/.test(text) || /^\s/.test(text)) {
+				if (/^\n+$/.test(text) || /^\s+$/.test(text)) {
 					const element = node.get<Text>()!;
 					const prev = element.previousSibling;
 					const next = element.nextSibling;

@@ -4,7 +4,7 @@
 
 可用来配合开发类似于批注、划线评论
 
-[批注/评论 DEMO](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/comment/index.tsx)
+[批注/评论 DEMO](https://github.com/big-camel/am-editor/blob/master/docs/demo/comment/index.tsx)
 
 ## 安装
 

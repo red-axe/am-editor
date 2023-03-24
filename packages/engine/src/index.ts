@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey';
-import { Path } from 'sharedb';
+import { Path } from './model';
 import Engine from './engine';
 import {
 	Plugin,
@@ -31,7 +31,7 @@ import Resizer from './resizer';
 
 export * from './types';
 export * from './utils';
-export * from './ot/utils';
+export * from './model';
 export * from './constants';
 export * from './card/enum';
 export * from './node/utils';
@@ -66,7 +66,6 @@ export {
 	getFileSize,
 	Scrollbar,
 	Position,
-	Path,
 	isRangeInterface,
 	isRange,
 	isSelection,

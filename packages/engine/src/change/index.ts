@@ -204,8 +204,14 @@ class ChangeModel implements ChangeInterface {
 		callback?: (count: number) => void,
 	) {
 		const range = this.range.get();
-		const { schema, conversion, container, history, mark, card } =
-			this.engine;
+		const {
+			schema,
+			conversion,
+			container,
+			history,
+			mark,
+			card,
+		} = this.engine;
 		if (value === '') {
 			this.engine.container.html(value);
 			this.initValue(undefined, false);
@@ -314,10 +320,13 @@ class ChangeModel implements ChangeInterface {
 		);
 	}
 
-	getOriginValue(container: NodeInterface = this.engine.container) {
+	getOriginValue(
+		container: NodeInterface = this.engine.container,
+		isClone = true,
+	) {
 		const { schema, conversion } = this.engine;
 		return new Parser(
-			container.clone(true),
+			isClone ? container.clone(true) : container,
 			this.engine,
 			undefined,
 			false,
@@ -334,15 +343,14 @@ class ChangeModel implements ChangeInterface {
 			value = this.getOriginValue();
 		} else {
 			let range = this.range.get();
-			let selection;
+			const container = this.engine.container.clone(true);
 			if (!range.inCard()) {
 				const path = range.toPath(true);
-				if (!path) return this.getOriginValue();
-				range = Range.fromPath(this.engine, path, true);
-				selection = range.createSelection();
+				if (!path) return this.getOriginValue(container, false);
+				range = Range.fromPath(this.engine, path, true, container);
+				range.createSelection();
 			}
-			value = this.getOriginValue();
-			selection?.move();
+			value = this.getOriginValue(container, false);
 		}
 		return value;
 	}
@@ -469,8 +477,9 @@ class ChangeModel implements ChangeInterface {
 					range.startNode.text(text.substr(1));
 			}
 		}
-		let startRange: { node: NodeInterface; offset: number } | undefined =
-			undefined;
+		let startRange:
+			| { node: NodeInterface; offset: number }
+			| undefined = undefined;
 		const apply = (range: RangeInterface) => {
 			if (startRange && startRange.node[0].isConnected) {
 				range

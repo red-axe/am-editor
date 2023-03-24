@@ -1,4 +1,4 @@
-> 过去两年中，`am-editor` 编辑器基于 `contenteditable` 属性上做了很多功能和扩展，也遇到了很多问题。当然，有些问题从一开始的架构设计上就注定了的。所以，现在大胆一些，尝试抛弃`contenteditable`属性，使用自绘光标的模式开发的下一个版本的[富文本编辑器](https://github.com/editablejs/editable)。
+> 在这里，我们有一个新的富文本编辑器 [Editable](https://github.com/editablejs/editable)，它没有使用原生的可编辑属性[~~contenteditable~~](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable)，而是采用自定义的渲染器。这样做可以更好地控制编辑器的行为。
 
 # am-editor
 
@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yanmao-cc/am-editor/blob/master/README.md"><strong>English</strong></a> ·
+  <a href="https://github.com/big-camel/am-editor/blob/master/README.md"><strong>English</strong></a> ·
   <a href="https://editor.aomao.com"><strong>Demo</strong></a> ·
   <a href="https://editor.aomao.com/docs"><strong>文档</strong></a> ·
   <a href="#plugins"><strong>插件</strong></a> ·
@@ -40,120 +40,22 @@
 
 **`Vue3`** DEMO [https://github.com/red-axe/am-editor-vue3-demo](https://github.com/red-axe/am-editor-vue3-demo)
 
-**`React`** DEMO [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+**`React`** DEMO [https://github.com/big-camel/am-editor/tree/master/examples/react](https://github.com/big-camel/am-editor/tree/master/examples/react)
 
-**`Vue2 DEMO`** [https://github.com/yanmao-cc/am-editor-demo-vue2](https://github.com/yanmao-cc/am-editor-demo-vue2)
+**`Vue2 DEMO`** [https://github.com/big-camel/am-editor-demo-vue2](https://github.com/big-camel/am-editor-demo-vue2)
 
-**`Vue2 Nuxt DEMO`** [https://github.com/yanmao-cc/am-editor-nuxt](https://github.com/yanmao-cc/am-editor-nuxt)
-
-## 基本原理
-
-使用浏览器提供的 `contenteditable` 属性让一个 DOM 节点具有可编辑能力：
-
-```html
-<div contenteditable="true"></div>
-```
-
-所以它的值看起来像是这样的：
-
-```html
-<div data-element="root" contenteditable="true">
-	<p>Hello world!</p>
-	<p><br /></p>
-</div>
-```
-
-当然，有些场景下为了方便操作，也提供了转换为 JSON 类型值的 API：
-
-```ts
-[
-	'div', // 节点名称
-	// 节点所有的属性
-	{
-		'data-element': 'root',
-		contenteditable: 'true',
-	},
-	// 子节点1
-	[
-		// 子节点名称
-		'p',
-		// 子节点属性
-		{},
-		// 字节点的子节点
-		'Hello world!',
-	],
-	// 子节点2
-	['p', {}, ['br', {}]],
-];
-```
-
-<Alert>
-  编辑器依赖 <strong>contenteditable</strong> 属性提供的输入能力以及光标的控制能力。因此，它拥有所有的默认浏览器行为，但是浏览器的默认行为在不同的浏览器厂商实现下存在不同的处理方式，所以我们其大部分默认行为进行了拦截并进行自定义的处理。
-</Alert>
-
-比如输入的过程中 `beforeinput` `input`， 删除、回车以及快捷键涉及到的 `mousedown` `mouseup` `click` 等事件都会被拦截，并进行自定义的处理。
-
-在对事件进行接管后，编辑器所做的事情就是管理好基于 `contenteditable` 属性根节点下的所有子节点了，比如插入文本、删除文本、插入图片等等。
-
-综上所述，编辑中的数据结构是一个 DOM 树结构，所有的操作都是对 DOM 树直接进行操作，不是典型的以数据模型驱动视图渲染的 MVC 模式。
-
-## 节点约束
-
-为了更方便的管理节点，降低复杂性。编辑器抽象化了节点属性和功能，制定了 `mark` `inline` `block` `card` 4 种类型节点，他们由不同的属性、样式或 `html` 结构组成，并统一使用 `schema` 对它们进行约束。
-
-一个简单的 `schema` 看起来像是这样：
-
-```ts
-{
-  name: 'p', // 节点名称
-  type: 'block' // 节点类型
-}
-```
-
-除此之外，还可以描述属性、样式等，比如：
-
-```ts
-{
-  name: 'span', // 节点名称
-  type: 'mark', // 节点类型
-  attributes: {
-    // 节点有一个 style 属性
-    style: {
-      // 必须包含一个color的样式
-      color: {
-        required: true, // 必须包含
-        value: '@color' // 值是一个符合css规范的颜色值，@color 是编辑器内部定义的颜色效验，此处也可以使用方法、正则表达式去判断是否符合需要的规则
-      }
-    },
-    // 可选的包含一个 test 属性，他的值可以是任意的，但不是必须的
-    test: '*'
-  }
-}
-```
-
-下面这几种节点都符合上面的规则：
-
-```html
-<span style="color:#fff"></span>
-<span style="color:#fff" test="test123" test1="test1"></span>
-<span style="color:#fff;background-color:#000;"></span>
-<span style="color:#fff;background-color:#000;" test="test123"></span>
-```
-
-但是除了在 color 和 test 已经在 `schema` 中定义外，其它的属性(background-color、test1)在处理时都会被编辑器过滤掉。
-
-可编辑器区域内的节点通过 `schema` 规则，制定了 `mark` `inline` `block` `card` 4 种组合节点，他们由不同的属性、样式或 `html` 结构组成，并对它们的嵌套进行了一定的约束。
+**`Vue2 Nuxt DEMO`** [https://github.com/big-camel/am-editor-nuxt](https://github.com/big-camel/am-editor-nuxt)
 
 ## 特性
 
--   开箱即用，提供几十种丰富的插件来满足大部分需求
--   高扩展性，除了 `mark` `inline` `block` 类型基础插件外，我们还提供 `card` 组件结合`React` `Vue`等前端库渲染插件 UI
--   丰富的多媒体支持，不仅支持图片和音视频，更支持插入嵌入式多媒体内容
--   支持 Markdown 语法
--   支持国际化
--   引擎纯 JavaScript 编写，不依赖任何前端库，插件可以使用 `React` `Vue` 等前端库渲染。复杂架构轻松应对
--   内置协同编辑方案，轻量配置即可使用
--   兼容大部分最新移动端浏览器
+-   🎁 开箱即用，提供几十种丰富的插件来满足大部分需求
+-   🚀 高扩展性，除了 `mark` `inline` `block` 类型基础插件外，我们还提供 `card` 组件结合 `React` `Vue` 等前端库渲染插件 UI
+-   🎨 丰富的多媒体支持，不仅支持图片和音视频，更支持插入嵌入式多媒体内容
+-   📝 支持 `Markdown` 语法
+-   🌍 支持国际化
+-   💻 引擎纯 `JavaScript` 编写，不依赖任何前端库，插件可以使用 `React` `Vue` 等前端库渲染。复杂架构轻松应对
+-   👥 内置协同编辑方案，轻量配置即可使用
+-   📱 兼容大部分最新移动端浏览器
 
 ## 插件
 
@@ -210,7 +112,7 @@
 
 编辑器由 `引擎`、`工具栏`、`插件` 组成。`引擎` 为我们提供了核心的编辑能力。
 
-使用 npm 或者 yarn 安装引擎包
+使用 `npm` 或者 `yarn` 安装引擎包
 
 ```bash
 $ npm install @aomao/engine
@@ -220,7 +122,7 @@ $ yarn add @aomao/engine
 
 ### 使用
 
-我们按照惯例先输出一个`Hello word!`
+我们按照惯例先输出一个`Hello world!`
 
 ```tsx
 import React, { useEffect, useRef, useState } from 'react';
@@ -232,7 +134,7 @@ const EngineDemo = () => {
 	//引擎实例
 	const [engine, setEngine] = useState<EngineInterface>();
 	//编辑器内容
-	const [content, setContent] = useState<string>('<p>Hello word!</p>');
+	const [content, setContent] = useState<string>('<p>Hello world!</p>');
 
 	useEffect(() => {
 		if (!ref.current) return;
@@ -274,9 +176,9 @@ const engine = new Engine(ref.current, {
 
 ### 卡片
 
-卡片是编辑器中单独划分的一个区域，其 UI 以及逻辑在卡片内部可以使用 React、Vue 或其它前端库自定义渲染内容，最后再挂载到编辑器上。
+卡片是编辑器中的一个独立区域，其 UI 和逻辑在卡片内部可以使用 `React`、`Vue` 或其他前端库自定义渲染内容，最后再挂载到编辑器上。
 
-引入 `@aomao/plugin-codeblock` 代码块插件，这个插件的 `语言下拉框` 使用 `React` 渲染，所以有区分。 `Vue3` 使用 `@aomao/plugin-codeblock-vue`
+我们引入了 `@aomao/plugin-codeblock` 代码块插件，该插件的语言下拉框使用 `React` 渲染，因此有所区别。Vue3 则使用 `@aomao/plugin-codeblock-vue`。
 
 ```tsx
 import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
@@ -293,6 +195,53 @@ const engine = new Engine(ref.current, {
 ```
 
 `CodeBlock` 插件默认支持 `markdown`，在编辑器一行开头位置输入代码块语法` ```javascript ` 空格后即可触发。
+
+## 节点约束
+
+为了更方便的管理节点，降低复杂性。编辑器抽象化了节点属性和功能，制定了 `mark` `inline` `block` `card` 4 种类型节点，他们由不同的属性、样式或 `html` 结构组成，并统一使用 `schema` 对它们进行约束。
+
+一个简单的 `schema` 看起来像是这样：
+
+```ts
+{
+  name: 'p', // 节点名称
+  type: 'block' // 节点类型
+}
+```
+
+除此之外，还可以描述属性、样式等，比如：
+
+```ts
+{
+  name: 'span', // 节点名称
+  type: 'mark', // 节点类型
+  attributes: {
+    // 节点有一个 style 属性
+    style: {
+      // 必须包含一个color的样式
+      color: {
+        required: true, // 必须包含
+        value: '@color' // 值是一个符合css规范的颜色值，@color 是编辑器内部定义的颜色效验，此处也可以使用方法、正则表达式去判断是否符合需要的规则
+      }
+    },
+    // 可选的包含一个 test 属性，他的值可以是任意的，但不是必须的
+    test: '*'
+  }
+}
+```
+
+下面这几种节点都符合上面的规则：
+
+```html
+<span style="color:#fff"></span>
+<span style="color:#fff" test="test123" test1="test1"></span>
+<span style="color:#fff;background-color:#000;"></span>
+<span style="color:#fff;background-color:#000;" test="test123"></span>
+```
+
+但是除了在 color 和 test 已经在 `schema` 中定义外，其它的属性(background-color、test1)在处理时都会被编辑器过滤掉。
+
+可编辑器区域内的节点通过 `schema` 规则，制定了 `mark` `inline` `block` `card` 4 种组合节点，他们由不同的属性、样式或 `html` 结构组成，并对它们的嵌套进行了一定的约束。
 
 ### 工具栏
 
@@ -340,37 +289,15 @@ return (
 
 ### 协同编辑
 
-通过 `MutationObserver` 监听编辑区域(contenteditable 根节点)内的 `html` 结构的突变反推 OT。通过`Websocket`与 [ShareDB](https://github.com/share/sharedb) 连接，然后使用命令对 ShareDB 保存的数据进行增、删、改、查。
+该开源库通过监听编辑区域(contenteditable 根节点)内的 html 结构的变化，使用 `MutationObserver` 反推数据结构，并通过 `WebSocket` 与 [Yjs](https://github.com/yjs/yjs) 连接交互，实现多用户协同编辑的功能。
 
 #### 交互模式
 
-每位编辑者作为 [客户端](https://github.com/yanmao-cc/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 通过 `WebSocket` 与 [服务端](https://github.com/yanmao-cc/am-editor/tree/master/ot-server) 通信交换由编辑器生成的 `json0` 格式的数据。
+每位编辑者作为 [客户端](https://github.com/red-axe/am-editor/blob/master/examples/react/components/editor/index.tsx#L250) 通过 `@aomao/plugin-yjs-websocket` 插件中的 `Websocket` 与 [服务端](https://github.com/big-camel/am-editor/tree/master/yjs-server) 进行通信交互。
 
-服务端会保留一份 `json` 格式的 `html` 结构数据，接收到来自客户端的指令后，再去修改这份数据，最后再转发到每个客户端。
-
-在启用协同编辑前，我们需要配置好 [客户端](https://github.com/yanmao-cc/am-editor/tree/master/examples/react/components/editor/ot/client.ts) 和 [服务端](https://github.com/yanmao-cc/am-editor/tree/master/ot-server)
-
-服务端是 `NodeJs` 环境，使用 `express` + `WebSocket` 搭建的网络服务。
-
-#### DEMO
-
-DEMO 中我们已经一份比较基础的客户端代码
-
-[查看 React 完整 DEMO](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
-
-[查看 Vue3 完整 DEMO](https://github.com/red-axe/am-editor-vue3-demo)
-
-[查看 Vue2 完整 DEMO](https://github.com/zb201307/am-editor-vue2)
-
-```tsx
-//实例化协作编辑客户端，传入当前编辑器引擎实例
-const otClient = new OTClient(engine);
-//连接到协作服务端，`demo` 与服务端文档ID相同
-otClient.connect(
-	`ws://127.0.0.1:8080${currentMember ? '?uid=' + currentMember.id : ''}`,
-	'demo',
-);
-```
+-   `@aomao/yjs` 实现编辑器与 `Yjs` 数据的转换
+-   `@aomao/plugin-yjs-websocket` 提供编辑器与 `Yjs` 的 `WebSocket` 客户端功能
+-   `@aomao/plugin-yjs-websocket/server` 提供 `Yjs` 的 `WebSocket` 服务端，使用 Node.js 编写，并支持使用 `MongoDB` 和 `LevelDB` 存储数据。
 
 ### 项目图标
 
@@ -380,22 +307,30 @@ otClient.connect(
 
 ### React
 
-需要在 `am-editor 安装依赖
+在使用该开源库之前，需要先在项目根目录中安装依赖。
 
 ```base
-//依赖安装好后，只需要在根目录执行以下命令
+yarn install
 
+leran bootstrap
+```
+
+依赖安装好后，只需要在根目录执行以下命令即可启动项目：
+
+```base
 yarn start
 ```
 
--   `packages` 引擎和工具栏
--   `plugins` 所有的插件
--   `api` 支持一些插件所需要的 api 访问，默认使用 https://editor.aomao.com 作为 api 服务
--   `ot-server` 协同服务端。启动：yarn dev
+该开源库的开发目录结构如下：
+
+-   `packages` 存放引擎和工具栏相关代码
+-   `plugins` 存放所有的插件
+-   `api` 提供一些插件所需要的 API 访问，默认使用 https://editor.aomao.com 作为 API 服务
+-   `yjs-server` 存放协同服务端代码，可通过 `yarn dev` 启动服务。
 
 ### Vue
 
-[am-editor vue example](https://github.com/byoungd/am-editor-vue/blob/main/README.zh-CN.md)
+[am-editor vue example](https://github.com/red-axe/am-editor-vue3-demo)
 
 ## 贡献
 

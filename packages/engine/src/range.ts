@@ -7,7 +7,6 @@ import {
 	CARD_LEFT_SELECTOR,
 	CARD_RIGHT_SELECTOR,
 } from './constants/card';
-import { ANCHOR, CURSOR, FOCUS } from './constants/selection';
 import {
 	DATA_ELEMENT,
 	DATA_ID,
@@ -17,10 +16,10 @@ import {
 import Selection from './selection';
 import { SelectionInterface } from './types/selection';
 import { EditorInterface } from './types/editor';
-import { Path } from 'sharedb';
+import { Path } from './model';
 import { $ } from './node';
 import { CardEntry } from './types/card';
-import { isTransientElement } from './ot/utils';
+import { isTransientElementCache } from './model/utils';
 import { isNodeEntry } from './node/utils';
 
 class Range implements RangeInterface {
@@ -807,7 +806,7 @@ class Range implements RangeInterface {
 				includeCardCursor &&
 				node instanceof HTMLElement &&
 				~['left', 'right', 'center', 'body'].indexOf(
-					node.getAttribute('data-element') || '',
+					node.getAttribute(CARD_ELEMENT_KEY) || '',
 				)
 			) {
 				const cardElement = this.editor.card.closest(element);
@@ -821,7 +820,7 @@ class Range implements RangeInterface {
 				cardCaches.includes(element)
 			)
 				return true;
-			return !isTransientElement(element);
+			return !isTransientElementCache(element);
 		};
 	}
 
@@ -906,10 +905,7 @@ Range.fromPath = (
 	const startOffset = startPath.pop();
 	const endOffset = endPath.pop();
 
-	const getNode = (
-		path: Path,
-		context: Element = editor.container.get<Element>()!,
-	) => {
+	const getNode = (path: Path, context: Element = root.get<Element>()!) => {
 		let domNode: Node = context;
 		for (let i = 0; i < path.length; i++) {
 			let p = path[i];

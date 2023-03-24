@@ -1,15 +1,14 @@
 import { NodeInterface, Selector, EventListener } from './node';
 import { ChangeInterface } from './change';
-import { OTInterface } from './ot';
 import { SchemaInterface } from './schema';
 import { HistoryInterface } from './history';
 import { CardInterface } from './card';
 import { ClipboardData } from './clipboard';
 import { TypingInterface } from './typing';
 import { RangeInterface } from './range';
-import { Op } from 'sharedb';
 import { EditorInterface, EditorOptions } from './editor';
 import { HotkeyInterface } from './hotkey';
+import { Model, Operation, Element, Node } from '../model';
 
 /**
  * 编辑器容器接口
@@ -115,8 +114,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	/**
 	 * 协同编辑
 	 */
-	ot: OTInterface;
-
+	model: Model;
 	/**
 	 * 历史记录
 	 */
@@ -143,6 +141,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	isEmpty(): boolean;
 	/**
 	 * 获取编辑器值
+	 * @deprecated 请使用 model.toValue 性能更好
 	 * @param ignoreCursor 是否包含光标位置信息
 	 */
 	getValue(ignoreCursor?: boolean): string;
@@ -162,6 +161,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	): Promise<string>;
 	/**
 	 * 获取编辑器的html
+	 * @deprecated 请使用 model.toHTML 性能更好
 	 */
 	getHtml(): string;
 	/**
@@ -193,15 +193,16 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * @param callback 异步渲染卡片后的回调
 	 */
 	setJsonValue(
-		value: Array<any>,
+		value: Element,
 		callback?: (count: number) => void,
 	): EngineInterface;
 	/**
 	 * 获取JSON格式的值
 	 */
-	getJsonValue(): string | undefined | (string | {})[];
+	getJsonValue(): Element;
 	/**
 	 * 获取纯文本
+	 * @deprecated 请使用 model.toText 性能更好
 	 * @param includeCard 是否包含卡片内的
 	 */
 	getText(includeCard?: boolean): string;
@@ -286,6 +287,17 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 			styles: { [key: string]: string },
 			value: Array<string>,
 		) => boolean | void,
+		options?: boolean | AddEventListenerOptions,
+	): void;
+	/**
+	 * 解析 model node 时触发
+	 * @param eventType
+	 * @param listener
+	 * @param options
+	 */
+	on(
+		eventType: 'parse:node',
+		listener: (node: Node) => false | void,
 		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
@@ -428,7 +440,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 */
 	on(
 		eventType: 'ops',
-		listener: (ops: Op[]) => void,
+		listener: (ops: Operation[]) => void,
 		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
@@ -487,6 +499,17 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 			styles: { [key: string]: string },
 			value: Array<string>,
 		) => boolean | void,
+	): void;
+	/**
+	 * 解析 model node 时触发
+	 * @param eventType
+	 * @param listener
+	 * @param options
+	 */
+	off(
+		eventType: 'parse:node',
+		listener: (node: Node) => false | void,
+		options?: boolean | AddEventListenerOptions,
 	): void;
 	/**
 	 * 解析DOM节点，生成文本，遍历子节点时触发。返回false跳过当前节点
@@ -604,7 +627,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * @param eventType
 	 * @param ops
 	 */
-	off(eventType: 'ops', listener: (ops: Op[]) => void): void;
+	off(eventType: 'ops', listener: (ops: Operation[]) => void): void;
 	/**
 	 * 触发事件
 	 * @param eventType 事件名称
@@ -648,6 +671,17 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 		styles: { [key: string]: string },
 		value: Array<string>,
 	): boolean | void;
+	/**
+	 * 解析 model node 时触发
+	 * @param eventType
+	 * @param listener
+	 * @param options
+	 */
+	trigger(
+		eventType: 'parse:node',
+		listener: (node: Node) => false | void,
+		options?: boolean | AddEventListenerOptions,
+	): void;
 	/**
 	 * 解析DOM节点，生成文本，遍历子节点时触发。返回false跳过当前节点
 	 * @param node 当前遍历的节点
@@ -736,7 +770,7 @@ export interface EngineInterface<T extends EngineOptions = EngineOptions>
 	 * @param eventType
 	 * @param ops
 	 */
-	trigger(eventType: 'ops', ops: Op[]): void;
+	trigger(eventType: 'ops', ops: Operation[]): void;
 	/**
 	 * 回车键按下，返回false，终止处理其它监听
 	 * @param eventType

@@ -77,26 +77,26 @@ releaseHold(): void;
 
 ### `onFilter`
 
-Monitor and filter ops stored in history
+Monitor and filter operations stored in history
 
 ```ts
 /**
 * Monitoring and filtering are stored in the history stack
 * @param filter true to filter and exclude, false to record in the history stack
 */
-onFilter(filter: (op: Op) => boolean): void
+onFilter(filter: (operation: Operation) => boolean): void
 ```
 
 ### `onSelf`
 
-Monitor the current change ops and decide whether to write to the history record
+Monitor the current change operations and decide whether to write to the history record
 
 ```ts
 /**
 *
-* @param collect method undefined The default delay save, true save immediately, false immediately discard. Promise<boolean> blocks all subsequent ops until it returns false or true
+* @param collect method undefined The default delay save, true save immediately, false immediately discard. Promise<boolean> blocks all subsequent operations until it returns false or true
 */
-onSelf(collect: (ops: Op[]) => Promise<boolean> | boolean | undefined): void
+onSelf(collect: (operations: Operation[]) => Promise<boolean> | boolean | undefined): void
 ```
 
 ### `clear`
@@ -121,9 +121,9 @@ Collect local editing operations
 
 ```ts
 /**
- * @param ops operation set
+ * @param operations operation set
  * */
-handleSelfOps(ops: Op[]): void;
+handleSelfOps(operations: Operation[]): void;
 ```
 
 ### `handleRemoteOps`
@@ -132,9 +132,9 @@ Collect remote operations (operations from other coordinators)
 
 ```ts
 /**
- * @param ops operation set
+ * @param operations operation set
  * */
-handleRemoteOps(ops: Op[]): void;
+handleRemoteOps(operations: Operation[]): void;
 ```
 
 ### `getUndoOp`

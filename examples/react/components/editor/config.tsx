@@ -96,9 +96,10 @@ import type { ToolbarOptions } from '@aomao/toolbar';
 
 import ReactDOM from 'react-dom';
 import Empty from 'antd/es/empty';
-import 'antd/es/empty/style';
-import { ImageUploaderOptions } from 'plugins/image/dist/uploader';
+import 'antd/es/empty/style/css';
+import { ImageUploaderOptions } from '@aomao/plugin-image';
 import Mermaid, { MermaidComponent } from '@aomao/plugin-mermaid';
+import React from 'react';
 
 export const plugins: Array<PluginEntry> = [
 	Redo,
@@ -335,7 +336,7 @@ export const lineHeightOptions: LineHeightOptions = {
 	},
 };
 
-export const toolbarOptions: ToolbarOptions = (lang: string) => ({
+export const toolbarOptions = (lang: string): ToolbarOptions => ({
 	// 快捷键mod+/弹出菜单配置  默认使用系统配置
 	// config: [
 	// 	{

@@ -1,6 +1,6 @@
+import cloneDeep from 'lodash/cloneDeep';
 import Change from '../change';
 import { DATA_ELEMENT } from '../constants/root';
-import OT from '../ot';
 import { Selector, NodeInterface } from '../types/node';
 import { ChangeInterface } from '../types/change';
 import {
@@ -9,14 +9,12 @@ import {
 	EngineOptions,
 } from '../types/engine';
 import { HistoryInterface } from '../types/history';
-import { OTInterface } from '../types/ot';
 import { HotkeyInterface } from '../types/hotkey';
 import { CardInterface } from '../types/card';
 import History from '../history';
 import Hotkey from '../hotkey';
 import { getDocument } from '../utils';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
-import { toJSON0, toDOM } from '../ot/utils';
 import Parser from '../parser';
 import { TypingInterface } from '../types';
 import Typing from '../typing';
@@ -28,18 +26,18 @@ import Selection from '../selection';
 import Editor from '../editor';
 import { $ } from '../node';
 import { DATA_CONTENTEDITABLE_KEY } from '../constants';
+import { Model, Element } from '../model';
 import './index.css';
 
 class Engine<T extends EngineOptions = EngineOptions>
 	extends Editor<T>
-	implements EngineInterface<T>
-{
+	implements EngineInterface<T> {
 	private _readonly: boolean = false;
 	private _container: ContainerInterface;
 	readonly kind = 'engine';
 
 	typing: TypingInterface;
-	ot: OTInterface;
+	model: Model;
 	change: ChangeInterface;
 	history: HistoryInterface;
 	hotkey: HotkeyInterface;
@@ -53,11 +51,11 @@ class Engine<T extends EngineOptions = EngineOptions>
 		if (readonly) {
 			this.hotkey.disable();
 			this._container.setReadonly(true);
-			this.ot.stopMutation();
+			this.model.mutation.stop();
 		} else {
 			this.hotkey.enable();
 			this._container.setReadonly(false);
-			this.ot.startMutation();
+			this.model.mutation.start();
 		}
 		this._readonly = readonly;
 		this.card.reRender();
@@ -110,13 +108,12 @@ class Engine<T extends EngineOptions = EngineOptions>
 		// 快捷键
 		this.hotkey = new Hotkey(this);
 		this.init();
-		// 协同
-		this.ot = new OT(this);
 
 		if (this.isEmpty()) {
 			this._container.showPlaceholder();
 		}
-		this.ot.initLocal();
+		this.model = Model.from(this);
+		this.model.resetRoot();
 	}
 
 	isFocus() {
@@ -135,11 +132,20 @@ class Engine<T extends EngineOptions = EngineOptions>
 		this.change.range.blur();
 	}
 
+	/**
+	 * @deprecated 请使用 model.toValue 性能更好
+	 */
 	getValue(ignoreCursor: boolean = false) {
 		const value = this.change.getValue({ ignoreCursor });
 		return ignoreCursor ? Selection.removeTags(value) : value;
 	}
 
+	/**
+	 * @deprecated 请使用 model.toValueAsync 性能更好
+	 * @param ignoreCursor
+	 * @param callback
+	 * @returns
+	 */
 	async getValueAsync(
 		ignoreCursor: boolean = false,
 		callback?: (
@@ -168,6 +174,9 @@ class Engine<T extends EngineOptions = EngineOptions>
 		});
 	}
 
+	/**
+	 * @deprecated 请使用 model.toHTML 性能更好
+	 */
 	getHtml(): string {
 		const node = $(this.container[0].cloneNode(true));
 		node.removeAttributes(DATA_CONTENTEDITABLE_KEY);
@@ -183,12 +192,8 @@ class Engine<T extends EngineOptions = EngineOptions>
 	}
 
 	initDocOnReadonly() {
-		if (this.readonly && !this.ot.isRemote) {
-			if (!this.ot.doc?.type) {
-				this.ot.doc?.create(toJSON0(this.container));
-			} else {
-				this.ot.doc.data = toJSON0(this.container);
-			}
+		if (this.readonly) {
+			this.model.resetRoot();
 		}
 	}
 
@@ -235,10 +240,9 @@ class Engine<T extends EngineOptions = EngineOptions>
 		return this;
 	}
 
-	setJsonValue(value: Array<any>, callback?: (count: number) => void) {
-		const dom = $(toDOM(value));
-		const html = this.node.html(dom);
-		this.change.setValue(html, undefined, callback);
+	setJsonValue(value: Element, callback?: (count: number) => void) {
+		const modelValue = this.model.toValue(value);
+		this.change.setValue(modelValue, undefined, callback);
 		this.normalize();
 		this.nodeId.generateAll(this.container);
 		this.initDocOnReadonly();
@@ -246,9 +250,12 @@ class Engine<T extends EngineOptions = EngineOptions>
 	}
 
 	getJsonValue() {
-		return toJSON0(this.container);
+		return cloneDeep(this.model.root);
 	}
 
+	/**
+	 * @deprecated 请使用 model.toText 性能更好
+	 */
 	getText(includeCard?: boolean) {
 		return new Parser(this.container, this).toText(
 			this.schema,
@@ -283,8 +290,8 @@ class Engine<T extends EngineOptions = EngineOptions>
 			if (!node) return;
 			this.node.removeMinusStyle(node, 'text-indent');
 			if (this.node.isRootBlock(node)) {
-				const childrenLength =
-					node.get<HTMLElement>()!.childNodes.length;
+				const childrenLength = node.get<HTMLElement>()!.childNodes
+					.length;
 				if (childrenLength === 0) {
 					node.append($('<br />'));
 				} else {
@@ -316,9 +323,8 @@ class Engine<T extends EngineOptions = EngineOptions>
 		this.change.destroy();
 		this.hotkey.destroy();
 		this.typing.destroy();
-		if (this.ot) {
-			this.ot.destroy();
-		}
+		this.model.destroy();
+		this.history.reset();
 		super.destroy();
 	}
 }

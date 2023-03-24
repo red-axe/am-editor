@@ -24,6 +24,7 @@
 			"@@/*": [".umi/*"]
 		}
 	},
+	"include": ["**/src"],
 	"exclude": [
 		"node_modules",
 		"lib",
@@ -33,6 +34,7 @@
 		"typings",
 		"**/__test__",
 		"test",
-		"fixtures"
+		"fixtures",
+		"api"
 	]
 }

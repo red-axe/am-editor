@@ -18,7 +18,7 @@ The following three plugins are different
 
 **`Vue3`** example [https://github.com/red-axe/am-editor-vue3-demo](https://github.com/red-axe/am-editor-vue3-demo)
 
-**`React`** example [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+**`React`** example [https://github.com/big-camel/am-editor/tree/master/examples/react](https://github.com/big-camel/am-editor/tree/master/examples/react)
 
 ### Installation
 
@@ -352,18 +352,12 @@ const EngineDemo = () => {
 export default EngineDemo;
 ```
 
-### Collaborative editing
+### Collaborative Editing
 
-Collaborative editing is based on [ShareDB](https://github.com/share/sharedb). Each editor acts as [client](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/ot-client.ts) through `WebSocket` and [server](https://github.com/yanmao-cc/am-editor/tree/master/ot-server) to exchange data. The editor processes and renders data.
+This open-source library listens to changes in the `HTML` structure of the editing area (contenteditable root node), uses `MutationObserver` to reverse-engineer the data structure, and connects and interacts with [Yjs](https://github.com/yjs/yjs) through `WebSocket` to achieve multi-user collaborative editing.
 
-We need to set up the server and then configure the client. [View full example](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/engine.tsx)
+Each editor, as a [client](https://github.com/red-axe/am-editor/blob/master/examples/react/components/editor/index.tsx#L250), communicates and interacts with the [server](https://github.com/big-camel/am-editor/tree/master/yjs-server) through the `WebSocket` function in the `@aomao/plugin-yjs-websocket` plugin.
 
-```tsx | pure
-//Instantiate the collaborative editing client and pass in the current editor engine instance
-const otClient = new OTClient(engine);
-//Connect to the collaboration server, uid will do a simple authentication demonstration here, and authentication information such as token should be required in normal business. `demo` is the unique number of the document
-otClient.connect(
-	`ws://127.0.0.1:8080${currentMember ? '?uid=' + currentMember.id : ''}`,
-	'demo',
-);
-```
+-   `@aomao/yjs` implements the conversion of editor and `Yjs` data
+-   `@aomao/plugin-yjs-websocket` provides the `WebSocket` client function of the editor and `Yjs`
+-   `@aomao/plugin-yjs-websocket/server` provides the `WebSocket` server of `Yjs`, written in Node.js, and supports data storage using `MongoDB` and `LevelDB`.

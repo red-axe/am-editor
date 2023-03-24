@@ -18,7 +18,7 @@ title: 安装
 
 **`Vue3`** DEMO [https://github.com/red-axe/am-editor-vue3-demo](https://github.com/red-axe/am-editor-vue3-demo)
 
-**`React`** DEMO [https://github.com/yanmao-cc/am-editor/tree/master/examples/react](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+**`React`** DEMO [https://github.com/big-camel/am-editor/tree/master/examples/react](https://github.com/big-camel/am-editor/tree/master/examples/react)
 
 ### 安装
 
@@ -354,16 +354,10 @@ export default EngineDemo;
 
 ### 协同编辑
 
-协同编辑基于[ShareDB](https://github.com/share/sharedb)实现。每位编辑者作为[客户端](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/ot-client.ts)通过`WebSocket`与[服务端](https://github.com/yanmao-cc/am-editor/tree/master/ot-server)通信交换数据。编辑器处理数据、渲染数据。
+该开源库通过监听编辑区域(contenteditable 根节点)内的 html 结构的变化，使用 `MutationObserver` 反推数据结构，并通过 `WebSocket` 与 [Yjs](https://github.com/yjs/yjs) 连接交互，实现多用户协同编辑的功能。
 
-我们需要把服务端搭建好，然后配置客户端。[查看完整示例](https://github.com/yanmao-cc/am-editor/blob/master/docs/demo/engine.tsx)
+每位编辑者作为 [客户端](https://github.com/red-axe/am-editor/blob/master/examples/react/components/editor/index.tsx#L250) 通过 `@aomao/plugin-yjs-websocket` 插件中的 `Websocket` 与 [服务端](https://github.com/big-camel/am-editor/tree/master/yjs-server) 进行通信交互。
 
-```tsx | pure
-//实例化协作编辑客户端，传入当前编辑器引擎实例
-const otClient = new OTClient(engine);
-//连接到协作服务端，uid这里做一个简单的身份验证演示，正常业务中应该需要token等身份验证信息。`demo` 是文档的唯一编号
-otClient.connect(
-	`ws://127.0.0.1:8080${currentMember ? '?uid=' + currentMember.id : ''}`,
-	'demo',
-);
-```
+-   `@aomao/yjs` 实现编辑器与 `Yjs` 数据的转换
+-   `@aomao/plugin-yjs-websocket` 提供编辑器与 `Yjs` 的 `WebSocket` 客户端功能
+-   `@aomao/plugin-yjs-websocket/server` 提供 `Yjs` 的 `WebSocket` 服务端，使用 Node.js 编写，并支持使用 `MongoDB` 和 `LevelDB` 存储数据。

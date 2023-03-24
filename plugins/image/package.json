@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-image",
-    "version": "2.9.35",
+    "version": "2.10.0",
     "description": "图片",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
@@ -12,13 +12,13 @@
     ],
     "author": "me@aomao.com",
     "license": "MIT",
-    "homepage": "https://github.com/yanmao-cc/am-editor#readme",
+    "homepage": "https://github.com/big-camel/am-editor#readme",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/yanmao-cc/am-editor.git"
+        "url": "git+https://github.com/big-camel/am-editor.git"
     },
     "bugs": {
-        "url": "https://github.com/yanmao-cc/am-editor/issues"
+        "url": "https://github.com/big-camel/am-editor/issues"
     },
     "publishConfig": {
         "access": "public"

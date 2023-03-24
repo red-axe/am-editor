@@ -34,7 +34,6 @@ import { Backspace, Enter, Left, Right, Up, Down, Default } from './typing';
 import { $ } from '../node';
 import { isNode } from '../node/utils';
 import { CardActiveTrigger, CardType } from './enum';
-import { toJSON0 } from '../ot/utils';
 import './index.css';
 
 class CardModel implements CardModelInterface {
@@ -144,19 +143,6 @@ class CardModel implements CardModelInterface {
 						if (card.destroy) card.destroy();
 						card.getCenter().empty();
 						this.renderComponent(card);
-						if (
-							isEngine(editor) &&
-							editor.readonly &&
-							!editor.ot.isRemote
-						) {
-							if (!editor.ot.doc?.type) {
-								editor.ot.doc?.create(
-									toJSON0(editor.container),
-								);
-							} else {
-								editor.ot.doc.data = toJSON0(editor.container);
-							}
-						}
 					}
 				}
 			});
@@ -200,7 +186,7 @@ class CardModel implements CardModelInterface {
 
 	find<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(
 		selector: string | Node | NodeInterface,
 		ignoreEditable?: boolean,
@@ -236,7 +222,7 @@ class CardModel implements CardModelInterface {
 
 	findBlock<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(selector: Node | NodeInterface): T | undefined {
 		if (isNode(selector)) selector = $(selector);
 		if (!selector.get()) return;
@@ -250,7 +236,7 @@ class CardModel implements CardModelInterface {
 
 	getSingleCard<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(range: RangeInterface) {
 		let card = this.find<E, T>(range.commonAncestorNode);
 		if (!card) card = this.getSingleSelectedCard<E, T>(range);
@@ -259,7 +245,7 @@ class CardModel implements CardModelInterface {
 
 	getSingleSelectedCard<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(range: RangeInterface) {
 		const elements = range.findElements();
 		let node = elements[0];
@@ -275,7 +261,7 @@ class CardModel implements CardModelInterface {
 	// 插入Card
 	insertNode<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(range: RangeInterface, card: T, ...args: any) {
 		const isInline = card.type === 'inline';
 		const editor = this.editor;
@@ -497,7 +483,7 @@ class CardModel implements CardModelInterface {
 
 	insert<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(name: string, value?: E, ...args: any) {
 		const editor = this.editor;
 		if (!isEngine(editor)) throw 'Engine not found';
@@ -530,7 +516,7 @@ class CardModel implements CardModelInterface {
 
 	replace<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(source: CardInterface, name: string, value?: E, ...args: any) {
 		this.remove(source.root);
 		return this.insert<E, T>(name, value, ...args);
@@ -552,7 +538,11 @@ class CardModel implements CardModelInterface {
 		const parent = card.root.parent();
 		this.removeNode(card);
 		list.addBr(range.startNode);
-		if (parent && node.isEmpty(parent) && !editor.ot.isStopped) {
+		if (
+			parent &&
+			node.isEmpty(parent) &&
+			!editor.model.mutation.isStopped
+		) {
 			if (parent.isEditable()) {
 				node.html(parent, '<p><br /></p>');
 				range.select(parent, true);
@@ -581,7 +571,11 @@ class CardModel implements CardModelInterface {
 
 		const parent = card.root.parent();
 		this.removeNode(card);
-		if (parent && node.isEmpty(parent) && !editor.ot.isStopped) {
+		if (
+			parent &&
+			node.isEmpty(parent) &&
+			!editor.model.mutation.isStopped
+		) {
 			if (parent.isEditable()) {
 				node.html(parent, '<p><br /></p>');
 			} else {
@@ -593,7 +587,7 @@ class CardModel implements CardModelInterface {
 	// 创建Card DOM 节点
 	create<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(
 		name: string,
 		options?: {
@@ -783,13 +777,12 @@ class CardModel implements CardModelInterface {
 			}
 		});
 		let isTriggerRenderAsync = false;
-		const isRemote = isEngine(this.editor) && this.editor.ot.isRemote;
 		asyncRenderCards.forEach((card) => {
-			// 可编辑卡片在远程模式下不进行异步渲染
+			// 可编辑卡片不进行异步渲染
 			if (
 				lazyRender &&
 				(card.constructor as CardEntry).lazyRender &&
-				(!card.isEditable || !isRemote)
+				!card.isEditable
 			) {
 				if (card.beforeRender) {
 					const result = card.beforeRender();

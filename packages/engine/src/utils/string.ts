@@ -1,4 +1,3 @@
-import tinycolor2 from 'tinycolor2';
 import { ANCHOR, CURSOR, FOCUS } from '../constants/selection';
 import {
 	CARD_EDITABLE_KEY,
@@ -79,8 +78,7 @@ export const toHex = (color: string): string => {
  */
 export const getAttrMap = (value: string): { [k: string]: string } => {
 	const map: { [k: string]: string } = {};
-	const reg =
-		/\s+(?:([\w\-:]+)|(?:([\w\-:]+)=([^\s"'<>]+))|(?:([\w\-:"]+)="([^"]*)")|(?:([\w\-:"]+)='([^']*)'))(?=(?:\s|\/|>)+)/g;
+	const reg = /\s+(?:([\w\-:]+)|(?:([\w\-:]+)=([^\s"'<>]+))|(?:([\w\-:"]+)="([^"]*)")|(?:([\w\-:"]+)='([^']*)'))(?=(?:\s|\/|>)+)/g;
 	let match;
 
 	while ((match = reg.exec(value))) {

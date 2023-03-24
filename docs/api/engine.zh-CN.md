@@ -28,11 +28,11 @@
 
 类型：`TypingInterface`
 
-### `ot`
+### `model`
 
-协同编辑相关
+数据模型相关
 
-类型：`OTInterface`
+类型：`Model`
 
 ### `history`
 
@@ -100,6 +100,8 @@ isEmpty(): boolean;
 
 ### `getValue`
 
+> 使用 `model.toValue` 替代, 性能更好
+
 获取编辑器值
 
 ```ts
@@ -111,6 +113,8 @@ getValue(ignoreCursor?: boolean): string;
 ```
 
 ### `getValueAsync`
+
+> 使用 `model.toValueAsync` 替代, 性能更好
 
 异步获取编辑器值，将等候插件处理完成后再获取值
 
@@ -133,6 +137,8 @@ getValueAsync(
 
 ### `getHtml`
 
+> 使用 `model.toHTML` 替代, 性能更好
+
 获取编辑器的 html
 
 ```ts
@@ -140,6 +146,19 @@ getValueAsync(
  * 获取编辑器的html
  */
 getHtml(): string;
+```
+
+### `getText`
+
+> 使用 `model.toText` 替代, 性能更好
+
+获取编辑器的 html
+
+```ts
+/**
+ * 获取编辑器的文本
+ */
+getText(): string;
 ```
 
 ### `getJsonValue`

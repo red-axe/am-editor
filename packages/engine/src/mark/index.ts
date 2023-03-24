@@ -51,9 +51,10 @@ class Mark implements MarkModelInterface {
 		const { change } = editor;
 		let range = change.range.get();
 		if (!range.collapsed || change.isComposing()) return;
-		const { startNode, startOffset } = range
-			.cloneRange()
-			.shrinkToTextNode();
+		const {
+			startNode,
+			startOffset,
+		} = range.cloneRange().shrinkToTextNode();
 		const node =
 			startNode.type === Node.TEXT_NODE
 				? startNode
@@ -457,8 +458,7 @@ class Mark implements MarkModelInterface {
 				}
 				// 右侧没文本
 				if (node.isEmpty(rightContainer)) {
-					let firstChild: NodeInterface | null =
-						rightContainer.first();
+					let firstChild: NodeInterface | null = rightContainer.first();
 					while (firstChild && !firstChild.isText()) {
 						rightContainer = firstChild;
 						firstChild = firstChild.first();
@@ -584,11 +584,10 @@ class Mark implements MarkModelInterface {
 											nodeApi.isInline(parent))
 									)
 										break;
-									node.textContent =
-										node.textContent.substring(
-											0,
-											node.textContent.length - atTextLen,
-										);
+									node.textContent = node.textContent.substring(
+										0,
+										node.textContent.length - atTextLen,
+									);
 								}
 							} else {
 								while (
@@ -607,10 +606,9 @@ class Mark implements MarkModelInterface {
 									)
 										break;
 
-									node.textContent =
-										node.textContent.substring(
-											atText.length,
-										);
+									node.textContent = node.textContent.substring(
+										atText.length,
+									);
 								}
 							}
 							if (node.textContent?.length !== 0) return;
@@ -1190,7 +1188,7 @@ class Mark implements MarkModelInterface {
 									selection?.focus &&
 									result
 										.find(
-											`[data-element="${selection.focus.attributes(
+											`[${DATA_ELEMENT}="${selection.focus.attributes(
 												DATA_ELEMENT,
 											)}"]`,
 										)
@@ -1459,8 +1457,9 @@ class Mark implements MarkModelInterface {
 								) {
 									markNodes.push(child);
 								} else if (child.isCard()) {
-									const cardComponent =
-										editor.card.find(child);
+									const cardComponent = editor.card.find(
+										child,
+									);
 									if (
 										cardComponent &&
 										cardComponent.executeMark
@@ -1611,10 +1610,11 @@ class Mark implements MarkModelInterface {
 				const startChildren = startNode.get<Node>()!.childNodes;
 				const startNodeClone = cloneRange.startNode;
 				const startOffsetClone = cloneRange.startOffset;
-				const startNodeCloneChildren =
-					startNodeClone.get<Node>()!.childNodes;
-				const startOffsetNode =
-					startNodeCloneChildren.item(startOffsetClone);
+				const startNodeCloneChildren = startNodeClone.get<Node>()!
+					.childNodes;
+				const startOffsetNode = startNodeCloneChildren.item(
+					startOffsetClone,
+				);
 				const startChildrenOffsetNode =
 					startChildren.item(startOffset) ||
 					startChildren.item(startOffset - 1);
@@ -1749,8 +1749,9 @@ class Mark implements MarkModelInterface {
 									) {
 										addNode(nodes, child);
 									} else if (child.isCard()) {
-										const cardComponent =
-											editor.card.find(child);
+										const cardComponent = editor.card.find(
+											child,
+										);
 										if (cardComponent?.queryMarks) {
 											cardComponent
 												.queryMarks()

@@ -1,4 +1,4 @@
-import tinycolor from 'tinycolor2';
+import { colord } from 'colord';
 import type {
 	PluginOptions,
 	ElementPluginInterface,
@@ -19,8 +19,7 @@ import { isNode } from '../node/utils';
 
 abstract class ElementPluginEntry<T extends PluginOptions = PluginOptions>
 	extends PluginEntry<T>
-	implements ElementPluginInterface<T>
-{
+	implements ElementPluginInterface<T> {
 	readonly kind: string = 'element';
 	/**
 	 * 规则缓存
@@ -131,7 +130,7 @@ abstract class ElementPluginEntry<T extends PluginOptions = PluginOptions>
 				node = node as NodeInterface;
 				let value =
 					styleName.toLowerCase().indexOf('color') > -1
-						? tinycolor(node.css(styleName) || '').toHexString()
+						? colord(node.css(styleName) || '').toHex()
 						: node.css(styleName);
 				let styleValue = this.style![styleName];
 				if (typeof styleValue === 'object') {
@@ -169,8 +168,11 @@ abstract class ElementPluginEntry<T extends PluginOptions = PluginOptions>
 	 */
 	isSelf(node: NodeInterface | Node) {
 		if (isNode(node)) node = $(node);
-		let schema: SchemaRule | SchemaGlobal | Array<SchemaRule> | undefined =
-			this.schema();
+		let schema:
+			| SchemaRule
+			| SchemaGlobal
+			| Array<SchemaRule>
+			| undefined = this.schema();
 		if (Array.isArray(schema))
 			schema = schema.find(
 				({ name }) => name === (node as NodeInterface).name,

@@ -3,8 +3,8 @@ import { LanguageInterface } from '@aomao/engine';
 import Input, { InputRef } from 'antd/es/input';
 import Button from 'antd/es/button';
 import classnames from 'classnames-es-ts';
-import 'antd/es/input/style';
-import 'antd/es/button/style';
+import 'antd/es/input/style/css';
+import 'antd/es/button/style/css';
 
 export type LinkEditorProps = {
 	language: LanguageInterface;

@@ -2,8 +2,8 @@ import React, { useState, useContext } from 'react';
 import Input from 'antd/es/input';
 import Button from 'antd/es/button';
 import Contentx from '../../context';
-import 'antd/es/input/style';
-import 'antd/es/button/style';
+import 'antd/es/input/style/css';
+import 'antd/es/button/style/css';
 
 type EditProps = {
 	defaultValue?: string;

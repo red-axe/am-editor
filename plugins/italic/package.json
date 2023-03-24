@@ -1,6 +1,6 @@
 {
   "name": "@aomao/plugin-italic",
-  "version": "2.9.27",
+  "version": "2.10.0",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -11,13 +11,13 @@
   ],
   "author": "me@aomao.com",
   "license": "MIT",
-  "homepage": "https://github.com/yanmao-cc/am-editor#readme",
+  "homepage": "https://github.com/big-camel/am-editor#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yanmao-cc/am-editor.git"
+    "url": "git+https://github.com/big-camel/am-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/yanmao-cc/am-editor/issues"
+    "url": "https://github.com/big-camel/am-editor/issues"
   },
   "dependencies": {
     "@babel/runtime": "^7.13.10"

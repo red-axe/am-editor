@@ -1,4 +1,4 @@
-import { Path } from 'sharedb';
+import { Path } from '../model';
 import { RangeInterface } from './range';
 import { SchemaInterface, SchemaRule } from './schema';
 

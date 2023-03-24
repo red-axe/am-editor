@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-mention",
-    "version": "2.9.31",
+    "version": "2.10.2",
     "description": "提到 @",
     "publishConfig": {
         "access": "public"
@@ -15,13 +15,13 @@
     ],
     "author": "me@aomao.com",
     "license": "MIT",
-    "homepage": "https://github.com/yanmao-cc/am-editor#readme",
+    "homepage": "https://github.com/big-camel/am-editor#readme",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/yanmao-cc/am-editor.git"
+        "url": "git+https://github.com/big-camel/am-editor.git"
     },
     "bugs": {
-        "url": "https://github.com/yanmao-cc/am-editor/issues"
+        "url": "https://github.com/big-camel/am-editor/issues"
     },
     "dependencies": {
         "@babel/runtime": "^7.13.10",

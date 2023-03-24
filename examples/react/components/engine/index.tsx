@@ -7,8 +7,8 @@ import React, {
 import message from 'antd/es/message';
 import Modal from 'antd/es/modal';
 import Engine, { EngineInterface, EngineOptions, Parser } from '@aomao/engine';
-import 'antd/es/message/style';
-import 'antd/es/modal/style';
+import 'antd/es/message/style/css';
+import 'antd/es/modal/style/css';
 
 export type EngineProps = EngineOptions & {
 	defaultValue?: string;
@@ -19,6 +19,14 @@ message.config({
 	top: 240,
 	duration: 3,
 });
+
+declare global {
+	interface Window {
+		engine: EngineInterface;
+		Parser: typeof Parser;
+	}
+}
+
 const EngineComponent: React.FC<EngineProps> = forwardRef<
 	EngineInterface | null,
 	EngineProps

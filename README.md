@@ -1,4 +1,4 @@
-> In the past two years, the `am-editor` editor has done a lot of functions and extensions based on the `contenteditable` attribute, but also encountered many problems. Of course, some problems are doomed from the very beginning of the architectural design. So, be bold now and try to abandon the `contenteditable` attribute and use the self-drawn cursor mode to develop the next version of the [rich text editor](https://github.com/editablejs/editable).
+> Here, we have a new rich text editor called [Editable](https://github.com/editablejs/editable), which does not use the native editable property [~~contenteditable~~](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable), but instead uses a custom renderer. This approach allows us to better control the behavior of the editor.
 
 # am-editor
 
@@ -38,83 +38,169 @@
   </a>
 </p>
 
-## Features
-
--   🍉 **Out of the box** - Dozens of ready to use plug to meet most needs
--   🍋 **Extensibility** - In addition to the basic plugin of `mark`, inline`and`block`type`, we also provide`card`component combined with`React`, `Vue` and other front-end libraries to render the plugin UI
--   🍎 **Markdown Support**
--   👨‍🦳 **I18n**
--   🔥 **Zero dependency** - The engine is written by pure **JavaScript** and does not rely on any front-end libraries. Plugins can be developed by any libraries such as `React` 、 `Vue` or `Svelte`
--   🦔 **Collaboration** - Ready to use with lightweight configuration
--   Compatible with most of the latest mobile browsers
--   🦾 **TypeScript** - Of course
-
-## Example
-
 [**`Vue2`**](https://github.com/zb201307/am-editor-vue2)
 
 [**`Vue3`**](https://github.com/red-axe/am-editor-vue3-demo)
 
-[**`React`** ](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
+[**`React`** ](https://github.com/big-camel/am-editor/tree/master/examples/react)
 
-[**`Vue2 Demo`**](https://github.com/yanmao-cc/am-editor-demo-vue2)
+[**`Vue2 Demo`**](https://github.com/big-camel/am-editor-demo-vue2)
 
-[**`Vue2 Nuxt Demo`**](https://github.com/yanmao-cc/am-editor-nuxt)
+[**`Vue2 Nuxt Demo`**](https://github.com/big-camel/am-editor-nuxt)
 
-## Fundamental
+## Features
 
-Use the `contenteditable` attribute provided by the browser to make a DOM node editable:
+-   🎁 Out-of-the-box solution with dozens of rich plugins to meet most needs
+-   🚀 Highly extensible, in addition to basic plugins for mark, inline, and block types, we also provide card components combined with front-end libraries like React and Vue to render plugin UI
+-   🎨 Rich multimedia support, not only supports images and audio/video, but also supports embedding multimedia content
+-   📝 Supports Markdown syntax
+-   🌍 Supports internationalization
+-   💻 Engine written purely in JavaScript, without relying on any front-end libraries, plugins can be rendered using front-end libraries like React and Vue. Can easily handle complex architecture
+-   👥 Built-in collaborative editing solution, lightweight configuration to use
+-   📱 Compatible with most latest mobile browsers
 
-```html
-<div contenteditable="true"></div>
+## Plugins
+
+| **Package**                                                                                           |                                                                                                                                                                             **Version** |                                                                                                                                                                           **Size** | **description**                 |
+| :---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------ |
+| [`@aomao/toolbar`](./packages/toolbar)                                                                |                                                                [![](https://img.shields.io/npm/v/@aomao/toolbar.svg?maxAge=3600&label=&colorB=007ec6)](./packages/toolbar/package.json) |                           [![](http://img.badgesize.io/https://unpkg.com/@aomao/toolbar/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/toolbar/dist/index.js) | Toolbar, suitable for `React`   |
+| [`@aomao/toolbar-vue`](./packages/toolbar-vue)                                                        |                                                        [![](https://img.shields.io/npm/v/@aomao/toolbar-vue.svg?maxAge=3600&label=&colorB=007ec6)](./packages/toolbar-vue/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/toolbar-vue/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/toolbar-vue/dist/index.js) | Toolbar, suitable for `Vue3`    |
+| [`am-editor-toolbar-vue2`](https://github.com/zb201307/am-editor-vue2/tree/main/packages/toolbar)     |     [![](https://img.shields.io/npm/v/am-editor-toolbar-vue2.svg?maxAge=3600&label=&colorB=007ec6)](https://github.com/zb201307/am-editor-vue2/blob/main/packages/toolbar/package.json) |           [![](http://img.badgesize.io/https://unpkg.com/am-editor-toolbar-vue2/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/am-editor-toolbar-vue2/dist/index.js) | Toolbar, suitable for `Vue2`    |
+| [`@aomao/plugin-alignment`](./plugins/alignment)                                                      |                                                      [![](https://img.shields.io/npm/v/@aomao/plugin-alignment.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/alignment/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-alignment/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-alignment/dist/index.js) | Alignment                       |
+| [`@aomao/plugin-embed`](./plugins/embed)                                                              |                                                              [![](https://img.shields.io/npm/v/@aomao/plugin-embed.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/embed/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-embed/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-embed/dist/index.js) | Embed URL                       |
+| [`@aomao/plugin-backcolor`](./plugins/backcolor)                                                      |                                                      [![](https://img.shields.io/npm/v/@aomao/plugin-backcolor.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/backcolor/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-backcolor/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-backcolor/dist/index.js) | Background color                |
+| [`@aomao/plugin-bold`](./plugins/bold)                                                                |                                                                [![](https://img.shields.io/npm/v/@aomao/plugin-bold.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/bold/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-bold/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-bold/dist/index.js) | Bold                            |
+| [`@aomao/plugin-code`](./plugins/code)                                                                |                                                                [![](https://img.shields.io/npm/v/@aomao/plugin-code.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/code/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-code/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-code/dist/index.js) | Inline code                     |
+| [`@aomao/plugin-codeblock`](./plugins/codeblock)                                                      |                                                      [![](https://img.shields.io/npm/v/@aomao/plugin-codeblock.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/codeblock/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-codeblock/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-codeblock/dist/index.js) | CodeBlock, suitable for `React` |
+| [`@aomao/plugin-codeblock-vue`](./plugins/codeblock-vue)                                              |                                              [![](https://img.shields.io/npm/v/@aomao/plugin-codeblock-vue.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/codeblock-vue/package.json) | [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-codeblock-vue/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-codeblock-vue/dist/index.js) | CodeBlock, suitable for `Vue3`  |
+| [`am-editor-codeblock-vue2`](https://github.com/zb201307/am-editor-vue2/tree/main/packages/codeblock) | [![](https://img.shields.io/npm/v/am-editor-codeblock-vue2.svg?maxAge=3600&label=&colorB=007ec6)](https://github.com/zb201307/am-editor-vue2/tree/main/packages/codeblock/package.json) |       [![](http://img.badgesize.io/https://unpkg.com/am-editor-codeblock-vue2/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/am-editor-codeblock-vue2/dist/index.js) | CodeBlock, suitable for `Vue2`  |
+| [`@aomao/plugin-fontcolor`](./plugins/fontcolor)                                                      |                                                      [![](https://img.shields.io/npm/v/@aomao/plugin-fontcolor.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/fontcolor/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-fontcolor/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-fontcolor/dist/index.js) | Font color                      |
+| [`@aomao/plugin-fontfamily`](./plugins/fontfamily)                                                    |                                                    [![](https://img.shields.io/npm/v/@aomao/plugin-fontfamily.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/fontfamily/package.json) |       [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-fontfamily/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-fontfamily/dist/index.js) | Font Family                     |
+| [`@aomao/plugin-fontsize`](./plugins/fontsize)                                                        |                                                        [![](https://img.shields.io/npm/v/@aomao/plugin-fontsize.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/fontsize/package.json) |           [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-fontsize/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-fontsize/dist/index.js) | Font Size                       |
+| [`@aomao/plugin-heading`](./plugins/heading)                                                          |                                                          [![](https://img.shields.io/npm/v/@aomao/plugin-heading.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/heading/package.json) |             [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-heading/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-heading/dist/index.js) | Heading                         |
+| [`@aomao/plugin-hr`](./plugins/hr)                                                                    |                                                                    [![](https://img.shields.io/npm/v/@aomao/plugin-hr.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/hr/package.json) |                       [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-hr/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-hr/dist/index.js) | Horizontal rule                 |
+| [`@aomao/plugin-indent`](./plugins/indent)                                                            |                                                            [![](https://img.shields.io/npm/v/@aomao/plugin-indent.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/indent/package.json) |               [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-indent/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-indent/dist/index.js) | Indentation                     |
+| [`@aomao/plugin-italic`](./plugins/italic)                                                            |                                                            [![](https://img.shields.io/npm/v/@aomao/plugin-italic.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/italic/package.json) |               [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-italic/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-italic/dist/index.js) | Italic                          |
+| [`@aomao/plugin-link`](./plugins/link)                                                                |                                                                [![](https://img.shields.io/npm/v/@aomao/plugin-link.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/link/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-link/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-link/dist/index.js) | Link, suitable for `React`      |
+| [`@aomao/plugin-link-vue`](./plugins/link-vue)                                                        |                                                        [![](https://img.shields.io/npm/v/@aomao/plugin-link-vue.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/link-vue/package.json) |           [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-link-vue/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-link-vue/dist/index.js) | Link, suitable for `Vue3`       |
+| [`am-editor-link-vue2`](https://github.com/zb201307/am-editor-vue2/tree/main/packages/link)           |           [![](https://img.shields.io/npm/v/am-editor-link-vue2.svg?maxAge=3600&label=&colorB=007ec6)](https://github.com/zb201307/am-editor-vue2/tree/main/packages/link/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/am-editor-link-vue2/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/am-editor-link-vue2/dist/index.js) | Link, suitable for `Vue2`       |
+| [`@aomao/plugin-line-height`](./plugins/line-height)                                                  |                                                  [![](https://img.shields.io/npm/v/@aomao/plugin-line-height.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/line-height/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-line-height/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-line-height/dist/index.js) | Line height                     |
+| [`@aomao/plugin-mark`](./plugins/mark)                                                                |                                                                [![](https://img.shields.io/npm/v/@aomao/plugin-mark.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/mark/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-mark/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-mark/dist/index.js) | Mark                            |
+| [`@aomao/plugin-mention`](./plugins/mention)                                                          |                                                          [![](https://img.shields.io/npm/v/@aomao/plugin-mention.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/mention/package.json) |             [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-mention/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-mention/dist/index.js) | Mention                         |
+| [`@aomao/plugin-orderedlist`](./plugins/orderedlist)                                                  |                                                  [![](https://img.shields.io/npm/v/@aomao/plugin-orderedlist.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/orderedlist/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-orderedlist/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-orderedlist/dist/index.js) | Ordered list                    |
+| [`@aomao/plugin-paintformat`](./plugins/paintformat)                                                  |                                                  [![](https://img.shields.io/npm/v/@aomao/plugin-paintformat.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/paintformat/package.json) |     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-paintformat/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-paintformat/dist/index.js) | Format painter                  |
+| [`@aomao/plugin-quote`](./plugins/quote)                                                              |                                                              [![](https://img.shields.io/npm/v/@aomao/plugin-quote.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/quote/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-quote/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-quote/dist/index.js) | Blockquote                      |
+| [`@aomao/plugin-redo`](./plugins/redo)                                                                |                                                                [![](https://img.shields.io/npm/v/@aomao/plugin-redo.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/redo/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-redo/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-redo/dist/index.js) | Redo                            |
+| [`@aomao/plugin-removeformat`](./plugins/removeformat)                                                |                                                [![](https://img.shields.io/npm/v/@aomao/plugin-removeformat.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/removeformat/package.json) |   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-removeformat/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-removeformat/dist/index.js) | Remove format                   |
+| [`@aomao/plugin-selectall`](./plugins/selectall)                                                      |                                                      [![](https://img.shields.io/npm/v/@aomao/plugin-selectall.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/selectall/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-selectall/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-selectall/dist/index.js) | Select all                      |
+| [`@aomao/plugin-status`](./plugins/status)                                                            |                                                            [![](https://img.shields.io/npm/v/@aomao/plugin-status.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/status/package.json) |               [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-status/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-status/dist/index.js) | Status                          |
+| [`@aomao/plugin-strikethrough`](./plugins/strikethrough)                                              |                                              [![](https://img.shields.io/npm/v/@aomao/plugin-strikethrough.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/strikethrough/package.json) | [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-strikethrough/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-strikethrough/dist/index.js) | Strikethrough                   |
+| [`@aomao/plugin-sub`](./plugins/sub)                                                                  |                                                                  [![](https://img.shields.io/npm/v/@aomao/plugin-sub.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/sub/package.json) |                     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-sub/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-sub/dist/index.js) | Sub                             |
+| [`@aomao/plugin-sup`](./plugins/sup)                                                                  |                                                                  [![](https://img.shields.io/npm/v/@aomao/plugin-sup.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/sup/package.json) |                     [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-sup/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-sup/dist/index.js) | Sup                             |
+| [`@aomao/plugin-tasklist`](./plugins/tasklist)                                                        |                                                        [![](https://img.shields.io/npm/v/@aomao/plugin-tasklist.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/tasklist/package.json) |           [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-tasklist/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-tasklist/dist/index.js) | Task list                       |
+| [`@aomao/plugin-underline`](./plugins/underline)                                                      |                                                      [![](https://img.shields.io/npm/v/@aomao/plugin-underline.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/underline/package.json) |         [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-underline/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-underline/dist/index.js) | Underline                       |
+| [`@aomao/plugin-undo`](./plugins/undo)                                                                |                                                                [![](https://img.shields.io/npm/v/@aomao/plugin-undo.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/undo/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-undo/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-undo/dist/index.js) | Undo                            |
+| [`@aomao/plugin-unorderedlist`](./plugins/unorderedlist)                                              |                                              [![](https://img.shields.io/npm/v/@aomao/plugin-unorderedlist.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/unorderedlist/package.json) | [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-unorderedlist/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-unorderedlist/dist/index.js) | Unordered list                  |
+| [`@aomao/plugin-image`](./plugins/image)                                                              |                                                              [![](https://img.shields.io/npm/v/@aomao/plugin-image.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/image/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-image/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-image/dist/index.js) | Image                           |
+| [`@aomao/plugin-table`](./plugins/table)                                                              |                                                              [![](https://img.shields.io/npm/v/@aomao/plugin-table.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/table/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-table/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-table/dist/index.js) | Table                           |
+| [`@aomao/plugin-file`](./plugins/file)                                                                |                                                                [![](https://img.shields.io/npm/v/@aomao/plugin-file.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/file/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-file/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-file/dist/index.js) | File                            |
+| [`@aomao/plugin-mark-range`](./plugins/mark-range)                                                    |                                                    [![](https://img.shields.io/npm/v/@aomao/plugin-mark-range.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/mark-range/package.json) |       [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-mark-range/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-mark-range/dist/index.js) | Mark range                      |
+| [`@aomao/plugin-math`](./plugins/math)                                                                |                                                                [![](https://img.shields.io/npm/v/@aomao/plugin-math.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/math/package.json) |                   [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-math/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-math/dist/index.js) | Mathematical formula            |
+| [`@aomao/plugin-video`](./plugins/video)                                                              |                                                              [![](https://img.shields.io/npm/v/@aomao/plugin-video.svg?maxAge=3600&label=&colorB=007ec6)](./plugins/video/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/@aomao/plugin-video/dist/index.js?compression=gzip&label=%20)](https://unpkg.com/@aomao/plugin-video/dist/index.js) | Video                           |
+
+## Getting Started
+
+### Installation
+
+The editor consists of the `engine`, `toolbar`, and `plugins`. The `engine` provides us with the core editing capability.
+
+Use `npm` or `yarn` to install the engine package.
+
+```bash
+$ npm install @aomao/engine
+# or
+$ yarn add @aomao/engine
 ```
 
-So its value looks like this:
+### Usage
 
-```html
-<div data-element="root" contenteditable="true">
-	<p>Hello world!</p>
-	<p><br /></p>
-</div>
+We'll start by outputting a "Hello world!" message as usual.
+
+```tsx
+import React, { useEffect, useRef, useState } from 'react';
+import Engine, { EngineInterface } from '@aomao/engine';
+
+const EngineDemo = () => {
+	//Editor container
+	const ref = useRef<HTMLDivElement | null>(null);
+	//Engine instance
+	const [engine, setEngine] = useState<EngineInterface>();
+	//Editor content
+	const [content, setContent] = useState<string>('<p>Hello world!</p>');
+
+	useEffect(() => {
+		if (!ref.current) return;
+		//Instantiate the engine
+		const engine = new Engine(ref.current);
+		//Set the editor value
+		engine.setValue(content);
+		//Listen to the editor value change event
+		engine.on('change', () => {
+			const value = engine.getValue();
+			setContent(value);
+			console.log(`value:${value}`);
+		});
+		//Set the engine instance
+		setEngine(engine);
+	}, []);
+
+	return <div ref={ref} />;
+};
+export default EngineDemo;
 ```
 
-Of course, in some scenarios, for the convenience of operation, an API that converts to a JSON type value is also provided:
+### Plugins
 
-```ts
-[
-	'div', // node name
-	// All attributes of the node
-	{
-		'data-element': 'root',
-		contenteditable: 'true',
-	},
-	// child node 1
-	[
-		// child node name
-		'p',
-		// Child node attributes
-		{},
-		// child node of byte point
-		'Hello world!',
-	],
-	// child node 2
-	['p', {}, ['br', {}]],
-];
+Import the `@aomao/plugin-bold` bold plugin.
+
+```tsx
+import Bold from '@aomao/plugin-bold';
 ```
 
-<Alert>
-  The editor relies on the input capabilities provided by the <strong>contenteditable</strong> attribute and cursor control capabilities. Therefore, it has all the default browser behaviors, but the default behavior of the browser has different processing methods under different browser vendors' implementations, so we intercept most of its default behaviors and customize them.
-</Alert>
+Add the `Bold` plugin to the engine.
 
-For example, during the input process, `beforeinput`, `input`, delete, enter, and shortcut keys related to `mousedown`, `mouseup`, `click` and other events will be intercepted and customized processing will be performed.
+```tsx
+//Instantiate the engine
+const engine = new Engine(ref.current, {
+	plugins: [Bold],
+});
+```
 
-After taking over the event, what the editor does is to manage all the child nodes under the root node based on the `contenteditable` property, such as inserting text, deleting text, inserting pictures, and so on.
+### Card
 
-In summary, the data structure in editing is a DOM tree structure, and all operations are performed directly on the DOM tree, not a typical MVC mode that drives view rendering with a data model.
+A card is a separately defined area in the editor, with its UI and logic for rendering custom content inside the card using `React`, `Vue`, or other front-end libraries before being mounted onto the editor.
 
-## Node constraints
+Introduce `@aomao/plugin-codeblock`, a code block plugin with a language drop-down that is rendered using React, which distinguishes it from Vue3 using `@aomao/plugin-codeblock-vue`.
 
-In order to manage nodes more conveniently and reduce complexity. The editor abstracts node attributes and functions, and formulates four types of nodes, `mark`, `inline`, `block`, and `card`. They are composed of different attributes, styles, or `html` structures, and use the `schema` uniformly. They are constrained.
+```tsx
+import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
+```
+
+Add the `CodeBlock` plugin and the `CodeBlockComponent` card component to the engine.
+
+```tsx
+//Instantiate the engine
+const engine = new Engine(ref.current, {
+	plugins: [CodeBlock],
+	cards: [CodeBlockComponent],
+});
+```
+
+The `CodeBlock` plugin supports `markdown` by default. You can trigger it by typing the code block syntax at the beginning of a line in the editor, followed by a space and the language name, such as ```javascript.
+
+## Node Constraints
+
+To manage nodes more conveniently and reduce complexity, the editor abstracts node properties and functionality and defines four types of nodes: `mark`, `inline`, `block`, and `card`. They are composed of different attributes, styles, or `HTML` structures, and are uniformly constrained using a schema.
 
 A simple `schema` looks like this:
 
@@ -125,7 +211,7 @@ A simple `schema` looks like this:
 }
 ```
 
-In addition, you can also describe attributes, styles, etc., such as:
+In addition, properties, styles, etc. can also be described, for example:
 
 ```ts
 {
@@ -158,96 +244,6 @@ The following types of nodes conform to the above rules:
 But except that color and test have been defined in `schema`, other attributes (background-color, test1) will be filtered out by the editor during processing.
 
 The nodes in the editable area have four types of combined nodes of `mark`, `inline`, block`, and `card`through the`schema`rule. They are composed of different attributes, styles or`html` structures. Certain constraints are imposed on nesting.
-
-## Getting Started
-
-### Installation
-
-The editor consists of `engine`, `toolbar`, and `plugin`. `Engine` provides us with core editing capabilities.
-
-Install engine package using npm or yarn
-
-```bash
-$ npm install @aomao/engine
-# or
-$ yarn add @aomao/engine
-```
-
-### Usage
-
-We follow the convention to output a `Hello word!`
-
-```tsx
-import React, { useEffect, useRef, useState } from 'react';
-import Engine, { EngineInterface } from '@aomao/engine';
-
-const EngineDemo = () => {
-	//Editor container
-	const ref = useRef<HTMLDivElement | null>(null);
-	//Engine instance
-	const [engine, setEngine] = useState<EngineInterface>();
-	//Editor content
-	const [content, setContent] = useState<string>('<p>Hello word!</p>');
-
-	useEffect(() => {
-		if (!ref.current) return;
-		//Instantiate the engine
-		const engine = new Engine(ref.current);
-		//Set the editor value
-		engine.setValue(content);
-		//Listen to the editor value change event
-		engine.on('change', () => {
-			const value = engine.getValue();
-			setContent(value);
-			console.log(`value:${value}`);
-		});
-		//Set the engine instance
-		setEngine(engine);
-	}, []);
-
-	return <div ref={ref} />;
-};
-export default EngineDemo;
-```
-
-### Plugins
-
-Import `@aomao/plugin-bold` bold plugin
-
-```tsx
-import Bold from '@aomao/plugin-bold';
-```
-
-Add the `Bold` plugin to the engine
-
-```tsx
-//Instantiate the engine
-const engine = new Engine(ref.current, {
-	plugins: [Bold],
-});
-```
-
-### Card
-
-A card is a separate area in the editor. The UI and logic inside the card can be customized using React, Vue or other front-end libraries to customize the rendering content, and finally mount it to the editor.
-
-Import the `@aomao/plugin-codeblock` code block plugin. The `Language drop-down box` of this plugin is rendered using `React`, so there is a distinction. `Vue3` uses `@aomao/plugin-codeblock-vue`
-
-```tsx
-import CodeBlock, { CodeBlockComponent } from '@aomao/plugin-codeblock';
-```
-
-Add the `CodeBlock` plugin and `CodeBlockComponent` card component to the engine
-
-```tsx
-//Instantiate the engine
-const engine = new Engine(ref.current, {
-	plugins: [CodeBlock],
-	cards: [CodeBlockComponent],
-});
-```
-
-The `CodeBlock` plugin supports `markdown` by default. Enter the code block syntax ````javascript` at the beginning of a line in the editor to trigger it after pressing Space.
 
 ### Toolbar
 
@@ -293,39 +289,17 @@ return (
 
 For more complex toolbar configuration, please check the document [https://editor.aomao.com/config/toolbar](https://editor.aomao.com/config/toolbar)
 
-### Collaborative editing
+### Collaborative Editing
 
-Use the `MutationObserver` to monitor the mutation of the `html` structure in the editable area (contenteditable root node) to reverse infer OT. Connect to [ShareDB](https://github.com/share/sharedb) through `Websocket`, and then use commands to add, delete, modify, and check the data saved in ShareDB.
+This open-source library listens to changes in the `HTML` structure of the editing area (contenteditable root node), uses `MutationObserver` to reverse-engineer the data structure, and connects and interacts with [Yjs](https://github.com/yjs/yjs) through `WebSocket` to achieve multi-user collaborative editing.
 
 #### Interactive mode
 
-Each editor acts as a [Client](https://github.com/yanmao-cc/am-editor/tree/master/examples/react/components/editor/ot/client.ts) through `WebSocket` and [ Server](https://github.com/yanmao-cc/am-editor/tree/master/ot-server) Communication and exchange of data in `json0` format generated by the editor.
+Each editor, as a [client](https://github.com/red-axe/am-editor/blob/master/examples/react/components/editor/index.tsx#L250), communicates and interacts with the [server](https://github.com/big-camel/am-editor/tree/master/yjs-server) through the `WebSocket` function in the `@aomao/plugin-yjs-websocket` plugin.
 
-The server will keep a copy of the `html` structure data in the `json` format. After receiving the instructions from the client, it will modify the data, and finally forward it to each client.
-
-Before enabling collaborative editing, we need to configure [Client](https://github.com/yanmao-cc/am-editor/tree/master/examples/react/components/editor/ot/client.ts) and [Server](https://github.com/yanmao-cc/am-editor/tree/master/ot-server)
-
-The server is a `NodeJs` environment, and a network service built using `express` + `WebSocket`.
-
-#### Example
-
-In the example, we have a relatively basic client code
-
-[View the complete React example](https://github.com/yanmao-cc/am-editor/tree/master/examples/react)
-
-[View the complete example of Vue3](https://github.com/red-axe/am-editor-vue3-demo)
-
-[View the complete example of Vue2](https://github.com/zb201307/am-editor-vue2)
-
-```tsx
-//Instantiate the collaborative editing client and pass in the current editor engine instance
-const otClient = new OTClient(engine);
-//Connect to the collaboration server, `demo` is the same as the server document ID
-otClient.connect(
-	`ws://127.0.0.1:8080${currentMember ? '?uid=' + currentMember.id : ''}`,
-	'demo',
-);
-```
+-   `@aomao/yjs` implements the conversion of editor and `Yjs` data
+-   `@aomao/plugin-yjs-websocket` provides the `WebSocket` client function of the editor and `Yjs`
+-   `@aomao/plugin-yjs-websocket/server` provides the `WebSocket` server of `Yjs`, written in Node.js, and supports data storage using `MongoDB` and `LevelDB`.
 
 ### Project icon
 
@@ -335,26 +309,30 @@ otClient.connect(
 
 ### React
 
-Need to install dependencies in `am-editor
+Before using this open-source library, you need to install dependencies in the project root directory.
 
 ```base
-//After the dependencies are installed, you only need to execute the following commands in the root directory
+yarn install
 
+leran bootstrap
+```
+
+After installing the dependencies, you only need to execute the following command in the root directory to start the project:
+
+```base
 yarn start
 ```
 
--   `packages` engine and toolbar
--   `plugins` all plugins
--   `api` supports api access required by some plugins. By default, https://editor.aomao.com is used as the api service
--   `ot-server` collaborative server. Start: yarn dev
+The development directory structure of this open-source library is as follows:
 
-Visit localhost:7001 after startup
+-   `packages` contains the engine and toolbar-related code
+-   `plugins` contains all plugins
+-   `api` provides API access required by some plugins, and uses https://editor.aomao.com as the default API service
+-   `yjs-server` contains collaborative server code, which can be started by `yarn dev`.
 
 ### Vue
 
 [am-editor vue example](https://github.com/red-axe/am-editor-vue3-demo)
-
-> Vue example powered by [**modern-vue-template**](https://github.com/byoungd/modern-vue-template)
 
 ## Contribution
 

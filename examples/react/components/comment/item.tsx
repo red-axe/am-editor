@@ -4,7 +4,7 @@ import Space from 'antd/es/space';
 import { DataItem } from './types';
 import ItemEdit from './edit';
 import Context from '../../context';
-import 'antd/es/space/style';
+import 'antd/es/space/style/css';
 
 export type CommentItemProps = Omit<
 	React.AnchorHTMLAttributes<HTMLDivElement>,

@@ -1,4 +1,4 @@
-import tinycolor2 from 'tinycolor2';
+import { colord } from 'colord';
 import type { MarkInterface, NodeInterface, SchemaInterface } from '../types';
 import {
 	READY_CARD_KEY,
@@ -31,10 +31,10 @@ export default class Paste {
 
 	getDefaultStyle(container = this.engine.container) {
 		const defaultStyle = {
-			color: tinycolor2(container.css('color')).toHexString(),
-			'background-color': tinycolor2(
+			color: colord(container.css('color')).toHex(),
+			'background-color': colord(
 				container.css('background-color'),
-			).toHexString(),
+			).toHex(),
 			'font-size': container.css('font-size'),
 		};
 		return defaultStyle;
@@ -138,7 +138,7 @@ export default class Paste {
 					let value = styles[key];
 					if (!value) continue;
 					if (key.endsWith('color')) {
-						value = tinycolor2(value).toHexString();
+						value = colord(value).toHex();
 					}
 					if (
 						value.toLowerCase() === defaultStyle[key].toLowerCase()
@@ -158,8 +158,9 @@ export default class Paste {
 					node.css('padding-left', '');
 				}
 
-				let attributes: { [k: string]: string } | undefined =
-					node.attributes();
+				let attributes:
+					| { [k: string]: string }
+					| undefined = node.attributes();
 				// 删除空 style 属性
 				if (attributes.style && attributes.style.trim() === '') {
 					node.removeAttributes('style');
@@ -696,7 +697,7 @@ export default class Paste {
 				this.engine.trigger('paste:each', node);
 			// 删除非block节点的换行 \r\n\r\n<span
 			if (node.isText()) {
-				const text = node.text();
+				let text = node.text();
 				if (/^(\r|\n)+$/.test(text)) {
 					const prev = node.prev();
 					const next = node.next();
@@ -711,13 +712,24 @@ export default class Paste {
 					)
 						node.remove();
 				}
-				const match = /((\n)+)/.exec(text);
-				if (match && match.index > 0 && match.index < text.length - 1) {
-					const nextReg = node.get<Text>()!.splitText(match.index);
+				let match = /((\n)+)/.exec(text);
+				let matchNode = node;
+				while (
+					match &&
+					match.index > 0 &&
+					match.index < text.length - 1
+				) {
+					const nextReg = matchNode
+						.get<Text>()!
+						.splitText(match.index);
 					const endReg = nextReg.splitText(match[0].length);
-					node.after(nextReg);
+					matchNode.after(nextReg);
 					nextReg.after(endReg);
-					if (!node.text()) node.remove();
+					if (!matchNode.text()) matchNode.remove();
+					const endNode = $(endReg);
+					matchNode = endNode;
+					text = endNode.text();
+					match = /((\n)+)/.exec(text);
 				}
 			}
 			// 删除包含Card的 pre 标签

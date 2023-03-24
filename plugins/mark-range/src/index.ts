@@ -20,8 +20,9 @@ import {
 	View,
 	EditorInterface,
 	CardInterface,
+	Path,
+	Node as ModelNode,
 } from '@aomao/engine';
-import { Path } from 'sharedb';
 
 export interface MarkRangeOptions extends PluginOptions {
 	keys: Array<string>;
@@ -31,7 +32,7 @@ export interface MarkRangeOptions extends PluginOptions {
 const PLUGIN_NAME = 'mark-range';
 
 export default class<
-	T extends MarkRangeOptions = MarkRangeOptions,
+	T extends MarkRangeOptions = MarkRangeOptions
 > extends MarkPlugin<T> {
 	private range?: RangeInterface;
 	private executeBySelf: boolean = false;
@@ -106,12 +107,13 @@ export default class<
 			editor.on('change', this.onChange);
 			editor.on('select', this.onSelectionChange);
 			editor.on('parse:value', this.parseValue);
+			editor.on('parse:node', this.parseNode);
 			editor.on('afterSetValue', this.onAfterSetValue);
 			const keys = optionKeys.map((key) => this.getPreviewName(key));
 			editor.history.onFilter((op) => {
 				if (
-					('od' in op || 'oi' in op) &&
-					keys.includes(op.p[op.p.length - 1].toString())
+					op.type === 'set_node' &&
+					keys.some((key) => !!op.newProperties[key])
 				) {
 					return true;
 				}
@@ -162,6 +164,13 @@ export default class<
 		}
 	};
 
+	parseNode = (node: ModelNode) => {
+		const key = node[this.MARK_KEY];
+		if (!!key) {
+			node[DATA_TRANSIENT_ATTRIBUTES] = this.getPreviewName(key);
+		}
+	};
+
 	onAfterSetValue = () => {
 		const editor = this.editor;
 		if (!isEngine(editor)) return;
@@ -201,8 +210,13 @@ export default class<
 			.cloneRange()
 			.shrinkToElementNode()
 			.shrinkToTextNode();
-		const { startNode, startOffset, endNode, endOffset, collapsed } =
-			cloneRange;
+		const {
+			startNode,
+			startOffset,
+			endNode,
+			endOffset,
+			collapsed,
+		} = cloneRange;
 		let startMark = startNode.closest(`[${this.MARK_KEY}]`);
 		const startChild = startNode.isElement()
 			? startNode.children().eq(startOffset)
@@ -566,16 +580,20 @@ export default class<
 
 	startMutation() {
 		const editor = this.editor;
-		if (isEngine(editor) && editor.ot.isStopped()) {
-			editor.ot.startMutation();
+		if (isEngine(editor) && editor.model.mutation.isStopped) {
+			editor.model.mutation.start();
 		}
 	}
 
 	stopMutation() {
 		const editor = this.editor;
 		setTimeout(() => {
-			if (isEngine(editor) && editor.readonly && !editor.ot.isStopped()) {
-				editor.ot.stopMutation();
+			if (
+				isEngine(editor) &&
+				editor.readonly &&
+				!editor.model.mutation.isStopped
+			) {
+				editor.model.mutation.stop();
 			}
 		}, 10);
 	}
@@ -757,18 +775,19 @@ export default class<
 		if (value) container.html(transformCustomTags(value));
 		card.render(container, undefined, false);
 		const selection = container.window?.getSelection();
-		const range = (
-			selection
-				? Range.from(editor, selection) || Range.create(editor)
-				: Range.create(editor)
+		const range = (selection
+			? Range.from(editor, selection) || Range.create(editor)
+			: Range.create(editor)
 		).cloneRange();
 
 		const parser = new Parser(container, editor, undefined, false);
 		const { schema, conversion } = editor;
 		if (!range) {
+			const newValue = value ?? parser.toValue(schema, conversion);
+			editor.destroy();
 			container.remove();
 			return {
-				value: value ? value : parser.toValue(schema, conversion),
+				value: newValue,
 				paths: [],
 			};
 		}
@@ -825,7 +844,7 @@ export default class<
 				}
 			}
 		});
-		value = parser.toValue(schema, conversion);
+		value = value ?? parser.toValue(schema, conversion);
 		editor.destroy();
 		container.remove();
 		return {
@@ -859,17 +878,18 @@ export default class<
 		if (value) container.html(transformCustomTags(value));
 		card.render(container, undefined, false);
 		const selection = container.window?.getSelection();
-		const range = (
-			selection
-				? Range.from(editor, selection) || Range.create(editor)
-				: Range.create(editor)
+		const range = (selection
+			? Range.from(editor, selection) || Range.create(editor)
+			: Range.create(editor)
 		).cloneRange();
 
 		const parser = new Parser(container, editor, undefined, false);
 		const { schema, conversion } = editor;
 		if (!range) {
+			const newValue = value ? value : parser.toValue(schema, conversion);
+			editor.destroy();
 			container.remove();
-			return value ? value : parser.toValue(schema, conversion);
+			return newValue;
 		}
 
 		range.select(container, true).collapse(true);
@@ -938,6 +958,7 @@ export default class<
 			editor.off('change', this.onChange);
 			editor.off('select', this.onSelectionChange);
 			editor.off('parse:value', this.parseValue);
+			editor.off('parse:node', this.parseNode);
 			editor.off('afterSetValue', this.onAfterSetValue);
 		} else if (isView(editor)) {
 			editor.off(`${PLUGIN_NAME}:set-range`, this.onSelectionChange);
