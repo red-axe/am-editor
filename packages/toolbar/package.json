@@ -30,13 +30,13 @@
         "@types/keymaster": "^1.6.28",
         "@types/lodash": "^4.14.178",
         "@types/tinycolor2": "^1.4.2",
-        "antd": "^5.0.0-rc.3",
+		"antd": "^5.3.2",
         "react": "^17.0.0",
         "react-dom": ">=17.0.0"
     },
     "peerDependencies": {
         "@aomao/engine": ">=2.9",
-        "antd": "^5.0.0-rc.3",
+		"antd": "^5.3.2",
         "react": ">=17.0.0",
         "react-dom": ">=17.0.0"
     }

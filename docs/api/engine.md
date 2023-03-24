@@ -28,11 +28,11 @@ Key processing
 
 Type: `TypingInterface`
 
-### `ot`
+### `model`
 
-Co-editing related
+Data model related
 
-Type: `OTInterface`
+Type: `Model`
 
 ### `history`
 
@@ -95,6 +95,8 @@ isEmpty(): boolean;
 
 ### `getValue`
 
+> Use `model.toValue` instead, performance is better
+
 Get editor value
 
 ```ts
@@ -106,6 +108,8 @@ getValue(ignoreCursor?: boolean): string;
 ```
 
 ### `getValueAsync`
+
+> Use `model.toValueAsync` instead, performance is better
 
 Get the editor value asynchronously, and will wait for the plugin processing to complete before getting the value
 
@@ -128,6 +132,8 @@ getValueAsync(
 
 ### `getHtml`
 
+> Use `model.toHTML` instead, performance is better
+
 Get the html of the editor
 
 ```ts
@@ -136,6 +142,19 @@ Get the html of the editor
  */
 getHtml(): string;
 ```
+
+### `getText`
+
+> Use `model.toText` instead, performance is better
+
+Get the text of the editor
+
+````ts
+/**
+ * Get the text of the editor
+ */
+getText(): string;
+
 
 ### `getJsonValue`
 
@@ -146,7 +165,7 @@ Get the value in JSON format
   * Get the value in JSON format
   */
 getJsonValue(): string | undefined | (string | {})[];
-```
+````
 
 ### `setValue`
 

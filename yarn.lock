@@ -3243,6 +3243,11 @@
   dependencies:
     "@types/estree" "*"
 
+"@types/tinycolor2@^1.4.2":
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/@types/tinycolor2/-/tinycolor2-1.4.3.tgz#ed4a0901f954b126e6a914b4839c77462d56e706"
+  integrity sha512-Kf1w9NE5HEgGxCRyIcRXR/ZYtDv0V8FVPtYHwLxl0O+maGX0erE77pQlD0gpP+/KByMZ87mOA79SjifhSB3PjQ==
+
 "@types/unist@*", "@types/unist@^2.0.0", "@types/unist@^2.0.2", "@types/unist@^2.0.3":
   version "2.0.6"
   resolved "https://registry.npmjs.org/@types/unist/-/unist-2.0.6.tgz#250a7b16c3b91f672a24552ec64678eeb1d3a08d"
@@ -3941,7 +3946,7 @@ ant-design-vue@>=2.2.6:
     vue-types "^3.0.0"
     warning "^4.0.0"
 
-antd@^5.0.0-rc.3:
+antd@^5.0.0-rc.3, antd@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/antd/-/antd-5.3.2.tgz#6f225a3ae43c63c1003dc7af4d0045d3be612497"
   integrity sha512-AOCZ+5krqvlLPR1v33K2PQtt9XBAC0gUdjxuHltUliE9u2zlZzGT+4DSHTNnw8CtotPV4lFKab3+K+FgdtyTlw==
@@ -11415,11 +11420,6 @@ moment-mini@2.24.0:
   version "2.24.0"
   resolved "https://registry.npmjs.org/moment-mini/-/moment-mini-2.24.0.tgz#fa68d98f7fe93ae65bf1262f6abb5fb6983d8d18"
   integrity sha512-9ARkWHBs+6YJIvrIp0Ik5tyTTtP9PoV0Ssu2Ocq5y9v8+NOOpWiRshAp8c4rZVWTOe+157on/5G+zj5pwIQFEQ==
-
-moment@^2.24.0, moment@^2.29.2:
-  version "2.29.4"
-  resolved "https://registry.npmjs.org/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
-  integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
 mongodb-connection-string-url@^2.6.0:
   version "2.6.0"
