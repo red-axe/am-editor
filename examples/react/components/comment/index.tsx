@@ -24,7 +24,6 @@ import { CursorData } from '@aomao/plugin-yjs';
 import CommentItem from './item';
 import context from '../../context';
 import { useDispatch, useSelector } from '../../hooks';
-import 'antd/es/message/style/css';
 import './index.css';
 
 export type CommentProps<T = CursorData> = {
@@ -64,13 +63,14 @@ const Comment: React.FC<CommentProps> = forwardRef<CommentRef, CommentProps>(
 			const tempList: Array<DataItem> = [];
 			dataSource.forEach((item: DataSourceItem) => {
 				//获取评论编号对应在编辑器中的所有节点
-				const elements: Array<NodeInterface> = editor.command.executeMethod(
-					'mark-range',
-					'action', //插件名称
-					'comment', //标记类型
-					'find', //调用的方法
-					item.id,
-				);
+				const elements: Array<NodeInterface> =
+					editor.command.executeMethod(
+						'mark-range',
+						'action', //插件名称
+						'comment', //标记类型
+						'find', //调用的方法
+						item.id,
+					);
 				if (elements.length === 0) return;
 				//获取目标评论在编辑器中的 top
 				const top = getRectTop(elements[0]);

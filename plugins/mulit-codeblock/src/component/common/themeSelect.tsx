@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { cmTheme } from '../utils/index';
 import Select from 'antd/es/select';
-import 'antd/es/select/style/css';
 
 interface IThemeSelect {
 	theme: string;
