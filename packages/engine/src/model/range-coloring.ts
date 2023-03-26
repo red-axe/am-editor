@@ -492,16 +492,25 @@ class RangeColoring {
 
 		mask.on('mouseenter', () => {
 			this.showCursorInfo(cursor, member);
-			Tooltip.show(mask!, language.get('card', 'lockAlert').toString(), {
-				placement: 'bottomLeft',
-			});
+			if (mask && mask.length > 0)
+				Tooltip.show(
+					mask,
+					language.get('card', 'lockAlert').toString(),
+					{
+						placement: 'bottomLeft',
+					},
+				);
 		});
 
 		mask.on('mousemove', (event: MouseEvent) => {
 			const tooltipElement = $(`div[${DATA_ELEMENT}=tooltip]`);
-			tooltipElement.get<HTMLElement>()!.style.cssText = `left: 0; top: 0; transform: translateX(${
-				event.pageX - 16
-			}px) translateY(${event.pageY + 32}px); will-change: transform;`;
+			const tooltip = tooltipElement.get<HTMLElement>();
+			if (tooltip)
+				tooltip.style.cssText = `left: 0; top: 0; transform: translateX(${
+					event.pageX - 16
+				}px) translateY(${
+					event.pageY + 32
+				}px); will-change: transform;`;
 		});
 
 		mask.on('mouseleave', () => {
