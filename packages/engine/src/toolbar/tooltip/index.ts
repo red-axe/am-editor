@@ -3,6 +3,7 @@ import { DATA_ELEMENT } from '../../constants/root';
 import { NodeInterface } from '../../types/node';
 import { Placement } from '../../types/position';
 import { $ } from '../../node';
+import { getDocument } from '../../utils';
 import placements from '../../position/placements';
 import './index.css';
 
@@ -29,7 +30,8 @@ class Tooltip {
 			root.find('[data-role=tooltip]').html(title);
 		else root.find('[data-role=tooltip]').append(title);
 		// 计算定位
-		const body = $(document.body);
+		const doc = getDocument();
+		const body = $(doc.body);
 		body.append(root);
 		const rect = domAlign(
 			root.get<HTMLElement>(),
@@ -50,7 +52,8 @@ class Tooltip {
 		root.addClass('data-tooltip-active');
 	}
 	static hide() {
-		$(`div[${DATA_ELEMENT}=tooltip]`).remove();
+		const doc = getDocument();
+		$(doc.body).find(`div[${DATA_ELEMENT}=tooltip]`).remove();
 	}
 }
 
