@@ -29,6 +29,7 @@ export const getFileSize = (
 	size: number,
 	base: number = isWindows ? 2 : 10,
 ) => {
+	if (typeof size !== 'number') return '0B';
 	const options = {
 		exponent: 2,
 		round: 1,

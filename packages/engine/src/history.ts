@@ -23,16 +23,12 @@ const setRangeByPath = (
 			startClone.pop();
 			endClone.pop();
 			const { container, change } = engine;
-			const startChild = start.id
-				? container.find(`[${DATA_ID}="${start.id}"]`).get<Node>()
-				: container.getChildByPath(
+			const startChild = container.getChildByPath(
 						startClone,
 						(child) => !isTransientElementCache($(child)),
 				  );
 			if (!startChild) return;
-			const endChild = end.id
-				? container.find(`[${DATA_ID}="${end.id}"]`).get<Node>()
-				: container.getChildByPath(
+			const endChild = container.getChildByPath(
 						endClone,
 						(child) => !isTransientElementCache($(child)),
 				  );
