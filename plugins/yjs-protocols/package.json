@@ -3,7 +3,6 @@
 	"version": "1.0.2",
 	"main": "./dist/index.js",
 	"sideEffects": false,
-	"type": "module",
 	"module": "./index.esm.js",
 	"types": "./index.d.ts",
 	"exports": {
