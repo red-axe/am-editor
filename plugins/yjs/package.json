@@ -1,6 +1,6 @@
 {
     "name": "@aomao/plugin-yjs",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
     "typings": "dist/index.d.ts",
@@ -23,7 +23,7 @@
         "yjs": ">=13.5"
     },
     "dependencies": {
-        "@aomao/plugin-yjs-protocols": "^1.0.2",
+        "@aomao/plugin-yjs-protocols": "^1.0.3",
         "@babel/runtime": "^7.13.10"
     },
     "peerDependencies": {
