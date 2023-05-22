@@ -713,7 +713,10 @@ class RangeColoring {
 			// range
 			if (!target.name)
 				target = Range.fromPath(this.engine, target, true);
-			if (target.startContainer || target[0].isConnected) {
+			if (
+				target.startContainer ||
+				(target.length > 0 && target[0].isConnected)
+			) {
 				const rect = this.getCursorRect(target);
 				this.setCursorRect(key, node, rect);
 			} else {
