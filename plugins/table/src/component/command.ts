@@ -65,7 +65,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			widths = baseColHeader.offsetWidth;
 		}
 
-		const containerWidth = this.editor.container.width();
+		const containerWidth = this.table.root.width();
 		const minWidth = this.table.colMinWidth;
 		const colsWidths: number[] = [];
 		colsHeader.each((_, index) => {

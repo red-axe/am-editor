@@ -1047,7 +1047,7 @@ class TableComponent<V extends TableValue = TableValue>
 		}
 		value.rows = this.wrapper.find('tr').length;
 		if (value.width) {
-			const containerWidth = this.editor.container.width();
+			const containerWidth = this.root.width();
 			this.wrapper
 				.find('table')
 				.css(

@@ -205,7 +205,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 						this.colAddAlign === 'right' ? false : true,
 					);
 			});
-		const containerWidth = this.editor.container.width();
+		const containerWidth = this.table.root.width();
 		const width = !this.table.enableScroll
 			? Math.min(tableWidth, containerWidth)
 			: tableWidth;
@@ -220,7 +220,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		if (!table) return;
 		let tableWidth = removeUnit(getComputedStyle(table, 'width'));
 		if (!this.table.enableScroll) {
-			tableWidth = Math.min(tableWidth, this.editor.container.width());
+			tableWidth = Math.min(tableWidth, this.table.root.width());
 		}
 		const cols = this.tableRoot?.find('col');
 		if (!cols) return;
@@ -937,7 +937,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	onChangeColWidth(event: MouseEvent | TouchEvent) {
 		if (!this.dragging || !this.changeSize) return;
 		// 容器宽度
-		const containerWidth = this.editor.container.width();
+		const containerWidth = this.table.root.width();
 		//鼠标移动宽度
 		const delta =
 			(event instanceof MouseEvent
