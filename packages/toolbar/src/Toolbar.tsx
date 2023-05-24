@@ -95,7 +95,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
 						document.body.scrollTop,
 						document.documentElement.scrollTop,
 					) +
-					(window.visualViewport.height || 0) -
+					(window.visualViewport?.height || 0) -
 					height +
 					borderTop +
 					borderBottom,
