@@ -881,7 +881,7 @@ class TableComponent<V extends TableValue = TableValue>
 			this.onChange();
 			if (this.enableScroll) this.scrollbar?.refresh();
 		});
-		this.conltrollBar.on('insertCol', () => {
+		this.command.on('insertCol', () => {
 			editor.trigger('editor:resize');
 		});
 		this.conltrollBar.on('sizeChanging', () => {
