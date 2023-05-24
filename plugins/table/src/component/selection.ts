@@ -357,21 +357,14 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		this.select({ row: -1, col: -1 }, { row: -1, col: -1 });
 	}
 
-	select(
+	calcEdge(
 		begin: { row: number; col: number },
 		end: { row: number; col: number },
 	) {
-		if (!this.tableModel) return;
-		const isSame = begin.row === end.row && begin.col === end.col;
 		let beginRow = Math.min(begin.row, end.row);
 		let endRow = Math.max(begin.row, end.row);
 		let beginCol = Math.min(begin.col, end.col);
 		let endCol = Math.max(begin.col, end.col);
-
-		this.tableRoot
-			?.find('td[table-cell-selection]')
-			.removeAttributes('table-cell-selection');
-
 		const calc = (): Record<
 			'beginCol' | 'beginRow' | 'endRow' | 'endCol',
 			number
@@ -456,11 +449,25 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 				endRow,
 			};
 		};
-		const result = calc();
-		beginRow = result.beginRow;
-		endRow = result.endRow;
-		beginCol = result.beginCol;
-		endCol = result.endCol;
+		return calc();
+	}
+
+	select(
+		begin: { row: number; col: number },
+		end: { row: number; col: number },
+	) {
+		if (!this.tableModel) return;
+		const isSame = begin.row === end.row && begin.col === end.col;
+
+		this.tableRoot
+			?.find('td[table-cell-selection]')
+			.removeAttributes('table-cell-selection');
+
+		const { beginRow, endRow, beginCol, endCol } = this.calcEdge(
+			begin,
+			end,
+		);
+
 		let count = 0;
 		if (
 			beginRow >= 0 &&
@@ -1138,10 +1145,40 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 
 		const { begin, end, allCol, allRow } = area;
 		if (begin.row < 0 || begin.col < 0) return;
-		const fBeginRow = begin.row;
-		const fEndRow = end.row;
-		const fBeginCol = begin.col;
-		const fEndCol = end.col;
+		let beginRow = begin.row;
+		let endRow = end.row;
+		if (allCol && !allRow) {
+			for (let r = begin.row; r <= end.row; r++) {
+				const cell = tableModel.table[r][begin.col];
+				if (helper.isEmptyModelCol(cell)) {
+					const parentTd =
+						tableModel.table[cell.parent.row][cell.parent.col];
+					if (helper.isEmptyModelCol(parentTd)) continue;
+					beginRow = Math.min(cell.parent.row, beginRow);
+				} else {
+					endRow = Math.max(r + cell.rowSpan - 1, endRow);
+				}
+			}
+		}
+		let beginCol = begin.col;
+		let endCol = end.col;
+		if (allRow && !allCol) {
+			for (let c = begin.col; c <= end.col; c++) {
+				const cell = tableModel.table[begin.row][c];
+				if (helper.isEmptyModelCol(cell)) {
+					const parentTd =
+						tableModel.table[cell.parent.row][cell.parent.col];
+					if (helper.isEmptyModelCol(parentTd)) continue;
+					beginCol = Math.min(cell.parent.col, beginCol);
+				} else {
+					endCol = Math.max(c + cell.colSpan - 1, endCol);
+				}
+			}
+		}
+		// const { beginRow, endRow, beginCol, endCol } = this.calcEdge(
+		// 	begin,
+		// 	end,
+		// );
 		this.hideHighlight();
 		const colsHeader = this.colsHeader?.find(
 			Template.COLS_HEADER_ITEM_CLASS,
@@ -1149,63 +1186,53 @@ class TableSelection extends EventEmitter2 implements TableSelectionInterface {
 		const rowsHeader = this.rowsHeader?.find(
 			Template.ROWS_HEADER_ITEM_CLASS,
 		);
-		for (let row = fBeginRow; row <= fEndRow; row++) {
-			for (let col = fBeginCol; col <= fEndCol; col++) {
-				const cell = tableModel.table[row][col];
-				if (this.table.helper.isEmptyModelCol(cell)) {
-					if (begin.row > cell.parent.row)
-						begin.row = cell.parent.row;
-					if (begin.col >= cell.parent.col)
-						begin.col = cell.parent.col;
-					const parent =
-						tableModel.table[cell.parent.row][cell.parent.col];
-					if (!this.table.helper.isEmptyModelCol(parent)) {
-						if (
-							parent.rowSpan > 1 &&
-							end.row < parent.rowSpan - 1 + cell.parent.row
-						)
-							end.row = parent.rowSpan - 1 + cell.parent.row;
-						if (
-							parent.colSpan > 1 &&
-							end.col < parent.colSpan - 1 + cell.parent.col
-						)
-							end.col = parent.colSpan - 1 + cell.parent.col;
-					}
-				} else if (!this.table.helper.isEmptyModelCol(cell)) {
-					if (cell.rowSpan > 1 && end.row < cell.rowSpan - 1 + row)
-						end.row = cell.rowSpan - 1 + row;
-					if (cell.colSpan > 1 && end.col < cell.colSpan - 1 + col)
-						end.col = cell.colSpan - 1 + col;
-				}
-			}
-		}
 
 		let height: number = 0;
 		let width: number = 0;
-		for (let r = begin.row; r <= end.row; r++) {
-			const cell = tableModel.table[r][begin.col];
-			if (!helper.isEmptyModelCol(cell) && cell.element) {
-				height += cell.element.offsetHeight;
+		for (
+			let r = allRow ? 0 : beginRow;
+			r <= (allRow ? tableModel.rows - 1 : endRow);
+			r++
+		) {
+			const cell = tableModel.table[r][beginCol];
+			if (!helper.isEmptyModelCol(cell)) {
+				if (cell.element) height += cell.element.offsetHeight;
+				rowsHeader?.eq(r)?.addClass('active');
+			} else {
+				const parentTd =
+					tableModel.table[cell.parent.row][cell.parent.col];
+				if (helper.isEmptyModelCol(parentTd)) continue;
+				if (parentTd.element && allRow)
+					height += parentTd.element.offsetHeight;
 				rowsHeader?.eq(r)?.addClass('active');
 			}
 		}
 
-		for (let c = begin.col; c <= end.col; c++) {
-			const cell = tableModel.table[begin.row][c];
-			if (!helper.isEmptyModelCol(cell) && cell.element) {
-				width += cell.element.offsetWidth;
+		for (
+			let c = allCol ? 0 : beginCol;
+			c <= (allCol ? tableModel.cols - 1 : endCol);
+			c++
+		) {
+			const cell = tableModel.table[beginRow][c];
+			if (!helper.isEmptyModelCol(cell)) {
+				if (cell.element) width += cell.element.offsetWidth;
+				colsHeader?.eq(c)?.addClass('active');
+			} else {
+				const parentTd =
+					tableModel.table[cell.parent.row][cell.parent.col];
+				if (helper.isEmptyModelCol(parentTd)) continue;
+				if (parentTd.element && allCol)
+					width += parentTd.element.offsetWidth;
 				colsHeader?.eq(c)?.addClass('active');
 			}
 		}
 
-		if (
-			end.row === tableModel.rows - 1 &&
-			end.col === tableModel.cols - 1
-		) {
+		if (endRow === tableModel.rows - 1 && endCol === tableModel.cols - 1) {
 			this.tableHeader?.addClass('active');
 		}
 
-		const firstCell = tableModel.table[begin.row][begin.col];
+		const firstCell =
+			tableModel.table[allRow ? 0 : beginRow][allCol ? 0 : beginCol];
 		let top = 0;
 		let left = 0;
 		if (!helper.isEmptyModelCol(firstCell) && firstCell.element) {

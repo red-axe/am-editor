@@ -1719,8 +1719,8 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		if (!tableModel) return;
 		const selectArea = { ...selection.getSelectArea() };
 		selectArea.allCol = true;
-		selectArea.begin = { row: selectArea.begin.row, col: 0 };
-		selectArea.end = { row: selectArea.end.row, col: tableModel.cols - 1 };
+		selectArea.begin = selectArea.begin;
+		selectArea.end = selectArea.end;
 		selection.showHighlight(selectArea);
 	};
 
@@ -1730,8 +1730,8 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		if (!tableModel) return;
 		const selectArea = { ...selection.getSelectArea() };
 		selectArea.allRow = true;
-		selectArea.begin = { row: 0, col: selectArea.begin.col };
-		selectArea.end = { row: tableModel.rows - 1, col: selectArea.end.col };
+		selectArea.begin = selectArea.begin;
+		selectArea.end = selectArea.end;
 		selection.showHighlight(selectArea);
 	};
 
