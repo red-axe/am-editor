@@ -221,8 +221,8 @@ class Mention<T extends MentionValue = MentionValue> extends Card<T> {
 
 	resetPlaceHolder() {
 		if ('@' === this.#keyword?.get<HTMLElement>()?.innerText)
-			this.#placeholder?.show();
-		else this.#placeholder?.hide();
+			this.#placeholder?.css('visibility', 'visible');
+		else this.#placeholder?.css('visibility', 'hidden');
 	}
 
 	hideEnter = () => {
