@@ -533,7 +533,7 @@ class Helper implements HelperInterface {
 				const _width = cols.eq(c)?.attributes('width');
 				if (_width && !_width.endsWith('%')) {
 					const widthValue = parseInt(_width);
-					if (widthValue !== NaN)
+					if (!Number.isNaN(widthValue))
 						cols.eq(c)?.attributes('width', widthValue);
 				}
 
