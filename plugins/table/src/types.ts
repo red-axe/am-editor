@@ -185,6 +185,7 @@ export interface TableInterface<V extends TableValue = TableValue>
 	command: TableCommandInterface;
 	colMinWidth: number;
 	rowMinHeight: number;
+	enableScroll: boolean;
 	/**
 	 * 渲染
 	 */
@@ -206,6 +207,10 @@ export interface TableOptions extends PluginOptions {
 		items: (ToolbarItemOptions | CardToolbarItemOptions)[],
 		editor: EditorInterface,
 	) => (ToolbarItemOptions | CardToolbarItemOptions)[];
+	/**
+	 * 是否开启滚动，默认开启
+	 */
+	enableScrollbar?: boolean;
 }
 
 export type ControllOptions = {
@@ -243,6 +248,7 @@ export type ControllChangeSize = {
 		width: number;
 		height: number;
 	};
+	colsWidths?: number[];
 };
 
 export interface ControllBarInterface extends EventEmitter2 {
