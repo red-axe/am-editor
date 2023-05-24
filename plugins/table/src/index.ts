@@ -13,11 +13,12 @@ import {
 	CARD_VALUE_KEY,
 	transformCustomTags,
 	DATA_ID,
+	Parser,
 } from '@aomao/engine';
 import type MarkdownIt from 'markdown-it';
 import TableComponent, { Template, Helper } from './component';
 import locales from './locale';
-import { TableInterface, TableOptions, TableValue } from './types';
+import { TableOptions, TableValue } from './types';
 import './index.css';
 class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	static get pluginName() {
@@ -114,12 +115,41 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			!component.isCursor(range.startNode)
 		) {
 			const data = editor.clipboard.getData(event);
+
 			if (
 				!data ||
 				!/<meta\s+name="aomao"\s+content="table"\s{0,}\/?>/gi.test(
 					data.html || '',
 				)
 			) {
+				if (data.html && ~data.html.indexOf('<table')) {
+					const fragment = new Parser(data.html, editor).toDOM(
+						editor.schema,
+						editor.conversion,
+					);
+					const findTableElement = (
+						element: Node,
+					): HTMLElement | null => {
+						if (element instanceof HTMLElement) {
+							if (element.tagName === 'TABLE') {
+								return element;
+							}
+							if (element.childNodes.length === 1)
+								return findTableElement(element.firstChild!);
+							return null;
+						}
+						return null;
+					};
+
+					if (fragment.childElementCount === 1) {
+						const table = findTableElement(fragment.firstChild!);
+						event.preventDefault();
+						data.html = table!.outerHTML;
+						data.text = table!.outerText;
+						component.command.paste(data);
+						return false;
+					}
+				}
 				return true;
 			}
 			event.preventDefault();
