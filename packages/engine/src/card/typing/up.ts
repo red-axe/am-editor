@@ -1,6 +1,7 @@
 import isHotkey from 'is-hotkey';
 import { CardInterface, EngineInterface } from '../../types';
 import { CardType } from '../enum';
+import { unactivateCard } from './utils';
 
 class Up {
 	private engine: EngineInterface;
@@ -8,9 +9,10 @@ class Up {
 		this.engine = engine;
 	}
 
-	inline(component: CardInterface, event: KeyboardEvent) {
+	common(component: CardInterface, event: KeyboardEvent) {
 		const { change, card } = this.engine;
 		const range = change.range.get();
+		unactivateCard(this.engine, component);
 		const prev = component.root.prev();
 		if (prev) {
 			event.preventDefault();
@@ -21,17 +23,12 @@ class Up {
 		return;
 	}
 
+	inline(component: CardInterface, event: KeyboardEvent) {
+		return this.common(component, event);
+	}
+
 	block(component: CardInterface, event: KeyboardEvent) {
-		const { change, card } = this.engine;
-		const range = change.range.get();
-		const prev = component.root.prev();
-		if (prev) {
-			event.preventDefault();
-			card.focusPrevBlock(component, range, false);
-			change.range.select(range);
-			return false;
-		}
-		return;
+		return this.common(component, event);
 	}
 
 	trigger(event: KeyboardEvent) {
