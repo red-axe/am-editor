@@ -881,9 +881,7 @@ class TableComponent<V extends TableValue = TableValue>
 			this.onChange();
 			if (this.enableScroll) this.scrollbar?.refresh();
 		});
-		this.command.on('insertCol', () => {
-			editor.trigger('editor:resize');
-		});
+
 		this.conltrollBar.on('sizeChanging', () => {
 			if (this.enableScroll) this.scrollbar?.refresh();
 			editor.trigger('editor:resize');
@@ -893,7 +891,7 @@ class TableComponent<V extends TableValue = TableValue>
 			if (action === 'paste') {
 				editor.card.render(this.wrapper);
 			}
-			if (['splitCell', 'mergeCell'].includes(action)) {
+			if (['splitCell', 'mergeCell', 'insertCol'].includes(action)) {
 				editor.trigger('editor:resize');
 			}
 			this.selection.render(action);
