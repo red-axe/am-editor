@@ -66,7 +66,7 @@ export const convertMarkdown = (
 
 		let content = '';
 		if (type === 'inline' && children) {
-			content = renderer.renderInline(children, options, {});
+			content = renderer.renderInline(children, options, {}) ?? '';
 			if (
 				checkInline &&
 				children.find(
@@ -79,15 +79,11 @@ export const convertMarkdown = (
 				isHit = true;
 			}
 		} else if (typeof renderer.rules[type] !== 'undefined') {
-			content = renderer.rules[type]!(
-				tokens,
-				index,
-				options,
-				{},
-				renderer,
-			);
+			content =
+				renderer.rules[type]!(tokens, index, options, {}, renderer) ??
+				'';
 		} else {
-			content = renderer.renderToken(tokens, index, options);
+			content = renderer.renderToken(tokens, index, options) ?? '';
 		}
 		if (nesting === 1) {
 			nodeContent.push('');
