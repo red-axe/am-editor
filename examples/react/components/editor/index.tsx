@@ -230,6 +230,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 				engine.current?.history.clear();
 			}
 		};
+
 		if (yjs && provider) {
 			provider.connect();
 			provider.on('customMessage', handleCustomMessage);
@@ -251,6 +252,8 @@ const EditorComponent: React.FC<EditorProps> = ({
 			engine.current?.off('card:minimize', onMinimize);
 			provider?.off('customMessage', handleCustomMessage);
 			provider?.disconnect();
+			if (engine.current && YjsEditor.isYjsEditor(engine.current))
+				YjsEditor.disconnect(engine.current);
 		};
 	}, [engine, doc, yjs, provider]);
 
