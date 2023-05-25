@@ -85,8 +85,8 @@ export const YjsEditor = {
 	},
 
 	disconnect(editor: YjsEditor): void {
-		CONNECTED.delete(editor);
 		editor.disconnect();
+		CONNECTED.delete(editor);
 	},
 
 	isLocal(editor: YjsEditor): boolean {
