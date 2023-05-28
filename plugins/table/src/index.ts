@@ -20,6 +20,7 @@ import TableComponent, { Template, Helper } from './component';
 import locales from './locale';
 import { TableOptions, TableValue } from './types';
 import './index.css';
+import { convertToPX } from './utils';
 class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 	static get pluginName() {
 		return 'table';
@@ -295,6 +296,10 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				background: '@color',
 				'vertical-align': ['top', 'middle', 'bottom'],
 				valign: ['top', 'middle', 'bottom'],
+				width: '@length',
+				'border-width': '@length',
+				'padding-right': '@length',
+				'padding-left': '@length',
 			},
 		};
 	};
@@ -312,16 +317,6 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			cols: cols || 3,
 			overflow: !!this.options.overflow,
 		});
-	}
-
-	convertToPX(value: string) {
-		const match = /([\d\.]+)(pt|px)$/i.exec(value);
-		if (match && match[2] === 'pt') {
-			return (
-				String(Math.round((parseInt(match[1], 10) * 96) / 72)) + 'px'
-			);
-		}
-		return value;
 	}
 
 	pasteEach = (node: NodeInterface) => {
@@ -344,7 +339,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			const dataWidth = node.attributes('data-width');
 			const width = dataWidth ? dataWidth : node.css(type);
 			if (width.endsWith('%')) node.css(type, '');
-			if (width.endsWith('pt')) node.css(type, this.convertToPX(width));
+			if (width.endsWith('pt')) node.css(type, convertToPX(width));
 		};
 		const tables = root.find('table');
 		if (tables.length === 0) return;
@@ -390,10 +385,14 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				} else {
 					tr.css('display', '');
 				}
+
+				clearWH(tr);
+				clearWH(tr, 'height');
 				// 不是td就用td标签包裹起来
 				const childNodes = tr.children();
 				childNodes.each((tdChild) => {
 					const td = $(tdChild);
+					clearWH(td);
 					const text = td.text();
 					const childTable = td.find('table');
 					if (childTable.length > 0) {
@@ -402,6 +401,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 						);
 						childTable.remove();
 					}
+
 					// 排除空格
 					if (
 						td.name !== 'td' &&
@@ -413,11 +413,9 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 					}
 				});
 			});
-			const dataWidth = node.attributes('data-width');
-			if (dataWidth) node.css('width', dataWidth);
-			node = helper.normalizeTable(node);
 			clearWH(node);
 			clearWH(node, 'height');
+			node = helper.normalizeTable(node);
 			const tbody = node.find('tbody');
 
 			// 表头放在tbody最前面
@@ -448,6 +446,10 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				const children = element.children();
 				for (let i = 0, len = children.length; i < len; i++) {
 					const child = children.eq(i);
+
+					// word 粘贴的表格会有一个空的p标签，去除
+					if (child?.name === 'p' && child.children().length === 0)
+						continue;
 					// 移除单元格第一个和最后一个换行符，word 里面粘贴会存在，导致空行
 					if ((i === 0 || i === len - 1) && child?.isText()) {
 						const text = child.text();
@@ -469,7 +471,6 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			let rowSpan = 1;
 			trs.each((child) => {
 				const tr = $(child);
-
 				const tds = tr?.find('td');
 				if (tds?.length === 0 && rowSpan < 2) {
 					tr?.remove();
