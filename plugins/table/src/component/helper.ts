@@ -17,6 +17,7 @@ import {
 	isEngine,
 } from '@aomao/engine';
 import Template from './template';
+import { convertToPX } from '../utils';
 
 class Helper implements HelperInterface {
 	private clipboard?: {
@@ -533,7 +534,7 @@ class Helper implements HelperInterface {
 				const _width = cols.eq(c)?.attributes('width');
 				if (_width && !_width.endsWith('%')) {
 					const widthValue = parseInt(_width);
-					if (widthValue !== NaN)
+					if (!Number.isNaN(widthValue))
 						cols.eq(c)?.attributes('width', widthValue);
 				}
 
@@ -564,21 +565,45 @@ class Helper implements HelperInterface {
 			}
 			table.prepend(colgroup);
 			const widths = (function (table) {
-				const tr = table.find('tr')[0];
-				const tds = $(tr).find('td');
+				const trs = table.find('tr');
+				// 找到td最多的那行，不然别的行可能会有合并的单元格
+				let mainTr = trs[0] as HTMLTableRowElement;
+				trs.each((node) => {
+					const tr = node as HTMLTableRowElement;
+					if (tr.cells.length > mainTr.cells.length) {
+						mainTr = tr;
+					}
+				});
+
+				const tds = $(mainTr).find('td');
 				const widthArray: Array<number | undefined> = [];
 				tds.each((_, index) => {
 					const tdNode = tds.eq(index);
 					if (!tdNode) return;
 					let colWidth: string | Array<string> =
 						tdNode.attributes('data-colwidth');
-					let tdWidth: string | number = tdNode.attributes('width');
+					let tdWidth: string | number =
+						tdNode.attributes('width') || tdNode.css('width');
+
 					const tdColSpan = (tdNode[0] as HTMLTableDataCellElement)
 						.colSpan;
 					if (colWidth) {
 						colWidth = colWidth.split(',');
 					} else if (tdWidth) {
-						tdWidth = parseInt(tdWidth) / tdColSpan;
+						let w = parseInt(tdWidth);
+						const borderWidth = tdNode.css('border-width');
+						const paddingLeft = tdNode.css('padding-left');
+						const paddingRight = tdNode.css('padding-right');
+						if (borderWidth) {
+							w += parseInt(convertToPX(borderWidth));
+						}
+						if (paddingLeft) {
+							w += parseInt(convertToPX(paddingLeft));
+						}
+						if (paddingRight) {
+							w += parseInt(convertToPX(paddingRight));
+						}
+						tdWidth = w / tdColSpan;
 					}
 					for (let o = 0; tdColSpan > o; o++) {
 						if (colWidth && colWidth[o]) {
@@ -591,6 +616,10 @@ class Helper implements HelperInterface {
 					}
 				});
 				const td = table.find('td');
+				td.css('width', '');
+				td.css('border-width', '');
+				td.css('padding-left', '');
+				td.css('padding-right', '');
 				td.removeAttributes('data-colwidth');
 				td.removeAttributes('width');
 				return widthArray;
@@ -630,7 +659,14 @@ class Helper implements HelperInterface {
 		trs.each((_, index) => {
 			const $tr = trs.eq(index);
 			if (!$tr) return;
-			let height = parseInt($tr.css('height'));
+			const h = $tr.css('height');
+			// 一般word里面的表格行高是0px就是空行，这里直接删除
+			if (h === '0px') {
+				$tr.remove();
+				return;
+			}
+			let height = parseInt(h);
+
 			height =
 				height ||
 				this.#editor.plugin.findPlugin<TableOptions>('table')?.options

@@ -1,13 +1,13 @@
 import {
 	$,
 	Card,
+	CardOptions,
 	CardToolbarItemOptions,
 	CardType,
 	closest,
 	DATA_CONTENTEDITABLE_KEY,
 	DATA_ELEMENT,
 	EDITABLE_SELECTOR,
-	getComputedStyle,
 	isEngine,
 	isMobile,
 	NodeInterface,
@@ -38,7 +38,8 @@ import { ColorTool, Palette } from './toolbar';
 
 class TableComponent<V extends TableValue = TableValue>
 	extends Card<V>
-	implements TableInterface<V> {
+	implements TableInterface<V>
+{
 	readonly contenteditable: string[] = [
 		`div${Template.TABLE_TD_CONTENT_CLASS}`,
 	];
@@ -69,31 +70,40 @@ class TableComponent<V extends TableValue = TableValue>
 		}),
 	);
 
-	colMinWidth =
-		this.editor.plugin.findPlugin<TableOptions>('table')?.options
-			.colMinWidth || 40;
-	rowMinHeight =
-		this.editor.plugin.findPlugin<TableOptions>('table')?.options
-			.rowMinHeight || 35;
-	maxInsertNum =
-		this.editor.plugin.findPlugin<TableOptions>('table')?.options
-			.maxInsertNum || 30;
+	colMinWidth: number;
+	rowMinHeight: number;
+	maxInsertNum: number;
 	wrapper?: NodeInterface;
-	helper: HelperInterface = new Helper(this.editor);
-	template: TemplateInterface = new Template(this);
-	selection: TableSelectionInterface = new TableSelection(this.editor, this);
-	conltrollBar: ControllBarInterface = new ControllBar(this.editor, this, {
-		col_min_width: this.colMinWidth,
-		row_min_height: this.rowMinHeight,
-		max_insert_num: this.maxInsertNum,
-	});
-	command: TableCommandInterface = new TableCommand(this.editor, this);
+	helper: HelperInterface;
+	template: TemplateInterface;
+	selection: TableSelectionInterface;
+	conltrollBar: ControllBarInterface;
+	command: TableCommandInterface;
 	scrollbar?: Scrollbar;
 	viewport?: NodeInterface;
 	colorTool?: ColorTool;
 	noBorderToolButton?: NodeInterface;
 	alignToolButton?: NodeInterface;
+	enableScroll: boolean;
 	#changeTimeout?: NodeJS.Timeout;
+
+	constructor(options: CardOptions<V>) {
+		super(options);
+		const pluginOptions = this.getOptions();
+		this.colMinWidth = pluginOptions?.colMinWidth || 40;
+		this.rowMinHeight = pluginOptions?.rowMinHeight || 35;
+		this.maxInsertNum = pluginOptions?.maxInsertNum || 30;
+		this.helper = new Helper(this.editor);
+		this.template = new Template(this);
+		this.selection = new TableSelection(this.editor, this);
+		this.conltrollBar = new ControllBar(this.editor, this, {
+			col_min_width: this.colMinWidth,
+			row_min_height: this.rowMinHeight,
+			max_insert_num: this.maxInsertNum,
+		});
+		this.command = new TableCommand(this.editor, this);
+		this.enableScroll = pluginOptions?.enableScroll !== false;
+	}
 
 	init() {
 		super.init();
@@ -141,7 +151,7 @@ class TableComponent<V extends TableValue = TableValue>
 							return false;
 						}
 					}
-					if (td.length > 0) {
+					if (td.length > 0 && this.enableScroll) {
 						setTimeout(() => {
 							this.scrollbar?.refresh();
 						}, 0);
@@ -210,7 +220,7 @@ class TableComponent<V extends TableValue = TableValue>
 						return false;
 					}
 				}
-				if (td.length > 0) {
+				if (td.length > 0 && this.enableScroll) {
 					setTimeout(() => {
 						this.scrollbar?.refresh();
 					}, 0);
@@ -277,7 +287,7 @@ class TableComponent<V extends TableValue = TableValue>
 						return false;
 					}
 				}
-				if (td.length > 0) {
+				if (td.length > 0 && this.enableScroll) {
 					setTimeout(() => {
 						this.scrollbar?.refresh();
 					}, 0);
@@ -296,7 +306,7 @@ class TableComponent<V extends TableValue = TableValue>
 				if (!component?.equal(this.root)) return;
 				const contentElement = td.find('.table-main-content');
 				if (!contentElement) return;
-				if (td.length > 0) {
+				if (td.length > 0 && this.enableScroll) {
 					setTimeout(() => {
 						this.scrollbar?.refresh();
 					}, 0);
@@ -314,7 +324,7 @@ class TableComponent<V extends TableValue = TableValue>
 				if (!component?.equal(this.root)) return;
 				const contentElement = td.find('.table-main-content');
 				if (!contentElement) return;
-				if (td.length > 0) {
+				if (td.length > 0 && this.enableScroll) {
 					setTimeout(() => {
 						this.scrollbar?.refresh();
 					}, 0);
@@ -332,6 +342,10 @@ class TableComponent<V extends TableValue = TableValue>
 			},
 		});
 	}
+
+	getOptions = () => {
+		return this.editor.plugin.findPlugin<TableOptions>('table')?.options;
+	};
 
 	doChange = () => {
 		this.remoteRefresh();
@@ -352,130 +366,135 @@ class TableComponent<V extends TableValue = TableValue>
 					},
 				];
 			const language = editor.language.get('table');
-			const funBtns: Array<
-				ToolbarItemOptions | CardToolbarItemOptions
-			> = [
-				{
-					key: 'color',
-					type: 'node',
-					title: editor.language.get<string>(
-						'table',
-						'color',
-						'title',
-					),
-					node: this.colorTool!.getButton(),
-				},
-				{
-					key: 'border',
-					type: 'button',
-					title: super.getValue()?.noBorder
-						? language['showBorder']
-						: language['noBorder'],
-					content:
-						'<span class="data-icon data-icon-no-border"></span>',
-					didMount: (node) => {
-						const value = super.getValue();
-						if (value?.noBorder === true) {
-							node.addClass('active');
-						}
-						this.noBorderToolButton = node;
+			const funBtns: Array<ToolbarItemOptions | CardToolbarItemOptions> =
+				[
+					{
+						key: 'color',
+						type: 'node',
+						title: editor.language.get<string>(
+							'table',
+							'color',
+							'title',
+						),
+						node: this.colorTool!.getButton(),
 					},
-					onClick: (_, node) => {
-						const value = super.getValue();
-						this.setValue({
-							noBorder: !value?.noBorder,
-						} as V);
-						const table = this.wrapper?.find('.data-table');
-						if (value?.noBorder === true) {
-							table?.removeAttributes('data-table-no-border');
-							node.removeClass('active');
-						} else {
-							table?.attributes('data-table-no-border', 'true');
-							node.addClass('active');
-						}
-					},
-				},
-				{
-					key: 'align',
-					type: 'dropdown',
-					content: '<span class="data-icon data-icon-align-top" />',
-					title: language['verticalAlign']['title'],
-					didMount: (node) => {
-						this.alignToolButton = node.find('.data-toolbar-btn');
-					},
-					items: [
-						{
-							type: 'button',
-							content: `<span class="data-icon data-icon-align-top"></span> ${language['verticalAlign']['top']}`,
-							onClick: (event: MouseEvent) =>
-								this.updateAlign(event, 'top'),
+					{
+						key: 'border',
+						type: 'button',
+						title: super.getValue()?.noBorder
+							? language['showBorder']
+							: language['noBorder'],
+						content:
+							'<span class="data-icon data-icon-no-border"></span>',
+						didMount: (node) => {
+							const value = super.getValue();
+							if (value?.noBorder === true) {
+								node.addClass('active');
+							}
+							this.noBorderToolButton = node;
 						},
-						{
-							type: 'button',
-							content: `<span class="data-icon data-icon-align-middle"></span> ${language['verticalAlign']['middle']}`,
-							onClick: (event: MouseEvent) =>
-								this.updateAlign(event, 'middle'),
+						onClick: (_, node) => {
+							const value = super.getValue();
+							this.setValue({
+								noBorder: !value?.noBorder,
+							} as V);
+							const table = this.wrapper?.find('.data-table');
+							if (value?.noBorder === true) {
+								table?.removeAttributes('data-table-no-border');
+								node.removeClass('active');
+							} else {
+								table?.attributes(
+									'data-table-no-border',
+									'true',
+								);
+								node.addClass('active');
+							}
 						},
-						{
-							type: 'button',
-							content: `<span class="data-icon data-icon-align-bottom"></span> ${language['verticalAlign']['bottom']}`,
-							onClick: (event: MouseEvent) =>
-								this.updateAlign(event, 'bottom'),
+					},
+					{
+						key: 'align',
+						type: 'dropdown',
+						content:
+							'<span class="data-icon data-icon-align-top" />',
+						title: language['verticalAlign']['title'],
+						didMount: (node) => {
+							this.alignToolButton =
+								node.find('.data-toolbar-btn');
 						},
-					],
-				},
-				{
-					key: 'merge',
-					type: 'button',
-					title: language['mergeCell'],
-					content:
-						'<span class="data-icon data-icon-merge-cells"></span>',
-					disabled: this.conltrollBar.getMenuDisabled('mergeCell'),
-					onClick: () => {
-						this.command.mergeCell();
+						items: [
+							{
+								type: 'button',
+								content: `<span class="data-icon data-icon-align-top"></span> ${language['verticalAlign']['top']}`,
+								onClick: (event: MouseEvent) =>
+									this.updateAlign(event, 'top'),
+							},
+							{
+								type: 'button',
+								content: `<span class="data-icon data-icon-align-middle"></span> ${language['verticalAlign']['middle']}`,
+								onClick: (event: MouseEvent) =>
+									this.updateAlign(event, 'middle'),
+							},
+							{
+								type: 'button',
+								content: `<span class="data-icon data-icon-align-bottom"></span> ${language['verticalAlign']['bottom']}`,
+								onClick: (event: MouseEvent) =>
+									this.updateAlign(event, 'bottom'),
+							},
+						],
 					},
-				},
-				{
-					key: 'split',
-					type: 'button',
-					title: language['splitCell'],
-					content:
-						'<span class="data-icon data-icon-solit-cells"></span>',
-					disabled: this.conltrollBar.getMenuDisabled('splitCell'),
-					onClick: () => {
-						this.command.splitCell();
+					{
+						key: 'merge',
+						type: 'button',
+						title: language['mergeCell'],
+						content:
+							'<span class="data-icon data-icon-merge-cells"></span>',
+						disabled:
+							this.conltrollBar.getMenuDisabled('mergeCell'),
+						onClick: () => {
+							this.command.mergeCell();
+						},
 					},
-				},
-			];
+					{
+						key: 'split',
+						type: 'button',
+						title: language['splitCell'],
+						content:
+							'<span class="data-icon data-icon-solit-cells"></span>',
+						disabled:
+							this.conltrollBar.getMenuDisabled('splitCell'),
+						onClick: () => {
+							this.command.splitCell();
+						},
+					},
+				];
 			if (this.isMaximize) return funBtns;
-			const toolbars: Array<
-				ToolbarItemOptions | CardToolbarItemOptions
-			> = [
-				{
-					key: 'maximize',
-					type: 'maximize',
-				},
-				{
-					key: 'copy',
-					type: 'copy',
-					onClick: () => {
-						this.command.copy(true);
-						editor.messageSuccess(
-							'copy',
-							editor.language.get<string>('copy', 'success'),
-						);
+			const toolbars: Array<ToolbarItemOptions | CardToolbarItemOptions> =
+				[
+					{
+						key: 'maximize',
+						type: 'maximize',
 					},
-				},
-				{
-					key: 'delete',
-					type: 'delete',
-				},
-				{
-					key: 'separator',
-					type: 'separator',
-				},
-				...funBtns,
-			];
+					{
+						key: 'copy',
+						type: 'copy',
+						onClick: () => {
+							this.command.copy(true);
+							editor.messageSuccess(
+								'copy',
+								editor.language.get<string>('copy', 'success'),
+							);
+						},
+					},
+					{
+						key: 'delete',
+						type: 'delete',
+					},
+					{
+						key: 'separator',
+						type: 'separator',
+					},
+					...funBtns,
+				];
 			if (removeUnit(this.wrapper?.css('margin-left') || '0') === 0) {
 				toolbars.unshift({
 					key: 'dnd',
@@ -484,8 +503,7 @@ class TableComponent<V extends TableValue = TableValue>
 			}
 			return toolbars;
 		};
-		const options = editor.plugin.findPlugin<TableOptions>('table')
-			?.options;
+		const options = this.getOptions();
 		if (options?.cardToolbars) {
 			return options.cardToolbars(getItems(), this.editor);
 		}
@@ -647,7 +665,7 @@ class TableComponent<V extends TableValue = TableValue>
 			this.conltrollBar.hideContextMenu();
 			this.wrapper?.removeClass('active');
 		}
-		this.scrollbar?.refresh();
+		if (this.enableScroll) this.scrollbar?.refresh();
 	}
 
 	handleChange = (trigger: 'remote' | 'local' = 'local') => {
@@ -683,7 +701,7 @@ class TableComponent<V extends TableValue = TableValue>
 
 	maximize() {
 		super.maximize();
-		this.scrollbar?.refresh();
+		if (this.enableScroll) this.scrollbar?.refresh();
 		const { editor } = this;
 		if (isEngine(editor) && !isMobile) {
 			this.getCenter().on('scroll', this.updateScrollbar, {
@@ -694,7 +712,7 @@ class TableComponent<V extends TableValue = TableValue>
 
 	minimize() {
 		super.minimize();
-		this.scrollbar?.refresh();
+		if (this.enableScroll) this.scrollbar?.refresh();
 		this.getCenter().off('scroll', this.updateScrollbar);
 	}
 
@@ -715,6 +733,7 @@ class TableComponent<V extends TableValue = TableValue>
 	}
 
 	overflow(max: number) {
+		if (!this.enableScroll) return;
 		// 表格宽度
 		const tableWidth = this.wrapper?.find('.data-table')?.width() || 0;
 		const rootWidth = this.getCenter().width();
@@ -731,7 +750,7 @@ class TableComponent<V extends TableValue = TableValue>
 	}
 
 	updateScrollbar = () => {
-		if (!this.scrollbar) return;
+		if (!this.scrollbar || !this.enableScroll) return;
 		const hideHeight =
 			(this.wrapper?.getBoundingClientRect()?.bottom || 0) -
 			(this.wrapper?.getViewport().bottom || 0);
@@ -775,15 +794,18 @@ class TableComponent<V extends TableValue = TableValue>
 					},
 			  }
 			: undefined;
-		this.scrollbar = new Scrollbar(
-			this.viewport,
-			true,
-			false,
-			true,
-			overflowLeftConfig,
-		);
-		this.scrollbar.setContentNode(this.viewport.find('.data-table')!);
-		this.scrollbar.on('display', (display: 'node' | 'block') => {
+
+		if (this.enableScroll) {
+			this.scrollbar = new Scrollbar(
+				this.viewport,
+				true,
+				false,
+				true,
+				overflowLeftConfig,
+			);
+		}
+		this.scrollbar?.setContentNode(this.viewport.find('.data-table')!);
+		this.scrollbar?.on('display', (display: 'node' | 'block') => {
 			if (display === 'block') {
 				this.wrapper?.addClass('scrollbar-show');
 			} else {
@@ -809,7 +831,7 @@ class TableComponent<V extends TableValue = TableValue>
 				this.conltrollBar.refresh();
 			}
 		};
-		this.scrollbar.on('change', handleScrollbarChange);
+		this.scrollbar?.on('change', handleScrollbarChange);
 		if (!isMobile)
 			window.addEventListener('scroll', this.updateScrollbar, {
 				passive: true,
@@ -837,13 +859,14 @@ class TableComponent<V extends TableValue = TableValue>
 		if (!isEngine(editor) || editor.readonly)
 			this.toolbarModel?.setOffset([0, 0]);
 		else this.toolbarModel?.setOffset([13, -28, 0, -6]);
-		const tablePlugin = editor.plugin.findPlugin<TableOptions>('table');
-		const tableOptions = tablePlugin?.options.overflow || {};
+		const options = this.getOptions();
+		const tableOptions = options?.overflow || {};
 		if (this.viewport) {
 			this.selection.refreshModel();
-			setTimeout(() => {
-				this.initScrollbar();
-			}, 0);
+			if (this.enableScroll)
+				setTimeout(() => {
+					this.initScrollbar();
+				}, 0);
 		}
 		this.selection.on('select', () => {
 			this.conltrollBar.refresh(false);
@@ -856,10 +879,11 @@ class TableComponent<V extends TableValue = TableValue>
 		this.conltrollBar.on('sizeChanged', () => {
 			this.selection.refreshModel();
 			this.onChange();
-			this.scrollbar?.refresh();
+			if (this.enableScroll) this.scrollbar?.refresh();
 		});
+
 		this.conltrollBar.on('sizeChanging', () => {
-			this.scrollbar?.refresh();
+			if (this.enableScroll) this.scrollbar?.refresh();
 			editor.trigger('editor:resize');
 			this.updateScrollbar();
 		});
@@ -867,7 +891,7 @@ class TableComponent<V extends TableValue = TableValue>
 			if (action === 'paste') {
 				editor.card.render(this.wrapper);
 			}
-			if (['splitCell', 'mergeCell'].includes(action)) {
+			if (['splitCell', 'mergeCell', 'insertCol'].includes(action)) {
 				editor.trigger('editor:resize');
 			}
 			this.selection.render(action);
@@ -877,7 +901,7 @@ class TableComponent<V extends TableValue = TableValue>
 			}
 			if (tableOptions.maxRightWidth)
 				this.overflow(tableOptions.maxRightWidth());
-			this.scrollbar?.refresh();
+			if (this.enableScroll) this.scrollbar?.refresh();
 		});
 
 		const tableRoot = this.wrapper?.find(Template.TABLE_CLASS);
@@ -960,7 +984,7 @@ class TableComponent<V extends TableValue = TableValue>
 				);
 		});
 		// this.conltrollBar.refresh();
-		this.scrollbar?.refresh();
+		if (this.enableScroll) this.scrollbar?.refresh();
 		if (this.remoteRefreshTimeout) clearTimeout(this.remoteRefreshTimeout);
 		this.remoteRefreshTimeout = setTimeout(() => {
 			// 找到所有可编辑节点，对没有 contenteditable 属性的节点添加contenteditable一下
@@ -1022,8 +1046,19 @@ class TableComponent<V extends TableValue = TableValue>
 				.addClass('data-table-view');
 		}
 		value.rows = this.wrapper.find('tr').length;
-		if (value.width)
-			this.wrapper.find('table').css('width', `${value.width}px`);
+		if (value.width) {
+			const containerWidth = this.root.width();
+			this.wrapper
+				.find('table')
+				.css(
+					'width',
+					`${
+						!this.enableScroll
+							? Math.min(value.width, containerWidth)
+							: value.width
+					}px`,
+				);
+		}
 		return this.wrapper;
 	}
 
@@ -1033,7 +1068,7 @@ class TableComponent<V extends TableValue = TableValue>
 		window.removeEventListener('scroll', this.updateScrollbar);
 		window.removeEventListener('resize', this.updateScrollbar);
 		editor.scrollNode?.off('scroll', this.updateScrollbar);
-		this.scrollbar?.destroy();
+		if (this.enableScroll) this.scrollbar?.destroy();
 		this.command.removeAllListeners();
 		const selection = this.selection;
 		selection.removeAllListeners();

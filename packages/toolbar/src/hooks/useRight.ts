@@ -7,7 +7,8 @@ const useRight = (button: React.MutableRefObject<HTMLDivElement | null>) => {
 	useEffect(() => {
 		if (button.current && isMobile) {
 			const rect = button.current.getBoundingClientRect();
-			setIsRight(rect.left > window.visualViewport.width / 2);
+			const width = window.visualViewport?.width;
+			setIsRight(!width ? true : rect.left > width / 2);
 		}
 	}, []);
 	return isRight;

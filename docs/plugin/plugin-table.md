@@ -41,7 +41,7 @@ new Engine(...,{
   })
 ```
 
-### Overflow display
+### Overflow display, `enableScrollbar` needs to be turned on to take effect
 
 ```ts
 overflow?: {
@@ -68,6 +68,12 @@ rowMinHeight: number; //default 30
 
 ```ts
 maxInsertNum: number; //default 50
+```
+
+### Whether to enable the scroll bar
+
+```ts
+enableScrollbar: boolean; //default true
 ```
 
 ## Command

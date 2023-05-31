@@ -8,7 +8,13 @@ export const toDOM = (node: Node) => {
 		return document.createTextNode(node.text);
 	} else if (Element.isElement(node)) {
 		const { type, children } = node;
-		const element = document.createElement(type);
+		let element: HTMLElement | null = null;
+		try {
+			element = document.createElement(type.replace(/[-_\[\]\s]/g, ''));
+		} catch (error) {
+			element = document.createElement('span');
+		}
+
 		for (const [key, value] of Object.entries(node)) {
 			if (key === 'type' || key === 'children') continue;
 			element.setAttribute(key, value);

@@ -7,7 +7,9 @@ const useRight = (button: Ref<HTMLElement | null>) => {
 	onMounted(() => {
 		if (button.value && isMobile) {
 			const rect = button.value.getBoundingClientRect();
-			isRight.value = rect.left > window.visualViewport.width / 2;
+			isRight.value = !window.visualViewport
+				? true
+				: rect.left > window.visualViewport.width / 2;
 		}
 	});
 

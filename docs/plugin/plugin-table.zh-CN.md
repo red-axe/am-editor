@@ -41,7 +41,7 @@ new Engine(...,{
  })
 ```
 
-### 溢出展示
+### 溢出展示，需要开启 `enableScrollbar` 才能生效
 
 ```ts
 overflow?: {
@@ -68,6 +68,12 @@ rowMinHeight: number; //默认30
 
 ```ts
 maxInsertNum: number; //默认50
+```
+
+### 是否启用滚动条
+
+```ts
+enableScrollbar: boolean; //默认true
 ```
 
 ## 命令

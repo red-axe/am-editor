@@ -85,6 +85,7 @@ export default class<
 		const { node } = this.editor;
 		if (!node.isNestedBlock(block)) return;
 		block.css(this.#styleName, lineHeight || '');
+		if (isEngine(this.editor)) this.editor.change.apply();
 	}
 
 	schema(): SchemaGlobal {

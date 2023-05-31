@@ -196,7 +196,8 @@ export const tableOptions: TableOptions = {
 			return width <= 0 ? 0 : width - 16;
 		},
 	},
-	maxInsertNum: 50,
+	maxInsertNum: 20,
+	enableScroll: false,
 };
 
 export const markRangeOptions: MarkRangeOptions = {

@@ -284,7 +284,9 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 			: parentNode.children.length;
 
 		const children: Node[] = [];
-		let next = previousSibling?.nextSibling;
+		// 在model中找不到对应的node，说明是新增的，这里就无法确定到底是从哪个位置新增的，所以只能设置为null从头开始遍历
+		let next = previousNode ? previousSibling?.nextSibling : null;
+
 		if (!next) {
 			next = node.firstChild;
 			previousIndex = -1;

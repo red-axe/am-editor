@@ -230,6 +230,7 @@ const EditorComponent: React.FC<EditorProps> = ({
 				engine.current?.history.clear();
 			}
 		};
+
 		if (yjs && provider) {
 			provider.connect();
 			provider.on('customMessage', handleCustomMessage);
@@ -251,6 +252,8 @@ const EditorComponent: React.FC<EditorProps> = ({
 			engine.current?.off('card:minimize', onMinimize);
 			provider?.off('customMessage', handleCustomMessage);
 			provider?.disconnect();
+			if (engine.current && YjsEditor.isYjsEditor(engine.current))
+				YjsEditor.disconnect(engine.current);
 		};
 	}, [engine, doc, yjs, provider]);
 
@@ -429,12 +432,11 @@ const EditorComponent: React.FC<EditorProps> = ({
 								editor={engine.current}
 								member={
 									member ||
-									(({
-										avatar:
-											'https://cdn-image.aomao.com/10016/avatar/2020/04/17/1587113793-da092550-5b12-477e-b229-631908d0ac2b.png',
+									({
+										avatar: 'https://cdn-image.aomao.com/10016/avatar/2020/04/17/1587113793-da092550-5b12-477e-b229-631908d0ac2b.png',
 										name: 'test',
 										uuid: 'test',
-									} as unknown) as CursorData)
+									} as unknown as CursorData)
 								}
 								onUpdate={onCommentRequestUpdate}
 								{...(props.comment === true

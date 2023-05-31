@@ -7,6 +7,7 @@ import {
 	isEngine,
 	NodeInterface,
 	Parser,
+	removeUnit,
 } from '@aomao/engine';
 import { EventEmitter2 } from 'eventemitter2';
 import { TableCommandInterface, TableInterface } from '../types';
@@ -53,31 +54,55 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		// 第一行插在前面，其他行插在后面
 		const colBase = index;
 		const insertMethod = isLeft ? 'after' : 'before';
-		const colsHeader = wrapper.find(Template.COLS_HEADER_ITEM_CLASS);
+		let colsHeader = wrapper.find(Template.COLS_HEADER_ITEM_CLASS);
 		const baseColHeader = colsHeader.eq(colBase)?.get<HTMLElement>()!;
+
 		const insertCol = isLeft ? colBase + 1 : colBase;
 		const head = wrapper.find(Template.COLS_HEADER_CLASS);
-		let totalWidth = 0;
+		const table = wrapper.find(Template.TABLE_CLASS);
 
 		if (!widths) {
 			widths = baseColHeader.offsetWidth;
 		}
 
+		const containerWidth = this.table.root.width();
+		const minWidth = this.table.colMinWidth;
+		const colsWidths: number[] = [];
+		colsHeader.each((_, index) => {
+			const col = colsHeader.eq(index);
+			if (col) colsWidths.push(removeUnit(col.css('width')));
+		});
 		if (Array.isArray(widths)) {
-			widths.forEach((w) => {
-				totalWidth += w;
-			});
+			for (let i = 0; i < widths.length; i++) {
+				colsWidths.splice(insertCol + i, 0, widths[i]);
+			}
 		} else if (typeof widths === 'number') {
-			totalWidth = count * widths;
+			for (let i = 0; i < count; i++) {
+				colsWidths.splice(insertCol, 0, widths);
+			}
+		}
+		let gridWidth = colsWidths.reduce((a, b) => a + b, 0);
+		while (!this.table.enableScroll && gridWidth > containerWidth) {
+			let minCount = 0;
+			for (let i = 0; i < colsWidths.length; i++) {
+				const w = colsWidths[i];
+				if (w > minWidth) {
+					colsWidths[i] = w - 1;
+					gridWidth--;
+					if (gridWidth <= containerWidth) break;
+				} else {
+					minCount++;
+				}
+			}
+			if (minCount === colsWidths.length) break;
 		}
 
-		head.css(
-			'width',
-			head.get<HTMLElement>()!.offsetWidth + totalWidth + 'px',
-		);
+		head.css('width', gridWidth + 'px');
+		table.css('width', gridWidth + 'px');
+
 		const colgroup = this.tableRoot.find('colgroup');
 		const trs = wrapper.find('tr');
-		const cols = this.tableRoot.find('col');
+		let cols = this.tableRoot.find('col');
 		const cloneNode = cols.eq(colBase)?.clone();
 		if (!cloneNode) return;
 		let counter = count;
@@ -86,19 +111,30 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 			// 插入头 和 col
 			const cloneColHeader = $(baseColHeader.outerHTML);
 			$(baseColHeader)[insertMethod](cloneColHeader);
-			const width = Array.isArray(widths)
-				? widths[count - counter]
-				: widths;
-			cloneColHeader.css({ width: `${width}px` });
+			// const width = Array.isArray(widths)
+			// 	? widths[count - counter]
+			// 	: widths;
+
+			// cloneColHeader.css({ width: `${width}px` });
 			const insertCloneCol = cloneNode?.clone();
 			insertCloneCol.removeAttributes(DATA_ID);
-			insertCloneCol.attributes('width', width);
+			// insertCloneCol.attributes('width', width);
 			nodeId.create(insertCloneCol);
 			const baseCol = cols[index];
 			if (insertMethod === 'after') $(baseCol).after(insertCloneCol);
 			else colgroup[0].insertBefore(insertCloneCol[0], baseCol);
 			counter--;
 		}
+		// 插入了新列，需要重新获取
+		colsHeader = wrapper.find(Template.COLS_HEADER_ITEM_CLASS);
+		cols = this.tableRoot.find('col');
+		// 设置宽度
+		for (let i = 0; i < colsWidths.length; i++) {
+			const width = colsWidths[i];
+			colsHeader.eq(i)?.css({ width: `${width}px` });
+			cols.eq(i)?.attributes('width', width);
+		}
+
 		// 插入 td
 		trs.each((tr, r) => {
 			const insertIndex = selection.getCellIndex(r, insertCol);
@@ -151,7 +187,7 @@ class TableCommand extends EventEmitter2 implements TableCommandInterface {
 		const width = colBars.eq(colBase)?.get<HTMLElement>()!.offsetWidth;
 
 		this.insertColAt(insertCol, count, isLeft, width, ...args);
-		if (isEnd) {
+		if (isEnd && this.table.enableScroll) {
 			const viewPort = this.viewport?.get<HTMLElement>();
 			if (!viewPort) return;
 			viewPort.scrollLeft = viewPort.scrollWidth - viewPort.offsetWidth;

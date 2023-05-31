@@ -205,8 +205,12 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 						this.colAddAlign === 'right' ? false : true,
 					);
 			});
-		this.tableRoot?.css('width', `${tableWidth}px`);
-		this.colsHeader?.css('width', `${tableWidth}px`);
+		const containerWidth = this.table.root.width();
+		const width = !this.table.enableScroll
+			? Math.min(tableWidth, containerWidth)
+			: tableWidth;
+		this.tableRoot?.css('width', `${width}px`);
+		this.colsHeader?.css('width', `${width}px`);
 
 		if (refershSize) this.renderColSize();
 	}
@@ -214,7 +218,10 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	renderColSize() {
 		const table = this.tableRoot?.get<HTMLTableElement>();
 		if (!table) return;
-		const tableWidth = removeUnit(getComputedStyle(table, 'width'));
+		let tableWidth = removeUnit(getComputedStyle(table, 'width'));
+		if (!this.table.enableScroll) {
+			tableWidth = Math.min(tableWidth, this.table.root.width());
+		}
 		const cols = this.tableRoot?.find('col');
 		if (!cols) return;
 
@@ -787,8 +794,9 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	startChangeCol(trigger: NodeInterface, event: MouseEvent | TouchEvent) {
 		event.stopPropagation();
 		event.preventDefault();
-		const col = trigger.parent()!;
-		const colElement = col.get<HTMLTableColElement>()!;
+		if (!this.colsHeader) return;
+		const currentCol = trigger.parent()!;
+		const currentColElement = currentCol.get<HTMLTableColElement>()!;
 		this.table.selection.clearSelect();
 		this.dragging = {
 			x:
@@ -797,11 +805,17 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 					: event.touches[0].clientX,
 			y: -1,
 		};
-		const index =
-			this.colsHeader
-				?.find(Template.COLS_HEADER_ITEM_CLASS)
-				.toArray()
-				.findIndex((item) => item.equal(col)) || 0;
+		const cols = this.colsHeader.find(Template.COLS_HEADER_ITEM_CLASS);
+		const colArray = cols.toArray();
+		let index = 0;
+		const colsWidths: number[] = [];
+		for (let i = 0; i < colArray.length; i++) {
+			const colNode = colArray[i];
+			if (colNode.equal(currentCol)) {
+				index = i;
+			}
+			colsWidths.push(removeUnit(colNode.css('width')));
+		}
 		this.changeSize = {
 			trigger: {
 				element: trigger,
@@ -812,10 +826,11 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 					getComputedStyle(trigger.get<Element>()!, 'width'),
 				),
 			},
-			element: col,
-			width: removeUnit(getComputedStyle(colElement, 'width')),
+			element: currentCol,
+			width: removeUnit(getComputedStyle(currentColElement, 'width')),
 			height: -1,
 			index,
+			colsWidths,
 			table: {
 				width: this.table.selection.tableModel?.width || 0,
 				height: this.table.selection.tableModel?.height || 0,
@@ -846,6 +861,7 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 				?.find(Template.ROWS_HEADER_ITEM_CLASS)
 				.toArray()
 				.findIndex((item) => item.equal(row)) || 0;
+
 		this.changeSize = {
 			trigger: {
 				element: trigger,
@@ -920,43 +936,90 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 	 */
 	onChangeColWidth(event: MouseEvent | TouchEvent) {
 		if (!this.dragging || !this.changeSize) return;
+		// 容器宽度
+		const containerWidth = this.table.root.width();
 		//鼠标移动宽度
-		let width =
+		const delta =
 			(event instanceof MouseEvent
 				? event.clientX
 				: event.touches[0].clientX) - this.dragging.x;
 		//获取合法的宽度
-		const colWidth = Math.max(
+		let colWidth = Math.max(
 			this.COL_MIN_WIDTH,
-			this.changeSize.width + width,
+			this.changeSize.width + delta,
 		);
-		//需要移动的宽度
-		width = colWidth - this.changeSize.width;
+
 		//表格变化后的宽度
-		const tableWidth = this.changeSize.table.width + width;
-		this.changeSize.element.css('width', colWidth + 'px');
-		const currentElement = this.changeSize.element.get<HTMLElement>()!;
-		this.colsHeader?.css('width', tableWidth + 'px');
-		const viewportElement = this.viewport?.get<HTMLElement>()!;
-		// 拖到边界时，需要滚动表格视窗的滚动条
-		const currentColRightSide =
-			currentElement.offsetLeft + currentElement.offsetWidth;
-		if (
-			currentColRightSide - viewportElement.scrollLeft + 20 >
-			viewportElement.offsetWidth
-		) {
-			// 拖宽单元格时，若右侧已经到边，需要滚动左侧的滚动条
-			viewportElement.scrollLeft =
-				currentColRightSide + 20 - viewportElement.offsetWidth;
-		} else if (
-			viewportElement.scrollLeft + viewportElement.offsetWidth ===
-			viewportElement.scrollWidth
-		) {
-			// 拖窄单元格时，若右侧已经到边，需要滚动左侧的滚动条
-			viewportElement.scrollLeft = Math.max(
-				0,
-				tableWidth + 34 - viewportElement.offsetWidth,
+		let tableWidth =
+			this.changeSize.table.width + (colWidth - this.changeSize.width);
+
+		const cols = this.tableRoot?.find('col');
+		if (!this.table.enableScroll && cols) {
+			const minColWidth = this.table.colMinWidth;
+			const colsWidths = (this.changeSize.colsWidths ?? []).concat();
+			const start = this.changeSize.index;
+			if (start < colsWidths.length - 1) {
+				colWidth = Math.min(
+					colsWidths[start] + colsWidths[start + 1] - minColWidth,
+					colWidth,
+				);
+				let nextW = colsWidths[start + 1] - delta;
+				nextW = Math.max(nextW, minColWidth);
+				nextW = Math.min(
+					colsWidths[start] + colsWidths[start + 1] - minColWidth,
+					nextW,
+				);
+				colsWidths[start + 1] = nextW;
+				// 设置列宽度
+				this.changeSize.element.next()?.css('width', nextW + 'px');
+				//设置列头宽度
+				cols?.eq(start + 1)?.attributes('width', nextW);
+			} else {
+				const otherWidth = colsWidths.reduce((a, b, i) => {
+					if (i !== start) return a + b;
+					return a;
+				}, 0);
+				colWidth = Math.min(containerWidth - otherWidth, colWidth);
+			}
+			colsWidths[start] = colWidth;
+			// 设置列宽度
+			this.changeSize.element.css('width', colWidth + 'px');
+			//设置列头宽度
+			cols?.eq(start)?.attributes('width', colWidth);
+			tableWidth = Math.min(
+				colsWidths.reduce((a, b) => a + b, 0),
+				containerWidth,
 			);
+		} else {
+			// 设置列宽度
+			this.changeSize.element.css('width', colWidth + 'px');
+			//设置列头宽度
+			cols?.eq(this.changeSize.index)?.attributes('width', colWidth);
+		}
+
+		if (this.table.enableScroll) {
+			const currentElement = this.changeSize.element.get<HTMLElement>()!;
+			const viewportElement = this.viewport?.get<HTMLElement>()!;
+			// 拖到边界时，需要滚动表格视窗的滚动条
+			const currentColRightSide =
+				currentElement.offsetLeft + currentElement.offsetWidth;
+			if (
+				currentColRightSide - viewportElement.scrollLeft + 20 >
+				viewportElement.offsetWidth
+			) {
+				// 拖宽单元格时，若右侧已经到边，需要滚动左侧的滚动条
+				viewportElement.scrollLeft =
+					currentColRightSide + 20 - viewportElement.offsetWidth;
+			} else if (
+				viewportElement.scrollLeft + viewportElement.offsetWidth ===
+				viewportElement.scrollWidth
+			) {
+				// 拖窄单元格时，若右侧已经到边，需要滚动左侧的滚动条
+				viewportElement.scrollLeft = Math.max(
+					0,
+					tableWidth + 34 - viewportElement.offsetWidth,
+				);
+			}
 		}
 		this.clearActiveStatus();
 		this.hideContextMenu();
@@ -965,13 +1028,10 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 			this.changeSize.element,
 			this.changeSize.trigger.element,
 		);
-		//设置列头宽度
-		this.tableRoot
-			?.find('col')
-			.eq(this.changeSize.index)
-			?.attributes('width', colWidth);
 		//设置表格宽度
 		this.tableRoot?.css('width', `${tableWidth}px`);
+		// 设置表头宽度
+		this.colsHeader?.css('width', `${tableWidth}px`);
 	}
 
 	onChangeRowHeight(event: MouseEvent | TouchEvent) {
@@ -1659,8 +1719,8 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		if (!tableModel) return;
 		const selectArea = { ...selection.getSelectArea() };
 		selectArea.allCol = true;
-		selectArea.begin = { row: selectArea.begin.row, col: 0 };
-		selectArea.end = { row: selectArea.end.row, col: tableModel.cols - 1 };
+		selectArea.begin = selectArea.begin;
+		selectArea.end = selectArea.end;
 		selection.showHighlight(selectArea);
 	};
 
@@ -1670,8 +1730,8 @@ class ControllBar extends EventEmitter2 implements ControllBarInterface {
 		if (!tableModel) return;
 		const selectArea = { ...selection.getSelectArea() };
 		selectArea.allRow = true;
-		selectArea.begin = { row: 0, col: selectArea.begin.col };
-		selectArea.end = { row: tableModel.rows - 1, col: selectArea.end.col };
+		selectArea.begin = selectArea.begin;
+		selectArea.end = selectArea.end;
 		selection.showHighlight(selectArea);
 	};
 

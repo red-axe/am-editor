@@ -85,8 +85,8 @@ export default class Paste {
 						}
 					} else if (/^\n(\t)+$/.test(text)) {
 						node.remove();
-						if (parent.get<Element>()?.childNodes.length === 0)
-							parent.remove();
+						// if (parent.get<Element>()?.childNodes.length === 0)
+						// 	parent.remove();
 						return;
 					} else if (/^\n$/.test(text)) {
 						if (nodeApi.isList(parent)) {
@@ -158,9 +158,8 @@ export default class Paste {
 					node.css('padding-left', '');
 				}
 
-				let attributes:
-					| { [k: string]: string }
-					| undefined = node.attributes();
+				let attributes: { [k: string]: string } | undefined =
+					node.attributes();
 				// 删除空 style 属性
 				if (attributes.style && attributes.style.trim() === '') {
 					node.removeAttributes('style');
