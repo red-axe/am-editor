@@ -314,7 +314,7 @@ Before using this open-source library, you need to install dependencies in the p
 ```base
 yarn install
 
-leran bootstrap
+lerna bootstrap
 ```
 
 After installing the dependencies, you only need to execute the following command in the root directory to start the project:

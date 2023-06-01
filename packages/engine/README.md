@@ -312,7 +312,7 @@ return (
 ```base
 yarn install
 
-leran bootstrap
+lerna bootstrap
 ```
 
 依赖安装好后，只需要在根目录执行以下命令即可启动项目：
