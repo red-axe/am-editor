@@ -99,7 +99,24 @@ export const Node = {
 
 	isVoid: (node: Node) => {
 		if (Element.isElement(node)) {
-			return NODE_TO_IS_VOID.get(node) === true;
+			return (
+				NODE_TO_IS_VOID.get(node) === true ||
+				~[
+					'img',
+					'br',
+					'area',
+					'col',
+					'embed',
+					'hr',
+					'input',
+					'link',
+					'meta',
+					'param',
+					'source',
+					'track',
+					'wbr',
+				].indexOf(node.type)
+			);
 		}
 		return false;
 	},

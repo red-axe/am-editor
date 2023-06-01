@@ -138,6 +138,19 @@ const transform = (engine: EngineInterface, records: MutationRecord[]) => {
 		if (mutationNode.nextSibling === oldNode) {
 			mutationNode.nextSibling = oldNode.nextSibling;
 		}
+		if (
+			mutationNode.previousSibling !== previousSibling &&
+			mutationNode.previousSibling?.contains(previousSibling)
+		) {
+			mutationNode.previousSibling =
+				mutationNode.previousSibling.previousSibling;
+		}
+		if (
+			mutationNode.nextSibling !== nextSibling &&
+			mutationNode.nextSibling?.contains(nextSibling)
+		) {
+			mutationNode.nextSibling = mutationNode.nextSibling.nextSibling;
+		}
 	};
 
 	const validMutationNode = (

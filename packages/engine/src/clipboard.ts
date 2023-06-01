@@ -86,9 +86,10 @@ export default class Clipboard implements ClipboardInterface {
 		event?.preventDefault();
 		event?.clipboardData?.setData(
 			'text/html',
-			'<meta name="source" content="aomao" />' + html,
+			'<meta name="source" content="aomao" />' +
+				html.replace(/\u200b/g, ''),
 		);
-		event?.clipboardData?.setData('text', text);
+		event?.clipboardData?.setData('text', text.replace(/\u200b/g, ''));
 		return data;
 	}
 
