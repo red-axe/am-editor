@@ -417,7 +417,16 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			clearWH(node, 'height');
 			node = helper.normalizeTable(node);
 			const tbody = node.find('tbody');
-
+			if (tbody.length > 1) {
+				for (let i = 1; i < tbody.length; i++) {
+					const currentTbody = tbody.eq(i);
+					const trs = currentTbody?.find('tr');
+					if (trs && trs.length > 0) {
+						tbody.eq(0)?.append(trs);
+					}
+					currentTbody?.remove();
+				}
+			}
 			// 表头放在tbody最前面
 			const thead = node.find('thead');
 			if (thead && thead.length > 0) tbody.prepend(thead.children());
@@ -569,7 +578,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 				const td = $(`<td width="${colWidth}px"></td>`);
 				lastEmptyTr.append(td);
 			});
-			table.append(lastEmptyTr);
+			table.find('tbody').append(lastEmptyTr);
 			if (callback) {
 				table = callback(table, value);
 			}
