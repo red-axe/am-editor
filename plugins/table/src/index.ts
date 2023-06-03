@@ -561,6 +561,15 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 			table.find(Template.TABLE_TD_CONTENT_CLASS).each((content) => {
 				editor.node.unwrap($(content));
 			});
+			// 添加一个空行，为了更好的识别每列的宽度(如果在大部分colspan的情况下，不知道每列的具体宽度)
+			const colgroup = table.find('colgroup');
+			const lastEmptyTr = $(`<tr style="height:0px"></tr>`);
+			colgroup.find('col').each((col) => {
+				const colWidth = $(col).attributes('width');
+				const td = $(`<td width="${colWidth}px"></td>`);
+				lastEmptyTr.append(td);
+			});
+			table.append(lastEmptyTr);
 			if (callback) {
 				table = callback(table, value);
 			}
