@@ -543,11 +543,12 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 					editor.trigger('parse:html', table);
 				}
 			}
+			const enableScrollbar = this.options.enableScrollbar ?? true;
 			const width = table.attributes('width') || table.css('width');
 			table.css({
 				outline: 'none',
 				'border-collapse': 'collapse',
-				width: '100%',
+				width: enableScrollbar ? '100%' : width,
 			});
 			table.attributes('data-width', width);
 			const tds = table.find('td');
