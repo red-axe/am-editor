@@ -1,7 +1,7 @@
 import { Node } from '../node';
 import { Text } from '../text';
 import { Element } from '../element';
-import { unescape } from '../../utils';
+import { unescape, escape } from '../../utils';
 
 export const toHTML = (node: Node) => {
 	if (Text.isText(node)) {
@@ -14,7 +14,7 @@ export const toHTML = (node: Node) => {
 		let element = `<${type}`;
 		for (const [key, value] of Object.entries(node)) {
 			if (key === 'type' || key === 'children') continue;
-			element += ` ${key}="${value}"`;
+			element += ` ${key}="${escape(value)}"`;
 		}
 		const isVoid = Node.isVoid(node);
 		element += isVoid ? '' : '>';

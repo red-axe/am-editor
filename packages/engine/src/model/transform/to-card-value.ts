@@ -1,3 +1,4 @@
+import { escape } from '../../utils';
 import {
 	CARD_EDITABLE_KEY,
 	CARD_KEY,
@@ -33,7 +34,7 @@ export const toCardValue = (node: Node) => {
 	for (const name in attributes) {
 		const value = attributes[name];
 		if (value === undefined) continue;
-		card += `${name}="${attributes[name]}" `;
+		card += `${name}="${escape(attributes[name])}" `;
 	}
 	card += '></card>';
 	return card;

@@ -3,7 +3,7 @@ import { Text } from '../text';
 import { Element } from '../element';
 import { toCardValue } from './to-card-value';
 import { CARD_KEY } from '../../constants';
-import { unescape } from '../../utils';
+import { escape, unescape } from '../../utils';
 
 export const toValue = (node: Node, filter?: (node: Node) => false | void) => {
 	if (Text.isText(node)) {
@@ -19,7 +19,7 @@ export const toValue = (node: Node, filter?: (node: Node) => false | void) => {
 		let element = `<${type}`;
 		for (const [key, value] of Object.entries(node)) {
 			if (key === 'type' || key === 'children') continue;
-			element += ` ${key}="${value}"`;
+			element += ` ${key}="${escape(value)}"`;
 		}
 		if (Node.isVoid(node)) {
 			return element + ' />';
