@@ -210,7 +210,7 @@ export interface TableOptions extends PluginOptions {
 	/**
 	 * 是否开启滚动，默认开启
 	 */
-	enableScrollbar?: boolean;
+	enableScroll?: boolean;
 }
 
 export type ControllOptions = {
