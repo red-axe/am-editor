@@ -1,6 +1,6 @@
 {
 	"name": "@aomao/plugin-yjs-protocols",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"main": "./dist/index.js",
 	"sideEffects": false,
 	"module": "./index.esm.js",
