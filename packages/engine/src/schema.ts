@@ -317,7 +317,7 @@ class Schema implements SchemaInterface {
 					break;
 
 				case '@color':
-					rule = /^(rgb(.+?)|#\w{3,6}|\w+)$/i;
+					rule = /^(rgb(.+?)|#\w{3,8}|\w+)$/i;
 					break;
 
 				case '@url':

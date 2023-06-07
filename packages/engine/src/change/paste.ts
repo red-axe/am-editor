@@ -83,10 +83,12 @@ export default class Paste {
 							text = text.replace(/\u200b/g, '');
 							node.text(text);
 						}
-					} else if (/^\n(\t)+$/.test(text)) {
+					} else if (/^\n(\t)[0,]$/.test(text)) {
 						node.remove();
-						// if (parent.get<Element>()?.childNodes.length === 0)
-						// 	parent.remove();
+						if (parent.get<Element>()?.childNodes.length === 0) {
+							parent.after('<p><br /></p>');
+							parent.remove();
+						}
 						return;
 					} else if (/^\n$/.test(text)) {
 						if (nodeApi.isList(parent)) {

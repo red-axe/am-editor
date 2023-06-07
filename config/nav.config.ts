@@ -31,7 +31,7 @@ export default () => {
 			},
 			{
 				title: 'Github',
-				path: 'https://github.com/big-camel/am-editor',
+				path: 'https://github.com/red-axe/am-editor',
 			},
 			{
 				title: 'Editable',
@@ -69,7 +69,7 @@ export default () => {
 			},
 			{
 				title: 'Github',
-				path: 'https://github.com/big-camel/am-editor',
+				path: 'https://github.com/red-axe/am-editor',
 			},
 			{
 				title: 'Editable',

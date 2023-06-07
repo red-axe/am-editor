@@ -992,7 +992,7 @@ class NodeModel implements NodeModelInterface {
 					}
 					if (childNode.length > 0) cloneNode.append(childNode);
 					//判断下一个节点的开头是换行符，有换行符就跳出
-					if (nextNode?.isText()) {
+					if (nextNode) {
 						const text = nextNode.text();
 						let match = /^(\n|\r)+/.exec(text);
 						if (match) {
