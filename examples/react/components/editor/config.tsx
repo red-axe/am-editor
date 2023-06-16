@@ -84,7 +84,7 @@ import Lightblock, { LightblockComponent } from '@aomao/plugin-lightblock';
 import MulitCodeblock, {
 	MulitCodeblockComponent,
 } from '../../../../plugins/mulit-codeblock/src';
-
+import EditablePlugin from './plugins/editable';
 import Tag, { TagComponent } from '../../../../plugins/tag/src';
 
 import {
@@ -148,6 +148,7 @@ export const plugins: Array<PluginEntry> = [
 	MulitCodeblock,
 	Tag,
 	Mermaid,
+	EditablePlugin,
 ];
 
 export const cards: CardEntry[] = [

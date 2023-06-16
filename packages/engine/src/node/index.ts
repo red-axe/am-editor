@@ -646,6 +646,7 @@ class NodeModel implements NodeModelInterface {
 					parentBlock &&
 					this.isBlock(parentBlock) &&
 					!blockNode.isEditable() &&
+					(!parentBlock.isEditable() || parentBlock.isCard()) &&
 					!schema.isAllowIn(
 						parentBlock.name,
 						node.nodeName.toLowerCase(),

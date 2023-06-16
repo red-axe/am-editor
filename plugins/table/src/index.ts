@@ -310,7 +310,7 @@ class Table<T extends TableOptions = TableOptions> extends Plugin<T> {
 		//可编辑子区域内不插入表格
 		const { change } = editor;
 		const range = change.range.get();
-		if (range.startNode.closest(EDITABLE_SELECTOR).length > 0) return;
+		if (range.startNode.closest(EDITABLE_SELECTOR).isCard()) return;
 		//插入表格
 		editor.card.insert<TableValue>(TableComponent.cardName, {
 			rows: rows || 3,
