@@ -74,7 +74,7 @@ class Block implements BlockModelInterface {
 		if (!node) return;
 		const blockNode = this.closest(node);
 		if (!editor.node.isRootBlock(blockNode)) return;
-		const text = node.text().trimEnd();
+		const text = node.text().trim();
 		if (text.replace(/\s|\t|\n|\r\n|\u200b/g, '') === '') return;
 		const cacheRange = range.toPath();
 		const markdown = createMarkdownIt(editor, 'zero');

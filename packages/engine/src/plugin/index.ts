@@ -13,7 +13,9 @@ import InlinePlugin, { isInlinePlugin } from './inline';
 import ListPlugin from './list';
 import MarkPlugin, { isMarkPlugin } from './mark';
 import { isEngine } from '../utils';
-import { BlockInterface, InlineInterface, MarkInterface } from 'src';
+import { BlockInterface } from '../types/block';
+import { InlineInterface } from '../types/inline';
+import { MarkInterface } from '../types/mark';
 
 class PluginModel implements PluginModelInterface {
 	protected data: Record<string, PluginEntry> = {};
