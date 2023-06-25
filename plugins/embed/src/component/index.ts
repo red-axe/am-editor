@@ -1,4 +1,4 @@
-import { EmbedOptions, EmbedRenderBeforeEvent } from '@/types';
+import { EmbedOptions, EmbedRenderBeforeEvent } from '../types';
 import {
 	$,
 	Card,
