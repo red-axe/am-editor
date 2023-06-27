@@ -75,7 +75,7 @@ export default class<T extends HrOptions = HrOptions> extends Plugin<T> {
 		const results: NodeInterface[] = [];
 		root.find(`[${CARD_KEY}=${HrComponent.cardName}]`).each((hrNode) => {
 			const node = $(hrNode);
-			let hr = node.find('hr');
+			let hr = $(`<hr />`);
 			hr.css({
 				'background-color': '#e8e8e8',
 				border: '1px solid transparent',
