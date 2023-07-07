@@ -80,6 +80,7 @@ import type { MentionOptions } from '@aomao/plugin-mention';
 import Embed, { EmbedComponent } from '@aomao/plugin-embed';
 // import type { EmbedOptions } from '@aomao/plugin-embed'
 import Test, { TestComponent } from './plugins/test';
+import TestEditable, { TestEditableComponent } from './plugins/test-editable';
 import Lightblock, { LightblockComponent } from '@aomao/plugin-lightblock';
 import MulitCodeblock, {
 	MulitCodeblockComponent,
@@ -149,6 +150,7 @@ export const plugins: Array<PluginEntry> = [
 	Tag,
 	Mermaid,
 	EditablePlugin,
+	TestEditable,
 ];
 
 export const cards: CardEntry[] = [
@@ -164,6 +166,7 @@ export const cards: CardEntry[] = [
 	StatusComponent,
 	MentionComponent,
 	TestComponent,
+	TestEditableComponent,
 	EmbedComponent,
 	LightblockComponent,
 	MulitCodeblockComponent,
