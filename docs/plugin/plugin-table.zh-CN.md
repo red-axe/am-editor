@@ -41,7 +41,7 @@ new Engine(...,{
  })
 ```
 
-### 溢出展示，需要开启 `enableScrollbar` 才能生效
+### 溢出展示，需要开启 `enableScroll` 才能生效
 
 ```ts
 overflow?: {
@@ -73,7 +73,7 @@ maxInsertNum: number; //默认50
 ### 是否启用滚动条
 
 ```ts
-enableScrollbar: boolean; //默认true
+enableScroll: boolean; //默认true
 ```
 
 ## 命令

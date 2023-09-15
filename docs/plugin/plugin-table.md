@@ -41,7 +41,7 @@ new Engine(...,{
   })
 ```
 
-### Overflow display, `enableScrollbar` needs to be turned on to take effect
+### Overflow display, `enableScroll` needs to be turned on to take effect
 
 ```ts
 overflow?: {
@@ -73,7 +73,7 @@ maxInsertNum: number; //default 50
 ### Whether to enable the scroll bar
 
 ```ts
-enableScrollbar: boolean; //default true
+enableScroll: boolean; //default true
 ```
 
 ## Command
