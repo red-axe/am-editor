@@ -65,8 +65,8 @@ class List implements ListModelInterface {
 			.filter(
 				(child) =>
 					!child.isCursor() ||
-					(child.isText() &&
-						child.text().replace(/[\n\t]/g, '') !== ''),
+					!child.isText() ||
+					child.text().replace(/[\n\t]/g, '') !== '',
 			);
 		const nodeApi = this.editor.node;
 		return (
