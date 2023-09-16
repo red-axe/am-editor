@@ -74,6 +74,7 @@ class List implements ListModelInterface {
 			'li' === node.name &&
 			//空节点
 			(nodeApi.isEmpty(node) ||
+				children.length === 0 ||
 				//子节点只有一个，如果是自定义列表并且第一个是卡片 或者第一个节点是 br标签，就是空节点
 				(1 === children.length
 					? (nodeApi.isCustomize(node) && children[0].isCard()) ||
