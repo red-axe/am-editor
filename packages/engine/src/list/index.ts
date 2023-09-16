@@ -62,7 +62,12 @@ class List implements ListModelInterface {
 		const children = node
 			.children()
 			.toArray()
-			.filter((child) => !child.isCursor());
+			.filter(
+				(child) =>
+					!child.isCursor() ||
+					(child.isText() &&
+						child.text().replace(/[\n\t]/g, '') === ''),
+			);
 		const nodeApi = this.editor.node;
 		return (
 			//节点名称必须为li

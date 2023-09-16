@@ -177,7 +177,7 @@ class NodeModel implements NodeModelInterface {
 
 		let value = node.isText() ? node[0].nodeValue || '' : node.text();
 		value = value?.replace(/\u200B/g, '');
-		value = value?.replace(/\r\n|\n/, '');
+		value = value?.replace(/\r\n|\n|\t/, '');
 
 		if (value && withTrim) {
 			value = value.trim();
