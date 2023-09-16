@@ -41,7 +41,7 @@ new Engine(...,{
  })
 ```
 
-### 溢出展示
+### 溢出展示，需要开启 `enableScroll` 才能生效
 
 ```ts
 overflow?: {
@@ -50,6 +50,30 @@ overflow?: {
     // 相对于编辑器右侧最大能展示的宽度
     maxRightWidth?: () => number;
 };
+```
+
+### 最小列宽
+
+```ts
+colMinWidth: number; //默认40
+```
+
+### 最小行高
+
+```ts
+rowMinHeight: number; //默认30
+```
+
+### 一次最大插入的行/列
+
+```ts
+maxInsertNum: number; //默认50
+```
+
+### 是否启用滚动条
+
+```ts
+enableScroll: boolean; //默认true
 ```
 
 ## 命令
