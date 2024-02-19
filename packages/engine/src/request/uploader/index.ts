@@ -21,14 +21,16 @@ class Uploader implements UploaderInterface {
 	}
 
 	async request(files: Array<File>, name?: string) {
+		const result =[]
 		for (let i = 0; i < files.length; i++) {
 			const file = files[i];
 			if (!file.uid) file.uid = this.createUid(i);
-			if ((await this.handleBefore(file, files)) === false) {
-				files.splice(i, 1);
+			if ((await this.handleBefore(file, files)) === true) {
+				// files.splice(i, 1);
+				result.push(file)
 			}
 		}
-		this.upload(files, name);
+		this.upload(result, name);
 	}
 
 	private async upload(files: Array<File>, name: string = 'file') {
