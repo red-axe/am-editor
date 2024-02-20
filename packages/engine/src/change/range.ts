@@ -170,9 +170,12 @@ class ChangeRange implements ChangeRangeInterface {
 			}
 		}
 		//修复inline光标
-		let { startNode, endNode, startOffset, endOffset } = range
-			.cloneRange()
-			.shrinkToTextNode();
+		let {
+			startNode,
+			endNode,
+			startOffset,
+			endOffset,
+		} = range.cloneRange().shrinkToTextNode();
 		const prev = startNode.prev();
 		const next = endNode.next();
 		//光标上一个节点是inline节点，让其选择在inline节点后的零宽字符后面
@@ -385,8 +388,9 @@ class ChangeRange implements ChangeRangeInterface {
 				.collapse(toStart);
 		}
 		this.select(range);
-		const editableElement =
-			range.commonAncestorNode.closest(EDITABLE_SELECTOR);
+		const editableElement = range.commonAncestorNode.closest(
+			EDITABLE_SELECTOR,
+		);
 		editableElement?.get<HTMLElement>()?.focus();
 		if (
 			editableElement.length > 0 &&

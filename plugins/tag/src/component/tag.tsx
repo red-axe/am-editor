@@ -1,9 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { TagValue, IType } from './type';
 import Popover from 'antd/es/popover/index';
-import 'antd/es/popover/style/css';
 import Input from 'antd/es/input/index';
-import 'antd/es/input/style/css';
 import uniqBy from 'lodash/uniqBy';
 import { EditorInterface } from '@aomao/engine';
 
@@ -222,11 +220,11 @@ export default function Tag({
 	return (
 		<Popover
 			showArrow={false}
-			visible={visible}
+			open={visible}
 			trigger={['click']}
 			placement="bottomLeft"
 			overlayClassName="tag-plugin-tooltip"
-			onVisibleChange={handleVisibleChange}
+			onOpenChange={handleVisibleChange}
 			overlayStyle={{
 				padding: 0,
 				boxShadow: '0px 2px 4px 0px rgba(225 225 225, .5)',

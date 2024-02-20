@@ -1,7 +1,6 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 import Select from 'antd/es/select';
-import 'antd/es/select/style/css';
 
 type Options = {
 	defaultValue?: string;

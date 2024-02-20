@@ -31,8 +31,7 @@ import './index.css';
 
 class Engine<T extends EngineOptions = EngineOptions>
 	extends Editor<T>
-	implements EngineInterface<T>
-{
+	implements EngineInterface<T> {
 	private _readonly: boolean = false;
 	private _container: ContainerInterface;
 	readonly kind = 'engine';
@@ -291,8 +290,8 @@ class Engine<T extends EngineOptions = EngineOptions>
 			if (!node) return;
 			this.node.removeMinusStyle(node, 'text-indent');
 			if (this.node.isRootBlock(node)) {
-				const childrenLength =
-					node.get<HTMLElement>()!.childNodes.length;
+				const childrenLength = node.get<HTMLElement>()!.childNodes
+					.length;
 				if (childrenLength === 0) {
 					node.append($('<br />'));
 				} else {

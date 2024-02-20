@@ -66,16 +66,20 @@ const setRangeByPath = (
 						endCard &&
 						startCard?.root.equal(endCard.root)
 					) {
-						let startEditableElement =
-							range.startNode.closest(EDITABLE_SELECTOR);
+						let startEditableElement = range.startNode.closest(
+							EDITABLE_SELECTOR,
+						);
 						if (startEditableElement.length === 0)
-							startEditableElement =
-								range.startNode.find(EDITABLE_SELECTOR);
-						let endEditableElement =
-							range.endNode.closest(EDITABLE_SELECTOR);
+							startEditableElement = range.startNode.find(
+								EDITABLE_SELECTOR,
+							);
+						let endEditableElement = range.endNode.closest(
+							EDITABLE_SELECTOR,
+						);
 						if (endEditableElement.length === 0)
-							endEditableElement =
-								range.endNode.find(EDITABLE_SELECTOR);
+							endEditableElement = range.endNode.find(
+								EDITABLE_SELECTOR,
+							);
 						if (
 							startEditableElement.length > 0 &&
 							endEditableElement.length > 0 &&
@@ -289,11 +293,11 @@ class HistoryModel implements HistoryInterface {
 				if (!this.currentAction.ops) this.currentAction.ops = [];
 
 				if (!this.currentAction.startRangePath) {
-					this.currentAction.startRangePath =
-						this.getRangePathBeforeCommand();
+					this.currentAction.startRangePath = this.getRangePathBeforeCommand();
 				}
-				const lastOp =
-					this.currentAction.ops[this.currentAction.ops.length - 1];
+				const lastOp = this.currentAction.ops[
+					this.currentAction.ops.length - 1
+				];
 				if (lastOp && Operation.isReverse(op, lastOp)) {
 					this.currentAction.ops.pop();
 				} else {
@@ -435,8 +439,9 @@ class HistoryModel implements HistoryInterface {
 			if (!this.currentAction.ops) {
 				this.currentAction.ops = [];
 			}
-			const lastOp =
-				this.currentAction.ops[this.currentAction.ops.length - 1];
+			const lastOp = this.currentAction.ops[
+				this.currentAction.ops.length - 1
+			];
 			if (lastOp && Operation.isReverse(op, lastOp)) {
 				this.currentAction.ops.pop();
 			} else {

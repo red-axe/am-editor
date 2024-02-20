@@ -36,13 +36,13 @@
     "@types/codemirror": "^5.60.0",
     "@types/lodash": "^4.14.178",
     "@types/markdown-it": "^12.2.3",
-    "antd": "^4.12.3",
+	"antd": "^5.3.2",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },
   "peerDependencies": {
     "@aomao/engine": ">=2.9",
-    "antd": "^4.14.1",
+	"antd": "^5.3.2",
     "react": ">=17.0.0",
     "react-dom": ">=17.0.0"
   }

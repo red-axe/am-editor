@@ -186,7 +186,7 @@ class CardModel implements CardModelInterface {
 
 	find<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(
 		selector: string | Node | NodeInterface,
 		ignoreEditable?: boolean,
@@ -222,7 +222,7 @@ class CardModel implements CardModelInterface {
 
 	findBlock<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(selector: Node | NodeInterface): T | undefined {
 		if (isNode(selector)) selector = $(selector);
 		if (!selector.get()) return;
@@ -236,7 +236,7 @@ class CardModel implements CardModelInterface {
 
 	getSingleCard<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(range: RangeInterface) {
 		let card = this.find<E, T>(range.commonAncestorNode);
 		if (!card) card = this.getSingleSelectedCard<E, T>(range);
@@ -245,7 +245,7 @@ class CardModel implements CardModelInterface {
 
 	getSingleSelectedCard<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(range: RangeInterface) {
 		const elements = range.findElements();
 		let node = elements[0];
@@ -261,7 +261,7 @@ class CardModel implements CardModelInterface {
 	// 插入Card
 	insertNode<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(range: RangeInterface, card: T, ...args: any) {
 		const isInline = card.type === 'inline';
 		const editor = this.editor;
@@ -483,7 +483,7 @@ class CardModel implements CardModelInterface {
 
 	insert<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(name: string, value?: E, ...args: any) {
 		const editor = this.editor;
 		if (!isEngine(editor)) throw 'Engine not found';
@@ -516,7 +516,7 @@ class CardModel implements CardModelInterface {
 
 	replace<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(source: CardInterface, name: string, value?: E, ...args: any) {
 		this.remove(source.root);
 		return this.insert<E, T>(name, value, ...args);
@@ -587,7 +587,7 @@ class CardModel implements CardModelInterface {
 	// 创建Card DOM 节点
 	create<
 		E extends CardValue = {},
-		T extends CardInterface<E> = CardInterface<E>,
+		T extends CardInterface<E> = CardInterface<E>
 	>(
 		name: string,
 		options?: {

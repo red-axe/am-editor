@@ -24,14 +24,14 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "antd": "^4.12.3",
+	"antd": "^5.3.2",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },
   "peerDependencies": {
     "@aomao/engine": ">=^2.9",
     "@types/lodash": "^4.14.178",
-    "antd": "^4.14.1",
+	"antd": "^5.3.2",
     "react": ">=17.0.0",
     "react-dom": ">=17.0.0"
   }

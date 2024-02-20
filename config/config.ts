@@ -64,7 +64,8 @@ export default defineConfig({
 	],
 	headScripts: [
 		{
-			src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+			src:
+				'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
 			'data-ad-client': 'ca-pub-3706417744839656',
 		} as any,
 	],

@@ -391,8 +391,9 @@ class NodeEntry implements NodeInterface {
 	 */
 	find(selector: string): NodeInterface {
 		if (this.length > 0 && (this.isElement() || this.fragment)) {
-			const nodeList = (
-				this.fragment ? this.fragment : this.get<Element>()
+			const nodeList = (this.fragment
+				? this.fragment
+				: this.get<Element>()
 			)?.querySelectorAll(selector);
 			return new NodeEntry(nodeList || []);
 		}
@@ -983,11 +984,13 @@ class NodeEntry implements NodeInterface {
 							includeCard === 'editable' &&
 							child.isEditableCard()
 						) {
-							const editableElements =
-								child.find(EDITABLE_SELECTOR);
+							const editableElements = child.find(
+								EDITABLE_SELECTOR,
+							);
 							editableElements.each((_, index) => {
-								const editableElement =
-									editableElements.eq(index);
+								const editableElement = editableElements.eq(
+									index,
+								);
 								if (editableElement) walk(editableElement);
 							});
 						}
@@ -1112,8 +1115,12 @@ class NodeEntry implements NodeInterface {
 		}
 		const viewElement = view.get<Element>();
 		if (!viewElement) return true;
-		const { top, left, right, bottom } =
-			viewElement.getBoundingClientRect();
+		const {
+			top,
+			left,
+			right,
+			bottom,
+		} = viewElement.getBoundingClientRect();
 		const vp = this.getViewport();
 		if (viewNode)
 			(viewNode.parentElement ?? viewNode.parentNode)?.removeChild(

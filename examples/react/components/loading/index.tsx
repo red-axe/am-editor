@@ -1,6 +1,5 @@
 import React from 'react';
 import Spin from 'antd/es/spin';
-import 'antd/es/spin/style/css';
 import './index.less';
 
 export type LoadingType = {

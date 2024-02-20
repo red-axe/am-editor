@@ -10,8 +10,6 @@ import Loading from './components/loading';
 import { IS_DEV, lang } from './config';
 import Space from 'antd/es/space';
 import Button from 'antd/es/button';
-import 'antd/es/space/style/css';
-import 'antd/es/button/style/css';
 import './editor.less';
 import React from 'react';
 

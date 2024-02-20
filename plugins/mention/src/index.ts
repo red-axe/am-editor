@@ -26,7 +26,7 @@ const PASTE_EACH = 'paste:each';
 const KEYDOWN_AT = 'keydown:at';
 
 class MentionPlugin<
-	T extends MentionOptions = MentionOptions,
+	T extends MentionOptions = MentionOptions
 > extends Plugin<T> {
 	static get pluginName() {
 		return 'mention';

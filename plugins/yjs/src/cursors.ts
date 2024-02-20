@@ -155,7 +155,7 @@ export type WithCursorsOptions<T extends CursorData = CursorData> = {
 
 export function withYCursors<
 	TCursorData extends CursorData,
-	T extends EngineInterface,
+	T extends EngineInterface
 >(
 	editor: T,
 	awareness: Awareness,

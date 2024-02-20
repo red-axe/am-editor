@@ -24,7 +24,6 @@ import { CursorData } from '@aomao/plugin-yjs';
 import CommentItem from './item';
 import context from '../../context';
 import { useDispatch, useSelector } from '../../hooks';
-import 'antd/es/message/style/css';
 import './index.css';
 
 export type CommentProps<T = CursorData> = {

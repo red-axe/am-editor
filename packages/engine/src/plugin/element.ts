@@ -19,8 +19,7 @@ import { isNode } from '../node/utils';
 
 abstract class ElementPluginEntry<T extends PluginOptions = PluginOptions>
 	extends PluginEntry<T>
-	implements ElementPluginInterface<T>
-{
+	implements ElementPluginInterface<T> {
 	readonly kind: string = 'element';
 	/**
 	 * 规则缓存
@@ -169,8 +168,11 @@ abstract class ElementPluginEntry<T extends PluginOptions = PluginOptions>
 	 */
 	isSelf(node: NodeInterface | Node) {
 		if (isNode(node)) node = $(node);
-		let schema: SchemaRule | SchemaGlobal | Array<SchemaRule> | undefined =
-			this.schema();
+		let schema:
+			| SchemaRule
+			| SchemaGlobal
+			| Array<SchemaRule>
+			| undefined = this.schema();
 		if (Array.isArray(schema))
 			schema = schema.find(
 				({ name }) => name === (node as NodeInterface).name,

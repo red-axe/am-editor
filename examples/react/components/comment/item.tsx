@@ -1,10 +1,12 @@
 import React, { useContext, forwardRef } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import Space from 'antd/es/space';
 import { DataItem } from './types';
 import ItemEdit from './edit';
 import Context from '../../context';
-import 'antd/es/space/style/css';
+
+dayjs.extend(relativeTime);
 
 export type CommentItemProps = Omit<
 	React.AnchorHTMLAttributes<HTMLDivElement>,
@@ -76,9 +78,9 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(
 									>
 										{username}
 										<span className="doc-comment-item-time">
-											{moment()
-												.startOf('seconds')
-												.from(new Date(createdAt))}
+											{dayjs(new Date(createdAt)).fromNow(
+												true,
+											)}
 										</span>
 										<a
 											onClick={(event) => {

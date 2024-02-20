@@ -281,12 +281,9 @@ export const setupWSConnection = (
 	req: http.IncomingMessage,
 	options?: SetupWSConnectionOptions,
 ) => {
-	const {
-		docname,
-		gc = true,
-		pingTimeout = 30000,
-		callback,
-	} = options ?? { docname: 'default' };
+	const { docname, gc = true, pingTimeout = 30000, callback } = options ?? {
+		docname: 'default',
+	};
 	conn.binaryType = 'arraybuffer';
 	// get doc, initialize if it does not exist yet
 	const doc = getYDoc(

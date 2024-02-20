@@ -46,7 +46,7 @@ const defaultConfig = (editor: EditorInterface): Config => {
 };
 
 class ToolbarPlugin<
-	T extends ToolbarOptions = ToolbarOptions,
+	T extends ToolbarOptions = ToolbarOptions
 > extends Plugin<T> {
 	static get pluginName() {
 		return 'toolbar';

@@ -204,8 +204,14 @@ class ChangeModel implements ChangeInterface {
 		callback?: (count: number) => void,
 	) {
 		const range = this.range.get();
-		const { schema, conversion, container, history, mark, card } =
-			this.engine;
+		const {
+			schema,
+			conversion,
+			container,
+			history,
+			mark,
+			card,
+		} = this.engine;
 		if (value === '') {
 			this.engine.container.html(value);
 			this.initValue(undefined, false);
@@ -471,8 +477,9 @@ class ChangeModel implements ChangeInterface {
 					range.startNode.text(text.substr(1));
 			}
 		}
-		let startRange: { node: NodeInterface; offset: number } | undefined =
-			undefined;
+		let startRange:
+			| { node: NodeInterface; offset: number }
+			| undefined = undefined;
 		const apply = (range: RangeInterface) => {
 			if (startRange && startRange.node[0].isConnected) {
 				range

@@ -32,7 +32,7 @@ export interface MarkRangeOptions extends PluginOptions {
 const PLUGIN_NAME = 'mark-range';
 
 export default class<
-	T extends MarkRangeOptions = MarkRangeOptions,
+	T extends MarkRangeOptions = MarkRangeOptions
 > extends MarkPlugin<T> {
 	private range?: RangeInterface;
 	private executeBySelf: boolean = false;
@@ -210,8 +210,13 @@ export default class<
 			.cloneRange()
 			.shrinkToElementNode()
 			.shrinkToTextNode();
-		const { startNode, startOffset, endNode, endOffset, collapsed } =
-			cloneRange;
+		const {
+			startNode,
+			startOffset,
+			endNode,
+			endOffset,
+			collapsed,
+		} = cloneRange;
 		let startMark = startNode.closest(`[${this.MARK_KEY}]`);
 		const startChild = startNode.isElement()
 			? startNode.children().eq(startOffset)
@@ -770,10 +775,9 @@ export default class<
 		if (value) container.html(transformCustomTags(value));
 		card.render(container, undefined, false);
 		const selection = container.window?.getSelection();
-		const range = (
-			selection
-				? Range.from(editor, selection) || Range.create(editor)
-				: Range.create(editor)
+		const range = (selection
+			? Range.from(editor, selection) || Range.create(editor)
+			: Range.create(editor)
 		).cloneRange();
 
 		const parser = new Parser(container, editor, undefined, false);
@@ -874,10 +878,9 @@ export default class<
 		if (value) container.html(transformCustomTags(value));
 		card.render(container, undefined, false);
 		const selection = container.window?.getSelection();
-		const range = (
-			selection
-				? Range.from(editor, selection) || Range.create(editor)
-				: Range.create(editor)
+		const range = (selection
+			? Range.from(editor, selection) || Range.create(editor)
+			: Range.create(editor)
 		).cloneRange();
 
 		const parser = new Parser(container, editor, undefined, false);

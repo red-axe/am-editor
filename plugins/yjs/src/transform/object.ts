@@ -34,7 +34,7 @@ export function deepEquals(node: any, another: any): boolean {
 
 export function pick<
 	TObj extends Record<string, any>,
-	TKeys extends keyof TObj,
+	TKeys extends keyof TObj
 >(obj: TObj, ...keys: TKeys[]): Pick<TObj, TKeys> {
 	return Object.fromEntries(
 		Object.entries(obj).filter(([key]) => keys.includes(key as TKeys)),
@@ -43,7 +43,7 @@ export function pick<
 
 export function omit<
 	TObj extends Record<string, any>,
-	TKeys extends keyof TObj,
+	TKeys extends keyof TObj
 >(obj: TObj, ...keys: TKeys[]): Omit<TObj, TKeys> {
 	return Object.fromEntries(
 		Object.entries(obj).filter(([key]) => !keys.includes(key as TKeys)),

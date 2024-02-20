@@ -250,7 +250,8 @@ engine.setScrollNode(滚动条节点);
 const engine = new Engine(渲染节点, {
 	iconFonts: [
 		{
-			url: '//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645',
+			url:
+				'//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645',
 			format: 'woff2',
 			// ...
 		},

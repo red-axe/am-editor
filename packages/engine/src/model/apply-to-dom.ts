@@ -59,11 +59,11 @@ export const applyToDOM = (
 ) => {
 	const { card } = engine;
 	const { path } = operation;
-	const {
-		parent,
-		node: domNode,
-		offset: domOffset,
-	} = findDOMByPath(engine, engine.container[0], path);
+	const { parent, node: domNode, offset: domOffset } = findDOMByPath(
+		engine,
+		engine.container[0],
+		path,
+	);
 	if (operation.type === 'insert_node') {
 		const { node } = operation;
 		const element = toDOM(node);

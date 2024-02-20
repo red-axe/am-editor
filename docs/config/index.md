@@ -244,7 +244,8 @@ After rendering, `View` loses all editing capabilities and collaboration capabil
 const engine = new Engine(container, {
 	iconFonts: [
 		{
-			url: '//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645',
+			url:
+				'//at.alicdn.com/t/font_1456030_lnqmc6a6ca.woff2?t=1638071536645',
 			format: 'woff2',
 			// ...
 		},
